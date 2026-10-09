@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, Plus, Trash2 } from "lucide-react";
+import { Clock, Plus, Trash2, Pencil, X } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface TimeSlot {
@@ -25,6 +25,7 @@ interface TimeSlot {
 export const AvailabilityManager = () => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newSlot, setNewSlot] = useState({
     start_time: "09:00",
     end_time: "17:00",
@@ -101,13 +102,54 @@ export const AvailabilityManager = () => {
     }
   };
 
+  const startEdit = (slot: TimeSlot) => {
+    setEditingId(slot.id);
+    setNewSlot({
+      start_time: slot.start_time,
+      end_time: slot.end_time,
+      day_of_week: slot.day_of_week,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setNewSlot({ start_time: "09:00", end_time: "17:00", day_of_week: 1 });
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    try {
+      const { data, error } = await supabase
+        .from('provider_availability')
+        .update({
+          start_time: newSlot.start_time,
+          end_time: newSlot.end_time,
+          day_of_week: newSlot.day_of_week,
+        })
+        .eq('id', editingId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTimeSlots(timeSlots.map(s => s.id === editingId ? (data as TimeSlot) : s));
+      toast.success("Time slot updated successfully");
+      cancelEdit();
+    } catch (error) {
+      console.error("Error updating time slot:", error);
+      toast.error("Failed to update time slot");
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
     <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Manage Availability</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        {editingId ? "Edit Time Slot" : "Manage Availability"}
+      </h2>
       
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -150,31 +192,63 @@ export const AvailabilityManager = () => {
           </div>
         </div>
 
-        <Button onClick={addTimeSlot} className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Time Slot
-        </Button>
+        <div className="flex gap-2">
+          {editingId ? (
+            <>
+              <Button onClick={saveEdit} className="flex-1">
+                Save Changes
+              </Button>
+              <Button onClick={cancelEdit} variant="outline" className="flex-1">
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button onClick={addTimeSlot} className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Time Slot
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="mt-6">
-        {timeSlots.map((slot) => (
-          <div key={slot.id} className="flex items-center justify-between p-3 bg-muted rounded-lg mb-2">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>{daysOfWeek[slot.day_of_week]}</span>
-              <span className="text-muted-foreground">
-                {slot.start_time} - {slot.end_time}
-              </span>
+        <h3 className="text-sm font-bold mb-3">Current Availability ({timeSlots.length})</h3>
+        {timeSlots.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-lg">
+            No time slots yet. Add your working hours above.
+          </p>
+        ) : (
+          timeSlots.map((slot) => (
+            <div key={slot.id} className="flex items-center justify-between p-3 bg-muted rounded-lg mb-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{daysOfWeek[slot.day_of_week]}</span>
+                <span className="text-muted-foreground">
+                  {slot.start_time} - {slot.end_time}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => startEdit(slot)}
+                  aria-label={`Edit ${daysOfWeek[slot.day_of_week]} slot`}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteTimeSlot(slot.id)}
+                  aria-label={`Delete ${daysOfWeek[slot.day_of_week]} slot`}
+                >
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => deleteTimeSlot(slot.id)}
-            >
-              <Trash2 className="w-4 h-4 text-destructive" />
-            </Button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </Card>
   );

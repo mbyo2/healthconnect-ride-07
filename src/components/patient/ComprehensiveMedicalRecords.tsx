@@ -154,8 +154,11 @@ export const ComprehensiveMedicalRecords = () => {
       // comprehensive_medical_records — fetch them alongside so patients can
       // see their imaging results here. Only relevant for the 'all'/'imaging'
       // filters; other record-type filters exclude them.
+      // Lab results and prescriptions are also aggregated (2026-10-10).
       const includeImaging = filterType === 'all' || filterType === 'imaging';
-      const [recordsRes, imagingRes] = await Promise.all([
+      const includeLabs = filterType === 'all' || filterType === 'lab';
+      const includeMeds = filterType === 'all' || filterType === 'medication';
+      const [recordsRes, imagingRes, labsRes, prescriptionsRes] = await Promise.all([
         query,
         includeImaging
           ? (supabase.from('imaging_orders' as any) as any)
@@ -164,10 +167,26 @@ export const ComprehensiveMedicalRecords = () => {
               .eq('status', 'completed')
               .order('created_at', { ascending: false })
           : Promise.resolve({ data: [], error: null }),
+        includeLabs
+          ? (supabase.from('lab_results' as any) as any)
+              .select('id, test_name, result_value, unit, reference_range, test_date, created_at')
+              .eq('patient_id', user?.id)
+              .order('test_date', { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [], error: null }),
+        includeMeds
+          ? (supabase.from('comprehensive_prescriptions' as any) as any)
+              .select('id, medication_name, dosage, frequency, created_at')
+              .eq('patient_id', user?.id)
+              .order('created_at', { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [], error: null }),
       ]);
 
       if (recordsRes.error) throw recordsRes.error;
       if (imagingRes.error) throw imagingRes.error;
+      if (labsRes.error) throw labsRes.error;
+      if (prescriptionsRes.error) throw prescriptionsRes.error;
 
       const baseRecords = (recordsRes.data as unknown as MedicalRecord[]) || [];
       const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((img: any) => ({
@@ -186,7 +205,36 @@ export const ComprehensiveMedicalRecords = () => {
         record_source: 'provider' as const,
       }));
 
-      const merged = [...baseRecords, ...imagingRecords];
+      const labRecords: MedicalRecord[] = (labsRes.data || []).map((lab: any) => ({
+        id: `lab-${lab.id}`,
+        record_type: 'lab',
+        title: `Lab: ${lab.test_name}`,
+        description: `Result: ${lab.result_value} ${lab.unit || ''}`.trim() +
+          (lab.reference_range ? `\nReference: ${lab.reference_range}` : ''),
+        clinical_data: { test_name: lab.test_name, result_value: lab.result_value },
+        visit_date: lab.test_date || lab.created_at,
+        severity_level: 'low',
+        status: 'completed',
+        is_private: false,
+        created_at: lab.created_at,
+        record_source: 'provider' as const,
+      }));
+
+      const prescriptionRecords: MedicalRecord[] = (prescriptionsRes.data || []).map((rx: any) => ({
+        id: `rx-${rx.id}`,
+        record_type: 'medication',
+        title: `Prescription: ${rx.medication_name}`,
+        description: [rx.dosage, rx.frequency].filter(Boolean).join(' — ') || 'Prescribed medication.',
+        clinical_data: { medication_name: rx.medication_name },
+        visit_date: rx.created_at,
+        severity_level: 'low',
+        status: 'active',
+        is_private: false,
+        created_at: rx.created_at,
+        record_source: 'provider' as const,
+      }));
+
+      const merged = [...baseRecords, ...imagingRecords, ...labRecords, ...prescriptionRecords];
       const dir = orderDirection.ascending ? 1 : -1;
       merged.sort((a: any, b: any) => {
         const av = new Date(a[orderColumn] || 0).getTime();

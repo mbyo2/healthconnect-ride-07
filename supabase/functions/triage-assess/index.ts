@@ -51,9 +51,54 @@ Rules:
 - Never diagnose definitively. Never invent data.
 Respond with ONLY the JSON object, no prose, no code fences.`;
 
+/**
+ * Rule-based fallback triage when the AI gateway is unavailable.
+ * Uses keyword matching on emergency symptoms. Conservative: when in doubt,
+ * escalates urgency. This is NOT a diagnosis — it guides care routing.
+ */
+function ruleBasedTriage(userPayload: string): TriageOutput {
+  const lower = userPayload.toLowerCase();
+
+  const emergencyKeywords = [
+    "chest pain", "difficulty breathing", "can't breathe", "unconscious",
+    "severe bleeding", "stroke", "heart attack", "overdose", "suicide",
+    "severe burn", "head injury", "seizure",
+  ];
+  const urgentKeywords = [
+    "fever", "vomiting", "severe pain", "broken", "fracture",
+    "deep cut", "infection", "dehydration",
+  ];
+
+  let urgency: TriageOutput["urgency"] = "routine";
+  let specialty = "General Practice";
+  if (emergencyKeywords.some(k => lower.includes(k))) {
+    urgency = "emergency";
+    specialty = "Emergency Medicine";
+  } else if (urgentKeywords.some(k => lower.includes(k))) {
+    urgency = "urgent";
+  }
+
+  return {
+    urgency,
+    recommended_specialty: specialty,
+    red_flags: urgency === "emergency" ? ["Potential emergency symptoms detected"] : [],
+    recommended_action: urgency === "emergency"
+      ? "Seek emergency care immediately or call your local emergency number."
+      : urgency === "urgent"
+      ? "See a healthcare provider within 24 hours."
+      : "Schedule a routine appointment with a provider.",
+    reasoning: "Rule-based triage (AI gateway unavailable). Assessment based on keyword matching of reported symptoms. When in doubt, urgency is escalated for safety.",
+  };
+}
+
 async function callGateway(userPayload: string): Promise<TriageOutput> {
   const key = Deno.env.get("LOVABLE_API_KEY");
-  if (!key) throw new Error("LOVABLE_API_KEY not configured");
+  if (!key) {
+    // Graceful degradation: rule-based triage when AI key is not configured.
+    // This ensures the function responds instead of crashing (bug 2026-10-10).
+    console.warn("LOVABLE_API_KEY not configured, using rule-based fallback");
+    return ruleBasedTriage(userPayload);
+  }
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",

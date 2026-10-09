@@ -263,8 +263,8 @@ const InstitutionSettings = () => {
       await saveInstitutionSpecialties(institution.id, selectedSpecialtyIds, primarySpecialtyId);
 
       // Update local institution state with saved values immediately.
-      // This prevents the context-refresh effect from reverting the form
-      // to stale data if refreshInstitution returns cached values.
+      // This is the source of truth — do NOT call refreshInstitution() here
+      // as it may return stale cached data and revert the form (bug 2026-10-10).
       setInstitution((prev: any) => prev ? {
         ...prev,
         name: formData.name,
@@ -291,7 +291,6 @@ const InstitutionSettings = () => {
         accreditation_expiry_date: formData.accreditation_expiry_date || null,
       } : prev);
 
-      await refreshInstitution?.();
       toast.success("Settings saved successfully");
     } catch (error: any) {
       console.error("Error saving settings:", error);

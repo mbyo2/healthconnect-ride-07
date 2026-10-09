@@ -394,6 +394,29 @@ export const ProviderDashboard = () => {
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
+  // ── Approval gate: unverified providers see a pending screen, not the dashboard ──
+  // (Security: prevents "under review" accounts from accessing clinical tools.)
+  const [verificationChecked, setVerificationChecked] = useState(false);
+  const [isVerifiedProvider, setIsVerifiedProvider] = useState(false);
+
+  useEffect(() => {
+    const checkVerification = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setVerificationChecked(true);
+        return;
+      }
+      const { data } = await supabase
+        .from("profiles")
+        .select("is_verified")
+        .eq("id", user.id)
+        .maybeSingle();
+      setIsVerifiedProvider((data as any)?.is_verified === true);
+      setVerificationChecked(true);
+    };
+    checkVerification();
+  }, []);
+
   // Specialty workflows for professions with dedicated clinical tools.
   // For multi-role users, prefer the specialty profession over the priority
   // admin role (mirrors hasSpecialtyTools logic below).
@@ -589,6 +612,36 @@ export const ProviderDashboard = () => {
 
   const scheduledToday = todayAppointments.filter((a: any) => a.status === "scheduled");
   const completedToday = todayAppointments.filter((a: any) => a.status === "completed");
+
+  // ── Approval gate render ──
+  if (!verificationChecked) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (!isVerifiedProvider) {
+    return (
+      <div className="min-h-screen bg-canvas text-midnight font-sans flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="mx-auto h-16 w-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-6">
+            <Hourglass className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+          </div>
+          <h1 className="text-2xl font-black mb-3">Application Under Review</h1>
+          <p className="text-sm text-graphite-500 mb-6">
+            Your healthcare provider application is being reviewed by our team.
+            You'll get full access to the dashboard once approved. This usually
+            takes 1-2 business days.
+          </p>
+          <Button onClick={() => navigate('/')} variant="outline">
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
