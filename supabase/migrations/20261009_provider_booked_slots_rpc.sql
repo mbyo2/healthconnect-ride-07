@@ -22,8 +22,11 @@ RETURNS TABLE (provider_id uuid, slot_date date, slot_time time)
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public
+-- Live schema note (verified 2026-10-09): public.appointments.time is TEXT,
+-- not time — hence the ::time cast. Declared return type stays time so
+-- callers always get normalized "HH:MM:SS" values.
 AS $$
-  SELECT a.provider_id, a.date, a.time
+  SELECT a.provider_id, a.date, a.time::time
   FROM public.appointments a
   WHERE a.provider_id = ANY (p_provider_ids)
     AND a.status IN ('scheduled', 'confirmed')
