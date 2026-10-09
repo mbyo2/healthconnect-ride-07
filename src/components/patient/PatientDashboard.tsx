@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { VoiceCommandButton } from "../VoiceCommandButton";
 import { AIInsightsWidget } from "../ai/AIInsightsWidget";
 import { PatientOverviewHero } from "./PatientOverviewHero";
-import { HealthMetricCards } from "./HealthMetricCards";
 
 export const PatientDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("health");
@@ -89,9 +88,6 @@ export const PatientDashboard = () => {
 
       {/* Zocdoc-style overview: greeting hero, animated stats, next visit */}
       {!isSimplifiedMode && <PatientOverviewHero />}
-
-      {/* Latest recorded vitals as glanceable cards */}
-      {!isSimplifiedMode && <HealthMetricCards />}
 
       {/* AI Health Assistant Banner */}
       <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">

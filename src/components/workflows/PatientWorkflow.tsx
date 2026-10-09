@@ -44,6 +44,7 @@ import {
 import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
+import { HealthMetricCards } from "@/components/patient/HealthMetricCards";
 
 // Predefined modern specialties with Lucide medical iconography.
 const SPECIALTIES_DATA = [
@@ -413,6 +414,9 @@ export const PatientWorkflow = React.memo(() => {
           </button>
         </div>
       )}
+
+      {/* ─── Your health: latest recorded vitals as glanceable cards ─── */}
+      <HealthMetricCards />
 
       {/* ─── Specialties Squircle Grid ─── */}
       <div>

@@ -409,7 +409,13 @@ html {
      it. Use this for in-page sticky bars; plain `sticky top-0` gets covered
      by the z-50 DesktopNav and hides actions like "Write E-Prescription". */
   .doc-page-header {
-    @apply sticky top-16 lg:top-[4.25rem] z-30 bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800;
+    /* Docks below the fixed global header (h-16 + border). The extra 8px
+       absorbs sub-pixel rounding and any header content that runs taller
+       than h-16 on narrow viewports — previously the sticky bar's buttons
+       could slide under the header and eat clicks meant for them (QA 2026-10-09:
+       "Book Appointment" intercepted by the theme toggle). Stays below the
+       header's z-50 so dropdowns/menus always win. */
+    @apply sticky top-[4.5rem] z-40 bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800;
   }
 
   /* ── Section heading styles ── */
