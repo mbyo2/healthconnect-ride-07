@@ -63,6 +63,54 @@ main {
   }
 }
 
+/* ============================================================
+   Opt-in accessibility modes (AccessibilityMenu → all off by default)
+   ============================================================ */
+
+/* High contrast: stronger text/border definition, keeps brand hues */
+.a11y-high-contrast {
+  --doc-muted: #3f3f3f;
+}
+.a11y-high-contrast body {
+  color: #111;
+}
+.a11y-high-contrast .text-muted-foreground {
+  color: #404040 !important;
+}
+.a11y-high-contrast .border,
+.a11y-high-contrast [class*="border-"] {
+  border-color: #525252 !important;
+}
+.a11y-high-contrast :focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 3px;
+}
+.a11y-high-contrast img {
+  filter: contrast(1.08);
+}
+
+/* Reduced motion: calm everything down, same as OS-level preference */
+.a11y-reduced-motion *,
+.a11y-reduced-motion *::before,
+.a11y-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Dyslexia-friendly font: OpenDyslexic when loaded, gentle fallback stack */
+.a11y-dyslexia body,
+.a11y-dyslexia button,
+.a11y-dyslexia input,
+.a11y-dyslexia select,
+.a11y-dyslexia textarea {
+  font-family: 'OpenDyslexic', 'OpenDyslexic Alta', Verdana, 'Segoe UI', sans-serif !important;
+  letter-spacing: 0.02em;
+  word-spacing: 0.08em;
+  line-height: 1.65;
+}
+
 html {
   font-size: clamp(14px, 0.8vw + 12px, 18px);
 }

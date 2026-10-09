@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
+import { FxConverterWidget } from "@/components/wallet/FxConverterWidget";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { Navigate } from "react-router-dom";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -72,6 +73,8 @@ const Wallet = () => {
                 )}
 
                 {isEarner && <EarningsPanel />}
+
+                <FxConverterWidget />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-6" id="wallet-topup">

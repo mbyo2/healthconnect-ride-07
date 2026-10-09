@@ -23,6 +23,7 @@ import { useOfflineMode } from "@/hooks/use-offline-mode";
 import { toast } from "sonner";
 import { VoiceCommandButton } from "../VoiceCommandButton";
 import { AIInsightsWidget } from "../ai/AIInsightsWidget";
+import { PatientOverviewHero } from "./PatientOverviewHero";
 
 export const PatientDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("health");
@@ -84,6 +85,9 @@ export const PatientDashboard = () => {
           </Button>
         </div>
       </div>
+
+      {/* Zocdoc-style overview: greeting hero, animated stats, next visit */}
+      {!isSimplifiedMode && <PatientOverviewHero />}
 
       {/* AI Health Assistant Banner */}
       <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">

@@ -38,7 +38,9 @@ export const AccessibilityMenu = () => {
     disableEasyReading,
     isEasyReadingEnabled,
     isScreenReaderEnabled,
-    setScreenReaderEnabled
+    setScreenReaderEnabled,
+    preferences,
+    updatePreferences,
   } = useAccessibility();
   
   const { theme, setTheme } = useTheme();
@@ -193,6 +195,57 @@ export const AccessibilityMenu = () => {
             </CardContent>
           </Card>
 
+          {/* Vision & Motion — all off by default, opt-in only */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Vision &amp; Motion
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="a11y-contrast">High contrast</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Darker text and stronger borders
+                  </p>
+                </div>
+                <Switch
+                  id="a11y-contrast"
+                  checked={preferences.highContrast}
+                  onCheckedChange={(checked) => updatePreferences({ highContrast: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="a11y-motion">Reduce motion</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Calm animations and transitions
+                  </p>
+                </div>
+                <Switch
+                  id="a11y-motion"
+                  checked={preferences.reducedMotion}
+                  onCheckedChange={(checked) => updatePreferences({ reducedMotion: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="a11y-dyslexia">Dyslexia-friendly font</Label>
+                  <p className="text-xs text-muted-foreground">
+                    OpenDyslexic typeface + wider spacing (loads on demand)
+                  </p>
+                </div>
+                <Switch
+                  id="a11y-dyslexia"
+                  checked={preferences.dyslexiaFont}
+                  onCheckedChange={(checked) => updatePreferences({ dyslexiaFont: checked })}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Theme Controls */}
           <Card>
             <CardHeader className="pb-3">
@@ -200,8 +253,7 @@ export const AccessibilityMenu = () => {
                 <Palette className="h-5 w-5" />
                 Display Theme
               </CardTitle>
-            </CardHeader>
-            <CardContent>
+            </CardHeader>            <CardContent>
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant={theme === 'light' ? 'default' : 'outline'}

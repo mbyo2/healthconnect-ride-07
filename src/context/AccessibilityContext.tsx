@@ -6,6 +6,7 @@ type AccessibilityPreferences = {
   largeText: boolean;
   reducedMotion: boolean;
   screenReader: boolean;
+  dyslexiaFont: boolean;
 };
 
 type AccessibilityContextType = {
@@ -42,8 +43,31 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     highContrast: safeLocalGet('accessibility_high_contrast') === 'true',
     largeText: safeLocalGet('accessibility_large_text') === 'true',
     reducedMotion: safeLocalGet('accessibility_reduced_motion') === 'true',
-    screenReader: safeLocalGet('accessibility_screen_reader') === 'true'
+    screenReader: safeLocalGet('accessibility_screen_reader') === 'true',
+    dyslexiaFont: safeLocalGet('accessibility_dyslexiafont') === 'true',
   });
+
+  // Apply vision & motion preferences to the document root.
+  // Everything is opt-in and off by default; classes are the single source of truth.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('a11y-high-contrast', preferences.highContrast);
+    root.classList.toggle('a11y-reduced-motion', preferences.reducedMotion);
+    root.classList.toggle('a11y-dyslexia', preferences.dyslexiaFont);
+
+    // OpenDyslexic (SIL Open Font License, open source) loads on demand only
+    // when the user enables the dyslexia-friendly font — never otherwise.
+    const FONT_LINK_ID = 'a11y-dyslexia-font';
+    if (preferences.dyslexiaFont && !document.getElementById(FONT_LINK_ID)) {
+      const link = document.createElement('link');
+      link.id = FONT_LINK_ID;
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5.3.0/index.css';
+      document.head.appendChild(link);
+    } else if (!preferences.dyslexiaFont) {
+      document.getElementById(FONT_LINK_ID)?.remove();
+    }
+  }, [preferences.highContrast, preferences.reducedMotion, preferences.dyslexiaFont]);
   
   // Apply stored settings on load
   useEffect(() => {
