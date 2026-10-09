@@ -66,8 +66,7 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router-dom/') || id.includes('node_modules/react/')) return 'vendor-react';
           if (id.includes('@supabase/')) return 'vendor-supabase';
           if (id.includes('@radix-ui/')) return 'vendor-ui';
-          if (id.includes('node_modules/recharts/')) return 'vendor-charts';
-          if (id.includes('node_modules/leaflet/') || id.includes('node_modules/react-leaflet/')) return 'vendor-maps';
+          // Charts and maps are lazy-loaded with their routes (not in initial bundle)
           if (id.includes('node_modules/date-fns/') || id.includes('node_modules/lucide-react/') || id.includes('node_modules/clsx/') || id.includes('node_modules/tailwind-merge/')) return 'vendor-utils';
         },
       },
