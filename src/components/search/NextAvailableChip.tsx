@@ -26,17 +26,18 @@ export function useBookedSlots(providerIds: string[]) {
       try {
         const from = format(new Date(), "yyyy-MM-dd");
         const to = format(addDays(new Date(), 14), "yyyy-MM-dd");
-        const { data } = await (supabase as any)
-          .from("appointments")
-          .select("provider_id, date, time")
-          .in("provider_id", providerIds)
-          .in("status", ["scheduled", "confirmed"])
-          .gte("date", from)
-          .lte("date", to);
+        // SECURITY DEFINER rpc (see migration 20261009_provider_booked_slots_rpc):
+        // direct appointments SELECTs are RLS-blind to other patients'
+        // bookings, so occupancy must come from the rpc.
+        const { data } = await (supabase as any).rpc("get_provider_booked_slots", {
+          p_provider_ids: providerIds,
+          p_from: from,
+          p_to: to,
+        });
         if (cancelled) return;
         const map = new Map<string, Set<string>>();
         for (const a of data || []) {
-          const k = `${a.date}-${String(a.time).slice(0, 5)}`;
+          const k = `${a.slot_date}-${String(a.slot_time).slice(0, 5)}`;
           if (!map.has(a.provider_id)) map.set(a.provider_id, new Set());
           map.get(a.provider_id)!.add(k);
         }

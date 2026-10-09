@@ -67,21 +67,22 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
     const fetchBookedSlots = async () => {
       // Scope to the bookable window (today → +120 days). Without a date
       // bound this pulled the provider's ENTIRE appointment history just to
-      // render availability for the current week. `date` is a DATE column.
+      // render availability for the current week.
+      // Occupancy comes from the SECURITY DEFINER rpc: a direct appointments
+      // SELECT is RLS-blind to other patients' bookings (own rows only),
+      // which made taken slots render as free.
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       const horizonStr = format(addDays(new Date(), 120), 'yyyy-MM-dd');
-      const { data } = await supabase
-        .from('appointments')
-        .select('date, time')
-        .eq('provider_id', provider.id)
-        .in('status', ['scheduled', 'confirmed'])
-        .gte('date', todayStr)
-        .lte('date', horizonStr);
+      const { data } = await (supabase as any).rpc('get_provider_booked_slots', {
+        p_provider_ids: [provider.id],
+        p_from: todayStr,
+        p_to: horizonStr,
+      });
 
       if (data) {
-        // Postgres TIME comes back as "HH:MM:SS" while TIME_SLOTS are "HH:MM" —
-        // normalize so already-booked slots actually render as booked.
-        setBookedSlots(data.map(a => `${a.date}-${String(a.time).slice(0, 5)}`));
+        // Postgres TIME comes back as "HH:MM:SS" — normalize to "HH:MM" so
+        // already-booked slots actually render as booked.
+        setBookedSlots(data.map((a: any) => `${a.slot_date}-${String(a.slot_time).slice(0, 5)}`));
       }
     };
     

@@ -58,15 +58,17 @@ export function ProviderSlotsPreview({
 
         const from = format(upcoming[0], "yyyy-MM-dd");
         const to = format(upcoming[upcoming.length - 1], "yyyy-MM-dd");
-        const { data } = await (supabase as any)
-          .from("appointments")
-          .select("date, time")
-          .eq("provider_id", providerId)
-          .in("status", ["scheduled", "confirmed"])
-          .gte("date", from)
-          .lte("date", to);
+        // Slot occupancy via SECURITY DEFINER rpc: a direct appointments
+        // SELECT is RLS-blind to other patients' bookings (own rows only),
+        // which made every slot look free. The rpc returns only date/time
+        // occupancy — no patient identities.
+        const { data } = await (supabase as any).rpc("get_provider_booked_slots", {
+          p_provider_ids: [providerId],
+          p_from: from,
+          p_to: to,
+        });
         const booked = new Set(
-          (data || []).map((a: any) => `${a.date}-${String(a.time).slice(0, 5)}`)
+          (data || []).map((a: any) => `${a.slot_date}-${String(a.slot_time).slice(0, 5)}`)
         );
 
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
