@@ -22,9 +22,12 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    const { data: records } = await (supabase as any)
-      .from('comprehensive_medical_records')
-      .select(`
+    // Comprehensive records plus completed imaging orders (imaging results live
+    // in imaging_orders, not comprehensive_medical_records).
+    const [recordsRes, imagingRes] = await Promise.all([
+      (supabase as any)
+        .from('comprehensive_medical_records')
+        .select(`
         id,
         title,
         visit_date,
@@ -32,12 +35,18 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
         status,
         provider:profiles!comprehensive_medical_records_provider_id_fkey(first_name, last_name)
       `)
-      .eq('patient_id', user.id)
-      .order('visit_date', { ascending: false });
+        .eq('patient_id', user.id)
+        .order('visit_date', { ascending: false }),
+      (supabase.from('imaging_orders' as any) as any)
+        .select('id, order_number, modality, body_part, status, findings, impression, created_at, completed_at')
+        .eq('patient_id', user.id)
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false }),
+    ]);
 
-    const rows: any[] = records || [];
+    const rows: any[] = recordsRes.data || [];
 
-    return rows.map((record) => ({
+    const mapped = rows.map((record) => ({
       id: record.id,
       title: record.title,
       date: record.visit_date,
@@ -45,6 +54,19 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
       type: record.record_type,
       status: record.status || 'Active'
     }));
+
+    const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((img: any) => ({
+      id: `imaging-${img.id}`,
+      title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
+      date: img.completed_at || img.created_at,
+      provider: 'Radiology',
+      type: 'imaging',
+      status: 'Completed'
+    }));
+
+    return [...mapped, ...imagingRecords].sort(
+      (a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+    );
   } catch (error) {
     console.error('Error fetching medical records:', error);
     return [];

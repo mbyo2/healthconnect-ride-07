@@ -150,10 +150,50 @@ export const ComprehensiveMedicalRecords = () => {
 
       query = query.order(orderColumn, orderDirection);
 
-      const { data, error } = await query;
+      // Completed imaging results live in imaging_orders, not
+      // comprehensive_medical_records — fetch them alongside so patients can
+      // see their imaging results here. Only relevant for the 'all'/'imaging'
+      // filters; other record-type filters exclude them.
+      const includeImaging = filterType === 'all' || filterType === 'imaging';
+      const [recordsRes, imagingRes] = await Promise.all([
+        query,
+        includeImaging
+          ? (supabase.from('imaging_orders' as any) as any)
+              .select('id, order_number, modality, body_part, status, findings, impression, created_at, completed_at')
+              .eq('patient_id', user?.id)
+              .eq('status', 'completed')
+              .order('created_at', { ascending: false })
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
-      if (error) throw error;
-      setRecords((data as unknown as MedicalRecord[]) || []);
+      if (recordsRes.error) throw recordsRes.error;
+      if (imagingRes.error) throw imagingRes.error;
+
+      const baseRecords = (recordsRes.data as unknown as MedicalRecord[]) || [];
+      const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((img: any) => ({
+        id: `imaging-${img.id}`,
+        record_type: 'imaging',
+        title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
+        description: [img.impression && `Impression: ${img.impression}`, img.findings && `Findings: ${img.findings}`]
+          .filter(Boolean)
+          .join('\n') || 'Completed imaging study.',
+        clinical_data: { order_number: img.order_number, modality: img.modality, body_part: img.body_part },
+        visit_date: img.completed_at || img.created_at,
+        severity_level: 'low',
+        status: 'completed',
+        is_private: false,
+        created_at: img.created_at,
+        record_source: 'provider' as const,
+      }));
+
+      const merged = [...baseRecords, ...imagingRecords];
+      const dir = orderDirection.ascending ? 1 : -1;
+      merged.sort((a: any, b: any) => {
+        const av = new Date(a[orderColumn] || 0).getTime();
+        const bv = new Date(b[orderColumn] || 0).getTime();
+        return (av - bv) * dir;
+      });
+      setRecords(merged);
     } catch (error) {
       console.error('Error fetching medical records:', error);
       toast.error('Failed to load medical records');
