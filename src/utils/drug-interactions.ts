@@ -89,18 +89,42 @@ export interface AllergyMatch {
  */
 export async function getPatientAllergies(patientId: string): Promise<string[]> {
   if (!patientId) return [];
+  const allergens = new Set<string>();
   try {
+    // Source 1: institution patient registry (structured allergies field)
     const { data } = await (supabase.from('institution_patient_registry' as any) as any)
       .select('allergies')
       .eq('linked_patient_id', patientId)
       .limit(1)
       .maybeSingle();
     const raw = (data as any)?.allergies as string | null;
-    if (!raw) return [];
-    return raw.split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+    if (raw) {
+      raw.split(/[,;|]/).map(s => s.trim()).filter(Boolean).forEach(a => allergens.add(a));
+    }
   } catch {
-    return [];
+    // non-fatal — try the next source
   }
+  try {
+    // Source 2: medical_records with allergy record types (patients add these
+    // via Medical Records → Add Record). Without this, the safety check misses
+    // allergies recorded outside the registry (found 2026-10-09: Penicillin
+    // allergy in medical_records did not block a Penicillin prescription).
+    const { data: records } = await (supabase.from('medical_records' as any) as any)
+      .select('title, description, record_type')
+      .eq('patient_id', patientId)
+      .ilike('record_type', '%allerg%')
+      .limit(20);
+    for (const r of (records as any[]) ?? []) {
+      const text = [r.title, r.description].filter(Boolean).join(' ');
+      // Extract the allergen name: prefer the title, fall back to description.
+      // Titles like "Penicillin" or "Allergy: Penicillin" yield "Penicillin".
+      const cleaned = text.replace(/^allergy\s*[:\-–]\s*/i, '').trim();
+      if (cleaned) allergens.add(cleaned.split(/[,;|]/)[0].trim());
+    }
+  } catch {
+    // non-fatal
+  }
+  return [...allergens].filter(Boolean);
 }
 
 /**
