@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { WaitlistSignup } from "./WaitlistSignup";
 import { CostBreakdown } from "./CostBreakdown";
+import { DayStripPicker } from "./DayStripPicker";
 import { FlowResult } from "@/components/ui/flow-result";
 import {
   savePendingAction,
@@ -377,7 +378,8 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
             <Calendar className="h-4 w-4 text-primary" />
             Select a date
           </h4>
-          <div className="flex items-center gap-2">
+          {/* Week pager is desktop-only; phones get the swipeable day strip below */}
+          <div className="hidden sm:flex items-center gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -397,7 +399,17 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        {/* Mobile day strip (phones): large swipeable day cells */}
+        <div className="sm:hidden">
+          <DayStripPicker
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+            schedule={(provider as any).availability_schedule ?? null}
+          />
+        </div>
+
+        {/* Desktop week grid */}
+        <div className="hidden sm:grid grid-cols-7 gap-2">
           {weekDays.map((day) => {
             const isPast = isBefore(day, today);
             const isSelected = selectedDate && isSameDay(day, selectedDate);

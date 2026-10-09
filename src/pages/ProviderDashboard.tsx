@@ -23,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
+import { AgendaTimeline } from "@/components/provider/AgendaTimeline";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { DentistWorkflow } from "@/components/workflows/DentistWorkflow";
 import { OptometristWorkflow } from "@/components/workflows/OptometristWorkflow";
@@ -382,6 +383,8 @@ const MyPracticeEditor = () => {
 export const ProviderDashboard = () => {
   const navigate = useNavigate();
   const today = new Date();
+  // Agenda day — the timeline below navigates days; defaults to today.
+  const [agendaDate, setAgendaDate] = useState<Date>(() => new Date());
   const { formatPrice } = useCurrency();
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
@@ -512,6 +515,22 @@ export const ProviderDashboard = () => {
         .select(`id, date, time, status, type, patient:profiles!appointments_patient_id_fkey (first_name, last_name)`)
         .eq("provider_id", user.id)
         .eq("date", format(today, "yyyy-MM-dd"))
+        .order("time");
+      return data || [];
+    },
+  });
+
+  // Agenda timeline data for the navigable day (defaults to today).
+  const { data: agendaAppointments = [], isLoading: agendaLoading } = useQuery({
+    queryKey: ["provider-agenda-appointments", format(agendaDate, "yyyy-MM-dd")],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data } = await supabase
+        .from("appointments")
+        .select(`id, date, time, status, type, patient:profiles!appointments_patient_id_fkey (first_name, last_name)`)
+        .eq("provider_id", user.id)
+        .eq("date", format(agendaDate, "yyyy-MM-dd"))
         .order("time");
       return data || [];
     },
@@ -705,69 +724,15 @@ export const ProviderDashboard = () => {
           </div>
         )}
 
-        {/* Today's queue */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-          <div className="px-4 py-3 bg-primary-50 dark:bg-blue-950/40 border-b border-canvas-silk dark:border-slate-800 flex items-center justify-between border-l-4 border-l-primary-500">
-            <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-sm text-primary-500">Today's Scheduled Consultations</h2>
-              <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-primary-500 text-white">
-                {todayAppointments.length}
-              </span>
-            </div>
-            <button onClick={() => navigate("/appointments")} className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1 min-h-[44px]">
-              View all <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {todayAppointments.length === 0 ? (
-            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400">
-              No appointments scheduled for today
-            </div>
-          ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[850px]">
-                <thead>
-                  <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
-                    <th className="py-2.5 px-4 w-[240px]">Patient Name</th>
-                    <th className="py-2.5 px-3 w-[130px] text-center">Status</th>
-                    <th className="py-2.5 px-3 w-[150px]">Consult Time</th>
-                    <th className="py-2.5 px-3 w-[140px]">Mode</th>
-                    <th className="py-2.5 px-3 w-[150px] text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
-                  {todayAppointments.map((app: any) => (
-                    <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
-                      <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-100">
-                        {[app.patient?.first_name, app.patient?.last_name].filter(Boolean).join(' ') || 'Patient'}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        {app.status === "completed"
-                          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>
-                          : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Scheduled</span>
-                        }
-                      </td>
-                      <td className="py-3 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">{app.time}</td>
-                      <td className="py-3 px-3">
-                        <span className="inline-block px-2 py-0.5 rounded bg-canvas-mist dark:bg-slate-800 font-semibold text-[11px]">
-                          {app.type === "video_consultation" ? "Video Call" : "In-Person"}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <button
-                          onClick={() => navigate("/appointments")}
-                          className="px-3 py-1.5 min-h-[32px] rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
-                        >
-                          Manage
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        {/* Day agenda timeline — replaces the old 850px-wide table (unusable on phones) */}
+        <AgendaTimeline
+          appointments={agendaAppointments as any}
+          selectedDate={agendaDate}
+          onDateChange={setAgendaDate}
+          onManage={() => navigate("/appointments")}
+          onViewAll={() => navigate("/appointments")}
+          loading={agendaLoading}
+        />
 
         {/* ── Detailed modules tabs (now includes My Practice) ── */}
         <Tabs defaultValue="schedule" className="space-y-4">
