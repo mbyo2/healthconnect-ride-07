@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { ProviderSlotsPreview } from "@/components/booking/ProviderSlotsPreview";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,12 @@ export const ProviderDetail = () => {
   const navigate = useNavigate();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [preselectedSlot, setPreselectedSlot] = useState<{ date: Date; time: string } | null>(null);
+
+  const openBookingWithSlot = (date: Date, time: string) => {
+    setPreselectedSlot({ date, time });
+    setIsBookingOpen(true);
+  };
 
   const { data: provider, isLoading, error, refetch } = useQuery({
     queryKey: ["provider-detail", id],
@@ -316,6 +323,15 @@ export const ProviderDetail = () => {
             {/* ── Left column (2/3 wide) ── */}
             <div className="lg:col-span-2 space-y-5">
 
+              {/* Nearest available slots — tap a chip to book it */}
+              {canBook && (
+                <ProviderSlotsPreview
+                  providerId={provider.id}
+                  availabilitySchedule={schedule}
+                  onSelectSlot={openBookingWithSlot}
+                />
+              )}
+
               {/* Education & Credentials */}
               {(provider.medical_school || certs.length > 0 || subs.length > 0) && (
                 <Section icon={GraduationCap} title="Education & Credentials">
@@ -510,8 +526,10 @@ export const ProviderDetail = () => {
           <BookingModal
             provider={provider as Provider}
             isOpen={isBookingOpen}
-            onClose={() => setIsBookingOpen(false)}
+            onClose={() => { setIsBookingOpen(false); setPreselectedSlot(null); }}
             onRequestOpen={() => setIsBookingOpen(true)}
+            initialDate={preselectedSlot?.date ?? null}
+            initialTime={preselectedSlot?.time ?? null}
           />
         )}
         {provider && (

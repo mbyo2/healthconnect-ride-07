@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -31,6 +31,9 @@ interface BookingModalProps {
   onClose: () => void;
   /** Called when a saved pre-login booking is ready to resume (parent opens the modal). */
   onRequestOpen?: () => void;
+  /** Preselect a slot (e.g. tapped from "Nearest available slots"). Jumps to the time step. */
+  initialDate?: Date | null;
+  initialTime?: string | null;
 }
 
 const TIME_SLOTS = [
@@ -39,7 +42,7 @@ const TIME_SLOTS = [
   "15:30", "16:00", "16:30", "17:00"
 ];
 
-export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: BookingModalProps) => {
+export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime }: BookingModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<'visit' | 'type' | 'datetime' | 'confirm'>('visit');
@@ -53,6 +56,9 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [showWaitlist, setShowWaitlist] = useState(false);
+  // Set when the pre-login resume path restores a booking and reopens the
+  // modal — the open effect must not wipe those restored selections.
+  const resumedRef = useRef(false);
 
   // Fetch booked slots for this provider
   useEffect(() => {
@@ -119,6 +125,33 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
     setSubmitError(null);
   }, [selectedDate, selectedTime]);
 
+  // Preselected slot (e.g. from "Nearest available slots" chips): apply it
+  // when the modal opens and jump straight to the time step. A plain open
+  // ("Book Appointment") starts fresh so a previously tapped chip never
+  // leaks into an unrelated booking — except when the pre-login resume
+  // path just restored the user's own selections (see resumedRef).
+  useEffect(() => {
+    if (!isOpen) return;
+    if (resumedRef.current) {
+      resumedRef.current = false;
+      return;
+    }
+    if (initialDate) {
+      setSelectedDate(initialDate);
+      setWeekStart(startOfWeek(initialDate, { weekStartsOn: 1 }));
+      if (initialTime) setSelectedTime(initialTime);
+      setStep('datetime');
+    } else {
+      setSelectedDate(null);
+      setSelectedTime(null);
+      setReason("");
+      setSubmitError(null);
+      setStep('visit');
+      setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   // Resume a booking started before login: restore selections and reopen
   // at the confirm step. Nothing is created until the user confirms.
   useEffect(() => {
@@ -134,6 +167,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
       setSelectedTime(pending.time);
       setReason(pending.reason || '');
       setStep('confirm');
+      resumedRef.current = true; // open effect must keep these selections
       onRequestOpen();
       toast.success('Welcome back — your booking details were kept. Review and confirm.');
     }
@@ -320,13 +354,21 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
     </div>
   );
 
-  const renderDateTimeSelection = () => (
+  const renderDateTimeSelection = () => {
+    // A tapped "nearest slot" chip can carry a time outside the standard
+    // grid (e.g. a provider schedule of 08:35 or 17:10). Merge it in so the
+    // preselected time always renders visibly selected — otherwise the user
+    // lands here with nothing highlighted and Continue disabled.
+    const displaySlots =
+      selectedTime && !TIME_SLOTS.includes(selectedTime)
+        ? [...TIME_SLOTS, selectedTime].sort()
+        : TIME_SLOTS;
+    return (
     <div className="space-y-6">
       <Button variant="ghost" onClick={() => setStep('type')} className="mb-2 h-11">
         <ChevronLeft className="h-4 w-4 mr-1" />
         Back
       </Button>
-
       {/* Week Navigation */}
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -391,7 +433,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
             Available times for {format(selectedDate, 'EEEE, MMM d')}
           </h4>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Available times">
-            {TIME_SLOTS.map((time) => {
+            {displaySlots.map((time) => {
               const isBooked = isSlotBooked(selectedDate, time);
               const isPast = isSlotPast(selectedDate, time);
               const unavailable = isBooked || isPast;
@@ -430,7 +472,8 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         <ChevronRight className="h-4 w-4 ml-2" />
       </Button>
     </div>
-  );
+    );
+  };
 
   const renderConfirmation = () => (
     <div className="space-y-6">

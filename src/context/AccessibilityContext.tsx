@@ -30,6 +30,18 @@ type AccessibilityContextType = {
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
+// Single source of truth for localStorage keys. updatePreferences() used to
+// derive keys from the camelCase field name (`accessibility_highcontrast`)
+// while initialization read the underscored form (`accessibility_high_contrast`),
+// so toggles worked for the session but silently failed to persist.
+const STORAGE_KEYS: Record<keyof AccessibilityPreferences, string> = {
+  highContrast: 'accessibility_high_contrast',
+  largeText: 'accessibility_large_text',
+  reducedMotion: 'accessibility_reduced_motion',
+  screenReader: 'accessibility_screen_reader',
+  dyslexiaFont: 'accessibility_dyslexiafont',
+};
+
 export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isScreenReaderEnabled, setScreenReaderEnabled] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
@@ -40,11 +52,11 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     safeLocalGet('accessibility_easy_reading') === 'true'
   );
   const [preferences, setPreferences] = useState<AccessibilityPreferences>({
-    highContrast: safeLocalGet('accessibility_high_contrast') === 'true',
-    largeText: safeLocalGet('accessibility_large_text') === 'true',
-    reducedMotion: safeLocalGet('accessibility_reduced_motion') === 'true',
-    screenReader: safeLocalGet('accessibility_screen_reader') === 'true',
-    dyslexiaFont: safeLocalGet('accessibility_dyslexiafont') === 'true',
+    highContrast: safeLocalGet(STORAGE_KEYS.highContrast) === 'true',
+    largeText: safeLocalGet(STORAGE_KEYS.largeText) === 'true',
+    reducedMotion: safeLocalGet(STORAGE_KEYS.reducedMotion) === 'true',
+    screenReader: safeLocalGet(STORAGE_KEYS.screenReader) === 'true',
+    dyslexiaFont: safeLocalGet(STORAGE_KEYS.dyslexiaFont) === 'true',
   });
 
   // Apply vision & motion preferences to the document root.
@@ -119,12 +131,12 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const updatePreferences = useCallback((newPrefs: Partial<AccessibilityPreferences>) => {
     setPreferences(prev => {
       const updated = { ...prev, ...newPrefs };
-      
-      // Save to localStorage
-      Object.entries(updated).forEach(([key, value]) => {
-        safeLocalSet(`accessibility_${key.toLowerCase()}`, value.toString());
+
+      // Save to localStorage using the canonical keys (see STORAGE_KEYS).
+      (Object.keys(updated) as (keyof AccessibilityPreferences)[]).forEach((key) => {
+        safeLocalSet(STORAGE_KEYS[key], String(updated[key]));
       });
-      
+
       return updated;
     });
   }, []);

@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { useSearch } from "@/context/SearchContext";
 import { SearchResults } from "@/components/SearchResults";
 import { SearchFilters } from "@/components/SearchFilters";
+import { SpecialtyTiles } from "@/components/search/SpecialtyTiles";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 
 const SearchPage = () => {
@@ -120,6 +121,8 @@ const SearchPage = () => {
         </div>
 
         <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          <SpecialtyTiles />
+
           <div className="vf-card">
             <div className="flex items-center gap-2 border-b border-canvas-silk pb-3 mb-4">
               <SlidersHorizontal className="h-4 w-4 text-primary-500" />
