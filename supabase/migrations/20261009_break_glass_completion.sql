@@ -29,23 +29,20 @@ CREATE POLICY "Break-glass emergency access to records"
 --
 -- emergency_patient_search: identity only (never clinical data). Failing
 -- preconditions (not authenticated, <2 chars, not clinical staff) yield an
--- empty set rather than an error, so callers learn nothing from probing.
+-- empty set rather than an error, so probing reveals nothing. (A NULL caller
+-- fails the EXISTS check.) Deliberately a single compact statement: the
+-- dashboard SQL editor mangles long typed input.
 CREATE OR REPLACE FUNCTION public.emergency_patient_search(q text)
 RETURNS TABLE (pid uuid, nm text)
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
-  WITH v AS (SELECT auth.uid() AS c, trim(coalesce(q, '')) AS t)
-  SELECT s.id, trim(s.nm)
-  FROM (
-    SELECT p.id, coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '') AS nm
-    FROM public.profiles p
-  ) s, v
-  WHERE s.nm ILIKE '%' || v.t || '%'
-    AND char_length(v.t) >= 2
-    AND v.c IS NOT NULL
-    AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v.c AND role <> 'patient')
+  SELECT p.id, concat_ws(' ', p.first_name, p.last_name)
+  FROM public.profiles p
+  WHERE concat_ws(' ', p.first_name, p.last_name) ILIKE '%' || trim(coalesce(q, '')) || '%'
+    AND char_length(trim(coalesce(q, ''))) >= 2
+    AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role <> 'patient')
   LIMIT 20;
 $$;
 
