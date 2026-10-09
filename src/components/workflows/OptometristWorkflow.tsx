@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
-  Brain, Wallet, AlertTriangle, Video, Activity, Eye, Glasses
+  Brain, Wallet, AlertTriangle, Video, Activity, Eye, Glasses, Loader2
 } from 'lucide-react';
 
 export const OptometristWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { patients } = useHospitalPatients();
+  const { user } = useAuth();
   const [showExam, setShowExam] = useState(false);
+  const [examPatientId, setExamPatientId] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [pastExams, setPastExams] = useState<any[]>([]);
+  const [loadingExams, setLoadingExams] = useState(false);
   const [exam, setExam] = useState({
     odSphere: '', odCylinder: '', odAxis: '', odAcuity: '',
     osSphere: '', osCylinder: '', osAxis: '', osAcuity: '',
@@ -28,9 +39,81 @@ export const OptometristWorkflow = () => {
     showSuccess({ message: `Opening ${title}...` });
   };
 
-  const saveExam = () => {
-    showSuccess({ message: 'Eye examination saved to patient record' });
-    setShowExam(false);
+  const fetchPastExams = async () => {
+    if (!examPatientId) {
+      setPastExams([]);
+      return;
+    }
+    setLoadingExams(true);
+    try {
+      const { data, error } = await supabase
+        .from('eye_examinations')
+        .select('*')
+        .eq('patient_id', examPatientId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      setPastExams(data || []);
+    } catch (err) {
+      console.error('Failed to fetch eye exams:', err);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPastExams();
+  }, [examPatientId]);
+
+  const saveExam = async () => {
+    if (!examPatientId) {
+      toast.error('Select a patient');
+      return;
+    }
+    setSaving(true);
+    try {
+      // Get institution from user context or staff affiliation
+      const { data: staff } = await supabase
+        .from('institution_staff')
+        .select('institution_id')
+        .eq('provider_id', user?.id)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      const { error } = await supabase.from('eye_examinations').insert({
+        institution_id: staff?.institution_id || null,
+        patient_id: examPatientId,
+        provider_id: user?.id,
+        od_sphere: exam.odSphere || null,
+        od_cylinder: exam.odCylinder || null,
+        od_axis: exam.odAxis || null,
+        od_visual_acuity: exam.odAcuity || null,
+        od_iop: exam.iopOd || null,
+        os_sphere: exam.osSphere || null,
+        os_cylinder: exam.osCylinder || null,
+        os_axis: exam.osAxis || null,
+        os_visual_acuity: exam.osAcuity || null,
+        os_iop: exam.iopOs || null,
+        notes: exam.notes || null,
+      });
+
+      if (error) throw error;
+
+      toast.success('Eye examination saved to patient record');
+      setShowExam(false);
+      setExam({
+        odSphere: '', odCylinder: '', odAxis: '', odAcuity: '',
+        osSphere: '', osCylinder: '', osAxis: '', osAcuity: '',
+        iopOd: '', iopOs: '', notes: ''
+      });
+      fetchPastExams();
+    } catch (err: any) {
+      console.error('Failed to save eye exam:', err);
+      toast.error(err.message || 'Failed to save examination');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const workflowSteps = [
@@ -91,6 +174,39 @@ export const OptometristWorkflow = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label>Patient</Label>
+              <Select value={examPatientId} onValueChange={setExamPatientId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select patient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {patients.map((p: any) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.first_name} {p.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {examPatientId && pastExams.length > 0 && (
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm font-medium mb-2">Past Examinations ({pastExams.length})</p>
+                {loadingExams ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {pastExams.map((pe: any) => (
+                      <p key={pe.id} className="text-xs text-gray-600">
+                        {new Date(pe.created_at).toLocaleDateString()} — OD: {pe.od_sphere || '-'} / OS: {pe.os_sphere || '-'}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
                 <h4 className="font-bold text-sm">Right Eye (OD)</h4>
@@ -122,7 +238,10 @@ export const OptometristWorkflow = () => {
                 className="mt-1"
               />
             </div>
-            <Button onClick={saveExam} className="w-full">Save Examination</Button>
+            <Button onClick={saveExam} className="w-full" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Save Examination
+            </Button>
           </CardContent>
         </Card>
       )}
