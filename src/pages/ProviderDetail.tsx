@@ -11,7 +11,6 @@ import { ProviderReviews } from "@/components/reviews/ProviderReviews";
 import { BookingModal } from "@/components/booking/BookingModal";
 import { WaitlistSignup } from "@/components/booking/WaitlistSignup";
 import { providerDisplayName } from "@/utils/providerDisplay";
-import { CONSULTABLE_PROVIDER_ROLES } from "@/config/roleConfig";
 import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -173,9 +172,13 @@ export const ProviderDetail = () => {
   const reviewCount = stats?.total_reviews || 0;
 
   // Booking is only offered for consultable cadres (individual clinicians
-  // patients can book with). Lab/pharmacy/imaging cadres are reached via
-  // their institutions, not direct appointments.
-  const canBook = (CONSULTABLE_PROVIDER_ROLES as string[]).includes(provider?.role ?? "");
+  // A provider rendered from the verified directory is bookable, full stop.
+  // (Previously this gated on profiles.role, but that column is unreliable
+  // live — every verified provider carries role='patient' from the signup
+  // trigger default — so the gate hid the booking CTA and the slot preview
+  // for the entire directory. The directory view itself is the gate:
+  // is_verified = true AND show_in_search.)
+  const canBook = !!provider;
   // Honorific fits the cadre — only doctoral roles are "Dr.".
   const providerName = providerDisplayName(provider);
   const providerSpecialty = provider.specialty || "Healthcare Specialist";

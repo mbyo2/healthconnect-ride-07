@@ -21,6 +21,14 @@ export function useBookedSlots(providerIds: string[]) {
       setBookedByProvider(new Map());
       return;
     }
+    // Seed every visible provider with an empty set FIRST, so cards render
+    // their availability chip on first paint (no bookings is the common
+    // case). Previously providers with zero booked rows had no map entry at
+    // all, and their chip never rendered. The rpc then merges real occupancy.
+    const seed = new Map<string, Set<string>>(
+      providerIds.map((id) => [id, new Set<string>()])
+    );
+    setBookedByProvider(seed);
     let cancelled = false;
     (async () => {
       try {
@@ -35,7 +43,9 @@ export function useBookedSlots(providerIds: string[]) {
           p_to: to,
         });
         if (cancelled) return;
-        const map = new Map<string, Set<string>>();
+        const map = new Map<string, Set<string>>(
+          providerIds.map((id) => [id, new Set<string>()])
+        );
         for (const a of data || []) {
           const k = `${a.slot_date}-${String(a.slot_time).slice(0, 5)}`;
           if (!map.has(a.provider_id)) map.set(a.provider_id, new Set());
@@ -43,7 +53,9 @@ export function useBookedSlots(providerIds: string[]) {
         }
         setBookedByProvider(map);
       } catch {
-        if (!cancelled) setBookedByProvider(new Map());
+        // On failure keep the seeded empty sets: chips render from schedule
+        // alone rather than vanishing.
+        if (!cancelled) setBookedByProvider(seed);
       }
     })();
     return () => {
@@ -57,9 +69,9 @@ export function useBookedSlots(providerIds: string[]) {
 
 /**
  * "Next free: Tue 10:00" — Zocdoc-style availability chip on the search
- * result card, so patients never tap into a dead end. Renders nothing
- * until the batched booked-slots query resolves (no layout shift from
- * placeholder guesses).
+ * result card, so patients never tap into a dead end. Renders from the
+ * provider's schedule immediately (seeded empty occupancy) and corrects
+ * itself when the batched booked-slots query resolves.
  */
 export function NextAvailableChip({
   provider,
