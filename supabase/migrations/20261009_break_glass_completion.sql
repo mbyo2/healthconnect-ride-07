@@ -72,3 +72,14 @@ $function$;
 
 GRANT EXECUTE ON FUNCTION public.emergency_patient_search(text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.log_emergency_lookup(text, uuid[]) TO authenticated;
+
+-- ── 3. Patient identity follows the grant ─────────────────────────────
+-- A clinician holding an active grant must also see the patient's name
+-- (otherwise unlocked records list the patient as "Patient"). Additive
+-- permissive policy using the same SECURITY DEFINER helper — no inline
+-- subqueries, so no RLS recursion risk.
+DROP POLICY IF EXISTS "Break-glass patient identity" ON public.profiles;
+CREATE POLICY "Break-glass patient identity"
+  ON public.profiles FOR SELECT
+  TO authenticated
+  USING (public.has_break_glass_access(id));
