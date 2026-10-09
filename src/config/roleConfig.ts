@@ -231,6 +231,7 @@ export const PRESCRIBING_ROLES: UserRole[] = [
   USER_ROLES.MEDICAL_LICENTIATE,
   USER_ROLES.CLINICAL_OFFICER,
   USER_ROLES.DENTIST,
+  USER_ROLES.OPTOMETRIST,
 ];
 
 /** Roles whose charter includes the live lab_orders module — clinicians who
