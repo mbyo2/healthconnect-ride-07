@@ -161,3 +161,4 @@ export function summarizeAllergies(matches: AllergyMatch[]): string {
     .map(m => `ALLERGY ALERT: ${m.medication} may conflict with recorded allergy "${m.allergen}"`)
     .join('\n');
 }
+// Force rebuild 20261009174257
