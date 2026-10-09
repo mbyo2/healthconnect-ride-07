@@ -26,8 +26,8 @@ export function useMedicalRecords(userId: string | undefined) {
 
     const fetchRecords = async () => {
         try {
-            // Fetch from comprehensive_medical_records plus completed imaging orders
-            const [recordsRes, imagingRes] = await Promise.all([
+            // Fetch from comprehensive_medical_records plus completed imaging, labs, and prescriptions
+            const [recordsRes, imagingRes, labsRes, prescriptionsRes] = await Promise.all([
                 supabase
                     .from('comprehensive_medical_records')
                     .select('*')
@@ -38,6 +38,16 @@ export function useMedicalRecords(userId: string | undefined) {
                     .eq('patient_id', userId)
                     .eq('status', 'completed')
                     .order('created_at', { ascending: false }),
+                (supabase.from('lab_results' as any) as any)
+                    .select('id, test_name, result_value, unit, reference_range, test_date, created_at')
+                    .eq('patient_id', userId)
+                    .order('test_date', { ascending: false })
+                    .limit(50),
+                (supabase.from('prescriptions' as any) as any)
+                    .select('id, medication_name, dosage, frequency, created_at')
+                    .eq('patient_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(50),
             ]);
 
             if (recordsRes.error) throw recordsRes.error;
@@ -67,7 +77,33 @@ export function useMedicalRecords(userId: string | undefined) {
                 created_at: img.created_at
             }));
 
-            setRecords([...mappedData, ...imagingRecords]);
+            // Add lab results as medical records
+            const labRecords = (labsRes.data || []).map((lab: any) => ({
+                id: `lab-${lab.id}`,
+                title: `Lab: ${lab.test_name} - ${lab.result_value} ${lab.unit || ''}`.trim(),
+                provider: 'Laboratory',
+                date: lab.test_date || lab.created_at,
+                category: 'Lab Results',
+                hash: generateMockRecordHash(),
+                verified: true,
+                shared_with: [],
+                created_at: lab.created_at
+            }));
+
+            // Add prescriptions as medical records
+            const prescriptionRecords = (prescriptionsRes.data || []).map((rx: any) => ({
+                id: `rx-${rx.id}`,
+                title: `Prescription: ${rx.medication_name} ${rx.dosage || ''}`.trim(),
+                provider: 'Pharmacy',
+                date: rx.created_at,
+                category: 'Medications',
+                hash: generateMockRecordHash(),
+                verified: true,
+                shared_with: [],
+                created_at: rx.created_at
+            }));
+
+            setRecords([...mappedData, ...imagingRecords, ...labRecords, ...prescriptionRecords]);
         } catch (error) {
             console.error('Error fetching medical records:', error);
             toast.error('Failed to load medical records');

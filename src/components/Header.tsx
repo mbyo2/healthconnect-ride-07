@@ -18,6 +18,7 @@ import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { PHARMACY_SIDE_ROLES, LAB_SIDE_ROLES } from "@/config/roleConfig";
 
 export function Header() {
@@ -65,6 +66,7 @@ export function Header() {
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {user && (
             <>
+              <InstitutionSwitcher />
               <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill shrink-0" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
