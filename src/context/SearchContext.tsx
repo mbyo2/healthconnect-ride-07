@@ -3,7 +3,6 @@ import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/type
 import type { Provider } from '@/types/provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 import { withTimeout, TIMEOUTS } from '@/utils/async';
 
 type Coordinates = { latitude: number; longitude: number } | null;
@@ -98,7 +97,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsLoading(true);
     try {
       // Public directory view (verified providers, directory-safe columns).
-      // Every clinical cadre, verified only — never a single legacy role.
+      // The view itself is the gate: is_verified = true AND show_in_search.
+      // NOTE (2026-10-09): a previous .in('role', ALL_CLINICIAN_ROLES) filter
+      // was removed — profiles.role is unreliable live (verified doctors
+      // carry role='patient' from the signup trigger default), so the filter
+      // excluded every provider and /search always rendered empty.
       let query = supabase
         .from('provider_directory' as any)
         .select(`
@@ -113,7 +116,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           languages_spoken, typical_wait_time, appointment_types,
           availability_schedule
         `, { count: 'exact' })
-        .in('role', ALL_CLINICIAN_ROLES as any)
         .eq('is_verified', true);
 
       if (selectedSpecialty && selectedSpecialty !== 'all' as any) {
