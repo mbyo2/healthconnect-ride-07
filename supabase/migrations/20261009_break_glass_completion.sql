@@ -10,28 +10,20 @@
 --    review. Patients and anonymous callers are rejected.
 
 -- ── 1. Records RLS consults break-glass ──────────────────────────────
-DROP POLICY IF EXISTS "Providers with recent appointments can view medical records"
+-- Additive permissive policy (OR'd with the existing ones): a clinician
+-- holding an active, unexpired, unrevoked grant for a patient can read that
+-- patient's records. has_break_glass_access is SECURITY DEFINER (opaque to
+-- the RLS rewriter, no recursion risk). The existing policy is untouched.
+DROP POLICY IF EXISTS "Break-glass emergency access to records"
   ON public.comprehensive_medical_records;
-
-CREATE POLICY "Providers with recent appointments can view medical records"
+CREATE POLICY "Break-glass emergency access to records"
   ON public.comprehensive_medical_records FOR SELECT
   TO authenticated
-  USING (
-    auth.uid() = patient_id
-    OR auth.uid() = provider_id
-    OR public.has_role(auth.uid(), 'admin'::app_role)
-    OR public.has_role(auth.uid(), 'super_admin'::app_role)
-    OR public.has_break_glass_access(comprehensive_medical_records.patient_id)
-    OR EXISTS (
-      SELECT 1 FROM public.appointments a
-      WHERE a.patient_id = comprehensive_medical_records.patient_id
-        AND a.provider_id = auth.uid()
-        AND a.status IN ('confirmed','in_progress','completed')
-        AND a.date >= (CURRENT_DATE - INTERVAL '30 days')
-    )
-  );
+  USING (public.has_break_glass_access(patient_id));
 
 -- ── 2. Emergency patient lookup ───────────────────────────────────────
+-- NOTE for dashboard application: this statement is long — PASTE it (do not
+-- type it) into a fresh SQL tab; the editor mangles long typed input.
 CREATE OR REPLACE FUNCTION public.find_patient_for_emergency(p_search text)
 RETURNS TABLE (patient_id uuid, full_name text)
 LANGUAGE plpgsql
