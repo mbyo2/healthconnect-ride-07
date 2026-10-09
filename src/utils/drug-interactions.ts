@@ -76,3 +76,64 @@ export function summarize(interactions: DrugInteraction[]): string {
     .map(i => `${i.severity.toUpperCase()}: ${i.drug_a} ↔ ${i.drug_b}${i.clinical_effect ? ` — ${i.clinical_effect}` : ''}`)
     .join('\n');
 }
+
+export interface AllergyMatch {
+  medication: string;
+  allergen: string;
+}
+
+/**
+ * Fetch the patient's recorded allergies from the institution patient registry.
+ * Returns a list of allergen strings (may be comma/semicolon separated in storage).
+ * Safe — never throws, returns [] on failure.
+ */
+export async function getPatientAllergies(patientId: string): Promise<string[]> {
+  if (!patientId) return [];
+  try {
+    const { data } = await (supabase.from('institution_patient_registry' as any) as any)
+      .select('allergies')
+      .eq('patient_id', patientId)
+      .limit(1)
+      .maybeSingle();
+    const raw = (data as any)?.allergies as string | null;
+    if (!raw) return [];
+    return raw.split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Check prescribed medication names against the patient's known allergies.
+ * Matches when the medication name contains (or is contained in) an allergen term,
+ * e.g. allergen "penicillin" matches "Amoxicillin" via common stems is NOT attempted —
+ * this is a conservative substring match; clinicians confirm.
+ * Safe — never throws.
+ */
+export function checkAllergyMatches(
+  medicationNames: string[],
+  allergies: string[],
+): AllergyMatch[] {
+  const meds = medicationNames.map(norm).filter(Boolean);
+  const allergens = allergies.map(norm).filter(Boolean);
+  if (!meds.length || !allergens.length) return [];
+  const matches: AllergyMatch[] = [];
+  for (const med of meds) {
+    for (const allergen of allergens) {
+      if (allergen.length < 3) continue;
+      if (med.includes(allergen) || allergen.includes(med)) {
+        const originalMed = medicationNames[meds.indexOf(med)];
+        const originalAllergen = allergies[allergens.indexOf(allergen)];
+        matches.push({ medication: originalMed, allergen: originalAllergen });
+      }
+    }
+  }
+  return matches;
+}
+
+export function summarizeAllergies(matches: AllergyMatch[]): string {
+  if (!matches.length) return '';
+  return matches
+    .map(m => `ALLERGY ALERT: ${m.medication} may conflict with recorded allergy "${m.allergen}"`)
+    .join('\n');
+}

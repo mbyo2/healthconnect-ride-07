@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { checkInteractions, getPatientActiveMedications, isBlocking, summarize } from "@/utils/drug-interactions";
+import { checkInteractions, getPatientActiveMedications, isBlocking, summarize, getPatientAllergies, checkAllergyMatches, summarizeAllergies } from "@/utils/drug-interactions";
 import { AlertTriangle, Plus, Trash2, Pill, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -99,9 +99,17 @@ export const PrescriptionWriter = () => {
       allInteractions = allInteractions.concat(res);
     }
 
-    if (!allInteractions.length) return { blocking: false, message: "" };
-    const blocking = allInteractions.some((i) => isBlocking(i.severity));
-    return { blocking, message: summarize(allInteractions) };
+    // Allergy screening against the patient's recorded allergies (Epic-style safety check)
+    const allergies = await getPatientAllergies(selectedPatient.id);
+    const allergyMatches = checkAllergyMatches(names, allergies);
+
+    const messages: string[] = [];
+    if (allInteractions.length) messages.push(summarize(allInteractions));
+    if (allergyMatches.length) messages.push(summarizeAllergies(allergyMatches));
+
+    if (!messages.length) return { blocking: false, message: "" };
+    const blocking = allInteractions.some((i) => isBlocking(i.severity)) || allergyMatches.length > 0;
+    return { blocking, message: messages.join('\n') };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,7 +134,7 @@ export const PrescriptionWriter = () => {
       if (check.message) {
         setInteractionWarning(check.message);
         if (check.blocking && !overrideAck) {
-          toast.error("Major drug interaction detected — review and confirm to override.");
+          toast.error("Drug interaction or allergy alert detected — review and confirm to override.");
           setIsSubmitting(false);
           return;
         }
