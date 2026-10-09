@@ -262,7 +262,16 @@ export default function StaffDashboard() {
             {config.tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  // If tab matches a quick action (e.g., "Reports" tab -> Reports action), navigate there
+                  const matchingAction = config.quickActions.find(
+                    (action) => action.label.toLowerCase() === tab.label.toLowerCase()
+                  );
+                  if (matchingAction && tab.id !== "overview") {
+                    navigate(matchingAction.path);
+                  }
+                }}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? "border-blue-500 text-blue-600 dark:text-blue-400"
