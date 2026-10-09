@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { BreakGlassDialog } from "@/components/clinical/BreakGlassDialog";
 
 interface PatientRecord {
   id: string;
@@ -29,6 +30,8 @@ interface PatientRecord {
 
 export const PatientRecords = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [breakGlassOpen, setBreakGlassOpen] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<string>("");
   const navigate = useNavigate();
 
   const { data: records, isLoading } = useQuery({
@@ -100,12 +103,31 @@ export const PatientRecords = () => {
               className="pl-8"
             />
           </div>
+          <Button
+            variant="outline"
+            onClick={() => setBreakGlassOpen(true)}
+            className="border-red-200 text-red-700 hover:bg-red-50"
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            Emergency Access
+          </Button>
           <Button onClick={() => navigate("/medical-records")}>
             <FileText className="w-4 h-4 mr-2" />
             New Record
           </Button>
         </div>
       </div>
+
+      <BreakGlassDialog
+        open={breakGlassOpen}
+        onOpenChange={setBreakGlassOpen}
+        patientId={selectedPatientId}
+        patientName="Selected Patient"
+        onAccessGranted={() => {
+          // Refresh records after emergency access granted
+          window.location.reload();
+        }}
+      />
 
       {isLoading ? (
         <div className="text-center py-4">Loading records...</div>
