@@ -70,14 +70,20 @@ export const PatientWorkflow = React.memo(() => {
   // Uses the public provider directory (verified clinicians only); querying
   // profiles directly leaked the viewer's own row into the rail.
   const { data: featuredProviders = [] } = useQuery({
-    queryKey: ['patient-featured-providers'],
+    queryKey: ['patient-featured-providers', careMode],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('provider_directory')
-        .select('id, first_name, last_name, specialty, avatar_url, consultation_fee_min, role')
+        .select('id, first_name, last_name, specialty, avatar_url, consultation_fee_min, role, telemedicine_available')
         .eq('is_verified', true)
         .order('rating', { ascending: false, nullsFirst: false })
-        .limit(3);
+        .limit(10);
+      // Care mode actually filters: online shows video-capable providers,
+      // offline shows in-person providers. This is what the toggle is for.
+      if (careMode === 'online') {
+        query = query.eq('telemedicine_available', true);
+      }
+      const { data, error } = await query.limit(3);
       if (error) return [];
       return (data as any[]) || [];
     },
@@ -426,7 +432,7 @@ export const PatientWorkflow = React.memo(() => {
             <p className="text-xs text-slate-400 font-medium">Browse verified medical specialists</p>
           </div>
           <button
-            onClick={() => handleNavigation('/search', 'All Specialties')}
+            onClick={() => handleNavigation(`/search?mode=${careMode}`, 'All Specialties')}
             className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1"
           >
             <span>View all</span>
@@ -471,7 +477,7 @@ export const PatientWorkflow = React.memo(() => {
 
       <AvailableDoctorsRail
         providers={featuredProviders}
-        onViewAll={() => handleNavigation('/search', 'Find Doctors')}
+        onViewAll={() => handleNavigation(`/search?mode=${careMode}`, 'Find Doctors')}
         onViewProvider={(id) => navigate(`/provider/${id}`)}
       />
 

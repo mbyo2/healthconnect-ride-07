@@ -9,7 +9,7 @@ import { SpecialtyTiles } from "@/components/search/SpecialtyTiles";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 
 const SearchPage = () => {
-  const { searchQuery, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders } = useSearch();
+  const { searchQuery, setSearchQuery, setSearchTerm, setSelectedSpecialty, setTelemedicineOnly, refreshProviders } = useSearch();
   const { showSuccess } = useSuccessFeedback();
   const location = useLocation();
   const initializedRef = useRef(false);
@@ -37,6 +37,15 @@ const SearchPage = () => {
     const query = urlParams.get("q");
     const category = urlParams.get("category");
     const specialtyParam = urlParams.get("specialty");
+    const modeParam = urlParams.get("mode");
+
+    // Care mode from patient dashboard toggle: ?mode=online filters to
+    // video-capable providers, ?mode=offline shows all (in-person).
+    if (modeParam === "online") {
+      setTelemedicineOnly(true);
+    } else if (modeParam === "offline") {
+      setTelemedicineOnly(false);
+    }
 
     if (query) {
       setSearchQuery(query);
