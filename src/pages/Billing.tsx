@@ -153,7 +153,7 @@ export const Billing = () => {
         total_amount: total,
         paid_amount: 0,
         balance: total,
-        status: "pending",
+        status: "draft",
         due_date: dueDate || null,
         notes,
         created_by: user?.id,
