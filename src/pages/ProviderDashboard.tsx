@@ -18,7 +18,7 @@ import {
   MapPin, Building2, Languages, Save, Plus, X, Loader2,
   CheckCircle2, Hourglass,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
@@ -382,9 +382,14 @@ const MyPracticeEditor = () => {
 
 export const ProviderDashboard = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const today = new Date();
   // Agenda day — the timeline below navigates days; defaults to today.
   const [agendaDate, setAgendaDate] = useState<Date>(() => new Date());
+  // Deep-linkable tabs: ?tab=patients lands on the Patient Directory (used by
+  // the Medical EMR quick action so providers don't hit the patient-facing
+  // /medical-records page).
+  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") || "schedule");
   const { formatPrice } = useCurrency();
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
@@ -629,7 +634,7 @@ export const ProviderDashboard = () => {
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Weekly Patient Volume</div>
             <div className="text-3xl font-display font-medium text-accent-500">{weekStats?.total || 0}</div>
-            <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed Total</div>
+            <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed this week</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Active Queue Status</div>
@@ -657,7 +662,7 @@ export const ProviderDashboard = () => {
             { label: "Patient Queue", route: "/appointments", icon: ClipboardList },
             { label: "Write Rx", route: "/prescriptions", icon: FileText, requiresPrescribe: true },
             { label: "Telehealth", route: "/video-dashboard", icon: Video },
-            { label: "Medical EMR", route: "/medical-records", icon: Stethoscope },
+            { label: "Medical EMR", route: "/provider-dashboard?tab=patients", icon: Stethoscope },
             { label: "Chat Console", route: "/chat", icon: MessageSquare },
           ]
             .filter(act => hasRoutePermission(availableRoles, act.route) && (!act.requiresPrescribe || canPrescribe))
@@ -735,7 +740,7 @@ export const ProviderDashboard = () => {
         />
 
         {/* ── Detailed modules tabs (now includes My Practice) ── */}
-        <Tabs defaultValue="schedule" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto">
             <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
               {[

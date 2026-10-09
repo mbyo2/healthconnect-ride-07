@@ -204,17 +204,18 @@ export const Features = () => {
       preview: (
         <div className="space-y-2.5">
           {[
-            { name: "Sample Doctor", spec: "Cardiology · Video & clinic visits", note: "Sample preview" },
-            { name: "Sample Doctor", spec: "Emergency · Video visits", note: "Sample preview" },
-            { name: "Sample Doctor", spec: "General Medicine · Clinic visits", note: "Sample preview" },
+            { spec: "Cardiology", detail: "Video & clinic visits", price: "from K500" },
+            { spec: "Emergency Medicine", detail: "Video visits", price: "from K350" },
+            { spec: "General Medicine", detail: "Clinic visits", price: "from K200" },
           ].map((d, i) => (
             <div key={`${d.spec}-${i}`} className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
               <div>
-                <div className="font-medium text-sm text-midnight">{d.name}</div>
-                <div className="text-[11px] text-graphite-500 dark:text-slate-400">{d.spec}</div>
+                <div className="font-medium text-sm text-midnight">{d.spec}</div>
+                <div className="text-[11px] text-graphite-500 dark:text-slate-400">{d.detail}</div>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-[10px] text-graphite-400 font-medium">{d.note}</span>
+                <div className="text-xs font-bold text-primary-600">{d.price}</div>
+                <span className="text-[10px] text-graphite-400 font-medium">Illustrative preview</span>
               </div>
             </div>
           ))}
@@ -281,13 +282,13 @@ export const Features = () => {
       preview: (
         <div className="space-y-2.5">
           {[
-            { hospital: "Sample Referral Hospital", er: "Trauma care · Sample preview", dist: "2.4 km" },
-            { hospital: "Sample Emergency Centre", er: "24/7 Emergency Room · Sample preview", dist: "4.1 km" },
+            { facility: "ICU Bed", detail: "Trauma care · Available now", dist: "2.4 km" },
+            { facility: "Emergency Room", detail: "Open 24/7 · 3 beds free", dist: "4.1 km" },
           ].map((h) => (
-            <div key={h.hospital} className="p-3 rounded-2xl bg-canvas-bone border border-canvas-silk flex items-center justify-between gap-2">
+            <div key={h.facility} className="p-3 rounded-2xl bg-canvas-bone border border-canvas-silk flex items-center justify-between gap-2">
               <div>
-                <div className="text-xs font-medium text-midnight">{h.hospital}</div>
-                <div className="text-[10px] text-accent-600 font-medium">{h.er}</div>
+                <div className="text-xs font-medium text-midnight">{h.facility}</div>
+                <div className="text-[10px] text-accent-600 font-medium">{h.detail} · <span className="text-graphite-400">Illustrative preview</span></div>
               </div>
               <div className="flex items-center gap-1 text-[10px] text-graphite-400 shrink-0">
                 <MapPin className="h-3 w-3" /> {h.dist}

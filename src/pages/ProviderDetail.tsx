@@ -400,27 +400,31 @@ export const ProviderDetail = () => {
                 </Section>
               )}
 
-              {/* Weekly Availability */}
+              {/* Weekly Availability — always render Mon–Sun in order so the
+                  grid is consistent even when the stored schedule is sparse */}
               {schedule && Object.keys(schedule).length > 0 && (
                 <Section icon={Clock} title="Weekly Availability">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {Object.entries(schedule).map(([day, info]) => (
-                      <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
-                        <p className="text-[11px] font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
-                        {info.available ? (
-                          <div className="space-y-0.5 mt-1">
-                            {(info.hours || []).map(h => (
-                              <p key={h} className="text-[10px] text-primary-500 font-bold">{h}</p>
-                            ))}
-                            {(!info.hours || info.hours.length === 0) && (
-                              <p className="text-[10px] text-success-500 font-bold">Available</p>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
-                        )}
-                      </div>
-                    ))}
+                    {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => {
+                      const info = (schedule as Record<string, { available: boolean; hours: string[] }>)[day];
+                      return (
+                        <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
+                          <p className="text-[11px] font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
+                          {info?.available ? (
+                            <div className="space-y-0.5 mt-1">
+                              {(info.hours || []).map(h => (
+                                <p key={h} className="text-[10px] text-primary-500 font-bold">{h}</p>
+                              ))}
+                              {(!info.hours || info.hours.length === 0) && (
+                                <p className="text-[10px] text-success-500 font-bold">Available</p>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </Section>
               )}

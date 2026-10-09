@@ -124,7 +124,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap justify-end">
-                    {provider.rating && (
+                    {Number(provider.rating) > 0 && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold text-slate-900 bg-warning-500/20 border border-warning-500/30">
                         <Star className="h-3 w-3 text-warning-500 fill-warning-500" />
                         {Number(provider.rating).toFixed(1)}

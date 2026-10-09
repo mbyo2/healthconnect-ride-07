@@ -22,7 +22,7 @@ const personalInfoSchema = z.object({
   firstName: z.string().min(2, "First name required"),
   lastName: z.string().min(2, "Last name required"),
   email: z.string().email("Valid email required"),
-  phone: z.string().min(10, "Phone number required"),
+  phone: z.string().min(10, "Phone number required").regex(/^[+]?[0-9\s-]{10,15}$/, "Enter a valid phone number (e.g. +260970000001)"),
   dateOfBirth: z.string().min(1, "Date of birth required"),
   gender: z.string().min(1, "Gender required"),
   bloodType: z.string().optional(),
@@ -37,7 +37,7 @@ const contactInfoSchema = z.object({
 
 const emergencyContactSchema = z.object({
   emergencyName: z.string().min(2, "Emergency contact name required"),
-  emergencyPhone: z.string().min(10, "Emergency contact phone required"),
+  emergencyPhone: z.string().min(10, "Emergency contact phone required").regex(/^[+]?[0-9\s-]{10,15}$/, "Enter a valid phone number"),
   emergencyRelationship: z.string().min(1, "Relationship required"),
   emergencyEmail: z.string().email("Valid email").optional().or(z.literal("")),
 });
@@ -85,6 +85,14 @@ export const PatientRegistration = () => {
   const [insuranceProviders, setInsuranceProviders] = useState<any[]>([]);
 
   const totalSteps = 6;
+
+  // Step 6 passwords use local state as the source of truth, synced into
+  // passwordForm via setValue. (Three previous "binding" fixes to the RHF
+  // Controller for confirmPassword all failed live — the field would not
+  // retain input. Local state guarantees the input works; setValue keeps
+  // zod validation and submit intact.)
+  const [passwordValue, setPasswordValue] = useState("");
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState("");
 
   const personalInfoForm = useForm<z.infer<typeof personalInfoSchema>>({
     resolver: zodResolver(personalInfoSchema),
@@ -504,7 +512,7 @@ export const PatientRegistration = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Phone Number</FormLabel>
-                  <FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs" /></FormControl>
+                  <FormControl><Input {...field} type="tel" autoComplete="off" placeholder="+260..." className="h-9 text-xs" /></FormControl>
                   <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
@@ -736,7 +744,7 @@ export const PatientRegistration = () => {
             <FormField
               control={passwordForm.control}
               name="password"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Password</FormLabel>
                   <FormControl>
@@ -744,11 +752,12 @@ export const PatientRegistration = () => {
                       type="password"
                       autoComplete="new-password"
                       className="h-9 text-xs"
-                      name={field.name}
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
+                      value={passwordValue}
+                      onChange={(e) => {
+                        setPasswordValue(e.target.value);
+                        passwordForm.setValue("password", e.target.value, { shouldValidate: true });
+                      }}
+                      onBlur={() => passwordForm.trigger("password")}
                     />
                   </FormControl>
                   <FormMessage className="text-[10px]" />
@@ -758,7 +767,7 @@ export const PatientRegistration = () => {
             <FormField
               control={passwordForm.control}
               name="confirmPassword"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Confirm Password</FormLabel>
                   <FormControl>
@@ -766,8 +775,12 @@ export const PatientRegistration = () => {
                       type="password"
                       autoComplete="new-password"
                       className="h-9 text-xs"
-                      {...field}
-                      value={field.value ?? ""}
+                      value={confirmPasswordValue}
+                      onChange={(e) => {
+                        setConfirmPasswordValue(e.target.value);
+                        passwordForm.setValue("confirmPassword", e.target.value, { shouldValidate: true });
+                      }}
+                      onBlur={() => passwordForm.trigger("confirmPassword")}
                     />
                   </FormControl>
                   <FormMessage className="text-[10px]" />

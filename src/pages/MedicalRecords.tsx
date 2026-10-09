@@ -329,13 +329,6 @@ export default function MedicalRecords() {
                 <span>Request Records</span>
               </button>
               <button
-                onClick={() => navigate('/ai-diagnostics')}
-                title="Scan documents with AI"
-                className="flex items-center gap-2 p-3 min-h-[52px] rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
-                <Upload className="h-4 w-4 text-warning-500" />
-                <span>Scan Document</span>
-              </button>
-              <button
                 onClick={() => navigate('/health-dashboard')}
                 className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
               >

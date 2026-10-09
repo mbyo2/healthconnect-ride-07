@@ -86,7 +86,7 @@ export const ScheduleManager = () => {
 
       <Card className="p-6">
         <h2 className="text-2xl font-semibold mb-4">
-          Appointments for {selectedDate?.toLocaleDateString()}
+          Appointments for {selectedDate?.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
         </h2>
         
         {isLoading ? (

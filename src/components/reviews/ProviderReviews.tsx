@@ -176,12 +176,9 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
         </Card>
       )}
 
-      {/* Reviews List */}
-      {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Loading reviews...</div>
-      ) : reviews.length === 0 ? (
-        <Card><CardContent className="py-8 text-center text-muted-foreground">No reviews yet. Be the first to review!</CardContent></Card>
-      ) : (
+      {/* Reviews List — the summary card above already covers the empty state,
+          so don't render a second "no reviews" card */}
+      {!isLoading && reviews.length > 0 && (
         <div className="space-y-4">
           {reviews.map((review: any) => (
             <Card key={review.id}>
@@ -229,6 +226,9 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
             </Card>
           ))}
         </div>
+      )}
+      {isLoading && (
+        <div className="text-center py-8 text-muted-foreground">Loading reviews...</div>
       )}
     </div>
   );

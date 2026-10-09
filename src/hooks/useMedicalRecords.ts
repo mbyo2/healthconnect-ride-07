@@ -106,7 +106,9 @@ export function useMedicalRecords(userId: string | undefined) {
             setRecords([...mappedData, ...imagingRecords, ...labRecords, ...prescriptionRecords]);
         } catch (error) {
             console.error('Error fetching medical records:', error);
-            toast.error('Failed to load medical records');
+            // Don't toast on load failure — the empty state ("No medical
+            // records found yet") is the correct UX, especially for new
+            // accounts. A toast on every fresh load is hostile.
         } finally {
             setLoading(false);
         }

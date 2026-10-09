@@ -4,9 +4,11 @@ import { safeCryptoUUID } from "@/utils/storage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useUserRoles } from "@/context/UserRolesContext";
 
 const VideoDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { isHealthPersonnel } = useUserRoles();
   const navigate = useNavigate();
   const [stats, setStats] = useState({ upcoming: 0, today: 0, active: 0, loading: true, error: false });
 
@@ -157,7 +159,7 @@ const VideoDashboard: React.FC = () => {
             </div>
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Create a Shareable Call Room</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Create a room link to share with your provider — no provider is assigned automatically; share the link after your booking.</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{isHealthPersonnel ? "Create a room link to share with your patient — no patient is assigned automatically; share the link after the booking." : "Create a room link to share with your provider — no provider is assigned automatically; share the link after your booking."}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
