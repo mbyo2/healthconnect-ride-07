@@ -55,9 +55,9 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Overdue", icon: <Clock className="h-5 w-5" /> },
     ],
     quickActions: [
-      { label: "Create Invoice", path: "/institution-dashboard?tab=billing", icon: <FileText className="h-5 w-5" />, description: "Generate patient invoice" },
-      { label: "Record Payment", path: "/institution-dashboard?tab=billing", icon: <CreditCard className="h-5 w-5" />, description: "Log payment received" },
-      { label: "Revenue Reports", path: "/institution-dashboard?tab=reports", icon: <TrendingUp className="h-5 w-5" />, description: "View financial analytics" },
+      { label: "Create Invoice", path: "/hospital-management?tab=billing", icon: <FileText className="h-5 w-5" />, description: "Generate patient invoice" },
+      { label: "Record Payment", path: "/hospital-management?tab=billing", icon: <CreditCard className="h-5 w-5" />, description: "Log payment received" },
+      { label: "Revenue Reports", path: "/hospital-management?tab=billing", icon: <TrendingUp className="h-5 w-5" />, description: "View financial analytics" },
     ],
     tabs: [
       { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },
@@ -156,8 +156,8 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Assessed Today", icon: <ClipboardList className="h-5 w-5" /> },
     ],
     quickActions: [
-      { label: "Triage Queue", path: "/triage", icon: <ClipboardList className="h-5 w-5" />, description: "Assess waiting patients" },
-      { label: "Vitals Entry", path: "/triage", icon: <Activity className="h-5 w-5" />, description: "Record vital signs" },
+      { label: "Triage Queue", path: "/opd", icon: <ClipboardList className="h-5 w-5" />, description: "Assess waiting patients" },
+      { label: "Vitals Entry", path: "/opd", icon: <Activity className="h-5 w-5" />, description: "Record vital signs" },
     ],
     tabs: [
       { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },

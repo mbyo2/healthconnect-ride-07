@@ -87,9 +87,11 @@ const InstitutionSettings = () => {
   // Effective modules for this facility (tier charter + admin entitlements)
   const [effModules, setEffModules] = useState<EffectiveModule[]>([]);
   const [modulePrices, setModulePrices] = useState<Record<string, ModulePrice>>({});
+  const [modulesError, setModulesError] = useState(false);
   useEffect(() => {
     if (!institution?.id) return;
     let cancelled = false;
+    setModulesError(false);
     (async () => {
       try {
         const [{ modules }, priceMap] = await Promise.all([
@@ -97,7 +99,9 @@ const InstitutionSettings = () => {
           getModulePriceMap(supabase as any).catch(() => ({} as Record<string, ModulePrice>)),
         ]);
         if (!cancelled) { setEffModules(modules); setModulePrices(priceMap); }
-      } catch { /* modules are progressive enhancement */ }
+      } catch {
+        if (!cancelled) { setModulesError(true); }
+      }
     })();
     return () => { cancelled = true; };
   }, [institution?.id, institution?.type_code]);
@@ -423,7 +427,11 @@ const InstitutionSettings = () => {
               ambulance dispatch? Contact the Doc'O Clock platform team and we switch it on for you.
             </p>
             {effModules.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Loading modules…</p>
+              modulesError ? (
+                <p className="text-sm text-muted-foreground">Modules unavailable. Please refresh the page to try again.</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">Loading modules…</p>
+              )
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {effModules.map((m) => {
