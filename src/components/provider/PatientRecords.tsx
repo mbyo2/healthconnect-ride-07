@@ -221,7 +221,7 @@ export const PatientRecords = () => {
 
       {isLoading ? (
         <div className="text-center py-4">Loading records...</div>
-      ) : (
+      ) : filteredRecords && filteredRecords.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
@@ -253,6 +253,16 @@ export const PatientRecords = () => {
             })}
           </TableBody>
         </Table>
+      ) : (
+        <div className="text-center py-12">
+          <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" aria-hidden />
+          <h3 className="font-bold text-sm mb-1">No patient records yet</h3>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+            {searchTerm
+              ? `No records match "${searchTerm}". Try a different search.`
+              : "Records for your patients will appear here. In an emergency, use Emergency Access to request temporary access to a patient's records."}
+          </p>
+        </div>
       )}
     </Card>
   );

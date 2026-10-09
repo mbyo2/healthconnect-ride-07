@@ -294,7 +294,7 @@ const MyPracticeEditor = () => {
             placeholder="Add hospital name…"
             className="h-9 rounded-xl border-canvas-silk text-xs"
           />
-          <Button type="button" size="sm" onClick={addHospital} className="rounded-xl h-9 px-3 bg-primary-500 hover:bg-primary-600">
+          <Button type="button" size="sm" onClick={addHospital} aria-label="Add affiliated hospital" className="rounded-xl h-9 px-3 bg-primary-500 hover:bg-primary-600">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
