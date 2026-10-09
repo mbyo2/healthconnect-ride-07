@@ -105,11 +105,12 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
     // non-fatal — try the next source
   }
   try {
-    // Source 2: medical_records with allergy record types (patients add these
-    // via Medical Records → Add Record). Without this, the safety check misses
-    // allergies recorded outside the registry (found 2026-10-09: Penicillin
-    // allergy in medical_records did not block a Penicillin prescription).
-    const { data: records } = await (supabase.from('medical_records' as any) as any)
+    // Source 2: comprehensive_medical_records with allergy record types
+    // (patients add these via Medical Records → Add Record). Without this,
+    // the safety check misses allergies recorded outside the registry
+    // (found 2026-10-09: Penicillin allergy in comprehensive_medical_records
+    // did not block a Penicillin prescription).
+    const { data: records } = await (supabase.from('comprehensive_medical_records' as any) as any)
       .select('title, description, record_type')
       .eq('patient_id', patientId)
       .ilike('record_type', '%allerg%')
@@ -161,4 +162,3 @@ export function summarizeAllergies(matches: AllergyMatch[]): string {
     .map(m => `ALLERGY ALERT: ${m.medication} may conflict with recorded allergy "${m.allergen}"`)
     .join('\n');
 }
-// Force rebuild 20261009174257
