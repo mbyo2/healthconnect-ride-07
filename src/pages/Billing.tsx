@@ -75,14 +75,45 @@ export const Billing = () => {
 
   const fetchPatients = async () => {
     try {
-      const { data } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get patients from appointments (provider has relationship via appointment)
+      const { data: appointments } = await supabase
+        .from("appointments")
+        .select("patient_id")
+        .eq("provider_id", user.id);
+
+      const patientIds = [...new Set((appointments || []).map((a: any) => a.patient_id).filter(Boolean))];
+
+      // Get patients from registry
+      const { data: registry } = await supabase
         .from("institution_patient_registry")
         .select("linked_patient_id, first_name, last_name")
         .eq("institution_id", institutionId || "");
-      setPatients((data || []).map((p: any) => ({
+
+      const registryPatients = (registry || []).map((p: any) => ({
         id: p.linked_patient_id,
         name: `${p.first_name} ${p.last_name}`.trim()
-      })));
+      }));
+
+      // Get patient profiles for appointment patients not in registry
+      const registryIds = new Set(registryPatients.map(p => p.id));
+      const missingIds = patientIds.filter(id => !registryIds.has(id));
+
+      let appointmentPatients: any[] = [];
+      if (missingIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name")
+          .in("id", missingIds);
+        appointmentPatients = (profiles || []).map((p: any) => ({
+          id: p.id,
+          name: `${p.first_name} ${p.last_name}`.trim()
+        }));
+      }
+
+      setPatients([...registryPatients, ...appointmentPatients]);
     } catch (err) {
       console.error("Failed to fetch patients:", err);
     }
