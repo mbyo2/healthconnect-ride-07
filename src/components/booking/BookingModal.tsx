@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { expandHoursToSlots } from "@/utils/availability";
 import { WaitlistSignup } from "./WaitlistSignup";
 import { CostBreakdown } from "./CostBreakdown";
 import { DayStripPicker } from "./DayStripPicker";
@@ -357,14 +358,27 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
   );
 
   const renderDateTimeSelection = () => {
+    // The time grid honors the provider's working hours for the selected
+    // day: a Tuesday 09:00-12:00 schedule shows 09:00-11:30, not the full
+    // static grid. Providers with no schedule info keep the previous static
+    // grid (booking stays possible for the 8 directory providers whose
+    // hours were never entered).
+    const sched = (provider as any).availability_schedule as Record<
+      string, { available: boolean; hours: string[] }
+    > | null | undefined;
+    const hasAnySchedule = !!sched && Object.keys(sched).length > 0;
+    const dayKey = selectedDate ? format(selectedDate, "eeee").toLowerCase() : null;
+    const dayHours: string[] = hasAnySchedule && dayKey ? (sched![dayKey]?.hours ?? []) : [];
+    const baseSlots = hasAnySchedule ? expandHoursToSlots(dayHours) : TIME_SLOTS;
     // A tapped "nearest slot" chip can carry a time outside the standard
     // grid (e.g. a provider schedule of 08:35 or 17:10). Merge it in so the
     // preselected time always renders visibly selected — otherwise the user
     // lands here with nothing highlighted and Continue disabled.
     const displaySlots =
-      selectedTime && !TIME_SLOTS.includes(selectedTime)
-        ? [...TIME_SLOTS, selectedTime].sort()
-        : TIME_SLOTS;
+      selectedTime && !baseSlots.includes(selectedTime)
+        ? [...baseSlots, selectedTime].sort()
+        : baseSlots;
+    const noHoursToday = !!selectedDate && hasAnySchedule && displaySlots.length === 0;
     return (
     <div className="space-y-6">
       <Button variant="ghost" onClick={() => setStep('type')} className="mb-2 h-11">
@@ -445,6 +459,12 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
             <Clock className="h-4 w-4 text-primary" />
             Available times for {format(selectedDate, 'EEEE, MMM d')}
           </h4>
+          {noHoursToday ? (
+            <p className="text-sm text-muted-foreground bg-muted rounded-xl px-4 py-6 text-center">
+              {providerDisplayName(provider)} doesn't see patients on {format(selectedDate, 'EEEE')}s.
+              Please choose another day.
+            </p>
+          ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Available times">
             {displaySlots.map((time) => {
               const isBooked = isSlotBooked(selectedDate, time);
@@ -472,6 +492,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
               );
             })}
           </div>
+          )}
         </div>
       )}
 
