@@ -142,7 +142,7 @@ function renderApp() {
             <QueryClientProvider client={queryClient}>
               <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
                 <App />
-                <Toaster position="top-right" richColors closeButton />
+                <Toaster position="top-right" richColors closeButton toastOptions={{ style: { zIndex: 9999, marginTop: '64px' } }} />
               </ThemeProvider>
             </QueryClientProvider>
           </React.Suspense>
