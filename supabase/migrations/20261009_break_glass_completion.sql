@@ -31,20 +31,22 @@ CREATE POLICY "Break-glass emergency access to records"
 -- preconditions (not authenticated, <2 chars, not clinical staff) yield an
 -- empty set rather than an error, so probing reveals nothing. (A NULL caller
 -- fails the EXISTS check.) Deliberately a single compact statement: the
--- dashboard SQL editor mangles long typed input.
+-- dashboard SQL editor mangles long typed input — and specifically duplicates
+-- statements containing $$ quoting or % wildcards, so this uses $f$ quoting
+-- and position()/lower() instead of ILIKE '%...%'.
 CREATE OR REPLACE FUNCTION public.emergency_patient_search(q text)
 RETURNS TABLE (pid uuid, nm text)
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path TO 'public'
-AS $$
+AS $f$
   SELECT p.id, concat_ws(' ', p.first_name, p.last_name)
   FROM public.profiles p
-  WHERE concat_ws(' ', p.first_name, p.last_name) ILIKE '%' || trim(coalesce(q, '')) || '%'
+  WHERE position(lower(trim(coalesce(q, ''))) in lower(concat_ws(' ', p.first_name, p.last_name))) > 0
     AND char_length(trim(coalesce(q, ''))) >= 2
     AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role <> 'patient')
   LIMIT 20;
-$$;
+$f$;
 
 -- log_emergency_lookup: audit-log every returned identity as
 -- 'emergency_lookup' so admins can review who looked up whom.
