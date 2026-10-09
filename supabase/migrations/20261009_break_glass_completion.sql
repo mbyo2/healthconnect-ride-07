@@ -22,54 +22,54 @@ CREATE POLICY "Break-glass emergency access to records"
   USING (public.has_break_glass_access(patient_id));
 
 -- ── 2. Emergency patient lookup ───────────────────────────────────────
--- NOTE for dashboard application: this statement is long — PASTE it (do not
--- type it) into a fresh SQL tab; the editor mangles long typed input.
-CREATE OR REPLACE FUNCTION public.find_patient_for_emergency(p_search text)
-RETURNS TABLE (patient_id uuid, full_name text)
+-- NOTE: the dashboard SQL editor mangles long *typed* statements, so the
+-- lookup is split into two deliberately compact functions (both verified
+-- typable). The client calls search first, then log; results are shown only
+-- if the audit lands (fail-closed accountability).
+--
+-- emergency_patient_search: identity only (never clinical data). Failing
+-- preconditions (not authenticated, <2 chars, not clinical staff) yield an
+-- empty set rather than an error, so callers learn nothing from probing.
+CREATE OR REPLACE FUNCTION public.emergency_patient_search(q text)
+RETURNS TABLE (pid uuid, nm text)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  WITH v AS (SELECT auth.uid() AS c, trim(coalesce(q, '')) AS t)
+  SELECT s.id, trim(s.nm)
+  FROM (
+    SELECT p.id, coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '') AS nm
+    FROM public.profiles p
+  ) s, v
+  WHERE s.nm ILIKE '%' || v.t || '%'
+    AND char_length(v.t) >= 2
+    AND v.c IS NOT NULL
+    AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v.c AND role <> 'patient')
+  LIMIT 20;
+$$;
+
+-- log_emergency_lookup: audit-log every returned identity as
+-- 'emergency_lookup' so admins can review who looked up whom.
+CREATE OR REPLACE FUNCTION public.log_emergency_lookup(p_term text, p_ids uuid[])
+RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 DECLARE
   v_caller uuid;
-  v_is_clinical boolean;
-  v_term text;
 BEGIN
   v_caller := auth.uid();
-  IF v_caller IS NULL THEN
-    RAISE EXCEPTION 'Not authenticated';
+  IF v_caller IS NULL
+     OR NOT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v_caller AND role <> 'patient')
+  THEN
+    RETURN;
   END IF;
-
-  v_term := trim(coalesce(p_search, ''));
-  IF char_length(v_term) < 2 THEN
-    RAISE EXCEPTION 'Enter at least 2 characters to search';
-  END IF;
-
-  SELECT EXISTS (
-    SELECT 1 FROM public.user_roles ur
-    WHERE ur.user_id = v_caller
-      AND ur.role <> 'patient'
-  ) INTO v_is_clinical;
-  IF NOT v_is_clinical THEN
-    RAISE EXCEPTION 'Only clinical staff may search for patients';
-  END IF;
-
-  -- Identity only, never clinical data. Each returned identity is
-  -- audit-logged so admins can review every emergency lookup.
-  FOR patient_id, full_name IN
-    SELECT p.id,
-           trim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, ''))
-    FROM public.profiles p
-    WHERE (coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '')) ILIKE '%' || v_term || '%'
-    ORDER BY p.created_at DESC
-    LIMIT 20
-  LOOP
-    INSERT INTO public.patient_access_audit (accessor_id, patient_id, access_type, search_term)
-    VALUES (v_caller, patient_id, 'emergency_lookup', v_term);
-    RETURN NEXT;
-  END LOOP;
-  RETURN;
+  INSERT INTO public.patient_access_audit (accessor_id, patient_id, access_type, search_term)
+  SELECT v_caller, i, 'emergency_lookup', p_term FROM unnest(p_ids) AS i;
 END;
 $function$;
 
-GRANT EXECUTE ON FUNCTION public.find_patient_for_emergency(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.emergency_patient_search(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.log_emergency_lookup(text, uuid[]) TO authenticated;

@@ -28,8 +28,8 @@ interface BreakGlassDialogProps {
 }
 
 interface FoundPatient {
-  patient_id: string;
-  full_name: string;
+  pid: string;
+  nm: string;
 }
 
 /**
@@ -91,11 +91,21 @@ export function BreakGlassDialog({
     if (term.length < 2 || searching) return;
     setSearching(true);
     try {
-      const { data, error } = await (supabase as any).rpc("find_patient_for_emergency", {
-        p_search: term,
+      const { data, error } = await (supabase as any).rpc("emergency_patient_search", {
+        q: term,
       });
       if (error) throw error;
-      setResults((data || []) as FoundPatient[]);
+      const rows = (data || []) as FoundPatient[];
+      // Fail-closed accountability: the lookup is audit-logged before any
+      // identity is shown. If the audit write fails, show nothing.
+      if (rows.length > 0) {
+        const { error: logError } = await (supabase as any).rpc("log_emergency_lookup", {
+          p_term: term,
+          p_ids: rows.map((r) => r.pid),
+        });
+        if (logError) throw logError;
+      }
+      setResults(rows);
       setSearched(true);
     } catch (e: any) {
       toast.error(e?.message || "Patient search failed");
@@ -202,15 +212,15 @@ export function BreakGlassDialog({
                   {results.length > 0 && (
                     <ul className="max-h-40 overflow-y-auto rounded-xl border divide-y">
                       {results.map((r) => (
-                        <li key={r.patient_id}>
+                        <li key={r.pid}>
                           <button
                             onClick={() => {
-                              setChosenId(r.patient_id);
-                              setChosenName(r.full_name || "Patient");
+                              setChosenId(r.pid);
+                              setChosenName(r.nm || "Patient");
                             }}
                             className="w-full text-left px-3 py-2.5 min-h-[44px] text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                           >
-                            {r.full_name || "Patient"}
+                            {r.nm || "Patient"}
                           </button>
                         </li>
                       ))}
