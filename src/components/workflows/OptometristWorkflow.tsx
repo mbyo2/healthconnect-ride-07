@@ -20,8 +20,8 @@ import {
 export const OptometristWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  const { isInstitutionAffiliated } = useInstitutionAffiliation();
-  const { patients } = useHospitalPatients();
+  const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
+  const { patients } = useHospitalPatients(institutionId);
   const { user } = useAuth();
   const [showExam, setShowExam] = useState(false);
   const [examPatientId, setExamPatientId] = useState('');

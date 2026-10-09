@@ -21,13 +21,13 @@ import {
 export const NurseWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
   const { user } = useAuth();
 
   // Structured vitals entry (previously "coming soon").
   const [showVitals, setShowVitals] = useState(false);
   const [vitalsPatientId, setVitalsPatientId] = useState('');
-  const { patients: vitalsPatients } = useHospitalPatients();
+  const { patients: vitalsPatients } = useHospitalPatients(institutionId);
   const [vitals, setVitals] = useState({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
   const [vitalsNotes, setVitalsNotes] = useState('');
   const [savingVitals, setSavingVitals] = useState(false);
