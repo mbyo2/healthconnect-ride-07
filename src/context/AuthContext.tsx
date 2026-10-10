@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
@@ -242,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -255,9 +255,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error in signIn:', error);
       return { error };
     }
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string, userData = {}) => {
+  const signUp = useCallback(async (email: string, password: string, userData = {}) => {
     try {
       const response = await supabase.auth.signUp({
         email,
@@ -277,23 +277,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error in signUp:', error);
       return { error, data: null };
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error('Error signing out');
       console.error('Error signing out:', error);
     }
-  };
+  }, []);
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (user) {
       await fetchProfile(user.id);
     }
-  };
+  }, [user]);
 
-  const value = {
+  // Memoized context value — prevents cascade re-renders across the app.
+  // Without this, every AuthContext state change recreates the value object,
+  // forcing ALL consumers to re-render even when their data didn't change.
+  const value = useMemo(() => ({
     user,
     session,
     profile,
@@ -305,7 +308,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signOut,
     refreshProfile,
-  };
+  }), [user, session, profile, isLoading, signIn, signUp, signOut, refreshProfile]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

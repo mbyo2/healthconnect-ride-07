@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { expandHoursToSlots } from "@/utils/availability";
+import { isExpiringSoon } from "@/utils/celebration";
 import { WaitlistSignup } from "./WaitlistSignup";
 import { CostBreakdown } from "./CostBreakdown";
 import { DayStripPicker } from "./DayStripPicker";
@@ -482,23 +483,31 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
               const isPast = isSlotPast(selectedDate, time);
               const unavailable = isBooked || isPast;
               const isSelected = selectedTime === time;
+              // Uber-style urgency: slots starting within 2h pulse with an "Expiring soon" badge
+              const isExpiring = !unavailable && !isSelected && isExpiringSoon(time, selectedDate);
 
               return (
                 <button
                   key={time}
                   role="radio"
                   aria-checked={isSelected}
-                  aria-label={`${time}${isBooked ? ", already booked" : isPast ? ", time has passed" : ", available"}`}
+                  aria-label={`${time}${isBooked ? ", already booked" : isPast ? ", time has passed" : isExpiring ? ", available, expiring soon" : ", available"}`}
                   disabled={unavailable}
                   onClick={() => setSelectedTime(time)}
                   className={cn(
-                    "p-3 rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                    "relative p-3 rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                     unavailable && "bg-muted text-muted-foreground line-through cursor-not-allowed",
                     isSelected && "bg-primary text-primary-foreground",
-                    !unavailable && !isSelected && "bg-muted hover:bg-primary/10 cursor-pointer"
+                    isExpiring && "doc-pulse-ring bg-orange-50 border border-orange-300 text-orange-900 hover:bg-orange-100 cursor-pointer",
+                    !unavailable && !isSelected && !isExpiring && "bg-muted hover:bg-primary/10 cursor-pointer"
                   )}
                 >
                   {time}
+                  {isExpiring && (
+                    <span className="absolute -top-2 -right-1 text-[9px] font-bold text-white bg-orange-500 px-1.5 py-px rounded-full doc-urgency-blink whitespace-nowrap">
+                      Expiring soon
+                    </span>
+                  )}
                 </button>
               );
             })}
