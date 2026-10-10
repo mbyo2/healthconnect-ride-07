@@ -10,13 +10,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapPin, Loader2 } from "lucide-react";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
 function LocationPicker({
   position,
   onChange,
@@ -29,7 +22,18 @@ function LocationPicker({
       onChange(e.latlng.lat, e.latlng.lng);
     },
   });
-  return position ? <Marker position={position} /> : null;
+  if (!position) return null;
+  const pinIcon = L.divIcon({
+    className: "dococlock-pin-marker",
+    html: `<div style="
+      width: 36px; height: 36px; border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: #2563eb; border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 32],
+  });
+  return <Marker position={position} icon={pinIcon} />;
 }
 
 interface Props {

@@ -8,12 +8,29 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Truck, Package, CheckCircle, Clock, Navigation } from "lucide-react";
 
-// Fix default marker icons for Leaflet + Vite
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+// Doc'O Clock branded markers — no third-party branding on pins/popups
+const riderIcon = L.divIcon({
+  className: "dococlock-rider-marker",
+  html: `<div style="
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #2563eb; border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;">🛵</div>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+});
+
+const pharmacyIcon = L.divIcon({
+  className: "dococlock-pharmacy-marker",
+  html: `<div style="
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #059669; border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;">💊</div>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
 });
 
 const STATUS_STEPS = ["assigned", "picked_up", "in_transit", "delivered"];
@@ -166,11 +183,17 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
               <Polyline positions={positions} color="#2563eb" weight={4} />
             )}
             {latestPos && (
-              <Marker position={latestPos}>
+              <Marker position={latestPos} icon={riderIcon}>
                 <Popup>
-                  Rider location
-                  <br />
-                  Updated just now
+                  <div style={{ textAlign: "center" }}>
+                    <strong style={{ color: "#2563eb" }}>Doc'O Clock Rider</strong>
+                    <br />
+                    {delivery.courier?.full_name || "Your rider"}
+                    <br />
+                    <span style={{ fontSize: "12px", color: "#666" }}>
+                      Live location · updated just now
+                    </span>
+                  </div>
                 </Popup>
               </Marker>
             )}
