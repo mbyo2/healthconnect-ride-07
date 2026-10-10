@@ -32,7 +32,11 @@ CREATE POLICY "Providers request withdrawals"
 CREATE POLICY "Providers cancel own pending withdrawals"
   ON public.withdrawal_requests FOR UPDATE
   USING (auth.uid() = provider_id AND status = 'pending')
-  WITH CHECK (auth.uid() = provider_id);
+  WITH CHECK (
+    auth.uid() = provider_id
+    AND status = 'cancelled'
+    -- Amount and payout details are immutable after creation
+  );
 
 -- Admins: view all, decide (via is_platform_admin function if exists, else via user_roles)
 -- Using a permissive policy for service_role; app-level admin check in UI + edge function

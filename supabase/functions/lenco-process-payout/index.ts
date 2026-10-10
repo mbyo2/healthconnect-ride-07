@@ -53,7 +53,8 @@ serve(async (req) => {
 
     if (fetchError || !withdrawal) throw new Error("Withdrawal not found");
     if (withdrawal.status !== "approved") throw new Error(`Cannot pay: status is ${withdrawal.status}`);
-    if ((withdrawal as any).lenco_reference) throw new Error("Already paid via Lenco");
+    // SECURITY: must have been approved by an admin (decided_by set), not self-approved
+    if (!withdrawal.decided_by) throw new Error("Cannot pay: no admin approval recorded");
 
     const details = withdrawal.payout_details as any;
     const reference = `WD-${withdrawal.id.slice(0, 8).toUpperCase()}`;
@@ -109,29 +110,90 @@ serve(async (req) => {
       }
     }
 
-    // Update withdrawal with Lenco reference, mark as paid
+    // Atomically claim this withdrawal as processing (prevents double-send race)
+    const { data: claimed } = await supabase
+      .from("withdrawal_requests")
+      .update({ status: "processing", updated_at: new Date().toISOString() })
+      .eq("id", withdrawal_id)
+      .eq("status", "approved")
+      .select("id")
+      .maybeSingle();
+
+    if (!claimed) {
+      throw new Error("Withdrawal is no longer in approved state (may already be processing)");
+    }
+
+    // Update withdrawal with Lenco reference
+    // NOTE: status stays "processing" until transfer is confirmed successful.
+    // Only mark "paid" after checkTransferStatus returns "successful".
+    const finalStatus = result.status === "successful" ? "paid" : "processing";
+
     const { error: updateError } = await supabase
       .from("withdrawal_requests")
       .update({
-        status: "paid",
-        paid_at: new Date().toISOString(),
+        status: finalStatus,
+        paid_at: finalStatus === "paid" ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", withdrawal_id);
 
     if (updateError) throw updateError;
 
-    // Log in ledger
-    await supabase.from("lenco_payments").insert({
+    // Debit the provider's wallet (only when actually paid)
+    if (finalStatus === "paid") {
+      const { data: wallet } = await supabase
+        .from("user_wallets")
+        .select("balance")
+        .eq("user_id", withdrawal.provider_id)
+        .maybeSingle();
+
+      const currentBalance = Number((wallet as any)?.balance || 0);
+      const payoutAmount = Number(withdrawal.amount);
+
+      if (currentBalance < payoutAmount) {
+        // Insufficient balance — revert to approved for admin review
+        await supabase
+          .from("withdrawal_requests")
+          .update({ status: "approved", updated_at: new Date().toISOString() })
+          .eq("id", withdrawal_id);
+        throw new Error(`Insufficient wallet balance (K${currentBalance.toFixed(2)} < K${payoutAmount.toFixed(2)})`);
+      }
+
+      const { error: debitError } = await supabase
+        .from("user_wallets")
+        .update({
+          balance: currentBalance - payoutAmount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", withdrawal.provider_id);
+
+      if (debitError) throw debitError;
+
+      // Record the debit in wallet_transactions
+      await supabase.from("wallet_transactions").insert({
+        user_id: withdrawal.provider_id,
+        transaction_type: "debit",
+        amount: payoutAmount,
+        description: `Withdrawal payout ${reference}`,
+        gateway_ref: `PAYOUT:${withdrawal_id}`,
+      });
+    }
+
+    // Log in ledger (using correct lenco_payments columns)
+    const { error: ledgerError } = await supabase.from("lenco_payments").insert({
       user_id: withdrawal.provider_id,
       amount: withdrawal.amount,
       currency: withdrawal.currency || "ZMW",
-      reference,
-      lenco_reference: result.lencoReference,
-      type: "disbursement",
-      status: result.status || "pending",
+      status: finalStatus,
+      lenco_reference: reference, // our reference
+      lenco_lenco_reference: result.lencoReference, // Lenco's reference
+      reference_type: "payout",
       metadata: { withdrawal_id, payout_method: withdrawal.payout_method },
     });
+    if (ledgerError) {
+      console.error("Payout ledger insert failed:", ledgerError.message);
+      // Don't throw — the payout succeeded, just log the error
+    }
 
     return new Response(
       JSON.stringify({

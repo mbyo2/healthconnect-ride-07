@@ -15,12 +15,29 @@ import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { Navigate } from "react-router-dom";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Wallet as WalletIcon, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Wallet = () => {
     const { user, isLoading } = useAuth();
     const { isAdmin, availableRoles } = useUserRoles();
     const { institution, institutionId } = useInstitutionContext();
     const { currency, getSymbol } = useCurrency();
+
+    // Fetch the user's wallet balance for withdrawal validation
+    const { data: walletBalance = 0 } = useQuery({
+        queryKey: ["wallet-balance", user?.id],
+        queryFn: async () => {
+            if (!user) return 0;
+            const { data } = await supabase
+                .from("user_wallets")
+                .select("balance")
+                .eq("user_id", user.id)
+                .maybeSingle();
+            return Number((data as any)?.balance || 0);
+        },
+        enabled: !!user,
+    });
 
     // Earnings surface for every individual clinical cadre holding their
     // exact profession role — not just the legacy health_personnel role.
@@ -76,7 +93,7 @@ const Wallet = () => {
                 {isEarner && (
                   <>
                     <EarningsPanel />
-                    <WithdrawalRequests />
+                    <WithdrawalRequests walletBalance={walletBalance} />
                   </>
                 )}
 
