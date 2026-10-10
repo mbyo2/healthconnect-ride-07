@@ -75,10 +75,21 @@ export const REGIONAL_PAYERS: InsurancePolicy[] = [
     outOfPocketMax: 5000,
     outOfPocketMet: 0,
     coPayType: "flat",
-    coPayValue: 0, // 100% statutory coverage for accredited services
+    coPayValue: 0, // 100% of tariff-allowed amounts; see src/utils/nhima.ts for 2025 caps
     preAuthThreshold: 3500,
     requiresReferral: true,
     acceptedSpecialties: ["General Medicine", "Pediatrics", "Emergency", "Maternity", "Surgery", "Physiotherapy"],
+    // NHIMA 2025 tariff caps (Kwacha) — enforced by adjudicateNHIMAClaim
+    nhimaTariff: {
+      opdCap: 600,
+      consultation: 200,
+      drugs: 150,
+      laboratory: 150,
+      registration: 50,
+      consumables: 50,
+      chronicCap: 1200,
+      chronicVisitMonths: 3,
+    },
   },
   {
     id: "madison-gen",
