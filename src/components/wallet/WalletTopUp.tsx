@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
-import { useLencoCardPayment } from "@/hooks/useLencoCardPayment";
+import { useLencoWidget, generateWidgetReference } from "@/hooks/useLencoWidget";
 
 type PaymentMethod = 'paypal' | 'lenco' | 'card';
 
@@ -24,15 +24,9 @@ export const WalletTopUp = () => {
     const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
     const [lencoReference, setLencoReference] = useState<string | null>(null);
     const [lencoMessage, setLencoMessage] = useState<string>('');
-    // Card fields
-    const [cardNumber, setCardNumber] = useState('');
-    const [cardExpiry, setCardExpiry] = useState(''); // MM/YY
-    const [cardCvv, setCardCvv] = useState('');
-    const [cardName, setCardName] = useState('');
-    const [cardEmail, setCardEmail] = useState('');
     const { currency, getSymbol, toZmw, formatPrice } = useCurrency();
     const { createCollection, verifyPayment, verifying } = useLencoPayment();
-    const { payWithCard, loading: cardLoading } = useLencoCardPayment();
+    const { openWidget, loading: widgetLoading } = useLencoWidget();
 
     const handleTopUp = async () => {
         if (!user) {
@@ -77,50 +71,54 @@ export const WalletTopUp = () => {
                     throw new Error(data?.error || "Failed to initiate PayPal payment");
                 }
             } else if (paymentMethod === 'card') {
-                // Lenco card collection: JWE-encrypted, PCI-sensitive.
+                // Lenco hosted widget — PCI-safe, card details never touch our code.
                 const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
                 if (!(zmwAmount >= 1)) {
                     toast.error("Top-up must be at least K1.00");
                     setIsLoading(false);
                     return;
                 }
-                if (!cardName.trim() || !cardEmail.trim() || !cardNumber.trim() || !cardExpiry.trim() || !cardCvv.trim()) {
-                    toast.error("Please fill in all card details");
-                    setIsLoading(false);
-                    return;
-                }
-                const [expMonth, expYear] = cardExpiry.split('/').map(s => s.trim());
-                if (!expMonth || !expYear) {
-                    toast.error("Enter expiry as MM/YY");
-                    setIsLoading(false);
-                    return;
-                }
-                const nameParts = cardName.trim().split(/\s+/);
-                const result = await payWithCard({
+                const reference = generateWidgetReference("TOPUP");
+                // Record the pending top-up so the verify step can credit the wallet
+                await supabase.from("lenco_payments").insert({
+                    reference,
                     amount: zmwAmount,
                     currency: 'ZMW',
+                    status: 'pending',
+                    payment_type: 'card',
                     reference_type: 'wallet_topup',
-                    description: `Wallet top-up K${zmwAmount}`,
-                    email: cardEmail.trim(),
-                    firstName: nameParts[0],
-                    lastName: nameParts.slice(1).join(' ') || nameParts[0],
-                    cardNumber: cardNumber.replace(/\D/g, ''),
-                    expiryMonth: expMonth.padStart(2, '0'),
-                    expiryYear: expYear.length === 2 ? `20${expYear}` : expYear,
-                    cvv: cardCvv.trim(),
+                    description: `Wallet top-up K${zmwAmount} (widget)`,
+                    user_id: user.id,
                 });
-                if (result) {
-                    if (result.status === '3ds_required' && result.redirectUrl) {
-                        toast.info("Redirecting to your bank for verification...");
-                        window.location.href = result.redirectUrl;
-                    } else if (result.status === 'paid') {
-                        toast.success("Card payment successful — your wallet has been credited.");
-                        setCardNumber(''); setCardExpiry(''); setCardCvv('');
-                    } else {
-                        setLencoReference(result.reference);
-                        setLencoMessage("Your card payment is being processed. Tap below to check the status.");
-                    }
-                }
+                setIsLoading(false);
+                await openWidget({
+                    email: user.email || "",
+                    reference,
+                    amount: zmwAmount,
+                    currency: "ZMW",
+                    label: "Doc'O Clock Wallet Top-Up",
+                    channels: ["card", "mobile-money"],
+                    customer: {
+                        firstName: user.user_metadata?.first_name || "",
+                        lastName: user.user_metadata?.last_name || "",
+                    },
+                    onSuccess: async (response) => {
+                        // Verify server-side before crediting
+                        const r = await verifyPayment(response.reference);
+                        if (r?.status === 'paid') {
+                            toast.success("Payment successful — your wallet has been credited.");
+                        } else {
+                            toast.info("Payment received — confirming. Check your wallet in a moment.");
+                        }
+                    },
+                    onClose: () => {
+                        toast.info("Payment window closed.");
+                    },
+                    onConfirmationPending: () => {
+                        toast.info("Payment is being confirmed — check your wallet shortly.");
+                    },
+                });
+                return;
             } else if (paymentMethod === 'lenco') {
                 // Lenco mobile-money collection: same ZMW-canonical rule.
                 const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
@@ -193,31 +191,14 @@ export const WalletTopUp = () => {
                     </RadioGroup>
 
                     {paymentMethod === 'card' && (
-                        <div className="space-y-3 pt-1 rounded-xl border border-border p-4 bg-muted/30">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5 col-span-2">
-                                    <Label htmlFor="card-name" className="text-xs text-muted-foreground">Name on card</Label>
-                                    <Input id="card-name" placeholder="John Banda" className="h-11" value={cardName} onChange={(e) => setCardName(e.target.value)} />
-                                </div>
-                                <div className="space-y-1.5 col-span-2">
-                                    <Label htmlFor="card-email" className="text-xs text-muted-foreground">Email</Label>
-                                    <Input id="card-email" type="email" placeholder="you@example.com" className="h-11" value={cardEmail} onChange={(e) => setCardEmail(e.target.value)} />
-                                </div>
-                                <div className="space-y-1.5 col-span-2">
-                                    <Label htmlFor="card-number" className="text-xs text-muted-foreground">Card number</Label>
-                                    <Input id="card-number" inputMode="numeric" placeholder="4111 1111 1111 1111" className="h-11" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} maxLength={23} />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="card-expiry" className="text-xs text-muted-foreground">Expiry (MM/YY)</Label>
-                                    <Input id="card-expiry" placeholder="12/28" className="h-11" value={cardExpiry} onChange={(e) => setCardExpiry(e.target.value)} maxLength={5} />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="card-cvv" className="text-xs text-muted-foreground">CVV</Label>
-                                    <Input id="card-cvv" inputMode="numeric" type="password" placeholder="123" className="h-11" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} maxLength={4} />
-                                </div>
-                            </div>
-                            <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                <ShieldCheck className="h-3 w-3" /> Card details are encrypted end-to-end and never stored.
+                        <div className="rounded-xl border border-border p-4 bg-muted/30 space-y-2">
+                            <p className="text-sm font-semibold flex items-center gap-2">
+                                <ShieldCheck className="h-4 w-4 text-primary" />
+                                Secure card checkout
+                            </p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                A secure Lenco checkout will open where you can pay with your card or mobile money.
+                                Your card details are handled entirely by Lenco — we never see or store them.
                             </p>
                         </div>
                     )}
