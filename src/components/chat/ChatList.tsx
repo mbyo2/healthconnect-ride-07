@@ -168,25 +168,30 @@ export const ChatList = () => {
               </div>
             )}
             {contacts.map((contact) => (
-              <Button
+              <button
                 key={contact.id}
-                variant={selectedContact?.id === contact.id ? "default" : "ghost"}
-                className="w-full justify-start gap-2 min-h-[52px] py-2"
                 onClick={() => setSelectedContact(contact)}
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors ${
+                  selectedContact?.id === contact.id
+                    ? "bg-blue-50 border border-blue-200"
+                    : "hover:bg-gray-50 border border-transparent"
+                }`}
               >
-                <Avatar className="h-9 w-9">
+                <Avatar className="h-12 w-12 shrink-0">
                   <AvatarImage src={contact.avatar_url || ''} />
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
                     {contact.first_name?.[0]}{contact.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-left min-w-0">
-                  <div className="truncate">{providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}</div>
-                  <div className="text-xs text-muted-foreground capitalize">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-gray-900 truncate">
+                    {providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}
+                  </p>
+                  <p className="text-xs text-gray-500 capitalize truncate">
                     {(contact.role || 'member').replace('_', ' ')}
-                  </div>
+                  </p>
                 </div>
-              </Button>
+              </button>
             ))}
           </div>
         </ScrollArea>

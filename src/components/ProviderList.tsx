@@ -62,7 +62,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
   }
 
   return (
-    <div className="space-y-4 font-sans">
+    <div className="space-y-3 font-sans">
       {providers.map((provider) => {
         const feeLabel = (() => {
           if (provider.consultation_fee_min && provider.consultation_fee_max)
@@ -75,70 +75,60 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
         const subs = provider.subspecialties || [];
         const displaySubs = subs.slice(0, 2);
         const extraSubs = subs.length > 2 ? subs.length - 2 : 0;
+        const rating = Number(provider.rating) || 0;
 
         return (
           <div
             key={provider.id}
             onClick={() => (onProviderSelect ? onProviderSelect(provider) : navigate(`/provider/${provider.id}`))}
-            className={`p-5 rounded-2xl border bg-white dark:bg-slate-900 transition-all cursor-pointer shadow-xs ${
+            className={`p-4 rounded-2xl border bg-white transition-all cursor-pointer shadow-sm hover:shadow-md ${
               selectedProvider?.id === provider.id
-                ? "border-primary-500 ring-2 ring-primary-500/20"
-                : "border-canvas-silk dark:border-slate-800 hover:border-primary-500"
+                ? "border-blue-600 ring-2 ring-blue-600/20"
+                : "border-gray-100 hover:border-blue-200"
             }`}
           >
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Avatar */}
+            {/* Reference-style header: photo, name, stars, specialty, fee */}
+            <div className="flex items-center gap-3 mb-3">
               <div className="flex-shrink-0">
                 {provider.avatar_url ? (
                   <img
                     src={provider.avatar_url}
                     alt={`${provider.first_name} ${provider.last_name}`}
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-canvas-silk dark:border-slate-800"
+                    className="w-14 h-14 rounded-2xl object-cover"
                   />
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-primary-50 flex items-center justify-center text-xl font-black text-primary-500 border border-primary-200">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-700">
                     {provider.first_name?.[0]}{provider.last_name?.[0]}
                   </div>
                 )}
               </div>
-
-              {/* Info */}
               <div className="flex-1 min-w-0">
-                {/* Name row */}
-                <div className="flex flex-wrap items-start justify-between gap-2 mb-1.5">
-                  <div>
-                    <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
-                      {providerDisplayName(provider as any)}
-                    </h3>
-                    <p className="text-primary-500 font-extrabold text-xs">
-                      {provider.specialty || "General Practitioner"}
-                    </p>
-                    {/* Medical school line */}
-                    {provider.medical_school && (
-                      <p className="flex items-center gap-1 text-[11px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
-                        <GraduationCap className="h-3 w-3 shrink-0" />
-                        {provider.medical_school}
-                        {provider.graduation_year && ` '${String(provider.graduation_year).slice(-2)}`}
-                      </p>
-                    )}
+                <h3 className="font-bold text-base text-gray-900 truncate">
+                  {providerDisplayName(provider as any)}
+                </h3>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star
+                        key={i}
+                        className={`h-3 w-3 ${
+                          i <= Math.round(rating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "fill-gray-200 text-gray-200"
+                        }`}
+                      />
+                    ))}
                   </div>
-
-                  <div className="flex items-center gap-2 flex-wrap justify-end">
-                    {Number(provider.rating) > 0 && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold text-slate-900 bg-warning-500/20 border border-warning-500/30">
-                        <Star className="h-3 w-3 text-warning-500 fill-warning-500" />
-                        {Number(provider.rating).toFixed(1)}
-                      </span>
-                    )}
-                    {/* Consultation fee — prominent */}
-                    {feeLabel && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">
-                        <DollarSign className="h-3 w-3" />
-                        {feeLabel}
-                      </span>
-                    )}
-                  </div>
+                  {rating > 0 && (
+                    <span className="text-xs text-gray-500 font-medium">{rating.toFixed(1)}</span>
+                  )}
                 </div>
+                <p className="text-xs text-gray-500 truncate mt-0.5">
+                  {provider.specialty || "General Practitioner"}
+                  {feeLabel && <span className="text-blue-600 font-semibold"> · {feeLabel}</span>}
+                </p>
+              </div>
+            </div>
 
                 {/* Capability badges — real data, not hardcoded */}
                 <div className="flex flex-wrap gap-1.5 mb-2.5">
@@ -257,8 +247,6 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
           </div>
         );
       })}
