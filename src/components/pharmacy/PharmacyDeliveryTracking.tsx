@@ -9,6 +9,8 @@ import { Loader2, Package, Truck, CheckCircle, Clock, MapPin, ArrowRight, Clipbo
 import { format } from "date-fns";
 import { markDelivered, isValidOrderTransition } from "@/utils/marketplace-workflows";
 import { useAuth } from "@/context/AuthContext";
+import { AutoDispatch } from "@/components/delivery/AutoDispatch";
+import { LiveDeliveryMap } from "@/components/delivery/LiveDeliveryMap";
 
 interface DeliveryTrackingProps {
   pharmacyId: string;
@@ -201,6 +203,25 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                       </Button>
                     )}
                   </div>
+                  {/* Courier dispatch + live map (Yango-level, CEO 2026-10-10) */}
+                  {d.status === "pending" && !d.courier_id && (
+                    <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border">
+                      <AutoDispatch
+                        deliveryId={d.id}
+                        pickupLat={d.pickup_lat}
+                        pickupLng={d.pickup_lng}
+                        institutionId={d.order?.pharmacy_id}
+                        onDispatched={() =>
+                          queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] })
+                        }
+                      />
+                    </div>
+                  )}
+                  {d.courier_id && ["assigned", "picked_up", "in_transit"].includes(d.status) && (
+                    <div className="mt-3">
+                      <LiveDeliveryMap deliveryId={d.id} height={220} />
+                    </div>
+                  )}
                 </div>
               );
             })}

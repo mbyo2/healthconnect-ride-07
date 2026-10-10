@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Package, Clock, Truck, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { LiveDeliveryMap } from "@/components/delivery/LiveDeliveryMap";
 
 const STAGES = [
   { id: "pending", label: "Placed", icon: Clock },
@@ -23,7 +24,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("delivery_tracking")
-        .select("status, pickup_time, delivery_time, tracking_notes, updated_at")
+        .select("id, status, pickup_time, delivery_time, tracking_notes, updated_at, courier_id")
         .eq("order_id", orderId)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -77,6 +78,15 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
           {tracking.delivery_time && <>Delivered {format(new Date(tracking.delivery_time), "MMM d, h:mm a")}</>}
           {tracking.tracking_notes && <> — {tracking.tracking_notes}</>}
         </p>
+      )}
+      {/* Live courier map — Yango-style (CEO 2026-10-10) */}
+      {tracking?.id && tracking?.courier_id && tracking?.status !== "delivered" && (
+        <div className="mt-3">
+          <p className="text-[11px] font-bold mb-1.5 flex items-center gap-1">
+            <Truck className="h-3.5 w-3.5" /> Live courier location
+          </p>
+          <LiveDeliveryMap deliveryId={tracking.id} height={200} />
+        </div>
       )}
     </div>
   );
