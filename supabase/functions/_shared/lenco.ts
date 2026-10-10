@@ -238,6 +238,74 @@ export async function verifyWebhookSignature(rawBody: string, signature: string 
   }
 }
 
+// ── Banks (for bank-account transfers) ───────────────────────────────────
+// Lenco API v2: GET /banks returns the list of supported banks with their IDs.
+// The transfer endpoint needs bankId (not the bank name).
+
+export interface LencoBank {
+  id: string;
+  name: string;
+  code?: string;
+}
+
+let _banksCache: LencoBank[] | null = null;
+let _banksCacheTime = 0;
+const BANKS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+export async function getLencoBanks(): Promise<LencoBank[]> {
+  const now = Date.now();
+  if (_banksCache && now - _banksCacheTime < BANKS_CACHE_TTL) {
+    return _banksCache;
+  }
+
+  if (!LENCO_SECRET_KEY) {
+    throw new Error('LENCO_SECRET_KEY not configured');
+  }
+
+  const resp = await fetch(`${LENCO_API_URL}/banks`, {
+    headers: { Authorization: `Bearer ${LENCO_SECRET_KEY}` },
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Failed to fetch banks: ${resp.status} ${text}`);
+  }
+
+  const json = await resp.json();
+  const banks: LencoBank[] = json.data || json.banks || json || [];
+  _banksCache = banks;
+  _banksCacheTime = now;
+  return banks;
+}
+
+/**
+ * Resolve a human bank name (e.g. "Zanaco", "Stanbic") to Lenco's bank ID.
+ * Uses fuzzy matching — case-insensitive substring match.
+ * Throws if no match found.
+ */
+export async function resolveBankId(bankName: string): Promise<string> {
+  const banks = await getLencoBanks();
+  const needle = bankName.toLowerCase().trim();
+
+  // Exact match first
+  let match = banks.find((b) => b.name.toLowerCase() === needle);
+  // Then substring match
+  if (!match) {
+    match = banks.find(
+      (b) => b.name.toLowerCase().includes(needle) || needle.includes(b.name.toLowerCase())
+    );
+  }
+
+  if (!match) {
+    const available = banks.map((b) => b.name).join(', ');
+    throw new Error(
+      `Bank "${bankName}" not found in Lenco's supported banks. Available: ${available}`
+    );
+  }
+
+  return match.id;
+}
+
 // ── Transfers (payouts to providers/hospitals) ───────────────────────────
 // Lenco API v2 transfers — verified against lenco-api.readme.io/v2.0 (2026-08-06):
 //   POST /transfers/mobile-money

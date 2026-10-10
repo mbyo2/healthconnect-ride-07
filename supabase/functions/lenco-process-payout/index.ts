@@ -7,7 +7,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { initiateTransfer, checkTransferStatus } from "../_shared/lenco.ts";
+import { initiateTransfer, checkTransferStatus, resolveBankId } from "../_shared/lenco.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -84,12 +84,15 @@ serve(async (req) => {
         narration: `Doc'O Clock provider payout`,
       });
     } else {
+      // Bank transfer: resolve the human bank name to Lenco's bank ID.
+      // Lenco's /transfers/bank-account expects bankId, not a name.
+      const bankId = await resolveBankId(details.bank_name);
       result = await initiateTransfer({
         amount: Number(withdrawal.amount),
         currency: withdrawal.currency || "ZMW",
         reference,
         accountNumber: details.account_number,
-        bankId: details.bank_name,
+        bankId,
         accountName: details.account_name,
         narration: `Doc'O Clock provider payout`,
       });
