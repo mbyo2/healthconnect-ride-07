@@ -524,3 +524,61 @@ html {
    beats Tailwind's layered utilities regardless of order. */
 .dark .text-graphite-500 { color: #a8a29e; } /* graphite-400 */
 .dark .text-graphite-600 { color: #d6d3d1; } /* graphite-300 */
+
+/* ── Alive UI: Uber/Duolingo micro-interactions ────────────────────── */
+
+/* Pulsing ring for expiring slots (Uber urgency) */
+@keyframes doc-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+.doc-pulse-ring {
+  animation: doc-pulse-ring 2s ease-out infinite;
+}
+
+/* Urgency badge pulse */
+@keyframes doc-urgency-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.doc-urgency-blink {
+  animation: doc-urgency-blink 1.5s ease-in-out infinite;
+}
+
+/* Springy button press (tactile satisfaction) */
+.doc-springy {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.doc-springy:active {
+  transform: scale(0.96);
+}
+
+/* Card hover lift (micro-movement) */
+.doc-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.doc-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+}
+
+/* Skeleton shimmer (perceived speed) */
+@keyframes doc-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+.doc-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: doc-shimmer 1.5s infinite;
+}
+
+/* Health shield glow */
+@keyframes doc-shield-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.7)); }
+}
+.doc-shield-glow {
+  animation: doc-shield-glow 3s ease-in-out infinite;
+}

@@ -250,6 +250,9 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       }
 
       toast.success("Appointment booked successfully!");
+      // Duolingo-style celebration: confetti + haptic on booking win
+      const { celebrate } = await import("@/utils/celebration");
+      celebrate({ intensity: "large" });
       onClose();
       if (booked?.id) {
         navigate(`/booking-confirmed?id=${booked.id}`);

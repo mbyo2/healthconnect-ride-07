@@ -46,6 +46,7 @@ import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
 import { HealthMetricCards } from "@/components/patient/HealthMetricCards";
 import { DoctorCard } from "@/components/patient/DoctorCard";
+import { HealthStreak } from "@/components/patient/HealthStreak";
 
 // Predefined modern specialties with Lucide medical iconography.
 const SPECIALTIES_DATA = [
@@ -502,6 +503,17 @@ export const PatientWorkflow = React.memo(() => {
           )}
         </div>
       </div>
+
+      {/* ─── Health Streak (Duolingo-style gamification) ─── */}
+      <HealthStreak
+        streakDays={3}
+        milestones={[
+          { id: "physical", label: "Annual physical", completed: true },
+          { id: "dental", label: "Dental checkup", completed: false },
+          { id: "eye", label: "Eye exam", completed: true },
+          { id: "vitals", label: "Vitals updated", completed: false },
+        ]}
+      />
 
       {/* ─── Quick Access Services Hub (Clean Blue, Black & White) ─── */}
       <div>
