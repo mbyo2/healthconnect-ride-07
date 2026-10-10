@@ -69,7 +69,6 @@ const About = lazyWithRetry(() => import('@/pages/About'));
 const Contact = lazyWithRetry(() => import('@/pages/Contact'));
 const PaymentSuccess = lazyWithRetry(() => import('@/pages/PaymentSuccess'));
 const PaymentCancel = lazyWithRetry(() => import('@/pages/PaymentCancel'));
-const PaymentReturn = lazyWithRetry(() => import('@/pages/PaymentReturn'));
 const PaymentCancelled = lazyWithRetry(() => import('@/pages/PaymentCancelled'));
 const NotFound = lazyWithRetry(() => import('@/pages/NotFound'));
 const CreateAdmin = lazyWithRetry(() => import('@/pages/CreateAdmin'));
@@ -204,7 +203,6 @@ const AppContent = () => {
             <Route path="/queue-display" element={<Suspense fallback={<LoadingScreen />}><PublicQueueDisplay /></Suspense>} />
             <Route path="/kiosk" element={<Suspense fallback={<LoadingScreen />}><SelfServiceKiosk /></Suspense>} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
-            <Route path="/payment-return" element={<Suspense fallback={<LoadingScreen />}><PaymentReturn /></Suspense>} />
             <Route path="/payment-cancelled" element={<Suspense fallback={<LoadingScreen />}><PaymentCancelled /></Suspense>} />
             <Route path="/reset-password" element={<Suspense fallback={<LoadingScreen />}><ResetPassword /></Suspense>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />

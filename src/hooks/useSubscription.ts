@@ -145,7 +145,8 @@ export const useSubscribeToPlan = () => {
       const needsPayment = amount > 0 && effectiveTrialDays === 0;
 
       // Paid plans without trial start as PENDING and are activated only
-      // after the gateway confirms payment (see PaymentReturn).
+      // after the gateway confirms payment (the pricing page verifies the
+      // Lenco collection and flips the subscription active).
       // Existing active subscriptions stay untouched until payment succeeds.
       if (!needsPayment) {
         // Cancel existing active subscriptions

@@ -22,7 +22,7 @@ export interface WalletPayInput {
 }
 
 /**
- * Wallet spend rail. Balance is topped up via DPO/PayPal and spent here —
+ * Wallet spend rail. Balance is topped up via Mobile Money/PayPal and spent here —
  * previously top-ups worked but nothing could spend the balance.
  * Amounts are re-resolved server-side; the edge function rejects mismatches.
  */

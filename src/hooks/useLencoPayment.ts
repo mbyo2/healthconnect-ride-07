@@ -73,17 +73,17 @@ export function useLencoPayment() {
           /* keep original */
         }
         console.error("Lenco createCollection API error:", details);
-        toast.error(`Mobile money unavailable: ${details}. Please try DPO Pay or wallet balance.`);
+        toast.error(`Mobile money unavailable: ${details}. Please try PayPal or wallet balance.`);
         return null;
       }
       if (!data?.reference) {
-        toast.error("Could not start the mobile money payment. Please try DPO Pay or wallet balance.");
+        toast.error("Could not start the mobile money payment. Please try PayPal or wallet balance.");
         return null;
       }
       return data as LencoCollectionResult;
     } catch (e: any) {
       console.error("Lenco createCollection error", e);
-      toast.error(`Payment error: ${e?.message || "Failed to start payment"}. Please try DPO Pay or wallet balance.`);
+      toast.error(`Payment error: ${e?.message || "Failed to start payment"}. Please try PayPal or wallet balance.`);
       return null;
     } finally {
       setLoading(false);

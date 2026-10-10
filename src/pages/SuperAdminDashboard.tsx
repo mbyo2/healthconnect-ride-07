@@ -10,7 +10,6 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings, Shield } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
 import { syncAdminLevel } from "@/lib/adminLevelSync";
-import { DPOPaymentsAdmin } from "@/components/admin/DPOPaymentsAdmin";
 import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
 import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
 import { Button } from "@/components/ui/button";
@@ -307,10 +306,6 @@ const SuperAdminDashboard = () => {
           <ModulePricingAdmin />
         </div>
 
-        {/* DPO Payments Admin */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <DPOPaymentsAdmin />
-        </div>
       </div>
     </div>
   );

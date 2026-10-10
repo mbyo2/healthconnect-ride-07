@@ -32,7 +32,7 @@ const Marketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showCheckout, setShowCheckout] = useState(false);
   const [activeTab, setActiveTab] = useState<"products" | "cart" | "orders">("products");
-  // Order awaiting payment — the existing PharmacyPayment step (wallet or DPO)
+  // Order awaiting payment — the existing PharmacyPayment step (wallet or Mobile Money)
   // mounts here after checkout and for any pending order from history.
   const [pendingPaymentOrder, setPendingPaymentOrder] = useState<Order | null>(null);
 

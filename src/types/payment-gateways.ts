@@ -1,7 +1,7 @@
 // Payment Gateway Types and Interfaces for HealthConnect
 // Designed for easy extension with new payment providers
 
-export type PaymentGatewayType = 'paypal' | 'dpo' | 'stripe' | 'flutterwave' | 'wallet' | 'mobile_money' | 'lenco';
+export type PaymentGatewayType = 'paypal' | 'stripe' | 'flutterwave' | 'wallet' | 'mobile_money' | 'lenco';
 
 export type MobileMoneyProvider = 'mtn' | 'airtel' | 'vodacom' | 'orange' | 'tigo' | 'mpesa';
 
@@ -93,27 +93,6 @@ export interface MobileMoneyPayment {
   instructions?: string;
   ussdCode?: string;
   confirmationRequired: boolean;
-}
-
-// DPO Pay specific types
-export interface DPOPayRequest extends PaymentGatewayRequest {
-  companyToken: string;
-  serviceType: string;
-  serviceDescription: string;
-  customerFirstName?: string;
-  customerLastName?: string;
-  customerEmail?: string;
-  customerPhone?: string;
-  customerAddress?: string;
-  customerCity?: string;
-  customerCountry?: string;
-  customerZip?: string;
-}
-
-export interface DPOPayResponse extends PaymentGatewayResponse {
-  transactionToken?: string;
-  paymentUrl?: string;
-  mobileMoneyInstructions?: MobileMoneyPayment;
 }
 
 // Lenco mobile-money collection types (Zambia: MTN / Airtel / Zamtel)

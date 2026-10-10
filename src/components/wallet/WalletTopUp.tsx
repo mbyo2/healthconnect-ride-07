@@ -10,22 +10,20 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
-import { useDPOPayment } from "@/hooks/useDPOPayment";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 
-type PaymentMethod = 'paypal' | 'dpo' | 'lenco';
+type PaymentMethod = 'paypal' | 'lenco';
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('dpo');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('lenco');
     const [lencoPhone, setLencoPhone] = useState('');
     const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
     const [lencoReference, setLencoReference] = useState<string | null>(null);
     const [lencoMessage, setLencoMessage] = useState<string>('');
     const { currency, getSymbol, toZmw, formatPrice } = useCurrency();
-    const { redirectToCheckout: redirectToDPOCheckout } = useDPOPayment();
     const { createCollection, verifyPayment, verifying } = useLencoPayment();
 
     const handleTopUp = async () => {
@@ -43,7 +41,7 @@ export const WalletTopUp = () => {
         setIsLoading(true);
         try {
             if (paymentMethod === 'paypal') {
-                // Same ZMW-canonical rule as DPO: convert display amount first.
+                // Same ZMW-canonical rule as before: convert display amount first.
                 const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
                 if (!(zmwAmount >= 1)) {
                     toast.error("Top-up must be at least K1.00");
@@ -70,30 +68,6 @@ export const WalletTopUp = () => {
                 } else {
                     throw new Error(data?.error || "Failed to initiate PayPal payment");
                 }
-            } else if (paymentMethod === 'dpo') {
-                // Wallet balances are ZMW-denominated: convert whatever the
-                // user typed in their display currency back to Kwacha first,
-                // otherwise $50 would credit as K50.
-                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
-                if (!(zmwAmount >= 1)) {
-                    toast.error("Top-up must be at least K1.00");
-                    setIsLoading(false);
-                    return;
-                }
-                const profile = await supabase.from('profiles').select('first_name, last_name, phone').eq('id', user.id).single();
-
-                await redirectToDPOCheckout({
-                    amount: zmwAmount,
-                    currency: 'ZMW',
-                    reference_type: 'wallet_topup',
-                    reference_id: user.id,
-                    description: `Wallet Top Up (${formatPrice(zmwAmount, 'ZMW')})`,
-                    customer_first_name: profile.data?.first_name || '',
-                    customer_last_name: profile.data?.last_name || '',
-                    customer_phone: profile.data?.phone || '',
-                    redirect_url: `${window.location.origin}/payment-return`,
-                });
-
             } else if (paymentMethod === 'lenco') {
                 // Lenco mobile-money collection: same ZMW-canonical rule.
                 const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
@@ -144,24 +118,20 @@ export const WalletTopUp = () => {
                     Top Up Wallet
                 </CardTitle>
                 <CardDescription>
-                    Add funds to your wallet using DPO Pay (card & mobile money), Lenco mobile money, or PayPal
+                    Add funds to your wallet using Mobile Money (MTN, Airtel, Zamtel) or PayPal
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-4">
                     <Label className="text-sm font-semibold text-muted-foreground">Select Payment Method</Label>
-                    <RadioGroup value={paymentMethod} onValueChange={(value) => { setPaymentMethod(value as PaymentMethod); setLencoReference(null); }} className="grid grid-cols-3 gap-3">
-                        <div className="flex items-center space-x-2 space-y-0">
-                            <RadioGroupItem value="paypal" id="paypal" />
-                            <Label htmlFor="paypal" className="font-normal cursor-pointer">PayPal</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 space-y-0">
-                            <RadioGroupItem value="dpo" id="dpo" />
-                            <Label htmlFor="dpo" className="font-normal cursor-pointer">DPO Pay</Label>
-                        </div>
+                    <RadioGroup value={paymentMethod} onValueChange={(value) => { setPaymentMethod(value as PaymentMethod); setLencoReference(null); }} className="grid grid-cols-2 gap-3">
                         <div className="flex items-center space-x-2 space-y-0">
                             <RadioGroupItem value="lenco" id="lenco" />
                             <Label htmlFor="lenco" className="font-normal cursor-pointer">Mobile Money</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 space-y-0">
+                            <RadioGroupItem value="paypal" id="paypal" />
+                            <Label htmlFor="paypal" className="font-normal cursor-pointer">PayPal</Label>
                         </div>
                     </RadioGroup>
 
@@ -279,9 +249,7 @@ export const WalletTopUp = () => {
                     <p className="text-xs text-muted-foreground leading-relaxed">
                         {paymentMethod === 'paypal'
                             ? 'Your payment is processed securely via PayPal. Funds will be available in your wallet immediately after successful payment.'
-                            : paymentMethod === 'lenco'
-                                ? 'Lenco collects straight from your MTN, Airtel or Zamtel mobile-money wallet. Approve the prompt on your phone; funds land in your Doc\u2019O Clock wallet as soon as the collection succeeds.'
-                                : 'Your payment is processed securely via DPO Pay. Supports card payments and mobile money (MTN, Airtel, Zamtel). Funds will be available in your wallet immediately after successful payment.'}
+                            : 'Mobile money collects straight from your MTN, Airtel or Zamtel wallet. Approve the prompt on your phone; funds land in your Doc\u2019O Clock wallet as soon as the collection succeeds.'}
                     </p>
                 </div>
 
@@ -297,7 +265,7 @@ export const WalletTopUp = () => {
                         </>
                     ) : (
                         <>
-                            Pay with {paymentMethod === 'paypal' ? 'PayPal' : paymentMethod === 'lenco' ? 'Mobile Money' : 'DPO Pay'}
+                            Pay with {paymentMethod === 'paypal' ? 'PayPal' : 'Mobile Money'}
                         </>
                     )}
                 </Button>

@@ -483,7 +483,7 @@ export const BespokeWorkOSShowcase = () => {
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
-                {["Supabase Realtime Sync", "Twilio WhatsApp & SMS", "DPO & PayPal Payments", "HuggingFace MedGemma AI", "Zapier Webhooks"].map((app, i) => (
+                {["Supabase Realtime Sync", "Twilio WhatsApp & SMS", "Mobile Money & PayPal Payments", "HuggingFace MedGemma AI", "Zapier Webhooks"].map((app, i) => (
                   <div key={i} className={`p-3 rounded-xl border flex items-center justify-between ${
                     isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
                   }`}>

@@ -60,8 +60,8 @@ const BookingConfirmed = () => {
     queryFn: async () => {
       if (!appointmentId) return null;
       const { data } = await (supabase as any)
-        .from('dpo_payments')
-        .select('id, status, amount, currency, trans_ref, result_code, result_explanation, created_at')
+        .from('lenco_payments')
+        .select('id, status, amount, currency, lenco_reference, result_message, created_at')
         .eq('reference_id', appointmentId)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -177,12 +177,12 @@ const BookingConfirmed = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {Number(payment.amount).toFixed(2)} {payment.currency}
-                    {payment.trans_ref ? ` · ${payment.trans_ref}` : ''}
+                    {payment.lenco_reference ? ` · ${payment.lenco_reference}` : ''}
                   </p>
                 </div>
               </div>
-              {payment.result_explanation && (
-                <p className="text-xs text-muted-foreground">{payment.result_explanation}</p>
+              {payment.result_message && (
+                <p className="text-xs text-muted-foreground">{payment.result_message}</p>
               )}
             </CardContent>
           </Card>

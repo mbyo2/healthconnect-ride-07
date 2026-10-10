@@ -12,13 +12,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { TIME_SLOTS, CONSULTATION_TYPES } from '@/config/videoConsultations';
-import { CalendarIcon, Clock, Video, User, Wallet, CreditCard } from 'lucide-react';
+import { CalendarIcon, Clock, Video, User, Wallet, Smartphone } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
-import { useDPOPayment } from '@/hooks/useDPOPayment';
+import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from '@/hooks/useLencoPayment';
 import { useWalletPayment } from '@/hooks/useWalletPayment';
 import { useCurrency } from '@/hooks/use-currency';
 import { providerDisplayName } from '@/utils/providerDisplay';
@@ -38,8 +38,12 @@ interface VideoConsultationBookingProps {
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
-  const { formatPrice, convertForCharge } = useCurrency();
+  const { createCollection, verifyPayment, verifying } = useLencoPayment();
+  const { formatPrice } = useCurrency();
+  const [lencoPhone, setLencoPhone] = useState('');
+  const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
+  const [lencoReference, setLencoReference] = useState<string | null>(null);
+  const [lencoMessage, setLencoMessage] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
@@ -49,7 +53,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { balance: walletBalance, paying: walletPaying, pay: payWithWallet } = useWalletPayment();
-  const [payMethod, setPayMethod] = useState<'dpo' | 'wallet'>('dpo');
+  const [payMethod, setPayMethod] = useState<'lenco' | 'wallet'>('lenco');
 
   const resetForm = () => {
     setSelectedDate(undefined);
@@ -130,6 +134,22 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
     }
   }, [user]);
 
+  const checkLencoStatus = async () => {
+    if (!lencoReference) return;
+    const r = await verifyPayment(lencoReference);
+    if (!r) return;
+    if (r.status === 'paid') {
+      toast.success('Consultation booked and paid.');
+      setLencoReference(null);
+      resetForm();
+    } else if (r.status === 'failed' || r.status === 'cancelled') {
+      toast.error('This payment did not complete. You can try again.');
+      setLencoReference(null);
+    } else {
+      toast.info(r.message || 'Still waiting — approve the prompt on your phone, then check again.');
+    }
+  };
+
   const handleBookConsultation = async () => {
     if (!selectedDate || !selectedTime || !selectedProvider || !consultationType) {
       toast.error('Please fill in all required fields');
@@ -164,7 +184,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
       }
 
       if (payMethod === 'wallet' && walletBalance < consultationData.price) {
-        toast.error('Insufficient wallet balance — top up or choose DPO.');
+        toast.error('Insufficient wallet balance — top up or choose Mobile Money.');
         setIsLoading(false);
         return;
       }
@@ -224,21 +244,35 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
         return;
       }
 
-      toast.success('Consultation reserved — redirecting to secure payment…');
-
-      // Amount + currency must always travel as a converted pair so the
-      // gateway charges exactly what was displayed (ZMW-canonical price).
-      const charge = convertForCharge(consultationData.price);
-      // Kick off DPO Pay hosted checkout for the consultation fee
-      await redirectToCheckout({
-        amount: charge.amount,
-        currency: charge.currency,
+      // Mobile Money collection (Lenco): the fee is ZMW-canonical, a prompt
+      // goes to the customer's phone — they approve there, then tap
+      // "I've approved" below to finish booking.
+      const zmwAmount = Math.round(consultationData.price * 100) / 100;
+      if (lencoPhone.replace(/\D/g, '').length < 9) {
+        toast.error('Enter the mobile-money phone number that will approve this payment');
+        setIsLoading(false);
+        return;
+      }
+      const res = await createCollection({
+        amount: zmwAmount,
+        currency: 'ZMW',
         reference_type: 'consultation',
         reference_id: data?.id,
         description: `${consultationData.name} - ${providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}`.trim(),
-        customer_first_name: (user as any)?.user_metadata?.first_name,
-        customer_last_name: (user as any)?.user_metadata?.last_name,
+        phone: lencoPhone,
+        operator: lencoOperator,
+        country: 'zm',
       });
+      setIsLoading(false);
+      if (res?.reference) {
+        setLencoReference(res.reference);
+        setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
+        if (res.status === 'paid') {
+          toast.success('Consultation booked and paid.');
+          setLencoReference(null);
+          resetForm();
+        }
+      }
     } catch (error) {
       console.error('Error booking consultation:', error);
       setSubmitError(
@@ -388,24 +422,71 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              aria-pressed={payMethod === 'dpo'}
-              onClick={() => setPayMethod('dpo')}
-              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
+              aria-pressed={payMethod === 'lenco'}
+              onClick={() => { setLencoReference(null); setPayMethod('lenco'); }}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'lenco' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
             >
-              <CreditCard className="h-4 w-4" /> Card / MoMo (DPO)
+              <Smartphone className="h-4 w-4" /> Mobile Money
             </button>
             <button
               type="button"
               aria-pressed={payMethod === 'wallet'}
-              onClick={() => setPayMethod('wallet')}
+              onClick={() => { setLencoReference(null); setPayMethod('wallet'); }}
               className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
             >
               <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})
             </button>
           </div>
+          {payMethod === 'lenco' && !lencoReference && (
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-graphite-500">Operator</Label>
+                <select
+                  aria-label="Mobile money operator"
+                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={lencoOperator}
+                  onChange={(e) => setLencoOperator(e.target.value as LencoOperator)}
+                >
+                  {LENCO_OPERATORS.map((op) => (
+                    <option key={op.value} value={op.value}>
+                      {op.label} ({op.hint})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-graphite-500">MoMo phone number</Label>
+                <Input
+                  type="tel"
+                  placeholder="0971234567"
+                  className="h-11"
+                  value={lencoPhone}
+                  onChange={(e) => setLencoPhone(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          {payMethod === 'lenco' && lencoReference && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-3">
+              <p className="text-sm font-semibold">Check your phone</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{lencoMessage}</p>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1"
+                  disabled={verifying}
+                  onClick={checkLencoStatus}
+                >
+                  {verifying ? 'Checking...' : "I've approved — check status"}
+                </Button>
+                <Button variant="outline" onClick={() => setLencoReference(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
           {payMethod === 'wallet' && selectedConsultationType && walletBalance < selectedConsultationType.price && (
             <p className="text-xs font-medium text-error-500">
-              Insufficient balance — top up your wallet or pay with DPO.
+              Insufficient balance — top up your wallet or pay with Mobile Money.
             </p>
           )}
         </div>
@@ -422,11 +503,11 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
         <Button
           onClick={() => { setSubmitError(null); handleBookConsultation(); }}
-          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading || walletPaying}
+          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || walletPaying}
           className="w-full"
           size="lg"
         >
-          {isLoading || paymentLoading || walletPaying
+          {isLoading || walletPaying
             ? 'Processing…'
             : payMethod === 'wallet'
               ? `Book & Pay from Wallet${selectedConsultationType ? ` ${formatPrice(selectedConsultationType.price)}` : ''}`

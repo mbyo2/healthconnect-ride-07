@@ -381,7 +381,6 @@ export const PUBLIC_ROUTES = [
   // Waiting-room queue displays and the self-service kiosk are public by design
   '/queue-display',
   '/kiosk',
-  // Payment gateway bounce-back pages (DPO / wallet top-up return here)
-  '/payment-return',
+  // Payment gateway bounce-back pages (wallet top-up return here)
   '/payment-cancelled',
 ];

@@ -9,15 +9,182 @@ import { useSubscriptionPlans, useSubscribeToPlan, useUserSubscription, Subscrip
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useDPOPayment } from '@/hooks/useDPOPayment';
-import { useCurrency } from '@/hooks/use-currency';
+import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from '@/hooks/useLencoPayment';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const formatKwacha = (amount: number) => {
   if (amount === 0) return 'Free';
   return `K${amount.toLocaleString()}`;
 };
+
+/* ─── Lenco Mobile-Money subscribe dialog (shared by plan sections) ─── */
+interface LencoSubscribeDialogProps {
+  open: boolean;
+  onClose: () => void;
+  planName: string;
+  amountZmw: number;
+  referenceId: string | null;
+  onActivated: () => void;
+}
+
+function LencoSubscribeDialog({ open, onClose, planName, amountZmw, referenceId, onActivated }: LencoSubscribeDialogProps) {
+  const { createCollection, verifyPayment, verifying } = useLencoPayment();
+  const [phone, setPhone] = useState('');
+  const [operator, setOperator] = useState<LencoOperator>('mtn');
+  const [reference, setReference] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (open) { setReference(null); setMessage(''); setPhone(''); }
+  }, [open]);
+
+  const finishPaid = async () => {
+    if (referenceId) {
+      try {
+        const { data: sub } = await supabase
+          .from('user_subscriptions')
+          .select('id, status')
+          .eq('id', referenceId)
+          .maybeSingle() as any;
+        if (sub && sub.status !== 'active') {
+          const { error } = await (supabase as any)
+            .from('user_subscriptions')
+            .update({ status: 'active' })
+            .eq('id', referenceId)
+            .eq('status', 'pending');
+          if (error) {
+            toast.error('Payment received — account activation is pending. Contact support if it takes longer than a few minutes.');
+          }
+        }
+        toast.success('Subscription activated — welcome aboard!');
+      } catch (e) {
+        console.error('Subscription activation failed (non-fatal):', e);
+      }
+    }
+    setReference(null);
+    onClose();
+    onActivated();
+  };
+
+  const sendPrompt = async () => {
+    if (!referenceId) return;
+    if (phone.replace(/\D/g, '').length < 9) {
+      toast.error('Enter the mobile-money phone number that will approve this payment');
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await createCollection({
+        amount: Math.round(amountZmw * 100) / 100,
+        currency: 'ZMW',
+        reference_type: 'subscription',
+        reference_id: referenceId,
+        description: `HMS subscription — ${planName}`,
+        phone,
+        operator,
+        country: 'zm',
+      });
+      if (res?.reference) {
+        setReference(res.reference);
+        setMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
+        if (res.status === 'paid') await finishPaid();
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const checkStatus = async () => {
+    if (!reference) return;
+    const r = await verifyPayment(reference);
+    if (!r) return;
+    if (r.status === 'paid') {
+      await finishPaid();
+    } else if (r.status === 'failed' || r.status === 'cancelled') {
+      toast.error('This payment did not complete. You can try again.');
+      setReference(null);
+    } else {
+      toast.info(r.message || 'Still waiting — approve the prompt on your phone, then check again.');
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Pay with Mobile Money</DialogTitle>
+          <DialogDescription>
+            {planName} — {formatKwacha(amountZmw)} via MTN, Airtel or Zamtel
+          </DialogDescription>
+        </DialogHeader>
+        {!reference ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="lenco-op">Operator</Label>
+                <select
+                  id="lenco-op"
+                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={operator}
+                  onChange={(e) => setOperator(e.target.value as LencoOperator)}
+                >
+                  {LENCO_OPERATORS.map((op) => (
+                    <option key={op.value} value={op.value}>
+                      {op.label} ({op.hint})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="lenco-phone">MoMo phone number</Label>
+                <Input
+                  id="lenco-phone"
+                  type="tel"
+                  placeholder="0971234567"
+                  className="h-11"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button className="w-full" disabled={sending} onClick={sendPrompt}>
+                {sending ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending prompt…</>
+                ) : (
+                  <>Send payment prompt</>
+                )}
+              </Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-2">
+              <p className="text-sm font-semibold">Check your phone</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{message}</p>
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button className="flex-1" disabled={verifying} onClick={checkStatus}>
+                {verifying ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Checking…</>
+                ) : (
+                  "I've approved — check status"
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => setReference(null)}>Cancel</Button>
+            </DialogFooter>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 /* ─── Patient CTA ─── */
 const PatientCTA = () => {
@@ -368,11 +535,10 @@ const InstitutionPlanCard = ({ plan, onSubscribe, subscribing }: {
 const InstitutionSection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { convertForCharge } = useCurrency();
   const { data: plans, isLoading } = useSubscriptionPlans('institution');
   const subscribeMutation = useSubscribeToPlan();
-  const { redirectToCheckout } = useDPOPayment();
   const [subscribingId, setSubscribingId] = useState<string | null>(null);
+  const [lencoSub, setLencoSub] = useState<{ referenceId: string; planName: string; amountZmw: number } | null>(null);
 
   const handleInstitutionSubscribe = async (planId: string, cycle: 'monthly' | 'annual') => {
     if (!user) { navigate('/auth'); return; }
@@ -380,15 +546,11 @@ const InstitutionSection = () => {
     try {
       const result: any = await subscribeMutation.mutateAsync({ planId, billingCycle: cycle });
       if (result?.needsPayment) {
-        // Paid HMS plan — collect via DPO in the user's display currency
-        // (converted from the ZMW-canonical plan price), activation on verify.
-        const charge = convertForCharge(Number(result.payAmount) || 0, result.payCurrency || 'ZMW');
-        await redirectToCheckout({
-          amount: charge.amount,
-          currency: charge.currency,
-          reference_type: 'subscription',
-          reference_id: result.id,
-          description: `HMS subscription — ${result.plan?.name || 'plan'} (${cycle})`,
+        // Paid HMS plan — collect via Lenco mobile money (ZMW); activation on verify.
+        setLencoSub({
+          referenceId: result.id,
+          planName: result.plan?.name || 'HMS plan',
+          amountZmw: Number(result.payAmount) || 0,
         });
       } else {
         navigate('/institution-dashboard');
@@ -400,6 +562,14 @@ const InstitutionSection = () => {
 
   return (
     <div className="space-y-6">
+      <LencoSubscribeDialog
+        open={!!lencoSub}
+        onClose={() => setLencoSub(null)}
+        planName={lencoSub?.planName || ''}
+        amountZmw={lencoSub?.amountZmw || 0}
+        referenceId={lencoSub?.referenceId || null}
+        onActivated={() => navigate('/institution-dashboard')}
+      />
       <Card className="max-w-4xl mx-auto border-primary/20 bg-gradient-to-br from-primary/5 to-background">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
@@ -486,11 +656,10 @@ const InstitutionSection = () => {
 export const PricingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { convertForCharge } = useCurrency();
   const { data: plans } = useSubscriptionPlans();
   const { data: currentSub } = useUserSubscription();
   const subscribeMutation = useSubscribeToPlan();
-  const { redirectToCheckout } = useDPOPayment();
+  const [lencoSub, setLencoSub] = useState<{ referenceId: string; planName: string; amountZmw: number } | null>(null);
   void currentSub;
   void plans;
 
@@ -499,14 +668,11 @@ export const PricingPage = () => {
     try {
       const result: any = await subscribeMutation.mutateAsync({ planId, billingCycle: cycle });
       if (result?.needsPayment) {
-        // Paid plan — collect via DPO in display currency; activation on verify.
-        const charge = convertForCharge(Number(result.payAmount) || 0, result.payCurrency || 'ZMW');
-        await redirectToCheckout({
-          amount: charge.amount,
-          currency: charge.currency,
-          reference_type: 'subscription',
-          reference_id: result.id,
-          description: `Subscription — ${result.plan?.name || 'plan'} (${cycle})`,
+        // Paid plan — collect via Lenco mobile money (ZMW); activation on verify.
+        setLencoSub({
+          referenceId: result.id,
+          planName: result.plan?.name || 'plan',
+          amountZmw: Number(result.payAmount) || 0,
         });
       } else {
         navigate('/dashboard');
@@ -518,6 +684,14 @@ export const PricingPage = () => {
 
   return (
     <>
+      <LencoSubscribeDialog
+        open={!!lencoSub}
+        onClose={() => setLencoSub(null)}
+        planName={lencoSub?.planName || ''}
+        amountZmw={lencoSub?.amountZmw || 0}
+        referenceId={lencoSub?.referenceId || null}
+        onActivated={() => navigate('/dashboard')}
+      />
       <Helmet>
         <title>Pricing — Doc' O Clock Healthcare Platform</title>
         <meta name="description" content="Free for patients. Pay-per-booking for providers. Transparent pricing for pharmacies and hospitals." />

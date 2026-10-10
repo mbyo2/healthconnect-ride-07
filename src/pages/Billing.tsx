@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
-import { useDPOPayment } from "@/hooks/useDPOPayment";
+import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 
 interface Invoice {
   id: string;
@@ -36,7 +36,13 @@ export const Billing = () => {
   const { user } = useAuth();
   const { institutionId, institution } = useInstitutionContext();
   const { formatPrice } = useCurrency();
-  const { redirectToCheckout } = useDPOPayment();
+  const { createCollection, verifyPayment, verifying } = useLencoPayment();
+  const [lencoPayInvoice, setLencoPayInvoice] = useState<Invoice | null>(null);
+  const [lencoPhone, setLencoPhone] = useState("");
+  const [lencoOperator, setLencoOperator] = useState<LencoOperator>("mtn");
+  const [lencoReference, setLencoReference] = useState<string | null>(null);
+  const [lencoMessage, setLencoMessage] = useState("");
+  const [lencoSending, setLencoSending] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -194,24 +200,63 @@ export const Billing = () => {
     }
   };
 
-  const handlePayOnline = async (invoice: Invoice) => {
+  // Collect an invoice payment via Lenco mobile money: a prompt goes to the
+  // payer's phone; on "paid" the invoice is marked paid locally.
+  const handlePayOnline = (invoice: Invoice) => {
+    setLencoPhone("");
+    setLencoReference(null);
+    setLencoMessage("");
+    setLencoPayInvoice(invoice);
+  };
+
+  const sendLencoPrompt = async () => {
+    if (!lencoPayInvoice) return;
+    if (lencoPhone.replace(/\D/g, "").length < 9) {
+      toast.error("Enter the mobile-money phone number that will approve this payment");
+      return;
+    }
+    setLencoSending(true);
     try {
-      // Redirect to DPO hosted checkout for online payment
-      // The return URL will trigger verification and mark the invoice paid
-      await redirectToCheckout({
-        amount: Number(invoice.balance || invoice.total_amount),
+      const res = await createCollection({
+        amount: Math.round(Number(lencoPayInvoice.balance || lencoPayInvoice.total_amount) * 100) / 100,
         currency: "ZMW",
-        reference: `INV-${invoice.id}`,
-        description: `Invoice ${invoice.invoice_number || invoice.id} — ${institution?.name || "Healthcare"}`,
-        returnUrl: `${window.location.origin}/billing?paid_invoice=${invoice.id}`,
-        metadata: {
-          invoice_id: invoice.id,
-          institution_id: institutionId,
-          type: "invoice_payment",
-        },
+        reference_type: "invoice",
+        reference_id: lencoPayInvoice.id,
+        description: `Invoice ${lencoPayInvoice.invoice_number || lencoPayInvoice.id} — ${institution?.name || "Healthcare"}`,
+        phone: lencoPhone,
+        operator: lencoOperator,
+        country: "zm",
       });
+      if (res?.reference) {
+        setLencoReference(res.reference);
+        setLencoMessage(res.message || "Approve the payment on your phone, then tap \"I've approved\".");
+        if (res.status === "paid") {
+          await handleMarkPaid(lencoPayInvoice);
+          setLencoPayInvoice(null);
+          setLencoReference(null);
+        }
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to start online payment");
+    } finally {
+      setLencoSending(false);
+    }
+  };
+
+  const checkLencoStatus = async () => {
+    if (!lencoReference || !lencoPayInvoice) return;
+    const r = await verifyPayment(lencoReference);
+    if (!r) return;
+    if (r.status === "paid") {
+      await handleMarkPaid(lencoPayInvoice);
+      toast.success("Invoice payment confirmed");
+      setLencoPayInvoice(null);
+      setLencoReference(null);
+    } else if (r.status === "failed" || r.status === "cancelled") {
+      toast.error("This payment did not complete. You can try again.");
+      setLencoReference(null);
+    } else {
+      toast.info(r.message || "Still waiting — approve the prompt on your phone, then check again.");
     }
   };
 
@@ -555,6 +600,72 @@ export const Billing = () => {
               </Button>
             )}
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pay Online — Lenco Mobile Money collection */}
+      <Dialog open={!!lencoPayInvoice} onOpenChange={(o) => { if (!o) { setLencoPayInvoice(null); setLencoReference(null); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pay with Mobile Money</DialogTitle>
+          </DialogHeader>
+          {lencoPayInvoice && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Invoice {lencoPayInvoice.invoice_number} — {formatPrice(Number(lencoPayInvoice.balance || lencoPayInvoice.total_amount))}
+                {' '}via MTN, Airtel or Zamtel.
+              </p>
+              {!lencoReference ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Operator</Label>
+                      <select
+                        aria-label="Mobile money operator"
+                        className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                        value={lencoOperator}
+                        onChange={(e) => setLencoOperator(e.target.value as LencoOperator)}
+                      >
+                        {LENCO_OPERATORS.map((op) => (
+                          <option key={op.value} value={op.value}>
+                            {op.label} ({op.hint})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>MoMo phone number</Label>
+                      <Input
+                        type="tel"
+                        placeholder="0971234567"
+                        className="h-11"
+                        value={lencoPhone}
+                        onChange={(e) => setLencoPhone(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button className="w-full" disabled={lencoSending} onClick={sendLencoPrompt}>
+                      {lencoSending ? "Sending prompt…" : "Send payment prompt"}
+                    </Button>
+                  </DialogFooter>
+                </>
+              ) : (
+                <>
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-2">
+                    <p className="text-sm font-semibold">Check your phone</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{lencoMessage}</p>
+                  </div>
+                  <DialogFooter className="flex gap-2">
+                    <Button className="flex-1" disabled={verifying} onClick={checkLencoStatus}>
+                      {verifying ? "Checking…" : "I've approved — check status"}
+                    </Button>
+                    <Button variant="outline" onClick={() => setLencoReference(null)}>Cancel</Button>
+                  </DialogFooter>
+                </>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

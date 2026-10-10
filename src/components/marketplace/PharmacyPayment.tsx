@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, Pill, CreditCard, Smartphone, Wallet, CheckCircle2 } from "lucide-react";
+import { Loader2, Pill, Smartphone, Wallet, CheckCircle2 } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
-import { useDPOPayment } from "@/hooks/useDPOPayment";
+import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 import { useWalletPayment } from "@/hooks/useWalletPayment";
 import { peekPendingAction, takePendingAction } from "@/utils/pendingAction";
 import { FlowResult } from "@/components/ui/flow-result";
@@ -19,8 +19,12 @@ interface PharmacyPaymentProps {
 
 export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProps) => {
   const [loading, setLoading] = useState(false);
-  const [payMethod, setPayMethod] = useState<'dpo' | 'wallet'>('dpo');
+  const [payMethod, setPayMethod] = useState<'lenco' | 'wallet'>('lenco');
   const [payError, setPayError] = useState<string | null>(null);
+  const [lencoPhone, setLencoPhone] = useState('');
+  const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
+  const [lencoReference, setLencoReference] = useState<string | null>(null);
+  const [lencoMessage, setLencoMessage] = useState('');
   const resumedRef = useRef(false);
 
   // Post-login resume: restore the checkout the user left, then let them
@@ -37,11 +41,27 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       toast.success('Welcome back — review and confirm your payment.');
     }
   }, []);
-  const { formatPrice, convertForCharge } = useCurrency();
-  const { redirectToCheckout } = useDPOPayment();
+  const { formatPrice } = useCurrency();
+  const { createCollection, verifyPayment, verifying } = useLencoPayment();
   const { balance: walletBalance, paying: walletPaying, pay: payWithWallet } = useWalletPayment();
 
   const orderTotal = Number(order?.total_amount ?? 0);
+
+  const checkLencoStatus = async () => {
+    if (!lencoReference) return;
+    const r = await verifyPayment(lencoReference);
+    if (!r) return;
+    if (r.status === 'paid') {
+      toast.success("Payment confirmed — your order is being processed.");
+      setLencoReference(null);
+      onPaymentSuccess();
+    } else if (r.status === 'failed' || r.status === 'cancelled') {
+      toast.error("This payment did not complete. You can try again.");
+      setLencoReference(null);
+    } else {
+      toast.info(r.message || "Still waiting — approve the prompt on your phone, then check again.");
+    }
+  };
 
   const handlePayment = async () => {
     if (orderTotal <= 0) {
@@ -53,7 +73,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
     try {
       if (payMethod === 'wallet') {
         if (walletBalance < orderTotal) {
-          toast.error("Insufficient wallet balance — top up or pay with DPO.");
+          toast.error("Insufficient wallet balance — top up or pay with Mobile Money.");
           setLoading(false);
           return;
         }
@@ -68,16 +88,34 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         if (ok) onPaymentSuccess();
         return;
       }
-      // Gateway charge: converted amount paired with its currency.
-      const charge = convertForCharge(orderTotal);
-      await redirectToCheckout({
-        amount: charge.amount,
-        currency: charge.currency,
+      // Mobile Money collection (Lenco): ZMW-canonical amount, prompt goes to
+      // the customer's phone — they approve there, then tap "I've approved".
+      const zmwAmount = Math.round(orderTotal * 100) / 100;
+      if (lencoPhone.replace(/\D/g, '').length < 9) {
+        toast.error("Enter the mobile-money phone number that will approve this payment");
+        setLoading(false);
+        return;
+      }
+      const res = await createCollection({
+        amount: zmwAmount,
+        currency: 'ZMW',
         reference_type: 'pharmacy_sale',
         reference_id: order?.id,
         description: `Medicine Order Payment - Order #${order?.id}`,
-        customer_phone: (order as any)?.patient_phone,
+        phone: lencoPhone,
+        operator: lencoOperator,
+        country: 'zm',
       });
+      setLoading(false);
+      if (res?.reference) {
+        setLencoReference(res.reference);
+        setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
+        if (res.status === 'paid') {
+          toast.success("Payment confirmed — your order is being processed.");
+          setLencoReference(null);
+          onPaymentSuccess();
+        }
+      }
     } catch (error) {
       console.error('Payment error:', error);
       setPayError(
@@ -136,26 +174,79 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              aria-pressed={payMethod === 'dpo'}
-              onClick={() => { setPayError(null); setPayMethod('dpo'); }}
-              className={`flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
+              aria-pressed={payMethod === 'lenco'}
+              onClick={() => { setPayError(null); setLencoReference(null); setPayMethod('lenco'); }}
+              className={`flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-xl border text-xs font-bold transition-all ${payMethod === 'lenco' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
-              <CreditCard className="h-4 w-4" /> Card
-              <span className="mx-0.5">•</span>
-              <Smartphone className="h-4 w-4" /> MoMo
+              <Smartphone className="h-4 w-4" /> Mobile Money
             </button>
             <button
               type="button"
               aria-pressed={payMethod === 'wallet'}
-              onClick={() => { setPayError(null); setPayMethod('wallet'); }}
+              onClick={() => { setPayError(null); setLencoReference(null); setPayMethod('wallet'); }}
               className={`flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
               <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})
             </button>
           </div>
+          {payMethod === 'lenco' && !lencoReference && (
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="space-y-1.5">
+                <span className="text-xs text-muted-foreground">Operator</span>
+                <select
+                  aria-label="Mobile money operator"
+                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={lencoOperator}
+                  onChange={(e) => setLencoOperator(e.target.value as LencoOperator)}
+                >
+                  {LENCO_OPERATORS.map((op) => (
+                    <option key={op.value} value={op.value}>
+                      {op.label} ({op.hint})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <span className="text-xs text-muted-foreground">MoMo phone number</span>
+                <input
+                  type="tel"
+                  placeholder="0971234567"
+                  aria-label="Mobile money phone number"
+                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={lencoPhone}
+                  onChange={(e) => setLencoPhone(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          {payMethod === 'lenco' && lencoReference && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-3">
+              <p className="text-sm font-semibold">Check your phone</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{lencoMessage}</p>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1"
+                  disabled={verifying}
+                  onClick={checkLencoStatus}
+                >
+                  {verifying ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Checking...
+                    </>
+                  ) : (
+                    "I've approved — check status"
+                  )}
+                </Button>
+                <Button variant="outline" onClick={() => setLencoReference(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
           {payMethod === 'wallet' && walletBalance < orderTotal && (
             <p className="text-xs font-medium text-destructive">
-              Insufficient balance — top up your wallet or pay with DPO.
+              Insufficient balance — top up your wallet or pay with Mobile Money.
             </p>
           )}
         </div>
@@ -184,8 +275,8 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             </>
           ) : (
             <>
-              <CreditCard className="h-4 w-4 mr-2" />
-              Pay with DPO
+              <Smartphone className="h-4 w-4 mr-2" />
+              Pay with Mobile Money
             </>
           )}
         </Button>
