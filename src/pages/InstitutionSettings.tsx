@@ -33,6 +33,9 @@ type InstitutionFormData = {
   accepted_insurance_providers: string[];
   // New marketplace field
   list_in_marketplace: boolean;
+  // Payment mode: 'platform' = Doc'O Clock handles money via wallet/Lenco;
+  // 'own' = institution handles own money (HMS-only, platform not involved)
+  payment_mode: 'platform' | 'own';
   // New operational fields (correct migration names)
   services_offered: string[];
   equipment_available: string[];     // migration uses equipment_available, not specialized_equipment
@@ -122,6 +125,7 @@ const InstitutionSettings = () => {
     operating_hours: DEFAULT_HOURS,
     accepted_insurance_providers: [],
     list_in_marketplace: false,
+    payment_mode: 'platform' as 'platform' | 'own',
     services_offered: [],
     equipment_available: [],
     languages_spoken: [],
@@ -159,6 +163,7 @@ const InstitutionSettings = () => {
         operating_hours: hours,
         accepted_insurance_providers: contextInst.accepted_insurance_providers || [],
         list_in_marketplace: (contextInst as any).list_in_marketplace ?? false,
+        payment_mode: (contextInst as any).payment_mode || 'platform',
         services_offered: (contextInst as any).services_offered || [],
         equipment_available: (contextInst as any).equipment_available || [],
         languages_spoken: (contextInst as any).languages_spoken || [],
@@ -242,6 +247,7 @@ const InstitutionSettings = () => {
           accepted_insurance_providers: formData.accepted_insurance_providers,
           // New fields — exact migration column names
           list_in_marketplace: formData.list_in_marketplace,
+          payment_mode: formData.payment_mode,
           services_offered: formData.services_offered,
           equipment_available: formData.equipment_available,
           languages_spoken: formData.languages_spoken,
@@ -408,6 +414,48 @@ const InstitutionSettings = () => {
                   );
                 }}
               />
+            </div>
+
+            {/* Payment Mode: platform vs own */}
+            <div className="mt-4 p-4 border rounded-lg bg-muted/30">
+              <Label className="text-base font-medium">Payment Handling</Label>
+              <p className="text-sm text-muted-foreground mt-1 mb-3">
+                Choose who handles money for your institution's services.
+              </p>
+              <div className="space-y-2">
+                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                  <input
+                    type="radio"
+                    name="payment_mode"
+                    checked={formData.payment_mode === 'platform'}
+                    onChange={() => setFormData(p => ({ ...p, payment_mode: 'platform' as const }))}
+                    className="mt-1"
+                  />
+                  <div>
+                    <p className="font-medium text-sm">Doc'O Clock handles payments</p>
+                    <p className="text-xs text-muted-foreground">
+                      Patients pay via wallet/Lenco. We collect, take platform fee, and pay out to you.
+                      Required for marketplace listings.
+                    </p>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                  <input
+                    type="radio"
+                    name="payment_mode"
+                    checked={formData.payment_mode === 'own'}
+                    onChange={() => setFormData(p => ({ ...p, payment_mode: 'own' as const }))}
+                    className="mt-1"
+                  />
+                  <div>
+                    <p className="font-medium text-sm">We handle our own money (HMS only)</p>
+                    <p className="text-xs text-muted-foreground">
+                      Your institution collects payments directly. Doc'O Clock only provides the HMS software —
+                      we don't touch your money.
+                    </p>
+                  </div>
+                </label>
+              </div>
             </div>
           </CardContent>
         </Card>

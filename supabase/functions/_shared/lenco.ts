@@ -237,3 +237,106 @@ export async function verifyWebhookSignature(rawBody: string, signature: string 
     return false;
   }
 }
+
+// ── Disbursements (payouts to providers/hospitals) ──────────────────────
+// Lenco API v2 disbursements:
+//   POST {LENCO_API_URL}/disbursements/mobile-money
+//     { amount, currency, reference, phone, operator, narration? }
+//   POST {LENCO_API_URL}/disbursements/bank
+//     { amount, currency, reference, accountNumber, bankCode, accountName?, narration? }
+//   GET  {LENCO_API_URL}/disbursements/status/:reference
+
+export interface LencoDisbursementParams {
+  amount: number;
+  currency?: string;
+  reference: string;
+  phone?: string;
+  operator?: LencoOperator;
+  accountNumber?: string;
+  bankCode?: string;
+  accountName?: string;
+  narration?: string;
+}
+
+export async function initiateDisbursement(params: LencoDisbursementParams): Promise<{
+  success: boolean;
+  reference?: string;
+  lencoReference?: string;
+  status?: string;
+  error?: string;
+}> {
+  if (!LENCO_SECRET_KEY) {
+    return { success: false, error: "LENCO_SECRET_KEY not configured" };
+  }
+
+  const isMobileMoney = !!params.phone;
+  const endpoint = isMobileMoney ? "/disbursements/mobile-money" : "/disbursements/bank";
+
+  const body: any = {
+    amount: params.amount,
+    currency: params.currency || "ZMW",
+    reference: params.reference,
+    narration: params.narration || `Doc'O Clock payout ${params.reference}`,
+  };
+
+  if (isMobileMoney) {
+    body.phone = params.phone;
+    body.operator = params.operator || "mtn";
+  } else {
+    body.accountNumber = params.accountNumber;
+    body.bankCode = params.bankCode;
+    if (params.accountName) body.accountName = params.accountName;
+  }
+
+  try {
+    const res = await fetch(`${LENCO_API_URL}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LENCO_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok || json.status === false) {
+      return {
+        success: false,
+        error: json.message || `Lenco disbursement failed (${res.status})`,
+      };
+    }
+
+    return {
+      success: true,
+      reference: json.data?.reference || params.reference,
+      lencoReference: json.data?.lencoReference,
+      status: json.data?.status || "pending",
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Network error" };
+  }
+}
+
+export async function checkDisbursementStatus(reference: string): Promise<{
+  status: string;
+  lencoReference?: string;
+  error?: string;
+}> {
+  if (!LENCO_SECRET_KEY) {
+    return { status: "unknown", error: "LENCO_SECRET_KEY not configured" };
+  }
+
+  try {
+    const res = await fetch(`${LENCO_API_URL}/disbursements/status/${reference}`, {
+      headers: { "Authorization": `Bearer ${LENCO_SECRET_KEY}` },
+    });
+    const json = await res.json();
+    return {
+      status: json.data?.status || "unknown",
+      lencoReference: json.data?.lencoReference,
+    };
+  } catch (err: any) {
+    return { status: "unknown", error: err.message };
+  }
+}
