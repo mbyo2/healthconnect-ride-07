@@ -125,6 +125,24 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
   } catch {
     // non-fatal
   }
+  try {
+    // Source 3: digital intake forms (pre-visit allergy reports)
+    const { data: intake } = await (supabase.from('intake_forms' as any) as any)
+      .select('allergies')
+      .eq('patient_id', patientId)
+      .order('created_at', { ascending: false })
+      .limit(3);
+    for (const row of (intake as any[]) ?? []) {
+      const a = (row as any)?.allergies;
+      if (typeof a === 'string' && a.trim()) {
+        a.split(/[,;|]/).map((s: string) => s.trim()).filter(Boolean).forEach((x: string) => allergens.add(x));
+      } else if (Array.isArray(a)) {
+        a.map((s: any) => String(s).trim()).filter(Boolean).forEach((x: string) => allergens.add(x));
+      }
+    }
+  } catch {
+    // non-fatal
+  }
   return [...allergens].filter(Boolean);
 }
 

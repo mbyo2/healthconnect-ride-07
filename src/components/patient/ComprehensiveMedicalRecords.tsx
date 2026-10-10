@@ -313,6 +313,15 @@ export const ComprehensiveMedicalRecords = () => {
       toast.error('You do not have permission to edit this record');
       return;
     }
+    // SAFETY: patients may only edit their own patient-sourced records.
+    // Provider-entered records (diagnoses, allergies, medications) are read-only
+    // for patients — this protects the allergy safety screen from tampering.
+    const isPatientUser = !availableRoles || availableRoles.length === 0 || availableRoles.includes('patient');
+    const isPatientOwned = record.record_source === 'patient' || !record.record_source;
+    if (isPatientUser && !isPatientOwned && !isSuperAdmin && !isAdmin) {
+      toast.error('This record was entered by your healthcare provider and cannot be edited. Contact them to request changes.');
+      return;
+    }
     setFormData({
       record_type: record.record_type,
       title: record.title,

@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { checkInteractions } from "@/utils/drug-interactions";
+import { checkInteractions, getPatientAllergies, checkAllergyMatches } from "@/utils/drug-interactions";
 import { RefillRequestsQueue } from "@/components/provider/RefillRequestsQueue";
 import { DrugInteractionAlert } from "@/components/clinical/DrugInteractionAlert";
 import { AllergyAlertSystem } from "@/components/clinical/AllergyAlertSystem";
@@ -93,6 +93,8 @@ export const Prescriptions = () => {
   const [rxNotes, setRxNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [interactionAlerts, setInteractionAlerts] = useState<string[]>([]);
+  const [allergyAlerts, setAllergyAlerts] = useState<{ medication: string; allergen: string }[]>([]);
+  const [allergyOverride, setAllergyOverride] = useState(false);
 
   // Multi-medication item list
   const [medicationItems, setMedicationItems] = useState<MedicationItem[]>([
@@ -232,9 +234,19 @@ export const Prescriptions = () => {
     );
   };
 
-  // Check drug interactions across all medications in list
+  // Check drug interactions across all medications in list + allergy screening
   const runSafetyChecks = async () => {
     const names = medicationItems.map((m) => m.medication_name.trim()).filter(Boolean);
+
+    // ALLERGY SCREENING — check against patient's recorded allergies
+    if (selectedPatient && names.length > 0) {
+      const allergies = await getPatientAllergies(selectedPatient.id);
+      const allergyMatches = checkAllergyMatches(names, allergies);
+      setAllergyAlerts(allergyMatches);
+    } else {
+      setAllergyAlerts([]);
+    }
+
     if (names.length < 2) {
       setInteractionAlerts([]);
       return;
@@ -255,6 +267,20 @@ export const Prescriptions = () => {
   const handleCreatePrescription = async () => {
     if (!user || !selectedPatient) {
       toast.error("Please select a patient");
+      return;
+    }
+
+    // ALLERGY GATE: block if any prescribed med matches a known allergy,
+    // unless the provider has explicitly acknowledged the override.
+    const names = medicationItems.map((m) => m.medication_name.trim()).filter(Boolean);
+    const allergies = await getPatientAllergies(selectedPatient.id);
+    const allergyMatches = checkAllergyMatches(names, allergies);
+    if (allergyMatches.length > 0 && !allergyOverride) {
+      setAllergyAlerts(allergyMatches);
+      toast.error(
+        `ALLERGY WARNING: ${allergyMatches.map(m => `${m.medication} may trigger ${m.allergen} allergy`).join("; ")}`,
+        { duration: 8000, description: "Tick the acknowledgment box to override with clinical justification." }
+      );
       return;
     }
 
@@ -669,6 +695,32 @@ export const Prescriptions = () => {
                         {interactionAlerts.map((alert, i) => (
                           <p key={i} className="text-[11px] pl-6">• {alert}</p>
                         ))}
+                      </div>
+                    )}
+
+                    {allergyAlerts.length > 0 && (
+                      <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-900 dark:text-red-300 space-y-2">
+                        <div className="flex items-center gap-2 font-bold">
+                          <AlertTriangle className="h-4 w-4 text-red-600" />
+                          <span>ALLERGY ALERT — Prescription Blocked</span>
+                        </div>
+                        {allergyAlerts.map((m, i) => (
+                          <p key={i} className="text-xs pl-6 font-medium">
+                            • {m.medication} may trigger patient's {m.allergen} allergy
+                          </p>
+                        ))}
+                        <label className="flex items-start gap-2 pl-6 pt-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={allergyOverride}
+                            onChange={(e) => setAllergyOverride(e.target.checked)}
+                            className="mt-1"
+                          />
+                          <span className="text-xs">
+                            I acknowledge this allergy risk and override with clinical justification.
+                            This override will be recorded in the audit trail.
+                          </span>
+                        </label>
                       </div>
                     )}
 
