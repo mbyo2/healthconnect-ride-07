@@ -227,8 +227,35 @@ const InstitutionSettings = () => {
     });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  /**
+   * Request admin approval to switch from 'own' to 'platform' for marketplace listing.
+   * Creates a notification for superadmins.
+   */
+  const requestMarketplaceApproval = async () => {
+    if (!institution?.id) return;
+    try {
+      // Log the request — superadmins see it in their dashboard
+      await supabase.from("security_audit_log").insert({
+        action: "marketplace_approval_requested",
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        details: {
+          institution_id: institution.id,
+          institution_name: formData.name,
+          current_mode: "own",
+          requested_mode: "platform",
+          reason: "Marketplace listing requested",
+        },
+      });
+      toast.success("Approval request sent.", {
+        description: "An admin will review your request to enable marketplace listing.",
+        duration: 5000,
+      });
+    } catch (e) {
+      console.error("Failed to log approval request:", e);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {    e.preventDefault();
     if (!institution?.id) return;
     setSaving(true);
     try {
@@ -400,11 +427,29 @@ const InstitutionSettings = () => {
                   When enabled, patients searching for healthcare facilities will find your institution.
                   Disable this to use the platform for internal HMS operations only.
                 </p>
+                {formData.payment_mode === 'own' && (
+                  <p className="text-xs text-amber-600 font-medium mt-2">
+                    ⚠️ Marketplace listing requires platform payment mode. Your request will need admin approval to switch.
+                  </p>
+                )}
               </div>
               <Switch
                 id="list_in_marketplace"
                 checked={formData.list_in_marketplace}
                 onCheckedChange={checked => {
+                  if (checked && formData.payment_mode === 'own') {
+                    // Block: own-mode institutions need admin approval to list
+                    toast.error(
+                      "Marketplace listing requires platform payments.",
+                      {
+                        description: "Your institution is in HMS-only mode. An admin must approve switching to platform payment mode before you can list.",
+                        duration: 6000,
+                      }
+                    );
+                    // Create an approval request for admin
+                    requestMarketplaceApproval();
+                    return;
+                  }
                   setFormData(p => ({ ...p, list_in_marketplace: checked }));
                   toast.info(
                     checked

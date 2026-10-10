@@ -40,12 +40,13 @@ export const useMarketplace = () => {
         .select(`
           *,
           pharmacy:healthcare_institutions!marketplace_products_pharmacy_id_fkey!inner(
-            id, name, address, phone, email, is_verified, list_in_marketplace
+            id, name, address, phone, email, is_verified, list_in_marketplace, payment_mode
           )
         `)
         .eq('is_active', true)
         .eq('pharmacy.is_verified', true)
         .eq('pharmacy.list_in_marketplace', true)
+        .eq('pharmacy.payment_mode', 'platform')
         .order('medication_name');
 
       if (error) throw error;
