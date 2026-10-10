@@ -238,43 +238,57 @@ export async function verifyWebhookSignature(rawBody: string, signature: string 
   }
 }
 
-// ── Disbursements (payouts to providers/hospitals) ──────────────────────
-// Lenco API v2 disbursements:
-//   POST {LENCO_API_URL}/disbursements/mobile-money
-//     { amount, currency, reference, phone, operator, narration? }
-//   POST {LENCO_API_URL}/disbursements/bank
-//     { amount, currency, reference, accountNumber, bankCode, accountName?, narration? }
-//   GET  {LENCO_API_URL}/disbursements/status/:reference
+// ── Transfers (payouts to providers/hospitals) ───────────────────────────
+// Lenco API v2 transfers — verified against lenco-api.readme.io/v2.0 (2026-08-06):
+//   POST /transfers/mobile-money
+//     { accountId, amount, reference, phone, operator, country?, narration? }
+//   POST /transfers/bank-account
+//     { accountId, amount, reference, accountNumber, bankId, narration? }
+//   GET  /transfers/status/:reference
+//
+// CRITICAL:
+// - amount is a JSON number (major units, e.g. 20.00)
+// - fee is charged ON TOP of amount — budget for it
+// - reference must be deterministic (derived from our entity ID) for idempotency
+// - Check data.status boolean, not just HTTP 200
+// - Never blind-retry after timeout/5xx — GET status by reference first
 
-export interface LencoDisbursementParams {
+const LENCO_ACCOUNT_ID = Deno.env.get('LENCO_ACCOUNT_ID') || '';
+
+export interface LencoTransferParams {
   amount: number;
   currency?: string;
   reference: string;
   phone?: string;
   operator?: LencoOperator;
   accountNumber?: string;
-  bankCode?: string;
+  bankId?: string;
   accountName?: string;
   narration?: string;
 }
 
-export async function initiateDisbursement(params: LencoDisbursementParams): Promise<{
+export async function initiateTransfer(params: LencoTransferParams): Promise<{
   success: boolean;
   reference?: string;
   lencoReference?: string;
   status?: string;
+  fee?: string;
   error?: string;
+  errorCode?: string;
 }> {
   if (!LENCO_SECRET_KEY) {
     return { success: false, error: "LENCO_SECRET_KEY not configured" };
   }
+  if (!LENCO_ACCOUNT_ID) {
+    return { success: false, error: "LENCO_ACCOUNT_ID not configured" };
+  }
 
   const isMobileMoney = !!params.phone;
-  const endpoint = isMobileMoney ? "/disbursements/mobile-money" : "/disbursements/bank";
+  const endpoint = isMobileMoney ? "/transfers/mobile-money" : "/transfers/bank-account";
 
   const body: any = {
+    accountId: LENCO_ACCOUNT_ID,
     amount: params.amount,
-    currency: params.currency || "ZMW",
     reference: params.reference,
     narration: params.narration || `Doc'O Clock payout ${params.reference}`,
   };
@@ -282,9 +296,10 @@ export async function initiateDisbursement(params: LencoDisbursementParams): Pro
   if (isMobileMoney) {
     body.phone = params.phone;
     body.operator = params.operator || "mtn";
+    body.country = "zm";
   } else {
     body.accountNumber = params.accountNumber;
-    body.bankCode = params.bankCode;
+    body.bankId = params.bankId;
     if (params.accountName) body.accountName = params.accountName;
   }
 
@@ -300,10 +315,12 @@ export async function initiateDisbursement(params: LencoDisbursementParams): Pro
 
     const json = await res.json();
 
-    if (!res.ok || json.status === false) {
+    // Lenco can return HTTP 200 with status:false — check the body
+    if (!json.status) {
       return {
         success: false,
-        error: json.message || `Lenco disbursement failed (${res.status})`,
+        error: json.message || `Lenco transfer failed`,
+        errorCode: json.errorCode,
       };
     }
 
@@ -312,15 +329,18 @@ export async function initiateDisbursement(params: LencoDisbursementParams): Pro
       reference: json.data?.reference || params.reference,
       lencoReference: json.data?.lencoReference,
       status: json.data?.status || "pending",
+      fee: json.data?.fee,
     };
   } catch (err: any) {
+    // Ambiguous failure — caller should check status by reference before retrying
     return { success: false, error: err.message || "Network error" };
   }
 }
 
-export async function checkDisbursementStatus(reference: string): Promise<{
+export async function checkTransferStatus(reference: string): Promise<{
   status: string;
   lencoReference?: string;
+  fee?: string;
   error?: string;
 }> {
   if (!LENCO_SECRET_KEY) {
@@ -328,15 +348,30 @@ export async function checkDisbursementStatus(reference: string): Promise<{
   }
 
   try {
-    const res = await fetch(`${LENCO_API_URL}/disbursements/status/${reference}`, {
-      headers: { "Authorization": `Bearer ${LENCO_SECRET_KEY}` },
-    });
+    const res = await fetch(
+      `${LENCO_API_URL}/transfers/status/${encodeURIComponent(reference)}`,
+      { headers: { "Authorization": `Bearer ${LENCO_SECRET_KEY}` } }
+    );
+
+    if (res.status === 404) {
+      return { status: "not_found" }; // genuinely doesn't exist — safe to re-POST
+    }
+
     const json = await res.json();
+    if (!json.status) {
+      return { status: "unknown", error: json.message };
+    }
+
     return {
       status: json.data?.status || "unknown",
       lencoReference: json.data?.lencoReference,
+      fee: json.data?.fee,
     };
   } catch (err: any) {
     return { status: "unknown", error: err.message };
   }
 }
+
+// Legacy aliases (renamed for clarity — use initiateTransfer/checkTransferStatus)
+export const initiateDisbursement = initiateTransfer;
+export const checkDisbursementStatus = checkTransferStatus;

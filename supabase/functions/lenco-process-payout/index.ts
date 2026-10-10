@@ -7,7 +7,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { initiateDisbursement } from "../_shared/lenco.ts";
+import { initiateTransfer, checkTransferStatus } from "../_shared/lenco.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,7 +58,13 @@ serve(async (req) => {
     const details = withdrawal.payout_details as any;
     const reference = `WD-${withdrawal.id.slice(0, 8).toUpperCase()}`;
 
-    // Initiate Lenco disbursement
+    // Safety: check if this reference already exists (idempotency — never double-pay)
+    const existing = await checkTransferStatus(reference);
+    if (existing.status !== "not_found" && existing.status !== "unknown") {
+      throw new Error(`Transfer ${reference} already exists with status: ${existing.status}`);
+    }
+
+    // Initiate Lenco transfer (our keys, our account — provider just receives money)
     let result;
     if (withdrawal.payout_method === "mobile_money") {
       // Detect operator from phone prefix (Zambia)
@@ -68,7 +74,7 @@ serve(async (req) => {
       else if (phone.startsWith("095") || phone.startsWith("075")) operator = "airtel";
       else if (phone.startsWith("096") || phone.startsWith("076")) operator = "zamtel";
 
-      result = await initiateDisbursement({
+      result = await initiateTransfer({
         amount: Number(withdrawal.amount),
         currency: withdrawal.currency || "ZMW",
         reference,
@@ -77,19 +83,30 @@ serve(async (req) => {
         narration: `Doc'O Clock provider payout`,
       });
     } else {
-      result = await initiateDisbursement({
+      result = await initiateTransfer({
         amount: Number(withdrawal.amount),
         currency: withdrawal.currency || "ZMW",
         reference,
         accountNumber: details.account_number,
-        bankCode: details.bank_name, // Lenco may need bank code; using name as fallback
+        bankId: details.bank_name,
         accountName: details.account_name,
         narration: `Doc'O Clock provider payout`,
       });
     }
 
     if (!result.success) {
-      throw new Error(result.error || "Lenco disbursement failed");
+      // Duplicate reference means it already went through — check status
+      if (result.errorCode === "04") {
+        const statusCheck = await checkTransferStatus(reference);
+        if (statusCheck.status === "successful" || statusCheck.status === "pending") {
+          // It landed — treat as success
+          result = { ...result, success: true, status: statusCheck.status, lencoReference: statusCheck.lencoReference };
+        } else {
+          throw new Error(`Transfer failed: ${result.error}`);
+        }
+      } else {
+        throw new Error(result.error || "Transfer failed");
+      }
     }
 
     // Update withdrawal with Lenco reference, mark as paid

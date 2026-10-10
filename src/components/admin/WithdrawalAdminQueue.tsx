@@ -109,9 +109,9 @@ export const WithdrawalAdminQueue = () => {
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Payout failed");
 
-      toast.success(`Payout sent via Lenco (${json.reference})`);
+      toast.success(`Payout sent (${json.reference})`);
       window.dispatchEvent(new CustomEvent("app-feedback", {
-        detail: { type: "success", title: "Payout sent!", description: `K${requests.find(r => r.id === id)?.amount} via Lenco` }
+        detail: { type: "success", title: "Payout sent!", description: `K${requests.find(r => r.id === id)?.amount} on the way` }
       }));
       fetchRequests();
     } catch (error: any) {
@@ -186,7 +186,7 @@ export const WithdrawalAdminQueue = () => {
                       className="w-full bg-green-600 hover:bg-green-700"
                     >
                       <Send className="h-4 w-4 mr-1" />
-                      {processing === req.id ? "Sending…" : "Send via Lenco"}
+                      {processing === req.id ? "Sending…" : "Send Payout"}
                     </Button>
                   )}
                 </div>
