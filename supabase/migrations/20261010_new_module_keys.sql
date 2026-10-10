@@ -5,7 +5,7 @@
 --
 -- Inserted as 'planned' status — admin can grant them to any institution at any time.
 
-INSERT INTO public.facility_module_charter (tier, module_key, module_name, description, status, sort_order)
+INSERT INTO public.facility_module_charter (tier, module_key, module_name, description, status, display_order)
 VALUES
   -- Pediatrics: dedicated child-health workflows (was mapped to maternal_child)
   ('primary','pediatrics','Pediatric Center','Child-health consultations, growth monitoring and immunization','planned',12),
