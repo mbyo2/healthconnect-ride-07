@@ -18,7 +18,7 @@ import { SuggestionBanner, RecommendationCard } from "@/components/guidance";
 import {
   Shield, ShieldCheck, Users, Activity, DollarSign, Building2, Stethoscope,
   UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw, TrendingUp,
-  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote
+  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote, Trash2
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +28,7 @@ import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { SupportWorkflow } from "@/components/workflows/SupportWorkflow";
 import { WithdrawalAdminQueue } from "@/components/admin/WithdrawalAdminQueue";
+import { UserDeletionPanel } from "@/components/admin/UserDeletionPanel";
 import { format, subMonths, startOfMonth } from "date-fns";
 
 const TABS = [
@@ -44,6 +45,7 @@ const TABS = [
   { value: "promos", label: "Promos", icon: Ticket },
   { value: "security", label: "Security", icon: Lock },
   { value: "audit", label: "Audit Logs", icon: Activity },
+  { value: "delete-user", label: "Delete User", icon: Trash2 },
 ];
 
 export const AdminDashboard = () => {
@@ -58,7 +60,7 @@ export const AdminDashboard = () => {
 
   // Commissions RLS is superadmin-only — plain admins would see a dead tab.
   // manage-institutions is also superadmin-only (platform hierarchy).
-  const SUPERADMIN_ONLY_TABS = new Set(["commissions", "manage-institutions"]);
+  const SUPERADMIN_ONLY_TABS = new Set(["commissions", "manage-institutions", "delete-user"]);
   const visibleTabs = TABS.filter((t) => isSuperAdmin || !SUPERADMIN_ONLY_TABS.has(t.value));
 
   // Unknown ?tab= values fall back to overview instead of empty content.
@@ -430,6 +432,7 @@ export const AdminDashboard = () => {
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>
             <TabsContent value="security"><SecurityDashboard /></TabsContent>
             <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
+            {isSuperAdmin && <TabsContent value="delete-user"><UserDeletionPanel /></TabsContent>}
           </div>
         </Tabs>
       </div>

@@ -16,6 +16,9 @@ import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed"
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { getFacilityArchetype } from "@/config/facilityProfiles";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
+import { useModuleAccess } from "@/hooks/useModuleAccess";
+import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
+import { Lock } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, subDays, startOfMonth, startOfDay, endOfMonth } from "date-fns";
 import { toast } from "sonner";
@@ -262,6 +265,16 @@ export const InstitutionDashboard = () => {
     next.set("tab", tabName);
     setSearchParams(next, { replace: true });
   };
+
+  // Module entitlement enforcement: tabs locked unless their charter module is live
+  const { canAccess, lockedTabs } = useModuleAccess(charter);
+
+  // Redirect away from a locked tab (e.g. deep link to a revoked module)
+  useEffect(() => {
+    if (charter.length > 0 && activeTab !== "overview" && !canAccess(activeTab as InstitutionTabKey)) {
+      setActiveTab("overview");
+    }
+  }, [charter, activeTab]);
 
   useEffect(() => {
     if (!institution) { setDataLoading(false); return; }
@@ -518,6 +531,30 @@ export const InstitutionDashboard = () => {
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
+            const accessible = canAccess(tab.id as InstitutionTabKey);
+            const rule = getTabRule(tab.id as InstitutionTabKey);
+            if (!accessible) {
+              // Locked tab — show greyed with lock icon, clicking shows why
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={false}
+                  aria-disabled={true}
+                  title={`Requires module: ${rule?.requiredModules.join(" or ") || "—"} (not enabled for this facility)`}
+                  onClick={() => {
+                    toast.error(
+                      `"${tab.label}" is not enabled for this facility.`,
+                      { description: `Required module: ${rule?.requiredModules.join(" or ") || "—"}. Contact your administrator to enable it.` }
+                    );
+                  }}
+                  className="px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
+                >
+                  <Lock className="h-4 w-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            }
             return (
               <button
                 key={tab.id}
