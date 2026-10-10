@@ -79,17 +79,23 @@ export const WalletTopUp = () => {
                     return;
                 }
                 const reference = generateWidgetReference("TOPUP");
-                // Record the pending top-up so the verify step can credit the wallet
-                await supabase.from("lenco_payments").insert({
-                    reference,
-                    amount: zmwAmount,
-                    currency: 'ZMW',
-                    status: 'pending',
-                    payment_type: 'card',
-                    reference_type: 'wallet_topup',
-                    description: `Wallet top-up K${zmwAmount} (widget)`,
-                    user_id: user.id,
+                // Initialize via Edge Function (creates pending lenco_payments row
+                // with service_role, bypassing RLS). The widget then collects
+                // directly via Lenco's hosted checkout using this reference.
+                const { error: initError } = await supabase.functions.invoke("lenco-widget-init", {
+                    body: {
+                        reference,
+                        amount: zmwAmount,
+                        currency: 'ZMW',
+                        reference_type: 'wallet_topup',
+                        description: `Wallet top-up K${zmwAmount} (widget)`,
+                    },
                 });
+                if (initError) {
+                    toast.error("Could not start payment. Please try again.");
+                    setIsLoading(false);
+                    return;
+                }
                 setIsLoading(false);
                 await openWidget({
                     email: user.email || "",

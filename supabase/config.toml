@@ -57,6 +57,14 @@ verify_jwt = true
 [functions.send-reminder]
 verify_jwt = false
 
+# Webhooks must accept unauthenticated callbacks from payment providers
+# (they verify via HMAC signatures, not JWT)
+[functions.lenco-webhook]
+verify_jwt = false
+
+[functions.process-paypal-webhook]
+verify_jwt = false
+
 [functions.send-appointment-reminder]
 verify_jwt = true
 

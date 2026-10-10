@@ -67,12 +67,12 @@ serve(async (req) => {
     // Initiate Lenco transfer (our keys, our account — provider just receives money)
     let result;
     if (withdrawal.payout_method === "mobile_money") {
-      // Detect operator from phone prefix (Zambia)
+      // Detect operator from phone prefix (Zambia — verified 2026-10-10)
       const phone = details.phone_number.replace(/\D/g, "");
       let operator: "mtn" | "airtel" | "zamtel" = "mtn";
-      if (phone.startsWith("097") || phone.startsWith("077")) operator = "mtn";
-      else if (phone.startsWith("095") || phone.startsWith("075")) operator = "airtel";
-      else if (phone.startsWith("096") || phone.startsWith("076")) operator = "zamtel";
+      if (phone.startsWith("095")) operator = "zamtel";
+      else if (phone.startsWith("096") || phone.startsWith("076")) operator = "mtn";
+      else if (phone.startsWith("097") || phone.startsWith("077")) operator = "airtel";
 
       result = await initiateTransfer({
         amount: Number(withdrawal.amount),

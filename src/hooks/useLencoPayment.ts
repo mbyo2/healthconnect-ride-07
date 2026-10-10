@@ -34,8 +34,8 @@ export interface LencoVerifyResult {
 }
 
 export const LENCO_OPERATORS: { value: LencoOperator; label: string; hint: string }[] = [
-  { value: "mtn", label: "MTN MoMo", hint: "095 / 096 / 097" },
-  { value: "airtel", label: "Airtel Money", hint: "096 / 097" },
+  { value: "mtn", label: "MTN MoMo", hint: "096 / 076" },
+  { value: "airtel", label: "Airtel Money", hint: "097 / 077" },
   { value: "zamtel", label: "Zamtel Kwacha", hint: "095" },
 ];
 
