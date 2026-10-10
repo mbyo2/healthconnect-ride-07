@@ -35,6 +35,26 @@ export function SecurityAuditLogs() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  // Pinpoint filters
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [userFilter, setUserFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [uniqueUsers, setUniqueUsers] = useState<{ id: string; email: string }[]>([]);
+
+  // Event type → category mapping for pinpoint filtering
+  const getEventCategory = (eventType: string): string => {
+    const t = eventType.toLowerCase();
+    if (t.includes('login') || t.includes('logout') || t.includes('auth') || t.includes('password') || t.includes('mfa')) return 'Authentication';
+    if (t.includes('payment') || t.includes('payout') || t.includes('withdrawal') || t.includes('refund') || t.includes('lenco') || t.includes('paypal')) return 'Payments';
+    if (t.includes('role') || t.includes('user') || t.includes('delete') || t.includes('admin') || t.includes('approve')) return 'Admin Actions';
+    if (t.includes('prescri') || t.includes('diagnos') || t.includes('allerg') || t.includes('vital') || t.includes('clinical') || t.includes('break_glass') || t.includes('emergency')) return 'Clinical';
+    if (t.includes('marketplace') || t.includes('listing') || t.includes('institution')) return 'Institutions';
+    if (t.includes('appointment') || t.includes('booking') || t.includes('queue')) return 'Appointments';
+    return 'Other';
+  };
+
+  const categories = ['Authentication', 'Payments', 'Admin Actions', 'Clinical', 'Institutions', 'Appointments', 'Other'];
 
   useEffect(() => {
     fetchLogs();
@@ -78,6 +98,11 @@ export function SecurityAuditLogs() {
       }));
 
       setLogs(logsWithEmails);
+
+      // Build unique user list for the user filter
+      const users = Array.from(emailByUser.entries()).map(([id, email]) => ({ id, email }));
+      users.sort((a, b) => a.email.localeCompare(b.email));
+      setUniqueUsers(users);
       toast.success('Audit logs refreshed');
     } catch (error) {
       console.error('Error fetching audit logs:', error);
@@ -116,18 +141,59 @@ export function SecurityAuditLogs() {
       filtered = filtered.filter(log => log.event_type === eventFilter);
     }
 
+    // Filter by category
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(log => getEventCategory(log.event_type) === categoryFilter);
+    }
+
+    // Filter by user
+    if (userFilter !== 'all') {
+      filtered = filtered.filter(log => log.user_id === userFilter);
+    }
+
+    // Filter by date range
+    if (dateFrom) {
+      const from = new Date(dateFrom);
+      from.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(log => new Date(log.created_at) >= from);
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(log => new Date(log.created_at) <= to);
+    }
+
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(log =>
         log.event_type.toLowerCase().includes(query) ||
         (log.user_email && log.user_email.toLowerCase().includes(query)) ||
-        (log.ip_address && log.ip_address.toLowerCase().includes(query))
+        (log.ip_address && log.ip_address.toLowerCase().includes(query)) ||
+        JSON.stringify(log.event_data || {}).toLowerCase().includes(query)
       );
     }
 
     return filtered;
-  }, [logs, eventFilter, searchQuery]);
+  }, [logs, eventFilter, searchQuery, categoryFilter, userFilter, dateFrom, dateTo]);
+
+  const clearFilters = () => {
+    setEventFilter('all');
+    setCategoryFilter('all');
+    setUserFilter('all');
+    setDateFrom('');
+    setDateTo('');
+    setSearchQuery('');
+  };
+
+  const activeFilterCount = [
+    eventFilter !== 'all',
+    categoryFilter !== 'all',
+    userFilter !== 'all',
+    dateFrom !== '',
+    dateTo !== '',
+    searchQuery !== '',
+  ].filter(Boolean).length;
 
   // Pagination
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
@@ -139,7 +205,7 @@ export function SecurityAuditLogs() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [eventFilter, searchQuery]);
+  }, [eventFilter, searchQuery, categoryFilter, userFilter, dateFrom, dateTo]);
 
   const columns: ColumnDef<AuditLog>[] = [
     {
@@ -159,6 +225,14 @@ export function SecurityAuditLogs() {
       accessorKey: 'event_type',
       header: 'Event Type',
       cell: ({ row }) => getEventBadge(row.getValue('event_type')),
+    },
+    {
+      id: 'category',
+      header: 'Category',
+      cell: ({ row }) => {
+        const cat = getEventCategory(row.getValue('event_type') as string);
+        return <Badge variant="secondary" className="text-[11px">{cat}</Badge>;
+      },
     },
     {
       accessorKey: 'user_email',
@@ -250,42 +324,99 @@ export function SecurityAuditLogs() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search logs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          
-          <Select value={eventFilter} onValueChange={setEventFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by event type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Events</SelectItem>
-              {eventTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.replace(/_/g, ' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="space-y-3 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search logs (event, user, IP, details)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
 
-          <Select value={String(itemsPerPage)} onValueChange={(val) => setItemsPerPage(Number(val))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10 per page</SelectItem>
-              <SelectItem value="25">25 per page</SelectItem>
-              <SelectItem value="50">50 per page</SelectItem>
-              <SelectItem value="100">100 per page</SelectItem>
-            </SelectContent>
-          </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={eventFilter} onValueChange={setEventFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by event type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Events</SelectItem>
+                {eventTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type.replace(/_/g, ' ')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <Select value={userFilter} onValueChange={setUserFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by user" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                {uniqueUsers.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>{u.email}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="relative">
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="w-full"
+                aria-label="From date"
+              />
+              <span className="absolute -top-2 left-2 bg-card px-1 text-[10px] text-muted-foreground">From</span>
+            </div>
+
+            <div className="relative">
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="w-full"
+                aria-label="To date"
+              />
+              <span className="absolute -top-2 left-2 bg-card px-1 text-[10px] text-muted-foreground">To</span>
+            </div>
+
+            <div className="flex gap-2">
+              <Select value={String(itemsPerPage)} onValueChange={(val) => setItemsPerPage(Number(val))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10 per page</SelectItem>
+                  <SelectItem value="25">25 per page</SelectItem>
+                  <SelectItem value="50">50 per page</SelectItem>
+                  <SelectItem value="100">100 per page</SelectItem>
+                </SelectContent>
+              </Select>
+              {activeFilterCount > 0 && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="whitespace-nowrap">
+                  Clear ({activeFilterCount})
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
