@@ -110,8 +110,11 @@ BEGIN
   INSERT INTO payment_splits (payment_id, recipient_id, recipient_type, amount, percentage)
   VALUES (p_payment_id, (SELECT id FROM app_owner_wallet LIMIT 1), 'app_owner', v_app_amount, v_app_commission);
 
-  INSERT INTO payment_splits (payment_id, recipient_id, recipient_type, amount, percentage)
-  VALUES (p_payment_id, p_provider_id, 'health_personnel', v_personnel_amount, 100 - v_app_commission);
+  -- Only insert personnel split when we have a provider (institution-only payments skip this)
+  IF p_provider_id IS NOT NULL THEN
+    INSERT INTO payment_splits (payment_id, recipient_id, recipient_type, amount, percentage)
+    VALUES (p_payment_id, p_provider_id, 'health_personnel', v_personnel_amount, 100 - v_app_commission);
+  END IF;
 
   IF p_institution_id IS NOT NULL AND p_payment_type != 'pharmacy' THEN
     INSERT INTO payment_splits (payment_id, recipient_id, recipient_type, amount, percentage)
@@ -129,10 +132,12 @@ BEGIN
     updated_at = now()
   WHERE id = (SELECT id FROM app_owner_wallet LIMIT 1);
 
-  UPDATE user_wallets SET
-    balance = balance + v_personnel_amount,
-    updated_at = now()
-  WHERE user_id = p_provider_id;
+  IF p_provider_id IS NOT NULL THEN
+    UPDATE user_wallets SET
+      balance = balance + v_personnel_amount,
+      updated_at = now()
+    WHERE user_id = p_provider_id;
+  END IF;
 
   IF p_institution_id IS NOT NULL AND (v_institution_amount > 0 OR v_pharmacy_amount > 0) THEN
     INSERT INTO institution_wallets (institution_id, balance)

@@ -216,6 +216,52 @@ serve(async (req) => {
         .update({ payment_id: payment.id })
         .eq('id', transactionResult.transaction_id);
 
+      // CRITICAL: distribute the payment via splits (provider + platform fee).
+      // Without this, the patient is debited but nobody is credited.
+      // Determine if this is a pharmacy order (institution) or provider service.
+      let splitInstitutionId: string | null = null;
+      let splitProviderId: string | null = providerId;
+      let paymentType = 'consultation';
+      if (orderId) {
+        const { data: orderRow } = await supabaseClient
+          .from('orders')
+          .select('pharmacy_id')
+          .eq('id', orderId)
+          .maybeSingle();
+        const pharmId = (orderRow as any)?.pharmacy_id;
+        if (pharmId) {
+          const { data: pharmInst } = await supabaseClient
+            .from('healthcare_institutions')
+            .select('id')
+            .eq('id', pharmId)
+            .maybeSingle();
+          if (pharmInst) {
+            splitInstitutionId = (pharmInst as any).id;
+            splitProviderId = null;
+          }
+          paymentType = 'pharmacy';
+        }
+        // Mark the order as paid
+        await supabaseClient
+          .from('orders')
+          .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+      }
+
+      const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
+        p_payment_id: payment.id,
+        p_total_amount: amount,
+        p_provider_id: splitProviderId,
+        p_institution_id: splitInstitutionId,
+        p_payment_type: paymentType,
+      });
+
+      if (splitError) {
+        console.error('Wallet payment split failed:', splitError);
+        // Don't fail the whole payment — the debit succeeded.
+        // Log for admin reconciliation.
+      }
+
     console.log('Wallet payment processed successfully:', payment);
 
       return new Response(
