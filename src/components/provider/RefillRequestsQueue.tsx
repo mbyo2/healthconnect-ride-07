@@ -100,6 +100,35 @@ export const RefillRequestsQueue = () => {
         }
       }));
 
+      // REAL patient notification (was just a toast claiming notification)
+      try {
+        const req = requests.find((r) => r.id === requestId);
+        if (req?.patient_id) {
+          await supabase.from("notifications").insert({
+            user_id: req.patient_id,
+            title: approved ? "Refill request approved" : "Refill request denied",
+            message: approved
+              ? `Your refill request for ${req.prescription?.medication_name || "your medication"} was approved.${note ? ` Note: ${note}` : ""}`
+              : `Your refill request was denied.${note ? ` Reason: ${note}` : " Contact your provider for alternatives."}`,
+            type: "prescription",
+            reference_id: requestId,
+            created_at: new Date().toISOString(),
+          });
+          // Push notification (best-effort)
+          supabase.functions.invoke("send-push", {
+            body: {
+              userIds: [req.patient_id],
+              title: approved ? "Refill approved" : "Refill denied",
+              body: approved ? "Your medication refill was approved." : "Your refill request was denied. Check the app for details.",
+              url: "/prescriptions",
+              tag: "refill",
+            },
+          }).catch(() => {});
+        }
+      } catch (notifErr) {
+        console.error("Refill notification failed (non-fatal):", notifErr);
+      }
+
       // Remove from queue
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
       setNotes((prev) => {
