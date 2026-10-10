@@ -181,22 +181,28 @@ export const Billing = () => {
     }
   };
 
-  const handleMarkPaid = async (invoice: Invoice) => {
+  const handleMarkPaid = async (invoice: Invoice, paymentMode: string = "cash", referenceNumber?: string) => {
+    // LEDGER BYPASS FIX (2026-10-10): Never update billing_invoices directly.
+    // All payments go through billing_payments — the DB trigger recalculates
+    // paid_amount/balance/status from the sum of payments. Direct invoice
+    // updates bypass the payment ledger and allow marking invoices paid
+    // without any money record.
     try {
-      const { error } = await supabase
-        .from("billing_invoices")
-        .update({
-          paid_amount: invoice.total_amount,
-          balance: 0,
-          status: "paid"
-        })
-        .eq("id", invoice.id);
+      const { error } = await supabase.from("billing_payments").insert({
+        institution_id: invoice.institution_id,
+        invoice_id: invoice.id,
+        amount: invoice.balance > 0 ? invoice.balance : invoice.total_amount,
+        payment_mode: paymentMode,
+        reference_number: referenceNumber || null,
+        received_by: user?.id,
+        notes: `Marked paid via ${paymentMode}`,
+      });
 
       if (error) throw error;
-      toast.success("Invoice marked as paid");
+      toast.success("Payment recorded — invoice updated from ledger");
       fetchInvoices();
     } catch (err: any) {
-      toast.error(err.message || "Failed to update invoice");
+      toast.error(err.message || "Failed to record payment");
     }
   };
 
