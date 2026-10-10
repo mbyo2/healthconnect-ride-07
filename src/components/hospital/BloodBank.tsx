@@ -49,7 +49,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   React.useEffect(() => {
     (async () => {
       try {
-        const { data: requests } = await supabase.from("blood_requests").select("patient_id").limit(200);
+        const { data: requests } = await supabase.from("blood_bank_requests" as any).select("patient_id").limit(200);
         const patientIds = [...new Set((requests || []).map((r: any) => r.patient_id).filter(Boolean))];
         if (patientIds.length === 0) { setPatients([]); return; }
         const { data } = await supabase.from("profiles").select("id, first_name, last_name").in("id", patientIds);

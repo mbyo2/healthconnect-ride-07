@@ -39,12 +39,12 @@ export const RefillRequestsQueue = () => {
 
       if (error) throw error;
 
-      // Enrich with patient names from provider_directory (RLS-safe)
+      // Enrich with patient names from profiles (provider_directory only has clinicians)
       const patientIds = Array.from(new Set((data || []).map((r: any) => r.patient_id).filter(Boolean)));
       let patientMap: Record<string, any> = {};
       if (patientIds.length > 0) {
         const { data: patients } = await supabase
-          .from("provider_directory")
+          .from("profiles")
           .select("id, first_name, last_name")
           .in("id", patientIds);
         (patients || []).forEach((p: any) => { patientMap[p.id] = p; });

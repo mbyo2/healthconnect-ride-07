@@ -41,7 +41,12 @@ BEGIN
   IF v_order.status IN ('delivered', 'cancelled') THEN
     RAISE EXCEPTION 'Order is already % — cannot fulfill', v_order.status;
   END IF;
-  IF v_order.status NOT IN ('pending', 'confirmed', 'preparing') THEN
+  -- Payment gate: unpaid orders cannot dispense stock (audit 2026-10-10).
+  -- Orders must be 'confirmed' (paid) — 'pending' means payment not completed.
+  IF v_order.status = 'pending' THEN
+    RAISE EXCEPTION 'Order is unpaid — complete payment before fulfillment';
+  END IF;
+  IF v_order.status NOT IN ('confirmed', 'preparing') THEN
     RAISE EXCEPTION 'Order status "%" cannot be fulfilled yet', v_order.status;
   END IF;
 
