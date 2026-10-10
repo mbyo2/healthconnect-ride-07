@@ -327,16 +327,35 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
 
   const pipelineStages: InsuranceClaim["status"][] = ["Draft", "Scrubbed", "Submitted", "Adjudicated", "Remitted"];
 
-  const handleAction = (claim: InsuranceClaim, action: string) => {
-    if (action === "appeal") {
-      setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: "Appealed" } : c));
-      toast.success(`Appeal submitted for ${claim.claimNumber}`);
-    } else if (action === "scrub") {
-      setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: "Scrubbed" } : c));
-      toast.success(`Claim ${claim.claimNumber} scrubbed — clean.`);
-    } else if (action === "submit") {
-      setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: "Submitted" } : c));
-      toast.success(`Claim ${claim.claimNumber} submitted electronically.`);
+  const handleAction = async (claim: InsuranceClaim, action: string) => {
+    const statusMap: Record<string, string> = {
+      appeal: "Appealed",
+      scrub: "Scrubbed",
+      submit: "Submitted",
+    };
+    const newStatus = statusMap[action];
+    if (!newStatus) return;
+
+    // Persist to database first — local state only updates on success.
+    // A toast that says "submitted" when nothing saved is a lie.
+    try {
+      const patch: any = { status: newStatus.toLowerCase(), updated_at: new Date().toISOString() };
+      if (action === "submit") patch.submitted_at = new Date().toISOString();
+
+      const { error } = await (supabase as any)
+        .from("insurance_claims")
+        .update(patch)
+        .eq("id", claim.id);
+      if (error) throw error;
+
+      setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: newStatus as any } : c));
+
+      if (action === "appeal") toast.success(`Appeal submitted for ${claim.claimNumber}`);
+      else if (action === "scrub") toast.success(`Claim ${claim.claimNumber} scrubbed — clean.`);
+      else if (action === "submit") toast.success(`Claim ${claim.claimNumber} submitted electronically.`);
+    } catch (e: any) {
+      console.error("Claim action failed:", e);
+      toast.error(e?.message || `Could not ${action} claim ${claim.claimNumber}. Not saved.`);
     }
   };
 
