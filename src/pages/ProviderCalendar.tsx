@@ -57,42 +57,39 @@ const ProviderCalendar = () => {
     try {
       setLoading(true);
 
-      // Fetch time slots for the current week
+      // Fetch the provider's REAL appointments for the current week.
+      // The old provider_time_slots system was disconnected from the booking
+      // flow — bookings write directly to appointments (date/time/status).
       const weekEnd = addDays(currentWeekStart, 7);
-      const { data: slotsData, error: slotsError } = await (supabase as any)
-        .from('provider_time_slots')
-        .select('*')
+      const { data: apptData, error: apptError } = await (supabase as any)
+        .from('appointments')
+        .select('id, date, time, status, type, patient_id')
         .eq('provider_id', user.id)
         .gte('date', format(currentWeekStart, 'yyyy-MM-dd'))
-        .lt('date', format(weekEnd, 'yyyy-MM-dd'));
+        .lt('date', format(weekEnd, 'yyyy-MM-dd'))
+        .neq('status', 'cancelled');
 
-      if (slotsError) throw slotsError;
+      if (apptError) throw apptError;
 
-      const slots: any[] = slotsData || [];
+      const appointmentsData: any[] = apptData || [];
 
-      // Fetch appointments for these time slots
-      const slotIds = slots.map((s) => s.id) || [];
-      let appointmentsData: any[] = [];
-
-      if (slotIds.length > 0) {
-        const { data: apptData, error: apptError } = await (supabase as any)
-          .from('appointments')
-          .select(`
-            *,
-            patient:profiles!patient_id(first_name, last_name)
-          `)
-          .in('time_slot_id', slotIds)
-          .neq('status', 'cancelled');
-
-        if (apptError) throw apptError;
-        appointmentsData = apptData || [];
+      // Resolve patient names via profiles (direct id lookup, not FK hint)
+      const patientIds = [...new Set(appointmentsData.map((a: any) => a.patient_id).filter(Boolean))];
+      const patientNames: Record<string, string> = {};
+      if (patientIds.length > 0) {
+        const { data: profData } = await (supabase as any)
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', patientIds);
+        for (const p of (profData as any[]) || []) {
+          patientNames[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+        }
       }
 
-      setTimeSlots(slots as any);
       setAppointments(
         appointmentsData.map((a: any) => ({
           ...a,
-          patient_name: `${a.patient?.first_name || ''} ${a.patient?.last_name || ''}`.trim(),
+          patient_name: patientNames[a.patient_id] || 'Patient',
         }))
       );
     } catch (error) {
