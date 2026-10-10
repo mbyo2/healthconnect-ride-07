@@ -6,6 +6,7 @@ import App from './App';
 import './index.css';
 import './App.css';
 import { Toaster } from 'sonner';
+import { AppFeedbackProvider } from '@/components/feedback/AppFeedback';
 import { ThemeProvider } from './hooks/use-theme';
 import { LoadingScreen } from './components/LoadingScreen';
 import { ErrorBoundary } from './components/ui/error-boundary';
@@ -141,8 +142,22 @@ function renderApp() {
           <React.Suspense fallback={<LoadingScreen message="Loading Doc' O Clock..." />}>
             <QueryClientProvider client={queryClient}>
               <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
-                <App />
-                <Toaster position="top-right" richColors closeButton toastOptions={{ style: { zIndex: 9999, marginTop: '64px' } }} />
+                <AppFeedbackProvider>
+                  <App />
+                </AppFeedbackProvider>
+                {/* Legacy Sonner toasts kept for existing call sites; new code
+                    should use useAppFeedback() for app-native icon feedback. */}
+                <Toaster
+                  position="bottom-center"
+                  toastOptions={{
+                    style: {
+                      zIndex: 9998,
+                      borderRadius: '16px',
+                      border: '1px solid #f0f0f0',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    },
+                  }}
+                />
               </ThemeProvider>
             </QueryClientProvider>
           </React.Suspense>

@@ -253,6 +253,14 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       // Duolingo-style celebration: confetti + haptic on booking win
       const { celebrate } = await import("@/utils/celebration");
       celebrate({ intensity: "large" });
+      // App-native icon feedback (not browser-like toast)
+      try {
+        const { useAppFeedback } = await import("@/components/feedback/AppFeedback");
+        // Note: useAppFeedback is a hook; in non-component context we dispatch a custom event
+        window.dispatchEvent(new CustomEvent("app-feedback", {
+          detail: { type: "success", title: "Appointment booked!", description: "Check your appointments for details." }
+        }));
+      } catch { /* fallback to toast already shown */ }
       onClose();
       if (booked?.id) {
         navigate(`/booking-confirmed?id=${booked.id}`);
