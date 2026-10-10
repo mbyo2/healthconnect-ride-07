@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkInteractions } from "@/utils/drug-interactions";
+import { RefillRequestsQueue } from "@/components/provider/RefillRequestsQueue";
 import { DrugInteractionAlert } from "@/components/clinical/DrugInteractionAlert";
 import { AllergyAlertSystem } from "@/components/clinical/AllergyAlertSystem";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
@@ -809,6 +810,12 @@ export const Prescriptions = () => {
             )}
 
             <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            {/* Refill requests queue for prescribers */}
+            {isPrescriber && (
+              <div className="p-4 border-b border-canvas-silk dark:border-slate-800">
+                <RefillRequestsQueue />
+              </div>
+            )}
             <div className="px-5 py-4 bg-slate-900 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { ManualVitalsEntry } from "@/components/patient/ManualVitalsEntry";
 
 interface Metric {
   key: string;
@@ -104,8 +105,11 @@ export function HealthMetricCards() {
 
   return (
     <section aria-label="Your health" className="space-y-3">
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-midnight">Your health</h2>
+        <ManualVitalsEntry onSaved={() => window.location.reload()} />
+      </div>
+      <div className="flex items-baseline justify-between">
         <p className="text-xs text-graphite-500">
           Last recorded{" "}
           {formatDistanceToNow(new Date(metrics[0].recordedAt), { addSuffix: true })}

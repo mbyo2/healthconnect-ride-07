@@ -224,7 +224,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
         type: appointmentType === 'virtual' ? 'video_consultation' : 'in_person',
-        status: 'scheduled',
+        status: 'pending',
         notes: reason || null,
         duration: visitType === 'new' ? 45 : 30,
         patient_visit_type: visitType,

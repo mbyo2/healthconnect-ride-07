@@ -85,9 +85,11 @@ export const EarningsPanel = () => {
           </div>
         )}
         <p className="mt-3 text-xs text-muted-foreground">
-          Earnings settle into your wallet balance after the platform fee. Withdrawals are arranged through finance.
+          Earnings settle into your wallet balance after the platform fee.
         </p>
       </CardContent>
     </Card>
   );
 };
+
+export default EarningsPanel;

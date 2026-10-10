@@ -98,20 +98,59 @@ export const AnalyticsReporting = () => {
     if (!institution) return;
 
     try {
+      // Compute REAL metrics instead of empty placeholder
+      const startDate = reportForm.date_range_start;
+      const endDate = reportForm.date_range_end;
+
+      const [appointmentsRes, paymentsRes, patientsRes, prescriptionsRes] = await Promise.all([
+        supabase.from("appointments").select("id, status").eq("institution_id", institution.id).gte("date", startDate).lte("date", endDate),
+        supabase.from("payments").select("amount, status").eq("institution_id", institution.id).gte("created_at", startDate).lte("created_at", endDate),
+        supabase.from("institution_patient_registry").select("id").eq("institution_id", institution.id),
+        supabase.from("comprehensive_prescriptions").select("id").eq("institution_id", institution.id).gte("created_at", startDate).lte("created_at", endDate),
+      ]);
+
+      const appointments = appointmentsRes.data || [];
+      const payments = paymentsRes.data || [];
+      const totalRevenue = payments.filter((p: any) => p.status === "completed").reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+
+      const metricsData = {
+        period: { start: startDate, end: endDate },
+        appointments: {
+          total: appointments.length,
+          completed: appointments.filter((a: any) => a.status === "completed").length,
+          cancelled: appointments.filter((a: any) => a.status === "cancelled").length,
+          scheduled: appointments.filter((a: any) => a.status === "scheduled").length,
+        },
+        revenue: {
+          total: totalRevenue,
+          currency: "ZMW",
+          transaction_count: payments.length,
+        },
+        patients: {
+          total_registered: (patientsRes.data || []).length,
+        },
+        prescriptions: {
+          total: (prescriptionsRes.data || []).length,
+        },
+        generated_at: new Date().toISOString(),
+      };
+
       const { error } = await (supabase as any).from("analytics_reports").insert({
         institution_id: institution.id,
         generated_by: (await supabase.auth.getUser()).data.user?.id,
         ...reportForm,
-        metrics_data: {},
-        filters_applied: {},
+        metrics_data: metricsData,
+        filters_applied: { date_range: { start: startDate, end: endDate } },
         recipients: [],
       });
 
       if (error) throw error;
       setShowReportDialog(false);
       fetchAnalyticsData();
+      toast.success("Report generated with real metrics");
     } catch (error) {
       console.error("Error generating report:", error);
+      toast.error("Failed to generate report");
     }
   };
 

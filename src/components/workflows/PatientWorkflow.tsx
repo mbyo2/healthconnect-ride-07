@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useProfileCompletion } from '@/hooks/useProfileCompletion';
+import { useAppointmentReminders } from '@/hooks/useAppointmentReminders';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,6 +68,9 @@ export const PatientWorkflow = React.memo(() => {
   const { user } = useAuth();
   const [careMode, setCareMode] = useState<'online' | 'offline'>('online');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('dentistry');
+
+  // Client-side appointment reminders (24h before)
+  useAppointmentReminders();
 
   // Real verified providers for the "Available Doctors" rail — never sample data.
   // Uses the public provider directory (verified clinicians only); querying

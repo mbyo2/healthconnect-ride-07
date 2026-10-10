@@ -3,6 +3,7 @@ import { WalletTopUp } from "@/components/wallet/WalletTopUp";
 import { WalletHistory } from "@/components/wallet/WalletHistory";
 import { CurrencySelector } from "@/components/wallet/CurrencySelector";
 import { EarningsPanel } from "@/components/wallet/EarningsPanel";
+import { WithdrawalRequests } from "@/components/wallet/WithdrawalRequests";
 import { InstitutionWalletPanel } from "@/components/wallet/InstitutionWalletPanel";
 import { PlatformWalletPanel } from "@/components/wallet/PlatformWalletPanel";
 import { useAuth } from "@/context/AuthContext";
@@ -72,7 +73,12 @@ const Wallet = () => {
                     />
                 )}
 
-                {isEarner && <EarningsPanel />}
+                {isEarner && (
+                  <>
+                    <EarningsPanel />
+                    <WithdrawalRequests />
+                  </>
+                )}
 
                 <FxConverterWidget />
 

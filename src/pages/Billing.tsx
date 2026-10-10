@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
+import { useDPOPayment } from "@/hooks/useDPOPayment";
 
 interface Invoice {
   id: string;
@@ -35,6 +36,7 @@ export const Billing = () => {
   const { user } = useAuth();
   const { institutionId, institution } = useInstitutionContext();
   const { formatPrice } = useCurrency();
+  const { redirectToCheckout } = useDPOPayment();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -192,6 +194,27 @@ export const Billing = () => {
     }
   };
 
+  const handlePayOnline = async (invoice: Invoice) => {
+    try {
+      // Redirect to DPO hosted checkout for online payment
+      // The return URL will trigger verification and mark the invoice paid
+      await redirectToCheckout({
+        amount: Number(invoice.balance || invoice.total_amount),
+        currency: "ZMW",
+        reference: `INV-${invoice.id}`,
+        description: `Invoice ${invoice.invoice_number || invoice.id} — ${institution?.name || "Healthcare"}`,
+        returnUrl: `${window.location.origin}/billing?paid_invoice=${invoice.id}`,
+        metadata: {
+          invoice_id: invoice.id,
+          institution_id: institutionId,
+          type: "invoice_payment",
+        },
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to start online payment");
+    }
+  };
+
   const handleDownloadReceipt = async (invoice: Invoice) => {
     try {
       await downloadReceiptPdf({
@@ -303,9 +326,14 @@ export const Billing = () => {
                       <Download className="h-4 w-4 mr-1" /> PDF
                     </Button>
                     {invoice.status !== "paid" && (
-                      <Button size="sm" onClick={() => handleMarkPaid(invoice)}>
-                        <CheckCircle className="h-4 w-4 mr-1" /> Mark Paid
-                      </Button>
+                      <>
+                        <Button size="sm" onClick={() => handlePayOnline(invoice)} className="bg-blue-600 hover:bg-blue-700">
+                          <CheckCircle className="h-4 w-4 mr-1" /> Pay Online
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleMarkPaid(invoice)}>
+                          <CheckCircle className="h-4 w-4 mr-1" /> Mark Paid
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

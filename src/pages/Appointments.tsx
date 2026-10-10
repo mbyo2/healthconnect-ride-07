@@ -172,6 +172,38 @@ export const AppointmentsPage = () => {
     },
   });
 
+  const acceptAppointment = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "scheduled" })
+        .eq("id", appointmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      window.dispatchEvent(new CustomEvent("app-feedback", {
+        detail: { type: "success", title: "Appointment accepted", description: "Patient has been notified." }
+      }));
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Could not accept appointment."),
+  });
+
+  const declineAppointment = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled" })
+        .eq("id", appointmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Appointment declined");
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Could not decline appointment."),
+  });
+
   // Provider availability for the reschedule dialog (day_of_week + hours).
   const { data: providerAvailability = [] } = useQuery<any[]>({
     queryKey: ["reschedule-availability", rescheduleTarget?.provider_id],
@@ -536,7 +568,23 @@ export const AppointmentsPage = () => {
                                       JOIN
                                     </Link>
                                   )}
-                                  {isProvider && (
+                                  {isProvider && app.status === "pending" && (
+                                    <>
+                                      <button
+                                        onClick={() => acceptAppointment.mutate(app.id)}
+                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-green-600 text-white text-[10px] font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
+                                      >
+                                        ACCEPT
+                                      </button>
+                                      <button
+                                        onClick={() => declineAppointment.mutate(app.id)}
+                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-red-600 text-white text-[10px] font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
+                                      >
+                                        DECLINE
+                                      </button>
+                                    </>
+                                  )}
+                                  {isProvider && app.status !== "pending" && (
                                     <button
                                       onClick={() => completeAppointment.mutate(app.id)}
                                       className="px-3 py-1.5 min-h-[40px] rounded-lg bg-slate-900 text-white text-[10px] font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"

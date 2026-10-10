@@ -139,9 +139,51 @@ export const ComprehensivePrescriptions = () => {
 
   const requestRefill = async (prescriptionId: string) => {
     try {
-      // In a real implementation, this would create a refill request
-      // For now, we'll just show a success message
-      toast.success('Refill request sent to pharmacy');
+      const prescription = prescriptions.find((p: any) => p.id === prescriptionId);
+      if (!prescription) {
+        toast.error('Prescription not found');
+        return;
+      }
+
+      if (!prescription.provider_id) {
+        toast.error('Cannot request refill: no prescriber on file');
+        return;
+      }
+
+      // Check for existing pending request
+      const { data: existing } = await supabase
+        .from('prescription_refill_requests')
+        .select('id')
+        .eq('prescription_id', prescriptionId)
+        .eq('patient_id', user?.id)
+        .eq('status', 'pending')
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        toast.info('You already have a pending refill request for this prescription');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('prescription_refill_requests')
+        .insert({
+          prescription_id: prescriptionId,
+          patient_id: user?.id,
+          provider_id: prescription.provider_id,
+          status: 'pending',
+        });
+
+      if (error) throw error;
+
+      // App-native feedback + celebration
+      window.dispatchEvent(new CustomEvent("app-feedback", {
+        detail: { type: "success", title: "Refill requested!", description: "Your provider will review it soon." }
+      }));
+      const { celebrate } = await import("@/utils/celebration");
+      celebrate({ intensity: "small" });
+
+      // Refresh to show updated state
+      fetchPrescriptions();
     } catch (error) {
       console.error('Error requesting refill:', error);
       toast.error('Failed to request refill');

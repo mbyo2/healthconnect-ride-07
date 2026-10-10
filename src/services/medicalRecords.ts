@@ -24,6 +24,9 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
 
     // Comprehensive records plus completed imaging orders (imaging results live
     // in imaging_orders, not comprehensive_medical_records).
+    // NOTE: provider_id references auth.users (not profiles), so we fetch
+    // provider names via the RLS-safe provider_directory view instead of a
+    // profiles join hint (which 400s).
     const [recordsRes, imagingRes] = await Promise.all([
       (supabase as any)
         .from('comprehensive_medical_records')
@@ -33,7 +36,7 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
         visit_date,
         record_type,
         status,
-        provider:profiles!comprehensive_medical_records_provider_id_fkey(first_name, last_name)
+        provider_id
       `)
         .eq('patient_id', user.id)
         .order('visit_date', { ascending: false }),
@@ -46,11 +49,24 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
 
     const rows: any[] = recordsRes.data || [];
 
+    // Resolve provider names via provider_directory (RLS-safe)
+    const providerIds = Array.from(new Set(rows.map((r: any) => r.provider_id).filter(Boolean)));
+    let providerMap: Record<string, any> = {};
+    if (providerIds.length > 0) {
+      const { data: providers } = await supabase
+        .from('provider_directory')
+        .select('id, first_name, last_name')
+        .in('id', providerIds);
+      (providers || []).forEach((p: any) => { providerMap[p.id] = p; });
+    }
+
     const mapped = rows.map((record) => ({
       id: record.id,
       title: record.title,
       date: record.visit_date,
-      provider: record.provider ? `Dr. ${record.provider.first_name} ${record.provider.last_name}` : 'Healthcare Provider',
+      provider: providerMap[record.provider_id]
+        ? `Dr. ${providerMap[record.provider_id].first_name} ${providerMap[record.provider_id].last_name}`
+        : 'Healthcare Provider',
       type: record.record_type,
       status: record.status || 'Active'
     }));
