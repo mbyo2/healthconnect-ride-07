@@ -14,6 +14,8 @@
  * object here + its insurance tariff module.
  */
 
+import { EXTENDED_COUNTRIES } from "./country-compliance-extended";
+
 export interface CountryCompliance {
   code: string; // ISO 3166-1 alpha-2
   name: string;
@@ -492,17 +494,23 @@ export const COUNTRY_COMPLIANCE: Record<string, CountryCompliance> = {
 /**
  * Get compliance profile for a country code.
  * Falls back to Zambia (home market) if unknown.
+ * Extended countries (US, CA, GB, AU, AE, IN, BW, NA) are merged in.
  */
+const ALL_COUNTRIES: Record<string, CountryCompliance> = {
+  ...COUNTRY_COMPLIANCE,
+  ...EXTENDED_COUNTRIES,
+};
+
 export function getCountryCompliance(countryCode: string): CountryCompliance {
   const upper = countryCode.toUpperCase();
-  return COUNTRY_COMPLIANCE[upper] ?? COUNTRY_COMPLIANCE["ZM"];
+  return ALL_COUNTRIES[upper] ?? COUNTRY_COMPLIANCE["ZM"];
 }
 
 /**
  * List all supported countries.
  */
 export function getSupportedCountries(): { code: string; name: string; currency: string }[] {
-  return Object.values(COUNTRY_COMPLIANCE).map((c) => ({
+  return Object.values(ALL_COUNTRIES).map((c) => ({
     code: c.code,
     name: c.name,
     currency: `${c.currencySymbol} (${c.currencyCode})`,
