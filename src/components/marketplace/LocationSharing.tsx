@@ -85,16 +85,51 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
 
   const useMyLocation = () => {
     if (!navigator.geolocation) {
-      toast.error("Geolocation not supported");
+      toast.error("Location not supported on this device", {
+        description: "Please tap the map to set your location manually.",
+      });
       return;
     }
+    // Geolocation requires HTTPS or localhost — warn if insecure
+    if (!window.isSecureContext) {
+      toast.error("Location needs a secure connection (HTTPS)", {
+        description: "Please tap the map to set your location manually.",
+      });
+      return;
+    }
+    toast.info("Getting your location…");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setPosition([pos.coords.latitude, pos.coords.longitude]);
         toast.success("Location captured");
       },
-      () => toast.error("Could not get your location"),
-      { timeout: 10000 }
+      (err) => {
+        // Give the user an actionable message, not a generic failure
+        if (err.code === err.PERMISSION_DENIED) {
+          toast.error("Location permission denied", {
+            description:
+              "Allow location access in your browser/app settings, then try again — or tap the map to set your pin manually.",
+            duration: 6000,
+          });
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          toast.error("Location unavailable", {
+            description:
+              "Your device couldn't determine its position. Make sure location services are on — or tap the map to set your pin manually.",
+            duration: 6000,
+          });
+        } else if (err.code === err.TIMEOUT) {
+          toast.error("Location timed out", {
+            description:
+              "Taking too long — try again, or tap the map to set your pin manually.",
+            duration: 6000,
+          });
+        } else {
+          toast.error("Could not get your location", {
+            description: "Tap the map to set your pin manually.",
+          });
+        }
+      },
+      { timeout: 15000, maximumAge: 60000, enableHighAccuracy: true }
     );
   };
 
