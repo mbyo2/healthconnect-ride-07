@@ -100,6 +100,12 @@ export function CountrySelector({ value, onChange, showDetails = true }: Country
           <div>
             <p className="font-semibold">Regulator: {compliance.medicalRegulator}</p>
           </div>
+
+          <p className="text-[11px] text-muted-foreground italic pt-2 border-t border-blue-200 dark:border-blue-800">
+            Indicative compliance data only — not legal, tax, or insurance advice.
+            Verify tariffs with the insurer and regulatory requirements with local
+            counsel before billing.
+          </p>
         </div>
       )}
     </div>

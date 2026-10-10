@@ -1,6 +1,22 @@
 /**
  * Country Compliance Framework — Doc'O Clock multi-country expansion.
  *
+ * ⚖️ LEGAL NOTICE — READ BEFORE USE:
+ * This module provides INDICATIVE compliance reference data to help configure
+ * the platform per country. It is NOT legal advice, NOT tax advice, and NOT
+ * a substitute for professional counsel in any jurisdiction.
+ *
+ * - Insurance tariffs, contribution rates, and benefit packages change.
+ *   ALWAYS verify against the insurer's current published schedule before
+ *   billing or making coverage representations to patients.
+ * - Tax rates and exemptions are subject to legislative change.
+ * - Data protection obligations vary by implementation; consult local counsel.
+ * - Medical licensing requirements change; verify with the named regulator.
+ *
+ * Doc'O Clock displays this data as configuration defaults with visible
+ * "verify with [regulator/insurer]" prompts in the UI. No coverage guarantee
+ * is made to any patient based on this data.
+ *
  * Like Odoo's localization: when a user selects their country, the platform
  * automatically configures:
  * - Health insurance framework (statutory scheme, contribution rates, tariffs)

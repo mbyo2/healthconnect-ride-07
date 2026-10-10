@@ -1,6 +1,12 @@
 /**
  * Coordination of Benefits — Zambia.
  *
+ * ⚖️ LEGAL NOTICE:
+ * This module implements generally accepted coordination-of-benefits
+ * principles (indemnity, non-duplication). It is NOT legal advice.
+ * Specific insurer contracts may have their own coordination clauses
+ * that override these defaults. ALWAYS check each policy's terms.
+ *
  * Rules for patients holding multiple health insurance covers.
  *
  * WHAT IS ALLOWED:

@@ -2,6 +2,13 @@
  * NHIMA (National Health Insurance Management Authority) — Zambia
  * Real tariff and rules implementation based on NHIMA operational guidelines.
  *
+ * ⚖️ LEGAL NOTICE:
+ * Tariff data is INDICATIVE, sourced from NHIMA's 2025 published revisions.
+ * NHIMA revises tariffs periodically. ALWAYS verify against NHIMA's current
+ * official tariff schedule before billing. This module does NOT guarantee
+ * claim acceptance by NHIMA. Facilities must maintain NHIMA accreditation
+ * and follow NHIMA's current claiming procedures.
+ *
  * Sources: NHIMA Act No. 2 of 2018, 2025 revised tariff structure,
  * mandatory claim-bill policy (effective 15 Oct 2025).
  *

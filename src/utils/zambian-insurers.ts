@@ -1,6 +1,13 @@
 /**
  * Zambian Private Health Insurers — real plan structures.
  *
+ * ⚖️ LEGAL NOTICE:
+ * Plan details are INDICATIVE, based on publicly documented plan structures.
+ * Actual benefits, limits, co-pays, and exclusions are set PER EMPLOYER GROUP
+ * POLICY. ALWAYS confirm the patient's specific policy schedule with the
+ * insurer before making coverage representations. This module does NOT
+ * guarantee claim acceptance by any insurer.
+ *
  * Covers the major private medical insurers operating in Zambia:
  * - Madison General Insurance (Madison Blue: Essential / Core / Core Plus / Ultra)
  * - Hollard Health / Hollard Cigna (Core / Standard / Select / Essential / Executive / Elite)
