@@ -45,6 +45,7 @@ import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
 import { HealthMetricCards } from "@/components/patient/HealthMetricCards";
+import { DoctorCard } from "@/components/patient/DoctorCard";
 
 // Predefined modern specialties with Lucide medical iconography.
 const SPECIALTIES_DATA = [
@@ -475,11 +476,32 @@ export const PatientWorkflow = React.memo(() => {
         </div>
       </div>
 
-      <AvailableDoctorsRail
-        providers={featuredProviders}
-        onViewAll={() => handleNavigation(`/search?mode=${careMode}`, 'Find Doctors')}
-        onViewProvider={(id) => navigate(`/provider/${id}`)}
-      />
+      {/* ─── Reference-style Doctor Cards ─── */}
+      <div>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Available Doctors</h2>
+          <button
+            onClick={() => handleNavigation(`/search?mode=${careMode}`, 'Find Doctors')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700"
+          >
+            View all →
+          </button>
+        </div>
+        <div className="space-y-2">
+          {featuredProviders.slice(0, 3).map((provider: any) => (
+            <DoctorCard
+              key={provider.id}
+              provider={provider}
+              onSelect={() => navigate(`/provider/${provider.id}`)}
+            />
+          ))}
+          {featuredProviders.length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-6 bg-white rounded-2xl border border-gray-100">
+              No doctors available right now. Try changing the care mode above.
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* ─── Quick Access Services Hub (Clean Blue, Black & White) ─── */}
       <div>
