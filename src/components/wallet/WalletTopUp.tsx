@@ -11,8 +11,9 @@ import { toast } from "sonner";
 import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
+import { useLencoCardPayment } from "@/hooks/useLencoCardPayment";
 
-type PaymentMethod = 'paypal' | 'lenco';
+type PaymentMethod = 'paypal' | 'lenco' | 'card';
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
@@ -23,8 +24,15 @@ export const WalletTopUp = () => {
     const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
     const [lencoReference, setLencoReference] = useState<string | null>(null);
     const [lencoMessage, setLencoMessage] = useState<string>('');
+    // Card fields
+    const [cardNumber, setCardNumber] = useState('');
+    const [cardExpiry, setCardExpiry] = useState(''); // MM/YY
+    const [cardCvv, setCardCvv] = useState('');
+    const [cardName, setCardName] = useState('');
+    const [cardEmail, setCardEmail] = useState('');
     const { currency, getSymbol, toZmw, formatPrice } = useCurrency();
     const { createCollection, verifyPayment, verifying } = useLencoPayment();
+    const { payWithCard, loading: cardLoading } = useLencoCardPayment();
 
     const handleTopUp = async () => {
         if (!user) {
@@ -67,6 +75,51 @@ export const WalletTopUp = () => {
                     window.location.href = data.paymentUrl;
                 } else {
                     throw new Error(data?.error || "Failed to initiate PayPal payment");
+                }
+            } else if (paymentMethod === 'card') {
+                // Lenco card collection: JWE-encrypted, PCI-sensitive.
+                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                if (!(zmwAmount >= 1)) {
+                    toast.error("Top-up must be at least K1.00");
+                    setIsLoading(false);
+                    return;
+                }
+                if (!cardName.trim() || !cardEmail.trim() || !cardNumber.trim() || !cardExpiry.trim() || !cardCvv.trim()) {
+                    toast.error("Please fill in all card details");
+                    setIsLoading(false);
+                    return;
+                }
+                const [expMonth, expYear] = cardExpiry.split('/').map(s => s.trim());
+                if (!expMonth || !expYear) {
+                    toast.error("Enter expiry as MM/YY");
+                    setIsLoading(false);
+                    return;
+                }
+                const nameParts = cardName.trim().split(/\s+/);
+                const result = await payWithCard({
+                    amount: zmwAmount,
+                    currency: 'ZMW',
+                    reference_type: 'wallet_topup',
+                    description: `Wallet top-up K${zmwAmount}`,
+                    email: cardEmail.trim(),
+                    firstName: nameParts[0],
+                    lastName: nameParts.slice(1).join(' ') || nameParts[0],
+                    cardNumber: cardNumber.replace(/\D/g, ''),
+                    expiryMonth: expMonth.padStart(2, '0'),
+                    expiryYear: expYear.length === 2 ? `20${expYear}` : expYear,
+                    cvv: cardCvv.trim(),
+                });
+                if (result) {
+                    if (result.status === '3ds_required' && result.redirectUrl) {
+                        toast.info("Redirecting to your bank for verification...");
+                        window.location.href = result.redirectUrl;
+                    } else if (result.status === 'paid') {
+                        toast.success("Card payment successful — your wallet has been credited.");
+                        setCardNumber(''); setCardExpiry(''); setCardCvv('');
+                    } else {
+                        setLencoReference(result.reference);
+                        setLencoMessage("Your card payment is being processed. Tap below to check the status.");
+                    }
                 }
             } else if (paymentMethod === 'lenco') {
                 // Lenco mobile-money collection: same ZMW-canonical rule.
@@ -118,22 +171,56 @@ export const WalletTopUp = () => {
                     Top Up Wallet
                 </CardTitle>
                 <CardDescription>
-                    Add funds to your wallet using Mobile Money (MTN, Airtel, Zamtel) or PayPal
+                    Add funds to your wallet using Mobile Money, Card, or PayPal
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-4">
                     <Label className="text-sm font-semibold text-muted-foreground">Select Payment Method</Label>
-                    <RadioGroup value={paymentMethod} onValueChange={(value) => { setPaymentMethod(value as PaymentMethod); setLencoReference(null); }} className="grid grid-cols-2 gap-3">
+                    <RadioGroup value={paymentMethod} onValueChange={(value) => { setPaymentMethod(value as PaymentMethod); setLencoReference(null); }} className="grid grid-cols-3 gap-3">
                         <div className="flex items-center space-x-2 space-y-0">
                             <RadioGroupItem value="lenco" id="lenco" />
                             <Label htmlFor="lenco" className="font-normal cursor-pointer">Mobile Money</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 space-y-0">
+                            <RadioGroupItem value="card" id="card" />
+                            <Label htmlFor="card" className="font-normal cursor-pointer">Card</Label>
                         </div>
                         <div className="flex items-center space-x-2 space-y-0">
                             <RadioGroupItem value="paypal" id="paypal" />
                             <Label htmlFor="paypal" className="font-normal cursor-pointer">PayPal</Label>
                         </div>
                     </RadioGroup>
+
+                    {paymentMethod === 'card' && (
+                        <div className="space-y-3 pt-1 rounded-xl border border-border p-4 bg-muted/30">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5 col-span-2">
+                                    <Label htmlFor="card-name" className="text-xs text-muted-foreground">Name on card</Label>
+                                    <Input id="card-name" placeholder="John Banda" className="h-11" value={cardName} onChange={(e) => setCardName(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5 col-span-2">
+                                    <Label htmlFor="card-email" className="text-xs text-muted-foreground">Email</Label>
+                                    <Input id="card-email" type="email" placeholder="you@example.com" className="h-11" value={cardEmail} onChange={(e) => setCardEmail(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5 col-span-2">
+                                    <Label htmlFor="card-number" className="text-xs text-muted-foreground">Card number</Label>
+                                    <Input id="card-number" inputMode="numeric" placeholder="4111 1111 1111 1111" className="h-11" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} maxLength={23} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="card-expiry" className="text-xs text-muted-foreground">Expiry (MM/YY)</Label>
+                                    <Input id="card-expiry" placeholder="12/28" className="h-11" value={cardExpiry} onChange={(e) => setCardExpiry(e.target.value)} maxLength={5} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="card-cvv" className="text-xs text-muted-foreground">CVV</Label>
+                                    <Input id="card-cvv" inputMode="numeric" type="password" placeholder="123" className="h-11" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} maxLength={4} />
+                                </div>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                <ShieldCheck className="h-3 w-3" /> Card details are encrypted end-to-end and never stored.
+                            </p>
+                        </div>
+                    )}
 
                     {paymentMethod === 'lenco' && !lencoReference && (
                         <div className="grid grid-cols-2 gap-3 pt-1">
@@ -249,6 +336,8 @@ export const WalletTopUp = () => {
                     <p className="text-xs text-muted-foreground leading-relaxed">
                         {paymentMethod === 'paypal'
                             ? 'Your payment is processed securely via PayPal. Funds will be available in your wallet immediately after successful payment.'
+                            : paymentMethod === 'card'
+                            ? 'Your card is charged securely through encrypted processing. Card details are never stored. Some cards may require bank verification (3D Secure).'
                             : 'Mobile money collects straight from your MTN, Airtel or Zamtel wallet. Approve the prompt on your phone; funds land in your Doc\u2019O Clock wallet as soon as the collection succeeds.'}
                     </p>
                 </div>
@@ -265,7 +354,7 @@ export const WalletTopUp = () => {
                         </>
                     ) : (
                         <>
-                            Pay with {paymentMethod === 'paypal' ? 'PayPal' : 'Mobile Money'}
+                            Pay with {paymentMethod === 'paypal' ? 'PayPal' : paymentMethod === 'card' ? 'Card' : 'Mobile Money'}
                         </>
                     )}
                 </Button>
