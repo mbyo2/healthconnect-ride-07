@@ -68,19 +68,16 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
     queryFn: async () => {
       if (!user) return [];
 
-      // Every consultable cadre (doctors, clinical officers, nurses,
-      // midwives, dentists, therapists…) — verified and still practising.
-      // neq(false) instead of eq(true) so legacy rows with NULL are kept.
-      const base = supabase
-        .from('profiles')
-        .select('id, first_name, last_name, specialty, telemedicine_available, role')
-        .in('role', CONSULTABLE_PROVIDER_ROLES as any)
+      // Use provider_directory view (clinician role in user_roles, not profiles.role
+      // which is 'patient' for all real providers). Verified 2026-10-09.
+      const { data, error } = await supabase
+        .from('provider_directory')
+        .select('id, first_name, last_name, specialty, telemedicine_available')
         .eq('is_verified', true)
         .neq('accepting_patients', false)
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
 
-      const { data, error } = await base;
       if (error) {
         console.error('Error fetching providers for video consultation:', error);
         throw error;

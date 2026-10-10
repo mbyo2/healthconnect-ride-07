@@ -9,7 +9,8 @@
 --
 -- Fix: a SECURITY DEFINER function (same pattern as user_shares_appointment_with
 -- and the other RLS-bypass helpers) that returns ONLY slot occupancy —
--- provider_id, date, time — for scheduled/confirmed appointments in a window.
+-- provider_id, date, time — for scheduled/confirmed/pending appointments in a window.
+-- Includes 'pending' so double-booking is blocked even before provider accepts.
 -- No patient identities, notes, or fees ever leave the database through it.
 -- The window parameters keep callers from scraping a provider's full history.
 
@@ -29,7 +30,7 @@ AS $$
   SELECT a.provider_id, a.date, a.time::time
   FROM public.appointments a
   WHERE a.provider_id = ANY (p_provider_ids)
-    AND a.status IN ('scheduled', 'confirmed')
+    AND a.status IN ('scheduled', 'confirmed', 'pending')
     AND a.date >= p_from
     AND a.date <= p_to
 $$;

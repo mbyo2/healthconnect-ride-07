@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Clock, User, Video, FileText, X, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ export const AppointmentDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { availableRoles } = useUserRoles();
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
@@ -209,6 +211,8 @@ export const AppointmentDetails = () => {
             )}
             {appointment.status !== "cancelled" && appointment.status !== "completed" && (
               <>
+                {/* Only the assigned provider (or admin) can mark complete — patients cannot */}
+                {(availableRoles.some(r => r !== 'patient') || appointment.provider_id === user?.id) && (
                 <button
                   onClick={async () => {
                     try {
@@ -229,6 +233,7 @@ export const AppointmentDetails = () => {
                   <CheckCircle className="h-3.5 w-3.5" />
                   Mark Complete
                 </button>
+                )}
                 <button
                   onClick={() => setShowCancelDialog(true)}
                   className="px-3.5 py-1.5 rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
