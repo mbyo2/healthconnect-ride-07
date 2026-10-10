@@ -372,9 +372,15 @@ export const Billing = () => {
                     </Button>
                     {invoice.status !== "paid" && (
                       <>
-                        <Button size="sm" onClick={() => handlePayOnline(invoice)} className="bg-blue-600 hover:bg-blue-700">
-                          <CheckCircle className="h-4 w-4 mr-1" /> Pay Online
-                        </Button>
+                        {institution?.payment_mode === "own" ? (
+                          <p className="text-xs text-muted-foreground italic">
+                            This facility handles its own payments — please pay them directly.
+                          </p>
+                        ) : (
+                          <Button size="sm" onClick={() => handlePayOnline(invoice)} className="bg-blue-600 hover:bg-blue-700">
+                            <CheckCircle className="h-4 w-4 mr-1" /> Pay Online
+                          </Button>
+                        )}
                         <Button size="sm" variant="outline" onClick={() => handleMarkPaid(invoice)}>
                           <CheckCircle className="h-4 w-4 mr-1" /> Mark Paid
                         </Button>

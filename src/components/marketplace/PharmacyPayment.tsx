@@ -10,6 +10,7 @@ import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/us
 import { useWalletPayment } from "@/hooks/useWalletPayment";
 import { peekPendingAction, takePendingAction } from "@/utils/pendingAction";
 import { FlowResult } from "@/components/ui/flow-result";
+import { supabase } from "@/integrations/supabase/client";
 import type { Order } from "@/types/marketplace";
 
 interface PharmacyPaymentProps {
@@ -25,7 +26,22 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
   const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
   const [lencoReference, setLencoReference] = useState<string | null>(null);
   const [lencoMessage, setLencoMessage] = useState('');
+  const [pharmacyOwnMode, setPharmacyOwnMode] = useState(false);
   const resumedRef = useRef(false);
+
+  // Check if the pharmacy is in 'own' (HMS-only) payment mode
+  useEffect(() => {
+    const checkMode = async () => {
+      if (!order?.pharmacy_id) return;
+      const { data } = await supabase
+        .from("healthcare_institutions")
+        .select("payment_mode")
+        .eq("id", order.pharmacy_id)
+        .maybeSingle();
+      setPharmacyOwnMode(data?.payment_mode === "own");
+    };
+    checkMode();
+  }, [order?.pharmacy_id]);
 
   // Post-login resume: restore the checkout the user left, then let them
   // confirm payment explicitly. Money never moves without a tap. Only
@@ -138,8 +154,19 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           Complete payment for your medicine order
         </CardDescription>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
+      <CardContent>
+        {pharmacyOwnMode ? (
+          <div className="rounded-xl border border-border p-6 text-center space-y-3">
+            <p className="font-semibold">Pay at the pharmacy directly</p>
+            <p className="text-sm text-muted-foreground">
+              This pharmacy handles its own payments. Please pay them directly when you collect your medicines.
+            </p>
+            <Button onClick={onPaymentSuccess} variant="outline">
+              I've arranged payment
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Order Total:</span>
@@ -280,6 +307,8 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             </>
           )}
         </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

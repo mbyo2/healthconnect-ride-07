@@ -92,6 +92,19 @@ serve(async (req) => {
         .maybeSingle();
       const pharmacyId = (order as any)?.pharmacy_id;
       if (pharmacyId) {
+        // ── PAYMENT MODE GATE ──
+        // Platform wallet money must never route to an 'own'-mode institution.
+        const { data: modeCheck } = await supabaseClient
+          .from('healthcare_institutions')
+          .select('payment_mode')
+          .eq('id', pharmacyId)
+          .maybeSingle();
+        if ((modeCheck as any)?.payment_mode === 'own') {
+          return new Response(
+            JSON.stringify({ success: false, error: 'This pharmacy handles its own payments. Please pay them directly.' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         const { data: inst } = await supabaseClient
           .from('healthcare_institutions')
           .select('admin_id')

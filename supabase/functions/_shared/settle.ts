@@ -207,6 +207,22 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
 
   const payee = await resolvePayee(admin, type, referenceId);
 
+  // ── PAYMENT MODE GATE ──────────────────────────────────────────────
+  // If the payee institution is in 'own' (HMS-only) mode, Doc'O Clock must
+  // NEVER touch their money: no splits, no platform fee, no wallet credits.
+  // This is the single choke point covering Lenco verify + webhook.
+  if (payee?.institutionId) {
+    const { data: inst } = await admin
+      .from("healthcare_institutions")
+      .select("payment_mode")
+      .eq("id", payee.institutionId)
+      .maybeSingle();
+    if (inst?.payment_mode === "own") {
+      console.log(`settlePayment: skipping — institution ${payee.institutionId} is in 'own' mode`);
+      return { settled: false, reason: "own_mode_skip" };
+    }
+  }
+
   // Platform-only revenue (subscriptions, HMS fees): all of it goes to the
   // app owner wallet, there is no second party.
   if (!payee) {

@@ -253,25 +253,31 @@ serve(async (req) => {
         if (!existingSplits || existingSplits.length === 0) {
           const { data: institution } = await supabaseClient
             .from('healthcare_institutions')
-            .select('id, type')
+            .select('id, type, payment_mode')
             .eq('id', payment.provider_id)
             .maybeSingle();
 
-          const isPharmacy =
-            (institution?.type || '').toLowerCase().includes('pharmac') ||
-            (payment.metadata as any)?.reference_type === 'order' ||
-            (payment.metadata as any)?.reference_type === 'pharmacy_sale';
+          // ── PAYMENT MODE GATE ──
+          // Never split platform money to an 'own'-mode institution.
+          if ((institution as any)?.payment_mode === 'own') {
+            console.log(`PayPal capture: skipping splits — institution ${institution.id} is in 'own' mode`);
+          } else {
+            const isPharmacy =
+              (institution?.type || '').toLowerCase().includes('pharmac') ||
+              (payment.metadata as any)?.reference_type === 'order' ||
+              (payment.metadata as any)?.reference_type === 'pharmacy_sale';
 
-          const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
-            p_payment_id: payment.id,
-            p_total_amount: payment.amount,
-            p_provider_id: institution ? null : payment.provider_id,
-            p_institution_id: institution ? institution.id : null,
-            p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
-          });
+            const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
+              p_payment_id: payment.id,
+              p_total_amount: payment.amount,
+              p_provider_id: institution ? null : payment.provider_id,
+              p_institution_id: institution ? institution.id : null,
+              p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
+            });
 
-          if (splitError) {
-            console.error('Error settling payment splits:', splitError);
+            if (splitError) {
+              console.error('Error settling payment splits:', splitError);
+            }
           }
         }
       }
