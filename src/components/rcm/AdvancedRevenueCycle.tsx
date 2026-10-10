@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
   type InsurancePolicy, type BillingLineItem, type InsuranceClaim,
 } from "@/utils/rcm-engine";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // ─── Demo Claims Pipeline ─────────────────────────────────────────────────────
 const DEMO_CLAIMS: InsuranceClaim[] = [
@@ -281,10 +282,41 @@ function AdjudicationSimulator() {
 }
 
 // ─── Claims Pipeline Tab ──────────────────────────────────────────────────────
-function ClaimsPipeline() {
-  const [claims, setClaims] = useState<InsuranceClaim[]>(DEMO_CLAIMS);
+function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
+  const [claims, setClaims] = useState<InsuranceClaim[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedClaim, setSelectedClaim] = useState<InsuranceClaim | null>(null);
+
+  // Load REAL claims from insurance_claims table (was hardcoded DEMO_CLAIMS)
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        let query = (supabase as any)
+          .from("insurance_claims")
+          .select("*")
+          .order("submitted_at", { ascending: false })
+          .limit(100);
+        if (institutionId) query = query.eq("institution_id", institutionId);
+        const { data, error } = await query;
+        if (error) throw error;
+        setClaims((data || []).map((c: any) => ({
+          id: c.id,
+          claimNumber: c.id.slice(0, 8).toUpperCase(),
+          patientName: c.patient_name || "Patient",
+          payerName: c.insurance_provider || "Unknown",
+          status: c.status || "submitted",
+          amount: Number(c.claim_amount || 0),
+          submittedDate: c.submitted_at,
+        })));
+      } catch (e) {
+        console.error("Failed to load claims:", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [institutionId]);
 
   const filtered = claims.filter(
     (c) =>
@@ -467,7 +499,7 @@ function ERAReconciliation() {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function AdvancedRevenueCycle() {
+export default function AdvancedRevenueCycle({ institutionId }: { institutionId?: string }) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -498,7 +530,7 @@ export default function AdvancedRevenueCycle() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="adjudicate" className="mt-6"><AdjudicationSimulator /></TabsContent>
-        <TabsContent value="pipeline" className="mt-6"><ClaimsPipeline /></TabsContent>
+        <TabsContent value="pipeline" className="mt-6"><ClaimsPipeline institutionId={institutionId} /></TabsContent>
         <TabsContent value="era" className="mt-6"><ERAReconciliation /></TabsContent>
       </Tabs>
     </div>
