@@ -145,8 +145,20 @@ const LabManagement = () => {
   });
 
   const { data: patients } = useQuery({
-    queryKey: ["lab-patients"],
+    queryKey: ["lab-patients", patientSearchTerm],
     queryFn: async () => {
+      // Search patients by name/email when a search term is provided.
+      // Without a term, show patients with existing lab orders (privacy:
+      // prevents lab staff from enumerating all patients).
+      if (patientSearchTerm && patientSearchTerm.length >= 2) {
+        const term = `%${patientSearchTerm}%`;
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email")
+          .or(`first_name.ilike.${term},last_name.ilike.${term},email.ilike.${term}`)
+          .limit(20);
+        return data || [];
+      }
       // Only fetch patients who have lab orders (not all patients)
       // This prevents patient enumeration by lab staff
       const { data: labOrders } = await supabase

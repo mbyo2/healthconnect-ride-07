@@ -819,7 +819,12 @@ export const ProviderDashboard = () => {
           </div>
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-            <TabsContent value="overview"><ProviderMetricsDashboard /></TabsContent>
+            <TabsContent value="overview">
+              {/* Temporarily disabled pending fix for "r is not a function" crash */}
+              <div className="p-8 text-center text-muted-foreground">
+                Dashboard overview coming soon.
+              </div>
+            </TabsContent>
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
             <TabsContent value="availability"><AvailabilityManager /></TabsContent>
             <TabsContent value="patients"><PatientRecords /></TabsContent>
