@@ -27,6 +27,7 @@ import { StatsCard } from "@/components/charts";
 import { useGamification } from "@/hooks/useGamification";
 import { Trophy, Award } from "lucide-react";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
+import { PatientMetricsDashboard } from "@/components/metrics/RoleMetricsDashboard";
 
 interface VitalPoint { value: number }
 
@@ -168,6 +169,9 @@ export default function HealthDashboard() {
             <Sparkles className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Metrics Overview — appointments, prescriptions, records, wallet */}
+        <PatientMetricsDashboard />
 
         {/* AI Insights Widget */}
         {loadError && !loading && (

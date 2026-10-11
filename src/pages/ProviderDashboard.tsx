@@ -4,6 +4,7 @@ import { ScheduleManager } from "@/components/provider/ScheduleManager";
 import { AvailabilityManager } from "@/components/provider/AvailabilityManager";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
+import { ProviderMetricsDashboard } from "@/components/metrics/RoleMetricsDashboard";
 import { WaitlistManager } from "@/components/booking/WaitlistManager";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -389,7 +390,7 @@ export const ProviderDashboard = () => {
   // Deep-linkable tabs: ?tab=patients lands on the Patient Directory (used by
   // the Medical EMR quick action so providers don't hit the patient-facing
   // /medical-records page).
-  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") || "schedule");
+  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") || "overview");
   const { formatPrice } = useCurrency();
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
@@ -797,6 +798,7 @@ export const ProviderDashboard = () => {
           <div className="overflow-x-auto">
             <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
               {[
+                { value: "overview", label: "Overview" },
                 { value: "schedule", label: "Schedule Manager" },
                 { value: "availability", label: "Working Hours" },
                 { value: "patients", label: "Patient Directory" },
@@ -817,6 +819,7 @@ export const ProviderDashboard = () => {
           </div>
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <TabsContent value="overview"><ProviderMetricsDashboard /></TabsContent>
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
             <TabsContent value="availability"><AvailabilityManager /></TabsContent>
             <TabsContent value="patients"><PatientRecords /></TabsContent>
