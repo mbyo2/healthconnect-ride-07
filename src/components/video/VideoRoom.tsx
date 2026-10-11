@@ -9,7 +9,7 @@ import { ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", meetingToken, onLeave }: VideoRoomProps) {
   const [callFrame, setCallFrame] = useState<any>(null);
   const [participants, setParticipants] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState(false);
@@ -60,11 +60,13 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
   useEffect(() => {
     // Create Daily callFrame
     if (!callFrame && actualRoomUrl) {
-      const options = {
+      const options: any = {
         url: actualRoomUrl,
         userName: userName,
         showLeaveButton: true,
         showFullscreenButton: true,
+        // Pass meeting token for private rooms (required by Daily.co)
+        ...(meetingToken ? { token: meetingToken } : {}),
         iframeStyle: {
           position: 'fixed',
           top: isMobile ? '60px' : '0',

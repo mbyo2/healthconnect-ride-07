@@ -150,6 +150,29 @@ serve(async (req) => {
 
     const room = await createRoomResponse.json();
 
+    // Generate a meeting token for private rooms — required for participants to join
+    const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${dailyApiKey}`,
+      },
+      body: JSON.stringify({
+        properties: {
+          room_name: room.name,
+          user_id: user.id,
+          is_owner: true,
+          exp: Math.floor(Date.now() / 1000) + 86400,
+        },
+      }),
+    });
+
+    let meetingToken = null;
+    if (tokenResponse.ok) {
+      const tokenData = await tokenResponse.json();
+      meetingToken = tokenData.token;
+    }
+
     const { error: updateError } = await supabaseClient
       .from("video_consultations")
       .update({
@@ -168,7 +191,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ url: room.url }),
+      JSON.stringify({ url: room.url, token: meetingToken }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

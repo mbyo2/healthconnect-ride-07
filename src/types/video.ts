@@ -4,6 +4,7 @@ export interface VideoRoomProps {
   roomId?: string;  // Added for compatibility
   userName: string;
   videoQuality?: 'low' | 'medium' | 'high';
+  meetingToken?: string;  // Daily.co meeting token for private rooms
   onLeave?: () => void;
 }
 

@@ -38,6 +38,7 @@ const VideoCall = () => {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
+  const [meetingToken, setMeetingToken] = useState<string | null>(null);
   const [consultationId, setConsultationId] = useState<string | null>(null);
   const [fatalError, setFatalError] = useState<string | null>(null);
   const [userName, setUserName] = useState('');
@@ -169,9 +170,11 @@ const VideoCall = () => {
           if (cancelled) return;
           if (fnError) throw fnError;
           const url = (fnData as any)?.url;
+          const token = (fnData as any)?.token;
           if (!url) throw new Error('Video service did not return a room URL.');
           toast.dismiss();
           setMeetingUrl(url);
+          if (token) setMeetingToken(token);
         } else {
           setMeetingUrl(consultation.meeting_url);
         }
@@ -244,7 +247,7 @@ const VideoCall = () => {
           </div>
         </div>
       ) : (
-        <VideoRoom roomUrl={meetingUrl} userName={userName} onLeave={handleLeave} />
+        <VideoRoom roomUrl={meetingUrl} userName={userName} meetingToken={meetingToken || undefined} onLeave={handleLeave} />
       )}
     </ProtectedRoute>
   );
