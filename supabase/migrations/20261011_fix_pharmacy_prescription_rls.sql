@@ -19,6 +19,7 @@ DROP POLICY IF EXISTS "Pharmacies can update prescription status" ON public.comp
 
 -- Helper: is the current user affiliated with the given institution
 -- (as admin or staff)? SECURITY DEFINER to avoid RLS recursion.
+-- Staff links live in public.institution_staff (institution_id, provider_id).
 CREATE OR REPLACE FUNCTION public.user_affiliated_with_institution(p_institution_id uuid)
 RETURNS boolean
 LANGUAGE sql
@@ -31,10 +32,10 @@ AS $$
     WHERE hi.id = p_institution_id
       AND hi.admin_id = auth.uid()
   ) OR EXISTS (
-    SELECT 1 FROM public.user_roles ur
-    WHERE ur.user_id = auth.uid()
-      AND ur.institution_id = p_institution_id
-      AND ur.is_active = true
+    SELECT 1 FROM public.institution_staff ist
+    WHERE ist.institution_id = p_institution_id
+      AND ist.provider_id = auth.uid()
+      AND ist.is_active = true
   );
 $$;
 
