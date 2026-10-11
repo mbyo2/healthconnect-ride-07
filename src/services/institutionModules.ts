@@ -1,4 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  getFacilityArchetype,
+  archetypeToCharter,
+  type FacilityArchetype,
+} from "@/config/facilityProfiles";
 
 export type CharterModule = {
   module_key: string;
@@ -146,14 +151,37 @@ export async function getEffectiveInstitutionModules(
   supabase: SupabaseClient,
   institutionId: string,
   typeCode: string | null | undefined
-): Promise<{ tier: string | null; label: string | null; modules: EffectiveModule[] }> {
+): Promise<{ tier: string | null; label: string | null; modules: EffectiveModule[]; source: "archetype" | "tier" }> {
+  // Primary: archetype-based charter from facilityProfiles.ts (single source
+  // of truth shared with the frontend tab de-emphasis). Falls back to the
+  // DB tier charter only if the archetype cannot be resolved.
+  const archetype: FacilityArchetype = getFacilityArchetype(typeCode);
+  const entitlements = await getEntitlements(supabase, institutionId);
+
+  if (archetype) {
+    const archetypeCharter = archetypeToCharter(typeCode);
+    // Convert to CharterModule[] shape for mergeEffectiveModules
+    const charter: CharterModule[] = archetypeCharter.map((m) => ({
+      module_key: m.module_key,
+      module_name: m.module_name,
+      description: m.description,
+      status: m.status,
+      display_order: m.display_order,
+    }));
+    const { label } = await resolveInstitutionTier(supabase, typeCode).catch(() => ({ label: null }));
+    return {
+      tier: archetype,
+      label: label || archetype,
+      modules: mergeEffectiveModules(charter, entitlements),
+      source: "archetype",
+    };
+  }
+
+  // Fallback: legacy DB tier charter
   const { tier, label } = await resolveInstitutionTier(supabase, typeCode);
-  if (!tier) return { tier: null, label, modules: [] };
-  const [charter, entitlements] = await Promise.all([
-    getTierCharter(supabase, tier),
-    getEntitlements(supabase, institutionId),
-  ]);
-  return { tier, label, modules: mergeEffectiveModules(charter, entitlements) };
+  if (!tier) return { tier: null, label, modules: [], source: "tier" };
+  const charter = await getTierCharter(supabase, tier);
+  return { tier, label, modules: mergeEffectiveModules(charter, entitlements), source: "tier" };
 }
 
 /**

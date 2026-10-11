@@ -728,3 +728,64 @@ export function atypicalTabExplanation(
   const profile = getFacilityProfile(type);
   return `Not typical for a ${profile.label.toLowerCase()} — still available if you need it.`;
 }
+
+// ─── Archetype → backend charter ─────────────────────────────────────
+// Unifies frontend and backend: the FacilityProfile.modules map becomes
+// the source of truth for the default module charter, so the tab
+// de-emphasis in the UI and the entitlement enforcement in the backend
+// can never disagree.
+//
+// Mapping: core → 'live', optional → 'planned', atypical → 'planned'
+// (atypical stays usable; the UI de-emphasises it, the backend leaves it
+// grantable). Admin grant/revoke overrides still apply on top.
+
+export interface ArchetypeCharterModule {
+  module_key: string;
+  module_name: string;
+  description: string | null;
+  status: 'live' | 'planned';
+  display_order: number | null;
+  /** Original relevance from the facility profile. */
+  relevance: ModuleRelevance;
+}
+
+const HMS_MODULE_LABELS: Record<HmsModule, string> = {
+  dashboard: 'Dashboard',
+  notifications: 'Notifications',
+  emr: 'Electronic Medical Records',
+  opd: 'Outpatient (OPD)',
+  ipd: 'Inpatient (IPD)',
+  emergency: 'Emergency',
+  ot: 'Operating Theatre',
+  lab: 'Laboratory',
+  radiology: 'Radiology & Imaging',
+  pharmacy: 'Pharmacy',
+  bloodbank: 'Blood Bank',
+  beds: 'Bed Management',
+  billing: 'Billing',
+  tariffs: 'Tariffs & Pricing',
+  insurance: 'Insurance',
+  discharge: 'Discharge',
+  staff: 'Staff Management',
+  mis: 'MIS & Reports',
+};
+
+export function archetypeToCharter(
+  type: string | null | undefined
+): ArchetypeCharterModule[] {
+  const profile = getFacilityProfile(type);
+  return (Object.keys(profile.modules) as HmsModule[]).map((key, idx) => {
+    const relevance = profile.modules[key];
+    return {
+      module_key: key,
+      module_name: HMS_MODULE_LABELS[key] || key,
+      description:
+        relevance === 'atypical'
+          ? `Not typical for ${profile.label} — available on request`
+          : null,
+      status: relevance === 'core' ? ('live' as const) : ('planned' as const),
+      display_order: idx,
+      relevance,
+    };
+  });
+}
