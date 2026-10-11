@@ -134,14 +134,14 @@ export function DesktopNav() {
           { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-4 w-4" />, active: location.pathname === "/pharmacy-portal" },
           { to: "/pharmacy-inventory", label: "Stock", icon: <Pill className="h-4 w-4" />, active: location.pathname === "/pharmacy-inventory" },
           { to: "/marketplace", label: "Supply", icon: <ShoppingCart className="h-4 w-4" />, active: location.pathname === "/marketplace" },
-          { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" />, active: location.pathname === "/wallet" },
+          { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
         ];
       }
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-4 w-4" />, active: location.pathname === "/pharmacy-portal" },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-4 w-4" />, active: location.pathname === "/pharmacy-inventory" },
         { to: "/prescriptions", label: "Rx", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/prescriptions" },
-        { to: "/marketplace", label: "Market", icon: <ShoppingCart className="h-4 w-4" />, active: location.pathname === "/marketplace" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
       ];
     }
 
@@ -174,7 +174,7 @@ export function DesktopNav() {
       return [
         { to: "/lab-management", label: "Lab", icon: <Activity className="h-4 w-4" />, active: location.pathname === "/lab-management" },
         { to: "/medical-records", label: "Records", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/medical-records" },
-        { to: "/search", label: "Search", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
       ];
     }
 
