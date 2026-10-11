@@ -60,6 +60,7 @@ export function DesktopNav() {
   const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
   const { setSearchQuery } = useSearch();
   const navigate = useNavigate();
   const { ref: navScrollRef, edges: navEdges } = useScrollEdges<HTMLDivElement>();
@@ -358,16 +359,34 @@ export function DesktopNav() {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-3 shrink-0">
-          <form onSubmit={handleSearchSubmit} className="relative hidden md:block" role="search">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" />
-            <Input
-              type="search"
-              placeholder={isHealthPersonnel ? "Search patients, records..." : "Search doctors, specialties..."}
-              className="w-32 md:w-40 lg:w-48 xl:w-64 2xl:w-80 pl-10 h-10 lg:h-11 rounded-pill bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all duration-200 text-xs lg:text-sm font-medium placeholder:text-graphite-400 shrink-0"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </form>
+          {/* Collapsible search — icon button expands to input, keeps nav items visible */}
+          <div className="relative hidden md:block">
+            {searchTerm || searchFocused ? (
+              <form onSubmit={handleSearchSubmit} className="relative" role="search">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400 pointer-events-none" />
+                <Input
+                  type="search"
+                  autoFocus
+                  placeholder={isHealthPersonnel ? "Search patients, records..." : "Search doctors, specialties..."}
+                  className="w-44 lg:w-56 xl:w-64 pl-9 h-10 rounded-pill bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all duration-200 text-sm font-medium placeholder:text-graphite-400"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onBlur={() => { if (!searchTerm) setSearchFocused(false); }}
+                  onKeyDown={(e) => { if (e.key === "Escape") { setSearchTerm(""); setSearchFocused(false); } }}
+                />
+              </form>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Search"
+                className="h-10 w-10 rounded-pill"
+                onClick={() => setSearchFocused(true)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
 
           <CurrencyToggle />
           <ThemeToggle />
