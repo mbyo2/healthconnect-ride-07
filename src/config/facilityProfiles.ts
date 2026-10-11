@@ -666,3 +666,65 @@ export const DEFAULT_DEPARTMENTS: Record<FacilityArchetype, DefaultDepartment[]>
     { name: 'Accounts', code: 'ACCT', description: 'Monthly billing & receipts' },
   ],
 };
+
+// ─── InstitutionDashboard tab → HMS module mapping ───────────────────
+// Maps the InstitutionDashboard tab IDs to the HMS module keys used in
+// FacilityProfile.modules, so tabs can be de-emphasised (not hidden)
+// when they are atypical for the facility's archetype.
+
+export const TAB_TO_HMS_MODULE: Record<string, HmsModule> = {
+  overview: 'dashboard',
+  patients: 'emr',
+  queue: 'opd',
+  pediatrics: 'opd',
+  physio: 'opd',
+  dispensary: 'pharmacy',
+  care: 'ipd',
+  erp_stock: 'mis',
+  erp_admin: 'billing',
+  procedures: 'emr',
+  lis_ris: 'lab',
+  bloodbank: 'bloodbank',
+  fhir: 'mis',
+  rcm: 'insurance',
+  governance: 'staff',
+  // Legacy / extended tabs
+  appointments: 'opd',
+  staff: 'staff',
+  billing: 'billing',
+  pharmacy: 'pharmacy',
+  lab: 'lab',
+  radiology: 'radiology',
+  emergency: 'emergency',
+  theatre: 'ot',
+  ot: 'ot',
+  wards: 'ipd',
+  ipd: 'ipd',
+  opd: 'opd',
+  beds: 'beds',
+  tariffs: 'tariffs',
+  insurance: 'insurance',
+  discharge: 'discharge',
+  mis: 'mis',
+  notifications: 'notifications',
+};
+
+/** Relevance of an InstitutionDashboard tab for a facility type. */
+export function getTabRelevance(
+  type: string | null | undefined,
+  tabId: string
+): ModuleRelevance {
+  const module = TAB_TO_HMS_MODULE[tabId];
+  if (!module) return 'optional';
+  return getModuleRelevance(type, module);
+}
+
+/** Human-readable explanation for why a tab is de-emphasised. */
+export function atypicalTabExplanation(
+  type: string | null | undefined,
+  tabId: string
+): string | null {
+  if (getTabRelevance(type, tabId) !== 'atypical') return null;
+  const profile = getFacilityProfile(type);
+  return `Not typical for a ${profile.label.toLowerCase()} — still available if you need it.`;
+}

@@ -14,7 +14,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
-import { getFacilityArchetype } from "@/config/facilityProfiles";
+import { getFacilityArchetype, getTabRelevance, atypicalTabExplanation } from "@/config/facilityProfiles";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
@@ -37,6 +37,7 @@ import { CentralizedQueueDesk } from "@/components/scheduling/CentralizedQueueDe
 import { ClinicalProceduresDesk } from "@/components/clinical/ClinicalProceduresDesk";
 import { LISRadiologySuite } from "@/components/laboratory/LISRadiologySuite";
 import { BloodBank } from "@/components/hospital/BloodBank";
+import { FacilityJourneyCard } from "@/components/hospital/FacilityJourneyCard";
 import { CareManagementSuite } from "@/components/clinical/CareManagementSuite";
 import { UnifiedPatientHub } from "@/components/patient/UnifiedPatientHub";
 import AdvancedRevenueCycle from "@/components/rcm/AdvancedRevenueCycle";
@@ -533,6 +534,11 @@ export const InstitutionDashboard = () => {
             const isActive = activeTab === tab.id;
             const accessible = canAccess(tab.id as InstitutionTabKey);
             const rule = getTabRule(tab.id as InstitutionTabKey);
+            // Facility-type relevance: atypical modules are de-emphasised
+            // (dimmed + explained) but remain fully usable — nothing is hidden.
+            const relevance = getTabRelevance(preciseType, tab.id);
+            const atypicalNote = atypicalTabExplanation(preciseType, tab.id);
+            const isAtypical = relevance === "atypical" && !isActive;
             if (!accessible) {
               // Locked tab — show greyed with lock icon, clicking shows why
               return (
@@ -561,14 +567,20 @@ export const InstitutionDashboard = () => {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
+                title={atypicalNote || undefined}
                 className={`px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all ${
                   isActive
                     ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500"
+                    : isAtypical
+                      ? "bg-white dark:bg-slate-900 border border-dashed border-canvas-silk dark:border-slate-800 text-muted-foreground/60 dark:text-slate-500 hover:bg-primary-50 hover:text-primary-500 hover:border-solid"
+                      : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 <span>{tab.label}</span>
+                {isAtypical && (
+                  <span className="text-[10px] font-medium opacity-70" aria-hidden="true">•</span>
+                )}
               </button>
             );
           })}
@@ -609,6 +621,9 @@ export const InstitutionDashboard = () => {
                 trend={monthTrend(chartData.map((m) => m.revenue))}
               />
             </div>
+
+            {/* Patient journey for this facility type */}
+            <FacilityJourneyCard facilityType={preciseType} />
 
             {/* Admin Quick Tip */}
             {isAdmin && counts.appointments === 0 && (
