@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,10 @@ const InstitutionSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [institution, setInstitution] = useState<any>(null);
+  // Track initial form hydration — after the first load, context refreshes
+  // must NOT overwrite the form (this was the save-then-revert bug: the
+  // effect below reset formData whenever contextInst changed).
+  const formInitialized = useRef(false);
   // Clinical specialties (normalized join table, not the legacy text array)
   const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
   const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string | undefined>(undefined);
@@ -143,7 +147,12 @@ const InstitutionSettings = () => {
   });
 
   useEffect(() => {
+    // Only hydrate the form on first load. Subsequent contextInst changes
+    // (e.g. after refreshInstitution) must not clobber unsaved edits or
+    // revert just-saved values — that was the save-then-revert bug.
+    if (formInitialized.current) return;
     if (contextInst) {
+      formInitialized.current = true;
       setInstitution(contextInst);
 
       // Merge saved operating_hours over defaults so every day is always populated
@@ -296,8 +305,6 @@ const InstitutionSettings = () => {
       await saveInstitutionSpecialties(institution.id, selectedSpecialtyIds, primarySpecialtyId);
 
       // Update local institution state with saved values immediately.
-      // This is the source of truth — do NOT call refreshInstitution() here
-      // as it may return stale cached data and revert the form (bug 2026-10-10).
       setInstitution((prev: any) => prev ? {
         ...prev,
         name: formData.name,
@@ -323,6 +330,11 @@ const InstitutionSettings = () => {
         accreditation_number: formData.accreditation_number || null,
         accreditation_expiry_date: formData.accreditation_expiry_date || null,
       } : prev);
+
+      // Refresh the shared context so headers/other pages see the new values.
+      // Safe: formInitialized guard prevents the hydration effect from
+      // reverting the form on context change.
+      refreshInstitution().catch(() => { /* non-fatal */ });
 
       toast.success("Settings saved successfully");
     } catch (error: any) {
