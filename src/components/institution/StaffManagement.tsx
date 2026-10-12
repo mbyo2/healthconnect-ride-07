@@ -308,16 +308,17 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
     if (!addEmail) return;
     setIsAdding(true);
     try {
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', addEmail.toLowerCase().trim())
-        .single();
+      // Look up the user via the secure user_lookup function (bypasses RLS
+      // safely — only returns the ID, not PII).
+      const { data: userId, error: lookupError } = await supabase
+        .rpc('lookup_user_id_by_email', { p_email: addEmail.toLowerCase().trim() });
 
-      if (profileError || !profileData) {
+      if (lookupError || !userId) {
         toast.error("User not found. Send an invitation instead.");
         return;
       }
+
+      const profileData = { id: userId };
 
       // Avoid a raw unique-violation error when the user is already staff.
       const { data: existingStaff } = await supabase
