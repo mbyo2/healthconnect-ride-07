@@ -1,3 +1,4 @@
+import { safeRedirectUrl } from "../_shared/redirect-guard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -139,6 +140,15 @@ serve(async (req) => {
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
 
+    // Provider must be an existing, verified, non-patient account
+    {
+      const svc = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
+      const { data: prov } = await svc.from("profiles").select("id, role, is_verified").eq("id", providerId).maybeSingle();
+      if (!prov || (prov as any).role === "patient" || (prov as any).is_verified !== true) {
+        return new Response(JSON.stringify({ success: false, error: "Invalid provider" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // Prevent self-payment
     if (patientId === providerId) {
       return new Response(
@@ -170,8 +180,8 @@ serve(async (req) => {
       const paymentId = crypto.randomUUID();
       // Create PayPal payment
       const accessToken = await getPayPalAccessToken();
-      const returnUrl = redirectUrl || `${Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'lovableproject.com')}/payment-success`;
-      const cancelUrl = redirectUrl || `${Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'lovableproject.com')}/payment-cancel`;
+      const returnUrl = safeRedirectUrl(redirectUrl, "https://doc0clock.online/payment-success");
+      const cancelUrl = safeRedirectUrl(redirectUrl, "https://doc0clock.online/payment-cancel");
 
       const paypalOrder = await createPayPalOrder(amount, currency, accessToken, returnUrl, cancelUrl);
 

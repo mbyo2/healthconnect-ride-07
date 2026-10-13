@@ -44,7 +44,9 @@ export function amountsMatch(clientAmount: number, trustedAmount: number): boole
  * if `allowUnresolved` is true (e.g. self-funding wallet top-ups).
  */
 export class PriceMismatchError extends Error {
-  constructor(public expected: number | null) {
+  // expected is intentionally never exposed to callers (prevents leaking other users' invoice totals)
+  public expected: number | null = null;
+  constructor(_expected?: number | null) {
     super('Amount does not match the authoritative price for this item');
   }
 }

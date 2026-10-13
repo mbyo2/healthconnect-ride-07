@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
     const feedRows = parsed.data.readings.map((r) => ({
       device_id: r.device_id,
       institution_id: parsed.data.institution_id,
-      patient_id: r.patient_id ?? devicePatientMap.get(r.device_id) ?? null,
+      patient_id: devicePatientMap.get(r.device_id) ?? null,
       data_type: r.data_type,
       data_value: r.data_value,
       unit: r.unit ?? null,

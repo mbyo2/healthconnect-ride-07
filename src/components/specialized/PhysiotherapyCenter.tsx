@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -538,7 +539,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                     toast.error("Popup blocked — allow popups to print the worksheet");
                     return;
                   }
-                  printWin.document.write(
+                  safeDocumentWrite(printWin, 
                     `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
                     `<h2>Physiotherapy Session Summary</h2>` +
                     `<p>Printed ${new Date().toLocaleString()} — from filed chart sessions.</p><hr/>` +

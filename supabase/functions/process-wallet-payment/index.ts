@@ -54,6 +54,13 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    if (orderId) {
+      const { data: own } = await supabaseClient.from("orders").select("id").eq("id", orderId).eq("patient_id", patientId).maybeSingle();
+      if (!own) {
+        return new Response(JSON.stringify({ success: false, error: "Order not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // Resolve the authoritative price server-side — never trust the client amount.
     // Pharmacy orders resolve from the order total; services from the price book.
     let amount: number;

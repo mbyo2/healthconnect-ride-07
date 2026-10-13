@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -110,7 +111,7 @@ export const SelfServiceKiosk: React.FC = () => {
   const handlePrintBill = () => {
     const printWin = window.open("", "_blank");
     if (printWin) {
-      printWin.document.write(`
+      safeDocumentWrite(printWin, `
         <html>
           <body style="font-family: monospace; text-align: center; max-width: 260px; margin: auto; padding: 15px;">
             <h2 style="margin: 0; font-size: 16px;">DOC' O CLOCK HEALTH</h2>
@@ -132,7 +133,7 @@ export const SelfServiceKiosk: React.FC = () => {
   const handlePrintSlip = () => {
     const printWin = window.open("", "_blank");
     if (printWin) {
-      printWin.document.write(`
+      safeDocumentWrite(printWin, `
         <html>
           <body style="font-family: monospace; text-align: center; max-width: 260px; margin: auto; padding: 15px;">
             <h2 style="margin: 0; font-size: 16px;">DOC' O CLOCK HEALTH</h2>

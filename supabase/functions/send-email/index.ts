@@ -161,7 +161,7 @@ serve(async (req) => {
     }
     } // end user-path role lookup (internal workers skip: recipient pre-verified)
 
-    const STAFF_TEMPLATES: EmailType[] = ['general_notice', 'appointment_reminder'];
+    const STAFF_TEMPLATES: EmailType[] = ['appointment_reminder'];
     if (!isAdmin) {
       const forbiddenRecipients = requestedTo.filter(e => e !== userEmail);
       if (forbiddenRecipients.length > 0) {

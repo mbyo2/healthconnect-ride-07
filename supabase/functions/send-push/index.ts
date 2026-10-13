@@ -135,7 +135,37 @@ serve(async (req) => {
     // are unrestricted. NOTE: no care-relationship filter here — legitimate
     // flows such as lab-result pushes come from staff (e.g. lab
     // technologists) who hold no user_connections row with the patient.
-    const targetUserIds = requestedTargetIds;
+    // Non-platform-admin senders may only target users they have a care
+    // relationship with, or colleagues/patients in an institution they work at.
+    const isPlatformAdmin = normalizedSenderRoles.some((r) => ["admin", "superadmin", "super_admin"].includes(r));
+    let targetUserIds: string[] = requestedTargetIds;
+    if (!isPlatformAdmin) {
+      const { data: myInst } = await supabase
+        .from("institution_staff").select("institution_id")
+        .eq("provider_id", user.id).eq("is_active", true);
+      const instIds = (myInst ?? []).map((r: any) => r.institution_id);
+      const allowed: string[] = [];
+      for (const id of requestedTargetIds.slice(0, 200)) {
+        if (id === user.id) { allowed.push(id); continue; }
+        const { data: care } = await supabase.rpc("has_care_relationship", { _provider: user.id, _patient: id });
+        if (care === true) { allowed.push(id); continue; }
+        if (instIds.length) {
+          const { data: colleague } = await supabase.from("institution_staff").select("id")
+            .eq("provider_id", id).in("institution_id", instIds).limit(1);
+          if (colleague?.length) { allowed.push(id); continue; }
+          const { data: reg } = await supabase.from("institution_patient_registry").select("id")
+            .eq("linked_patient_id", id).in("institution_id", instIds).limit(1);
+          if (reg?.length) { allowed.push(id); continue; }
+        }
+      }
+      if (allowed.length !== requestedTargetIds.length) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden: you can only notify your own patients or colleagues" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      targetUserIds = allowed;
+    }
 
     // Audit log of the push send (columns must match the audit_logs schema:
     // action/category/outcome/resource/severity/timestamp are required).

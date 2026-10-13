@@ -182,7 +182,7 @@ serve(async (req) => {
         .eq('id', mobilePayment.id);
     }
 
-    console.log('Mobile money payment initiated:', paymentResult);
+    console.log('Mobile money payment initiated', { success: (paymentResult as any)?.success });
 
     return new Response(
       JSON.stringify({
