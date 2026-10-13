@@ -1,3 +1,4 @@
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 
 import React, { useState, useEffect } from 'react';
 import ProviderMap from '@/components/ProviderMap';
@@ -38,7 +39,7 @@ const MapPage = () => {
               telemedicine_available, consultation_fee_min, consultation_fee_max,
               typical_wait_time, subspecialties, city, state, is_verified
             `)
-            .in('role', PROVIDER_ROLES as any)
+            .in('role', ALL_CLINICIAN_ROLES as any)
             .eq('is_verified', true),
           supabase
             .from('healthcare_institutions')
