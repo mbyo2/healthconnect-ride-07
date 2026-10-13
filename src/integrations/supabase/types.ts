@@ -24043,6 +24043,10 @@ export type Database = {
         Returns: number
       }
       resolve_service_price: { Args: { _service_id: string }; Returns: number }
+      resolve_service_provider: {
+        Args: { _service_id: string }
+        Returns: string
+      }
       revoke_break_glass_access: {
         Args: { p_grant_id: string }
         Returns: boolean
