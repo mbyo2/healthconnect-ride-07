@@ -1,3 +1,4 @@
+import { csvCell } from "@/utils/csvSafe";
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -215,7 +216,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
     }
     const header = "Item,Batch,Expiry,Quantity,Unit Price,Cost Price,Value\n";
     const lines = batches.map((b) =>
-      [`"${b.itemName}"`, b.batchNo, b.expiryDate, b.quantity, b.unitPrice, b.costPrice, (b.quantity * (b.costPrice || b.unitPrice)).toFixed(2)].join(",")
+      [b.itemName, b.batchNo, b.expiryDate, b.quantity, b.unitPrice, b.costPrice, (b.quantity * (b.costPrice || b.unitPrice)).toFixed(2)].map(csvCell).join(",")
     );
     const blob = new Blob([header + lines.join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);

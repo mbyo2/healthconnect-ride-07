@@ -173,6 +173,25 @@ serve(async (req) => {
             { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+        // Staff may only email patients they actively care for
+        {
+          const svcRel = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+          );
+          for (const addr of forbiddenRecipients) {
+            const { data: pid } = await svcRel.rpc('lookup_user_id_by_email', { p_email: addr });
+            const { data: ok } = pid
+              ? await svcRel.rpc('has_care_relationship', { _provider: user!.id, _patient: pid })
+              : { data: false };
+            if (!ok) {
+              return new Response(
+                JSON.stringify({ error: 'You can only email patients in your care' }),
+                { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              );
+            }
+          }
+        }
         try {
           const supabaseService = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',

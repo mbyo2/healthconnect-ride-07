@@ -2,7 +2,7 @@ import { safeRedirectUrl } from "../_shared/redirect-guard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+import { resolveServicePrice, assertTrustedAmount, PriceMismatchError, PLATFORM_CURRENCY, providerOwnsService } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -136,7 +136,9 @@ serve(async (req) => {
       );
     }
 
-    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl, paymentMethod } = validationResult.data;
+    const { amount: clientAmount, providerId, serviceId, redirectUrl, paymentMethod } = validationResult.data;
+    // Prices are stored in the platform currency; never accept a caller-chosen currency
+    const currency = PLATFORM_CURRENCY;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
 
@@ -145,6 +147,14 @@ serve(async (req) => {
       const svc = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
       const { data: prov } = await svc.from("profiles").select("id, role, is_verified").eq("id", providerId).maybeSingle();
       if (!prov || (prov as any).role === "patient" || (prov as any).is_verified !== true) {
+        return new Response(JSON.stringify({ success: false, error: "Invalid provider" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
+    // Provider must own the service being paid for
+    {
+      const svc2 = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
+      if (!(await providerOwnsService(svc2 as any, serviceId, providerId))) {
         return new Response(JSON.stringify({ success: false, error: "Invalid provider" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
     }

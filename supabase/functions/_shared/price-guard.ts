@@ -65,3 +65,25 @@ export function assertTrustedAmount(
   }
   return trustedAmount;
 }
+
+/** Only currencies the platform prices in. Prices are stored in ZMW. */
+export const PLATFORM_CURRENCY = 'ZMW';
+export function assertPlatformCurrency(currency: string | null | undefined): string {
+  const c = String(currency || PLATFORM_CURRENCY).toUpperCase();
+  if (c !== PLATFORM_CURRENCY) throw new PriceMismatchError(null);
+  return c;
+}
+
+/**
+ * Ensures providerId is the owner of serviceId when the service is a
+ * provider-owned healthcare_services row. Platform service codes return true.
+ */
+export async function providerOwnsService(
+  admin: SupabaseLike, serviceId: string | null | undefined, providerId: string | null | undefined,
+): Promise<boolean> {
+  if (!serviceId) return true;
+  const { data, error } = await admin.rpc('resolve_service_provider', { _service_id: String(serviceId) });
+  if (error) return false;
+  if (!data) return true; // not a provider-owned service row
+  return String(data) === String(providerId);
+}

@@ -1,5 +1,6 @@
 // Minimal MLLP framing — 0x0B <message> 0x1C 0x0D
 import { createServer, Socket } from 'node:net'
+import { buildAllowlist, rejectUnlessAllowed } from './peer-guard.js'
 
 const VT = 0x0b
 const FS = 0x1c
@@ -9,8 +10,12 @@ export function startMllpServer(
   host: string,
   port: number,
   onMessage: (raw: string, socket: Socket) => void,
+  allowedIps?: string[],
 ) {
+  const allow = buildAllowlist(allowedIps)
+  if (allow.size === 0) console.warn(`[mllp] no allowed_ips configured for port ${port}; all connections will be rejected`)
   const server = createServer((socket) => {
+    if (rejectUnlessAllowed(socket, allow, 'mllp')) return
     let buf = Buffer.alloc(0)
     socket.on('data', (chunk) => {
       buf = Buffer.concat([buf, chunk])

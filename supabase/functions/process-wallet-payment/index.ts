@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { resolveServicePrice, resolveReferenceAmount, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+import { resolveServicePrice, resolveReferenceAmount, assertTrustedAmount, PriceMismatchError, PLATFORM_CURRENCY, providerOwnsService } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,9 +47,10 @@ serve(async (req) => {
     );
 
     const body = await req.json() as PaymentRequest;
-    const { amount: clientAmount, currency, providerId: clientProviderId, serviceId, orderId, description } = body;
+    const { amount: clientAmount, providerId: clientProviderId, serviceId, orderId, description } = body;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
+    const currency = PLATFORM_CURRENCY;
     if (!clientAmount || clientAmount <= 0 || (!serviceId && !orderId)) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
@@ -83,7 +84,13 @@ serve(async (req) => {
     // the whole payment). Client value wins when valid; pharmacy orders fall
     // back to the dispensing facility's admin, then any affiliated staffer.
     let providerId: string | null = null;
-    if (clientProviderId) {
+    if (clientProviderId && !orderId && serviceId) {
+      // Only accept a client payee when it owns the service being paid for
+      if (!(await providerOwnsService(supabaseClient as any, serviceId, clientProviderId))) {
+        return new Response(JSON.stringify({ success: false, error: 'Invalid provider' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+    if (clientProviderId && !orderId) {
       const { data: prof } = await supabaseClient
         .from('profiles')
         .select('id')
