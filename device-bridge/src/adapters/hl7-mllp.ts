@@ -8,5 +8,5 @@ export function startHl7Mllp(device: DeviceConfig, emit: (r: CanonicalReading) =
     const patientId = extractPatientId(raw)
     for (const r of parseOru(raw, device.id, patientId)) emit(r)
     socket.write(ackForMessage(raw))
-  })
+  }, device.allowed_ips)
 }

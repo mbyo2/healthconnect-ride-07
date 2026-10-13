@@ -10,5 +10,5 @@ export function startGeCarescape(device: DeviceConfig, emit: (r: CanonicalReadin
     const pid = extractPatientId(raw)
     for (const r of parseOru(raw, device.id, pid)) emit(r)
     socket.write(ackForMessage(raw))
-  })
+  }, device.allowed_ips)
 }
