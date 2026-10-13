@@ -75,7 +75,7 @@ export const useAppointmentReminders = () => {
             message: `Reminder: You have an appointment with ${providerName} tomorrow at ${appt.time}.`,
             type: "appointment_reminder",
             related_id: appt.id,
-          });
+          } as any);
         }
       } catch (error) {
         console.error("Reminder check failed:", error);

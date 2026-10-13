@@ -131,7 +131,7 @@ export function useGamification(userId: string | undefined) {
                     completed,
                     completed_at: completed ? new Date().toISOString() : null,
                     updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id, achievement_type' });
+                } as any, { onConflict: 'user_id, achievement_type' });
 
             if (error) throw error;
 

@@ -113,7 +113,7 @@ export const RefillRequestsQueue = () => {
             type: "prescription",
             reference_id: requestId,
             created_at: new Date().toISOString(),
-          });
+          } as any);
           // Push notification (best-effort)
           supabase.functions.invoke("send-push", {
             body: {

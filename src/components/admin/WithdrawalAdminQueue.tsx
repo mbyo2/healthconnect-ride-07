@@ -75,7 +75,7 @@ export const WithdrawalAdminQueue = () => {
           decided_by: user?.id,
           decided_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq("id", id);
 
       if (error) throw error;
