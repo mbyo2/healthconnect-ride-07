@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 /**
  * Universal High-Quality PDF & Data Export/Import Utility
  * Generates styled, print-ready documents for Invoices, Payslips,
@@ -79,7 +80,7 @@ export const printStyledPDF = (contentHtml: string, documentTitle: string) => {
     return;
   }
 
-  printWindow.document.write(`
+  safeDocumentWrite(printWindow, `
     <!DOCTYPE html>
     <html>
       <head>

@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -188,7 +189,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       toast.error("Popup blocked — allow popups to print the slip");
       return;
     }
-    printWin.document.write(`
+    safeDocumentWrite(printWin, `
       <html><body style="font-family: monospace; max-width: 260px; margin: auto; padding: 15px; text-align: center;">
         <h2 style="margin: 0; font-size: 16px;">STAFF PAY SLIP (ADVISORY)</h2>
         <p style="font-size: 10px;">Generated from directory records — confirm with payroll before acting</p>

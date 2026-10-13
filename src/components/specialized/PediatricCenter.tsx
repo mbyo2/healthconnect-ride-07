@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -452,7 +453,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     return;
                   }
                   const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-                  printWin.document.write(
+                  safeDocumentWrite(printWin, 
                     `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
                     `<h2>Immunization Registry Record</h2>` +
                     `<p>Patient: ${esc(activePatient?.first_name)} ${esc(activePatient?.last_name)}</p>` +

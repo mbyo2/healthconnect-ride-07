@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -196,7 +197,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           )
           .join("");
 
-        printWin.document.write(`
+        safeDocumentWrite(printWin, `
           <html>
             <body style="font-family: monospace; font-size: 12px; max-width: 280px; margin: auto; padding: 15px;">
               <div style="text-align:center; font-weight:bold; font-size:14px;">DOC' O CLOCK DISPENSARY</div>

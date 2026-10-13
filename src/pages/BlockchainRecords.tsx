@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import { useEffect, useState } from "react";
 import { Shield, Lock, Share2, Eye, Download, FileText, CheckCircle2, AlertTriangle, Plus, Database } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -31,7 +32,7 @@ const BlockchainRecords = () => {
     if (!printWin) return;
     const esc = (s: unknown) =>
       String(s ?? "—").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    printWin.document.write(`
+    safeDocumentWrite(printWin, `
       <html><head><title>Signed Record — ${esc((record as any).title)}</title></head>
       <body style="font-family: monospace; max-width: 640px; margin: auto; padding: 24px;">
         <h2 style="margin: 0;">DOC' O CLOCK — SIGNED HEALTH RECORD</h2>

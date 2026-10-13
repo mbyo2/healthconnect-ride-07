@@ -1,3 +1,4 @@
+import { safeDocumentWrite } from "@/utils/safePrint";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -374,7 +375,7 @@ export function PrescriptionFulfillment() {
       </tr>
     `).join("");
 
-    printWin.document.write(`
+    safeDocumentWrite(printWin, `
       <!DOCTYPE html>
       <html>
         <head>
