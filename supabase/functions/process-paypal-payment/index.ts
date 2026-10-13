@@ -1,3 +1,4 @@
+import { safeRedirectUrl } from "../_shared/redirect-guard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -109,7 +110,8 @@ serve(async (req: Request) => {
       );
     }
 
-    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl } = validationResult.data;
+    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl: rawRedirectUrl } = validationResult.data;
+    const redirectUrl = safeRedirectUrl(rawRedirectUrl, "https://doc0clock.online/payment-return");
     // FORCE patientId to the authenticated user
     const patientId = user.id;
 
