@@ -15,6 +15,8 @@ export interface DeviceConfig {
   serial_path?: string
   baud?: number
   room?: string
+  /** Source IPs permitted to connect to this device's TCP listener. */
+  allowed_ips?: string[]
 }
 
 export interface CanonicalReading {

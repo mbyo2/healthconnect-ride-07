@@ -3,6 +3,7 @@
 // XML. We accept both on the same port; anything starting with '<?xml' is
 // treated as IDE XML, everything else as HL7.
 import { createServer } from 'node:net'
+import { buildAllowlist, rejectUnlessAllowed } from '../peer-guard.js'
 import { parseOru, extractPatientId } from '../hl7.js'
 import type { DeviceConfig, CanonicalReading } from '../types.js'
 
@@ -36,7 +37,9 @@ function parseIde(xml: string, deviceId: string): CanonicalReading[] {
 
 export function startPhilipsIntellivue(device: DeviceConfig, emit: (r: CanonicalReading) => void) {
   const port = device.listen_port ?? 24105
+  const allow = buildAllowlist(device.allowed_ips)
   const server = createServer((socket) => {
+    if (rejectUnlessAllowed(socket, allow, 'philips')) return
     let buf = ''
     socket.on('data', (chunk) => {
       buf += chunk.toString('utf8')
