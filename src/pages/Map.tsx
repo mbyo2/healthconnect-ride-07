@@ -1,5 +1,4 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
-import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 
 import React, { useState, useEffect } from 'react';
 import ProviderMap from '@/components/ProviderMap';
