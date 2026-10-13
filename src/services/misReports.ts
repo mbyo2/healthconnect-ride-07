@@ -18,7 +18,7 @@ const slug = (s: string) =>
 
 export function downloadCsv(filename: string, rows: string[][]) {
   const csv = rows
-    .map((row) => row.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+    .map((row) => row.map((v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; }).join(','))
     .join('\n');
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   const link = document.createElement('a');

@@ -143,13 +143,20 @@ serve(async (req) => {
     // NOTE: no live SMS provider is connected yet, so successful calls are
     // recorded as 'simulated' — never 'sent' — until a real gateway
     // (Africa's Talking / MTN / Vodacom / Zamtel) is wired below.
+    // Only attribute the SMS to a patient the sender actually cares for.
+    let safePatientId: string | null = null;
+    if (patientId) {
+      const { data: care } = await supabaseClient.rpc('has_care_relationship', { _provider: user.id, _patient: patientId });
+      if (care === true || patientId === user.id) safePatientId = patientId;
+    }
+
     const { error: logError } = await supabaseClient
       .from('sms_logs')
       .insert({
         phone: formattedPhone,
         message: message,
         type: type,
-        patient_id: patientId,
+        patient_id: safePatientId,
         sender_id: user.id, // Track who sent the SMS
         status: smsResponse.success ? 'simulated' : 'failed',
         provider: smsConfig.provider,
