@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const clientAmount = Number(body.amount);
-    const currency = String(body.currency || 'ZMW').toUpperCase();
+    // Platform prices and Lenco mobile money collections are ZMW only
+    const currency = 'ZMW';
     const referenceType = String(body.reference_type || 'wallet_topup');
     const referenceId = body.reference_id || null;
     const description = String(body.description || 'D0C Health payment').slice(0, 100);

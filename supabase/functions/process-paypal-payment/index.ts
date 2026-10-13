@@ -2,7 +2,7 @@ import { safeRedirectUrl } from "../_shared/redirect-guard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+import { resolveServicePrice, assertTrustedAmount, PriceMismatchError, PLATFORM_CURRENCY, providerOwnsService } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -110,7 +110,9 @@ serve(async (req: Request) => {
       );
     }
 
-    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl: rawRedirectUrl } = validationResult.data;
+    const { amount: clientAmount, providerId, serviceId, redirectUrl: rawRedirectUrl } = validationResult.data;
+    // Prices are stored in the platform currency; ignore caller-chosen currency
+    const currency = PLATFORM_CURRENCY;
     const redirectUrl = safeRedirectUrl(rawRedirectUrl, "https://doc0clock.online/payment-return");
     // FORCE patientId to the authenticated user
     const patientId = user.id;
@@ -164,6 +166,13 @@ serve(async (req: Request) => {
         JSON.stringify({ success: false, error: 'Cannot process payment to yourself' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    if (!isWalletTopUp) {
+      const svcOwn = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+      if (!(await providerOwnsService(svcOwn as any, serviceId, providerId))) {
+        return new Response(JSON.stringify({ success: false, error: 'Invalid provider' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
     }
 
     // Verify PayPal credentials BEFORE creating any DB records to avoid stale pending rows.
