@@ -154,7 +154,7 @@ serve(async (req) => {
             .eq("provider_id", id).in("institution_id", instIds).limit(1);
           if (colleague?.length) { allowed.push(id); continue; }
           const { data: reg } = await supabase.from("institution_patient_registry").select("id")
-            .eq("patient_id", id).in("institution_id", instIds).limit(1);
+            .eq("linked_patient_id", id).in("institution_id", instIds).limit(1);
           if (reg?.length) { allowed.push(id); continue; }
         }
       }

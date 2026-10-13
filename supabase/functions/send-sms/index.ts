@@ -165,7 +165,7 @@ serve(async (req) => {
       throw new Error(smsResponse.error || 'Failed to send SMS');
     }
 
-    console.log(`SMS sent successfully by user ${user.id} to ${formattedPhone}:`, smsResponse);
+    console.log(`SMS dispatched by user ${user.id}`);
 
     return new Response(
       JSON.stringify({
