@@ -1,3 +1,4 @@
+import { csvCell } from "@/utils/csvSafe";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -169,7 +170,7 @@ function FacilityAuditTrail() {
       e.created_at || "", e.actorName || e.user_id, e.action,
       e.category || "", e.resource || "", e.outcome || "", e.severity || "",
     ]));
-    const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = rows.map((r) => r.map(csvCell).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = url;
