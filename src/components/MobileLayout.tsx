@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
+import { FloatingAIChat } from "@/components/FloatingAIChat";
 import { DesktopNav } from "@/components/DesktopNav";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { ReactNode, useEffect, useState } from "react";
@@ -47,6 +48,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
             </div>
           </main>
           <AccessibilityMenu />
+          {isAuthenticated && <FloatingAIChat />}
         </div>
       </SidebarProvider>
     );
@@ -72,6 +74,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       <OfflineBanner />
       <OfflineIndicator />
       <AccessibilityMenu />
+      {isAuthenticated && <FloatingAIChat />}
     </div>
   );
 }
