@@ -213,26 +213,59 @@ export async function verifyAndSettleLenco(
 }
 
 /**
- * Verify a Lenco webhook signature (HMAC-SHA256 of the raw body).
- * Returns true when no LENCO_WEBHOOK_SECRET is configured — callers must
- * still re-verify through the status API before settling.
+ * Verify a Lenco webhook signature.
+ *
+ * Official Lenco v2.0 spec (lenco-api.readme.io/v2.0/reference/webhooks):
+ *   header `X-Lenco-Signature` = HMAC-SHA512 of the event payload,
+ *   signed with `webhook_hash_key` = SHA256 hash (hex) of the API token.
+ *
+ * The Lenco dashboard may also issue a dedicated webhook signing secret.
+ * To stay compatible with both, we accept (any match wins):
+ *   1. HMAC-SHA512, key = SHA256(API token)            — official spec
+ *   2. HMAC-SHA512, key = configured secret as-is      — dashboard secret variant
+ *   3. HMAC-SHA256, key = configured secret as-is      — legacy behavior
+ * Accepting multiple derivations cannot admit a forgery: an attacker still
+ * needs the token/secret to produce any of them.
+ *
+ * Returns true when no secret/token is configured — callers must still
+ * re-verify through the status API before settling.
  */
 export async function verifyWebhookSignature(rawBody: string, signature: string | null): Promise<boolean> {
   const secret = Deno.env.get('LENCO_WEBHOOK_SECRET') || '';
-  if (!secret) return true; // not configured: caller re-verifies via API
+  if (!secret && !LENCO_SECRET_KEY) return true; // not configured: caller re-verifies via API
   if (!signature) return false;
+
+  const clean = signature.replace(/^sha512=/i, '').replace(/^sha256=/i, '').toLowerCase();
+
+  async function hmacHex(algo: 'SHA-256' | 'SHA-512', keyMaterial: Uint8Array, data: string): Promise<string> {
+    const key = await crypto.subtle.importKey('raw', keyMaterial, { name: 'HMAC', hash: algo }, false, ['sign']);
+    const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
+    return Array.from(new Uint8Array(mac)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function sha256Hex(text: string): Promise<string> {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  const enc = new TextEncoder();
+  const candidates: Array<[string, Uint8Array]> = [];
   try {
-    const key = await crypto.subtle.importKey(
-      'raw',
-      new TextEncoder().encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign'],
-    );
-    const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(rawBody));
-    const hex = Array.from(new Uint8Array(mac)).map((b) => b.toString(16).padStart(2, '0')).join('');
-    const clean = signature.replace(/^sha256=/i, '').toLowerCase();
-    return clean.length === hex.length && clean === hex;
+    // 1. Official spec: HMAC-SHA512 with SHA256(API token) as key
+    if (LENCO_SECRET_KEY) {
+      const derived = await sha256Hex(LENCO_SECRET_KEY);
+      candidates.push(['SHA-512', enc.encode(derived)]);
+    }
+    // 2 & 3. Dashboard-issued secret, tried as both SHA-512 and SHA-256
+    if (secret) {
+      candidates.push(['SHA-512', enc.encode(secret)]);
+      candidates.push(['SHA-256', enc.encode(secret)]);
+    }
+    for (const [algo, keyMaterial] of candidates) {
+      const hex = await hmacHex(algo as 'SHA-256' | 'SHA-512', keyMaterial, rawBody);
+      if (clean.length === hex.length && clean === hex) return true;
+    }
+    return false;
   } catch {
     return false;
   }

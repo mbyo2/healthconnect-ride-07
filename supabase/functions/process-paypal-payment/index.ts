@@ -256,12 +256,12 @@ serve(async (req: Request) => {
             currency_code: paypalCurrency,
             value: paypalValue.toFixed(2)
           },
-          description: `HealthConnect Payment - ${payment.invoice_number}`
+          description: `Doc'O Clock Payment - ${payment.invoice_number}`
         }],
         application_context: {
           return_url: `${redirectUrl}?payment_id=${payment.id}&status=success`,
           cancel_url: `${redirectUrl}?payment_id=${payment.id}&status=cancelled`,
-          brand_name: 'HealthConnect',
+          brand_name: "Doc'O Clock",
           landing_page: 'LOGIN',
           user_action: 'PAY_NOW'
         }
