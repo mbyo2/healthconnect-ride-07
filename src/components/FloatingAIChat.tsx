@@ -25,7 +25,7 @@ export const FloatingAIChat = () => {
           onClick={() => setOpen(true)}
           aria-label="Open Doc O Clock AI chat"
           className={cn(
-            'fixed z-50 right-4 bottom-24 sm:right-6 sm:bottom-8',
+            'fixed z-50 right-4 bottom-40 sm:right-6 sm:bottom-40',
             'h-14 w-14 rounded-full bg-primary text-primary-foreground',
             'flex items-center justify-center shadow-xl',
             'hover:scale-105 active:scale-95 transition-transform',
