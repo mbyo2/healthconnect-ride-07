@@ -13,7 +13,7 @@ import { useMaintenanceModule } from '@/hooks/useMaintenanceModule';
 import { PreventiveMaintenanceScheduler } from '@/components/maintenance/PreventiveMaintenanceScheduler';
 
 export const MaintenanceManagerWorkflow = () => {
-  const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset } = useMaintenanceModule();
+  const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, realtimeLive } = useMaintenanceModule();
   const [showAddWO, setShowAddWO] = useState(false);
   const [showAddAsset, setShowAddAsset] = useState(false);
   const [woForm, setWoForm] = useState({ title: '', description: '', category: 'general', priority: 'medium', location: '', assigned_to_name: '' });
@@ -27,7 +27,13 @@ export const MaintenanceManagerWorkflow = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Maintenance & Facilities</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            Maintenance & Facilities
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full ${realtimeLive ? "bg-green-500/10 text-green-700 dark:text-green-400" : "bg-muted text-muted-foreground"}`}>
+              <span className={`h-2 w-2 rounded-full ${realtimeLive ? "bg-green-500 animate-pulse" : "bg-muted-foreground/50"}`} />
+              {realtimeLive ? "Live" : "Connecting…"}
+            </span>
+          </h1>
           <p className="text-muted-foreground">Work orders, asset register & vendor management</p>
         </div>
         <div className="flex gap-2">

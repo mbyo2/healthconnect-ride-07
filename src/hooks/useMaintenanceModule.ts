@@ -65,13 +65,58 @@ export function useMaintenanceModule() {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  // Real-time: apply INSERT/UPDATE/DELETE deltas directly to state for
+  // zero-latency UI (no refetch round-trip). Falls back to fetchAll if a
+  // payload is malformed.
+  const [realtimeLive, setRealtimeLive] = useState(false);
   useEffect(() => {
     if (!institutionId) return;
-    const ch = supabase.channel('maintenance_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'work_orders', filter: `institution_id=eq.${institutionId}` }, () => fetchAll())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'asset_register', filter: `institution_id=eq.${institutionId}` }, () => fetchAll())
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
+
+    const applyDelta = <T extends { id: string }>(
+      setList: React.Dispatch<React.SetStateAction<T[]>>,
+      payload: any,
+      sort?: (a: T, b: T) => number,
+    ) => {
+      try {
+        const { eventType } = payload || {};
+        if (eventType === "INSERT" && payload.new?.id) {
+          const row = payload.new as T;
+          setList((prev) => {
+            if (prev.some((r) => r.id === row.id)) return prev;
+            const next = [...prev, row];
+            return sort ? next.sort(sort) : next;
+          });
+        } else if (eventType === "UPDATE" && payload.new?.id) {
+          const row = payload.new as T;
+          setList((prev) => prev.map((r) => (r.id === row.id ? { ...r, ...row } : r)));
+        } else if (eventType === "DELETE" && payload.old?.id) {
+          const id = payload.old.id as string;
+          setList((prev) => prev.filter((r) => r.id !== id));
+        } else {
+          fetchAll();
+        }
+      } catch {
+        fetchAll();
+      }
+    };
+
+    const ch = supabase
+      .channel("maintenance_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "work_orders", filter: `institution_id=eq.${institutionId}` },
+        (payload) => applyDelta(setWorkOrders, payload, (a, b) => +new Date(b.created_at) - +new Date(a.created_at)),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "asset_register", filter: `institution_id=eq.${institutionId}` },
+        (payload) => applyDelta(setAssets, payload, (a, b) => (a.asset_name || "").localeCompare(b.asset_name || "")),
+      )
+      .subscribe((status) => setRealtimeLive(status === "SUBSCRIBED"));
+    return () => {
+      setRealtimeLive(false);
+      supabase.removeChannel(ch);
+    };
   }, [institutionId, fetchAll]);
 
   const createWorkOrder = async (data: Partial<WorkOrder>) => {
@@ -113,5 +158,5 @@ export function useMaintenanceModule() {
   const openOrders = workOrders.filter(w => !['completed', 'cancelled'].includes(w.status));
   const criticalOrders = workOrders.filter(w => w.priority === 'critical' && !['completed', 'cancelled'].includes(w.status));
 
-  return { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, refetch: fetchAll };
+  return { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, refetch: fetchAll, realtimeLive };
 }
