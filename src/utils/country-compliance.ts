@@ -170,7 +170,7 @@ export const COUNTRY_COMPLIANCE: Record<string, CountryCompliance> = {
       { operator: "Airtel Money", prefix: ["073", "078"] },
       { operator: "T-Kash (Telkom)", prefix: ["077"] },
     ],
-    paymentNotes: "M-PESA dominant (90%+ of mobile money). Cards via DPO/Pesapal.",
+    paymentNotes: "M-PESA dominant (90%+ of mobile money). Cards via Broadpay.",
 
     medicalRegulator: "Kenya Medical Practitioners and Dentists Council (KMPDC)",
     facilityAccreditation: "SHA empanelment required for SHIF billing. KMPDC facility licensing.",
@@ -220,7 +220,7 @@ export const COUNTRY_COMPLIANCE: Record<string, CountryCompliance> = {
       { operator: "Airtel Money", prefix: ["068", "069", "078"] },
       { operator: "Halopesa", prefix: ["062"] },
     ],
-    paymentNotes: "Mobile money dominant. Cards via DPO.",
+    paymentNotes: "Mobile money dominant. Cards via Broadpay.",
 
     medicalRegulator: "Medical Council of Tanganyika (MCT)",
     facilityAccreditation: "NHIF accreditation for insurance billing.",

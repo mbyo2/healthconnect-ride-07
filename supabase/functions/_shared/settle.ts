@@ -1,6 +1,6 @@
 // Shared settlement helper.
 //
-// Once a gateway (DPO, PayPal, ...) confirms that money was actually
+// Once a gateway (Broadpay/Lenco, PayPal, ...) confirms that money was actually
 // received, this module books the money into the platform ledger:
 //   * creates/locates the canonical `payments` row,
 //   * resolves the single payee (institution, provider or pharmacy),
@@ -16,7 +16,7 @@ type Admin = {
 };
 
 export interface SettleInput {
-  gateway: 'dpo' | 'paypal' | 'mobile_money' | 'wallet' | 'lenco';
+  gateway: 'broadpay' | 'lenco' | 'paypal' | 'mobile_money' | 'wallet';
   /** Gateway-side unique id (trans token, capture id, ...). Used for idempotency. */
   externalRef: string;
   payerId: string;
