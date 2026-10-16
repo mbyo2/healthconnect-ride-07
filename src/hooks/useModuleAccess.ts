@@ -16,7 +16,8 @@ import {
  *   - visibleTabs(): ordered list of accessible tab keys
  *   - lockedTabs(): ordered list of tab keys hidden by entitlements
  *
- * NOT YET WIRED INTO InstitutionDashboard — awaiting CEO sign-off.
+ * Wired into InstitutionDashboard: locked tabs render greyed with a lock
+ * icon, and deep links to locked tabs redirect to overview.
  */
 export function useModuleAccess(effectiveModules: EffectiveModule[]) {
   return useMemo(() => {
