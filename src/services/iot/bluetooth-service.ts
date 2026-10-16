@@ -20,6 +20,26 @@ export const BLE_CHARACTERISTICS = {
 export class BluetoothService {
     private device: BluetoothDevice | null = null;
     private server: BluetoothRemoteGATTServer | null = null;
+    private disconnectHandlers = new Set<() => void>();
+    private reconnectHandlers = new Set<(attempt: number) => void>();
+    private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    private reconnectAttempts = 0;
+    private readonly maxReconnectAttempts = 8;
+    private manualDisconnect = false;
+    private hrCallback: ((hr: number) => void) | null = null;
+    private lastDevice: BluetoothDevice | null = null;
+
+    /** UI hook: fires on every unexpected drop. Returns an unsubscribe fn. */
+    onDisconnect(handler: () => void): () => void {
+        this.disconnectHandlers.add(handler);
+        return () => { this.disconnectHandlers.delete(handler); };
+    }
+
+    /** UI hook: fires on every reconnect attempt (1-based). */
+    onReconnectAttempt(handler: (attempt: number) => void): () => void {
+        this.reconnectHandlers.add(handler);
+        return () => { this.reconnectHandlers.delete(handler); };
+    }
 
     // Check if Web Bluetooth is supported
     isSupported(): boolean {
@@ -91,7 +111,10 @@ export class BluetoothService {
         }
 
         try {
+            this.cancelReconnect();
+            this.manualDisconnect = false;
             this.server = await device.gatt.connect();
+            this.lastDevice = device;
 
             // Add disconnect listener
             device.addEventListener('gattserverdisconnected', this.handleDisconnect);
@@ -103,15 +126,67 @@ export class BluetoothService {
 
     // Disconnect from device
     disconnect(): void {
+        this.manualDisconnect = true;
+        this.cancelReconnect();
         if (this.device && this.device.gatt && this.device.gatt.connected) {
             this.device.gatt.disconnect();
         }
         this.device = null;
         this.server = null;
+        this.hrCallback = null;
+    }
+
+    private cancelReconnect(): void {
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+        this.reconnectAttempts = 0;
+    }
+
+    /** Exponential backoff reconnect (1s, 2s, 4s … capped at 30s, 8 attempts). */
+    private scheduleReconnect(): void {
+        if (this.manualDisconnect || !this.lastDevice) return;
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.warn('[BluetoothService] Reconnect attempts exhausted');
+            return;
+        }
+        const delay = Math.min(1000 * 2 ** this.reconnectAttempts, 30000);
+        this.reconnectAttempts++;
+        const attempt = this.reconnectAttempts;
+        this.reconnectHandlers.forEach((h) => { try { h(attempt); } catch { /* noop */ } });
+        console.log(`[BluetoothService] Reconnect attempt ${attempt} in ${delay}ms`);
+        this.reconnectTimer = setTimeout(async () => {
+            try {
+                const dev = this.lastDevice;
+                if (!dev || !dev.gatt) return;
+                this.server = await dev.gatt.connect();
+                this.device = dev;
+                dev.addEventListener('gattserverdisconnected', this.handleDisconnect);
+                console.log('[BluetoothService] Reconnected');
+                // Re-subscribe to heart-rate notifications on the new GATT session
+                if (this.hrCallback) {
+                    try {
+                        await this.subscribeHeartRate(this.hrCallback);
+                    } catch (e) {
+                        console.error('[BluetoothService] Failed to re-subscribe HR after reconnect:', e);
+                    }
+                }
+                this.reconnectAttempts = 0;
+            } catch (error) {
+                console.error('[BluetoothService] Reconnect failed:', error);
+                this.scheduleReconnect();
+            }
+        }, delay);
     }
 
     // Start listening for heart rate notifications
     async startHeartRateNotifications(callback: (hr: number) => void): Promise<void> {
+        this.hrCallback = callback;
+        await this.subscribeHeartRate(callback);
+    }
+
+    private async subscribeHeartRate(callback: (hr: number) => void): Promise<void> {
         if (!this.server) throw new Error('Device not connected');
 
         try {
@@ -164,11 +239,17 @@ export class BluetoothService {
     }
 
     private handleDisconnect = () => {
-        console.log('Device disconnected');
+        console.log('[BluetoothService] Device disconnected');
+        const wasManual = this.manualDisconnect;
         this.device = null;
         this.server = null;
-        // Dispatch a custom event or use a callback if needed for UI updates
+        // Notify UI listeners first so the app can react immediately
+        this.disconnectHandlers.forEach((h) => { try { h(); } catch { /* noop */ } });
         window.dispatchEvent(new CustomEvent('iot-device-disconnected'));
+        // Auto-reconnect on unexpected drops (BLE links drop often)
+        if (!wasManual) {
+            this.scheduleReconnect();
+        }
     };
 }
 

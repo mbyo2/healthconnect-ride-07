@@ -26,6 +26,24 @@ export function useIoT(userId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'reconnecting'>('disconnected');
   const [isScanning, setIsScanning] = useState(false);
+  // Physical BLE device link state (separate from the realtime DB channel above)
+  const [deviceLink, setDeviceLink] = useState<'connected' | 'reconnecting' | 'disconnected'>('disconnected');
+
+  // Surface unexpected BLE drops + auto-reconnect attempts in the UI
+  useEffect(() => {
+    const offDrop = bluetoothService.onDisconnect(() => {
+      setDeviceLink('reconnecting');
+      toast.warning('Device disconnected — reconnecting…', { duration: 4000 });
+    });
+    const offRetry = bluetoothService.onReconnectAttempt((attempt) => {
+      setDeviceLink('reconnecting');
+      if (attempt >= 8) {
+        setDeviceLink('disconnected');
+        toast.error('Could not reconnect to the device. Please reconnect manually.');
+      }
+    });
+    return () => { offDrop(); offRetry(); };
+  }, []);
 
   // Refs for cleanup
   const subscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -206,6 +224,7 @@ export function useIoT(userId: string | undefined) {
 
         // Start listening for HR
         await bluetoothService.startHeartRateNotifications(async (hr) => {
+          setDeviceLink('connected'); // data flowing again (covers post-reconnect)
           await persistVitalSigns(hr, connectionId);
         });
       } else if (type === 'usb') {
@@ -247,6 +266,7 @@ export function useIoT(userId: string | undefined) {
 
       toast.dismiss();
       toast.success(`Connected to ${deviceName}`);
+      setDeviceLink('connected');
 
       // Register device in DB
       await addDevice({
@@ -344,6 +364,7 @@ export function useIoT(userId: string | undefined) {
     alerts,
     loading,
     connectionStatus,
+    deviceLink,
     isScanning,
     addDevice,
     scanAndConnectDevice,
