@@ -44,6 +44,7 @@ const Appointments = lazyWithRetry(() => import('@/pages/Appointments'));
 const AdminDashboard = lazyWithRetry(() => import('@/pages/AdminDashboard'));
 const Connections = lazyWithRetry(() => import('@/pages/Connections'));
 const Chat = lazyWithRetry(() => import('@/pages/Chat'));
+const SharedEquipment = lazyWithRetry(() => import('@/pages/SharedEquipment'));
 const Prescriptions = lazyWithRetry(() => import('@/pages/Prescriptions'));
 const Symptoms = lazyWithRetry(() => import('@/pages/Symptoms'));
 const TriageIntake = lazyWithRetry(() => import('@/pages/TriageIntake'));
@@ -268,6 +269,7 @@ const AppContent = () => {
             <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyInventory /></RouteGuard>} />
             <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
+            <Route path="/shared-equipment" element={<RouteGuard><SharedEquipment /></RouteGuard>} />
             <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
             {/* Legacy path: old bookmarks/links to the pharmacy Rx view land here */}
             <Route path="/pharmacy-rx" element={<Navigate to="/prescriptions" replace />} />

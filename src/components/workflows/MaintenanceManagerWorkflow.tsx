@@ -8,12 +8,38 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package, Calendar } from 'lucide-react';
+import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package, Calendar, Building2 } from 'lucide-react';
 import { useMaintenanceModule } from '@/hooks/useMaintenanceModule';
 import { PreventiveMaintenanceScheduler } from '@/components/maintenance/PreventiveMaintenanceScheduler';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export const MaintenanceManagerWorkflow = () => {
-  const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, realtimeLive } = useMaintenanceModule();
+  const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, updateAsset, realtimeLive } = useMaintenanceModule();
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareAsset, setShareAsset] = useState<any>(null);
+  const [shareTerms, setShareTerms] = useState('');
+  const [shareRate, setShareRate] = useState('');
+
+  const openShareDialog = (a: any) => {
+    setShareAsset(a);
+    setShareTerms(a.share_terms || '');
+    setShareRate(a.share_rate != null ? String(a.share_rate) : '');
+    setShowShareDialog(true);
+  };
+
+  const saveShare = async (enable: boolean) => {
+    if (!shareAsset) return;
+    try {
+      await updateAsset(shareAsset.id, {
+        is_shareable: enable,
+        share_terms: enable ? (shareTerms.trim() || null) : shareAsset.share_terms,
+        share_rate: enable ? (shareRate.trim() === '' ? null : Number(shareRate)) : shareAsset.share_rate,
+      });
+      toast.success(enable ? `"${shareAsset.asset_name}" is now shareable with other institutions` : `Sharing turned off for "${shareAsset.asset_name}"`);
+      setShowShareDialog(false);
+    } catch { /* toast already shown */ }
+  };
   const [showAddWO, setShowAddWO] = useState(false);
   const [showAddAsset, setShowAddAsset] = useState(false);
   const [woForm, setWoForm] = useState({ title: '', description: '', category: 'general', priority: 'medium', location: '', assigned_to_name: '' });
@@ -37,6 +63,9 @@ export const MaintenanceManagerWorkflow = () => {
           <p className="text-muted-foreground">Work orders, asset register & vendor management</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" className="gap-1" asChild>
+            <Link to="/shared-equipment"><Building2 className="h-4 w-4" /> Shared Equipment</Link>
+          </Button>
           <Dialog open={showAddAsset} onOpenChange={setShowAddAsset}>
             <DialogTrigger asChild><Button variant="outline" className="gap-1"><Package className="h-4 w-4" /> Register Asset</Button></DialogTrigger>
             <DialogContent>
@@ -144,13 +173,20 @@ export const MaintenanceManagerWorkflow = () => {
                 <div className="space-y-2">
                   {assets.map(a => (
                     <div key={a.id} className="flex items-center justify-between p-3 rounded-lg border">
-                      <div>
-                        <p className="font-medium">{a.asset_name} {a.asset_tag ? `(${a.asset_tag})` : ''}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium flex items-center gap-2 flex-wrap">{a.asset_name} {a.asset_tag ? `(${a.asset_tag})` : ''}
+                          {a.is_shareable && <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">Shared</Badge>}
+                        </p>
                         <p className="text-sm text-muted-foreground">{a.category} • {a.location || 'N/A'}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <Badge variant="outline">{a.status}</Badge>
                         <Badge variant="outline">{a.condition}</Badge>
+                        {a.status === 'operational' && (
+                          <Button size="sm" variant={a.is_shareable ? "outline" : "secondary"} onClick={() => openShareDialog(a)}>
+                            {a.is_shareable ? 'Sharing…' : 'Share'}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -163,6 +199,28 @@ export const MaintenanceManagerWorkflow = () => {
           <PreventiveMaintenanceScheduler />
         </TabsContent>
       </Tabs>
+
+      {/* Share machine with other institutions */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Share "{shareAsset?.asset_name}"</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Other verified institutions will see this machine in the Shared Equipment directory
+            (name, location and terms only — never your costs or internal notes) and can request usage.
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1"><Label>Terms of use</Label><Textarea value={shareTerms} onChange={e => setShareTerms(e.target.value)} rows={3} placeholder="e.g. Weekdays 8:00–17:00, operator included, 48h notice required" /></div>
+            <div className="space-y-1"><Label>Usage fee (K, optional)</Label><Input value={shareRate} onChange={e => setShareRate(e.target.value.replace(/[^0-9.]/g, ''))} inputMode="decimal" placeholder="0 = free" /></div>
+          </div>
+          <div className="flex gap-2">
+            {shareAsset?.is_shareable ? (
+              <Button variant="outline" className="flex-1" onClick={() => saveShare(false)}>Stop sharing</Button>
+            ) : (
+              <Button className="flex-1" onClick={() => saveShare(true)}>Share machine</Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -36,6 +36,9 @@ export interface Asset {
   status: string;
   condition: string;
   next_maintenance_date: string | null;
+  is_shareable?: boolean;
+  share_terms?: string | null;
+  share_rate?: number | null;
   created_at: string;
 }
 
@@ -155,8 +158,19 @@ export function useMaintenanceModule() {
     } catch (err: any) { toast.error(err.message); return null; }
   };
 
+  /** Update an asset (e.g. shareable flag, terms, rate). RLS restricts to own staff. */
+  const updateAsset = async (id: string, data: Partial<Asset> & { is_shareable?: boolean; share_terms?: string | null; share_rate?: number | null }) => {
+    try {
+      const { error } = await (supabase.from('asset_register' as any) as any)
+        .update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) throw error;
+      // Optimistic local update for zero-latency feel (realtime will confirm)
+      setAssets((prev) => prev.map((a) => (a.id === id ? { ...a, ...data } : a)));
+    } catch (err: any) { toast.error(err.message); throw err; }
+  };
+
   const openOrders = workOrders.filter(w => !['completed', 'cancelled'].includes(w.status));
   const criticalOrders = workOrders.filter(w => w.priority === 'critical' && !['completed', 'cancelled'].includes(w.status));
 
-  return { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, refetch: fetchAll, realtimeLive };
+  return { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset, updateAsset, refetch: fetchAll, realtimeLive };
 }
