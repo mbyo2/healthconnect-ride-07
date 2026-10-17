@@ -168,8 +168,6 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   const totalRevenue = invoices?.reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const pendingAmount = invoices?.filter((i: any) => i.payment_status === "pending").reduce((s: number, i: any) => s + (i.balance || 0), 0) || 0;
-  const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
-  const pendingAmount = invoices?.filter((i: any) => i.payment_status === "pending").reduce((s: number, i: any) => s + (i.balance || 0), 0) || 0;
 
   const generateInvoice = async () => {
     if (!selectedPatientId || !amount) return;
