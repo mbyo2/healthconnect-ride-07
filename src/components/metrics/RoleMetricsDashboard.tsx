@@ -1,4 +1,5 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -607,6 +608,215 @@ export function AdminMetricsDashboard() {
 
 import { Stethoscope } from "lucide-react";
 
+// ── Nurse Metrics ──────────────────────────────────────────────────
+// Priority: 1) Triage/vitals today 2) Queue 3) Vaccinations 4) ANC visits
+
+export function NurseMetricsDashboard() {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: vitals } = useQuery({
+    queryKey: ['nurse-vitals', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('vital_signs' as any)
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+      return count || 0;
+    },
+  });
+  const { data: vaccinations } = useQuery({
+    queryKey: ['nurse-vaccinations', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('immunizations' as any)
+        .select('id', { count: 'exact', head: true })
+        .not('administered_date', 'is', null)
+        .gte('administered_date', fromISO).lte('administered_date', toISO);
+      return count || 0;
+    },
+  });
+  const { data: anc } = useQuery({
+    queryKey: ['nurse-anc', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('anc_visits' as any)
+        .select('id', { count: 'exact', head: true })
+        .gte('visit_date', fromISO).lte('visit_date', toISO);
+      return count || 0;
+    },
+  });
+  const { data: queueWaiting } = useQuery({
+    queryKey: ['nurse-queue'],
+    queryFn: async () => {
+      const { count } = await supabase.from('queue_tokens' as any)
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'waiting');
+      return count || 0;
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Vitals Recorded" value={vitals || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Vaccinations Given" value={vaccinations || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="ANC Visits" value={anc || 0} icon={Heart} iconColor="text-pink-500" />
+        <MetricsCard label="Queue Waiting" value={queueWaiting || 0} icon={Clock} iconColor="text-warning-500" subtitle="Right now" />
+      </div>
+    </div>
+  );
+}
+
+// ── Receptionist / Front-Office Metrics ────────────────────────────
+// Priority: 1) Check-ins today 2) Queue 3) No-shows 4) Appointments
+
+export function ReceptionistMetricsDashboard() {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: checkins } = useQuery({
+    queryKey: ['recep-checkins', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('queue_tokens' as any)
+        .select('id', { count: 'exact', head: true })
+        .gte('check_in_time', fromISO).lte('check_in_time', `${toISO}T23:59:59`);
+      return count || 0;
+    },
+  });
+  const { data: noShows } = useQuery({
+    queryKey: ['recep-noshow', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('appointments' as any)
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'no_show')
+        .gte('date', fromISO).lte('date', toISO);
+      return count || 0;
+    },
+  });
+  const { data: appointments } = useQuery({
+    queryKey: ['recep-appts', fromISO, toISO],
+    queryFn: async () => {
+      const { count } = await supabase.from('appointments' as any)
+        .select('id', { count: 'exact', head: true })
+        .gte('date', fromISO).lte('date', toISO);
+      return count || 0;
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Check-ins" value={checkins || 0} icon={UserCheck} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Appointments" value={appointments || 0} icon={CalendarCheck} iconColor="text-success-500" />
+        <MetricsCard label="No-Shows" value={noShows || 0} icon={AlertTriangle} iconColor="text-destructive" />
+        <MetricsCard label="No-Show Rate" value={appointments ? `${Math.round(((noShows || 0) / appointments) * 100)}%` : '—'} icon={TrendingUp} iconColor="text-warning-500" />
+      </div>
+    </div>
+  );
+}
+
+// ── Finance / Billing Metrics ──────────────────────────────────────
+// Priority: 1) Revenue 2) Collected 3) Outstanding 4) Claims
+
+export function FinanceMetricsDashboard() {
+  const { formatPrice } = useCurrency();
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: invoices } = useQuery({
+    queryKey: ['finance-invoices', fromISO, toISO],
+    queryFn: async () => {
+      const { data } = await supabase.from('hospital_billing' as any)
+        .select('total_amount, balance, payment_status')
+        .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+      const rows = (data as any[]) || [];
+      return {
+        billed: rows.reduce((s, r) => s + (Number(r.total_amount) || 0), 0),
+        outstanding: rows.reduce((s, r) => s + (Number(r.balance) || 0), 0),
+        count: rows.length,
+      };
+    },
+  });
+  const { data: claims } = useQuery({
+    queryKey: ['finance-claims', fromISO, toISO],
+    queryFn: async () => {
+      const { data } = await supabase.from('insurance_claims' as any)
+        .select('claim_amount, status')
+        .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+      const rows = (data as any[]) || [];
+      return {
+        total: rows.reduce((s, r) => s + (Number(r.claim_amount) || 0), 0),
+        pending: rows.filter((r) => r.status === 'submitted').length,
+      };
+    },
+  });
+
+  const billed = invoices?.billed || 0;
+  const outstanding = invoices?.outstanding || 0;
+  const collected = billed - outstanding;
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Total Billed" value={formatPrice(billed)} icon={DollarSign} iconColor="text-primary-500" subtitle={`${invoices?.count || 0} invoices`} />
+        <MetricsCard label="Collected" value={formatPrice(collected)} icon={CheckCircle2} iconColor="text-success-500" subtitle={billed ? `${Math.round((collected / billed) * 100)}% of billed` : ''} />
+        <MetricsCard label="Outstanding" value={formatPrice(outstanding)} icon={AlertTriangle} iconColor="text-destructive" />
+        <MetricsCard label="Claims Pending" value={claims?.pending || 0} icon={FileText} iconColor="text-warning-500" subtitle={formatPrice(claims?.total || 0)} />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Collection Rate" description="Collected vs outstanding">
+          <MetricsDonutChart data={[
+            { name: 'Collected', value: collected },
+            { name: 'Outstanding', value: outstanding },
+          ]} />
+        </ChartCard>
+      </div>
+    </div>
+  );
+}
+
+// ── Shared dashboard filter bar ────────────────────────────────────
+
+function DashboardFilters({ from, to, setFrom, setTo }: {
+  from: string; to: string; setFrom: (v: string) => void; setTo: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl border border-border bg-card">
+      <span className="text-xs font-semibold text-muted-foreground mr-1">Period:</span>
+      <input
+        type="date"
+        value={from}
+        onChange={(e) => setFrom(e.target.value)}
+        className="text-xs px-2.5 py-1.5 rounded-lg border border-border bg-background"
+        aria-label="From date"
+      />
+      <span className="text-xs text-muted-foreground">→</span>
+      <input
+        type="date"
+        value={to}
+        onChange={(e) => setTo(e.target.value)}
+        className="text-xs px-2.5 py-1.5 rounded-lg border border-border bg-background"
+        aria-label="To date"
+      />
+      {(from || to) && (
+        <button
+          onClick={() => { setFrom(''); setTo(''); }}
+          className="text-xs font-medium text-primary-500 hover:underline ml-1"
+        >
+          Reset
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function RoleMetricsDashboard() {
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
 
@@ -619,12 +829,24 @@ export function RoleMetricsDashboard() {
   const isInstitution = availableRoles.some(r =>
     ["institution_admin", "institution_staff"].includes(r)
   );
+  const isNurse = availableRoles.some(r =>
+    ["nurse", "midwife", "nurse_assistant"].includes(r)
+  );
+  const isReceptionist = availableRoles.some(r =>
+    ["receptionist", "front_office", "medical_records_officer"].includes(r)
+  );
+  const isFinance = availableRoles.some(r =>
+    ["finance_manager", "accountant", "billing_staff", "cashier"].includes(r)
+  );
 
-  // Priority order: Admin > Institution > Pharmacy > Lab > Provider > Patient
+  // Priority order: Admin > Institution > Finance > Pharmacy > Lab > Nurse > Receptionist > Provider > Patient
   if (isAdmin) return <AdminMetricsDashboard />;
   if (isInstitution) return <InstitutionMetricsDashboard />;
+  if (isFinance) return <FinanceMetricsDashboard />;
   if (isPharmacy) return <PharmacyMetricsDashboard />;
   if (isLab) return <LabMetricsDashboard />;
+  if (isNurse) return <NurseMetricsDashboard />;
+  if (isReceptionist) return <ReceptionistMetricsDashboard />;
   if (isHealthPersonnel) return <ProviderMetricsDashboard />;
   if (isPatient) return <PatientMetricsDashboard />;
 
