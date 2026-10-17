@@ -178,10 +178,22 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
   const inConsultation = todayQueue.filter(p => p.status === 'serving').length;
   const completed = todayQueue.filter(p => p.status === 'completed').length;
 
-  const filteredQueue = todayQueue.filter(p =>
-    p.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.token_number?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const filteredQueue = todayQueue.filter(p => {
+    const matchesSearch =
+      p.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.token_number?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Frappe-style quick filter chips with live counts.
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: todayQueue.length };
+    for (const t of todayQueue) counts[t.status] = (counts[t.status] || 0) + 1;
+    return counts;
+  }, [todayQueue]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -246,6 +258,23 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                 <UserPlus className="h-4 w-4 mr-2" /> Register Patient
               </Button>
             </div>
+          </div>
+          {/* Quick filters — Frappe list-view style */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {(['all', 'waiting', 'serving', 'completed', 'cancelled'] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                  statusFilter === s
+                    ? 'bg-primary-500 text-white border-primary-500'
+                    : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+                }`}
+              >
+                {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+                <span className="ml-1.5 opacity-70">{statusCounts[s] || 0}</span>
+              </button>
+            ))}
           </div>
         </CardHeader>
         <CardContent>

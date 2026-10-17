@@ -6,12 +6,20 @@ import { HeaderControls } from '../navigation/HeaderControls';
 import { MobileNavigation } from '../navigation/MobileNavigation';
 import { DesktopNavigation } from '../navigation/DesktopNavigation';
 import { RoleSwitcher } from '../auth/RoleSwitcher';
+import { GlobalSearchPalette } from '../search/GlobalSearchPalette';
 import { useAuth } from '@/context/AuthContext';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  const handleSearchNavigate = (hit: { kind: string; id: string }) => {
+    if (hit.kind === 'patient') navigate(`/patients/${hit.id}`);
+    else if (hit.kind === 'invoice') navigate(`/billing?invoice=${hit.id}`);
+    else if (hit.kind === 'appointment') navigate(`/appointments?highlight=${hit.id}`);
+    else if (hit.kind === 'queue') navigate(`/queue?token=${hit.id}`);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b w-full">
@@ -24,6 +32,7 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center gap-2 flex-shrink-0">
+          {isAuthenticated && <GlobalSearchPalette onNavigate={handleSearchNavigate} />}
           {isAuthenticated && <RoleSwitcher />}
           <HeaderControls 
             isMenuOpen={isMenuOpen} 
