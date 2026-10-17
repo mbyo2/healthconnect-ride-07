@@ -341,13 +341,12 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
     load();
   }, [load]);
 
-  // One-click starter charge book: loads the institution's COUNTRY defaults
-  // (country_default_tariffs) so a Kenyan facility gets KES prices, a
-  // Zambian one gets Kwacha prices, etc. Falls back to the bundled
-  // Zambian book if the country has no seeded tariffs yet.
-  // Also upgrades facilities that loaded the original 11-item starter set
-  // (codes T-101..T-602): those legacy rows are removed first so the book
-  // doesn't carry duplicates. Custom rows are untouched.
+  // One-click starter charge book: loads the institution's COUNTRY defaults.
+  // Resolution: (1) country-seeded tariffs (country_default_tariffs);
+  // (2) smart conversion of the Zambia base book to local price levels
+  // using the country's USD rate + World Bank income-level multiplier;
+  // (3) bundled Zambia book as final fallback.
+  // Institutions always customize afterwards — these are starting defaults.
   const loadStarterTariffs = async () => {
     if (!institutionId) return;
     setSeeding(true);
@@ -356,16 +355,20 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       const { data: inst } = await supabase.from('healthcare_institutions').select('country_code').eq('id', institutionId).single();
       const countryCode = (inst as any)?.country_code || 'ZM';
 
-      // Prefer country-seeded defaults; fall back to bundled Zambia book.
+      // Country config for currency + conversion.
+      const { data: cfg } = await supabase.from('country_configurations').select('country_name, usd_reference_rate, income_level, currency_code').eq('country_code', countryCode).single();
+      const countryName = (cfg as any)?.country_name || countryCode;
+
+      // Prefer country-seeded defaults.
       let source: ServiceTariff[] = DEFAULT_TARIFFS;
       let sourceLabel = 'Zambia';
+      let converted = false;
       const { data: countryTariffs } = await supabase
         .from('country_default_tariffs' as any)
         .select('code, name, category, department, base_price, cost_price, insurance_price')
         .eq('country_code', countryCode);
       if (countryTariffs && countryTariffs.length > 0) {
-        const { data: cfg } = await supabase.from('country_configurations').select('country_name').eq('country_code', countryCode).single();
-        sourceLabel = (cfg as any)?.country_name || countryCode;
+        sourceLabel = countryName;
         source = (countryTariffs as any[]).map((r: any, i: number) => ({
           id: `C-${countryCode}-${i}`,
           code: r.code,
@@ -376,6 +379,22 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
           costPrice: Number(r.cost_price) || 0,
           insurancePrice: r.insurance_price != null ? Number(r.insurance_price) : undefined,
           isAvailable: true,
+        }));
+      } else if (countryCode !== 'ZM' && cfg) {
+        // Smart conversion: Zambia Kwacha -> local currency at price levels
+        // appropriate to the country's income level. Marked as estimates;
+        // the institution adjusts to their real fees.
+        const usdRate = Number((cfg as any).usd_reference_rate) || 1;
+        const incomeMult: Record<string, number> = { low: 1.0, lower_middle: 1.8, upper_middle: 3.5, high: 8.0 };
+        const mult = incomeMult[(cfg as any).income_level] ?? 1.8;
+        const factor = (usdRate / 23.0) * mult;
+        sourceLabel = `${countryName} (converted)`;
+        converted = true;
+        source = DEFAULT_TARIFFS.map((t) => ({
+          ...t,
+          basePrice: Math.round(t.basePrice * factor),
+          costPrice: Math.round((t.costPrice || 0) * factor),
+          insurancePrice: t.insurancePrice ? Math.round(t.insurancePrice * factor) : undefined,
         }));
       }
 
@@ -391,12 +410,12 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
         base_price: t.basePrice,
         cost_price: t.costPrice || 0,
         insurance_price: t.insurancePrice ?? Math.round(t.basePrice * 1.15),
-        currency,
+        currency: (cfg as any)?.currency_code || currency,
         is_active: true,
       }));
       const { error } = await supabase.from('service_tariffs' as any).upsert(rows, { onConflict: 'institution_id,code' });
       if (error) throw error;
-      toast.success(`Loaded ${rows.length} ${sourceLabel} starter tariffs — adjust them to your fees`);
+      toast.success(`Loaded ${rows.length} ${sourceLabel} starter tariffs${converted ? ' — review prices for your market' : ' — adjust them to your fees'}`);
       load();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to load starter tariffs');
