@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.optical_prescriptions (
   os_sphere NUMERIC,
   os_cylinder NUMERIC,
   os_axis INTEGER CHECK (os_axis IS NULL OR (os_axis >= 0 AND os_axis <= 180)),
-  pd NUMERIC COMMENT 'Pupillary distance in mm',
+  pd NUMERIC,
   notes TEXT,
   status TEXT NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'expired', 'superseded')),
