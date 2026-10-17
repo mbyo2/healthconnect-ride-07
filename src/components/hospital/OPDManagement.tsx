@@ -14,6 +14,7 @@ import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { HospitalPatientSelect } from './HospitalPatientSelect';
+import { StaffSelect } from './StaffSelect';
 import { DepartmentSelect } from './DepartmentSelect';
 
 interface OPDProps {
@@ -378,10 +379,14 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                 required
                 placeholder="Select department"
               />
-              <div className="space-y-2">
-                <Label>Consulting Doctor</Label>
-                <Input value={newPatient.doctor} onChange={e => setNewPatient(p => ({ ...p, doctor: e.target.value }))} placeholder="Doctor name" />
-              </div>
+              <StaffSelect
+                hospitalId={hospital?.id}
+                value={newPatient.doctor}
+                onChange={(v) => setNewPatient(p => ({ ...p, doctor: v }))}
+                label="Consulting Doctor"
+                placeholder="Select doctor"
+                roleFilter={['doctor', 'medical_officer', 'specialist', 'consultant']}
+              />
             </div>
             <div className="border-t pt-4">
               <Label className="text-sm font-semibold mb-3 block">Vitals (Triage)</Label>

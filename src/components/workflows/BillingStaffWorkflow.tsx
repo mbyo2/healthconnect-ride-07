@@ -65,10 +65,12 @@ export const BillingStaffWorkflow = () => {
 
       if (profiles && profiles.length > 0) {
         const patientId = profiles[0].id;
-        const [apptsRes, labsRes, rxsRes] = await Promise.all([
+        const [apptsRes, labsRes, rxsRes, insRes] = await Promise.all([
           supabase.from("appointments").select("id, type, date").eq("patient_id", patientId).eq("status", "completed"),
           supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
           supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
+          // Auto-fill insurance from the patient's latest verification — never re-typed.
+          supabase.from("insurance_verifications" as any).select("provider_name, verified_at").eq("patient_id", patientId).order("verified_at", { ascending: false }).limit(1),
         ]);
 
         // Prices resolve from the institution tariff book — never invented.
@@ -104,7 +106,15 @@ export const BillingStaffWorkflow = () => {
         });
 
         if (fetchedItems.length > 0) {
-          setInvoiceForm((prev) => ({ ...prev, items: fetchedItems }));
+          setInvoiceForm((prev) => {
+            const update: any = { ...prev, items: fetchedItems };
+            // Auto-fill insurance provider from verification — staff never re-types it.
+            const ins = (insRes.data as any[])?.[0];
+            if (ins?.provider_name && !prev.insurance_provider) {
+              update.insurance_provider = ins.provider_name;
+            }
+            return update;
+          });
           if (needsRate.length > 0) {
             toast.warning(
               `Auto-filled ${fetchedItems.length} items — ${needsRate.length} need${needsRate.length === 1 ? "s" : ""} a rate: ${needsRate.slice(0, 3).join(", ")}${needsRate.length > 3 ? "…" : ""}`
