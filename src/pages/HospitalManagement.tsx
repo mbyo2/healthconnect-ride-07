@@ -25,6 +25,7 @@ import { InsuranceTPA } from "@/components/hospital/InsuranceTPA";
 import { DayCareManagement } from "@/components/hospital/DayCareManagement";
 import { EmergencyTriage } from "@/components/hospital/EmergencyTriage";
 import { MISReports } from "@/components/hospital/MISReports";
+import { ReportCenter } from "@/components/reports/ReportCenter";
 import { PatientQueue } from "@/components/hospital/PatientQueue";
 import { ReferralManagement } from "@/components/hospital/ReferralManagement";
 import { BloodBank } from "@/components/hospital/BloodBank";
@@ -304,7 +305,7 @@ export const HospitalManagement = () => {
             <TabsContent value="insurance">{mod("insurance", <InsuranceTPA hospital={hospital} />)}</TabsContent>
             <TabsContent value="discharge">{mod("discharge", <DischargeSummary hospital={hospital} admissions={admissions} />)}</TabsContent>
             <TabsContent value="staff">{mod("staff", <StaffRoster hospital={hospital} departments={departments} />)}</TabsContent>
-            <TabsContent value="mis">{mod("mis", <MISReports hospital={hospital} />)}</TabsContent>
+            <TabsContent value="mis">{mod("mis", <ReportCenter hospital={hospital} />)}</TabsContent>
 
           </div>
         </Tabs>
