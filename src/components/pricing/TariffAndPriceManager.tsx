@@ -236,6 +236,14 @@ export async function fetchInstitutionTariffs(institutionId: string): Promise<Se
  * Resolve a charge from the tariff book: prefer a name match inside the
  * category, else the first active tariff of that category, else fallback.
  */
+/**
+ * Normalize text for fuzzy tariff matching: lowercase, collapse all
+ * separators (spaces, hyphens, em dashes, slashes) to single spaces.
+ */
+function norm(s: string): string {
+  return s.toLowerCase().replace(/[-–—/_,.()]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export function resolveTariffPrice(
   tariffs: ServiceTariff[],
   category: ServiceTariff['category'],
@@ -245,11 +253,25 @@ export function resolveTariffPrice(
   const inCategory = tariffs.filter((t) => t.category === category && t.isAvailable);
   if (inCategory.length === 0) return fallback;
   if (nameHint) {
-    const needle = nameHint.toLowerCase();
-    const hit = inCategory.find(
-      (t) => t.name.toLowerCase().includes(needle) || needle.includes(t.name.toLowerCase())
-    );
-    if (hit) return hit.basePrice;
+    const needle = norm(nameHint);
+    // Best match: tariff whose normalized name contains all words of the hint.
+    // Prefer the closest word-count (fewest extra words) so "X-Ray chest"
+    // hits "X-Ray — Chest" and a bare "X-Ray" doesn't land on the priciest
+    // specific scan.
+    const words = needle.split(" ").filter(Boolean);
+    let best: ServiceTariff | null = null;
+    let bestExtra = Infinity;
+    for (const t of inCategory) {
+      const hayWords = norm(t.name).split(" ").filter(Boolean);
+      if (words.every((w) => hayWords.some((hw) => hw.includes(w) || w.includes(hw)))) {
+        const extra = hayWords.length - words.length;
+        if (extra < bestExtra) {
+          bestExtra = extra;
+          best = t;
+        }
+      }
+    }
+    if (best) return best.basePrice;
   }
   return inCategory[0].basePrice;
 }

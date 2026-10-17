@@ -108,7 +108,9 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         const bedType = (a.bed?.bed_type || 'general').toString();
         const admittedAt = new Date(a.admission_date).getTime();
         const days = Math.max(1, Math.ceil((Date.now() - admittedAt) / 86400000));
-        const perDay = resolveTariffPrice(tariffs, 'ward', bedType.replace(/_/g, ' '), 0);
+        // Hint variants: "semi_private" -> "semi-private" to match tariff names like "Semi-Private Room".
+        const hint = bedType.replace(/_/g, '-');
+        const perDay = resolveTariffPrice(tariffs, 'ward', hint, resolveTariffPrice(tariffs, 'ward', bedType.replace(/_/g, ' '), 0));
         if (perDay > 0 && days > 0) {
           const fee = perDay * days;
           calculatedTotal += fee;
@@ -118,16 +120,17 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       });
       // ANC visits: each antenatal contact bills as a consultation.
       ((ancRes.data || []) as any[]).forEach((v: any) => {
-        const fee = resolveTariffPrice(tariffs, 'opd', 'ANC', 200);
+        const fee = resolveTariffPrice(tariffs, 'other', 'ANC', resolveTariffPrice(tariffs, 'opd', 'ANC', 200));
         if (fee > 0) {
           calculatedTotal += fee;
           charges.push({ category: "Maternal & Child Health", description: `ANC Visit #${v.visit_number || '?'}`, amount: fee, date: v.visit_date, selected: true });
         }
       });
-      // Administered immunizations: each dose bills from the tariff book.
+      // Administered immunizations: specific vaccine price if set, else the
+      // standard vaccination administration fee.
       ((immRes.data || []) as any[]).forEach((im: any) => {
         const label = `${im.vaccine_name || 'Vaccine'} (Dose ${im.dose_number ?? '?'})`;
-        const fee = resolveTariffPrice(tariffs, 'other', im.vaccine_name, 0);
+        const fee = resolveTariffPrice(tariffs, 'other', im.vaccine_name, resolveTariffPrice(tariffs, 'other', 'vaccination', 0));
         if (fee > 0) {
           calculatedTotal += fee;
           charges.push({ category: "Maternal & Child Health", description: `Immunization: ${label}`, amount: fee, date: im.administered_date, selected: true });
