@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, DollarSign, CheckCircle, Loader2, Receipt, TrendingUp, AlertCircle } from "lucide-react";
@@ -169,6 +169,23 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const pendingAmount = invoices?.filter((i: any) => i.payment_status === "pending").reduce((s: number, i: any) => s + (i.balance || 0), 0) || 0;
 
+  // Frappe-style quick filters for the invoice list.
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<string>('all');
+  const [invoiceSearch, setInvoiceSearch] = useState('');
+  const invoiceStatusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: invoices?.length || 0 };
+    for (const inv of invoices || []) counts[inv.payment_status] = (counts[inv.payment_status] || 0) + 1;
+    return counts;
+  }, [invoices]);
+  const filteredInvoices = (invoices || []).filter((inv: any) => {
+    const matchesStatus = invoiceStatusFilter === 'all' || inv.payment_status === invoiceStatusFilter;
+    const q = invoiceSearch.toLowerCase();
+    const matchesSearch = !q ||
+      inv.invoice_number?.toLowerCase().includes(q) ||
+      `${inv.patient?.first_name || ''} ${inv.patient?.last_name || ''}`.toLowerCase().includes(q);
+    return matchesStatus && matchesSearch;
+  });
+
   const generateInvoice = async () => {
     if (!selectedPatientId || !amount) return;
     setIsSubmitting(true);
@@ -280,7 +297,33 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       </div>
 
       {/* Invoices Table — grouped list style, hairline dividers */}
-      {invoices && invoices.length > 0 ? (
+      {/* Quick filters — Frappe list-view style */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {(['all', 'pending', 'partial', 'paid'] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setInvoiceStatusFilter(s)}
+            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+              invoiceStatusFilter === s
+                ? 'bg-primary-500 text-white border-primary-500'
+                : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+            }`}
+          >
+            {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+            <span className="ml-1.5 opacity-70">{invoiceStatusCounts[s] || 0}</span>
+          </button>
+        ))}
+        <div className="relative ml-auto">
+          <input
+            type="search"
+            value={invoiceSearch}
+            onChange={(e) => setInvoiceSearch(e.target.value)}
+            placeholder="Search invoice or patient…"
+            className="text-xs pl-3 pr-3 py-1.5 rounded-full border border-border bg-muted/50 outline-none focus:bg-background w-48"
+          />
+        </div>
+      </div>
+      {filteredInvoices.length > 0 ? (
         <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
@@ -295,7 +338,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {invoices.map((inv: any) => (
+              {filteredInvoices.map((inv: any) => (
                 <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100">{inv.invoice_number}</td>
                   <td className="py-3 px-3 font-medium text-primary-600 dark:text-primary-400">{inv.patient?.first_name} {inv.patient?.last_name}</td>

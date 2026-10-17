@@ -90,11 +90,25 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
     fetchStock();
   }, [fetchStock]);
 
-  const filteredStock = stock.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.batchNo.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [stockFilter, setStockFilter] = useState<string>('all');
+  const filteredStock = stock.filter((s) => {
+    const matchesSearch =
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.batchNo.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStock =
+      stockFilter === 'all' ||
+      (stockFilter === 'in_stock' && s.stock > 10) ||
+      (stockFilter === 'low' && s.stock > 0 && s.stock <= 10) ||
+      (stockFilter === 'out' && s.stock <= 0);
+    return matchesSearch && matchesStock;
+  });
+  const stockCounts = {
+    all: stock.length,
+    in_stock: stock.filter((s) => s.stock > 10).length,
+    low: stock.filter((s) => s.stock > 0 && s.stock <= 10).length,
+    out: stock.filter((s) => s.stock <= 0).length,
+  };
 
   const addToCart = (item: DispensaryItem) => {
     if (item.stock <= 0) {
@@ -294,6 +308,23 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 className="pl-10 py-2.5 rounded-2xl text-xs font-medium"
               />
             </div>
+          </div>
+          {/* Stock-level filter chips — Frappe list-view style */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {([['all', 'All Stock'], ['in_stock', 'In Stock'], ['low', 'Low Stock'], ['out', 'Out of Stock']] as const).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setStockFilter(key)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                  stockFilter === key
+                    ? 'bg-primary-500 text-white border-primary-500'
+                    : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+                }`}
+              >
+                {label}
+                <span className="ml-1.5 opacity-70">{stockCounts[key as keyof typeof stockCounts]}</span>
+              </button>
+            ))}
           </div>
 
           {loading ? (

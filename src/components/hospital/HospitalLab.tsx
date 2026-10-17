@@ -171,19 +171,25 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         ))}
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
-        {["all", "pending", "sample_collected", "processing", "completed"].map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-md text-xs font-extrabold whitespace-nowrap transition-all ${
-              filter === s ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
-            }`}
-          >
-            {s === "all" ? "All Orders" : s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-          </button>
-        ))}
+      {/* Filter Chips — Frappe list-view style with live counts */}
+      <div className="flex flex-wrap gap-1.5">
+        {["all", "pending", "sample_collected", "processing", "completed"].map((s) => {
+          const count = s === "all" ? labOrders.length : labOrders.filter((o) => o.status === s).length;
+          return (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                filter === s
+                  ? "bg-primary-500 text-white border-primary-500"
+                  : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
+              }`}
+            >
+              {s === "all" ? "All Orders" : s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              <span className="ml-1.5 opacity-70">{count}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* LIMS Table */}
