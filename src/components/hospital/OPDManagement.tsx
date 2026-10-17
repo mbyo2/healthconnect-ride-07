@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from './HospitalPatientSelect';
 import { DepartmentSelect } from './DepartmentSelect';
 
 interface OPDProps {
@@ -60,6 +62,18 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
     name: '', phone: '', department: '', doctor: '',
     bp: '', temp: '', pulse: '', weight: ''
   });
+
+  // Existing patients — pick instead of re-typing (smooth-data principle).
+  const { patients: knownPatients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
+  const [selectedExistingId, setSelectedExistingId] = useState('');
+
+  const handleExistingPatientPick = (id: string) => {
+    setSelectedExistingId(id);
+    const p = knownPatients.find((k) => k.id === id);
+    if (p) {
+      setNewPatient((prev) => ({ ...prev, name: p.name }));
+    }
+  };
 
   // OPD → IPD handoff state (shared admit dialog)
   const [showAdmitDialog, setShowAdmitDialog] = useState(false);
@@ -132,6 +146,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       if (error) throw error;
 
       setNewPatient({ name: '', phone: '', department: '', doctor: '', bp: '', temp: '', pulse: '', weight: '' });
+      setSelectedExistingId('');
       setShowRegDialog(false);
       toast.success(`Token issued for ${newPatient.name}`);
       refresh();
@@ -329,6 +344,19 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
             <DialogTitle>OPD Patient Registration</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Returning patient? Pick them — no re-typing. */}
+            {knownPatients.length > 0 && (
+              <div className="p-3 rounded-xl bg-primary-50 dark:bg-primary-950/30 border border-primary-200 dark:border-primary-800">
+                <HospitalPatientSelect
+                  patients={knownPatients}
+                  loading={patientsLoading}
+                  value={selectedExistingId}
+                  onChange={handleExistingPatientPick}
+                  label="Returning patient (pick instead of typing)"
+                  emptyHint=""
+                />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Patient Name *</Label>
