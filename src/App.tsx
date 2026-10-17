@@ -58,6 +58,7 @@ const Testing = lazyWithRetry(() => import('@/pages/Testing'));
 const Documentation = lazyWithRetry(() => import('@/pages/Documentation'));
 const UserMarketplace = lazyWithRetry(() => import('@/pages/UserMarketplace'));
 const Emergency = lazyWithRetry(() => import('@/pages/Emergency'));
+const FHIRExchanges = lazyWithRetry(() => import('@/pages/FHIRExchanges'));
 const PharmacyPortal = lazyWithRetry(() => import('@/pages/PharmacyPortal'));
 const Marketplace = lazyWithRetry(() => import('@/pages/Marketplace'));
 const ProviderDashboard = lazyWithRetry(() => import('@/pages/ProviderDashboard'));
@@ -264,6 +265,7 @@ const AppContent = () => {
             {/* search is now public above */}
             <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
             <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
+            <Route path="/fhir-exchanges" element={<RouteGuard><FHIRExchanges /></RouteGuard>} />
             <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
             <Route path="/super-admin-dashboard" element={<RouteGuard requireRoles={["super_admin"]}><SuperAdminDashboard /></RouteGuard>} />
             <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyInventory /></RouteGuard>} />

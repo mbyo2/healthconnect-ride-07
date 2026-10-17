@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CrossSystemExchange } from "./CrossSystemExchange";
 import {
   Select,
   SelectContent,
@@ -245,6 +246,11 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
         <pre className="overflow-x-auto max-h-[480px] leading-relaxed scrollbar-thin scrollbar-thumb-slate-700">
           {jsonString}
         </pre>
+      </div>
+
+      {/* Cross-system exchange — send records to external FHIR servers */}
+      <div className="mt-6">
+        <CrossSystemExchange institutionId={institutionId} />
       </div>
     </div>
   );
