@@ -138,26 +138,72 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     setIsSubmitting(true);
     try {
       const total = Number(amount);
-      let insuranceClaimId = null;
+      // Split payer allocation: insurer covers coverage%, patient covers the
+      // rest (copay / shortfall). Cash bills: patient owes 100%.
       let paymentStatus: string = "pending";
+      let patientPortion = total;
+      let insurerPortion = 0;
+      let insuranceProvider: string | null = null;
+      let insurancePolicyNumber: string | null = null;
       if (selectedVerification) {
         const coverage = selectedVerification.coverage_percentage || 0;
+        insurerPortion = Math.round((total * coverage) / 100 * 100) / 100;
+        patientPortion = Math.round((total - insurerPortion) * 100) / 100;
+        insuranceProvider = selectedVerification.coverage_details?.provider || null;
         if (coverage >= 100) paymentStatus = "paid";
-        insuranceClaimId = selectedVerification.id;
       }
       const invoiceNumber = `INV-${Date.now().toString(36).toUpperCase()}`;
       // NOTE: balance is a GENERATED column — do not insert it explicitly (error 428C9)
-      const { error } = await supabase.from("hospital_billing" as any).insert({
+      const { data: invData, error } = await supabase.from("hospital_billing" as any).insert({
         hospital_id: hospital.id, patient_id: selectedPatientId, invoice_number: invoiceNumber,
-        total_amount: total, subtotal: total, insurance_claim_id: insuranceClaimId,
-        items: [{ description: description || "Hospital services", amount: total }],
+        total_amount: total, subtotal: total,
+        patient_portion: patientPortion, insurer_portion: insurerPortion,
+        insurance_provider: insuranceProvider, insurance_policy_number: insurancePolicyNumber,
+        items: pendingPatientCharges.length > 0
+          ? pendingPatientCharges.map((c: any) => ({ description: c.description, amount: c.amount, category: c.category }))
+          : [{ description: description || "Hospital services", amount: total }],
         payment_status: paymentStatus,
         due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
-      });
+      }).select("id").single();
       if (error) throw error;
-      toast.success(`Invoice ${invoiceNumber} generated`);
+
+      // Auto-create the insurance claim so billing flows straight into the
+      // claims workbench — no manual re-entry. Best-effort: a claim failure
+      // must never block the invoice.
+      let insuranceClaimId: string | null = null;
+      if (selectedVerification && insurerPortion > 0 && invData) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          const adm = (admissions || []).find((a: any) => a.patient_id === selectedPatientId);
+          const patientName = adm?.patient ? `${adm.patient.first_name || ""} ${adm.patient.last_name || ""}`.trim() : "Patient";
+          const { data: claimData, error: claimError } = await supabase.from("insurance_claims").insert({
+            institution_id: hospital.id,
+            hospital_billing_id: (invData as any).id,
+            patient_id: selectedPatientId,
+            patient_name: patientName,
+            insurance_provider: insuranceProvider || "Unknown",
+            policy_number: insurancePolicyNumber || "",
+            claim_amount: insurerPortion,
+            status: "submitted",
+            created_by: user?.id || selectedPatientId,
+          } as any).select("id").single();
+          if (!claimError && claimData) {
+            insuranceClaimId = (claimData as any).id;
+            await supabase.from("hospital_billing" as any).update({ insurance_claim_id: insuranceClaimId }).eq("id", (invData as any).id);
+          }
+        } catch (claimErr) {
+          console.error("Auto-claim creation failed (invoice kept):", claimErr);
+        }
+      }
+
+      toast.success(
+        insuranceClaimId
+          ? `Invoice ${invoiceNumber} generated — claim filed for ${insuranceProvider}`
+          : `Invoice ${invoiceNumber} generated`
+      );
       setShowDialog(false);
       setSelectedPatientId(""); setAmount(""); setDescription(""); setSelectedVerification(null);
+      setPendingPatientCharges([]);
       onRefresh();
     } catch (error) {
       toast.error("Failed to generate invoice");
