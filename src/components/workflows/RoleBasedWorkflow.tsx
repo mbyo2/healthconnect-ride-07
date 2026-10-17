@@ -12,6 +12,7 @@ import { AdminWorkflow } from './AdminWorkflow';
 import { InstitutionAdminWorkflow } from './InstitutionAdminWorkflow';
 import { InstitutionStaffWorkflow } from './InstitutionStaffWorkflow';
 import { PharmacyWorkflow } from './PharmacyWorkflow';
+import { WholesalePharmacyWorkflow } from './WholesalePharmacyWorkflow';
 import { PharmacistWorkflow } from './PharmacistWorkflow';
 import { LabWorkflow } from './LabWorkflow';
 import { LabTechnicianWorkflow } from './LabTechnicianWorkflow';
@@ -139,7 +140,7 @@ export const RoleBasedWorkflow = () => {
       return <HealthPersonnelWorkflow />;
     }
     if (activeRole === 'wholesale_pharmacy') {
-      return <PharmacyWorkflow />;
+      return <WholesalePharmacyWorkflow />;
     }
     if (activeRole === 'medical_records_officer') {
       return <InstitutionStaffWorkflow />;
