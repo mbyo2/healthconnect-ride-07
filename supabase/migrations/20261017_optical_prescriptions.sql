@@ -3,6 +3,8 @@
 --
 -- An optician dispenses glasses/contacts from prescriptions (different
 -- from the optometrist, who performs eye exams). This migration adds:
+--   0. 'optician' value to the app_role enum (the role exists in the
+--      workflow router but was never added to the enum).
 --   1. public.optical_prescriptions — the prescription itself (OD/OS
 --      sphere/cylinder/axis, pupillary distance, notes, status).
 --   2. public.lens_orders — fulfillment tracking for frames + lenses
@@ -15,6 +17,9 @@
 --    institution; platform admin/super_admin/support can manage all.
 --  - No DELETE — history is the audit trail.
 -- ============================================================================
+
+-- 0. Register the optician role in the enum (additive, safe).
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'optician';
 
 -- 1. Optical prescriptions
 CREATE TABLE IF NOT EXISTS public.optical_prescriptions (
