@@ -40,7 +40,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes, tariffs, procRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, tariffs, procRes, imagingRes, admissionsRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
         supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
@@ -49,6 +49,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         fetchInstitutionTariffs(hospital.id),
         // Procedures / treatments executed for this patient at this facility.
         supabase.from("procedure_executions").select("id, procedure_id, execution_date, procedure:clinical_procedures(procedure_name)").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(100),
+        // Completed imaging orders (radiology) awaiting billing.
+        supabase.from("imaging_orders" as any).select("id, modality, body_part, status, ordered_at").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(100),
+        // Active admissions with bed occupancy for per-day ward charges.
+        supabase.from("hospital_admissions" as any).select("id, admission_date, bed_id, bed:hospital_beds(bed_number, bed_type)").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "admitted").limit(20),
       ]);
       // Institution procedure prices for the executions above.
       const procIds = [...new Set(((procRes.data || []) as any[]).map((p: any) => p.procedure_id).filter(Boolean))];
@@ -81,6 +85,31 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         if (fee > 0) {
           calculatedTotal += fee;
           charges.push({ category: "Clinical Procedures", description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee });
+        }
+      });
+      // Radiology: completed imaging orders priced from the tariff book by
+      // modality + body part (e.g. "CT Head", "X-Ray Chest").
+      const modalityLabel: Record<string, string> = { xray: 'X-Ray', ct: 'CT Scan', mri: 'MRI', ultrasound: 'Ultrasound', mammography: 'Mammography' };
+      ((imagingRes.data || []) as any[]).forEach((o: any) => {
+        const label = `${modalityLabel[o.modality] || o.modality} ${o.body_part || ''}`.trim();
+        const fee = resolveTariffPrice(tariffs, 'radiology', label, resolveTariffPrice(tariffs, 'radiology', modalityLabel[o.modality] || o.modality, 0));
+        if (fee > 0) {
+          calculatedTotal += fee;
+          charges.push({ category: "Radiology & Imaging", description: `Imaging: ${label}`, amount: fee });
+        }
+      });
+      // Ward & bed charges: per-day rate × days admitted for active admissions.
+      ((admissionsRes.data || []) as any[]).forEach((a: any) => {
+        if (!a.bed_id) return;
+        const bedType = (a.bed?.bed_type || 'general').toString();
+        const admittedAt = new Date(a.admission_date).getTime();
+        const days = Math.max(1, Math.ceil((Date.now() - admittedAt) / 86400000));
+        const perDay = resolveTariffPrice(tariffs, 'ward', bedType.replace(/_/g, ' '), 0);
+        if (perDay > 0 && days > 0) {
+          const fee = perDay * days;
+          calculatedTotal += fee;
+          const bedLabel = bedType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+          charges.push({ category: "Ward & Bed Charges", description: `Bed ${a.bed?.bed_number || ''} (${bedLabel}) × ${days} day${days > 1 ? 's' : ''}`.trim(), amount: fee });
         }
       });
       if (charges.length > 0) {
