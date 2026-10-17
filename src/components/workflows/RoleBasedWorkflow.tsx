@@ -28,6 +28,8 @@ import { BillingStaffWorkflow } from './BillingStaffWorkflow';
 import { InventoryManagerWorkflow } from './InventoryManagerWorkflow';
 import { TriageStaffWorkflow } from './TriageStaffWorkflow';
 import { MaintenanceManagerWorkflow } from './MaintenanceManagerWorkflow';
+import { FinanceManagerWorkflow } from './FinanceManagerWorkflow';
+import { OpticianWorkflow } from './OpticianWorkflow';
 import { SpecialistWorkflow } from './SpecialistWorkflow';
 import { DentistWorkflow } from './DentistWorkflow';
 import { OptometristWorkflow } from './OptometristWorkflow';
@@ -35,6 +37,7 @@ import { MidwifeWorkflow } from './MidwifeWorkflow';
 import { NutritionistWorkflow } from './NutritionistWorkflow';
 import { PsychologistWorkflow } from './PsychologistWorkflow';
 import { PathologistWorkflow } from './PathologistWorkflow';
+import { SuperAdminWorkflow } from './SuperAdminWorkflow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
@@ -56,7 +59,13 @@ export const RoleBasedWorkflow = () => {
   const { profile } = useAuth();
   
   const getCurrentWorkflow = () => {
-    if (isAdmin || isSuperAdmin) {
+    // SuperAdmin gets the DISTINCT platform-owner console — never the
+    // shared admin console. Platform admin and institution admin are
+    // different roles with different scopes.
+    if (isSuperAdmin) {
+      return <SuperAdminWorkflow />;
+    }
+    if (isAdmin) {
       return <AdminWorkflow />;
     }
 
@@ -83,6 +92,10 @@ export const RoleBasedWorkflow = () => {
         return <TriageStaffWorkflow />;
       case 'maintenance_manager':
         return <MaintenanceManagerWorkflow />;
+      case 'finance_manager':
+        return <FinanceManagerWorkflow />;
+      case 'optician':
+        return <OpticianWorkflow />;
       case 'specialist':
         return <SpecialistWorkflow />;
       case 'ambulance_staff':
