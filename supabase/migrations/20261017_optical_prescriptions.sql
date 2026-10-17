@@ -51,6 +51,9 @@ ALTER TABLE public.optical_prescriptions ENABLE ROW LEVEL SECURITY;
 
 -- Helper: caller is institution staff of the row's institution, or a
 -- platform role. (SECURITY DEFINER — opaque to the RLS rewriter.)
+-- NOTE: is_institution_admin / is_institution_staff_member take a single
+-- (institution_id) arg and check auth.uid() internally; in the RLS
+-- context p_user_id is always auth.uid(), so this is equivalent.
 CREATE OR REPLACE FUNCTION public.can_manage_optical(p_user_id UUID, p_institution_id UUID)
 RETURNS BOOLEAN
 LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public
@@ -60,8 +63,8 @@ AS $$
     OR public.has_role(p_user_id, 'admin'::app_role)
     OR public.has_role(p_user_id, 'support'::app_role)
     OR public.has_role(p_user_id, 'optician'::app_role)
-    OR public.is_institution_admin(p_institution_id, p_user_id)
-    OR public.is_institution_staff_member(p_institution_id, p_user_id)
+    OR public.is_institution_admin(p_institution_id)
+    OR public.is_institution_staff_member(p_institution_id)
 $$;
 
 DROP POLICY IF EXISTS "Optical staff manage prescriptions" ON public.optical_prescriptions;
