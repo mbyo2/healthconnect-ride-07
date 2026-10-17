@@ -817,18 +817,303 @@ function DashboardFilters({ from, to, setFrom, setTo }: {
   );
 }
 
+// ── Super Admin Metrics (PLATFORM-WIDE) ────────────────────────────
+// Distinct from Admin: sees EVERYTHING across all institutions.
+
+export function SuperAdminMetricsDashboard() {
+  const { formatPrice } = useCurrency();
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+
+  const { data: stats } = useQuery({
+    queryKey: ['superadmin-stats', from, to],
+    queryFn: async () => {
+      const [inst, users, subs] = await Promise.all([
+        supabase.from('healthcare_institutions').select('id', { count: 'exact', head: true }),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('institution_subscriptions' as any).select('status').eq('status', 'active'),
+      ]);
+      return {
+        institutions: inst.count || 0,
+        users: users.count || 0,
+        activeSubs: ((subs.data as any[]) || []).length,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Institutions" value={stats?.institutions || 0} icon={Building2} iconColor="text-primary-500" subtitle="Platform-wide" />
+        <MetricsCard label="Total Users" value={stats?.users || 0} icon={Users} iconColor="text-success-500" subtitle="All roles" />
+        <MetricsCard label="Active Subscriptions" value={stats?.activeSubs || 0} icon={CheckCircle2} iconColor="text-warning-500" />
+        <MetricsCard label="Platform Scope" value="Global" icon={Activity} iconColor="text-purple-500" subtitle="All countries" />
+      </div>
+    </div>
+  );
+}
+
+// ── CXO / Executive Metrics ────────────────────────────────────────
+
+export function CXOMetricsDashboard() {
+  const { formatPrice } = useCurrency();
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: kpis } = useQuery({
+    queryKey: ['cxo-kpis', fromISO, toISO],
+    queryFn: async () => {
+      const [inv, appts, adm] = await Promise.all([
+        supabase.from('hospital_billing' as any).select('total_amount').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).gte('date', fromISO).lte('date', toISO),
+        supabase.from('hospital_admissions' as any).select('id', { count: 'exact', head: true }).gte('admission_date', fromISO).lte('admission_date', toISO),
+      ]);
+      const revenue = ((inv.data as any[]) || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      return { revenue, appointments: appts.count || 0, admissions: adm.count || 0 };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Revenue" value={formatPrice(kpis?.revenue || 0)} icon={DollarSign} iconColor="text-success-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Appointments" value={kpis?.appointments || 0} icon={CalendarCheck} iconColor="text-primary-500" />
+        <MetricsCard label="Admissions" value={kpis?.admissions || 0} icon={BedDouble} iconColor="text-warning-500" />
+        <MetricsCard label="Growth" value="—" icon={TrendingUp} iconColor="text-purple-500" subtitle="vs prior period" />
+      </div>
+    </div>
+  );
+}
+
+// ── Radiologist Metrics ────────────────────────────────────────────
+
+export function RadiologistMetricsDashboard() {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: stats } = useQuery({
+    queryKey: ['radio-stats', fromISO, toISO],
+    queryFn: async () => {
+      const { data } = await supabase.from('imaging_orders' as any)
+        .select('status').gte('ordered_at', fromISO).lte('ordered_at', `${toISO}T23:59:59`);
+      const rows = (data as any[]) || [];
+      return {
+        total: rows.length,
+        pending: rows.filter((r) => r.status === 'ordered').length,
+        completed: rows.filter((r) => r.status === 'completed').length,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Imaging Orders" value={stats?.total || 0} icon={Activity} iconColor="text-primary-500" />
+        <MetricsCard label="Pending" value={stats?.pending || 0} icon={Clock} iconColor="text-warning-500" />
+        <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="Completion" value={stats?.total ? `${Math.round((stats.completed / stats.total) * 100)}%` : '—'} icon={TrendingUp} iconColor="text-purple-500" />
+      </div>
+    </div>
+  );
+}
+
+// ── HR Manager Metrics ─────────────────────────────────────────────
+
+export function HRMetricsDashboard() {
+  const { data: stats } = useQuery({
+    queryKey: ['hr-stats'],
+    queryFn: async () => {
+      const [staff, shifts] = await Promise.all([
+        supabase.from('institution_staff' as any).select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('medical_shifts' as any).select('id', { count: 'exact', head: true }).gte('shift_date', format(new Date(), 'yyyy-MM-dd')),
+      ]);
+      return { activeStaff: staff.count || 0, todayShifts: shifts.count || 0 };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Active Staff" value={stats?.activeStaff || 0} icon={Users} iconColor="text-primary-500" />
+        <MetricsCard label="Shifts Today" value={stats?.todayShifts || 0} icon={Calendar} iconColor="text-success-500" />
+        <MetricsCard label="On Leave" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
+        <MetricsCard label="Open Roles" value="—" icon={UserCheck} iconColor="text-purple-500" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
+// ── OT (Theatre) Staff Metrics ─────────────────────────────────────
+
+export function OTMetricsDashboard() {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: stats } = useQuery({
+    queryKey: ['ot-stats', fromISO, toISO],
+    queryFn: async () => {
+      const { data } = await supabase.from('procedure_executions' as any)
+        .select('id, status').gte('execution_date', fromISO).lte('execution_date', toISO);
+      const rows = (data as any[]) || [];
+      return {
+        total: rows.length,
+        completed: rows.filter((r) => r.status === 'completed').length,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Procedures" value={stats?.total || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="Theatre Utilization" value="—" icon={TrendingUp} iconColor="text-warning-500" subtitle="Coming soon" />
+        <MetricsCard label="Avg Duration" value="—" icon={Clock} iconColor="text-purple-500" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
+// ── Inventory Manager Metrics ──────────────────────────────────────
+
+export function InventoryMetricsDashboard() {
+  const { data: stats } = useQuery({
+    queryKey: ['inventory-stats'],
+    queryFn: async () => {
+      const { data } = await supabase.from('pharmacy_inventory' as any).select('quantity, reorder_level');
+      const rows = (data as any[]) || [];
+      return {
+        totalItems: rows.length,
+        lowStock: rows.filter((r) => (r.quantity || 0) <= (r.reorder_level || 10)).length,
+        outOfStock: rows.filter((r) => (r.quantity || 0) <= 0).length,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Stock Items" value={stats?.totalItems || 0} icon={Pill} iconColor="text-primary-500" />
+        <MetricsCard label="Low Stock" value={stats?.lowStock || 0} icon={AlertTriangle} iconColor="text-warning-500" />
+        <MetricsCard label="Out of Stock" value={stats?.outOfStock || 0} icon={AlertTriangle} iconColor="text-destructive" />
+        <MetricsCard label="Stock Value" value="—" icon={DollarSign} iconColor="text-success-500" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
+// ── Triage Staff Metrics ───────────────────────────────────────────
+
+export function TriageMetricsDashboard() {
+  const { data: stats } = useQuery({
+    queryKey: ['triage-stats'],
+    queryFn: async () => {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const [waiting, triaged] = await Promise.all([
+        supabase.from('queue_tokens' as any).select('id', { count: 'exact', head: true }).eq('status', 'waiting'),
+        supabase.from('vital_signs' as any).select('id', { count: 'exact', head: true }).gte('created_at', today),
+      ]);
+      return { waiting: waiting.count || 0, triagedToday: triaged.count || 0 };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Waiting for Triage" value={stats?.waiting || 0} icon={Clock} iconColor="text-warning-500" subtitle="Right now" />
+        <MetricsCard label="Triaged Today" value={stats?.triagedToday || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="Avg Wait" value="—" icon={Activity} iconColor="text-primary-500" subtitle="Coming soon" />
+        <MetricsCard label="Emergency" value="—" icon={AlertTriangle} iconColor="text-destructive" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
+// ── Ambulance Staff Metrics ────────────────────────────────────────
+
+export function AmbulanceMetricsDashboard() {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
+  const toISO = to || format(new Date(), 'yyyy-MM-dd');
+
+  const { data: stats } = useQuery({
+    queryKey: ['ambulance-stats', fromISO, toISO],
+    queryFn: async () => {
+      const { data } = await supabase.from('ambulance_trips' as any)
+        .select('status').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+      const rows = (data as any[]) || [];
+      return { total: rows.length, completed: rows.filter((r) => r.status === 'completed').length };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Trips" value={stats?.total || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="Avg Response" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
+        <MetricsCard label="Vehicles Active" value="—" icon={CheckCircle2} iconColor="text-purple-500" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
+// ── Maintenance Manager Metrics ────────────────────────────────────
+
+export function MaintenanceMetricsDashboard() {
+  const { data: stats } = useQuery({
+    queryKey: ['maintenance-stats'],
+    queryFn: async () => {
+      const [assets, tickets] = await Promise.all([
+        supabase.from('asset_register' as any).select('status'),
+        supabase.from('maintenance_tickets' as any).select('status').neq('status', 'resolved'),
+      ]);
+      const assetRows = (assets.data as any[]) || [];
+      return {
+        totalAssets: assetRows.length,
+        operational: assetRows.filter((a) => a.status === 'operational').length,
+        openTickets: ((tickets.data as any[]) || []).length,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <MetricsCard label="Total Assets" value={stats?.totalAssets || 0} icon={Activity} iconColor="text-primary-500" />
+        <MetricsCard label="Operational" value={stats?.operational || 0} icon={CheckCircle2} iconColor="text-success-500" />
+        <MetricsCard label="Open Tickets" value={stats?.openTickets || 0} icon={AlertTriangle} iconColor="text-warning-500" />
+        <MetricsCard label="Downtime" value="—" icon={Clock} iconColor="text-destructive" subtitle="Coming soon" />
+      </div>
+    </div>
+  );
+}
+
 export function RoleMetricsDashboard() {
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
 
+  const isSuperAdmin = availableRoles.includes("super_admin");
   const isPharmacy = availableRoles.some(r =>
     ["pharmacy", "wholesale_pharmacy", "pharmacist", "pharmacy_technologist"].includes(r)
   );
   const isLab = availableRoles.some(r =>
     ["lab", "lab_technician", "pathologist", "phlebotomist"].includes(r)
   );
-  const isInstitution = availableRoles.some(r =>
-    ["institution_admin", "institution_staff"].includes(r)
-  );
+  // Institution admin is DISTINCT from platform admin — facility-scoped only.
+  const isInstitutionAdmin = availableRoles.includes("institution_admin");
+  const isInstitutionStaff = availableRoles.includes("institution_staff");
   const isNurse = availableRoles.some(r =>
     ["nurse", "midwife", "nurse_assistant"].includes(r)
   );
@@ -838,15 +1123,38 @@ export function RoleMetricsDashboard() {
   const isFinance = availableRoles.some(r =>
     ["finance_manager", "accountant", "billing_staff", "cashier"].includes(r)
   );
+  const isCXO = availableRoles.includes("cxo");
+  const isRadiologist = availableRoles.includes("radiologist");
+  const isHR = availableRoles.includes("hr_manager");
+  const isOT = availableRoles.includes("ot_staff");
+  const isInventory = availableRoles.includes("inventory_manager");
+  const isTriage = availableRoles.includes("triage_staff");
+  const isAmbulance = availableRoles.includes("ambulance_staff");
+  const isMaintenance = availableRoles.includes("maintenance_manager");
+  const isSupport = availableRoles.includes("support");
 
-  // Priority order: Admin > Institution > Finance > Pharmacy > Lab > Nurse > Receptionist > Provider > Patient
+  // Priority: SuperAdmin (platform-wide) > Admin (platform) > CXO >
+  // InstitutionAdmin (facility) > Finance > Pharmacy > Lab > Radiologist >
+  // Nurse > Triage > Receptionist > OT > Inventory > Ambulance >
+  // Maintenance > HR > Support > Provider > Patient
+  if (isSuperAdmin) return <SuperAdminMetricsDashboard />;
   if (isAdmin) return <AdminMetricsDashboard />;
-  if (isInstitution) return <InstitutionMetricsDashboard />;
+  if (isCXO) return <CXOMetricsDashboard />;
+  if (isInstitutionAdmin) return <InstitutionMetricsDashboard />;
+  if (isInstitutionStaff) return <InstitutionMetricsDashboard />;
   if (isFinance) return <FinanceMetricsDashboard />;
   if (isPharmacy) return <PharmacyMetricsDashboard />;
   if (isLab) return <LabMetricsDashboard />;
+  if (isRadiologist) return <RadiologistMetricsDashboard />;
   if (isNurse) return <NurseMetricsDashboard />;
+  if (isTriage) return <TriageMetricsDashboard />;
   if (isReceptionist) return <ReceptionistMetricsDashboard />;
+  if (isOT) return <OTMetricsDashboard />;
+  if (isInventory) return <InventoryMetricsDashboard />;
+  if (isAmbulance) return <AmbulanceMetricsDashboard />;
+  if (isMaintenance) return <MaintenanceMetricsDashboard />;
+  if (isHR) return <HRMetricsDashboard />;
+  if (isSupport) return <AdminMetricsDashboard />;
   if (isHealthPersonnel) return <ProviderMetricsDashboard />;
   if (isPatient) return <PatientMetricsDashboard />;
 
