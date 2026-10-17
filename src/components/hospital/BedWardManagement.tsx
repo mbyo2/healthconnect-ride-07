@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Plus, Bed, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { DepartmentSelect } from './DepartmentSelect';
 
 interface BedWardProps {
   hospital: any;
@@ -169,17 +170,17 @@ export const BedWardManagement = ({ hospital, departments, beds, onRefresh }: Be
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Department *</Label>
-              <Select value={bedForm.departmentId} onValueChange={v => setBedForm(p => ({ ...p, departmentId: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
-                <SelectContent>
-                  {departments?.map((d: any) => (
-                    <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <DepartmentSelect
+              hospitalId={hospital?.id}
+              value={bedForm.departmentId}
+              onChange={v => setBedForm(p => ({ ...p, departmentId: v }))}
+              departments={departments}
+              onDepartmentsChange={() => onRefresh()}
+              valueMode="id"
+              label="Department"
+              required
+              placeholder="Select department"
+            />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Room Number</Label>

@@ -11,6 +11,7 @@ import { Plus, UserPlus, Calendar, Clock, Users, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePatientNames } from '@/hooks/usePatientNames';
+import { DepartmentSelect } from './DepartmentSelect';
 
 interface StaffRosterProps {
   hospital: any;
@@ -273,18 +274,16 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Department *</Label>
-                <Select value={form.department} onValueChange={v => setForm(p => ({ ...p, department: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    {departments?.map((d: any) => (
-                      <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
-                    ))}
-                    <SelectItem value="General">General</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <DepartmentSelect
+                hospitalId={hospital?.id}
+                value={form.department}
+                onChange={v => setForm(p => ({ ...p, department: v }))}
+                departments={departments}
+                valueMode="name"
+                label="Department"
+                required
+                placeholder="Select"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

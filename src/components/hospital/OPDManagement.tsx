@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
+import { DepartmentSelect } from './DepartmentSelect';
 
 interface OPDProps {
   hospital: any;
@@ -339,19 +340,16 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Department *</Label>
-                <Select value={newPatient.department} onValueChange={v => setNewPatient(p => ({ ...p, department: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
-                  <SelectContent>
-                    {departments?.map((d: any) => (
-                      <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
-                    ))}
-                    <SelectItem value="General OPD">General OPD</SelectItem>
-                    <SelectItem value="Emergency">Emergency</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <DepartmentSelect
+                hospitalId={hospital?.id}
+                value={newPatient.department}
+                onChange={v => setNewPatient(p => ({ ...p, department: v }))}
+                departments={departments}
+                valueMode="name"
+                label="Department"
+                required
+                placeholder="Select department"
+              />
               <div className="space-y-2">
                 <Label>Consulting Doctor</Label>
                 <Input value={newPatient.doctor} onChange={e => setNewPatient(p => ({ ...p, doctor: e.target.value }))} placeholder="Doctor name" />

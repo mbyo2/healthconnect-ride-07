@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { DischargeChecklist } from './DischargeChecklist';
+import { DepartmentSelect } from './DepartmentSelect';
 import { ensureBillingDraft } from '@/services/dischargeWorkflow';
 
 interface IPDProps {
@@ -318,17 +319,17 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Department *</Label>
-                <Select value={admitForm.departmentId} onValueChange={v => setAdmitForm(p => ({ ...p, departmentId: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    {departments?.map((d: any) => (
-                      <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <DepartmentSelect
+                hospitalId={hospital?.id}
+                value={admitForm.departmentId}
+                onChange={v => setAdmitForm(p => ({ ...p, departmentId: v }))}
+                departments={departments}
+                onDepartmentsChange={() => onRefresh()}
+                valueMode="id"
+                label="Department"
+                required
+                placeholder="Select"
+              />
             </div>
             <div className="space-y-2">
               <Label>Assign Bed</Label>

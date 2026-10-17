@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { BedDouble } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { DepartmentSelect } from './DepartmentSelect';
 
 interface AdmitPatientDialogProps {
   hospital: any;
@@ -148,17 +149,17 @@ export const AdmitPatientDialog = ({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Department *</Label>
-              <Select value={departmentId} onValueChange={setDepartmentId}>
-                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent>
-                  {departments.map((d: any) => (
-                    <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <DepartmentSelect
+              hospitalId={hospital?.id}
+              value={departmentId}
+              onChange={setDepartmentId}
+              departments={departments}
+              onDepartmentsChange={setDepartments}
+              valueMode="id"
+              label="Department"
+              required
+              placeholder="Select"
+            />
           </div>
           <div className="space-y-2">
             <Label>Assign Bed</Label>
