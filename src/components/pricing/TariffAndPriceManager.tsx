@@ -341,18 +341,48 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
     load();
   }, [load]);
 
-  // One-click Zambian starter charge book for brand-new facilities.
+  // One-click starter charge book: loads the institution's COUNTRY defaults
+  // (country_default_tariffs) so a Kenyan facility gets KES prices, a
+  // Zambian one gets Kwacha prices, etc. Falls back to the bundled
+  // Zambian book if the country has no seeded tariffs yet.
   // Also upgrades facilities that loaded the original 11-item starter set
   // (codes T-101..T-602): those legacy rows are removed first so the book
-  // doesn't carry duplicate chest X-rays etc. Custom rows are untouched.
+  // doesn't carry duplicates. Custom rows are untouched.
   const loadStarterTariffs = async () => {
     if (!institutionId) return;
     setSeeding(true);
     try {
+      // Resolve the institution's country.
+      const { data: inst } = await supabase.from('healthcare_institutions').select('country_code').eq('id', institutionId).single();
+      const countryCode = (inst as any)?.country_code || 'ZM';
+
+      // Prefer country-seeded defaults; fall back to bundled Zambia book.
+      let source: ServiceTariff[] = DEFAULT_TARIFFS;
+      let sourceLabel = 'Zambia';
+      const { data: countryTariffs } = await supabase
+        .from('country_default_tariffs' as any)
+        .select('code, name, category, department, base_price, cost_price, insurance_price')
+        .eq('country_code', countryCode);
+      if (countryTariffs && countryTariffs.length > 0) {
+        const { data: cfg } = await supabase.from('country_configurations').select('country_name').eq('country_code', countryCode).single();
+        sourceLabel = (cfg as any)?.country_name || countryCode;
+        source = (countryTariffs as any[]).map((r: any, i: number) => ({
+          id: `C-${countryCode}-${i}`,
+          code: r.code,
+          name: r.name,
+          category: r.category,
+          department: r.department || '',
+          basePrice: Number(r.base_price) || 0,
+          costPrice: Number(r.cost_price) || 0,
+          insurancePrice: r.insurance_price != null ? Number(r.insurance_price) : undefined,
+          isAvailable: true,
+        }));
+      }
+
       const legacyCodes = ["T-101","T-102","T-103","T-201","T-202","T-301","T-401","T-402","T-501","T-601","T-602"];
       const { error: delError } = await supabase.from('service_tariffs' as any).delete().eq('institution_id', institutionId).in('code', legacyCodes);
       if (delError) throw delError;
-      const rows = DEFAULT_TARIFFS.map((t) => ({
+      const rows = source.map((t) => ({
         institution_id: institutionId,
         code: t.code,
         name: t.name,
@@ -366,7 +396,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       }));
       const { error } = await supabase.from('service_tariffs' as any).upsert(rows, { onConflict: 'institution_id,code' });
       if (error) throw error;
-      toast.success(`Loaded ${rows.length} starter tariffs — adjust them to your fees`);
+      toast.success(`Loaded ${rows.length} ${sourceLabel} starter tariffs — adjust them to your fees`);
       load();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to load starter tariffs');
