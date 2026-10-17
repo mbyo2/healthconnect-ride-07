@@ -503,23 +503,23 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
         </select>
       </div>
 
-      {/* Main Tariff Table */}
+      {/* Main Tariff Table — grouped list style, hairline dividers */}
       {!loading && tariffs.length > 0 && (
-      <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
-        <table className="w-full text-left border-collapse text-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <table className="w-full text-left border-collapse text-sm">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
-              <th className="py-2.5 px-4">Code / Category</th>
-              <th className="py-2.5 px-3">Service Name</th>
-              <th className="py-2.5 px-3">Department</th>
-              <th className="py-2.5 px-3 text-right">Cost Price ({getSymbol()})</th>
-              <th className="py-2.5 px-3 text-right">Base Price ({getSymbol()})</th>
-              <th className="py-2.5 px-3 text-right">Margin</th>
-              <th className="py-2.5 px-3 text-center">Status</th>
-              <th className="py-2.5 px-3 text-center">Action</th>
+            <tr className="border-b border-slate-200/60 dark:border-slate-800 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <th className="py-3 px-4 font-medium">Code / Category</th>
+              <th className="py-3 px-3 font-medium">Service Name</th>
+              <th className="py-3 px-3 font-medium">Department</th>
+              <th className="py-3 px-3 text-right font-medium">Cost ({getSymbol()})</th>
+              <th className="py-3 px-3 text-right font-medium">Price ({getSymbol()})</th>
+              <th className="py-3 px-3 text-right font-medium">Margin</th>
+              <th className="py-3 px-3 text-center font-medium">Status</th>
+              <th className="py-3 px-3 text-center font-medium">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {filtered.map((t) => {
               const isEditing = editingId === t.id;
               const cost = isEditing ? editingCost : t.costPrice || 0;
@@ -527,7 +527,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               const margin = price > 0 ? Math.round(((price - cost) / price) * 100) : 0;
 
               return (
-                <tr key={t.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="py-3 px-4 font-mono font-bold text-slate-900">{t.code}</td>
                   <td className="py-3 px-3 font-extrabold text-slate-900">{t.name}</td>
                   <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{t.department}</td>

@@ -248,12 +248,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   };
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
-        <h3 className="text-base font-extrabold flex items-center gap-2">
+    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+      {/* Header — single clear title, deference to content */}
+      <div className="flex items-center justify-between pb-1">
+        <h3 className="text-xl font-bold tracking-tight flex items-center gap-2">
           <Receipt className="h-5 w-5 text-primary-500" />
-          Hospital Billing & Invoice Management
+          Billing & Invoices
         </h3>
         <button
           onClick={() => setShowDialog(true)}
@@ -263,45 +263,45 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         </button>
       </div>
 
-      {/* KPI Strip */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* KPI Strip — restrained, semantic colors only */}
+      <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Total Billed", value: formatPrice(totalRevenue), color: "#0073ea", icon: <DollarSign className="h-5 w-5" /> },
           { label: "Collected", value: formatPrice(paidAmount), color: "#00c875", icon: <CheckCircle className="h-5 w-5" /> },
           { label: "Outstanding", value: formatPrice(pendingAmount), color: "#e2445c", icon: <AlertCircle className="h-5 w-5" /> },
         ].map((c) => (
-          <div key={c.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
-            <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
-            <div className="text-xl font-black font-mono" style={{ color: c.color }}>{c.value}</div>
-            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{c.label}</div>
+          <div key={c.label} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 shadow-sm text-center">
+            <div style={{ color: c.color }} className="flex justify-center mb-1.5">{c.icon}</div>
+            <div className="text-2xl font-bold tracking-tight font-mono" style={{ color: c.color }}>{c.value}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{c.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Invoices Table */}
+      {/* Invoices Table — grouped list style, hairline dividers */}
       {invoices && invoices.length > 0 ? (
-        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
-                <th className="py-2.5 px-4">Invoice #</th>
-                <th className="py-2.5 px-3">Patient</th>
-                <th className="py-2.5 px-3">Date</th>
-                <th className="py-2.5 px-3 text-right">Total</th>
-                <th className="py-2.5 px-3 text-right">Balance Due</th>
-                <th className="py-2.5 px-3 text-center">Status</th>
-                <th className="py-2.5 px-3 text-center">Receipt</th>
+              <tr className="border-b border-slate-200/60 dark:border-slate-800 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <th className="py-3 px-4 font-medium">Invoice #</th>
+                <th className="py-3 px-3 font-medium">Patient</th>
+                <th className="py-3 px-3 font-medium">Date</th>
+                <th className="py-3 px-3 text-right font-medium">Total</th>
+                <th className="py-3 px-3 text-right font-medium">Balance Due</th>
+                <th className="py-3 px-3 text-center font-medium">Status</th>
+                <th className="py-3 px-3 text-center font-medium">Receipt</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-canvas-silk">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {invoices.map((inv: any) => (
-                <tr key={inv.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900">{inv.invoice_number}</td>
-                  <td className="py-3 px-3 font-bold text-primary-500">{inv.patient?.first_name} {inv.patient?.last_name}</td>
-                  <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
-                  <td className="py-3 px-3 text-right font-extrabold text-slate-900">{formatPrice(inv.total_amount)}</td>
+                <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100">{inv.invoice_number}</td>
+                  <td className="py-3 px-3 font-medium text-primary-600 dark:text-primary-400">{inv.patient?.first_name} {inv.patient?.last_name}</td>
+                  <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-3 text-right font-semibold text-slate-900 dark:text-slate-100">{formatPrice(inv.total_amount)}</td>
                   <td className="py-3 px-3 text-right">
-                    {inv.balance > 0 ? <span className="font-bold text-error-500">{formatPrice(inv.balance)}</span> : <span className="text-success-500 font-bold">—</span>}
+                    {inv.balance > 0 ? <span className="font-semibold text-red-500">{formatPrice(inv.balance)}</span> : <span className="text-slate-400">—</span>}
                   </td>
                   <td className="py-3 px-3 text-center">{getPaymentPill(inv.payment_status)}</td>
                   <td className="py-3 px-3 text-center">
@@ -371,22 +371,23 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             )}
 
             {pendingPatientCharges.length > 0 && (
-              <div className="p-3 rounded-xl border border-primary-500/20 bg-primary-50 space-y-1">
-                <p className="font-extrabold text-primary-500 text-[10px] uppercase">Auto-Populated Charges — untick to exclude:</p>
+              <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-1">
+                <p className="font-semibold text-slate-700 dark:text-slate-300 text-xs mb-2">Charges — untick to exclude from this bill</p>
                 {pendingPatientCharges.map((c, i) => (
-                  <label key={i} className="flex items-center gap-2 text-graphite-500 dark:text-slate-400 cursor-pointer hover:bg-white/60 rounded px-1 py-0.5">
+                  <label key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-white dark:hover:bg-slate-800 rounded-xl px-2 py-2 transition-colors">
                     <input
                       type="checkbox"
                       checked={c.selected !== false}
                       onChange={() => toggleCharge(i)}
-                      className="h-3.5 w-3.5 accent-primary-500"
+                      className="h-5 w-5 accent-primary-500 shrink-0"
                     />
-                    <span className={`flex-1 ${c.selected === false ? "line-through opacity-50" : ""}`}>
-                      • {c.description}
-                      {c.date && <span className="text-[10px] opacity-70"> ({new Date(c.date).toLocaleDateString()})</span>}
-                      <span className="text-[10px] opacity-70"> [{c.category}]</span>
+                    <span className={`flex-1 text-sm ${c.selected === false ? "line-through opacity-50" : ""}`}>
+                      {c.description}
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">
+                        {c.date ? `${new Date(c.date).toLocaleDateString()} · ` : ""}{c.category}
+                      </span>
                     </span>
-                    <span className="font-mono font-bold">{formatPrice(c.amount)}</span>
+                    <span className="font-mono font-semibold text-sm">{formatPrice(c.amount)}</span>
                   </label>
                 ))}
               </div>
