@@ -40,7 +40,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes, tariffs, procRes, imagingRes, admissionsRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, tariffs, procRes, imagingRes, admissionsRes, ancRes, immRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
         supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
@@ -53,6 +53,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         supabase.from("imaging_orders" as any).select("id, modality, body_part, status, ordered_at").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(100),
         // Active admissions with bed occupancy for per-day ward charges.
         supabase.from("hospital_admissions" as any).select("id, admission_date, bed_id, bed:hospital_beds(bed_number, bed_type)").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "admitted").limit(20),
+        // ANC visits (maternal & child health).
+        supabase.from("anc_visits" as any).select("id, visit_number, visit_date").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(50),
+        // Administered immunizations.
+        supabase.from("immunizations" as any).select("id, vaccine_name, dose_number, administered_date").eq("patient_id", patientId).eq("institution_id", hospital.id).not("administered_date", "is", null).limit(50),
       ]);
       // Institution procedure prices for the executions above.
       const procIds = [...new Set(((procRes.data || []) as any[]).map((p: any) => p.procedure_id).filter(Boolean))];
@@ -110,6 +114,23 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           calculatedTotal += fee;
           const bedLabel = bedType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
           charges.push({ category: "Ward & Bed Charges", description: `Bed ${a.bed?.bed_number || ''} (${bedLabel}) × ${days} day${days > 1 ? 's' : ''}`.trim(), amount: fee, date: a.admission_date, selected: true });
+        }
+      });
+      // ANC visits: each antenatal contact bills as a consultation.
+      ((ancRes.data || []) as any[]).forEach((v: any) => {
+        const fee = resolveTariffPrice(tariffs, 'opd', 'ANC', 200);
+        if (fee > 0) {
+          calculatedTotal += fee;
+          charges.push({ category: "Maternal & Child Health", description: `ANC Visit #${v.visit_number || '?'}`, amount: fee, date: v.visit_date, selected: true });
+        }
+      });
+      // Administered immunizations: each dose bills from the tariff book.
+      ((immRes.data || []) as any[]).forEach((im: any) => {
+        const label = `${im.vaccine_name || 'Vaccine'} (Dose ${im.dose_number ?? '?'})`;
+        const fee = resolveTariffPrice(tariffs, 'other', im.vaccine_name, 0);
+        if (fee > 0) {
+          calculatedTotal += fee;
+          charges.push({ category: "Maternal & Child Health", description: `Immunization: ${label}`, amount: fee, date: im.administered_date, selected: true });
         }
       });
       if (charges.length > 0) {

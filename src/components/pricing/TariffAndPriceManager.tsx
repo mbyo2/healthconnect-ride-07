@@ -200,6 +200,8 @@ const DEFAULT_TARIFFS: ServiceTariff[] = [
   { id: "T-OTH-10", code: "OTH-TRANSFUSE", name: "Blood Transfusion — per unit", category: "other", department: "Blood Bank", basePrice: 1500, costPrice: 375, insurancePrice: 1750, isAvailable: true },
   { id: "T-OTH-11", code: "OTH-DIALYSIS", name: "Haemodialysis — per session", category: "other", department: "Renal Unit", basePrice: 2500, costPrice: 625, insurancePrice: 2900, isAvailable: true },
   { id: "T-OTH-12", code: "OTH-GUARDIAN", name: "Guardian / Bed-sitter Lodging — per day", category: "other", department: "Inpatient (IPD)", basePrice: 300, costPrice: 75, insurancePrice: 350, isAvailable: true },
+  { id: "T-OTH-13", code: "OTH-VAC-ADMIN", name: "Vaccination Administration Fee", category: "other", department: "Nursing", basePrice: 100, costPrice: 25, insurancePrice: 115, isAvailable: true },
+  { id: "T-OTH-14", code: "OTH-ANC", name: "Antenatal Care Visit", category: "other", department: "Maternity", basePrice: 200, costPrice: 50, insurancePrice: 230, isAvailable: true },
 ];
 
 /**

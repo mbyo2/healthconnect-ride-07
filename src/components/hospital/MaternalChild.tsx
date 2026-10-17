@@ -16,6 +16,39 @@ type Tab = "anc" | "deliveries" | "immunizations";
 const numOrNull = (v: string) => (v === "" || v === null || v === undefined ? null : Number(v));
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
+/** Zambia EPI schedule (confirmed): birth → 6/10/14 weeks → 9 & 18 months. */
+const ZAMBIA_EPI_SCHEDULE: { vaccine: string; dose: number; dueLabel: string }[] = [
+  { vaccine: "BCG", dose: 1, dueLabel: "Birth" },
+  { vaccine: "OPV", dose: 0, dueLabel: "Birth" },
+  { vaccine: "Hepatitis B", dose: 0, dueLabel: "Birth" },
+  { vaccine: "Pentavalent (DPT-HepB-Hib)", dose: 1, dueLabel: "6 weeks" },
+  { vaccine: "PCV (Pneumococcal)", dose: 1, dueLabel: "6 weeks" },
+  { vaccine: "Rotavirus", dose: 1, dueLabel: "6 weeks" },
+  { vaccine: "OPV", dose: 1, dueLabel: "6 weeks" },
+  { vaccine: "Pentavalent (DPT-HepB-Hib)", dose: 2, dueLabel: "10 weeks" },
+  { vaccine: "PCV (Pneumococcal)", dose: 2, dueLabel: "10 weeks" },
+  { vaccine: "Rotavirus", dose: 2, dueLabel: "10 weeks" },
+  { vaccine: "OPV", dose: 2, dueLabel: "10 weeks" },
+  { vaccine: "Pentavalent (DPT-HepB-Hib)", dose: 3, dueLabel: "14 weeks" },
+  { vaccine: "PCV (Pneumococcal)", dose: 3, dueLabel: "14 weeks" },
+  { vaccine: "OPV", dose: 3, dueLabel: "14 weeks" },
+  { vaccine: "IPV (Inactivated Polio)", dose: 1, dueLabel: "14 weeks" },
+  { vaccine: "Measles", dose: 1, dueLabel: "9 months" },
+  { vaccine: "Measles", dose: 2, dueLabel: "18 months" },
+];
+
+/** WHO 8-contact ANC schedule (confirmed): contact → target gestational week. */
+const ANC_CONTACTS: { contact: number; weekLabel: string; maxWeek: number }[] = [
+  { contact: 1, weekLabel: "≤ 12 weeks", maxWeek: 12 },
+  { contact: 2, weekLabel: "20 weeks", maxWeek: 20 },
+  { contact: 3, weekLabel: "26 weeks", maxWeek: 26 },
+  { contact: 4, weekLabel: "30 weeks", maxWeek: 30 },
+  { contact: 5, weekLabel: "34 weeks", maxWeek: 34 },
+  { contact: 6, weekLabel: "36 weeks", maxWeek: 36 },
+  { contact: 7, weekLabel: "38 weeks", maxWeek: 38 },
+  { contact: 8, weekLabel: "40 weeks", maxWeek: 40 },
+];
+
 export const MaternalChild = ({ hospital }: { hospital: any }) => {
   const [activeTab, setActiveTab] = useState<Tab>("anc");
   const [showAnc, setShowAnc] = useState(false);
@@ -183,6 +216,17 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
             <h3 className="font-semibold text-sm">ANC Visit History</h3>
             <button onClick={refreshAnc} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
+          {/* WHO 8-contact schedule reference */}
+          <div className="px-4 py-3 border-b border-border bg-muted/30">
+            <p className="text-[11px] font-bold uppercase text-muted-foreground mb-2">WHO 8-Contact Schedule</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ANC_CONTACTS.map((c) => (
+                <span key={c.contact} className="inline-flex items-center gap-1 text-[11px] font-medium bg-card border border-border rounded-full px-2.5 py-1">
+                  <span className="font-bold text-primary-500">{c.contact}</span> {c.weekLabel}
+                </span>
+              ))}
+            </div>
+          </div>
           {ancLoading ? <ListSkeleton rows={4} /> : ancVisits.length === 0 ? (
             <EmptyState title="No ANC visits yet" description="Record the first antenatal visit to start the register." />
           ) : (
@@ -347,9 +391,26 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
           <DialogHeader><DialogTitle>Schedule Vaccination</DialogTitle></DialogHeader>
           <form onSubmit={handleScheduleImmun} className="space-y-3">
             <HospitalPatientSelect patients={patients} loading={patientsLoading} value={immunForm.patient_id} onChange={(id) => setImmunForm({ ...immunForm, patient_id: id })} />
+            {/* Zambia EPI quick-pick */}
+            <div>
+              <p className={labelCls}>Quick-pick — Zambia EPI schedule</p>
+              <div className="flex flex-wrap gap-1.5 mt-1 max-h-28 overflow-y-auto">
+                {ZAMBIA_EPI_SCHEDULE.map((s, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setImmunForm({ ...immunForm, vaccine_name: s.vaccine, dose_number: String(s.dose) })}
+                    className={`text-[11px] px-2 py-1 rounded-full border transition-colors ${immunForm.vaccine_name === s.vaccine && immunForm.dose_number === String(s.dose) ? "bg-primary-500 text-white border-primary-500" : "bg-muted/50 hover:bg-muted border-border"}`}
+                    title={`Due: ${s.dueLabel}`}
+                  >
+                    {s.vaccine} · D{s.dose}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2"><p className={labelCls}>Vaccine name</p><input className={inputCls} value={immunForm.vaccine_name} onChange={(e) => setImmunForm({ ...immunForm, vaccine_name: e.target.value })} placeholder="e.g. BCG, OPV-1, Penta-1" required /></div>
-              <div><p className={labelCls}>Dose number</p><input type="number" min="1" className={inputCls} value={immunForm.dose_number} onChange={(e) => setImmunForm({ ...immunForm, dose_number: e.target.value })} /></div>
+              <div><p className={labelCls}>Dose number</p><input type="number" min="0" className={inputCls} value={immunForm.dose_number} onChange={(e) => setImmunForm({ ...immunForm, dose_number: e.target.value })} /></div>
               <div><p className={labelCls}>Scheduled date</p><input type="date" className={inputCls} value={immunForm.scheduled_date} onChange={(e) => setImmunForm({ ...immunForm, scheduled_date: e.target.value })} required /></div>
               <div className="col-span-2"><p className={labelCls}>Batch number</p><input className={inputCls} value={immunForm.batch_number} onChange={(e) => setImmunForm({ ...immunForm, batch_number: e.target.value })} /></div>
             </div>
