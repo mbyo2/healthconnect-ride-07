@@ -66,25 +66,25 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       (apptsRes.data || []).forEach((a: any) => {
         const fee = resolveTariffPrice(tariffs, 'opd', a.type, 150);
         calculatedTotal += fee;
-        charges.push({ category: "Consultations", description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee });
+        charges.push({ category: "Consultations", description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee, date: a.date, selected: true });
       });
       (labsRes.data || []).forEach((l: any) => {
         const fee = l.price || l.total_amount || resolveTariffPrice(tariffs, 'lab', l.test_type, 200);
         calculatedTotal += fee;
-        charges.push({ category: "Laboratory", description: `Lab Test: ${l.test_type}`, amount: fee });
+        charges.push({ category: "Laboratory", description: `Lab Test: ${l.test_type}`, amount: fee, date: (l as any).created_at || (l as any).test_date, selected: true });
       });
       (rxsRes.data || []).forEach((r: any) => {
         const unit = resolveTariffPrice(tariffs, 'pharmacy', r.medication_name, 50);
         const fee = unit * (r.quantity || 1);
         calculatedTotal += fee;
-        charges.push({ category: "Pharmacy", description: `Rx: ${r.medication_name}`, amount: fee });
+        charges.push({ category: "Pharmacy", description: `Rx: ${r.medication_name}`, amount: fee, date: (r as any).created_at, selected: true });
       });
       ((procRes.data || []) as any[]).forEach((p: any) => {
         const procName = p.procedure?.procedure_name || 'Procedure';
         const fee = procPrices.get(p.procedure_id) || resolveTariffPrice(tariffs, 'surgery', procName, 0);
         if (fee > 0) {
           calculatedTotal += fee;
-          charges.push({ category: "Clinical Procedures", description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee });
+          charges.push({ category: "Clinical Procedures", description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee, date: p.execution_date, selected: true });
         }
       });
       // Radiology: completed imaging orders priced from the tariff book by
@@ -95,7 +95,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         const fee = resolveTariffPrice(tariffs, 'radiology', label, resolveTariffPrice(tariffs, 'radiology', modalityLabel[o.modality] || o.modality, 0));
         if (fee > 0) {
           calculatedTotal += fee;
-          charges.push({ category: "Radiology & Imaging", description: `Imaging: ${label}`, amount: fee });
+          charges.push({ category: "Radiology & Imaging", description: `Imaging: ${label}`, amount: fee, date: o.ordered_at, selected: true });
         }
       });
       // Ward & bed charges: per-day rate × days admitted for active admissions.
@@ -109,7 +109,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           const fee = perDay * days;
           calculatedTotal += fee;
           const bedLabel = bedType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-          charges.push({ category: "Ward & Bed Charges", description: `Bed ${a.bed?.bed_number || ''} (${bedLabel}) × ${days} day${days > 1 ? 's' : ''}`.trim(), amount: fee });
+          charges.push({ category: "Ward & Bed Charges", description: `Bed ${a.bed?.bed_number || ''} (${bedLabel}) × ${days} day${days > 1 ? 's' : ''}`.trim(), amount: fee, date: a.admission_date, selected: true });
         }
       });
       if (charges.length > 0) {
@@ -129,7 +129,21 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     }
   };
 
+  const toggleCharge = (index: number) => {
+    setPendingPatientCharges(prev => {
+      const next = prev.map((c, i) => i === index ? { ...c, selected: !c.selected } : c);
+      const total = next.filter(c => c.selected !== false).reduce((s, c) => s + (Number(c.amount) || 0), 0);
+      setAmount(total.toString());
+      setDescription(next.filter(c => c.selected !== false).map((c) => c.description).join(", "));
+      return next;
+    });
+  };
+
+  const selectedCharges = pendingPatientCharges.filter(c => c.selected !== false);
+
   const totalRevenue = invoices?.reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
+  const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
+  const pendingAmount = invoices?.filter((i: any) => i.payment_status === "pending").reduce((s: number, i: any) => s + (i.balance || 0), 0) || 0;
   const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const pendingAmount = invoices?.filter((i: any) => i.payment_status === "pending").reduce((s: number, i: any) => s + (i.balance || 0), 0) || 0;
 
@@ -159,8 +173,8 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         total_amount: total, subtotal: total,
         patient_portion: patientPortion, insurer_portion: insurerPortion,
         insurance_provider: insuranceProvider, insurance_policy_number: insurancePolicyNumber,
-        items: pendingPatientCharges.length > 0
-          ? pendingPatientCharges.map((c: any) => ({ description: c.description, amount: c.amount, category: c.category }))
+        items: selectedCharges.length > 0
+          ? selectedCharges.map((c: any) => ({ description: c.description, amount: c.amount, category: c.category }))
           : [{ description: description || "Hospital services", amount: total }],
         payment_status: paymentStatus,
         due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
@@ -337,12 +351,22 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
 
             {pendingPatientCharges.length > 0 && (
               <div className="p-3 rounded-xl border border-primary-500/20 bg-primary-50 space-y-1">
-                <p className="font-extrabold text-primary-500 text-[10px] uppercase">Auto-Populated Charges:</p>
+                <p className="font-extrabold text-primary-500 text-[10px] uppercase">Auto-Populated Charges — untick to exclude:</p>
                 {pendingPatientCharges.map((c, i) => (
-                  <div key={i} className="flex justify-between text-graphite-500 dark:text-slate-400">
-                    <span>• {c.description}</span>
+                  <label key={i} className="flex items-center gap-2 text-graphite-500 dark:text-slate-400 cursor-pointer hover:bg-white/60 rounded px-1 py-0.5">
+                    <input
+                      type="checkbox"
+                      checked={c.selected !== false}
+                      onChange={() => toggleCharge(i)}
+                      className="h-3.5 w-3.5 accent-primary-500"
+                    />
+                    <span className={`flex-1 ${c.selected === false ? "line-through opacity-50" : ""}`}>
+                      • {c.description}
+                      {c.date && <span className="text-[10px] opacity-70"> ({new Date(c.date).toLocaleDateString()})</span>}
+                      <span className="text-[10px] opacity-70"> [{c.category}]</span>
+                    </span>
                     <span className="font-mono font-bold">{formatPrice(c.amount)}</span>
-                  </div>
+                  </label>
                 ))}
               </div>
             )}
@@ -373,12 +397,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </div>
           <DialogFooter>
             <button onClick={() => setShowDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-            {pendingPatientCharges.length > 0 && (
+            {selectedCharges.length > 0 && (
               <button
                 onClick={() => {
                   // Group charges by category for the consolidated bill
                   const byCat = new Map<string, any[]>();
-                  pendingPatientCharges.forEach((c: any) => {
+                  selectedCharges.forEach((c: any) => {
                     const cat = c.category || "Services";
                     if (!byCat.has(cat)) byCat.set(cat, []);
                     byCat.get(cat)!.push({
