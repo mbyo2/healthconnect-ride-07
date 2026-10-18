@@ -22,6 +22,7 @@ const MapPage = () => {
   const [locationLoading, setLocationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers-map'],
@@ -192,6 +193,7 @@ const MapPage = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
+                ref={searchInputRef}
                 type="search"
                 aria-label="Search by name or specialty"
                 placeholder="Search by name or specialty..."
@@ -200,7 +202,14 @@ const MapPage = () => {
                 className="pl-10 h-11"
               />
             </div>
-            <Button variant="outline" size="icon" className="h-11 w-11" aria-label="Filter search results">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-11 w-11" 
+              aria-label="Filter search results"
+              onClick={() => searchInputRef.current?.focus()}
+              title="Search by name or specialty"
+            >
               <Filter className="w-4 h-4" />
             </Button>
           </div>
