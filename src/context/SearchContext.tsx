@@ -120,7 +120,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .eq('is_verified', true);
 
       if (selectedSpecialty && selectedSpecialty !== 'all' as any) {
-        query = query.ilike('specialty', selectedSpecialty);
+        // Match specialty case-insensitively; also match NULL when filtering
+        // by the default 'General Practice' (providers without a set specialty)
+        if (selectedSpecialty.toLowerCase() === 'general practice') {
+          query = query.or(`specialty.ilike.${selectedSpecialty},specialty.is.null`);
+        } else {
+          query = query.ilike('specialty', selectedSpecialty);
+        }
       }
       if (selectedType && selectedType !== 'all' as any) {
         query = query.ilike('provider_type', selectedType);
