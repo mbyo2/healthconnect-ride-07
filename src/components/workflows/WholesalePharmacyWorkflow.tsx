@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
+import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,9 +21,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import {
   Package, Truck, Users, DollarSign, Plus, Loader2,
-  Building2, Tag, CheckCircle2, XCircle, Trash2
+  Building2, Tag, CheckCircle2, XCircle, Trash2, ChevronRight, Clock
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
 
 interface WholesaleOrder {
   id: string;
@@ -43,6 +46,19 @@ interface PriceTier {
   unit_price: number;
 }
 
+interface ActionItem {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action: () => void;
+}
+
+interface ActionGroup {
+  title: string;
+  primary: ActionItem;
+  secondary: ActionItem[];
+}
+
 const ORDER_STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-500',
   confirmed: 'bg-blue-500',
@@ -56,7 +72,9 @@ export const WholesalePharmacyWorkflow = () => {
   const { institution } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
+  const [activeTab, setActiveTab] = useState('orders');
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [showTierDialog, setShowTierDialog] = useState(false);
   const [tierForm, setTierForm] = useState({ product_name: '', min_quantity: '10', unit_price: '' });
@@ -184,53 +202,150 @@ export const WholesalePharmacyWorkflow = () => {
     return null;
   };
 
+  const icon = (Icon: React.ElementType) => <Icon className="h-5 w-5" />;
+  const goToTab = (tab: string, title: string) => {
+    setActiveTab(tab);
+    showSuccess({ message: `Opening ${title}...` });
+    document.getElementById('wholesale-workspace')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const groups: ActionGroup[] = [
+    {
+      title: 'Orders',
+      primary: { title: 'Bulk Orders', description: 'Review, confirm & fulfill B2B orders', icon: icon(Package), action: () => goToTab('orders', 'Bulk Orders') },
+      secondary: [
+        { title: 'Pending Fulfillment', description: `${orderStats.pending} awaiting your action`, icon: icon(Clock), action: () => { setOrderStatusFilter('pending'); goToTab('orders', 'Pending Orders'); } },
+      ],
+    },
+    {
+      title: 'Pricing',
+      primary: { title: 'Price Tiers', description: 'Volume discounts buyers see', icon: icon(Tag), action: () => goToTab('tiers', 'Price Tiers') },
+      secondary: [
+        { title: 'Add Price Tier', description: 'New volume discount tier', icon: icon(Plus), action: () => { setShowTierDialog(true); } },
+      ],
+    },
+    {
+      title: 'Partners',
+      primary: { title: 'B2B Clients', description: 'Institutions you trade with', icon: icon(Building2), action: () => goToTab('clients', 'B2B Clients') },
+      secondary: [],
+    },
+  ];
+
   return (
-    <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
-      <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center justify-center gap-2">
-          <Truck className="h-6 w-6 text-primary-500" /> Wholesale Pharmacy — B2B
-        </h2>
-        <p className="text-muted-foreground text-sm md:text-base px-4">
-          Bulk orders, volume pricing tiers, and institutional clients
-        </p>
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+      <ApplicationStatusBanner />
+      <ProfileCompleteBanner />
+
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-md">
+          <Truck className="h-7 w-7" />
+        </div>
+        <div>
+          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Wholesale Pharmacy — B2B</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Bulk Trading Dashboard</h1>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 max-w-xl mx-auto">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="orders">Bulk Orders</TabsTrigger>
-          <TabsTrigger value="tiers">Price Tiers</TabsTrigger>
-          <TabsTrigger value="clients">B2B Clients</TabsTrigger>
-        </TabsList>
+      {/* Today at a Glance */}
+      <section>
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <button
+            onClick={() => goToTab('orders', 'Pending Orders')}
+            className="rounded-2xl bg-primary-500 p-5 text-left text-white shadow-sm transition-all hover:bg-primary-600 active:scale-[0.98]"
+          >
+            <div className="flex items-center justify-between">
+              <Package className="h-5 w-5 opacity-80" />
+              <ChevronRight className="h-4 w-4 opacity-60" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none">{orderStats.pending}</p>
+            <p className="mt-1 text-[15px] font-medium">Pending orders</p>
+            <p className="text-[13px] opacity-80">Awaiting your action</p>
+          </button>
 
-        {/* ── Overview ── */}
-        <TabsContent value="overview" className="mt-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <Card><CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium"><Package className="h-4 w-4" /> Bulk Orders</div>
-              <p className="text-2xl font-bold mt-1">{orderStats.total}</p>
-              <p className="text-xs text-muted-foreground">{orderStats.pending} pending action</p>
-            </CardContent></Card>
-            <Card><CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium"><Truck className="h-4 w-4" /> Orders as Seller</div>
-              <p className="text-2xl font-bold mt-1">{orderStats.asSeller}</p>
-              <p className="text-xs text-muted-foreground">fulfilled by you</p>
-            </CardContent></Card>
-            <Card><CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium"><DollarSign className="h-4 w-4" /> B2B Revenue</div>
-              <p className="text-2xl font-bold mt-1">{formatPrice(orderStats.revenue)}</p>
-              <p className="text-xs text-muted-foreground">delivered orders</p>
-            </CardContent></Card>
-            <Card><CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium"><Users className="h-4 w-4" /> B2B Clients</div>
-              <p className="text-2xl font-bold mt-1">{clients?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">trading partners</p>
-            </CardContent></Card>
+          <button
+            onClick={() => goToTab('orders', 'Bulk Orders')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <DollarSign className="h-5 w-5 text-emerald-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{formatPrice(orderStats.revenue)}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">B2B revenue</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">Delivered orders</p>
+          </button>
+
+          <button
+            onClick={() => goToTab('clients', 'B2B Clients')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <Users className="h-5 w-5 text-blue-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{clients?.length || 0}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">B2B clients</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">Trading partners</p>
+          </button>
+        </div>
+      </section>
+
+      {/* Grouped Actions */}
+      {groups.map((group) => (
+        <section key={group.title}>
+          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
+          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <button
+              onClick={group.primary.action}
+              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
+                {group.primary.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+            </button>
+            {group.secondary.length > 0 && (
+              <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+                {group.secondary.map((item) => (
+                  <button
+                    key={item.title}
+                    onClick={item.action}
+                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                  >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
+                      <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        </TabsContent>
+        </section>
+      ))}
 
-        {/* ── Bulk Orders ── */}
-        <TabsContent value="orders" className="mt-4 space-y-3">
+      {/* Workspace — orders, tiers, clients */}
+      <section id="wholesale-workspace" className="scroll-mt-6">
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Workspace</h2>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 max-w-xl">
+            <TabsTrigger value="orders" className="min-h-[44px]">Bulk Orders</TabsTrigger>
+            <TabsTrigger value="tiers" className="min-h-[44px]">Price Tiers</TabsTrigger>
+            <TabsTrigger value="clients" className="min-h-[44px]">B2B Clients</TabsTrigger>
+          </TabsList>
+
+          {/* ── Bulk Orders ── */}
+          <TabsContent value="orders" className="mt-4 space-y-3">
           <div className="flex flex-wrap gap-1.5">
             {(['all', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const).map((s) => (
               <button
@@ -405,7 +520,8 @@ export const WholesalePharmacyWorkflow = () => {
             </div>
           )}
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </section>
 
       {/* Decline (cancel) a B2B order — financial impact, requires confirmation */}
       <AlertDialog open={declineTarget !== null} onOpenChange={(open) => !open && setDeclineTarget(null)}>

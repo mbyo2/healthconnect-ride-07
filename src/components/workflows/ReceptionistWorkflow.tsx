@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, UserPlus, Search, Play, CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Users, Calendar, Clock, UserPlus, Search, Play, CheckCircle, XCircle, AlertTriangle, Loader2, ChevronRight, ClipboardList } from 'lucide-react';
 import { useQueueTokens, QueueToken } from '@/hooks/useQueueTokens';
+import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
 import { format } from 'date-fns';
+
+interface ActionItem {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action: () => void;
+}
+
+interface ActionGroup {
+  title: string;
+  primary: ActionItem;
+  secondary: ActionItem[];
+}
 
 const PRIORITY_CONFIG = {
   emergency: { label: 'Emergency', color: 'bg-destructive text-destructive-foreground', badge: 'destructive' as const },
@@ -30,6 +46,8 @@ const STATUS_CONFIG = {
 const DEPARTMENTS = ['General', 'OPD', 'Emergency', 'Pediatrics', 'Gynecology', 'Orthopedics', 'ENT', 'Ophthalmology', 'Cardiology', 'Dermatology'];
 
 export const ReceptionistWorkflow = () => {
+  const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
   const { tokens, loading, waiting, serving, completed, createToken, updateTokenStatus } = useQueueTokens();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,6 +69,27 @@ export const ReceptionistWorkflow = () => {
     setCreating(false);
   };
 
+  const icon = (Icon: React.ElementType) => <Icon className="h-5 w-5" />;
+  const openDialog = () => setIsDialogOpen(true);
+
+  const groups: ActionGroup[] = [
+    {
+      title: 'Front Desk',
+      primary: { title: 'New Token', description: 'Check in a patient & generate queue token', icon: icon(UserPlus), action: openDialog },
+      secondary: [
+        { title: 'Patient Registration', description: 'Register a new patient record', icon: icon(ClipboardList), action: () => { navigate('/patient-registration'); showSuccess({ message: 'Opening Patient Registration...' }); } },
+        { title: 'Find Patient', description: 'Search existing patients', icon: icon(Search), action: () => { navigate('/search'); showSuccess({ message: 'Opening Patient Search...' }); } },
+      ],
+    },
+    {
+      title: 'Schedule',
+      primary: { title: 'Appointments', description: "Today's bookings & scheduling", icon: icon(Calendar), action: () => { navigate('/appointments'); showSuccess({ message: 'Opening Appointments...' }); } },
+      secondary: [],
+    },
+  ];
+
+  const emergencyCount = waiting.filter(t => t.priority === 'emergency').length;
+
   const TokenCard = ({ token }: { token: QueueToken }) => {
     const priority = PRIORITY_CONFIG[token.priority];
     return (
@@ -58,7 +97,7 @@ export const ReceptionistWorkflow = () => {
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold font-mono text-foreground">{token.token_number}</span>
+              <span className="text-2xl font-bold text-foreground tabular-nums">{token.token_number}</span>
               <Badge variant={priority.badge} className="text-xs">{priority.label}</Badge>
             </div>
             <div className="flex gap-1">
@@ -98,16 +137,100 @@ export const ReceptionistWorkflow = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Front Office Dashboard</h1>
-          <p className="text-muted-foreground">Patient registration, token queue & check-in management</p>
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+      <ApplicationStatusBanner />
+      <ProfileCompleteBanner />
+
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-md">
+          <Users className="h-7 w-7" />
         </div>
+        <div>
+          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Front Office Workspace</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Reception Dashboard</h1>
+        </div>
+      </div>
+
+      {/* Today at a Glance */}
+      <section>
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl bg-primary-500 p-5 text-left text-white shadow-sm">
+            <div className="flex items-center justify-between">
+              <Clock className="h-5 w-5 opacity-80" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none">{loading ? '–' : waiting.length}</p>
+            <p className="mt-1 text-[15px] font-medium">Waiting in queue</p>
+            <p className="text-[13px] opacity-80">Patients checked in</p>
+          </div>
+
+          <div className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <Play className="h-5 w-5 text-blue-500" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{loading ? '–' : serving.length}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Now serving</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">With clinicians</p>
+          </div>
+
+          <div className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{loading ? '–' : emergencyCount}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Emergency</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">Priority patients waiting</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Grouped Actions */}
+      {groups.map((group) => (
+        <section key={group.title}>
+          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
+          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <button
+              onClick={group.primary.action}
+              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
+                {group.primary.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+            </button>
+            {group.secondary.length > 0 && (
+              <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+                {group.secondary.map((item) => (
+                  <button
+                    key={item.title}
+                    onClick={item.action}
+                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                  >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
+                      <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      ))}
+
+      {/* Queue Workspace */}
+      <section>
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Live Queue</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><UserPlus className="h-4 w-4 mr-2" /> New Token</Button>
-          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Generate Queue Token</DialogTitle>
@@ -158,40 +281,8 @@ export const ReceptionistWorkflow = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-primary">{waiting.length}</p>
-            <p className="text-sm text-muted-foreground">Waiting</p>
-          </CardContent>
-        </Card>
-        <Card className="border-accent/20 bg-accent/5">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-accent-foreground">{serving.length}</p>
-            <p className="text-sm text-muted-foreground">Serving</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-foreground">{completed.length}</p>
-            <p className="text-sm text-muted-foreground">Completed</p>
-          </CardContent>
-        </Card>
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-destructive">
-              {waiting.filter(t => t.priority === 'emergency').length}
-            </p>
-            <p className="text-sm text-muted-foreground">Emergency</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Queue Tabs */}
-      <Tabs defaultValue="waiting">
+      <Tabs defaultValue="waiting" className="mt-1">
         <TabsList>
           <TabsTrigger value="waiting">
             <Clock className="h-4 w-4 mr-1" /> Waiting ({waiting.length})
@@ -245,6 +336,7 @@ export const ReceptionistWorkflow = () => {
           )}
         </TabsContent>
       </Tabs>
+      </section>
     </div>
   );
 };

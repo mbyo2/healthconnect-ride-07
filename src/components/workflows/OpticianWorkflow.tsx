@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import {
   Glasses, FileText, Package, CheckCircle2, Loader2, Plus,
-  Building2, BarChart3, Clock, Eye,
+  Building2, Clock, Eye, ChevronRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
@@ -18,8 +19,23 @@ import { useAuth } from "@/context/AuthContext";
 import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuccessFeedback } from "@/hooks/use-success-feedback";
+import { ApplicationStatusBanner, ProfileCompleteBanner } from "@/components/dashboard/StatusBanners";
 import { toast } from "sonner";
 import { format } from "date-fns";
+
+interface ActionItem {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action: () => void;
+}
+
+interface ActionGroup {
+  title: string;
+  primary: ActionItem;
+  secondary: ActionItem[];
+}
 
 const ORDER_STATUS_COLOR: Record<string, string> = {
   pending: "bg-warning-500",
@@ -45,6 +61,8 @@ const emptyRx = {
 
 export const OpticianWorkflow = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
   const { institutionId, loading: affilLoading } = useInstitutionAffiliation();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
@@ -226,6 +244,33 @@ export const OpticianWorkflow = () => {
     );
   }
 
+  const icon = (Icon: React.ElementType) => <Icon className="h-5 w-5" />;
+  const goToTab = (tab: string, title: string) => {
+    setActiveTab(tab);
+    showSuccess({ message: `Opening ${title}...` });
+    document.getElementById('optician-workspace')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const groups: ActionGroup[] = [
+    {
+      title: 'Prescriptions',
+      primary: { title: 'Optical Prescriptions', description: 'Write & manage patient prescriptions', icon: icon(Eye), action: () => goToTab('prescriptions', 'Prescriptions') },
+      secondary: [
+        { title: 'New Prescription', description: 'Record a new optical prescription', icon: icon(Plus), action: () => setRxDialogOpen(true) },
+      ],
+    },
+    {
+      title: 'Orders',
+      primary: { title: 'Lens Orders', description: 'Track orders from pending to ready', icon: icon(Package), action: () => goToTab('orders', 'Lens Orders') },
+      secondary: [],
+    },
+    {
+      title: 'Fulfillment',
+      primary: { title: 'Dispensing', description: 'Hand ready orders to patients', icon: icon(CheckCircle2), action: () => goToTab('dispensing', 'Dispensing') },
+      secondary: [],
+    },
+  ];
+
   const rxField = (
     label: string,
     key: keyof typeof emptyRx,
@@ -244,61 +289,123 @@ export const OpticianWorkflow = () => {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Glasses className="h-6 w-6 text-primary-500" /> Optician
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Optical prescriptions, lens orders and dispensing.
-        </p>
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+      <ApplicationStatusBanner />
+      <ProfileCompleteBanner />
+
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-md">
+          <Glasses className="h-7 w-7" />
+        </div>
+        <div>
+          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Optical Services</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Optician Dashboard</h1>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview" className="gap-1.5">
-            <BarChart3 className="h-4 w-4" /> Overview
-          </TabsTrigger>
-          <TabsTrigger value="prescriptions" className="gap-1.5">
-            <Eye className="h-4 w-4" /> Prescriptions
-          </TabsTrigger>
-          <TabsTrigger value="orders" className="gap-1.5">
-            <Package className="h-4 w-4" /> Lens Orders
-          </TabsTrigger>
-          <TabsTrigger value="dispensing" className="gap-1.5">
-            <CheckCircle2 className="h-4 w-4" /> Dispensing
-          </TabsTrigger>
-        </TabsList>
+      {/* Today at a Glance */}
+      <section>
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <button
+            onClick={() => goToTab('dispensing', 'Dispensing')}
+            className="rounded-2xl bg-primary-500 p-5 text-left text-white shadow-sm transition-all hover:bg-primary-600 active:scale-[0.98]"
+          >
+            <div className="flex items-center justify-between">
+              <CheckCircle2 className="h-5 w-5 opacity-80" />
+              <ChevronRight className="h-4 w-4 opacity-60" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none">{ordersReady}</p>
+            <p className="mt-1 text-[15px] font-medium">Ready to dispense</p>
+            <p className="text-[13px] opacity-80">Orders awaiting pickup</p>
+          </button>
 
-        {/* ── Overview ── */}
-        <TabsContent value="overview" className="mt-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <Card>
-              <CardContent className="pt-5">
-                <p className="text-xs text-muted-foreground">Prescriptions today</p>
-                <p className="text-2xl font-bold mt-1">{rxToday}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-5">
-                <p className="text-xs text-muted-foreground">Orders pending</p>
-                <p className="text-2xl font-bold mt-1 text-warning-600">{ordersPending}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-5">
-                <p className="text-xs text-muted-foreground">Ready to dispense</p>
-                <p className="text-2xl font-bold mt-1 text-success-600">{ordersReady}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-5">
-                <p className="text-xs text-muted-foreground">Total dispensed</p>
-                <p className="text-2xl font-bold mt-1">{dispensedTotal}</p>
-              </CardContent>
-            </Card>
+          <button
+            onClick={() => goToTab('orders', 'Lens Orders')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <Clock className="h-5 w-5 text-amber-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{ordersPending}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Orders pending</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">In production queue</p>
+          </button>
+
+          <button
+            onClick={() => goToTab('prescriptions', 'Prescriptions')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <FileText className="h-5 w-5 text-blue-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{rxToday}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Prescriptions today</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">{dispensedTotal} dispensed total</p>
+          </button>
+        </div>
+      </section>
+
+      {/* Grouped Actions */}
+      {groups.map((group) => (
+        <section key={group.title}>
+          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
+          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <button
+              onClick={group.primary.action}
+              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
+                {group.primary.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+            </button>
+            {group.secondary.length > 0 && (
+              <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+                {group.secondary.map((item) => (
+                  <button
+                    key={item.title}
+                    onClick={item.action}
+                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                  >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
+                      <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        </TabsContent>
+        </section>
+      ))}
+
+      {/* Workspace */}
+      <section id="optician-workspace" className="scroll-mt-6">
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Workspace</h2>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="prescriptions" className="gap-1.5 min-h-[44px]">
+              <Eye className="h-4 w-4" /> Prescriptions
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="gap-1.5 min-h-[44px]">
+              <Package className="h-4 w-4" /> Lens Orders
+            </TabsTrigger>
+            <TabsTrigger value="dispensing" className="gap-1.5 min-h-[44px]">
+              <CheckCircle2 className="h-4 w-4" /> Dispensing
+            </TabsTrigger>
+          </TabsList>
 
         {/* ── Prescriptions ── */}
         <TabsContent value="prescriptions" className="mt-4 space-y-4">
@@ -481,6 +588,7 @@ export const OpticianWorkflow = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      </section>
 
       {/* ── New prescription dialog ── */}
       <Dialog open={rxDialogOpen} onOpenChange={setRxDialogOpen}>
