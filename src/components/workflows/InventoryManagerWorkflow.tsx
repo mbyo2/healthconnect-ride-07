@@ -96,7 +96,13 @@ export const InventoryManagerWorkflow = () => {
         </CardHeader>
         <CardContent>
           {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-            filtered.length === 0 ? <p className="text-muted-foreground text-center py-4">No items found</p> : (
+            filtered.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-1">No items found</p>
+                <p className="text-sm text-muted-foreground mb-4">Add inventory items to start tracking stock levels.</p>
+                <Button onClick={() => setShowAdd(true)} className="gap-1.5 min-h-[44px]"><Plus className="h-4 w-4" /> Add Item</Button>
+              </div>
+            ) : (
               <div className="space-y-2">
                 {filtered.slice(0, 50).map(item => (
                   <div key={item.id} className="flex items-center justify-between p-3 rounded-lg border">

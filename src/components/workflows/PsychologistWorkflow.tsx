@@ -173,10 +173,10 @@ export const PsychologistWorkflow = () => {
                   {['Not at all', 'Several days', 'More than half', 'Nearly every day'].map((label, v) => (
                     <Button
                       key={v}
-                      size="sm"
+                      size="touch"
                       variant={scores[i] === v ? 'default' : 'outline'}
                       onClick={() => { const s = [...scores]; s[i] = v; setScores(s); }}
-                      className="flex-1 text-xs"
+                      className="flex-1 min-h-[44px] text-xs"
                     >
                       {label} ({v})
                     </Button>

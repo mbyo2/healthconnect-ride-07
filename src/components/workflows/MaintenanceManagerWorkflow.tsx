@@ -46,7 +46,7 @@ export const MaintenanceManagerWorkflow = () => {
   const [assetForm, setAssetForm] = useState({ asset_name: '', asset_tag: '', category: 'medical_equipment', location: '', manufacturer: '', serial_number: '' });
 
   const priorityColor = (p: string) => {
-    switch (p) { case 'critical': return 'bg-destructive/10 text-destructive'; case 'high': return 'bg-amber-100 text-amber-800'; default: return ''; }
+    switch (p) { case 'critical': return 'bg-destructive/10 text-destructive'; case 'high': return 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'; default: return ''; }
   };
 
   return (
@@ -144,7 +144,13 @@ export const MaintenanceManagerWorkflow = () => {
           <Card>
             <CardContent className="pt-4">
               {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-                workOrders.length === 0 ? <p className="text-muted-foreground text-center py-4">No work orders</p> : (
+                workOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-1">No work orders yet</p>
+                    <p className="text-sm text-muted-foreground mb-4">Log maintenance requests so nothing falls through the cracks.</p>
+                    <Button onClick={() => setShowAddWO(true)} className="gap-1.5 min-h-[44px]"><Plus className="h-4 w-4" /> Create Work Order</Button>
+                  </div>
+                ) : (
                   <div className="space-y-2">
                     {workOrders.map(wo => (
                       <div key={wo.id} className="flex items-center justify-between p-3 rounded-lg border">
@@ -169,7 +175,13 @@ export const MaintenanceManagerWorkflow = () => {
         <TabsContent value="assets">
           <Card>
             <CardContent className="pt-4">
-              {assets.length === 0 ? <p className="text-muted-foreground text-center py-4">No assets registered</p> : (
+              {assets.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-1">No assets registered yet</p>
+                  <p className="text-sm text-muted-foreground mb-4">Register equipment to track condition, maintenance and sharing.</p>
+                  <Button onClick={() => setShowAddAsset(true)} className="gap-1.5 min-h-[44px]"><Package className="h-4 w-4" /> Register Asset</Button>
+                </div>
+              ) : (
                 <div className="space-y-2">
                   {assets.map(a => (
                     <div key={a.id} className="flex items-center justify-between p-3 rounded-lg border">

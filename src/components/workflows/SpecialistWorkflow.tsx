@@ -28,7 +28,7 @@ export const SpecialistWorkflow = () => {
   });
 
   const statusColor = (s: string) => {
-    switch (s) { case 'in_progress': return 'bg-amber-100 text-amber-800'; case 'completed': return 'bg-green-100 text-green-800'; default: return ''; }
+    switch (s) { case 'in_progress': return 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'; case 'completed': return 'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300'; default: return ''; }
   };
 
   return (
@@ -75,7 +75,13 @@ export const SpecialistWorkflow = () => {
           <Card>
             <CardContent className="pt-4">
               {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-                sessions.length === 0 ? <p className="text-muted-foreground text-center py-4">No sessions yet</p> : (
+                sessions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-1">No sessions yet</p>
+                    <p className="text-sm text-muted-foreground mb-4">Schedule a specialist session to start a patient's treatment plan.</p>
+                    <Button onClick={() => setShowAdd(true)} className="gap-1.5 min-h-[44px]"><Plus className="h-4 w-4" /> New Session</Button>
+                  </div>
+                ) : (
                   <div className="space-y-2">
                     {sessions.slice(0, 50).map(s => (
                       <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border">
@@ -85,8 +91,8 @@ export const SpecialistWorkflow = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className={statusColor(s.status)}>{s.status}</Badge>
-                          {s.status === 'scheduled' && <Button size="sm" variant="outline" onClick={() => updateSession(s.id, { status: 'in_progress', start_time: new Date().toISOString() })}>Start</Button>}
-                          {s.status === 'in_progress' && <Button size="sm" onClick={() => updateSession(s.id, { status: 'completed', end_time: new Date().toISOString(), outcome: 'successful' })}><CheckCircle className="h-3 w-3 mr-1" /> Complete</Button>}
+                          {s.status === 'scheduled' && <Button size="touch" className="min-h-[44px]" variant="outline" onClick={() => updateSession(s.id, { status: 'in_progress', start_time: new Date().toISOString() })}>Start</Button>}
+                          {s.status === 'in_progress' && <Button size="touch" className="min-h-[44px]" onClick={() => updateSession(s.id, { status: 'completed', end_time: new Date().toISOString(), outcome: 'successful' })}><CheckCircle className="h-3 w-3 mr-1" /> Complete</Button>}
                         </div>
                       </div>
                     ))}

@@ -413,7 +413,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
                 <button
                   onClick={() => setIsAutomationsModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -425,7 +425,7 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-rose-500">Status changes to Stuck / Critical</span></div>
-                    <div className="text-xs text-slate-400">Send instant SMS alert to On-Call Chief Doctor & page ICU staff</div>
+                    <div className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Send instant SMS alert to On-Call Chief Doctor & page ICU staff</div>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
@@ -435,7 +435,7 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-blue-500">Patient intake completes</span></div>
-                    <div className="text-xs text-slate-400">Trigger MedGemma AI diagnostic triage classification & assign bed</div>
+                    <div className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Trigger MedGemma AI diagnostic triage classification & assign bed</div>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
@@ -445,7 +445,7 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-success-500">Status changes to Done</span></div>
-                    <div className="text-xs text-slate-400">Move patient item to Discharge Pipeline & generate PDF invoice</div>
+                    <div className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Move patient item to Discharge Pipeline & generate PDF invoice</div>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
@@ -476,7 +476,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
                 <button
                   onClick={() => setIsIntegrationsModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -518,7 +518,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -526,7 +526,7 @@ export const BespokeWorkOSShowcase = () => {
 
               <form onSubmit={handleAddNewPatient} className="mt-4 space-y-4">
                 <div>
-                  <label className="text-xs font-bold uppercase text-slate-400">Patient Full Name</label>
+                  <label className={`text-xs font-bold uppercase ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Patient Full Name</label>
                   <input
                     type="text"
                     required
@@ -541,7 +541,7 @@ export const BespokeWorkOSShowcase = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-bold uppercase text-slate-400">Age / Gender</label>
+                    <label className={`text-xs font-bold uppercase ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Age / Gender</label>
                     <input
                       type="text"
                       placeholder="e.g. 35F"
@@ -554,7 +554,7 @@ export const BespokeWorkOSShowcase = () => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold uppercase text-slate-400">Initial Priority</label>
+                    <label className={`text-xs font-bold uppercase ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Initial Priority</label>
                     <select
                       value={newPatientPriority}
                       onChange={(e) => setNewPatientPriority(e.target.value as PriorityLevel)}
@@ -571,7 +571,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase text-slate-400">Chief Symptoms / Complaint</label>
+                  <label className={`text-xs font-bold uppercase ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Chief Symptoms / Complaint</label>
                   <textarea
                     rows={2}
                     placeholder="Describe symptoms or ER notes..."
@@ -618,7 +618,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
                 <button
                   onClick={() => setSelectedPatient(null)}
-                  className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                  className={`p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -628,12 +628,12 @@ export const BespokeWorkOSShowcase = () => {
                 {/* Status & Priority Strip */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className={`p-3 rounded-xl border ${isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
-                    <span className="text-xs uppercase font-bold text-slate-400">Current Status</span>
+                    <span className={`text-xs uppercase font-bold ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Current Status</span>
                     <div className="mt-1 text-sm font-bold text-blue-500">{selectedPatient.status}</div>
                   </div>
 
                   <div className={`p-3 rounded-xl border ${isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
-                    <span className="text-xs uppercase font-bold text-slate-400">Triage Priority</span>
+                    <span className={`text-xs uppercase font-bold ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Triage Priority</span>
                     <div className="mt-1 text-sm font-bold text-amber-500">{selectedPatient.priority}</div>
                   </div>
                 </div>
@@ -645,7 +645,7 @@ export const BespokeWorkOSShowcase = () => {
                     <span>Real-Time Vitals Telemetry</span>
                   </div>
                   <div className="mt-2 text-lg font-mono font-bold">{selectedPatient.vitalScore}</div>
-                  <div className="mt-1 text-xs text-slate-400">Location: {selectedPatient.location}</div>
+                  <div className={`mt-1 text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Location: {selectedPatient.location}</div>
                 </div>
 
                 {/* Assigned Clinical Lead */}
@@ -657,7 +657,7 @@ export const BespokeWorkOSShowcase = () => {
                   />
                   <div>
                     <div className="font-extrabold text-base">{selectedPatient.doctor.name}</div>
-                    <div className="text-xs text-slate-400">{selectedPatient.doctor.specialty}</div>
+                    <div className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{selectedPatient.doctor.specialty}</div>
                   </div>
                 </div>
 
@@ -672,7 +672,7 @@ export const BespokeWorkOSShowcase = () => {
 
                 {/* Billing Summary */}
                 <div className="flex justify-between items-center p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <span className="text-xs font-bold text-slate-400">Total Billing (ZMW):</span>
+                  <span className={`text-xs font-bold ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Total Billing (ZMW):</span>
                   <span className="text-lg font-mono font-bold text-emerald-500">ZMW K{selectedPatient.billingZMW.toLocaleString()}</span>
                 </div>
               </div>

@@ -23,7 +23,7 @@ export const AmbulanceStaffWorkflow = () => {
   };
 
   const priorityColor = (p: string) => {
-    switch (p) { case 'emergency': return 'bg-destructive/10 text-destructive'; case 'urgent': return 'bg-amber-100 text-amber-800'; default: return ''; }
+    switch (p) { case 'emergency': return 'bg-destructive/10 text-destructive'; case 'urgent': return 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'; default: return ''; }
   };
 
   return (
@@ -100,7 +100,7 @@ export const AmbulanceStaffWorkflow = () => {
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className={priorityColor(d.priority)}>{d.priority}</Badge>
                           <Badge variant="outline">{d.status.replace(/_/g, ' ')}</Badge>
-                          {statusFlow[d.status] && <Button size="sm" onClick={() => updateStatus(d.id, statusFlow[d.status])}>{statusFlow[d.status].replace(/_/g, ' ')}</Button>}
+                          {statusFlow[d.status] && <Button size="touch" className="min-h-[44px]" onClick={() => updateStatus(d.id, statusFlow[d.status])}>{statusFlow[d.status].replace(/_/g, ' ')}</Button>}
                         </div>
                       </div>
                     ))}

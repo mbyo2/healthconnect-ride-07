@@ -237,7 +237,7 @@ export const OpticianWorkflow = () => {
         value={rxForm[key]}
         onChange={(e) => setRxForm({ ...rxForm, [key]: e.target.value })}
         placeholder={placeholder}
-        className="h-8 text-xs"
+        className="h-11 text-xs"
         inputMode="decimal"
       />
     </div>
@@ -303,7 +303,7 @@ export const OpticianWorkflow = () => {
         {/* ── Prescriptions ── */}
         <TabsContent value="prescriptions" className="mt-4 space-y-4">
           <div className="flex justify-end">
-            <Button size="sm" onClick={() => setRxDialogOpen(true)} className="gap-1.5">
+            <Button size="touch" onClick={() => setRxDialogOpen(true)} className="gap-1.5 min-h-[44px]">
               <Plus className="h-4 w-4" /> New Prescription
             </Button>
           </div>
@@ -346,9 +346,8 @@ export const OpticianWorkflow = () => {
                           </td>
                           <td className="px-4 py-2.5 text-right">
                             <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs"
+                              size="touch"
+                              variant="outline" className="min-h-[44px] text-xs"
                               onClick={() => { setOrderRxId(rx.id); setOrderDialogOpen(true); }}
                             >
                               <Package className="h-3.5 w-3.5 mr-1" /> Order lenses
@@ -422,17 +421,17 @@ export const OpticianWorkflow = () => {
                           <td className="px-4 py-2.5 text-right">
                             <div className="flex justify-end gap-1.5">
                               {o.status === "pending" && (
-                                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => advanceOrder(o, "ordered")}>
+                                <Button size="touch" variant="outline" className="min-h-[44px] text-xs" onClick={() => advanceOrder(o, "ordered")}>
                                   Mark ordered
                                 </Button>
                               )}
                               {o.status === "ordered" && (
-                                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => advanceOrder(o, "ready")}>
+                                <Button size="touch" variant="outline" className="min-h-[44px] text-xs" onClick={() => advanceOrder(o, "ready")}>
                                   Mark ready
                                 </Button>
                               )}
                               {o.status === "ready" && (
-                                <Button size="sm" className="h-7 text-xs" onClick={() => advanceOrder(o, "dispensed")}>
+                                <Button size="touch" className="min-h-[44px] text-xs" onClick={() => advanceOrder(o, "dispensed")}>
                                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Dispense
                                 </Button>
                               )}
@@ -471,7 +470,7 @@ export const OpticianWorkflow = () => {
                           {o.frame || "No frame"} · {LENS_TYPES.find((t) => t.value === o.lens_type)?.label || o.lens_type}
                         </p>
                       </div>
-                      <Button size="sm" onClick={() => advanceOrder(o, "dispensed")} className="gap-1.5">
+                      <Button size="touch" onClick={() => advanceOrder(o, "dispensed")} className="gap-1.5 min-h-[44px]">
                         <CheckCircle2 className="h-4 w-4" /> Dispense
                       </Button>
                     </div>
@@ -519,7 +518,7 @@ export const OpticianWorkflow = () => {
                   value={rxForm.pd}
                   onChange={(e) => setRxForm({ ...rxForm, pd: e.target.value })}
                   placeholder="63"
-                  className="h-8 text-xs"
+                  className="h-11 text-xs"
                   inputMode="decimal"
                 />
               </div>

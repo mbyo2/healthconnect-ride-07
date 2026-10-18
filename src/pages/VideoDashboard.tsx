@@ -177,6 +177,25 @@ const VideoDashboard: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Empty session list — no upcoming video sessions */}
+        {!stats.loading && !stats.error && stats.upcoming === 0 && (
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-xs text-center">
+            <div className="mx-auto h-12 w-12 rounded-xl bg-primary-500/10 text-primary-500 flex items-center justify-center mb-3">
+              <Video className="h-6 w-6" />
+            </div>
+            <h3 className="font-extrabold text-sm mb-1">No upcoming video sessions</h3>
+            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mb-4">
+              Schedule a video consultation and it will appear here.
+            </p>
+            <button
+              onClick={() => navigate("/appointments")}
+              className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all inline-flex items-center justify-center gap-2"
+            >
+              <Calendar className="h-4 w-4" /> Schedule Session
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -477,7 +477,14 @@ export const PatientFlowManagement = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeFlows.map((flow) => {
+              {activeFlows.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-muted-foreground mb-1">No patients in flow right now</p>
+                  <p className="text-sm text-muted-foreground mb-4">Check a patient in to start tracking their journey through the facility.</p>
+                  <Button onClick={() => navigate("/kiosk")} className="gap-1.5 min-h-[44px]"><UserRound className="h-4 w-4" /> Check In Patient</Button>
+                </div>
+              ) : (
+              activeFlows.map((flow) => {
                 const timeData = calculateTimeInStage(
                   flow.current_stage_started_at,
                   flow.current_stage?.estimated_duration_minutes
@@ -540,7 +547,7 @@ export const PatientFlowManagement = () => {
                     </CardContent>
                   </Card>
                 );
-              })}
+              }))}
             </div>
           </TabsContent>
 

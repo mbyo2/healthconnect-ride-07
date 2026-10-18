@@ -177,13 +177,13 @@ export const HealthcareInstitutions = () => {
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
             Healthcare Institutions &amp; Clinics
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl font-medium">
+          <p className="text-slate-400 dark:text-slate-300 text-sm sm:text-base max-w-2xl font-medium">
             Explore accredited hospitals, pharmacies, laboratories, and specialised medical clinics. Book appointments and manage care seamlessly.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 max-w-2xl">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400 dark:text-slate-300" />
               <Input
                 placeholder="Search by facility name, city, specialty or service…"
                 value={searchTerm}
@@ -237,7 +237,7 @@ export const HealthcareInstitutions = () => {
             </div>
           ) : filtered.length === 0 ? (
             <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 space-y-3">
-              <Building2 className="h-12 w-12 mx-auto text-slate-300" />
+              <Building2 className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600" />
               <h3 className="font-extrabold text-base">No institutions found</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">Try clearing your search filters or choose another category.</p>
               <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); setTypeFilter('all'); }}>

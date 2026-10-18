@@ -484,7 +484,7 @@ export const PatientWorkflow = React.memo(() => {
       {/* ─── Reference-style Doctor Cards ─── */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Available Doctors</h2>
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Available Doctors</h2>
           <button
             onClick={() => handleNavigation(`/search?mode=${careMode}`, 'Find Doctors')}
             className="text-xs font-bold text-blue-600 hover:text-blue-700"

@@ -56,8 +56,8 @@ export const DentistWorkflow = () => {
             <button
               key={tooth}
               onClick={() => setSelectedTooth(tooth)}
-              className={`w-10 h-12 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-slate-200'
+              className={`min-w-[44px] min-h-[44px] w-11 h-12 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-bold transition-all ${
+                selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-slate-200 dark:border-slate-700'
               } ${condInfo?.color} text-white hover:scale-105`}
               title={`Tooth ${tooth} - ${condInfo?.label}`}
             >
@@ -145,7 +145,7 @@ export const DentistWorkflow = () => {
                     ))}
                   </div>
                 )}
-                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
+                <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
                   <div className="text-xs font-bold mb-2">Legend</div>
                   <div className="flex flex-wrap gap-2">
                     {TOOTH_CONDITIONS.map(cond => (

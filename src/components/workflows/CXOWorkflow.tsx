@@ -48,7 +48,7 @@ export const CXOWorkflow = () => {
                 <CardTitle className="flex items-center gap-2 text-lg"><TrendingUp className="h-5 w-5" /> Growth</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className={`text-3xl font-bold ${metrics.growthPercent >= 0 ? 'text-green-600' : 'text-destructive'}`}>
+                <p className={`text-3xl font-bold ${metrics.growthPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
                   {metrics.growthPercent >= 0 ? '+' : ''}{metrics.growthPercent}%
                 </p>
                 <p className="text-sm text-muted-foreground">vs last month</p>
@@ -107,7 +107,7 @@ export const CXOWorkflow = () => {
                 <CardTitle className="flex items-center gap-2 text-sm"><ShieldCheck className="h-4 w-4" /> Claims</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold text-amber-600">{metrics.pendingClaims}</p>
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{metrics.pendingClaims}</p>
                 <p className="text-xs text-muted-foreground">Pending insurance</p>
               </CardContent>
             </Card>

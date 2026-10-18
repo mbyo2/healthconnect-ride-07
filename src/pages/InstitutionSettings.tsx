@@ -517,7 +517,7 @@ const InstitutionSettings = () => {
                 Choose who handles money for your institution's services.
               </p>
               <div className="space-y-2">
-                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/60 transition-colors">
                   <input
                     type="radio"
                     name="payment_mode"
@@ -533,7 +533,7 @@ const InstitutionSettings = () => {
                     </p>
                   </div>
                 </label>
-                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/60 transition-colors">
                   <input
                     type="radio"
                     name="payment_mode"

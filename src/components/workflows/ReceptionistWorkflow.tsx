@@ -64,16 +64,16 @@ export const ReceptionistWorkflow = () => {
             <div className="flex gap-1">
               {token.status === 'waiting' && (
                 <>
-                  <Button size="sm" variant="default" onClick={() => updateTokenStatus(token.id, 'serving')}>
+                  <Button size="touch" variant="default" onClick={() => updateTokenStatus(token.id, 'serving')}>
                     <Play className="h-3 w-3 mr-1" /> Call
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => updateTokenStatus(token.id, 'no_show')}>
+                  <Button size="touch" variant="outline" onClick={() => updateTokenStatus(token.id, 'no_show')}>
                     No Show
                   </Button>
                 </>
               )}
               {token.status === 'serving' && (
-                <Button size="sm" variant="default" onClick={() => updateTokenStatus(token.id, 'completed')}>
+                <Button size="touch" variant="default" onClick={() => updateTokenStatus(token.id, 'completed')}>
                   <CheckCircle className="h-3 w-3 mr-1" /> Complete
                 </Button>
               )}

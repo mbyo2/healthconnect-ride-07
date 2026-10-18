@@ -39,7 +39,7 @@ export const SupportWorkflow = () => {
     <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
       <div className="text-center space-y-2">
         <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center justify-center gap-2">
-          <Headphones className="h-6 w-6 text-sky-500" /> Support Center
+          <Headphones className="h-6 w-6 text-primary" /> Support Center
         </h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
           Real ticket management, user assistance & platform support

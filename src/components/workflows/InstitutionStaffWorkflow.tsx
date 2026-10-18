@@ -72,7 +72,7 @@ export const InstitutionStaffWorkflow = () => {
                   <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
                 </div>
               </div>
-              <Button onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }} size="sm" className="w-full text-xs mt-2" variant="outline">Open</Button>
+              <Button onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }} size="touch" className="w-full text-sm mt-2 min-h-[44px]" variant="outline">Open</Button>
             </CardContent>
           </Card>
         ))}

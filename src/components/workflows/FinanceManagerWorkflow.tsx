@@ -204,9 +204,11 @@ export const FinanceManagerWorkflow = () => {
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : filteredInvoices.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-12">
-                  No invoices match.
-                </p>
+                <div className="text-center py-12">
+                  <p className="text-sm text-muted-foreground mb-1">No invoices match.</p>
+                  <p className="text-sm text-muted-foreground mb-4">Try widening your filters to see more invoices.</p>
+                  <Button variant="outline" size="touch" onClick={() => { setInvoiceFilter("all"); setInvoiceSearch(""); }}>Clear filters</Button>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -225,7 +227,7 @@ export const FinanceManagerWorkflow = () => {
                         <tr key={inv.id} className="hover:bg-muted/40">
                           <td className="px-4 py-2.5 font-medium text-xs">{inv.invoice_number}</td>
                           <td className="px-4 py-2.5 text-right text-xs">{formatPrice(inv.total_amount || 0)}</td>
-                          <td className="px-4 py-2.5 text-right text-xs text-success-600">{formatPrice(inv.paid_amount || 0)}</td>
+                          <td className="px-4 py-2.5 text-right text-xs text-success-600 dark:text-success-400">{formatPrice(inv.paid_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-right text-xs text-destructive">{formatPrice(inv.balance || 0)}</td>
                           <td className="px-4 py-2.5 text-center">
                             <Badge variant={inv.payment_status === "paid" ? "default" : "secondary"} className="text-xs">
@@ -273,9 +275,11 @@ export const FinanceManagerWorkflow = () => {
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : filteredClaims.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-12">
-                  No claims match.
-                </p>
+                <div className="text-center py-12">
+                  <p className="text-sm text-muted-foreground mb-1">No claims match.</p>
+                  <p className="text-sm text-muted-foreground mb-4">Try widening your filters to see more claims.</p>
+                  <Button variant="outline" size="touch" onClick={() => setClaimFilter("all")}>Clear filters</Button>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

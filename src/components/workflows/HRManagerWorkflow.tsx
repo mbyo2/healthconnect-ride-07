@@ -173,7 +173,7 @@ export const HRManagerWorkflow = () => {
           <div className="text-3xl font-black font-mono text-success-500 mt-1">
             {todayAttendance.filter((a) => a.status === "present").length}
           </div>
-          <div className="text-xs text-emerald-500 font-bold mt-0.5">Biometric Clocked-In</div>
+          <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Biometric Clocked-In</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
@@ -181,19 +181,19 @@ export const HRManagerWorkflow = () => {
           <div className="text-3xl font-black font-mono text-warning-500 mt-1">
             {todayAttendance.filter((a) => a.status === "late").length}
           </div>
-          <div className="text-xs text-amber-500 font-bold mt-0.5">Grace period exceeded</div>
+          <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Grace period exceeded</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
           <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Leaves</div>
           <div className="text-3xl font-black font-mono text-primary-500 mt-1">{pendingLeaves.length}</div>
-          <div className="text-xs text-blue-500 font-bold mt-0.5">Awaiting Approval</div>
+          <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Awaiting Approval</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
           <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Payroll Items</div>
-          <div className="text-3xl font-black font-mono text-purple-600 mt-1">{payroll.length}</div>
-          <div className="text-xs text-purple-500 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
+          <div className="text-3xl font-black font-mono text-primary-500 mt-1">{payroll.length}</div>
+          <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
         </div>
       </div>
 

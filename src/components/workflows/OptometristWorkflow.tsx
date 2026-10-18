@@ -191,14 +191,14 @@ export const OptometristWorkflow = () => {
             </div>
 
             {examPatientId && pastExams.length > 0 && (
-              <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
                 <p className="text-sm font-medium mb-2">Past Examinations ({pastExams.length})</p>
                 {loadingExams ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {pastExams.map((pe: any) => (
-                      <p key={pe.id} className="text-xs text-gray-600">
+                      <p key={pe.id} className="text-xs text-gray-600 dark:text-gray-300">
                         {new Date(pe.created_at).toLocaleDateString()} — OD: {pe.od_sphere || '-'} / OS: {pe.os_sphere || '-'}
                       </p>
                     ))}
