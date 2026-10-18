@@ -96,9 +96,8 @@ const SearchPage = () => {
                 <Stethoscope className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+                <h1 className="font-display text-2xl font-medium tracking-tight">
                   Find a Doctor
-                  <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">
                   Locate verified specialists, hospitals, pharmacies, and telemedicine practitioners

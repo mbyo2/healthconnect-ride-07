@@ -425,7 +425,7 @@ export const Auth = () => {
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-graphite-600">Email Address</FormLabel>
-                      <FormControl><Input placeholder="you@example.online" {...field} type="email" autoComplete="email" className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
+                      <FormControl><Input placeholder="you@example.online" {...field} type="email" autoComplete="email" className="h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
                       <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
@@ -437,11 +437,11 @@ export const Auth = () => {
                       </div>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" {...field} className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" {...field} className="h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
                           <button type="button" onClick={() => setShowPassword(!showPassword)}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                             aria-pressed={showPassword}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 p-3 -m-1 rounded-md text-graphite-400 hover:text-midnight min-h-[44px] min-w-[44px] flex items-center justify-center">
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-3 -m-1 rounded-md text-graphite-400 hover:text-midnight dark:text-slate-400 dark:hover:text-slate-100 min-h-[44px] min-w-[44px] flex items-center justify-center">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>

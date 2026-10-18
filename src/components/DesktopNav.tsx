@@ -341,7 +341,7 @@ export function DesktopNav() {
                   }`}
                 >
                   {item.icon}
-                  <span className="truncate">{item.label}</span>
+                  <span>{item.label}</span>
                 </Link>
               ))}
 

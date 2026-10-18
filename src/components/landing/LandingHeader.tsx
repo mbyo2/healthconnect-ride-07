@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { AppLogo } from "@/components/ui/AppLogo";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "@/hooks/use-theme";
 
 const NAV_ITEMS = [
   { label: "Find Doctors", route: "/search" },
@@ -19,6 +20,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const isActive = (route: string) => location.pathname === route.split("?")[0];
 
@@ -75,6 +77,14 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
         </nav>
 
         <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+          <button
+            type="button"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="rounded-pill p-3 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
           <button
             type="button"
             onClick={() => navigate("/auth")}

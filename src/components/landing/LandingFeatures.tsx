@@ -11,7 +11,7 @@ import { LandingImg } from "./LandingImg";
 export const HowItWorks = () => {
   const navigate = useNavigate();
   return (
-    <section className="vf-section bg-white">
+    <section className="vf-section bg-white dark:bg-slate-950">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-3 md:gap-12">
           {[
@@ -86,8 +86,8 @@ export const PlatformScale = () => (
         loading="lazy"
         decoding="async"
       />
-      <div className="absolute inset-0 bg-midnight/70" />
-      <div className="absolute inset-0 bg-gradient-to-b from-midnight/40 via-transparent to-midnight/40" />
+      <div className="absolute inset-0 bg-slate-950/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/40" />
     </div>
     <div className="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
       <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-white">
