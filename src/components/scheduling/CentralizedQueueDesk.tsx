@@ -141,7 +141,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
           </Link>
           <Dialog open={showNewTokenModal} onOpenChange={setShowNewTokenModal}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
+              <button className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
                 <Plus className="h-4 w-4" /> Issue Walk-in Token
               </button>
             </DialogTrigger>

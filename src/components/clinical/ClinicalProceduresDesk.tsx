@@ -233,7 +233,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         <div className="flex items-center gap-2">
           <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs">
+              <Button size="sm" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-extrabold text-xs">
                 <Plus className="h-4 w-4" /> Log Clinical Procedure
               </Button>
             </DialogTrigger>

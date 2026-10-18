@@ -183,7 +183,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
             onClick={handleDownload}
             disabled={!profile}
             size="sm"
-            className="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs"
+            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-extrabold text-xs"
           >
             <Download className="h-4 w-4" /> Download FHIR Bundle
           </Button>

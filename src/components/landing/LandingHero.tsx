@@ -131,7 +131,7 @@ export const LandingHero = () => {
         </div>
       </div>
 
-      <div className="mt-10 border-y border-canvas-silk bg-white">
+      <div className="mt-10 border-y border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="mx-auto grid max-w-content grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           <div className="flex items-center border-b border-canvas-silk px-5 py-4 text-left sm:border-b-0 lg:border-r">
             <p className="text-xs font-medium uppercase tracking-widest text-graphite-400">
