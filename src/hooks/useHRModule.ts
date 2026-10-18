@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
+import { calculateZambiaPayroll } from '@/utils/zambiaPayroll';
 import { toast } from 'sonner';
 
 export interface LeaveRequest {
@@ -47,6 +48,39 @@ export interface PayrollRecord {
   currency: string;
   status: string;
   paid_at: string | null;
+}
+
+export interface Employee {
+  id: string;
+  institution_id: string;
+  user_id: string;
+  role: string;
+  department: string | null;
+  salary_monthly: number;
+  status: 'active' | 'inactive' | 'pending';
+  joined_at: string;
+  // joined from profiles
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+}
+
+export interface PayrollRunSummary {
+  employeeCount: number;
+  totalGross: number;
+  totalNapsa: number;
+  totalNhima: number;
+  totalPaye: number;
+  totalDeductions: number;
+  totalNet: number;
+  lines: {
+    employee: Employee;
+    gross: number;
+    napsa: number;
+    nhima: number;
+    paye: number;
+    net: number;
+  }[];
 }
 
 export function useHRModule() {

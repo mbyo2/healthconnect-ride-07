@@ -534,7 +534,7 @@ export const BillingStaffWorkflow = () => {
         </TabsContent>
 
         <TabsContent value="accounting" className="mt-4">
-          <MultiCountryAccounting />
+          <MultiCountryAccounting institutionId={institutionId} />
         </TabsContent>
 
         <TabsContent value="claims" className="space-y-3 mt-4">
