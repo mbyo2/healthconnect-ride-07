@@ -63,6 +63,8 @@ export const USER_ROLES = {
   TRIAGE_STAFF: 'triage_staff',
   MAINTENANCE_MANAGER: 'maintenance_manager',
   AMBULANCE_STAFF: 'ambulance_staff',
+  // ── Delivery & logistics ──
+  COURIER: 'courier',
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
@@ -129,6 +131,8 @@ export const ROLE_META: Record<UserRole, RoleMeta> = {
   [USER_ROLES.TRIAGE_STAFF]:        { label: 'Triage Staff',        icon: 'AlertTriangle',   category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.MAINTENANCE_MANAGER]: { label: 'Maintenance Manager', icon: 'Wrench',          category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.AMBULANCE_STAFF]:     { label: 'Ambulance Staff',     icon: 'Truck',           category: 'institution', landingPage: '/staff-dashboard' },
+  // ── Delivery & logistics ──
+  [USER_ROLES.COURIER]:              { label: 'Courier',             icon: 'Bike',            category: 'logistics',   landingPage: '/courier-deliveries' },
   // ── Platform administration ──
   [USER_ROLES.ADMIN]:               { label: 'Admin',               icon: 'Shield',          category: 'admin',       landingPage: '/admin-dashboard' },
   [USER_ROLES.SUPER_ADMIN]:         { label: 'Super Admin',         icon: 'ShieldCheck',     category: 'admin',       landingPage: '/super-admin-dashboard' },

@@ -470,6 +470,15 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/medications',
   ]),
 
+  // ── Courier (delivery driver/biker) ──────────────────────
+  [USER_ROLES.COURIER]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/courier-deliveries',
+    '/wallet',
+    '/chat',
+    '/map',
+  ]),
+
   // ── Admin ────────────────────────────────────────────────
   [USER_ROLES.ADMIN]: dedupeRoutes([
     ...COMMON_ROUTES,
@@ -892,6 +901,14 @@ ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = dedupeRoutes([
   '/appointments',
 ]);
 
+ROLE_PERMISSIONS[USER_ROLES.COURIER] = dedupeRoutes([
+  ...COMMON_ROUTES,
+  '/courier-deliveries',
+  '/wallet',
+  '/chat',
+  '/map',
+]);
+
 ROLE_PERMISSIONS[USER_ROLES.PATHOLOGIST] = dedupeRoutes([
   ...COMMON_ROUTES,
   '/lab-management',
@@ -954,6 +971,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
   [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
   [USER_ROLES.AMBULANCE_STAFF]: '/institution-dashboard',
+  [USER_ROLES.COURIER]: '/courier-deliveries',
   [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
 
