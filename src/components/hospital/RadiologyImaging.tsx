@@ -188,7 +188,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
 
       {/* New Order Dialog */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
-        <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">New Radiology Imaging Order</DialogTitle></DialogHeader>
           <form onSubmit={handleNewOrder} className="space-y-3 py-2 text-xs">
             <div className="grid grid-cols-2 gap-2">

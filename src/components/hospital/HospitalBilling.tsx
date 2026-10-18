@@ -393,7 +393,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
 
       {/* Generate Invoice Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-white border border-canvas-silk max-w-md">
+        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk max-w-md">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Generate Invoice</DialogTitle>
             <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Create a billing record and auto-populate pending charges for a patient.</DialogDescription>

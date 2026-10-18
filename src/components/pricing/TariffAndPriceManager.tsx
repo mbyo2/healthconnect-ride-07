@@ -669,7 +669,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
       {/* Add Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[450px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Add Service Price</DialogTitle>
           </DialogHeader>

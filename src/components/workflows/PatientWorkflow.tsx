@@ -397,7 +397,7 @@ export const PatientWorkflow = React.memo(() => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="px-5 py-2.5 rounded-full bg-white text-slate-900 hover:bg-primary-50 dark:hover:bg-slate-800 hover:text-primary-500 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
+          <button className="px-5 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-primary-50 dark:hover:bg-slate-700 hover:text-primary-500 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
             <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -501,7 +501,7 @@ export const PatientWorkflow = React.memo(() => {
             />
           ))}
           {featuredProviders.length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-6 bg-white rounded-2xl border border-gray-100">
+            <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-6 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700">
               No doctors available right now. Try changing the care mode above.
             </p>
           )}

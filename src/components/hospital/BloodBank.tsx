@@ -469,7 +469,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Add Stock Dialog */}
       <Dialog open={showAddStock} onOpenChange={setShowAddStock}>
-        <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">Add Blood Stock</DialogTitle></DialogHeader>
           <form onSubmit={handleAddStock} className="space-y-3 py-2 text-xs">
             <div className="grid grid-cols-2 gap-2">
@@ -509,7 +509,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* New Request Dialog */}
       <Dialog open={showNewRequest} onOpenChange={setShowNewRequest}>
-        <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">New Blood Transfusion Request</DialogTitle></DialogHeader>
           <form onSubmit={handleNewRequest} className="space-y-3 py-2 text-xs">
             <div>
@@ -560,7 +560,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Add Donor Dialog */}
       <Dialog open={showAddDonor} onOpenChange={setShowAddDonor}>
-        <DialogContent className="sm:max-w-[420px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Register Blood Donor</DialogTitle>
           </DialogHeader>
@@ -606,7 +606,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Record Donation Dialog */}
       <Dialog open={showAddDonation} onOpenChange={setShowAddDonation}>
-        <DialogContent className="sm:max-w-[420px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Record Blood Donation</DialogTitle>
           </DialogHeader>
@@ -663,7 +663,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Compatibility Test Dialog */}
       <Dialog open={showCompatTest} onOpenChange={setShowCompatTest}>
-        <DialogContent className="sm:max-w-[420px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Compatibility / Crossmatch Test</DialogTitle>
           </DialogHeader>

@@ -290,7 +290,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
 
       {/* Order Dialog */}
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
-        <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Order Laboratory Test</DialogTitle>
           </DialogHeader>
@@ -356,7 +356,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
 
       {/* Enter Result Dialog */}
       <Dialog open={!!showResultDialog} onOpenChange={(o) => !o && setShowResultDialog(null)}>
-        <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Enter Result — {showResultDialog?.test_type}</DialogTitle>
           </DialogHeader>

@@ -362,7 +362,7 @@ export const PharmacyPOS = () => {
 
       {/* Custom Item Dialog */}
       <Dialog open={showCustomItem} onOpenChange={setShowCustomItem}>
-        <DialogContent className="max-w-sm bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">Add Custom Item</DialogTitle></DialogHeader>
           <div className="space-y-3 text-xs py-2">
             <div>
@@ -383,7 +383,7 @@ export const PharmacyPOS = () => {
 
       {/* Close Register Dialog */}
       <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>
-        <DialogContent className="max-w-sm bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">Close Register</DialogTitle></DialogHeader>
           <div className="space-y-3 text-xs py-2">
             {activeSession && (
@@ -408,7 +408,7 @@ export const PharmacyPOS = () => {
 
       {/* Receipt Dialog */}
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
-        <DialogContent className="max-w-sm bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base flex items-center gap-2">
               <Receipt className="h-5 w-5 text-success-500" /> Sale Receipt

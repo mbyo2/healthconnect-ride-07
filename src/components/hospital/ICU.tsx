@@ -227,7 +227,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
             {beds.map((bed) => {
               const latest = latestFor(bed.id);
               return (
-                <div key={bed.id} className={`rounded-xl border p-4 space-y-2 ${STATUS_BG[bed.status] || "bg-white border-canvas-silk"}`}>
+                <div key={bed.id} className={`rounded-xl border p-4 space-y-2 ${STATUS_BG[bed.status] || "bg-white dark:bg-slate-900 border-canvas-silk dark:border-slate-700"}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`h-3 w-3 rounded-full ${STATUS_COLORS[bed.status] || "bg-slate-400"}`} />

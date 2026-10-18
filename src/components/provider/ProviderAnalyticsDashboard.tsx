@@ -93,7 +93,7 @@ export const ProviderAnalyticsDashboard = () => {
       {/* 8 Bento Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="p-3.5 rounded-xl border border-canvas-silk bg-white shadow-xs">
+          <div key={label} className="p-3.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                 <Icon className={`h-4 w-4 ${color}`} />

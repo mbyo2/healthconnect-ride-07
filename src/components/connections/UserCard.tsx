@@ -69,7 +69,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-canvas-silk bg-white shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
+    <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-11 w-11 border border-canvas-silk dark:border-slate-800">
@@ -182,14 +182,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         </button>
         <button
           onClick={() => navigate(`/chat?receiver=${user.id}`)}
-          className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
+          className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
         >
           <MessageCircle className="h-3.5 w-3.5 text-primary-500" /> Chat
         </button>
         {isClinicianRole(user.role) && (
           <button
             onClick={() => navigate(`/provider/${user.id}`)}
-            className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
+            className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
           >
             <Calendar className="h-3.5 w-3.5 text-success-500" /> Book
           </button>
