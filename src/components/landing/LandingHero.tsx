@@ -107,7 +107,7 @@ export const LandingHero = () => {
               fetchpriority="high"
               decoding="async"
             />
-            <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md sm:left-auto sm:right-6 sm:mx-0">
+            <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 sm:left-auto sm:right-6 sm:mx-0">
               <p className="font-display text-lg leading-snug text-midnight">
                 &ldquo;{featured.content}&rdquo;
               </p>

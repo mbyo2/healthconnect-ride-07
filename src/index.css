@@ -269,13 +269,13 @@ html {
     @apply inline-flex items-center justify-center gap-2 rounded-pill border border-graphite-300 bg-white px-6 py-3 text-sm font-medium tracking-wide text-charcoal transition-all hover:border-graphite-400 hover:bg-graphite-50;
   }
   .vf-card {
-    @apply rounded-card border border-canvas-silk bg-white p-6 shadow-card transition-all hover:shadow-card-hover;
+    @apply rounded-card border border-canvas-silk bg-white p-6 shadow-card transition-all hover:shadow-card-hover dark:border-slate-800 dark:bg-slate-900;
   }
   .vf-section {
     @apply py-section lg:py-section-lg;
   }
   .vf-eyebrow {
-    @apply inline-flex items-center gap-2 rounded-pill border border-canvas-silk bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-graphite-600;
+    @apply inline-flex items-center gap-2 rounded-pill border border-canvas-silk bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-graphite-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300;
   }
 }
 
