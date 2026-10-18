@@ -544,16 +544,32 @@ export function AdminMetricsDashboard() {
     },
   });
 
-  // User growth trend (last 7 days) - using profiles created_at
+  // User growth trend (last 7 days) - real signup counts from profiles.created_at
   const { data: growthTrend } = useQuery({
     queryKey: ["admin-user-growth"],
     queryFn: async () => {
-      const days = Array.from({ length: 7 }, (_, i) => {
+      const startOfWeek = subDays(new Date(), 6);
+      startOfWeek.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", startOfWeek.toISOString());
+      // On error, return empty so the chart shows an honest "No data yet" state
+      if (error || !data) return [];
+
+      // Bucket real signups by day
+      const counts = new Map<string, number>();
+      for (const row of data) {
+        if (!row.created_at) continue;
+        const day = format(new Date(row.created_at), "yyyy-MM-dd");
+        counts.set(day, (counts.get(day) || 0) + 1);
+      }
+
+      return Array.from({ length: 7 }, (_, i) => {
         const d = subDays(new Date(), 6 - i);
-        return { name: format(d, "EEE"), users: 0 };
+        const key = format(d, "yyyy-MM-dd");
+        return { name: format(d, "EEE"), users: counts.get(key) || 0 };
       });
-      // TODO: Fill with real cumulative data
-      return days;
     },
   });
 
