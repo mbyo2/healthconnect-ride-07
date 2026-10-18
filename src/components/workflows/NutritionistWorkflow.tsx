@@ -10,7 +10,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
