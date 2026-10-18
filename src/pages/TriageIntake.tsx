@@ -192,6 +192,9 @@ export default function TriageIntake() {
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
               Tell us how you feel — we'll suggest the right care and help you book a visit
             </p>
+            <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2 mt-2 font-medium">
+              This is not medical advice. If you're experiencing an emergency, call 116 immediately.
+            </p>
           </div>
         </div>
       </div>

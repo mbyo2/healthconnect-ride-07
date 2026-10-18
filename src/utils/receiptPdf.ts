@@ -294,7 +294,15 @@ export function generateReceiptPdf(data: ReceiptData): jsPDF {
     footerY,
     { align: "center" }
   );
-  doc.text("doc0clock.online", pageW / 2, footerY + 4, { align: "center" });
+  doc.setFontSize(7);
+  doc.text(
+    "NHIMA tariffs are indicative; final coverage subject to NHIMA approval.",
+    pageW / 2,
+    footerY + 4,
+    { align: "center" }
+  );
+  doc.setFontSize(8);
+  doc.text("doc0clock.online", pageW / 2, footerY + 8, { align: "center" });
 
   return doc;
 }
@@ -558,7 +566,15 @@ export function generateConsolidatedReceiptPdf(data: ConsolidatedReceiptData): j
     footerY,
     { align: "center" }
   );
-  doc.text("doc0clock.online", pageW / 2, footerY + 4, { align: "center" });
+  doc.setFontSize(7);
+  doc.text(
+    "NHIMA tariffs are indicative; final coverage subject to NHIMA approval.",
+    pageW / 2,
+    footerY + 4,
+    { align: "center" }
+  );
+  doc.setFontSize(8);
+  doc.text("doc0clock.online", pageW / 2, footerY + 8, { align: "center" });
 
   return doc;
 }

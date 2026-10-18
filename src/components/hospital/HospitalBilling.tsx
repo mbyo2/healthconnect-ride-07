@@ -280,6 +280,9 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           <Plus className="h-4 w-4" /> Generate Invoice
         </button>
       </div>
+      <p className="text-xs text-muted-foreground">
+        NHIMA tariffs are indicative; final coverage is subject to NHIMA approval. Confirm amounts with the facility.
+      </p>
 
       {/* KPI Strip — restrained, semantic colors only */}
       <div className="grid grid-cols-3 gap-4">

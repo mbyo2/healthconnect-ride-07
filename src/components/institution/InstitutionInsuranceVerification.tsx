@@ -89,7 +89,10 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
         if (!selectedInsurance) return;
         setLoading(true);
         try {
-            // Real verification logic per Zambian provider rules
+            // ESTIMATED coverage only — this does NOT contact NHIMA, Hollard,
+            // Sanlam, or any insurer. It is a planning estimate based on typical
+            // plan terms. Actual coverage is confirmed by the insurer at time
+            // of service. Never present this to a patient as a guarantee.
             let coveragePercentage = 80;
             let coverageNotes = "";
 
@@ -98,15 +101,17 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
                 // Uses the real 2025 tariff caps (K600 OPD / K1,200 chronic).
                 // Coverage % here reflects tariff compliance, not a co-pay.
                 coveragePercentage = 100;
-                coverageNotes = "NHIMA covers 100% of tariff-allowed amounts (2025: K600 OPD cap, K1,200 chronic cap). Non-tariff excess is patient responsibility.";
+                coverageNotes = "Estimated: NHIMA covers 100% of tariff-allowed amounts (2025: K600 OPD cap, K1,200 chronic cap). Non-tariff excess is patient responsibility. Confirm with NHIMA at time of service.";
             } else if (selectedInsurance.provider_name === InsuranceProvider.HOLLARD_HEALTH) {
                 coveragePercentage = 85;
+                coverageNotes = "Estimated coverage based on typical Hollard Health plan terms. Actual coverage confirmed by Hollard at time of service.";
             } else if (selectedInsurance.provider_name === InsuranceProvider.SANLAM) {
                 coveragePercentage = 75;
+                coverageNotes = "Estimated coverage based on typical Sanlam plan terms. Actual coverage confirmed by Sanlam at time of service.";
             }
 
             const coverageDetails = {
-                status: 'verified',
+                status: 'estimated',
                 coverage_percentage: coveragePercentage,
                 copay_amount: 0,
                 deductible_remaining: 0,
@@ -115,13 +120,13 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
                 notes: coverageNotes || undefined,
             };
 
-            // Create verification record
+            // Create coverage estimate record (NOT a verified check)
             const { data, error } = await supabase
                 .from('insurance_verifications')
                 .insert({
                     patient_id: patientId,
                     insurance_info_id: selectedInsurance.id,
-                    verification_status: 'verified',
+                    verification_status: 'estimated',
                     coverage_details: coverageDetails,
                     coverage_percentage: coveragePercentage,
                     verification_date: new Date().toISOString(),
@@ -132,11 +137,11 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
 
             if (error) throw error;
 
-            toast.success(`Insurance verified: ${coveragePercentage}% coverage`);
+            toast.success(`Coverage estimated: ${coveragePercentage}% (not verified with insurer)`);
             onVerified(data);
         } catch (error) {
-            console.error('Error verifying insurance:', error);
-            toast.error('Verification failed');
+            console.error('Error estimating coverage:', error);
+            toast.error('Coverage estimate failed');
         } finally {
             setLoading(false);
         }
@@ -146,8 +151,11 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
         <Card className="border-primary/20 bg-primary/5">
             <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-primary" /> Insurance Verification
+                    <Shield className="h-4 w-4 text-primary" /> Coverage Estimate
                 </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                    Estimated coverage based on typical plan terms. This is not verified with your insurer — actual coverage is confirmed by them at time of service.
+                </p>
             </CardHeader>
             <CardContent>
                 {insuranceInfo.length === 0 ? (
@@ -178,7 +186,7 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
                             ))}
                         </div>
                         <Button className="w-full" onClick={verifyInsurance} disabled={loading || !selectedInsurance}>
-                            {loading ? 'Verifying...' : 'Verify Selected Insurance'}
+                            {loading ? 'Estimating...' : 'Estimate Coverage'}
                         </Button>
                     </div>
                 )}

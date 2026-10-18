@@ -133,10 +133,10 @@ export const CareExperience = () => {
             </p>
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
               {[
-                { badge: "24/7 Access", title: "Video Telehealth", desc: "Connect with certified doctors in under 15 minutes, any time.", route: "/video-dashboard" },
-                { badge: "Doorstep", title: "Pharmacy Delivery", desc: "Order genuine prescribed medications delivered to your home.", route: "/search?type=pharmacy" },
-                { badge: "NHIMA", title: "Insurance Accepted", desc: "Zero-hassle digital claims and instant insurance verification.", route: "/pricing" },
-                { badge: "Emergency", title: "24/7 Emergency & ER", desc: "One-tap emergency dispatch and hospital bed reservation.", route: "/emergency" },
+                { badge: "Video Visits", title: "Video Telehealth", desc: "Book video consultations with certified doctors at their available times.", route: "/video-dashboard" },
+                { badge: "Pharmacy", title: "Pharmacy Delivery", desc: "Order prescribed medications for delivery from participating pharmacies.", route: "/search?type=pharmacy" },
+                { badge: "NHIMA", title: "Insurance Accepted", desc: "Digital claims with coverage estimates. Actual coverage confirmed by your insurer.", route: "/pricing" },
+                { badge: "Emergency", title: "Emergency Contacts", desc: "Quick access to emergency numbers and your personal contacts.", route: "/emergency" },
               ].map((item) => (
                 <button
                   key={item.title}
