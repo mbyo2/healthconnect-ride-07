@@ -8,7 +8,7 @@ import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
   Shield, Bug, Pill, Video, Activity, Megaphone, Code2, Bell,
-  ChevronRight, Clock
+  ChevronRight, Clock, Mic
 } from 'lucide-react';
 
 interface ActionItem {
@@ -103,6 +103,7 @@ export const DoctorWorkflow = () => {
       title: 'Clinical Tools',
       primary: { title: 'AI Clinical Assistant', description: 'AI-powered diagnostic support', icon: icon(Brain), route: '/ai-diagnostics' },
       secondary: [
+        { title: 'Ambient Scribe', description: 'AI consultation notes — you review & approve', icon: icon(Mic), route: '/ambient-scribe' },
         { title: 'Allergy & Drug Safety', description: 'Interaction & allergy checks', icon: icon(Shield), route: '/prescriptions' },
         { title: 'Medication Management', description: 'Active meds & refills', icon: icon(Pill), route: '/medications' },
         { title: 'Infection Management', description: 'HAI tracking & stewardship', icon: icon(Bug), route: '/institution/patients' },

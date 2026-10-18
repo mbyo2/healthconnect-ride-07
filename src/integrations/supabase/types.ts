@@ -10330,6 +10330,65 @@ export type Database = {
           },
         ]
       }
+      claim_denials: {
+        Row: {
+          appeal_deadline: string | null
+          appeal_notes: string | null
+          assigned_to: string | null
+          claim_id: string | null
+          created_at: string
+          denied_amount: number
+          denial_code: string | null
+          denial_reason: string
+          id: string
+          institution_id: string
+          resolved_at: string | null
+          status: string
+          supporting_documents: Json | null
+          updated_at: string
+        }
+        Insert: {
+          appeal_deadline?: string | null
+          appeal_notes?: string | null
+          assigned_to?: string | null
+          claim_id?: string | null
+          created_at?: string
+          denied_amount?: number
+          denial_code?: string | null
+          denial_reason: string
+          id?: string
+          institution_id: string
+          resolved_at?: string | null
+          status?: string
+          supporting_documents?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          appeal_deadline?: string | null
+          appeal_notes?: string | null
+          assigned_to?: string | null
+          claim_id?: string | null
+          created_at?: string
+          denied_amount?: number
+          denial_code?: string | null
+          denial_reason?: string
+          id?: string
+          institution_id?: string
+          resolved_at?: string | null
+          status?: string
+          supporting_documents?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_denials_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_information: {
         Row: {
           coverage_end_date: string | null

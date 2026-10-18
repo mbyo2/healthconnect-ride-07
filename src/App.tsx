@@ -127,6 +127,7 @@ const ProviderProfile = lazyWithRetry(() => import('@/pages/ProviderProfile'));
 const ProviderDetail = lazyWithRetry(() => import('@/pages/ProviderDetail'));
 const VideoCall = lazyWithRetry(() => import('@/pages/VideoCall'));
 const VisitSummary = lazyWithRetry(() => import('@/pages/VisitSummary'));
+const AmbientScribe = lazyWithRetry(() => import('@/components/clinical/AmbientScribe'));
 const Providers = lazyWithRetry(() => import('@/pages/Providers'));
 const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
@@ -372,6 +373,7 @@ const AppContent = () => {
             {/* provider/:id and providers are now public above */}
             <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
             <Route path="/visit-summary/:consultationId" element={<RouteGuard><VisitSummary /></RouteGuard>} />
+            <Route path="/ambient-scribe/:consultationId?" element={<RouteGuard><AmbientScribe /></RouteGuard>} />
             <Route path="/role-management" element={<RouteGuard requireRoles={["super_admin"]}><RoleManagement /></RouteGuard>} />
             <Route path="/intake-form" element={<RouteGuard><IntakeForm /></RouteGuard>} />
 
