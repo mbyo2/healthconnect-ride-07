@@ -24,6 +24,27 @@ const MapPage = () => {
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
+  /** Haversine distance in kilometers between two lat/lng points */
+  const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth radius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  /** Format distance for display: "850 m" or "2.3 km" */
+  const formatDistance = (km: number): string => {
+    if (km < 1) return `${Math.round(km * 1000)} m`;
+    return `${km.toFixed(1)} km`;
+  };
+
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers-map'],
     queryFn: async () => {
@@ -138,19 +159,26 @@ const MapPage = () => {
     }
   };
 
-  // Filter providers based on search
+  // Filter providers based on search, sorted by distance when location known
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredProviders(providers);
-      return;
+    let result = providers;
+    if (searchQuery.trim()) {
+      result = providers.filter(provider =>
+        `${provider.first_name} ${provider.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        provider.specialty?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-
-    const filtered = providers.filter(provider =>
-      `${provider.first_name} ${provider.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      provider.specialty?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredProviders(filtered);
-  }, [providers, searchQuery]);
+    // Calculate distance and sort by distance when user location is known — nearest first
+    if (userLocation) {
+      result = result.map(p => ({
+        ...p,
+        distance: p.location
+          ? haversineKm(userLocation.lat, userLocation.lng, p.location.latitude, p.location.longitude)
+          : undefined,
+      })).sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+    }
+    setFilteredProviders(result);
+  }, [providers, searchQuery, userLocation]);
 
   if (isLoading) {
     return <LoadingScreen message="Loading healthcare providers..." />;
