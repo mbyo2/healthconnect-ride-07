@@ -255,7 +255,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                   onChange={(e) => searchPatients(e.target.value)}
                   placeholder="Type patient name..."
                 />
-                {searching && <p className="text-xs text-slate-500">Searching...</p>}
+                {searching && <p className="text-xs text-slate-500 dark:text-slate-400">Searching...</p>}
                 {searchResults.length > 0 && (
                   <div className="rounded-lg border max-h-40 overflow-y-auto">
                     {searchResults.map((p: any) => (

@@ -111,7 +111,7 @@ function AdjudicationSimulator() {
             value={preAuthToken}
             onChange={(e) => setPreAuthToken(e.target.value)}
             placeholder="e.g. AUTH-7234-B"
-            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 dark:text-slate-400"
           />
         </div>
       </div>
@@ -143,7 +143,7 @@ function AdjudicationSimulator() {
           value={policy.annualDeductible > 0 ? (policy.deductibleMet / policy.annualDeductible) * 100 : 100}
           className="h-2 bg-slate-600"
         />
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           {policy.annualDeductible > 0
             ? `ZMW ${Math.max(0, policy.annualDeductible - policy.deductibleMet).toLocaleString()} remaining before full coverage`
             : "No deductible — full statutory coverage"}
@@ -387,7 +387,7 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
           const count = claims.filter((c) => c.status === stage).length;
           return (
             <div key={stage} className="bg-slate-700/20 rounded-lg p-2 border border-slate-600/20">
-              <div className={`text-xs font-semibold mb-1 ${count > 0 ? "text-blue-300" : "text-slate-500"}`}>{stage}</div>
+              <div className={`text-xs font-semibold mb-1 ${count > 0 ? "text-blue-300" : "text-slate-500 dark:text-slate-400"}`}>{stage}</div>
               <div className={`text-2xl font-bold ${count > 0 ? "text-white" : "text-slate-600"}`}>{count}</div>
             </div>
           );
@@ -428,7 +428,7 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
                     <p className="text-xs text-slate-400">{claim.dateOfService}</p>
                   </div>
                   <ClaimStatusBadge status={claim.status} />
-                  <ChevronRight className={`h-4 w-4 text-slate-500 transition-transform ${selectedClaim?.id === claim.id ? "rotate-90" : ""}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-500 dark:text-slate-400 transition-transform ${selectedClaim?.id === claim.id ? "rotate-90" : ""}`} />
                 </div>
               </div>
 

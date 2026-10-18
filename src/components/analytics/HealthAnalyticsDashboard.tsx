@@ -65,7 +65,7 @@ export const HealthAnalyticsDashboard: React.FC<HealthAnalyticsDashboardProps> =
       case 'high': return 'text-orange-600';
       case 'medium': return 'text-yellow-600';
       case 'low': return 'text-blue-600';
-      default: return 'text-gray-600';
+      default: return 'text-gray-600 dark:text-gray-300';
     }
   };
 
@@ -332,13 +332,13 @@ export const HealthAnalyticsDashboard: React.FC<HealthAnalyticsDashboardProps> =
                     ) : trend.trend === 'declining' ? (
                       <TrendingDown className="h-6 w-6 text-red-500" />
                     ) : (
-                      <Activity className="h-6 w-6 text-gray-500" />
+                      <Activity className="h-6 w-6 text-gray-500 dark:text-gray-400" />
                     )}
                   </div>
                   <h4 className="font-medium mb-1">{trend.metric}</h4>
                   <div className={`text-sm ${
                     trend.trend === 'improving' ? 'text-green-600' :
-                    trend.trend === 'declining' ? 'text-red-600' : 'text-gray-600'
+                    trend.trend === 'declining' ? 'text-red-600' : 'text-gray-600 dark:text-gray-300'
                   }`}>
                     {trend.changePercent > 0 ? '+' : ''}{trend.changePercent}%
                   </div>

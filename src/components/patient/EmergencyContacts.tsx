@@ -112,7 +112,7 @@ export const EmergencyContacts = () => {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold">{contact.name}</h3>
-                <p className="text-sm text-gray-600">{contact.relationship}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{contact.relationship}</p>
                 <p className="text-sm">{contact.phone}</p>
                 {contact.email && <p className="text-sm">{contact.email}</p>}
                 {contact.address && <p className="text-sm">{contact.address}</p>}

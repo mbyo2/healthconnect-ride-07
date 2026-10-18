@@ -113,7 +113,7 @@ function FacilityOverview({ institutionId }: { institutionId: string }) {
           </div>
         ))}
       </div>
-      <p className="text-xs text-slate-500">Live from beds, admissions, billing and personnel records for this facility. Zero rows render as zero — never as estimates.</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400">Live from beds, admissions, billing and personnel records for this facility. Zero rows render as zero — never as estimates.</p>
     </div>
   );
 }
@@ -221,9 +221,9 @@ function FacilityAuditTrail() {
       </div>
 
       {loading ? (
-        <p className="text-xs text-slate-500 text-center py-8">Loading audit events…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">Loading audit events…</p>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-10 text-xs text-slate-500">
+        <div className="text-center py-10 text-xs text-slate-500 dark:text-slate-400">
           <Eye className="h-8 w-8 mx-auto mb-2 opacity-40" />
           <p className="font-semibold text-slate-300">No audit events recorded yet.</p>
           <p className="mt-1">Staff notifications, emails and system actions will appear here as they happen.</p>
@@ -246,13 +246,13 @@ function FacilityAuditTrail() {
                         <span className={`text-xs font-semibold font-mono ${ACTION_COLORS[entry.action] || "text-slate-300"}`}>
                           {entry.action.replace(/_/g, " ")}
                         </span>
-                        {entry.outcome ? <span className="text-xs text-slate-500">· {entry.outcome}</span> : null}
-                        {entry.category ? <span className="text-xs text-slate-500">· {entry.category}</span> : null}
+                        {entry.outcome ? <span className="text-xs text-slate-500 dark:text-slate-400">· {entry.outcome}</span> : null}
+                        {entry.category ? <span className="text-xs text-slate-500 dark:text-slate-400">· {entry.category}</span> : null}
                       </div>
-                      <p className="text-xs text-slate-500 truncate">{entry.actorName} · {entry.resource || "—"}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{entry.actorName} · {entry.resource || "—"}</p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 shrink-0">{entry.created_at ? new Date(entry.created_at).toLocaleString() : "—"}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{entry.created_at ? new Date(entry.created_at).toLocaleString() : "—"}</p>
                 </div>
                 {isExpanded && (
                   <pre className="mt-3 pt-3 border-t border-slate-700/40 text-xs text-slate-300 font-mono whitespace-pre-wrap break-all" onClick={(e) => e.stopPropagation()}>
@@ -322,9 +322,9 @@ function FacilityTeam({ institutionId }: { institutionId: string }) {
         <ShieldCheck className="ml-auto h-5 w-5 text-emerald-400" />
       </div>
       {loading ? (
-        <p className="text-xs text-slate-500 text-center py-8">Loading roster…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">Loading roster…</p>
       ) : members.length === 0 ? (
-        <p className="text-xs text-slate-500 text-center py-8">No personnel registered for this facility yet.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">No personnel registered for this facility yet.</p>
       ) : (
         <div className="space-y-3">
           {Object.entries(byRole).sort((a, b) => b[1] - a[1]).map(([role, count]) => (

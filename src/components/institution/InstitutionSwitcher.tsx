@@ -36,7 +36,7 @@ export const InstitutionSwitcher = ({ affiliations, activeId, onSwitch, tone = "
           size="sm"
           className={
             tone === "dark"
-              ? "gap-2 max-w-[240px] bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
+              ? "gap-2 max-w-[240px] bg-white dark:bg-slate-900/10 border-white/20 text-white hover:bg-white dark:bg-slate-900/20 hover:text-white"
               : "gap-2 max-w-[240px]"
           }
         >

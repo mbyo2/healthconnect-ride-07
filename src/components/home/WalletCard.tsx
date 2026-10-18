@@ -94,7 +94,7 @@ export const WalletCard = () => {
     return (
         <Card className="group bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground border-none shadow-2xl overflow-hidden relative transition-all duration-500 hover:shadow-primary/20 hover:-translate-y-1 active:scale-[0.98]">
             {/* Animated background glow */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700" />
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-white dark:bg-slate-900/10 rounded-full blur-3xl group-hover:bg-white dark:bg-slate-900/20 transition-colors duration-700" />
             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-foreground/10 rounded-full blur-2xl" />
 
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500 group-hover:scale-110 transform">
@@ -113,7 +113,7 @@ export const WalletCard = () => {
                     <div>
                         <div className="text-4xl font-black tracking-tight">
                             {isLoading ? (
-                                <div className="h-10 w-32 bg-white/20 animate-pulse rounded-lg relative overflow-hidden">
+                                <div className="h-10 w-32 bg-white dark:bg-slate-900/20 animate-pulse rounded-lg relative overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                                 </div>
                             ) : (

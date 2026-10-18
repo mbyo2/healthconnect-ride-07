@@ -219,7 +219,7 @@ export const PublicQueueDisplay: React.FC = () => {
             Please have your Token Slip and National ID / Insurance Card ready when your number is called.
           </span>
         </div>
-        <div className="text-slate-500 hidden md:block">
+        <div className="text-slate-500 dark:text-slate-400 hidden md:block">
           Need assistance? Please visit the Central Registration Desk.
         </div>
       </div>

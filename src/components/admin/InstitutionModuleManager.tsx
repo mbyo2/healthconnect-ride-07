@@ -172,7 +172,7 @@ export const InstitutionModuleManager = () => {
           className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-canvas-silk text-sm font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
         />
         {institutions.length > 0 && !selectedId && (
-          <div className="absolute z-20 mt-1 w-full rounded-xl border border-canvas-silk bg-white shadow-lg overflow-hidden">
+          <div className="absolute z-20 mt-1 w-full rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-lg overflow-hidden">
             {institutions.map((i) => (
               <button
                 key={i.id}
@@ -189,7 +189,7 @@ export const InstitutionModuleManager = () => {
       </div>
 
       {selectedId && (
-        <div className="rounded-2xl border border-canvas-silk bg-white p-5 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 className="font-extrabold text-sm">{selected?.name}</h3>
             <span className="text-xs font-bold text-graphite-500">

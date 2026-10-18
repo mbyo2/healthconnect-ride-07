@@ -187,7 +187,7 @@ export const ChatList = () => {
                   <p className="font-semibold text-sm text-gray-900 truncate">
                     {providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}
                   </p>
-                  <p className="text-xs text-gray-500 capitalize truncate">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
                     {(contact.role || 'member').replace('_', ' ')}
                   </p>
                 </div>

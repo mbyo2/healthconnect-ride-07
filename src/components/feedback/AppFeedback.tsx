@@ -108,7 +108,7 @@ export const AppFeedbackProvider = ({ children }: { children: ReactNode }) => {
             <div
               key={item.id}
               onClick={() => dismiss(item.id)}
-              className="pointer-events-auto w-full flex items-center gap-3 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 animate-[slideUp_0.3s_cubic-bezier(0.34,1.56,0.64,1)]"
+              className="pointer-events-auto w-full flex items-center gap-3 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 px-4 py-3 animate-[slideUp_0.3s_cubic-bezier(0.34,1.56,0.64,1)]"
             >
               <div
                 className={`h-10 w-10 rounded-full ${COLORS[item.type]} flex items-center justify-center shrink-0`}
@@ -120,7 +120,7 @@ export const AppFeedbackProvider = ({ children }: { children: ReactNode }) => {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm text-gray-900">{item.title}</p>
                 {item.description && (
-                  <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{item.description}</p>
                 )}
               </div>
             </div>

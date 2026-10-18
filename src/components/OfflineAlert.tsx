@@ -139,7 +139,7 @@ export const OfflineAlert = () => {
             <Button
               variant="outline"
               size="sm"
-              className="ml-2 bg-transparent border-white/20 hover:bg-white/20 text-white text-xs"
+              className="ml-2 bg-transparent border-white/20 hover:bg-white dark:bg-slate-900/20 text-white text-xs"
               onClick={handleAttemptReconnect}
             >
               Reconnect
@@ -150,7 +150,7 @@ export const OfflineAlert = () => {
             <Button
               variant="outline"
               size="sm"
-              className="ml-2 bg-transparent border-white/20 hover:bg-white/20 text-white text-xs"
+              className="ml-2 bg-transparent border-white/20 hover:bg-white dark:bg-slate-900/20 text-white text-xs"
               onClick={syncOfflineActionsWithUI}
             >
               Sync now
@@ -161,7 +161,7 @@ export const OfflineAlert = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 rounded-full text-white hover:bg-white/20"
+              className="h-6 w-6 rounded-full text-white hover:bg-white dark:bg-slate-900/20"
             >
               <span className="sr-only">Offline details</span>
               <span className="text-xs">i</span>

@@ -123,12 +123,12 @@ export function PackageManager() {
       {tab === "surgery" && (
         <div className="space-y-3">
           {(surgeryQuery.data || []).map((p) => (
-            <div key={p.id} className="border rounded-xl p-4 bg-white">
+            <div key={p.id} className="border rounded-xl p-4 bg-white dark:bg-slate-900">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="font-bold">{p.name}</div>
-                  <div className="text-xs text-slate-500">{p.code}{p.description ? ` — ${p.description}` : ""}</div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-slate-500 dark:text-slate-400">{p.code}{p.description ? ` — ${p.description}` : ""}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {p.components.length} components · Cost {fmt(p.total_cost)} · Price {fmt(p.package_price)}
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export function PackageManager() {
             </div>
           ))}
           {surgeryQuery.data?.length === 0 && (
-            <div className="text-sm text-slate-500 border rounded-xl p-6 text-center">
+            <div className="text-sm text-slate-500 dark:text-slate-400 border rounded-xl p-6 text-center">
               No surgery packages yet. Create bundled procedure packages (e.g. "Caesarean Section Bundle") with component costs to track margins.
             </div>
           )}
@@ -161,12 +161,12 @@ export function PackageManager() {
               ? p.single_visit_price * p.total_visits - p.package_price
               : 0;
             return (
-              <div key={p.id} className="border rounded-xl p-4 bg-white">
+              <div key={p.id} className="border rounded-xl p-4 bg-white dark:bg-slate-900">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="font-bold">{p.name}</div>
-                    <div className="text-xs text-slate-500">{p.code} · {p.service_type}{p.description ? ` — ${p.description}` : ""}</div>
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{p.code} · {p.service_type}{p.description ? ` — ${p.description}` : ""}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                       {p.total_visits} visits · {fmt(p.package_price)}
                       {p.validity_days ? ` · valid ${p.validity_days} days` : ""}
                     </div>
@@ -187,7 +187,7 @@ export function PackageManager() {
             );
           })}
           {visitQuery.data?.length === 0 && (
-            <div className="text-sm text-slate-500 border rounded-xl p-6 text-center">
+            <div className="text-sm text-slate-500 dark:text-slate-400 border rounded-xl p-6 text-center">
               No visit packages yet. Create bundles like "Dialysis 12-Session Pack" or "Physio 10-Session Pack".
             </div>
           )}

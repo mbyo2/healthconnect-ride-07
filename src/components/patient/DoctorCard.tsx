@@ -27,7 +27,7 @@ export const DoctorCard = ({ provider, onSelect }: DoctorCardProps) => {
   return (
     <button
       onClick={onSelect}
-      className="w-full flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-left"
+      className="w-full flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-left"
     >
       <Avatar className="h-14 w-14 shrink-0">
         <AvatarImage src={provider.avatar_url} alt={name} />
@@ -50,9 +50,9 @@ export const DoctorCard = ({ provider, onSelect }: DoctorCardProps) => {
               />
             ))}
           </div>
-          <span className="text-xs text-gray-500 font-medium">{rating.toFixed(1)}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{rating.toFixed(1)}</span>
         </div>
-        <p className="text-xs text-gray-500 truncate mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
           {provider.specialty || "General Practice"}
           {provider.consultation_fee_min ? ` · K${provider.consultation_fee_min}` : ""}
         </p>

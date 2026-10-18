@@ -61,7 +61,7 @@ export const Hero = () => {
                   placeholder="Search doctors, specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 rounded-pill border-canvas-silk bg-white focus:border-primary-500 focus:ring-primary-500/20"
+                  className="pl-10 h-12 rounded-pill border-canvas-silk bg-white dark:bg-slate-900 focus:border-primary-500 focus:ring-primary-500/20"
                 />
               </div>
               <Button type="submit" size="lg" className="vf-btn-primary h-12 px-6">

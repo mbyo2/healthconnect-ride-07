@@ -365,7 +365,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
           {/* Scale Bar */}
           <div className="absolute bottom-4 right-4 bg-black/70 text-white px-2 py-1 rounded text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-12 h-0.5 bg-white" />
+              <div className="w-12 h-0.5 bg-white dark:bg-slate-900" />
               <span>{(100 / zoom).toFixed(1)} µm</span>
             </div>
           </div>

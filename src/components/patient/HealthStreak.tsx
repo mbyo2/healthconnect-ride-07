@@ -49,7 +49,7 @@ export const HealthStreak = ({ milestones, streakDays = 0 }: HealthStreakProps) 
 
           <div className="flex-1">
             <p className="font-bold text-sm text-gray-900">Health Shield</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {completed}/{total} checkups complete
             </p>
             {/* Progress bar */}
@@ -69,7 +69,7 @@ export const HealthStreak = ({ milestones, streakDays = 0 }: HealthStreakProps) 
               <div
                 key={m.id}
                 className={`flex items-center gap-2 p-2 rounded-xl text-xs ${
-                  m.completed ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-500"
+                  m.completed ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-500 dark:text-gray-400"
                 }`}
               >
                 {m.completed ? (
