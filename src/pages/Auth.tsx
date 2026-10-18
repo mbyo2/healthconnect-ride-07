@@ -373,7 +373,7 @@ export const Auth = () => {
           onClick={() => setSignupPath(item.path)}
           className="w-full flex items-center gap-3 p-4 rounded-xl border border-canvas-silk bg-canvas-bone hover:bg-primary-50 hover:border-primary-200 transition-all text-left group"
         >
-          <div className="p-2.5 rounded-xl bg-white border border-canvas-silk shadow-sm">
+          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 shadow-sm">
             {item.icon}
           </div>
           <div className="flex-1 min-w-0">
