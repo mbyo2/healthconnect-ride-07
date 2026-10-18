@@ -105,7 +105,7 @@ const IoTMonitoring = () => {
                   )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="border border-canvas-silk bg-white rounded-xl shadow-lg">
+              <DropdownMenuContent align="end" className="border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl shadow-lg">
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("bluetooth")} className="text-xs font-bold">
                   <Bluetooth className="w-4 h-4 mr-2 text-primary-500" /> Bluetooth Low Energy
                 </DropdownMenuItem>
@@ -247,7 +247,7 @@ const IoTMonitoring = () => {
             <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={heartRateData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="time" fontSize={11} />
                   <YAxis fontSize={11} />
                   <Tooltip />

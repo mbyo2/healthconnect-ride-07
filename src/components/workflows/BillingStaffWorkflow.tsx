@@ -218,10 +218,10 @@ export const BillingStaffWorkflow = () => {
   const InvoiceCard = ({ invoice }: { invoice: BillingInvoice }) => {
     const status = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
     return (
-      <div className="p-4 rounded-xl border border-canvas-silk bg-white font-sans space-y-2">
+      <div className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 font-sans space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-slate-900 text-xs">{invoice.invoice_number}</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">{invoice.invoice_number}</span>
             <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${status.pillColor}`}>
               {status.label}
             </span>
@@ -268,14 +268,14 @@ export const BillingStaffWorkflow = () => {
             )}
           </div>
         </div>
-        <p className="font-extrabold text-xs text-slate-900">{invoice.patient_name}</p>
+        <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{invoice.patient_name}</p>
         <div className="flex items-center gap-4 text-xs font-bold text-graphite-500 dark:text-slate-400">
           <span>Total: K{invoice.total_amount?.toLocaleString()}</span>
           <span>Paid: K{invoice.paid_amount?.toLocaleString()}</span>
           {invoice.balance > 0 && <span className="text-error-500">Balance: K{invoice.balance?.toLocaleString()}</span>}
         </div>
         {invoice.insurance_provider && (
-          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-primary-50 text-primary-500">
+          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-primary-50 dark:bg-primary-500/20 text-primary-500 dark:text-primary-300">
             {invoice.insurance_provider}
           </span>
         )}
@@ -296,7 +296,7 @@ export const BillingStaffWorkflow = () => {
               <Plus className="h-4 w-4" /> New Invoice
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
             <DialogHeader><DialogTitle className="font-extrabold text-base">Create Hospital Invoice</DialogTitle></DialogHeader>
             <div className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
@@ -368,7 +368,7 @@ export const BillingStaffWorkflow = () => {
                         className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                       />
                     </div>
-                    <div className="col-span-2 font-mono font-bold text-slate-900 text-right pr-2">
+                    <div className="col-span-2 font-mono font-bold text-slate-900 dark:text-slate-100 text-right pr-2">
                       K{item.total.toLocaleString()}
                     </div>
                     <div className="col-span-1 text-center">
@@ -412,7 +412,7 @@ export const BillingStaffWorkflow = () => {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-canvas border border-canvas-silk space-y-1">
+              <div className="p-3 rounded-xl bg-canvas dark:bg-slate-950 border border-canvas-silk dark:border-slate-800 space-y-1">
                 <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>K{subtotal.toLocaleString()}</span></div>
                 {invoiceForm.tax > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Tax</span><span>K{invoiceForm.tax.toLocaleString()}</span></div>}
                 {invoiceForm.discount > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Discount</span><span>-K{invoiceForm.discount.toLocaleString()}</span></div>}
@@ -433,7 +433,7 @@ export const BillingStaffWorkflow = () => {
 
       {/* Payment Dialog */}
       <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-        <DialogContent className="bg-white border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">Record Payment — {selectedInvoice?.invoice_number}</DialogTitle></DialogHeader>
           <div className="space-y-4 text-xs">
             <div>
@@ -481,19 +481,19 @@ export const BillingStaffWorkflow = () => {
 
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-white border border-canvas-silk shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
           <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Today's Total Collections</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-canvas-silk shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-primary-500">{pendingInvoices.length}</p>
           <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Pending Invoices</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-canvas-silk shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-error-500">{pendingClaims.length}</p>
           <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Pending Insurance Claims</p>
@@ -502,7 +502,7 @@ export const BillingStaffWorkflow = () => {
 
       {/* Module Tabs */}
       <Tabs defaultValue="invoices">
-        <TabsList className="flex items-center gap-1 p-1 bg-white border border-canvas-silk rounded-xl">
+        <TabsList className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl">
           <TabsTrigger value="invoices" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Invoices ({invoices.length})
           </TabsTrigger>
@@ -521,7 +521,7 @@ export const BillingStaffWorkflow = () => {
           {loading ? (
             <div className="p-8 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">Loading invoices...</div>
           ) : invoices.length === 0 ? (
-            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white rounded-2xl border border-canvas-silk dark:border-slate-800">
+            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800">
               No invoices yet. Click "New Invoice" to create one.
             </div>
           ) : (
@@ -537,14 +537,14 @@ export const BillingStaffWorkflow = () => {
           {loading ? (
             <div className="p-8 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">Loading claims...</div>
           ) : claims.length === 0 ? (
-            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white rounded-2xl border border-canvas-silk dark:border-slate-800">
+            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800">
               No insurance claims submitted yet.
             </div>
           ) : (
             claims.map((claim) => (
-              <div key={claim.id} className="p-4 rounded-xl border border-canvas-silk bg-white space-y-1 text-xs">
+              <div key={claim.id} className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-900">{claim.patient_name}</span>
+                  <span className="font-extrabold text-slate-900 dark:text-slate-100">{claim.patient_name}</span>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
                     claim.status === "approved" ? "bg-success-500" : claim.status === "rejected" ? "bg-error-500" : "bg-warning-500"
                   }`}>

@@ -235,10 +235,10 @@ const SuperAdminDashboard = () => {
                   <UserPlus className="h-3.5 w-3.5" /> Add Admin
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk rounded-card">
+              <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card">
                 <DialogHeader>
-                  <DialogTitle className="font-medium text-lg text-midnight">Create New Admin</DialogTitle>
-                  <DialogDescription className="text-sm text-graphite-500">Create an admin user with access to the Admin Dashboard.</DialogDescription>
+                  <DialogTitle className="font-medium text-lg text-midnight dark:text-slate-100">Create New Admin</DialogTitle>
+                  <DialogDescription className="text-sm text-graphite-500 dark:text-slate-400">Create an admin user with access to the Admin Dashboard.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2 text-sm">
                   {[
@@ -248,17 +248,17 @@ const SuperAdminDashboard = () => {
                     { id: "lastName", label: "Last Name", type: "text", val: newAdminLastName, set: setNewAdminLastName, ph: "Doe" },
                   ].map(f => (
                     <div key={f.id}>
-                      <label className="font-medium text-graphite-600 text-xs uppercase">{f.label}</label>
+                      <label className="font-medium text-graphite-600 dark:text-slate-400 text-xs uppercase">{f.label}</label>
                       <input
                         id={f.id} type={f.type} value={f.val} placeholder={f.ph}
                         onChange={(e) => f.set(e.target.value)}
-                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-graphite-400 dark:placeholder:text-slate-500 font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                       />
                     </div>
                   ))}
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-graphite-500 hover:text-midnight">Cancel</button>
+                  <button onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-graphite-500 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100">Cancel</button>
                   <button onClick={handleCreateAdmin} disabled={isSubmitting || !newAdminEmail || !newAdminPassword} className="vf-btn-primary text-sm">
                     {isSubmitting ? "Creating..." : "Create Admin"}
                   </button>
