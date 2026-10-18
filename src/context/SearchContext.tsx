@@ -120,10 +120,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .eq('is_verified', true);
 
       if (selectedSpecialty && selectedSpecialty !== 'all' as any) {
-        query = query.eq('specialty', selectedSpecialty);
+        query = query.ilike('specialty', selectedSpecialty);
       }
       if (selectedType && selectedType !== 'all' as any) {
-        query = query.eq('provider_type', selectedType);
+        query = query.ilike('provider_type', selectedType);
       }
       if (searchTerm) {
         query = query.or(

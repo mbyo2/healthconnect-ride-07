@@ -61,7 +61,6 @@ const MapPage = () => {
               telemedicine_available, consultation_fee_min, consultation_fee_max,
               typical_wait_time, subspecialties, city, state, is_verified
             `)
-            .in('role', ALL_CLINICIAN_ROLES as any)
             .eq('is_verified', true),
           supabase
             .from('healthcare_institutions')
