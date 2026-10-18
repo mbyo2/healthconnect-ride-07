@@ -193,11 +193,11 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
                       <p className="text-sm font-medium text-foreground">{r.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-[10px]">{r.frequency}</Badge>
+                        <Badge variant="outline" className="text-xs">{r.frequency}</Badge>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-[10px] h-6 px-2"
+                          className="text-xs h-6 px-2"
                           onClick={() => generateReport(r.title)}
                           disabled={generating !== null}
                         >

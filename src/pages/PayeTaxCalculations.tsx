@@ -432,43 +432,43 @@ export const PayeTaxCalculations = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Tax Slabs</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Tax Slabs</span>
                 <BarChart3 className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{activeSlabs}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured bands</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured bands</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total PAYE Collected</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total PAYE Collected</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">
                 {institution.currency || "ZMW"} {(totalPayeCollected / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">This period</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">This period</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
                 <CheckCircle className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{processedPayroll}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Completed runs</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Completed runs</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Payroll</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Payroll</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{pendingPayroll}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
         </div>
@@ -505,14 +505,14 @@ export const PayeTaxCalculations = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{slab.slab_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">
                           {new Date(slab.effective_from).toLocaleDateString()}
                         </div>
                       </div>
                       {slab.is_active ? (
-                        <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
+                        <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                       ) : (
-                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
+                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-xs">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -603,7 +603,7 @@ export const PayeTaxCalculations = () => {
                         {institution.currency || "ZMW"} {calc.total_paye_tax.toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px]" title={(calc as any).engine === 'zra-statutory' ? 'ZRA 2024/25 statutory bands (no custom slabs configured)' : 'This institution\u2019s custom tax slabs'}>
+                        <Badge variant="outline" className="text-xs" title={(calc as any).engine === 'zra-statutory' ? 'ZRA 2024/25 statutory bands (no custom slabs configured)' : 'This institution\u2019s custom tax slabs'}>
                           {(calc as any).engine === 'zra-statutory' ? 'ZRA statutory' : 'Custom slabs'}
                         </Badge>
                       </td>
@@ -659,11 +659,11 @@ export const PayeTaxCalculations = () => {
                         <CardTitle className="text-sm font-extrabold">
                           {pay.employee?.first_name} {pay.employee?.last_name}
                         </CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">
                           {pay.month} {pay.year}
                         </div>
                       </div>
-                      <Badge className={getStatusColor(pay.status) + " text-[10px]"}>
+                      <Badge className={getStatusColor(pay.status) + " text-xs"}>
                         {pay.status}
                       </Badge>
                     </div>
@@ -671,13 +671,13 @@ export const PayeTaxCalculations = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Gross Pay</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Gross Pay</div>
                         <div className="text-sm font-bold">
                           {institution.currency || "ZMW"} {pay.gross_pay.toFixed(2)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Net Pay</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Net Pay</div>
                         <div className="text-sm font-bold text-success-500">
                           {institution.currency || "ZMW"} {pay.net_pay.toFixed(2)}
                         </div>
@@ -729,13 +729,13 @@ export const PayeTaxCalculations = () => {
                     <div className="flex justify-center gap-4">
                       <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">NAPSA</div>
-                        <div className="text-[10px]">National Pension Scheme Authority</div>
-                        <div className="text-[10px] mt-1">Employee: 5% • Employer: 10%</div>
+                        <div className="text-xs">National Pension Scheme Authority</div>
+                        <div className="text-xs mt-1">Employee: 5% • Employer: 10%</div>
                       </div>
                       <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">NHIMA</div>
-                        <div className="text-[10px]">National Health Insurance Management Authority</div>
-                        <div className="text-[10px] mt-1">Employee: 1% • Employer: 2%</div>
+                        <div className="text-xs">National Health Insurance Management Authority</div>
+                        <div className="text-xs mt-1">Employee: 1% • Employer: 2%</div>
                       </div>
                     </div>
                     <div className="text-xs">

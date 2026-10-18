@@ -94,11 +94,11 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-1">
                 <span className="font-extrabold text-sm tracking-tight truncate">Clinical Dashboard</span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-400 rounded font-bold uppercase">
+                <span className="text-xs font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-400 rounded font-bold uppercase">
                   CRM
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 truncate">Doc' O Clock Hub</p>
+              <p className="text-xs text-slate-400 truncate">Doc' O Clock Hub</p>
             </div>
           )}
         </div>
@@ -124,7 +124,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
 
           {/* Favorites Section */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 px-2 py-1">
               <span>Favorites</span>
               <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
             </div>
@@ -148,7 +148,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                       <Icon className={`h-4 w-4 ${isActive ? "text-white" : board.color}`} />
                       <span className="truncate">{board.name}</span>
                     </div>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                    <span className={`text-xs px-1.5 py-0.2 rounded-full font-mono font-bold ${
                       isActive ? "bg-white/20 text-white" : "bg-slate-800 text-slate-400"
                     }`}>
                       {board.count}
@@ -162,7 +162,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
           <div className="pt-2 space-y-1">
             <div
               onClick={() => setWorkspaceOpen(!workspaceOpen)}
-              className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1 cursor-pointer hover:text-slate-200"
+              className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 px-2 py-1 cursor-pointer hover:text-slate-200"
             >
               <div className="flex items-center gap-1.5">
                 <Folder className="h-3.5 w-3.5 text-blue-400" />
@@ -190,7 +190,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                       <Icon className={`h-3.5 w-3.5 ${isActive ? "text-white" : board.color}`} />
                       <span className="truncate">{board.name}</span>
                     </div>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                    <span className={`text-xs px-1.5 py-0.2 rounded-full font-mono font-bold ${
                       isActive ? "bg-white/20 text-white" : "bg-slate-800 text-slate-400"
                     }`}>
                       {board.count}
@@ -235,7 +235,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
               <Zap className="h-4 w-4 text-amber-400" />
               <span>3 Automations Active</span>
             </div>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold font-mono">
+            <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold font-mono">
               ONLINE
             </span>
           </div>

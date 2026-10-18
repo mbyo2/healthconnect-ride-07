@@ -33,7 +33,7 @@ export const InstitutionStatsCards = ({
           </CardHeader>
           <CardContent className="px-3 pb-3">
             <div className="text-lg font-bold">{stat.value}</div>
-            <p className="text-[10px] text-muted-foreground truncate">{stat.subtitle}</p>
+            <p className="text-xs text-muted-foreground truncate">{stat.subtitle}</p>
           </CardContent>
         </Card>
       ))}

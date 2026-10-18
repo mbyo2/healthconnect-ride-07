@@ -41,7 +41,7 @@ export const HealthStreak = ({ milestones, streakDays = 0 }: HealthStreakProps) 
               )}
             </div>
             {streakDays > 0 && (
-              <span className="absolute -bottom-1 -right-1 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="absolute -bottom-1 -right-1 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                 {streakDays}🔥
               </span>
             )}

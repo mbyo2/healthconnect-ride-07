@@ -411,41 +411,41 @@ export const MedicalShiftHR = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{activeShifts}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured shifts</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured shifts</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
                 <Users className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{todayAssignments}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Staff scheduled</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Staff scheduled</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{presentToday}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Clock-in recorded</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Clock-in recorded</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
                 <Fingerprint className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{onlineDevices}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Biometric devices</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Biometric devices</div>
             </CardContent>
           </Card>
         </div>
@@ -486,13 +486,13 @@ export const MedicalShiftHR = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{shift.shift_name}</CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{shift.shift_type}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{shift.shift_type}</div>
                         </div>
                       </div>
                       {shift.is_active ? (
-                        <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
+                        <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                       ) : (
-                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
+                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-xs">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -507,13 +507,13 @@ export const MedicalShiftHR = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       {shift.is_overnight && (
-                        <Badge className="bg-indigo-500 text-white text-[10px]">Overnight</Badge>
+                        <Badge className="bg-indigo-500 text-white text-xs">Overnight</Badge>
                       )}
                       {shift.requires_on_call && (
-                        <Badge className="bg-error-500 text-white text-[10px]">On Call</Badge>
+                        <Badge className="bg-error-500 text-white text-xs">On Call</Badge>
                       )}
                       {shift.auto_assign_rotation && (
-                        <Badge className="bg-purple-500 text-white text-[10px]">Auto Rotation</Badge>
+                        <Badge className="bg-purple-500 text-white text-xs">Auto Rotation</Badge>
                       )}
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
@@ -640,11 +640,11 @@ export const MedicalShiftHR = () => {
                         <div className="text-xs font-bold">
                           {assignment.staff?.first_name} {assignment.staff?.last_name}
                         </div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{assignment.shift?.shift_name}</div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
                       </td>
                       <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(assignment.shift_date).toLocaleDateString()}
@@ -653,7 +653,7 @@ export const MedicalShiftHR = () => {
                         {assignment.shift?.break_duration_minutes} min break
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getAttendanceStatusColor(assignment.status) + " text-[10px]"}>
+                        <Badge className={getAttendanceStatusColor(assignment.status) + " text-xs"}>
                           {assignment.status}
                         </Badge>
                       </td>
@@ -755,7 +755,7 @@ export const MedicalShiftHR = () => {
                         {record.overtime_hours?.toFixed(1) || "-"}h
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getAttendanceStatusColor(record.status) + " text-[10px]"}>
+                        <Badge className={getAttendanceStatusColor(record.status) + " text-xs"}>
                           {record.status}
                         </Badge>
                       </td>
@@ -793,10 +793,10 @@ export const MedicalShiftHR = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{device.device_name}</CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{device.device_type}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{device.device_type}</div>
                         </div>
                       </div>
-                      <Badge className={getDeviceStatusColor(device.connection_status) + " text-[10px]"}>
+                      <Badge className={getDeviceStatusColor(device.connection_status) + " text-xs"}>
                         {device.connection_status}
                       </Badge>
                     </div>

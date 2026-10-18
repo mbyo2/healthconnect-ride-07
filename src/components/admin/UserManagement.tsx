@@ -285,7 +285,7 @@ export function UserManagement() {
               </CardTitle>
               <CardDescription>
                 Manage user accounts and role assignments
-                <span className="block text-[11px] mt-1">Showing up to 200 most recent — use search to find specific users.</span>
+                <span className="block text-xs mt-1">Showing up to 200 most recent — use search to find specific users.</span>
               </CardDescription>
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">

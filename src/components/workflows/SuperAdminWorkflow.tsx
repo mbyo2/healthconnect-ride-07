@@ -30,7 +30,7 @@ const getStatusPill = (status: string | null | undefined) => {
     s === "suspended" ? "bg-error-500" :
     s === "pending" ? "bg-warning-500" : "bg-slate-400";
   return (
-    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white ${color}`}>
+    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${color}`}>
       {s.charAt(0).toUpperCase() + s.slice(1)}
     </span>
   );
@@ -389,7 +389,7 @@ function UsersTab() {
                   <td className="px-4 py-2.5">
                     <div className="flex flex-wrap gap-1">
                       {u.roles.map((r) => (
-                        <span key={r} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400">
+                        <span key={r} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400">
                           {r}
                         </span>
                       ))}

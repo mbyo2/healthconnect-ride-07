@@ -291,7 +291,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Network facilities receive this referral instantly under their Incoming tab.
               </p>
             </div>

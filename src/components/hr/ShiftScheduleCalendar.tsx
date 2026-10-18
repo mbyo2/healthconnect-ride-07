@@ -210,14 +210,14 @@ export const ShiftScheduleCalendar: React.FC = () => {
                         {getShiftsForDay(day).slice(0, 3).map(shift => (
                           <div
                             key={shift.id}
-                            className={`text-[10px] px-1 py-0.5 rounded truncate ${SHIFT_COLORS[shift.shift_type]}`}
+                            className={`text-xs px-1 py-0.5 rounded truncate ${SHIFT_COLORS[shift.shift_type]}`}
                             title={`${shift.staff_id} - ${shift.shift_type}`}
                           >
                             {shift.staff_id.slice(0, 6)}
                           </div>
                         ))}
                         {getShiftsForDay(day).length > 3 && (
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             +{getShiftsForDay(day).length - 3} more
                           </div>
                         )}

@@ -342,7 +342,7 @@ export const OpticianWorkflow = () => {
                           </td>
                           <td className="px-4 py-2.5 text-xs">{rx.pd ?? "—"}</td>
                           <td className="px-4 py-2.5 text-center">
-                            <Badge variant="secondary" className="text-[10px]">{rx.status}</Badge>
+                            <Badge variant="secondary" className="text-xs">{rx.status}</Badge>
                           </td>
                           <td className="px-4 py-2.5 text-right">
                             <Button
@@ -415,7 +415,7 @@ export const OpticianWorkflow = () => {
                             {LENS_TYPES.find((t) => t.value === o.lens_type)?.label || o.lens_type}
                           </td>
                           <td className="px-4 py-2.5 text-center">
-                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold text-white ${ORDER_STATUS_COLOR[o.status] || "bg-muted"}`}>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-white ${ORDER_STATUS_COLOR[o.status] || "bg-muted"}`}>
                               {o.status}
                             </span>
                           </td>

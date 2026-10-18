@@ -178,7 +178,7 @@ export const CostEstimator = () => {
             <ShieldCheck className="h-5 w-5 text-primary-500" />
             <div>
               <div className="text-xs font-extrabold text-slate-900">{insuranceInfo.provider_name}</div>
-              <div className="text-[11px] text-graphite-500 dark:text-slate-400">Policy: {insuranceInfo.policy_number}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400">Policy: {insuranceInfo.policy_number}</div>
             </div>
           </div>
           {verification && (verification.verification_status === 'verified' || verification.status === 'verified') ? (
@@ -245,7 +245,7 @@ export const CostEstimator = () => {
               <span>Estimated Copay Due</span><span className="font-mono text-primary-500">K{estimate.outOfPocket.toFixed(2)}</span>
             </div>
           </div>
-          <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-graphite-500 dark:text-slate-400">
             Estimate only — the actual amount can change depending on the provider&apos;s confirmed fee and your plan&apos;s final decision.
           </p>
         </div>

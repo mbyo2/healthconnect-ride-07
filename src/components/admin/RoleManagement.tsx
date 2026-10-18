@@ -218,7 +218,7 @@ export const RoleManagement: React.FC = () => {
               </CardTitle>
               <CardDescription>
                 Manage user roles and permissions across the system
-                <span className="block text-[11px] mt-1">Showing up to 200 most recent users — use search to find specific users.</span>
+                <span className="block text-xs mt-1">Showing up to 200 most recent users — use search to find specific users.</span>
               </CardDescription>
             </div>
           </div>

@@ -137,7 +137,7 @@ const AppointmentRemindersPage = () => {
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
               <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
-              {prefsLoading && <span className="text-[11px] font-medium text-graphite-400">Loading…</span>}
+              {prefsLoading && <span className="text-xs font-medium text-graphite-400">Loading…</span>}
             </h2>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -147,7 +147,7 @@ const AppointmentRemindersPage = () => {
                 </div>
                 <div>
                   <p className="font-extrabold text-xs">Email Notifications</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
                 </div>
               </div>
               <Switch checked={emailReminders} onCheckedChange={setEmailReminders} aria-label="Email notifications" />
@@ -161,9 +161,9 @@ const AppointmentRemindersPage = () => {
                 <div>
                   <p className="font-extrabold text-xs flex items-center gap-2">
                     SMS Text Reminders
-                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-[10px] font-bold">Coming soon</span>
+                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-xs font-bold">Coming soon</span>
                   </p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
                 </div>
               </div>
               <Switch checked={smsReminders} disabled aria-label="SMS text reminders (coming soon — no live gateway yet)" />
@@ -176,7 +176,7 @@ const AppointmentRemindersPage = () => {
                 </div>
                 <div>
                   <p className="font-extrabold text-xs">Push Notifications</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
                 </div>
               </div>
               <Switch checked={pushReminders} onCheckedChange={setPushReminders} aria-label="Push notifications" />
@@ -238,7 +238,7 @@ const AppointmentRemindersPage = () => {
                       </div>
                       <div>
                         <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{apt.type || "Medical Consultation"}</p>
-                        <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium">
+                        <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                           {new Date(apt.date).toLocaleDateString()} at {apt.time}
                         </p>
                       </div>

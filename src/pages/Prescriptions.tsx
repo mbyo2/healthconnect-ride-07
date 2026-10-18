@@ -586,7 +586,7 @@ export const Prescriptions = () => {
                         <button
                           type="button"
                           onClick={handleAddMedication}
-                          className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-all flex items-center gap-1"
+                          className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs transition-all flex items-center gap-1"
                         >
                           <Plus className="h-3 w-3" /> Add Another Medication
                         </button>
@@ -595,7 +595,7 @@ export const Prescriptions = () => {
                       {medicationItems.map((item, idx) => (
                         <div key={item.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950/60 space-y-3 relative">
                           <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
                               Medication #{idx + 1}
                             </span>
                             {medicationItems.length > 1 && (
@@ -695,7 +695,7 @@ export const Prescriptions = () => {
                           <span>Multi-Drug Interaction Warning</span>
                         </div>
                         {interactionAlerts.map((alert, i) => (
-                          <p key={i} className="text-[11px] pl-6">• {alert}</p>
+                          <p key={i} className="text-xs pl-6">• {alert}</p>
                         ))}
                       </div>
                     )}
@@ -906,7 +906,7 @@ export const Prescriptions = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[950px]">
                   <thead>
-                    <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                    <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                       <th className="py-2.5 px-4 w-[240px]">Medication Profile</th>
                       <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                       <th className="py-2.5 px-3 w-[180px]">Dosage &amp; Frequency</th>
@@ -926,7 +926,7 @@ export const Prescriptions = () => {
                             <span>{p.medication_name}</span>
                           </div>
                           {p.prescription_number && (
-                            <span className="inline-block px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[10px] text-slate-500 mt-0.5">
+                            <span className="inline-block px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 font-mono text-xs text-slate-500 mt-0.5">
                               {p.prescription_number}
                             </span>
                           )}
@@ -994,7 +994,7 @@ export const Prescriptions = () => {
                                     toast.error(e.message || "Failed to claim prescription.");
                                   }
                                 }}
-                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
+                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-xs font-black transition-all active:scale-95 flex items-center gap-1"
                                 title="Claim this prescription for your pharmacy"
                               >
                                 <CheckCircle className="h-3.5 w-3.5" />
@@ -1009,7 +1009,7 @@ export const Prescriptions = () => {
                                   : [p];
                                 handlePrintSlip(batchItems);
                               }}
-                              className="px-3 py-2.5 min-h-[44px] rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
+                              className="px-3 py-2.5 min-h-[44px] rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-xs font-black transition-all active:scale-95 flex items-center gap-1"
                               title="Print full official multi-drug prescription"
                             >
                               <Printer className="h-3.5 w-3.5" />

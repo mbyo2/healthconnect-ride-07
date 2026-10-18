@@ -490,13 +490,13 @@ export const ZraSmartInvoiceIntegration = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Connection Status</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Connection Status</span>
                 <ShieldCheck className="h-4 w-4 text-primary-500" />
               </div>
-              <Badge className={getStatusColor(settings?.status || "not_connected") + " text-[10px]"}>
+              <Badge className={getStatusColor(settings?.status || "not_connected") + " text-xs"}>
                 {settings?.status || "Not Connected"}
               </Badge>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
                 {settings?.environment === "sandbox" ? "Sandbox Environment" : settings?.environment === "production" ? "Production Environment" : ""}
               </div>
             </CardContent>
@@ -504,31 +504,31 @@ export const ZraSmartInvoiceIntegration = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accepted Invoices</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accepted Invoices</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{activeSubmissions}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Successfully fiscalized</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Successfully fiscalized</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending/Retrying</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending/Retrying</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{pendingSubmissions}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting submission</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting submission</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Mappings</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Mappings</span>
                 <Database className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{totalMappings}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Catalog synced</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Catalog synced</div>
             </CardContent>
           </Card>
         </div>
@@ -672,7 +672,7 @@ export const ZraSmartInvoiceIntegration = () => {
                         {institution.currency || "ZMW"} {submission.invoice?.amount?.toFixed(2) || "0.00"}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getStatusColor(submission.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(submission.status) + " text-xs"}>
                           {submission.status}
                         </Badge>
                       </td>
@@ -726,12 +726,12 @@ export const ZraSmartInvoiceIntegration = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{mapping.zra_item_code}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Item ID: {mapping.catalog_item_id}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Item ID: {mapping.catalog_item_id}</div>
                       </div>
                       {mapping.is_active ? (
-                        <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
+                        <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                       ) : (
-                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
+                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-xs">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -789,7 +789,7 @@ export const ZraSmartInvoiceIntegration = () => {
                         <div className="text-xs font-bold">{log.operation_type}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getOperationStatusColor(log.operation_status) + " text-[10px]"}>
+                        <Badge className={getOperationStatusColor(log.operation_status) + " text-xs"}>
                           {log.operation_status}
                         </Badge>
                       </td>

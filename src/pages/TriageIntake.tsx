@@ -337,7 +337,7 @@ export default function TriageIntake() {
             </div>
 
             {result.reasoning && (
-              <p className="text-[11px] text-graphite-500 dark:text-slate-400 italic bg-canvas dark:bg-slate-800 p-3 rounded-xl border border-canvas-silk dark:border-slate-700">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 italic bg-canvas dark:bg-slate-800 p-3 rounded-xl border border-canvas-silk dark:border-slate-700">
                 Why we think this: {result.reasoning}
               </p>
             )}
@@ -362,7 +362,7 @@ export default function TriageIntake() {
                       <div className="flex-1">
                         <p className="font-extrabold text-xs text-primary-500">{name}</p>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">
                             {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""}
                           </p>
                           {p.rating && (

@@ -99,7 +99,7 @@ export const DeliveryCalculator = ({ pharmacyId, patientPhone, onDeliverySelect 
         ) : zones.length === 0 ? (
           <div className="rounded-lg border border-dashed p-4 text-center">
             <p className="text-xs font-bold">No delivery zones configured by this pharmacy</p>
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Choose free pharmacy pickup below, or ask the pharmacy about delivery when they confirm your order.
             </p>
           </div>

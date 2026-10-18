@@ -132,7 +132,7 @@ export const PsychologistWorkflow = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Psychologist Workspace</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-300">Psychologist Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Mental Health Dashboard</h1>
             <p className="text-xs text-slate-400 font-medium">Assessments, therapy sessions & client care</p>
@@ -151,7 +151,7 @@ export const PsychologistWorkflow = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <Label className="text-[11px]">Patient *</Label>
+              <Label className="text-xs">Patient *</Label>
               <select
                 required
                 value={patientId}
@@ -176,7 +176,7 @@ export const PsychologistWorkflow = () => {
                       size="sm"
                       variant={scores[i] === v ? 'default' : 'outline'}
                       onClick={() => { const s = [...scores]; s[i] = v; setScores(s); }}
-                      className="flex-1 text-[10px]"
+                      className="flex-1 text-xs"
                     >
                       {label} ({v})
                     </Button>
@@ -185,7 +185,7 @@ export const PsychologistWorkflow = () => {
               </div>
             ))}
             <div>
-              <Label className="text-[11px]">Clinical Notes</Label>
+              <Label className="text-xs">Clinical Notes</Label>
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Assessment notes, treatment plan..." rows={3} className="mt-1" />
             </div>
             {selfHarmRisk && (
@@ -278,11 +278,11 @@ export const PsychologistWorkflow = () => {
               <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-primary-500 group-hover:text-white transition-colors">{step.icon}</div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
-                <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
+                <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
               </div>
             </div>
             <button onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-[11px] font-black transition-all">Open Module</button>
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-black transition-all">Open Module</button>
           </div>
         ))}
       </div>

@@ -353,7 +353,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
                     style={{ backgroundColor: ann.color }}
                   />
                   {ann.label && (
-                    <span className="text-[10px] bg-black/70 text-white px-1 rounded mt-1 whitespace-nowrap">
+                    <span className="text-xs bg-black/70 text-white px-1 rounded mt-1 whitespace-nowrap">
                       {ann.label}
                     </span>
                   )}

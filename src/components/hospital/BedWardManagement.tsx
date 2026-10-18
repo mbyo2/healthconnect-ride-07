@@ -114,7 +114,7 @@ export const BedWardManagement = ({ hospital, departments, beds, onRefresh }: Be
             <div key={deptId} className="mb-6">
               <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
                 {data.name}
-                <Badge variant="outline" className="text-[10px]">{data.beds.length} beds</Badge>
+                <Badge variant="outline" className="text-xs">{data.beds.length} beds</Badge>
               </h4>
               {data.beds.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -128,9 +128,9 @@ export const BedWardManagement = ({ hospital, departments, beds, onRefresh }: Be
                         <Bed className="h-3 w-3" />
                         <span className="font-mono font-bold text-xs">{bed.bed_number}</span>
                       </div>
-                      <p className="text-[10px] capitalize">{bed.bed_type}</p>
-                      {bed.room_number && <p className="text-[10px]">Room {bed.room_number}</p>}
-                      <Badge variant="outline" className="text-[9px] mt-1 capitalize">{bed.status}</Badge>
+                      <p className="text-xs capitalize">{bed.bed_type}</p>
+                      {bed.room_number && <p className="text-xs">Room {bed.room_number}</p>}
+                      <Badge variant="outline" className="text-xs mt-1 capitalize">{bed.status}</Badge>
                     </div>
                   ))}
                 </div>

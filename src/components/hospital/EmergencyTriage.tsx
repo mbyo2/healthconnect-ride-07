@@ -171,7 +171,7 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
               <div className={`w-4 h-4 rounded-full ${triageColors[key].bg} flex-shrink-0`} />
               <div>
                 <p className="text-sm font-bold text-foreground">{cases.filter(c => c.triage_level === key).length}</p>
-                <p className="text-[10px] text-muted-foreground">{triageColors[key].label}</p>
+                <p className="text-xs text-muted-foreground">{triageColors[key].label}</p>
               </div>
             </CardContent>
           </Card>
@@ -196,7 +196,7 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
                     <div className="flex items-center gap-2 flex-wrap">
                       <div className={`w-3 h-3 rounded-full ${tone || 'bg-muted'} flex-shrink-0`} />
                       <span className="font-medium text-sm text-foreground">{displayName(c)}</span>
-                      <Badge variant={c.status === 'resuscitation' ? 'destructive' : c.status === 'waiting' ? 'outline' : 'secondary'} className="text-[10px] capitalize">
+                      <Badge variant={c.status === 'resuscitation' ? 'destructive' : c.status === 'waiting' ? 'outline' : 'secondary'} className="text-xs capitalize">
                         {c.status}
                       </Badge>
                     </div>

@@ -192,7 +192,7 @@ export const InstitutionModuleManager = () => {
         <div className="rounded-2xl border border-canvas-silk bg-white p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 className="font-extrabold text-sm">{selected?.name}</h3>
-            <span className="text-[11px] font-bold text-graphite-500">
+            <span className="text-xs font-bold text-graphite-500">
               Tier: <span className="text-midnight">{tier || "unknown"}</span>
               {tierLabel && <span className="text-graphite-400"> · {tierLabel}</span>}
               {" · "}{liveCount} live
@@ -227,7 +227,7 @@ export const InstitutionModuleManager = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-extrabold truncate" title={m.module_name}>{m.module_name}</p>
-                        <p className="text-[10px] text-graphite-500">
+                        <p className="text-xs text-graphite-500">
                           {m.source === "charter" ? (isLive ? "Tier default" : "Tier default · planned")
                           : m.source === "admin_grant" ? "Added by admin" : "Suspended by admin"}
                           {priceLabel && <span className="ml-1 font-extrabold text-primary-600">{priceLabel}</span>}
@@ -236,7 +236,7 @@ export const InstitutionModuleManager = () => {
                           <button
                             onClick={() => toggleModule(m)}
                             disabled={saving === m.module_key}
-                            className={`text-[11px] font-extrabold px-3 py-1 rounded-full transition-colors ${
+                            className={`text-xs font-extrabold px-3 py-1 rounded-full transition-colors ${
                               isLive ? "bg-error-100 text-error-600 hover:bg-error-200" : "bg-success-100 text-success-700 hover:bg-success-200"
                             }`}
                           >
@@ -247,7 +247,7 @@ export const InstitutionModuleManager = () => {
                               onClick={() => resetModule(m)}
                               disabled={saving === m.module_key}
                               title="Remove override — back to tier default"
-                              className="text-[11px] font-bold text-graphite-500 hover:text-midnight flex items-center gap-1"
+                              className="text-xs font-bold text-graphite-500 hover:text-midnight flex items-center gap-1"
                             >
                               <RotateCcw className="h-3 w-3" /> Reset
                             </button>

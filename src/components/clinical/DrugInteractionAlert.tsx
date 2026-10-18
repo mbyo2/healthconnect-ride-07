@@ -104,9 +104,9 @@ export const DrugInteractionAlert = ({ prescribedDrugs }: Props) => {
             {riskDrugs.map((d, idx) => (
               <div key={idx} className={`p-3 rounded-lg ${riskColors[d.risk_level] || ''}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="destructive" className="text-[10px] uppercase">{d.risk_level.replace('_', ' ')}</Badge>
+                  <Badge variant="destructive" className="text-xs uppercase">{d.risk_level.replace('_', ' ')}</Badge>
                   <span className="text-xs font-semibold">{d.drug_name}</span>
-                  {d.risk_category && <Badge variant="outline" className="text-[10px]">{d.risk_category}</Badge>}
+                  {d.risk_category && <Badge variant="outline" className="text-xs">{d.risk_category}</Badge>}
                 </div>
                 <p className="text-xs">{d.special_instructions}</p>
               </div>

@@ -275,7 +275,7 @@ export const MultiCenterManagement = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{network.network_name}</CardTitle>
-                          <Badge variant="outline" className="text-[10px] mt-1">
+                          <Badge variant="outline" className="text-xs mt-1">
                             {networkTypeLabels[network.network_type] || network.network_type}
                           </Badge>
                         </div>
@@ -352,7 +352,7 @@ export const MultiCenterManagement = () => {
                           </div>
                           <div>
                             <div className="text-xs font-bold">{member.institution?.name}</div>
-                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">{member.institution?.type}</div>
+                            <div className="text-xs text-graphite-500 dark:text-slate-400">{member.institution?.type}</div>
                           </div>
                         </div>
                       </td>
@@ -360,16 +360,16 @@ export const MultiCenterManagement = () => {
                         {networks.find((n) => n.id === member.network_id)?.network_name}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           {memberTypeLabels[member.member_type] || member.member_type}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-xs font-bold">{member.commission_rate}%</td>
                       <td className="px-4 py-3">
                         {member.is_active ? (
-                          <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
+                          <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                         ) : (
-                          <Badge className="bg-error-500 text-white text-[10px]">Inactive</Badge>
+                          <Badge className="bg-error-500 text-white text-xs">Inactive</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
@@ -407,7 +407,7 @@ export const MultiCenterManagement = () => {
                       </div>
                       <div>
                         <CardTitle className="text-sm font-extrabold">{country.name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{country.code}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{country.code}</div>
                       </div>
                     </div>
                   </CardHeader>
@@ -458,7 +458,7 @@ export const MultiCenterManagement = () => {
                           <CheckCircle className="h-4 w-4 text-success-500" />
                           <div>
                             <div className="text-xs font-bold">{network.network_name}</div>
-                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                            <div className="text-xs text-graphite-500 dark:text-slate-400">
                               {members.filter((m) => m.network_id === network.id).length} institutions
                             </div>
                           </div>

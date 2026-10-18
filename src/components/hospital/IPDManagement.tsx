@@ -217,8 +217,8 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
                           <h4 className="font-semibold text-sm">
                             {admission.patient?.first_name} {admission.patient?.last_name}
                           </h4>
-                          <Badge className="text-[10px]">{admission.admission_type}</Badge>
-                          <Badge variant="outline" className="text-[10px] font-mono">#{admission.admission_number}</Badge>
+                          <Badge className="text-xs">{admission.admission_type}</Badge>
+                          <Badge variant="outline" className="text-xs font-mono">#{admission.admission_number}</Badge>
                         </div>
                         <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
                           <span>Dept: <strong>{admission.department?.name}</strong></span>
@@ -266,7 +266,7 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
                           <h4 className="font-semibold text-sm">
                             {admission.patient?.first_name} {admission.patient?.last_name}
                           </h4>
-                          <Badge variant="outline" className="text-[10px] font-mono">#{admission.admission_number}</Badge>
+                          <Badge variant="outline" className="text-xs font-mono">#{admission.admission_number}</Badge>
                         </div>
                         <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
                           <span>Dept: <strong>{admission.department?.name}</strong></span>

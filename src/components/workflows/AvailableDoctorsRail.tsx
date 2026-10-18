@@ -65,7 +65,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
                     {providerDisplayName({ first_name: doc.first_name, last_name: doc.last_name, role: doc.role })}
                   </h3>
                   <p className="text-xs text-primary-500 font-extrabold">{doc.specialty || 'General Practice'}</p>
-                  <p className="text-[11px] text-slate-400 font-medium truncate">
+                  <p className="text-xs text-slate-400 font-medium truncate">
                     {doc.consultation_fee_min ? `From K${doc.consultation_fee_min}` : 'Fee on request'}
                   </p>
                 </div>

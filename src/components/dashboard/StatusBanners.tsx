@@ -108,7 +108,7 @@ export const ApplicationStatusBanner = () => {
         {config.icon}
         <AlertTitle className="flex items-center gap-2">
           {config.title}
-          <Badge variant={app.status === 'rejected' ? 'destructive' : 'secondary'} className="text-[10px]">
+          <Badge variant={app.status === 'rejected' ? 'destructive' : 'secondary'} className="text-xs">
             {app.status.replace('_', ' ').toUpperCase()}
           </Badge>
         </AlertTitle>
@@ -194,7 +194,7 @@ export const InstitutionApprovalBanner = () => {
         <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
         <AlertTitle className="flex items-center gap-2">
           {inst.name} is Approved & Live
-          <Badge variant="secondary" className="text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">VERIFIED</Badge>
+          <Badge variant="secondary" className="text-xs bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">VERIFIED</Badge>
         </AlertTitle>
         <AlertDescription className="text-sm text-muted-foreground mt-1">
           Your institution has been approved by Doc' O Clock administrators and is now publicly listed. Patients can discover, book and message you.
@@ -208,7 +208,7 @@ export const InstitutionApprovalBanner = () => {
       <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
       <AlertTitle className="flex items-center gap-2">
         Awaiting Admin Approval
-        <Badge variant="secondary" className="text-[10px]">PENDING</Badge>
+        <Badge variant="secondary" className="text-xs">PENDING</Badge>
       </AlertTitle>
       <AlertDescription className="text-sm text-muted-foreground mt-1">
         {inst.name} is registered but not yet verified by an administrator. You can configure your workspace, but the institution will only be visible to patients after approval.
@@ -249,7 +249,7 @@ export const ProfileCompleteBanner = () => {
       <User className="h-5 w-5 text-primary" />
       <AlertTitle className="flex items-center gap-2">
         Complete Your Profile
-        <Badge variant="secondary" className="text-[10px]">{pct}%</Badge>
+        <Badge variant="secondary" className="text-xs">{pct}%</Badge>
       </AlertTitle>
       <AlertDescription className="mt-1">
         <p className="text-sm text-muted-foreground mb-2">

@@ -302,13 +302,13 @@ function KpiCard({ label, icon, value, caption, accent }: {
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</span>
+        <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</span>
         {icon}
       </div>
       <div className={`text-2xl font-black font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
         {value ?? "—"}
       </div>
-      <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
+      <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
         {value ? caption ?? "Recorded reading" : "No readings yet"}
       </div>
     </div>

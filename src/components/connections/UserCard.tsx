@@ -86,14 +86,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{user.specialty}</p>
             )}
             {user.city && user.state && (
-              <div className="flex items-center gap-1 text-[11px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+              <div className="flex items-center gap-1 text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
                 <MapPin className="h-3 w-3 text-primary-500" />
                 {user.city}, {user.state}
               </div>
             )}
           </div>
         </div>
-        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize flex items-center gap-1 ${getRolePill(user.role)}`}>
+        <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold capitalize flex items-center gap-1 ${getRolePill(user.role)}`}>
           {getRoleIcon(user.role)}
           {user.role.replace("_", " ")}
         </span>
@@ -112,14 +112,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
             <Building className="h-3.5 w-3.5" />
             <span>{user.institution.name}</span>
           </div>
-          <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">{user.institution.type}</p>
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">{user.institution.type}</p>
         </div>
       )}
 
       {/* Services */}
       {user.services && user.services.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] flex items-center gap-1">
+          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
             <Stethoscope className="h-3 w-3 text-primary-500" /> Services Offered
           </h4>
           <div className="space-y-1">
@@ -129,7 +129,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
                 <div className="flex items-center gap-2">
                   <span className="text-success-500 font-black">K{service.price}</span>
                   {service.duration && (
-                    <span className="text-graphite-500 dark:text-slate-400 text-[10px] flex items-center gap-0.5">
+                    <span className="text-graphite-500 dark:text-slate-400 text-xs flex items-center gap-0.5">
                       <Clock className="h-3 w-3" /> {service.duration}m
                     </span>
                   )}
@@ -143,7 +143,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Products */}
       {user.products && user.products.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] flex items-center gap-1">
+          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
             <Pill className="h-3 w-3 text-purple-500" /> Available Products
           </h4>
           <div className="space-y-1">
@@ -158,7 +158,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       )}
 
       {/* Contact Info */}
-      <div className="flex flex-wrap gap-3 text-[11px] text-graphite-500 dark:text-slate-400 font-medium pt-1 border-t border-canvas-silk dark:border-slate-800">
+      <div className="flex flex-wrap gap-3 text-xs text-graphite-500 dark:text-slate-400 font-medium pt-1 border-t border-canvas-silk dark:border-slate-800">
         {user.email && (
           <div className="flex items-center gap-1">
             <Mail className="h-3 w-3 text-primary-500" /> {user.email}

@@ -104,19 +104,19 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Utensils className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-black font-mono text-primary-500">{activePlans.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Active Meal Plans</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Active Meal Plans</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <AlertTriangle className="h-5 w-5 mx-auto text-error-500 mb-1" />
           <div className="text-2xl font-black font-mono text-error-500">{withAllergies.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Known Allergies</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Known Allergies</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
           <div className="text-2xl font-black font-mono text-success-500">{plans.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Plans Issued</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Plans Issued</div>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
       <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Patient Name</th>
               <th className="py-2.5 px-3">Diet Category</th>
               <th className="py-2.5 px-3 text-center">Status</th>

@@ -228,7 +228,7 @@ export const FinanceManagerWorkflow = () => {
                           <td className="px-4 py-2.5 text-right text-xs text-success-600">{formatPrice(inv.paid_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-right text-xs text-destructive">{formatPrice(inv.balance || 0)}</td>
                           <td className="px-4 py-2.5 text-center">
-                            <Badge variant={inv.payment_status === "paid" ? "default" : "secondary"} className="text-[10px]">
+                            <Badge variant={inv.payment_status === "paid" ? "default" : "secondary"} className="text-xs">
                               {inv.payment_status || "pending"}
                             </Badge>
                           </td>
@@ -295,7 +295,7 @@ export const FinanceManagerWorkflow = () => {
                           <td className="px-4 py-2.5 text-xs text-muted-foreground">{claim.insurance_provider}</td>
                           <td className="px-4 py-2.5 text-right text-xs">{formatPrice(claim.claim_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-center">
-                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold text-white ${CLAIM_STATUS_COLOR[claim.status] || "bg-muted"}`}>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-white ${CLAIM_STATUS_COLOR[claim.status] || "bg-muted"}`}>
                               {claim.status}
                             </span>
                           </td>

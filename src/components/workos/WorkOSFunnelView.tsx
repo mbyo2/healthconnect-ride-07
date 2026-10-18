@@ -88,7 +88,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <Users className="h-4 w-4 text-blue-500" />
           </div>
           <div className="mt-2 text-2xl font-black font-mono">{patients.length} Patients</div>
-          <div className="mt-1 text-[11px] text-emerald-500 flex items-center gap-1 font-semibold">
+          <div className="mt-1 text-xs text-emerald-500 flex items-center gap-1 font-semibold">
             <TrendingUp className="h-3 w-3" />
             <span>+14.2% intake velocity vs last week</span>
           </div>
@@ -102,7 +102,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <Filter className="h-4 w-4 text-purple-500" />
           </div>
           <div className="mt-2 text-2xl font-black font-mono">82.4%</div>
-          <div className="mt-1 text-[11px] text-purple-400 font-semibold">
+          <div className="mt-1 text-xs text-purple-400 font-semibold">
             Average 18 hrs per stage completion
           </div>
         </div>
@@ -115,7 +115,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </div>
           <div className="mt-2 text-2xl font-black font-mono text-emerald-500">94.8%</div>
-          <div className="mt-1 text-[11px] text-slate-400">Zero unplanned readmissions</div>
+          <div className="mt-1 text-xs text-slate-400">Zero unplanned readmissions</div>
         </div>
 
         <div className={`p-4 rounded-2xl border transition-all ${
@@ -128,7 +128,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
           <div className="mt-2 text-2xl font-black font-mono text-emerald-500">
             ZMW K{totalBillingSum.toLocaleString()}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">Est. gross operational revenue</div>
+          <div className="mt-1 text-xs text-slate-400">Est. gross operational revenue</div>
         </div>
       </div>
 

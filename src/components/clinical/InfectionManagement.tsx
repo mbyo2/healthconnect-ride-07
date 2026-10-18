@@ -122,8 +122,8 @@ export const InfectionManagement = ({ hospital }: Props) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-sm text-foreground">{r.infection_type}</span>
-                    <Badge variant={r.status === 'active' ? 'destructive' : 'default'} className="text-[10px]">{r.status}</Badge>
-                    {r.organism && <Badge variant="outline" className="text-[10px]">{r.organism}</Badge>}
+                    <Badge variant={r.status === 'active' ? 'destructive' : 'default'} className="text-xs">{r.status}</Badge>
+                    {r.organism && <Badge variant="outline" className="text-xs">{r.organism}</Badge>}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
                     {r.infection_site && <p>Site: {r.infection_site}</p>}

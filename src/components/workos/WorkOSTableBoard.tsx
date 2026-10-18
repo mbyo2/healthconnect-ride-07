@@ -171,7 +171,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                 <div className="w-full">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className={`text-[11px] font-extrabold uppercase tracking-wider border-b ${isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-500"}`}>
+                      <tr className={`text-xs font-extrabold uppercase tracking-wider border-b ${isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-500"}`}>
                         <th className="py-2.5 px-4 w-[260px]">Patient & Clinical Profile</th>
                         <th className="py-2.5 px-3 w-[160px] text-center">Status</th>
                         <th className="py-2.5 px-3 w-[130px] text-center">Priority</th>
@@ -211,7 +211,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                   <div className="font-bold text-sm tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors flex items-center justify-between">
                                     <div className="flex items-center gap-1.5 truncate">
                                       <span>{patient.name}</span>
-                                      <span className="text-[10px] font-mono text-slate-400 font-normal">({patient.ageGender})</span>
+                                      <span className="text-xs font-mono text-slate-400 font-normal">({patient.ageGender})</span>
                                     </div>
 
                                     {/* Monday Comment Speech Bubble */}
@@ -221,13 +221,13 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                         onSelectPatient(patient);
                                       }}
                                       title="Open Item Activity & Updates"
-                                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 text-[10px] font-mono font-bold transition-all"
+                                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 text-xs font-mono font-bold transition-all"
                                     >
                                       <FileText className="h-3 w-3" />
                                       <span>2</span>
                                     </button>
                                   </div>
-                                  <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[190px]">
+                                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[190px]">
                                     {patient.symptoms}
                                   </div>
                                 </div>
@@ -248,7 +248,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                 <div className={`absolute left-0 top-12 z-30 w-44 p-1.5 rounded-xl border shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 ${
                                   isDarkMode ? "bg-slate-900/95 border-slate-700" : "bg-white border-slate-200"
                                 }`}>
-                                  <div className="text-[10px] uppercase font-bold text-slate-400 px-2 py-1">Set Status</div>
+                                  <div className="text-xs uppercase font-bold text-slate-400 px-2 py-1">Set Status</div>
                                   {(Object.keys(WORKOS_STATUS_CONFIG) as PatientStatus[]).map((st) => (
                                     <button
                                       key={st}
@@ -270,7 +270,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                             <td className="py-3 px-3 relative" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={() => setActivePriorityPopoverId(activePriorityPopoverId === patient.id ? null : patient.id)}
-                                className={`w-full py-1 px-2 rounded-md text-[11px] text-center transition-transform active:scale-95 ${priorityConfig.bg} ${priorityConfig.text}`}
+                                className={`w-full py-1 px-2 rounded-md text-xs text-center transition-transform active:scale-95 ${priorityConfig.bg} ${priorityConfig.text}`}
                               >
                                 {patient.priority}
                               </button>
@@ -280,7 +280,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                 <div className={`absolute left-0 top-11 z-30 w-36 p-1.5 rounded-xl border shadow-xl ${
                                   isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200"
                                 }`}>
-                                  <div className="text-[10px] uppercase font-bold text-slate-400 px-2 py-1">Priority</div>
+                                  <div className="text-xs uppercase font-bold text-slate-400 px-2 py-1">Priority</div>
                                   {(Object.keys(WORKOS_PRIORITY_CONFIG) as PriorityLevel[]).map((pr) => (
                                     <button
                                       key={pr}
@@ -307,14 +307,14 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                 />
                                 <div className="min-w-0">
                                   <div className="font-semibold text-xs truncate text-slate-800 dark:text-slate-200">{patient.doctor.name}</div>
-                                  <div className="text-[10px] text-slate-400 truncate">{patient.doctor.specialty}</div>
+                                  <div className="text-xs text-slate-400 truncate">{patient.doctor.specialty}</div>
                                 </div>
                               </div>
                             </td>
 
                             {/* Bed Location */}
                             <td className="py-3 px-3">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold border ${
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-mono text-xs font-semibold border ${
                                 isDarkMode ? "bg-slate-800 border-slate-700 text-slate-300" : "bg-slate-100 border-slate-200 text-slate-700"
                               }`}>
                                 {patient.location}
@@ -332,7 +332,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                             {/* Progress Timeline Bar */}
                             <td className="py-3 px-3">
                               <div className="space-y-1">
-                                <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                                <div className="flex justify-between text-xs font-mono text-slate-400">
                                   <span>{patient.dateAdded}</span>
                                   <span>{patient.timelineDays}%</span>
                                 </div>
@@ -352,7 +352,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
 
                             {/* AI Clinical Recommendation */}
                             <td className="py-3 px-3">
-                              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20 text-[11px] font-medium">
+                              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20 text-xs font-medium">
                                 <Sparkles className="h-3 w-3 text-purple-500 flex-shrink-0" />
                                 <span className="truncate">{patient.aiDiagnosticTag}</span>
                               </div>
@@ -382,7 +382,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                       
                       {/* Iconic Monday Status Battery Bar */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono text-slate-400 font-bold">Status Battery:</span>
+                        <span className="text-xs font-mono text-slate-400 font-bold">Status Battery:</span>
                         <div className="h-4 w-44 rounded-md overflow-hidden bg-slate-200 dark:bg-slate-800 flex p-0.5 shadow-inner">
                           {doneCount > 0 && (
                             <div

@@ -353,7 +353,7 @@ export const ProviderDetail = () => {
                   )}
                   {certs.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Board Certifications</p>
+                      <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Board Certifications</p>
                       <div className="flex flex-wrap gap-1.5">
                         {certs.map(c => (
                           <Badge key={c} variant="outline" className="gap-1 text-xs">
@@ -365,7 +365,7 @@ export const ProviderDetail = () => {
                   )}
                   {subs.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Subspecialties</p>
+                      <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Subspecialties</p>
                       <div className="flex flex-wrap gap-1.5">
                         {subs.map(s => (
                           <Badge key={s} variant="secondary" className="text-xs">
@@ -383,7 +383,7 @@ export const ProviderDetail = () => {
                 <Section icon={Building2} title="Practice Details">
                   {hospitals.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Affiliated Hospitals</p>
+                      <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Affiliated Hospitals</p>
                       <ul className="space-y-1">
                         {hospitals.map(h => (
                           <li key={h} className="flex items-center gap-1.5 text-xs">
@@ -395,7 +395,7 @@ export const ProviderDetail = () => {
                   )}
                   {apptTypes.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Appointment Types</p>
+                      <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Appointment Types</p>
                       <div className="flex flex-wrap gap-1.5">
                         {apptTypes.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
                       </div>
@@ -413,18 +413,18 @@ export const ProviderDetail = () => {
                       const info = (schedule as Record<string, { available: boolean; hours: string[] }>)[day];
                       return (
                         <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
-                          <p className="text-[11px] font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
+                          <p className="text-xs font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
                           {info?.available ? (
                             <div className="space-y-0.5 mt-1">
                               {(info.hours || []).map(h => (
-                                <p key={h} className="text-[10px] text-primary-500 font-bold">{h}</p>
+                                <p key={h} className="text-xs text-primary-500 font-bold">{h}</p>
                               ))}
                               {(!info.hours || info.hours.length === 0) && (
-                                <p className="text-[10px] text-success-500 font-bold">Available</p>
+                                <p className="text-xs text-success-500 font-bold">Available</p>
                               )}
                             </div>
                           ) : (
-                            <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
+                            <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
                           )}
                         </div>
                       );
@@ -466,7 +466,7 @@ export const ProviderDetail = () => {
                   {feeLabel && <InfoRow label="Consultation fee" value={<span className="font-bold text-primary-500">{feeLabel}</span>} />}
                   {insurances.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Accepted Insurance</p>
+                      <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Accepted Insurance</p>
                       <div className="flex flex-wrap gap-1.5">
                         {insurances.map(ins => (
                           <Badge key={ins} variant="outline" className="text-xs gap-1">

@@ -86,7 +86,7 @@ export function SpecialtyTiles() {
               </span>
               <span
                 className={cn(
-                  "text-[11px] sm:text-xs font-bold text-center leading-tight",
+                  "text-xs sm:text-xs font-bold text-center leading-tight",
                   isActive ? "text-primary-700 dark:text-primary-300" : "text-graphite-600 dark:text-slate-300"
                 )}
               >

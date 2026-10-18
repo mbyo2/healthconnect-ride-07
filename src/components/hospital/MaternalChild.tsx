@@ -198,7 +198,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === t.key ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t.icon}{t.label}
-              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-error-500 text-white">{t.badge}</span> : null}
+              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold bg-error-500 text-white">{t.badge}</span> : null}
             </button>
           ))}
         </div>
@@ -218,10 +218,10 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
           </div>
           {/* WHO 8-contact schedule reference */}
           <div className="px-4 py-3 border-b border-border bg-muted/30">
-            <p className="text-[11px] font-bold uppercase text-muted-foreground mb-2">WHO 8-Contact Schedule</p>
+            <p className="text-xs font-bold uppercase text-muted-foreground mb-2">WHO 8-Contact Schedule</p>
             <div className="flex flex-wrap gap-1.5">
               {ANC_CONTACTS.map((c) => (
-                <span key={c.contact} className="inline-flex items-center gap-1 text-[11px] font-medium bg-card border border-border rounded-full px-2.5 py-1">
+                <span key={c.contact} className="inline-flex items-center gap-1 text-xs font-medium bg-card border border-border rounded-full px-2.5 py-1">
                   <span className="font-bold text-primary-500">{c.contact}</span> {c.weekLabel}
                 </span>
               ))}
@@ -312,7 +312,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
                       Mark Given
                     </button>
                   ) : (
-                    <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Administered</span>
+                    <span className="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Administered</span>
                   )}
                 </div>
               ))}
@@ -400,7 +400,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
                     key={idx}
                     type="button"
                     onClick={() => setImmunForm({ ...immunForm, vaccine_name: s.vaccine, dose_number: String(s.dose) })}
-                    className={`text-[11px] px-2 py-1 rounded-full border transition-colors ${immunForm.vaccine_name === s.vaccine && immunForm.dose_number === String(s.dose) ? "bg-primary-500 text-white border-primary-500" : "bg-muted/50 hover:bg-muted border-border"}`}
+                    className={`text-xs px-2 py-1 rounded-full border transition-colors ${immunForm.vaccine_name === s.vaccine && immunForm.dose_number === String(s.dose) ? "bg-primary-500 text-white border-primary-500" : "bg-muted/50 hover:bg-muted border-border"}`}
                     title={`Due: ${s.dueLabel}`}
                   >
                     {s.vaccine} · D{s.dose}

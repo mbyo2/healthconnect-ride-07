@@ -120,7 +120,7 @@ export const WalletCard = () => {
                                 formatPrice(balance ?? 0)
                             )}
                         </div>
-                        <p className="text-[10px] md:text-xs text-primary-foreground/80 mt-1.5 font-medium flex items-center gap-1">
+                        <p className="text-xs md:text-xs text-primary-foreground/80 mt-1.5 font-medium flex items-center gap-1">
                             <ArrowUpRight className="h-3 w-3" />
                             {isEarner
                                 ? "Consultation earnings & payouts"

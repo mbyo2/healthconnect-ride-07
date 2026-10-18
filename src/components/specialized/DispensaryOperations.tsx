@@ -276,7 +276,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">Community Dispensary &amp; First-Aid POS</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white text-emerald-900">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-white text-emerald-900">
                 Live Stock
               </span>
             </div>
@@ -352,16 +352,16 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      <span className="text-xs font-black uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                         {item.category}
                       </span>
-                      <span className={`text-[10px] font-extrabold ${item.stock <= 10 ? "text-amber-600" : "text-emerald-600"}`}>
+                      <span className={`text-xs font-extrabold ${item.stock <= 10 ? "text-amber-600" : "text-emerald-600"}`}>
                         {item.stock} left
                       </span>
                     </div>
 
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{item.name}</h4>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-1">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                       <span className="flex items-center gap-1"><Barcode className="h-3 w-3" aria-hidden />Batch: {item.batchNo}</span>
                       <span>•</span>
                       <span>Exp: {item.expiryDate}</span>
@@ -371,7 +371,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-canvas-silk dark:border-slate-800">
                     <div>
                       <span className="text-xs font-black text-slate-900 dark:text-slate-100">{formatPrice(item.unitPrice)}</span>
-                      <span className="text-[10px] text-slate-400 block">{item.stock} in stock</span>
+                      <span className="text-xs text-slate-400 block">{item.stock} in stock</span>
                     </div>
 
                     <Button
@@ -395,7 +395,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
             <h3 className="font-black text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-emerald-600" aria-hidden /> Dispensing Order Cart
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs">
               {cart.reduce((s, c) => s + c.qty, 0)} Items
             </span>
           </div>
@@ -449,7 +449,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 <div key={c.item.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk flex items-center justify-between">
                   <div className="max-w-[130px]">
                     <div className="font-bold truncate">{c.item.name}</div>
-                    <div className="text-[10px] text-slate-400">{formatPrice(c.item.unitPrice)} each</div>
+                    <div className="text-xs text-slate-400">{formatPrice(c.item.unitPrice)} each</div>
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -497,7 +497,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <CheckCircle2 className="h-4 w-4" aria-hidden />
               {processing ? "Recording Sale…" : "Complete Dispense & Print Slip"}
             </Button>
-            <p className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
               <Layers className="h-3 w-3" aria-hidden /> Sale is recorded and stock decremented
             </p>
           </div>

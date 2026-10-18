@@ -642,7 +642,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                     {isEditing ? (
                       <button
                         onClick={() => handleSaveInlineEdit(t.id)}
-                        className="px-2.5 py-1 rounded-md bg-success-500 text-white text-[11px] font-bold"
+                        className="px-2.5 py-1 rounded-md bg-success-500 text-white text-xs font-bold"
                       >
                         Save
                       </button>
@@ -653,7 +653,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                           setEditingPrice(t.basePrice);
                           setEditingCost(t.costPrice || 0);
                         }}
-                        className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold"
+                        className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-xs font-bold"
                       >
                         Edit Price
                       </button>

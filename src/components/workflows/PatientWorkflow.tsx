@@ -257,9 +257,9 @@ export const PatientWorkflow = React.memo(() => {
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
                   {step.completed ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-700">Done</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-700">Done</span>
                   ) : step.required ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600">Required</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-600">Required</span>
                   ) : null}
                 </div>
                 <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 mb-1">{step.title}</h3>
@@ -305,7 +305,7 @@ export const PatientWorkflow = React.memo(() => {
             <Calendar className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Today</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Today</span>
             <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100">
               {format(new Date(), 'MMMM d, yyyy')}
             </span>
@@ -412,7 +412,7 @@ export const PatientWorkflow = React.memo(() => {
               <Pill className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 font-bold block">Medical Records</span>
+              <span className="text-xs text-slate-400 font-bold block">Medical Records</span>
               <span className="text-sm sm:text-base font-black text-white">
                 You have {activePrescriptionsCount} active {activePrescriptionsCount === 1 ? 'prescription' : 'prescriptions'}
               </span>
@@ -471,7 +471,7 @@ export const PatientWorkflow = React.memo(() => {
                   <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 block group-hover:text-primary-500 transition-colors">
                     {spec.name}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium block">
+                  <span className="text-xs text-slate-400 font-medium block">
                     {spec.sub}
                   </span>
                 </div>
@@ -532,7 +532,7 @@ export const PatientWorkflow = React.memo(() => {
               <AlertTriangle className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Emergency Help</h3>
-            <p className="text-[11px] text-slate-400 font-medium">24/7 hotline & dispatch</p>
+            <p className="text-xs text-slate-400 font-medium">24/7 hotline & dispatch</p>
           </button>
 
           <button
@@ -544,7 +544,7 @@ export const PatientWorkflow = React.memo(() => {
               <Pill className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Buy Medicine</h3>
-            <p className="text-[11px] text-slate-400 font-medium">Online pharmacy & refill</p>
+            <p className="text-xs text-slate-400 font-medium">Online pharmacy & refill</p>
           </button>
 
           <button
@@ -556,7 +556,7 @@ export const PatientWorkflow = React.memo(() => {
               <Users className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Find Doctor</h3>
-            <p className="text-[11px] text-slate-400 font-medium">Book clinic & video visits</p>
+            <p className="text-xs text-slate-400 font-medium">Book clinic & video visits</p>
           </button>
 
           <button
@@ -568,7 +568,7 @@ export const PatientWorkflow = React.memo(() => {
               <Building2 className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Hospitals & Labs</h3>
-            <p className="text-[11px] text-slate-400 font-medium">Find nearby facilities</p>
+            <p className="text-xs text-slate-400 font-medium">Find nearby facilities</p>
           </button>
         </div>
       </div>
@@ -586,7 +586,7 @@ export const PatientWorkflow = React.memo(() => {
               <CreditCard className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Insurance Card</h4>
-            <p className="text-[10px] text-slate-400">Upload & verify</p>
+            <p className="text-xs text-slate-400">Upload & verify</p>
           </button>
 
           <button
@@ -598,7 +598,7 @@ export const PatientWorkflow = React.memo(() => {
               <Shield className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Cost Estimator</h4>
-            <p className="text-[10px] text-slate-400">Clear pricing</p>
+            <p className="text-xs text-slate-400">Clear pricing</p>
           </button>
 
           <button
@@ -610,7 +610,7 @@ export const PatientWorkflow = React.memo(() => {
               <Calendar className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Early Slots</h4>
-            <p className="text-[10px] text-slate-400">Priority waitlist</p>
+            <p className="text-xs text-slate-400">Priority waitlist</p>
           </button>
 
           <button
@@ -622,7 +622,7 @@ export const PatientWorkflow = React.memo(() => {
               <Activity className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Reminders</h4>
-            <p className="text-[10px] text-slate-400">Calendar alerts</p>
+            <p className="text-xs text-slate-400">Calendar alerts</p>
           </button>
         </div>
       </div>

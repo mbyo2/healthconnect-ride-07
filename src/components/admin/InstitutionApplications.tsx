@@ -54,7 +54,7 @@ interface InstitutionDetail {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
+    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
     <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{value || "—"}</span>
   </div>
 );
@@ -310,7 +310,7 @@ export const InstitutionApplications = () => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Institution</th>
                 <th className="py-2.5 px-3">Type</th>
                 <th className="py-2.5 px-3">Applicant</th>
@@ -328,7 +328,7 @@ export const InstitutionApplications = () => {
                   <td className="py-3 px-3 text-graphite-500 dark:text-slate-400 capitalize">{a.institution_type}</td>
                   <td className="py-3 px-3">
                     <div className="font-bold">{a.applicant?.first_name} {a.applicant?.last_name}</div>
-                    <div className="text-[10px] text-slate-400">{a.applicant?.email}</div>
+                    <div className="text-xs text-slate-400">{a.applicant?.email}</div>
                   </td>
                   <td className="py-3 px-3 text-slate-500">{a.institution?.city || "—"}, {a.institution?.country || "—"}</td>
                   <td className="py-3 px-3 font-mono">{a.institution?.license_number || "—"}</td>
@@ -342,7 +342,7 @@ export const InstitutionApplications = () => {
                   <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => openReview(a)}
-                      className="px-3 py-1 rounded-md bg-primary-500 text-white text-[10px] font-bold flex items-center gap-1 mx-auto"
+                      className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1 mx-auto"
                     >
                       <FileText className="h-3 w-3" /> Review
                     </button>
@@ -391,7 +391,7 @@ export const InstitutionApplications = () => {
                     : <Badge variant="outline" className="border-primary-500 text-primary-500">HMS Internal Use Only</Badge>
                   }
                 </div>
-                <p className="text-graphite-500 dark:text-slate-400 mt-1.5 text-[11px]">
+                <p className="text-graphite-500 dark:text-slate-400 mt-1.5 text-xs">
                   {inst?.list_in_marketplace
                     ? "This institution wants to be discoverable by patients in public searches."
                     : "This institution will only use the platform for internal HMS operations — it should not appear in public listings."}
@@ -407,15 +407,15 @@ export const InstitutionApplications = () => {
                   <InfoRow label="Number of Beds" value={inst?.number_of_beds} />
                   <InfoRow label="Total Staff" value={inst?.number_of_staff} />
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Emergency Services</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Emergency Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.emergency_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Ambulance Services</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Ambulance Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.ambulance_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Open 24/7</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Open 24/7</span>
                     <div className="mt-1"><BoolBadge value={inst?.is_24_7} /></div>
                   </div>
                 </div>
@@ -428,19 +428,19 @@ export const InstitutionApplications = () => {
                 </h4>
                 <div className="space-y-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Services Offered</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Services Offered</span>
                     <TagList items={inst?.services_offered} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Equipment Available</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Equipment Available</span>
                     <TagList items={inst?.equipment_available} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical Specialties</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical Specialties</span>
                     <TagList items={inst?.specialties} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Languages Spoken</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Languages Spoken</span>
                     <TagList items={inst?.languages_spoken} emptyLabel="None listed" />
                   </div>
                 </div>
@@ -483,7 +483,7 @@ export const InstitutionApplications = () => {
                           <label htmlFor={`chk-${req.id}`} className="font-bold cursor-pointer flex items-center gap-1">
                             {req.name} {req.required && <span className="text-error-500">*</span>}
                           </label>
-                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
                         </div>
                         {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />}
                       </div>

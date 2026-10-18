@@ -77,12 +77,12 @@ export const AllergyAlertSystem = ({ patientId, onAllergyCheck, compact }: Props
     return (
       <div className="flex flex-wrap gap-1">
         {allergies.length === 0 ? (
-          <Badge variant="outline" className="text-[10px]">No Known Allergies</Badge>
+          <Badge variant="outline" className="text-xs">No Known Allergies</Badge>
         ) : (
           allergies.map(a => {
             const config = severityConfig[a.severity] || severityConfig.moderate;
             return (
-              <Badge key={a.id} className={`text-[10px] ${config.color}`}>
+              <Badge key={a.id} className={`text-xs ${config.color}`}>
                 <AlertTriangle className="h-3 w-3 mr-1" />
                 {a.allergen_name} ({config.label})
               </Badge>
@@ -119,8 +119,8 @@ export const AllergyAlertSystem = ({ patientId, onAllergyCheck, compact }: Props
                   <Icon className="h-4 w-4" />
                   <div>
                     <span className="text-xs font-semibold">{a.allergen_name}</span>
-                    <span className="text-[10px] ml-2 opacity-75">({a.allergen_type})</span>
-                    {a.reaction && <p className="text-[10px] opacity-75">Reaction: {a.reaction}</p>}
+                    <span className="text-xs ml-2 opacity-75">({a.allergen_type})</span>
+                    {a.reaction && <p className="text-xs opacity-75">Reaction: {a.reaction}</p>}
                   </div>
                 </div>
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => removeAllergy(a.id)}>

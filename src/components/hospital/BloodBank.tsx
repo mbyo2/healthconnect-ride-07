@@ -11,9 +11,9 @@ import { toast } from "sonner";
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const getStockPill = (status: string) => {
-  if (status === "adequate") return <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Adequate</span>;
-  if (status === "low") return <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-warning-500">Low Stock</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">Critical</span>;
+  if (status === "adequate") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Adequate</span>;
+  if (status === "low") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Low Stock</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Critical</span>;
 };
 
 const getRequestPill = (urgency: string) => {
@@ -256,7 +256,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Blood Type</th>
                   <th className="py-2.5 px-3 text-center">Status</th>
                   <th className="py-2.5 px-3 text-right">Whole Blood</th>
@@ -290,7 +290,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Request #</th>
                   <th className="py-2.5 px-3">Patient</th>
                   <th className="py-2.5 px-3">Blood Type</th>
@@ -311,17 +311,17 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 text-right font-mono font-bold">{r.units_required}</td>
                     <td className="py-3 px-3 text-center">{getRequestPill(r.urgency)}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white ${r.status === "issued" ? "bg-success-500" : r.status === "crossmatch_done" ? "bg-primary-400" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${r.status === "issued" ? "bg-success-500" : r.status === "crossmatch_done" ? "bg-primary-400" : "bg-warning-500"}`}>
                         {(r.status || "pending").replace("_", " ")}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
                       <div className="flex gap-1 justify-center">
                         {r.status === "pending" && (
-                          <button onClick={() => setShowCompatTest(true)} className="px-2 py-1 rounded text-[10px] font-bold bg-primary-400 text-white">Crossmatch</button>
+                          <button onClick={() => setShowCompatTest(true)} className="px-2 py-1 rounded text-xs font-bold bg-primary-400 text-white">Crossmatch</button>
                         )}
                         {r.status !== "issued" && (
-                          <button onClick={() => updateRequest(r, "issued")} className="px-2 py-1 rounded text-[10px] font-bold bg-success-500 text-white">Issue</button>
+                          <button onClick={() => updateRequest(r, "issued")} className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white">Issue</button>
                         )}
                       </div>
                     </td>
@@ -339,7 +339,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Donor</th>
                   <th className="py-2.5 px-3">Blood Type</th>
                   <th className="py-2.5 px-3">Phone</th>
@@ -355,7 +355,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3">{d.phone || "—"}</td>
                     <td className="py-3 px-3">{d.last_donation_date ? new Date(d.last_donation_date).toLocaleDateString() : "Never"}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${d.is_active ? "bg-success-500" : "bg-graphite-400"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.is_active ? "bg-success-500" : "bg-graphite-400"}`}>
                         {d.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
@@ -373,7 +373,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Date</th>
                   <th className="py-2.5 px-3">Blood Type</th>
                   <th className="py-2.5 px-3">Component</th>
@@ -389,7 +389,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 capitalize">{(d.component_type || "").replace(/_/g, " ")}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{d.units_collected}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${d.screening_status === "passed" ? "bg-success-500" : d.screening_status === "failed" ? "bg-error-500" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.screening_status === "passed" ? "bg-success-500" : d.screening_status === "failed" ? "bg-error-500" : "bg-warning-500"}`}>
                         {d.screening_status}
                       </span>
                     </td>
@@ -407,7 +407,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Date</th>
                   <th className="py-2.5 px-3">Donor Type</th>
                   <th className="py-2.5 px-3">Recipient Type</th>
@@ -423,7 +423,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 font-mono font-bold">{t.recipient_blood_type}</td>
                     <td className="py-3 px-3 capitalize">{t.test_type}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${t.result === "compatible" ? "bg-success-500" : t.result === "incompatible" ? "bg-error-500" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${t.result === "compatible" ? "bg-success-500" : t.result === "incompatible" ? "bg-error-500" : "bg-warning-500"}`}>
                         {t.result}
                       </span>
                     </td>
@@ -441,7 +441,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Issued At</th>
                   <th className="py-2.5 px-3">Patient</th>
                   <th className="py-2.5 px-3">Blood</th>
@@ -458,7 +458,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 font-mono font-bold">{a.blood_type}</td>
                     <td className="py-3 px-3 capitalize">{(a.component_type || "").replace("_", " ")}</td>
                     <td className="py-3 px-3 text-center font-bold">{a.units_issued}</td>
-                    <td className="py-3 px-3"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">{a.action}</span></td>
+                    <td className="py-3 px-3"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">{a.action}</span></td>
                   </tr>
                 ))}
               </tbody>

@@ -226,7 +226,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
             <span className="font-medium text-sm text-foreground">{c.patient_name || 'Patient'}</span>
             <Badge
               variant={['paid', 'approved'].includes(c.status) ? 'default' : ['rejected', 'disputed'].includes(c.status) ? 'destructive' : 'secondary'}
-              className="text-[10px] capitalize"
+              className="text-xs capitalize"
             >
               {c.status}
             </Badge>
@@ -341,7 +341,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
                     <span className="font-medium text-sm">
                       {[inv.patient?.first_name, inv.patient?.last_name].filter(Boolean).join(' ') || 'Patient'}
                     </span>
-                    <Badge variant="secondary" className="text-[10px] font-mono">{inv.invoice_number}</Badge>
+                    <Badge variant="secondary" className="text-xs font-mono">{inv.invoice_number}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Balance K{Number(inv.balance ?? inv.total_amount ?? 0).toLocaleString()} • {inv.payment_status}

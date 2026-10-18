@@ -187,7 +187,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">LIS &amp; RIS Diagnostic Imaging Center</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-400 text-slate-950">
                 Live Orders
               </span>
             </div>
@@ -246,7 +246,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Sample Barcode</th>
                   <th className="py-3 px-3">Patient Name</th>
                   <th className="py-3 px-3">Test Panel &amp; Specimen</th>
@@ -270,7 +270,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                       <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{s.patientName}</td>
                       <td className="py-3 px-3">
                         <div className="font-extrabold">{s.testName}</div>
-                        <div className="text-[10px] text-slate-400">{s.specimenType} • Coll: {s.collectionTime}</div>
+                        <div className="text-xs text-slate-400">{s.specimenType} • Coll: {s.collectionTime}</div>
                       </td>
                       <td className="py-3 px-3 font-bold">
                         <span className={s.isUrgent ? "text-rose-600 font-black" : "text-slate-900 dark:text-slate-100"}>
@@ -279,7 +279,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                       </td>
                       <td className="py-3 px-3 text-center">
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-black uppercase ${
                             s.status === "completed"
                               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
                               : s.isUrgent
@@ -295,12 +295,12 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                           <button
                             onClick={() => handleVerifySample(s.id)}
                             disabled={verifyingId === s.id}
-                            className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-[11px] shadow-xs"
+                            className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-xs"
                           >
                             {verifyingId === s.id ? "Verifying…" : "Verify & Sign"}
                           </button>
                         ) : (
-                          <span className="text-[11px] font-bold text-emerald-600">✓ Signed</span>
+                          <span className="text-xs font-bold text-emerald-600">✓ Signed</span>
                         )}
                       </td>
                     </tr>
@@ -342,23 +342,23 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-mono font-black text-[10px]">
+                      <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-mono font-black text-xs">
                         {st.modality}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400">{st.studyDate}</span>
+                      <span className="text-xs font-bold text-slate-400">{st.studyDate}</span>
                     </div>
 
                     <h4 className="font-black text-sm text-slate-900 dark:text-slate-100">{st.bodyPart}</h4>
                     <p className="text-xs text-primary-500 font-bold mt-0.5">{st.patientName}</p>
 
-                    <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk text-[11px] text-slate-600 dark:text-slate-300">
+                    <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk text-xs text-slate-600 dark:text-slate-300">
                       <span className="font-bold text-slate-900 dark:text-slate-100 block mb-1">Radiology Findings:</span>
                       {st.radiologistReport}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 capitalize">{st.status}</span>
+                    <span className="text-xs font-bold text-slate-400 capitalize">{st.status}</span>
                     <button
                       onClick={() => {
                         setSelectedStudy(st);
@@ -462,7 +462,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       )}
 
       {/* Trust strip */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-success-500" aria-hidden /> Verified results publish to charts</span>
         <span className="flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 text-warning-500" aria-hidden /> Urgent priorities flagged</span>
         <Sparkles className="h-3.5 w-3.5 text-primary-500" aria-hidden />

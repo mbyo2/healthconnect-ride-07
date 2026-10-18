@@ -479,7 +479,7 @@ export const AppointmentsPage = () => {
                   <div className="w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                        <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                           <th className="py-3 px-6 w-[240px]">Participant</th>
                           <th className="py-3 px-3 w-[140px] text-center">Status</th>
                           <th className="py-3 px-3 w-[150px]">Date & Time</th>
@@ -508,25 +508,25 @@ export const AppointmentsPage = () => {
                                         : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
                                     </div>
                                     {!isProvider && person?.specialty && (
-                                      <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
+                                      <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
                                     )}
                                     {/* New: fee + telemedicine + wait time for patient view */}
                                     {!isProvider && (
                                       <div className="flex flex-wrap gap-1 mt-1">
                                         {(person?.consultation_fee_min || person?.consultation_fee_max) && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-primary-50 text-primary-500">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-primary-50 text-primary-500">
                                             <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
                                               ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
                                               : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                                           </span>
                                         )}
                                         {person?.telemedicine_available && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-700">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-emerald-50 text-emerald-700">
                                             <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                           </span>
                                         )}
                                         {person?.typical_wait_time && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-50 text-amber-700">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-amber-50 text-amber-700">
                                             <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
                                           </span>
                                         )}
@@ -542,11 +542,11 @@ export const AppointmentsPage = () => {
 
                               <td className="py-4 px-3 font-mono font-bold text-slate-900 dark:text-slate-200">
                                 <div>{format(apptDate, "MMM d, yyyy")}</div>
-                                <div className="text-[10px] text-slate-400 font-medium">{app.time}</div>
+                                <div className="text-xs text-slate-400 font-medium">{app.time}</div>
                               </td>
 
                               <td className="py-4 px-3">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
                                   isVideo ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"
                                 }`}>
                                   {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
@@ -563,7 +563,7 @@ export const AppointmentsPage = () => {
                                   {isVideo && isToday(apptDate) && (
                                     <Link
                                       to={`/video-call/${app.id}`}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-success-500 text-white text-[10px] font-black hover:bg-success-500 transition-all inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-success-500 text-white text-xs font-black hover:bg-success-500 transition-all inline-flex items-center"
                                     >
                                       JOIN
                                     </Link>
@@ -572,13 +572,13 @@ export const AppointmentsPage = () => {
                                     <>
                                       <button
                                         onClick={() => acceptAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-green-600 text-white text-[10px] font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
+                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-green-600 text-white text-xs font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
                                       >
                                         ACCEPT
                                       </button>
                                       <button
                                         onClick={() => declineAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-red-600 text-white text-[10px] font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
+                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-red-600 text-white text-xs font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
                                       >
                                         DECLINE
                                       </button>
@@ -587,7 +587,7 @@ export const AppointmentsPage = () => {
                                   {isProvider && app.status !== "pending" && (
                                     <button
                                       onClick={() => completeAppointment.mutate(app.id)}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-slate-900 text-white text-[10px] font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-slate-900 text-white text-xs font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
                                     >
                                       DONE
                                     </button>
@@ -595,14 +595,14 @@ export const AppointmentsPage = () => {
                                   {isProvider && (
                                     <button
                                       onClick={() => openReschedule(app)}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-primary-200 text-primary-600 text-[10px] font-black hover:bg-primary-50 transition-all active:scale-95 inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-primary-200 text-primary-600 text-xs font-black hover:bg-primary-50 transition-all active:scale-95 inline-flex items-center"
                                     >
                                       RESCHEDULE
                                     </button>
                                   )}
                                   <button
                                     onClick={() => cancelAppointment.mutate(app.id)}
-                                    className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-black hover:bg-slate-50 transition-all active:scale-95 inline-flex items-center"
+                                    className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-black hover:bg-slate-50 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     CANCEL
                                   </button>
@@ -642,7 +642,7 @@ export const AppointmentsPage = () => {
                   <div className="w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                        <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                           <th className="py-2.5 px-4 w-[240px]">Participant</th>
                           <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                           <th className="py-2.5 px-3 w-[150px]">Date & Time</th>
@@ -664,17 +664,17 @@ export const AppointmentsPage = () => {
                                     ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                                     : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}</div>
                                   {!isProvider && person?.specialty && (
-                                    <div className="text-[10px] text-primary-500 font-bold mt-0.5">{person.specialty}</div>
+                                    <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
                                   )}
                                   {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {person?.consultation_fee_min && (
-                                        <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
+                                        <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
                                           <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                                         </span>
                                       )}
                                       {person?.telemedicine_available && (
-                                        <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                                        <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
                                           <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                         </span>
                                       )}
@@ -703,7 +703,7 @@ export const AppointmentsPage = () => {
                                 {!isProvider && app.provider_id && (
                                   <button
                                     onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1.5 min-h-[40px] rounded-xl bg-primary-500 text-white text-[11px] font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
+                                    className="px-3 py-1.5 min-h-[40px] rounded-xl bg-primary-500 text-white text-xs font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     Re-Book
                                   </button>

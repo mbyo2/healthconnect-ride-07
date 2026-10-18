@@ -100,7 +100,7 @@ export const ProviderAnalyticsDashboard = () => {
               </div>
               <div>
                 <p className="text-xl font-black font-mono text-slate-900">{value}</p>
-                <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</p>
+                <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</p>
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export const ProviderAnalyticsDashboard = () => {
             <h3 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-primary-500" /> Recent Patient Visits
             </h3>
-            <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400">{recentAppointments.length} visits</span>
+            <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{recentAppointments.length} visits</span>
           </div>
 
           {recentAppointments.length === 0 ? (
@@ -125,9 +125,9 @@ export const ProviderAnalyticsDashboard = () => {
                 <div key={apt.id} className="flex items-center justify-between p-2.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
                   <div>
                     <p className="font-extrabold text-slate-900">{apt.patient?.first_name} {apt.patient?.last_name}</p>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">{apt.date} at {apt.time}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{apt.date} at {apt.time}</p>
                   </div>
-                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                     apt.status === "completed" ? "bg-success-500" : apt.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
                   }`}>
                     {apt.status}
@@ -144,7 +144,7 @@ export const ProviderAnalyticsDashboard = () => {
             <h3 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
               <MessageSquareText className="h-4 w-4 text-warning-500" /> Patient Ratings & Feedback
             </h3>
-            <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
+            <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
           </div>
 
           {recentReviews.length === 0 ? (
@@ -159,7 +159,7 @@ export const ProviderAnalyticsDashboard = () => {
                         <Star key={s} className={`h-3 w-3 ${s <= review.rating ? "text-warning-500 fill-warning-500" : "text-slate-300"}`} />
                       ))}
                     </div>
-                    <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400">{review.patient?.first_name}</span>
+                    <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{review.patient?.first_name}</span>
                   </div>
                   {review.review_text && <p className="text-xs text-slate-700 font-medium mt-1.5 leading-relaxed">{review.review_text}</p>}
                 </div>

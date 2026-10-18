@@ -152,7 +152,7 @@ export const SupplierRatingCard = ({
             <div className="text-3xl font-black text-blue-600 dark:text-blue-400">
               {rating.toFixed(1)}
             </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 font-semibold">
+            <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
               out of 5
             </div>
           </div>

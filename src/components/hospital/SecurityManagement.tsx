@@ -160,8 +160,8 @@ export const SecurityManagement = ({ hospital }: Props) => {
                     {log.event_type === 'account_locked' ? <Lock className="h-4 w-4 text-destructive" /> : <AlertTriangle className="h-4 w-4 text-amber-500" />}
                     <div>
                       <p className="text-xs font-medium text-foreground">{log.email}</p>
-                      <p className="text-[10px] text-muted-foreground">{log.description}</p>
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">{log.description}</p>
+                      <p className="text-xs text-muted-foreground">
                         IP: {log.ip_address || 'Unknown'} • {log.browser || 'Unknown browser'} • {log.platform || 'Unknown OS'}
                       </p>
                     </div>
@@ -170,7 +170,7 @@ export const SecurityManagement = ({ hospital }: Props) => {
                     <Badge variant={log.event_type === 'account_locked' ? 'destructive' : 'secondary'} className="text-[8px]">
                       {log.event_type.replace('_', ' ')}
                     </Badge>
-                    <p className="text-[10px] text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
                     </p>
                   </div>

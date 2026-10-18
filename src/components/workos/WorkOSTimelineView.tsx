@@ -46,7 +46,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
 
         {/* Timeline Grid Table */}
         <div className="mt-4">
-          <div className="grid grid-cols-12 gap-2 text-[11px] font-mono font-bold uppercase text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div className="grid grid-cols-12 gap-2 text-xs font-mono font-bold uppercase text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
             <div className="col-span-4">Patient / Ward Unit</div>
             <div className="col-span-8 grid grid-cols-8 text-center">
               {TIME_SLOTS.map((slot) => (
@@ -78,7 +78,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
                     />
                     <div className="min-w-0">
                       <div className="font-bold text-xs truncate text-slate-900 dark:text-slate-100">{patient.name}</div>
-                      <div className="text-[10px] text-slate-400 truncate flex items-center gap-1">
+                      <div className="text-xs text-slate-400 truncate flex items-center gap-1">
                         <span className="font-mono text-blue-500">{patient.location}</span>
                         <span>•</span>
                         <span>{patient.doctor.name}</span>
@@ -89,14 +89,14 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
                   {/* Right Timeline Bar Span */}
                   <div className="col-span-8 grid grid-cols-8 relative h-8 items-center bg-slate-100/50 dark:bg-slate-950/40 rounded-lg p-1">
                     <div
-                      className={`h-6 rounded-md flex items-center justify-between px-2 text-[10px] font-bold text-white shadow-sm transition-all ${statusConfig.bg}`}
+                      className={`h-6 rounded-md flex items-center justify-between px-2 text-xs font-bold text-white shadow-sm transition-all ${statusConfig.bg}`}
                       style={{
                         gridColumnStart: startCol,
                         gridColumnEnd: `span ${colSpan}`,
                       }}
                     >
                       <span className="truncate">{patient.symptoms}</span>
-                      <span className="font-mono text-[9px] bg-black/20 px-1 rounded">{patient.vitalScore.split(' ')[0]}</span>
+                      <span className="font-mono text-xs bg-black/20 px-1 rounded">{patient.vitalScore.split(' ')[0]}</span>
                     </div>
                   </div>
                 </div>

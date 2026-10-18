@@ -95,7 +95,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                         {/* Top patient line */}
                         <div className="flex items-start justify-between gap-2 mt-1">
                           <div>
-                            <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase text-slate-400">
+                            <div className="flex items-center gap-1.5 text-xs font-mono font-semibold uppercase text-slate-400">
                               <span>{patient.groupName}</span>
                               <span className="text-slate-300 dark:text-slate-700">•</span>
                               <span className="text-blue-400 font-bold">{patient.id}</span>
@@ -106,7 +106,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                           </div>
 
                           <div className="flex items-center gap-1.5">
-                            <span className={`px-2 py-0.5 rounded text-[10px] ${priorityConfig.bg} ${priorityConfig.text}`}>
+                            <span className={`px-2 py-0.5 rounded text-xs ${priorityConfig.bg} ${priorityConfig.text}`}>
                               {patient.priority}
                             </span>
                           </div>
@@ -118,7 +118,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                         </p>
 
                         {/* AI Tag */}
-                        <div className="mt-2.5 flex items-center gap-1.5 px-2 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-300 text-[10px] font-medium border border-purple-500/20">
+                        <div className="mt-2.5 flex items-center gap-1.5 px-2 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-300 text-xs font-medium border border-purple-500/20">
                           <Sparkles className="h-3 w-3 text-purple-500 flex-shrink-0" />
                           <span className="truncate">{patient.aiDiagnosticTag}</span>
                         </div>
@@ -131,12 +131,12 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                               alt={patient.doctor.name}
                               className="h-5 w-5 rounded-full object-cover"
                             />
-                            <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 truncate max-w-[110px]">
+                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate max-w-[110px]">
                               {patient.doctor.name}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1 font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                          <div className="flex items-center gap-1 font-mono text-xs text-slate-500 dark:text-slate-400">
                             <HeartPulse className="h-3 w-3 text-rose-500" />
                             <span>{patient.vitalScore.split(' ')[0]}</span>
                           </div>

@@ -44,7 +44,7 @@ export const MessageBubble = ({ message, isMine = false }: MessageBubbleProps) =
         ))}
         <div
           className={cn(
-            "mt-1 flex items-center justify-end gap-1 text-[10px] font-medium",
+            "mt-1 flex items-center justify-end gap-1 text-xs font-medium",
             mine ? "text-white/70" : "text-graphite-400"
           )}
         >

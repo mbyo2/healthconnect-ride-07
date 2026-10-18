@@ -184,7 +184,7 @@ const EmergencyResponse = () => {
             <Phone className="w-6 h-6" />
             <span>CALL EMERGENCY SERVICES</span>
           </button>
-          <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-graphite-500 dark:text-slate-400">
             Automatically transmits blood type, critical allergies, and GPS coordinates to hospital dispatch.
           </p>
         </div>
@@ -208,7 +208,7 @@ const EmergencyResponse = () => {
                 <div key={contact.id} className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                   <div>
                     <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{contact.name}</h4>
-                    <p className="text-[11px] text-graphite-500 dark:text-slate-400">{contact.relationship || contact.relation}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400">{contact.relationship || contact.relation}</p>
                     <p className="text-xs font-mono font-bold text-primary-500 mt-0.5">{contact.phone}</p>
                   </div>
                   <button
@@ -242,31 +242,31 @@ const EmergencyResponse = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-error-50 border border-error-500/30">
-                  <p className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
+                  <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
                   <p className="text-2xl font-black font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
                 <div className="p-3 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
-                  <p className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
+                  <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
                   <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
                 </div>
               </div>
 
               <div className="space-y-2 text-xs">
                 <div>
-                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] mb-1">Medical Conditions</p>
+                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Medical Conditions</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.conditions.map((condition, index) => (
-                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-purple-500">{condition}</span>
+                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-purple-500">{condition}</span>
                     ))}
                     {medicalInfo.conditions.length === 0 && <span className="text-graphite-500 dark:text-slate-400">None listed</span>}
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] mb-1">Current Medications</p>
+                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Current Medications</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.medications.map((med, index) => (
-                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">{med}</span>
+                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{med}</span>
                     ))}
                     {medicalInfo.medications.length === 0 && <span className="text-graphite-500 dark:text-slate-400">None listed</span>}
                   </div>
@@ -291,7 +291,7 @@ const EmergencyResponse = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{h.name}</h4>
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">24/7 Emergency</span>
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">24/7 Emergency</span>
                   </div>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{h.address || "Lusaka Medical District"}</p>
                 </div>

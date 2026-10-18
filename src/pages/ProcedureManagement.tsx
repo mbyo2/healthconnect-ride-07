@@ -419,43 +419,43 @@ export const ProcedureManagement = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Procedures</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Procedures</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{totalProcedures}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In catalog</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In catalog</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Pricing</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Pricing</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{activePricing}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured prices</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured prices</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
                 <Clock className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{recentExecutions}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Past 7 days</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Past 7 days</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Price</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Price</span>
                 <TrendingUp className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">
                 {institution?.currency || "ZMW"} {avgProcedurePrice.toFixed(0)}
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per procedure</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per procedure</div>
             </CardContent>
           </Card>
         </div>
@@ -511,15 +511,15 @@ export const ProcedureManagement = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{procedure.procedure_name}</CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{procedure.procedure_code}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{procedure.procedure_code}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
                         {procedure.requires_prior_authorization && (
-                          <Badge className="bg-warning-500 text-white text-[10px]">Auth Required</Badge>
+                          <Badge className="bg-warning-500 text-white text-xs">Auth Required</Badge>
                         )}
                         {procedure.requires_preparation && (
-                          <Badge className="bg-purple-500 text-white text-[10px]">Prep Required</Badge>
+                          <Badge className="bg-purple-500 text-white text-xs">Prep Required</Badge>
                         )}
                       </div>
                     </div>
@@ -527,7 +527,7 @@ export const ProcedureManagement = () => {
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Category</span>
-                      <Badge variant="outline" className="text-[10px]">{procedure.category}</Badge>
+                      <Badge variant="outline" className="text-xs">{procedure.category}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Base Price</span>
@@ -606,7 +606,7 @@ export const ProcedureManagement = () => {
                         <tr key={price.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                           <td className="px-4 py-3">
                             <div className="text-xs font-bold">{price.procedure?.procedure_name}</div>
-                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">{price.procedure?.procedure_code}</div>
+                            <div className="text-xs text-graphite-500 dark:text-slate-400">{price.procedure?.procedure_code}</div>
                           </td>
                           <td className="px-4 py-3 text-xs font-bold">{price.price.toFixed(2)}</td>
                           <td className="px-4 py-3 text-xs">{price.currency}</td>
@@ -614,7 +614,7 @@ export const ProcedureManagement = () => {
                             {new Date(price.effective_from).toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
-                            <Badge className={price.is_active ? "bg-success-500 text-white text-[10px]" : "bg-graphite-500 dark:bg-slate-600 text-white text-[10px]"}>
+                            <Badge className={price.is_active ? "bg-success-500 text-white text-xs" : "bg-graphite-500 dark:bg-slate-600 text-white text-xs"}>
                               {price.is_active ? "Active" : "Inactive"}
                             </Badge>
                           </td>
@@ -683,12 +683,12 @@ export const ProcedureManagement = () => {
                             </div>
                             <div>
                               <CardTitle className="text-sm font-extrabold">{execution.procedure?.procedure_name}</CardTitle>
-                              <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                              <div className="text-xs text-graphite-500 dark:text-slate-400">
                                 {execution.patient?.first_name} {execution.patient?.last_name}
                               </div>
                             </div>
                           </div>
-                          <Badge className={getStatusColor(execution.status) + " text-[10px]"}>
+                          <Badge className={getStatusColor(execution.status) + " text-xs"}>
                             {execution.status}
                           </Badge>
                         </div>

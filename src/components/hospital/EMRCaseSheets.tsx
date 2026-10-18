@@ -194,7 +194,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
               <div key={c.id} role="button" tabIndex={0} aria-pressed={activeCase?.id === c.id} aria-label={`Open case sheet for ${nameFor(c.patient_id)}`} onClick={() => setActiveCase(c)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCase(c); } }} className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${activeCase?.id === c.id ? 'border-primary bg-primary/5' : 'border-border'}`}>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm text-foreground">{nameFor(c.patient_id)}</span>
-                  <Badge variant={c.status === 'completed' ? 'default' : 'secondary'} className="text-[10px] capitalize">{c.status || 'active'}</Badge>
+                  <Badge variant={c.status === 'completed' ? 'default' : 'secondary'} className="text-xs capitalize">{c.status || 'active'}</Badge>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">{c.title || c.record_type}</div>
                 <div className="text-xs text-muted-foreground">{c.visit_date ? new Date(c.visit_date).toLocaleDateString() : ''}</div>

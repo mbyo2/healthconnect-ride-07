@@ -412,47 +412,47 @@ export const EnterpriseAccounting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
                 <BookOpen className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalAssets / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Gross asset value</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Gross asset value</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
                 <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
               <div className="text-2xl font-black font-mono text-error-500">
                 {institution.currency || "ZMW"} {(totalDepreciation / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Total depreciation</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Total depreciation</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">
                 {institution.currency || "ZMW"} {(netBookValue / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current asset value</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current asset value</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
                 <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{pendingReconciliations}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting reconciliation</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting reconciliation</div>
             </CardContent>
           </Card>
         </div>
@@ -520,7 +520,7 @@ export const EnterpriseAccounting = () => {
                     <tr key={entry.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{entry.entry_number}</div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{entry.reference_number}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{entry.reference_number}</div>
                       </td>
                       <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(entry.entry_date).toLocaleDateString()}
@@ -532,7 +532,7 @@ export const EnterpriseAccounting = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{entry.account_name}</div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{entry.account_code}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{entry.account_code}</div>
                       </td>
                       <td className="px-4 py-3 text-xs font-bold text-success-500">
                         {entry.debit_amount > 0 ? `${entry.currency} ${entry.debit_amount.toFixed(2)}` : "-"}
@@ -543,9 +543,9 @@ export const EnterpriseAccounting = () => {
                       <td className="px-4 py-3 text-xs">{entry.currency}</td>
                       <td className="px-4 py-3">
                         {entry.is_posted ? (
-                          <Badge className="bg-success-500 text-white text-[10px]">Posted</Badge>
+                          <Badge className="bg-success-500 text-white text-xs">Posted</Badge>
                         ) : (
-                          <Badge className="bg-warning-500 text-white text-[10px]">Draft</Badge>
+                          <Badge className="bg-warning-500 text-white text-xs">Draft</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -708,19 +708,19 @@ export const EnterpriseAccounting = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{asset.asset_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{asset.asset_code}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{asset.asset_code}</div>
                       </div>
-                      <Badge variant="outline" className="text-[10px]">{asset.asset_category}</Badge>
+                      <Badge variant="outline" className="text-xs">{asset.asset_category}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Purchase Cost</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Purchase Cost</div>
                         <div className="text-sm font-bold">{asset.currency} {asset.purchase_cost.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Net Book Value</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Net Book Value</div>
                         <div className="text-sm font-bold text-success-500">{asset.currency} {asset.net_book_value.toFixed(2)}</div>
                       </div>
                     </div>
@@ -857,9 +857,9 @@ export const EnterpriseAccounting = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{reconciliation.bank_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{reconciliation.account_number}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{reconciliation.account_number}</div>
                       </div>
-                      <Badge className={getReconciliationStatusColor(reconciliation.reconciliation_status) + " text-[10px]"}>
+                      <Badge className={getReconciliationStatusColor(reconciliation.reconciliation_status) + " text-xs"}>
                         {reconciliation.reconciliation_status}
                       </Badge>
                     </div>
@@ -867,11 +867,11 @@ export const EnterpriseAccounting = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Statement Balance</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Statement Balance</div>
                         <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.statement_balance.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Book Balance</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Book Balance</div>
                         <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.book_balance.toFixed(2)}</div>
                       </div>
                     </div>
@@ -909,15 +909,15 @@ export const EnterpriseAccounting = () => {
                     <div className="flex justify-center gap-4">
                       <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">SAP</div>
-                        <div className="text-[10px]">Enterprise ERP</div>
+                        <div className="text-xs">Enterprise ERP</div>
                       </div>
                       <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">Focus ERP</div>
-                        <div className="text-[10px]">Mid-market ERP</div>
+                        <div className="text-xs">Mid-market ERP</div>
                       </div>
                       <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">Tally</div>
-                        <div className="text-[10px]">Accounting Software</div>
+                        <div className="text-xs">Accounting Software</div>
                       </div>
                     </div>
                     <div className="text-xs">

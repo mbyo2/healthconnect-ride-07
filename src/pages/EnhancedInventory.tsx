@@ -337,7 +337,7 @@ export const EnhancedInventory = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Supplier Rating</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Supplier Rating</span>
                 <TrendingUp className="h-4 w-4 text-success-500" />
               </div>
               <div className="space-y-2">
@@ -348,7 +348,7 @@ export const EnhancedInventory = () => {
                   showTrend={false}
                 />
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-3 pt-3 border-t border-canvas-silk dark:border-slate-700">
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-3 pt-3 border-t border-canvas-silk dark:border-slate-700">
                 {supplierPerformance.length} suppliers tracked
               </div>
             </CardContent>
@@ -356,33 +356,33 @@ export const EnhancedInventory = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
                 <ShoppingCart className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{pendingOrders}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Order Value</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Order Value</span>
                 <DollarSign className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">
                 {institution.currency || "ZMW"} {(totalOrderValue / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All orders</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All orders</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Open Discrepancies</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Open Discrepancies</span>
                 <AlertTriangle className="h-4 w-4 text-error-500" />
               </div>
               <div className="text-2xl font-black font-mono text-error-500">{openDiscrepancies}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require resolution</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require resolution</div>
             </CardContent>
           </Card>
         </div>
@@ -500,7 +500,7 @@ export const EnhancedInventory = () => {
                         {institution.currency || "ZMW"} {Number(order.final_amount || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getStatusColor(order.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(order.status) + " text-xs"}>
                           {order.status}
                         </Badge>
                       </td>
@@ -550,11 +550,11 @@ export const EnhancedInventory = () => {
                           <RefreshCw className="h-4 w-4 text-primary-500" />
                           {new Date(reconciliation.reconciliation_date).toLocaleDateString()}
                         </CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">
+                        <div className="text-xs text-graphite-500 dark:text-slate-400 mt-1">
                           {reconciliation.total_items_checked} items checked
                         </div>
                       </div>
-                      <Badge className={getStatusColor(reconciliation.status) + " text-[10px]"}>
+                      <Badge className={getStatusColor(reconciliation.status) + " text-xs"}>
                         {reconciliation.status}
                       </Badge>
                     </div>
@@ -562,11 +562,11 @@ export const EnhancedInventory = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Discrepancies Found</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Discrepancies Found</div>
                         <div className="text-sm font-bold text-error-500">{reconciliation.discrepancies_found}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Total Value</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Total Value</div>
                         <div className="text-sm font-bold text-warning-500">
                           {institution.currency || "ZMW"} {Number(reconciliation.total_discrepancy_value || 0).toFixed(2)}
                         </div>

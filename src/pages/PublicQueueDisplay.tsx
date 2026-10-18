@@ -212,7 +212,7 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Bottom News Ticker / Waiting Room Advice */}
       <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs font-medium text-slate-300 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-black text-[10px] uppercase">
+          <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-black text-xs uppercase">
             Notice
           </span>
           <span>

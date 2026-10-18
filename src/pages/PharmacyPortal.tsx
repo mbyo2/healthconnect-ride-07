@@ -57,7 +57,7 @@ const PharmacyPortal = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Pharmacy &amp; Logistics Hub</span>
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-300">Pharmacy &amp; Logistics Hub</span>
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">
                     {portalTitle}

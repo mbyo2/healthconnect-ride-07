@@ -132,36 +132,36 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Capability badges — real data, not hardcoded */}
                 <div className="flex flex-wrap gap-1.5 mb-2.5">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-success-500">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-white bg-success-500">
                     <CheckCircle className="h-3 w-3" /> Verified
                   </span>
 
                   {provider.telemedicine_available && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-primary-500">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-white bg-primary-500">
                       <Video className="h-3 w-3" /> Telemedicine
                     </span>
                   )}
 
                   {provider.home_visits_available && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-purple-500">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-white bg-purple-500">
                       <Home className="h-3 w-3" /> Home Visits
                     </span>
                   )}
 
                   {provider.accepts_insurance && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-warning-500">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-white bg-warning-500">
                       <Shield className="h-3 w-3" /> Insurance
                     </span>
                   )}
 
                   {provider.typical_wait_time && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-slate-700 bg-canvas border border-canvas-silk dark:border-slate-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-slate-700 bg-canvas border border-canvas-silk dark:border-slate-800">
                       <Clock className="h-3 w-3 text-primary-500" /> Wait: {provider.typical_wait_time}
                     </span>
                   )}
 
                   {provider.distance !== undefined && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black text-slate-700 bg-canvas border border-canvas-silk dark:border-slate-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black text-slate-700 bg-canvas border border-canvas-silk dark:border-slate-800">
                       <MapPin className="h-3 w-3 text-primary-500" /> {provider.distance.toFixed(1)} km
                     </span>
                   )}
@@ -178,12 +178,12 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                 {displaySubs.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2.5">
                     {displaySubs.map(sub => (
-                      <span key={sub} className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-primary-50 border border-primary-200 text-primary-500 px-2 py-0.5 rounded-md">
+                      <span key={sub} className="inline-flex items-center gap-1 text-xs font-extrabold bg-primary-50 border border-primary-200 text-primary-500 px-2 py-0.5 rounded-md">
                         <Stethoscope className="h-2.5 w-2.5" /> {sub}
                       </span>
                     ))}
                     {extraSubs > 0 && (
-                      <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 px-1 py-0.5">
+                      <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 px-1 py-0.5">
                         +{extraSubs} more
                       </span>
                     )}
@@ -192,7 +192,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Practice location */}
                 {provider.primary_practice_location && (
-                  <p className="flex items-center gap-1 text-[11px] text-graphite-500 dark:text-slate-400 mb-2.5">
+                  <p className="flex items-center gap-1 text-xs text-graphite-500 dark:text-slate-400 mb-2.5">
                     <MapPin className="h-3 w-3 text-primary-500 shrink-0" />
                     {provider.primary_practice_location}
                   </p>
@@ -202,12 +202,12 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                 {(provider.insurance_providers_accepted || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2.5">
                     {(provider.insurance_providers_accepted || []).slice(0, 3).map(ins => (
-                      <span key={ins} className="text-[10px] font-bold bg-canvas border border-canvas-silk text-slate-600 px-1.5 py-0.5 rounded-md">
+                      <span key={ins} className="text-xs font-bold bg-canvas border border-canvas-silk text-slate-600 px-1.5 py-0.5 rounded-md">
                         {ins}
                       </span>
                     ))}
                     {(provider.insurance_providers_accepted || []).length > 3 && (
-                      <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400 px-1">
+                      <span className="text-xs font-bold text-graphite-500 dark:text-slate-400 px-1">
                         +{(provider.insurance_providers_accepted || []).length - 3} more
                       </span>
                     )}
@@ -229,19 +229,19 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={e => { e.stopPropagation(); navigate("/cost-estimator"); }}
-                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-[11px] font-bold flex items-center gap-1 hover:bg-primary-50 dark:hover:bg-slate-800"
+                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1 hover:bg-primary-50 dark:hover:bg-slate-800"
                     >
                       <Calculator className="h-3.5 w-3.5 text-primary-500" /> Estimate Copay
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); navigate(`/provider/${provider.id}`); }}
-                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-[11px] font-bold text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800"
                     >
                       View Profile
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); navigate(`/provider/${provider.id}`); }}
-                      className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-[11px] font-extrabold shadow-xs flex items-center gap-1"
+                      className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-xs flex items-center gap-1"
                     >
                       <CalendarPlus className="h-3.5 w-3.5" /> Book Consultation
                     </button>

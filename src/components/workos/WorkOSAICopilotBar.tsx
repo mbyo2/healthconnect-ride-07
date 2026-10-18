@@ -73,11 +73,11 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
                     <Icon className="h-4 w-4" />
                     <span>{wf.title}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                     {wf.prompt}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center text-[10px] font-bold text-purple-500 group-hover:translate-x-1 transition-transform">
+                <div className="mt-3 flex items-center text-xs font-bold text-purple-500 group-hover:translate-x-1 transition-transform">
                   <span>Run Automation</span>
                   <ArrowRight className="h-3 w-3 ml-1" />
                 </div>

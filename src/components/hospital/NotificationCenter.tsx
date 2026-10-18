@@ -75,7 +75,7 @@ export const NotificationCenter = ({ hospitalId }: Props) => {
           <CardTitle className="text-base flex items-center gap-2">
             {unreadCount > 0 ? <BellRing className="h-5 w-5 text-destructive animate-pulse" /> : <Bell className="h-5 w-5 text-muted-foreground" />}
             Notifications
-            {unreadCount > 0 && <Badge variant="destructive" className="text-[10px]">{unreadCount}</Badge>}
+            {unreadCount > 0 && <Badge variant="destructive" className="text-xs">{unreadCount}</Badge>}
           </CardTitle>
           {unreadCount > 0 && (
             <Button size="sm" variant="ghost" onClick={markAllRead} className="text-xs">
@@ -86,7 +86,7 @@ export const NotificationCenter = ({ hospitalId }: Props) => {
         <div className="flex gap-1 flex-wrap pt-2">
           {['all', 'unread', 'admission', 'discharge', 'pharmacy', 'lab', 'ot', 'billing', 'security'].map(f => (
             <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} onClick={() => setFilter(f)}
-              className="text-[10px] h-6 px-2 capitalize">{f}</Button>
+              className="text-xs h-6 px-2 capitalize">{f}</Button>
           ))}
         </div>
       </CardHeader>
@@ -110,8 +110,8 @@ export const NotificationCenter = ({ hospitalId }: Props) => {
                         <Badge variant="outline" className="text-[8px] capitalize">{n.category}</Badge>
                         {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary" />}
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{n.message}</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                       </p>
                     </div>

@@ -52,7 +52,7 @@ interface ProviderApp {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
+    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
     <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{value || "—"}</span>
   </div>
 );
@@ -272,7 +272,7 @@ export const ProviderApplications = () => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Applicant</th>
                 <th className="py-2.5 px-3">Specialty</th>
                 <th className="py-2.5 px-3">Medical School</th>
@@ -289,7 +289,7 @@ export const ProviderApplications = () => {
                     <div className="font-bold text-slate-900 dark:text-slate-100">
                       {app.profile?.first_name} {app.profile?.last_name}
                     </div>
-                    <div className="text-[10px] text-slate-400">{app.profile?.email}</div>
+                    <div className="text-xs text-slate-400">{app.profile?.email}</div>
                   </td>
                   <td className="py-3 px-3 font-semibold text-primary-500">{app.specialty || "General Medicine"}</td>
                   <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{app.profile?.medical_school || "—"}</td>
@@ -299,7 +299,7 @@ export const ProviderApplications = () => {
                     <div className="flex flex-col items-center gap-1">
                       {statusPill(app.status)}
                       {app.profile?.is_suspended && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-amber-600" title={app.profile.suspension_reason || "Suspended"}>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-amber-600" title={app.profile.suspension_reason || "Suspended"}>
                           Suspended
                         </span>
                       )}
@@ -308,7 +308,7 @@ export const ProviderApplications = () => {
                   <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => openReview(app)}
-                      className="px-3 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600 flex items-center gap-1 mx-auto"
+                      className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 flex items-center gap-1 mx-auto"
                     >
                       <FileText className="h-3 w-3" /> Review
                     </button>
@@ -351,7 +351,7 @@ export const ProviderApplications = () => {
                   <InfoRow label="Medical School" value={p?.medical_school} />
                   <InfoRow label="Graduation Year" value={p?.graduation_year} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Board Certifications</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Board Certifications</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.board_certifications || []).length > 0
                         ? (p!.board_certifications as string[]).map(c => (
@@ -364,7 +364,7 @@ export const ProviderApplications = () => {
                     </div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Subspecialties</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Subspecialties</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.subspecialties || []).length > 0
                         ? (p!.subspecialties as string[]).map(s => (
@@ -388,7 +388,7 @@ export const ProviderApplications = () => {
                   <InfoRow label="Practice Location" value={p?.primary_practice_location} />
                   <InfoRow label="Typical Wait Time" value={p?.typical_wait_time} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Affiliated Hospitals</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Affiliated Hospitals</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.affiliated_hospitals || []).length > 0
                         ? (p!.affiliated_hospitals as string[]).map(h => (
@@ -418,19 +418,19 @@ export const ProviderApplications = () => {
                     }
                   />
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Accepts Insurance</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Accepts Insurance</span>
                     <div className="mt-1"><BoolBadge value={p?.accepts_insurance ?? false} /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Telemedicine</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Telemedicine</span>
                     <div className="mt-1"><BoolBadge value={p?.telemedicine_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Home Visits</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Home Visits</span>
                     <div className="mt-1"><BoolBadge value={p?.home_visits_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Insurance Providers Accepted</span>
+                    <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Insurance Providers Accepted</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.insurance_providers_accepted || []).length > 0
                         ? (p!.insurance_providers_accepted as string[]).map(ins => (
@@ -475,7 +475,7 @@ export const ProviderApplications = () => {
                         <label htmlFor={`chk-${req.id}`} className="font-bold cursor-pointer flex items-center gap-1">
                           {req.name} {req.required && <span className="text-error-500">*</span>}
                         </label>
-                        <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
+                        <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
                       </div>
                       {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />}
                     </div>

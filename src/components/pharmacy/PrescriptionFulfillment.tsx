@@ -504,7 +504,7 @@ export function PrescriptionFulfillment() {
                   <button
                     type="button"
                     onClick={handleAddMedication}
-                    className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] flex items-center gap-1"
+                    className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs flex items-center gap-1"
                   >
                     <Plus className="h-3 w-3" /> Add Another Medication
                   </button>
@@ -513,7 +513,7 @@ export function PrescriptionFulfillment() {
                 {medicationItems.map((item, idx) => (
                   <div key={item.id} className="p-3.5 rounded-2xl border border-canvas-silk bg-canvas-bone dark:bg-slate-950 space-y-2 relative">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
+                      <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
                         Item #{idx + 1}
                       </span>
                       {medicationItems.length > 1 && (
@@ -621,7 +621,7 @@ export function PrescriptionFulfillment() {
       <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Medication Name</th>
               <th className="py-2.5 px-3">Patient</th>
               <th className="py-2.5 px-3 text-center">Fulfillment Status</th>
@@ -639,19 +639,19 @@ export function PrescriptionFulfillment() {
                     <span>{p.medication_name}</span>
                   </div>
                   {p.quantity && (
-                    <span className="text-[10px] text-slate-400 font-normal">Qty: {p.quantity} units</span>
+                    <span className="text-xs text-slate-400 font-normal">Qty: {p.quantity} units</span>
                   )}
                 </td>
                 <td className="py-3 px-3 font-bold text-primary-500">{p.patient_name}</td>
                 <td className="py-3 px-3 text-center">{getStatusPill(p.fulfillment_status || "pending")}</td>
                 <td className="py-3 px-3">
                   <div className="font-semibold">{p.dosage}</div>
-                  <div className="text-[10px] text-slate-400">{p.frequency}</div>
+                  <div className="text-xs text-slate-400">{p.frequency}</div>
                 </td>
                 <td className="py-3 px-3 text-slate-600">
                   <div>{p.prescribed_by}</div>
                   {p.prescription_number && (
-                    <span className="text-[10px] font-mono text-slate-400">{p.prescription_number}</span>
+                    <span className="text-xs font-mono text-slate-400">{p.prescription_number}</span>
                   )}
                 </td>
                 <td className="py-3 px-3 text-center">

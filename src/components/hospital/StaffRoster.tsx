@@ -189,7 +189,7 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
                       </p>
                       <p className="text-xs text-muted-foreground">{p.role || 'Staff'}</p>
                     </div>
-                    <Badge variant={p.status === 'active' ? 'default' : 'secondary'} className="text-[10px]">
+                    <Badge variant={p.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                       {p.status || 'active'}
                     </Badge>
                   </div>

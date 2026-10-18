@@ -51,10 +51,10 @@ export const RecentActivityFeed = ({ activities }: RecentActivityFeedProps) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium truncate">{item.title}</p>
-                        <Badge variant="outline" className="text-[10px] shrink-0">{config.badge}</Badge>
+                        <Badge variant="outline" className="text-xs shrink-0">{config.badge}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
                       </p>
                     </div>

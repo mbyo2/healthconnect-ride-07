@@ -309,7 +309,7 @@ const LabOrders = () => {
                       <div>
                         <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                           {o.test_type}
-                          <span className="ml-2 font-mono text-[10px] text-slate-400">{o.test_number}</span>
+                          <span className="ml-2 font-mono text-xs text-slate-400">{o.test_number}</span>
                         </p>
                         <p className="text-xs text-slate-500">
                           {o.patient?.first_name} {o.patient?.last_name} · {o.lab?.name} ·
@@ -317,8 +317,8 @@ const LabOrders = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px]">{o.priority}</Badge>
-                        <Badge className="text-[10px]">{o.status?.replace(/_/g, " ")}</Badge>
+                        <Badge variant="outline" className="text-xs">{o.priority}</Badge>
+                        <Badge className="text-xs">{o.status?.replace(/_/g, " ")}</Badge>
                         <button
                           onClick={() =>
                             downloadReceiptPdf({

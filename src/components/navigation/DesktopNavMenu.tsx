@@ -64,7 +64,7 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
                 {item.label}
               </div>
               {item.badge && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
+                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
                   {item.badge}
                 </span>
               )}

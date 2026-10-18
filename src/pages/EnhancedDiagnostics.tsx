@@ -468,41 +468,41 @@ export const EnhancedDiagnostics = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
                 <Clock className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{pendingOrders}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{inProgressOrders}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently processing</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently processing</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{completedToday}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Results delivered</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Results delivered</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
                 <Users className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{scheduledStaff}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Upcoming shifts</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Upcoming shifts</div>
             </CardContent>
           </Card>
         </div>
@@ -592,13 +592,13 @@ export const EnhancedDiagnostics = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getPriorityColor(order.priority) + " text-[10px]"}>
+                        <Badge className={getPriorityColor(order.priority) + " text-xs"}>
                           {order.priority}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-xs">{order.requested_tests.length} tests</td>
                       <td className="px-4 py-3">
-                        <Badge className={getStatusColor(order.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(order.status) + " text-xs"}>
                           {order.status}
                         </Badge>
                       </td>
@@ -672,11 +672,11 @@ export const EnhancedDiagnostics = () => {
                           <CardTitle className="text-sm font-extrabold">
                             {schedule.staff?.first_name} {schedule.staff?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{schedule.staff?.specialty}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{schedule.staff?.specialty}</div>
                         </div>
                       </div>
                       {schedule.is_on_call && (
-                        <Badge className="bg-warning-500 text-white text-[10px]">On Call</Badge>
+                        <Badge className="bg-warning-500 text-white text-xs">On Call</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -691,7 +691,7 @@ export const EnhancedDiagnostics = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Type</span>
-                      <Badge variant="outline" className="text-[10px]">{schedule.shift_type}</Badge>
+                      <Badge variant="outline" className="text-xs">{schedule.shift_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <div className="text-xs text-graphite-500 dark:text-slate-400">

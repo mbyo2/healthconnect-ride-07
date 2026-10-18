@@ -45,7 +45,7 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
           <div className="p-2 rounded-full transition-all duration-200 flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
             <Menu className="h-5 w-5" />
           </div>
-          <span className="hidden min-[400px]:block text-[10px] font-black leading-none tracking-tight mt-0.5">More</span>
+          <span className="hidden min-[400px]:block text-xs font-black leading-none tracking-tight mt-0.5">More</span>
         </button>
       </SheetTrigger>
 

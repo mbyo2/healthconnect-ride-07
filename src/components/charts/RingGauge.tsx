@@ -73,7 +73,7 @@ export const RingGauge = ({
             {centerValue && (
               <p className="font-display text-2xl font-medium text-midnight leading-none">{centerValue}</p>
             )}
-            {centerLabel && <p className="text-[11px] text-graphite-500 mt-1">{centerLabel}</p>}
+            {centerLabel && <p className="text-xs text-graphite-500 mt-1">{centerLabel}</p>}
           </div>
         )}
       </div>

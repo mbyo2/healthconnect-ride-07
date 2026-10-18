@@ -12,7 +12,7 @@ const PO_STATUSES = ["draft", "sent", "partially_received", "received", "cancell
 type POStatus = (typeof PO_STATUSES)[number];
 
 const getStatusPill = (status: string) => {
-  const base = "inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white";
+  const base = "inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white";
   if (status === "draft") return <span className={`${base} bg-graphite-400`}>Draft</span>;
   if (status === "sent") return <span className={`${base} bg-primary-400`}>Sent</span>;
   if (status === "partially_received") return <span className={`${base} bg-warning-500`}>Partially Received</span>;
@@ -284,7 +284,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-[11px] font-bold ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold ${
                   statusFilter === s ? "bg-slate-800 text-white" : "bg-canvas-mist text-graphite-500 hover:bg-canvas-silk"
                 }`}
               >
@@ -305,7 +305,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
             <div className="rounded-2xl border border-canvas-silk overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-canvas-mist text-left text-[11px] uppercase text-graphite-500">
+                  <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">
                     <th className="px-4 py-2.5">PO Number</th>
                     <th className="px-4 py-2.5">Supplier</th>
                     <th className="px-4 py-2.5">Order Date</th>
@@ -328,7 +328,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         <div className="flex gap-1 justify-end flex-wrap">
                           <button
                             onClick={() => { setViewingPO(o); refreshItems(); }}
-                            className="px-2 py-1 rounded-lg bg-canvas-mist text-[11px] font-bold hover:bg-canvas-silk"
+                            className="px-2 py-1 rounded-lg bg-canvas-mist text-xs font-bold hover:bg-canvas-silk"
                           >
                             View
                           </button>
@@ -336,7 +336,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                             <button
                               key={ns}
                               onClick={() => updatePOStatus(o, ns)}
-                              className="px-2 py-1 rounded-lg bg-primary-500/10 text-primary-600 text-[11px] font-bold hover:bg-primary-500/20"
+                              className="px-2 py-1 rounded-lg bg-primary-500/10 text-primary-600 text-xs font-bold hover:bg-primary-500/20"
                             >
                               {ns.replace(/_/g, " ")}
                             </button>
@@ -385,7 +385,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                       {s.contact_person && <p className="text-xs text-graphite-500">{s.contact_person}</p>}
                     </div>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                      className={`px-2 py-0.5 rounded-full text-xs font-bold text-white ${
                         s.is_active ? "bg-success-500" : "bg-graphite-400"
                       }`}
                     >
@@ -401,13 +401,13 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                   <div className="mt-3 flex gap-2">
                     <button
                       onClick={() => openEditSupplier(s)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-canvas-mist text-[11px] font-bold hover:bg-canvas-silk"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-canvas-mist text-xs font-bold hover:bg-canvas-silk"
                     >
                       <Pencil className="h-3 w-3" /> Edit
                     </button>
                     <button
                       onClick={() => toggleSupplierActive(s)}
-                      className="px-2.5 py-1.5 rounded-lg bg-canvas-mist text-[11px] font-bold hover:bg-canvas-silk"
+                      className="px-2.5 py-1.5 rounded-lg bg-canvas-mist text-xs font-bold hover:bg-canvas-silk"
                     >
                       {s.is_active ? "Deactivate" : "Activate"}
                     </button>
@@ -473,7 +473,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                       items: [...poForm.items, { item_name: "", quantity: 1, unit: "units", unit_price: 0 }],
                     })
                   }
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-canvas-mist text-[11px] font-bold hover:bg-canvas-silk"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-canvas-mist text-xs font-bold hover:bg-canvas-silk"
                 >
                   <Plus className="h-3 w-3" /> Add item
                 </button>
@@ -682,7 +682,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                   <div className="rounded-xl border border-canvas-silk overflow-hidden">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="bg-canvas-mist text-left text-[10px] uppercase text-graphite-500">
+                        <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">
                           <th className="px-3 py-2">Item</th>
                           <th className="px-3 py-2 text-right">Qty</th>
                           <th className="px-3 py-2 text-right">Unit Price</th>

@@ -274,8 +274,8 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
                     {t.category} · {format(new Date(t.created_at), 'MMM d, yyyy HH:mm')}
                   </p>
                 </div>
-                <Badge className={`${PRIORITY_COLORS[t.priority]} text-white text-[10px]`}>{t.priority}</Badge>
-                <Badge className={`${STATUS_COLORS[t.status]} text-white text-[10px]`}>{t.status.replace('_', ' ')}</Badge>
+                <Badge className={`${PRIORITY_COLORS[t.priority]} text-white text-xs`}>{t.priority}</Badge>
+                <Badge className={`${STATUS_COLORS[t.status]} text-white text-xs`}>{t.status.replace('_', ' ')}</Badge>
               </CardContent>
             </Card>
           ))}
@@ -288,9 +288,9 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
           <DialogHeader>
             <DialogTitle className="text-base">{selectedTicket?.subject}</DialogTitle>
             <div className="flex flex-wrap gap-1.5 mt-1">
-              {selectedTicket && <Badge className={`${STATUS_COLORS[selectedTicket.status]} text-white text-[10px]`}>{selectedTicket.status.replace('_', ' ')}</Badge>}
-              {selectedTicket && <Badge className={`${PRIORITY_COLORS[selectedTicket.priority]} text-white text-[10px]`}>{selectedTicket.priority}</Badge>}
-              {selectedTicket && <Badge variant="outline" className="text-[10px]">{selectedTicket.category}</Badge>}
+              {selectedTicket && <Badge className={`${STATUS_COLORS[selectedTicket.status]} text-white text-xs`}>{selectedTicket.status.replace('_', ' ')}</Badge>}
+              {selectedTicket && <Badge className={`${PRIORITY_COLORS[selectedTicket.priority]} text-white text-xs`}>{selectedTicket.priority}</Badge>}
+              {selectedTicket && <Badge variant="outline" className="text-xs">{selectedTicket.category}</Badge>}
             </div>
           </DialogHeader>
           <p className="text-sm text-muted-foreground bg-muted/50 rounded-xl p-3">{selectedTicket?.description}</p>
@@ -303,7 +303,7 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
                 <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-primary-500 text-white' : 'bg-muted'}`}>
                     <p>{m.message}</p>
-                    <p className={`text-[10px] mt-1 ${mine ? 'text-white/70' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs mt-1 ${mine ? 'text-white/70' : 'text-muted-foreground'}`}>
                       {format(new Date(m.created_at), 'MMM d HH:mm')}
                     </p>
                   </div>

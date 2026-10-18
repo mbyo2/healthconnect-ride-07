@@ -183,17 +183,17 @@ export function AgendaTimeline({
                         {patientName(app)}
                       </p>
                       {isUpNext && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-primary-500 text-white">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-primary-500 text-white">
                           Up next
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-600 dark:text-slate-300">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-500/10 text-slate-600 dark:text-slate-300">
                         {isVideo(app) ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
                         {isVideo(app) ? "Video" : "In-person"}
                       </span>
-                      <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold capitalize", pill)}>
+                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold capitalize", pill)}>
                         {app.status.replace("_", " ")}
                       </span>
                     </div>

@@ -327,7 +327,7 @@ const Settings = () => {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
-                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-[10px] font-bold text-graphite-500">Coming soon</span></p>
+                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-xs font-bold text-graphite-500">Coming soon</span></p>
                   <p className="text-xs text-graphite-600 dark:text-slate-300">Text reminders once the SMS gateway is connected</p>
                 </div>
                 <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)"  className="scale-125" />

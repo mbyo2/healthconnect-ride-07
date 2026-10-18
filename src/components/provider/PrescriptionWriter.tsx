@@ -268,7 +268,7 @@ export const PrescriptionWriter = () => {
           {medications.map((m, idx) => (
             <div key={m.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 space-y-3 relative">
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
+                <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
                   Medication #{idx + 1}
                 </span>
                 {medications.length > 1 && (

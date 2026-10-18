@@ -173,7 +173,7 @@ export const HRManagerWorkflow = () => {
           <div className="text-3xl font-black font-mono text-success-500 mt-1">
             {todayAttendance.filter((a) => a.status === "present").length}
           </div>
-          <div className="text-[10px] text-emerald-500 font-bold mt-0.5">Biometric Clocked-In</div>
+          <div className="text-xs text-emerald-500 font-bold mt-0.5">Biometric Clocked-In</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
@@ -181,19 +181,19 @@ export const HRManagerWorkflow = () => {
           <div className="text-3xl font-black font-mono text-warning-500 mt-1">
             {todayAttendance.filter((a) => a.status === "late").length}
           </div>
-          <div className="text-[10px] text-amber-500 font-bold mt-0.5">Grace period exceeded</div>
+          <div className="text-xs text-amber-500 font-bold mt-0.5">Grace period exceeded</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
           <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Leaves</div>
           <div className="text-3xl font-black font-mono text-primary-500 mt-1">{pendingLeaves.length}</div>
-          <div className="text-[10px] text-blue-500 font-bold mt-0.5">Awaiting Approval</div>
+          <div className="text-xs text-blue-500 font-bold mt-0.5">Awaiting Approval</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
           <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Payroll Items</div>
           <div className="text-3xl font-black font-mono text-purple-600 mt-1">{payroll.length}</div>
-          <div className="text-[10px] text-purple-500 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
+          <div className="text-xs text-purple-500 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
         </div>
       </div>
 
@@ -226,7 +226,7 @@ export const HRManagerWorkflow = () => {
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Leave Category</th>
                   <th className="py-2.5 px-3 text-center">Status</th>
                   <th className="py-2.5 px-3">Duration</th>
@@ -250,13 +250,13 @@ export const HRManagerWorkflow = () => {
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => approveLeave(l.id, true)}
-                            className="px-2.5 py-1 rounded-md bg-success-500 text-white text-[11px] font-bold"
+                            className="px-2.5 py-1 rounded-md bg-success-500 text-white text-xs font-bold"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => setRejectTarget(l)}
-                            className="px-2.5 py-1 rounded-md bg-error-500 text-white text-[11px] font-bold"
+                            className="px-2.5 py-1 rounded-md bg-error-500 text-white text-xs font-bold"
                           >
                             Reject
                           </button>
@@ -277,7 +277,7 @@ export const HRManagerWorkflow = () => {
           <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
             <div className="px-4 py-3 border-b border-canvas-silk">
               <h3 className="font-extrabold text-sm">Today's Attendance ({todayAttendance.length})</h3>
-              <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium">Clock-in records for today</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Clock-in records for today</p>
             </div>
             {todayAttendance.length === 0 ? (
               <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 font-medium">
@@ -288,7 +288,7 @@ export const HRManagerWorkflow = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                    <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                       <th className="py-2.5 px-4">Staff</th>
                       <th className="py-2.5 px-3 text-center">Status</th>
                       <th className="py-2.5 px-3">Clock In</th>
@@ -330,7 +330,7 @@ export const HRManagerWorkflow = () => {
                   <div className="font-extrabold text-slate-900">
                     Pay Period: {format(new Date(p.period_start), "MMM d")} - {format(new Date(p.period_end), "MMM d, yyyy")}
                   </div>
-                  <div className="text-[11px] font-mono text-graphite-500 dark:text-slate-400 mt-0.5">
+                  <div className="text-xs font-mono text-graphite-500 dark:text-slate-400 mt-0.5">
                     Basic: ZMW K{p.basic_salary.toLocaleString()} • Net Due: <strong className="text-success-500">ZMW K{zm.netPay.toLocaleString()}</strong>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export const HRManagerWorkflow = () => {
                       currency: p.currency || currency,
                     });
                   }}
-                  className="px-3 py-1.5 rounded-md bg-primary-500 text-white font-bold text-[11px] flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-md bg-primary-500 text-white font-bold text-xs flex items-center gap-1"
                 >
                   <Printer className="h-3.5 w-3.5" />
                   PDF Payslip

@@ -96,7 +96,7 @@ export const DayCareManagement = ({ hospital }: { hospital: any }) => {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm text-foreground">{nameFor(p.patient_id)}</span>
-                      <Badge variant={statusConfig[p.status]?.variant || 'outline'} className="text-[10px]">
+                      <Badge variant={statusConfig[p.status]?.variant || 'outline'} className="text-xs">
                         {statusConfig[p.status]?.label || p.status}
                       </Badge>
                     </div>

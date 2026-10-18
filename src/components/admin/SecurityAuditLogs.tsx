@@ -384,7 +384,7 @@ export function SecurityAuditLogs() {
                 className="w-full"
                 aria-label="From date"
               />
-              <span className="absolute -top-2 left-2 bg-card px-1 text-[10px] text-muted-foreground">From</span>
+              <span className="absolute -top-2 left-2 bg-card px-1 text-xs text-muted-foreground">From</span>
             </div>
 
             <div className="relative">
@@ -395,7 +395,7 @@ export function SecurityAuditLogs() {
                 className="w-full"
                 aria-label="To date"
               />
-              <span className="absolute -top-2 left-2 bg-card px-1 text-[10px] text-muted-foreground">To</span>
+              <span className="absolute -top-2 left-2 bg-card px-1 text-xs text-muted-foreground">To</span>
             </div>
 
             <div className="flex gap-2">

@@ -109,7 +109,7 @@ export function DayStripPicker({
                 todayCell && !selected && "ring-2 ring-primary/40"
               )}
             >
-              <span className={cn("text-[11px] font-bold uppercase tracking-wide", selected ? "text-primary-foreground/80" : "text-muted-foreground")}>
+              <span className={cn("text-xs font-bold uppercase tracking-wide", selected ? "text-primary-foreground/80" : "text-muted-foreground")}>
                 {todayCell ? "Today" : format(day, "EEE")}
               </span>
               <span className="text-xl font-extrabold leading-none">{format(day, "d")}</span>
@@ -118,7 +118,7 @@ export function DayStripPicker({
           );
         })}
       </div>
-      <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1.5">
+      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" aria-hidden />
         Dot = provider sees patients that day
       </p>

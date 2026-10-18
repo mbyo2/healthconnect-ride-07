@@ -116,7 +116,7 @@ export const PatientQueue = ({ hospital, departments }: Props) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={q.status === 'serving' ? 'default' : 'outline'} className="capitalize text-[10px]">{q.status}</Badge>
+                  <Badge variant={q.status === 'serving' ? 'default' : 'outline'} className="capitalize text-xs">{q.status}</Badge>
                   {q.status === 'waiting' && (
                     <Button size="sm" className="text-xs gap-1" onClick={() => setStatus(q, 'serving')}>
                       Call <ArrowRight className="h-3 w-3" />

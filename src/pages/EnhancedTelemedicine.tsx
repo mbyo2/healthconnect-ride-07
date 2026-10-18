@@ -373,41 +373,41 @@ export const EnhancedTelemedicine = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Workflows</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Workflows</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{activeWorkflows}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently running</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently running</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
                 <CheckCircle className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{pendingTasks}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Diagnostic Orders</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Diagnostic Orders</span>
                 <FileText className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{pendingOrders}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Remote diagnostics</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Remote diagnostics</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
                 <TrendingUp className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{completedToday}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Workflow sessions</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Workflow sessions</div>
             </CardContent>
           </Card>
         </div>
@@ -466,12 +466,12 @@ export const EnhancedTelemedicine = () => {
                           <CardTitle className="text-sm font-extrabold">
                             {workflow.patient?.first_name} {workflow.patient?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">
                             Started: {new Date(workflow.started_at).toLocaleString()}
                           </div>
                         </div>
                       </div>
-                      <Badge className={getStatusColor(workflow.status) + " text-[10px]"}>
+                      <Badge className={getStatusColor(workflow.status) + " text-xs"}>
                         {workflow.status}
                       </Badge>
                     </div>
@@ -539,13 +539,13 @@ export const EnhancedTelemedicine = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{task.task_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{task.task_type}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Badge className={getPriorityColor(task.priority) + " text-[10px]"}>
+                        <Badge className={getPriorityColor(task.priority) + " text-xs"}>
                           {task.priority}
                         </Badge>
-                        <Badge className={getStatusColor(task.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(task.status) + " text-xs"}>
                           {task.status}
                         </Badge>
                       </div>
@@ -633,10 +633,10 @@ export const EnhancedTelemedicine = () => {
                           <CardTitle className="text-sm font-extrabold">
                             {order.patient?.first_name} {order.patient?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{order.order_number}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{order.order_number}</div>
                         </div>
                       </div>
-                      <Badge className={getStatusColor(order.status) + " text-[10px]"}>
+                      <Badge className={getStatusColor(order.status) + " text-xs"}>
                         {order.status}
                       </Badge>
                     </div>
@@ -644,11 +644,11 @@ export const EnhancedTelemedicine = () => {
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Order Type</span>
-                      <Badge variant="outline" className="text-[10px]">{order.order_type}</Badge>
+                      <Badge variant="outline" className="text-xs">{order.order_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Priority</span>
-                      <Badge className={getPriorityColor(order.priority) + " text-[10px]"}>
+                      <Badge className={getPriorityColor(order.priority) + " text-xs"}>
                         {order.priority}
                       </Badge>
                     </div>

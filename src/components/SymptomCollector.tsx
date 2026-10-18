@@ -154,7 +154,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
             <div className="prose prose-sm max-w-none text-foreground">
               <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">{aiAnalysis}</p>
             </div>
-            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-[10px] sm:text-xs text-muted-foreground leading-relaxed flex gap-2">
+            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-xs sm:text-xs text-muted-foreground leading-relaxed flex gap-2">
               <TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
               <span>This AI analysis is for informational purposes only and does not constitute medical advice.
               Always consult with a qualified healthcare professional for medical decisions.</span>

@@ -195,7 +195,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">Outpatient (OPD) &amp; Inpatient (IPD) Care Management</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
                 Live ADT Data
               </span>
             </div>
@@ -296,7 +296,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-mono font-black text-xs text-primary-500">{b.bedNumber}</span>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-black uppercase ${
                             isOccupied
                               ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
                               : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
@@ -306,16 +306,16 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                         </span>
                       </div>
 
-                      <div className="text-[11px] font-bold text-slate-400">{b.ward}</div>
+                      <div className="text-xs font-bold text-slate-400">{b.ward}</div>
 
                       {isOccupied && (
                         <div className="mt-3 p-2.5 rounded-xl bg-primary-500/5 border border-primary-500/20 text-xs">
                           <div className="font-black text-slate-900 dark:text-slate-100">{b.patientName || "Occupant"}</div>
                           {b.admissionDate && (
-                            <div className="text-[10px] text-slate-500">Admitted: {b.admissionDate}</div>
+                            <div className="text-xs text-slate-500">Admitted: {b.admissionDate}</div>
                           )}
                           {b.admittingDoctor && (
-                            <div className="text-[10px] text-primary-500 font-semibold">{b.admittingDoctor}</div>
+                            <div className="text-xs text-primary-500 font-semibold">{b.admittingDoctor}</div>
                           )}
                         </div>
                       )}
@@ -396,7 +396,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       )}
 
       {/* Trust strip */}
-      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 text-success-500" aria-hidden />
         <span>Live facility data</span>
         <span aria-hidden>·</span>

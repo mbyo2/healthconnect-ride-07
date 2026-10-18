@@ -257,7 +257,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">Pediatric Care &amp; Child Health Center</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
                 WHO Standardized
               </span>
             </div>
@@ -380,27 +380,27 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Weight (charted)</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Latest Weight (charted)</span>
               <div className="text-2xl font-black text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
               </div>
-              <span className="text-[10px] font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
+              <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Length / Height</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Latest Length / Height</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
               </div>
-              <span className="text-[10px] font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
+              <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Head Circumference</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Head Circumference</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.head || "—"}{growthHistory[growthHistory.length - 1]?.head ? " cm" : ""}
               </div>
-              <span className="text-[10px] font-bold text-slate-500">Clinical screening still required</span>
+              <span className="text-xs font-bold text-slate-500">Clinical screening still required</span>
             </div>
           </div>
           )}
@@ -409,7 +409,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Visit Date</th>
                   <th className="py-3 px-3">Age (Months)</th>
                   <th className="py-3 px-3">Weight</th>
@@ -499,13 +499,13 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   </div>
                   <div>
                     <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{v.name}</h4>
-                    <p className="text-[11px] text-slate-400 font-medium">Recommended Age: {v.due}</p>
+                    <p className="text-xs text-slate-400 font-medium">Recommended Age: {v.due}</p>
                   </div>
                 </div>
 
                 <div>
                   {shown === "completed" ? (
-                    <span className="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+                    <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
                       ✓ Filed in registry
                     </span>
                   ) : (
@@ -513,7 +513,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       size="sm"
                       onClick={() => handleRecordDose(v.name)}
                       disabled={recordingDose === v.name}
-                      className="rounded-full text-[10px] font-black"
+                      className="rounded-full text-xs font-black"
                     >
                       {recordingDose === v.name ? "Filing…" : "Record Dose"}
                     </Button>
@@ -542,10 +542,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-black text-[10px]">
+                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-black text-xs">
                       {m.age}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">{m.category}</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase">{m.category}</span>
                   </div>
                   <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.milestone}</p>
                 </div>
@@ -560,7 +560,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                         prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
                       );
                     }}
-                    className={`rounded-xl font-extrabold text-[11px] ${
+                    className={`rounded-xl font-extrabold text-xs ${
                       achievedMilestones.includes(idx)
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                         : "text-emerald-700 dark:text-emerald-400 border-emerald-300"
@@ -572,7 +572,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     size="sm"
                     variant="outline"
                     onClick={() => toast.info(`Milestone for ${m.age} marked as In Progress`)}
-                    className="rounded-xl font-bold text-[11px]"
+                    className="rounded-xl font-bold text-xs"
                   >
                     In Progress
                   </Button>
@@ -661,14 +661,14 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   onChange={(e) => setCalcConcentrationMgMl(parseFloat(e.target.value) || 1)}
                   className="font-medium"
                 />
-                <span className="text-[10px] text-slate-400">e.g. 250mg in 5mL = 50 mg/mL</span>
+                <span className="text-xs text-slate-400">e.g. 250mg in 5mL = 50 mg/mL</span>
               </div>
             </div>
 
             {/* Calculated Result Card */}
             <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
-                <span className="px-3 py-1 rounded-full text-[10px] font-black bg-primary-500 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-black bg-primary-500 text-white uppercase tracking-wider">
                   Precise Calculated Dosage
                 </span>
                 <div className="mt-4">

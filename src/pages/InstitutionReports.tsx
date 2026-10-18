@@ -131,7 +131,7 @@ const InstitutionReports = () => {
             </CardHeader>
             <CardContent className="px-3 pb-3">
               <div className="text-lg font-bold">{s.value}</div>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-xs text-muted-foreground">{s.sub}</p>
             </CardContent>
           </Card>
         ))}

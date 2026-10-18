@@ -120,7 +120,7 @@ export function SubscriptionPricingAdmin() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="font-extrabold text-sm flex items-center gap-2">
           <Tag className="h-4 w-4 text-emerald-500" /> Subscription Pricing
-          <Badge variant="secondary" className="text-[10px]">Superadmin only</Badge>
+          <Badge variant="secondary" className="text-xs">Superadmin only</Badge>
         </h2>
         <Button variant="outline" size="sm" onClick={load} disabled={loading} className="gap-1.5 text-xs">
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
@@ -146,18 +146,18 @@ export function SubscriptionPricingAdmin() {
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                   <div className="lg:w-64 shrink-0">
                     <div className="font-bold text-sm text-midnight dark:text-white">{p.name}</div>
-                    <div className="text-[11px] text-graphite-500 font-mono">{p.slug}</div>
+                    <div className="text-xs text-graphite-500 font-mono">{p.slug}</div>
                     <div className="mt-1.5 flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px]">{p.target_audience}</Badge>
+                      <Badge variant="outline" className="text-xs">{p.target_audience}</Badge>
                       {!p.is_active && (
-                        <Badge variant="destructive" className="text-[10px]">Inactive</Badge>
+                        <Badge variant="destructive" className="text-xs">Inactive</Badge>
                       )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 flex-1">
                     <div>
-                      <label className="text-[10px] font-extrabold uppercase text-graphite-500">
+                      <label className="text-xs font-extrabold uppercase text-graphite-500">
                         Monthly (K)
                       </label>
                       <Input
@@ -170,7 +170,7 @@ export function SubscriptionPricingAdmin() {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-extrabold uppercase text-graphite-500">
+                      <label className="text-xs font-extrabold uppercase text-graphite-500">
                         Annual (K)
                       </label>
                       <div className="flex gap-1.5 mt-1">

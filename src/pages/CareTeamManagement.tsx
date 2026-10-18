@@ -487,41 +487,41 @@ export const CareTeamManagement = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Assignments</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Assignments</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{activeAssignments}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current team members</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current team members</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
                 <Clock className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{pendingTasks}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Available Roles</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Available Roles</span>
                 <Shield className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{totalRoles}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured roles</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured roles</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Overdue Tasks</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Overdue Tasks</span>
                 <AlertTriangle className="h-4 w-4 text-error-500" />
               </div>
               <div className="text-2xl font-black font-mono text-error-500">{overdueTasks}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require attention</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require attention</div>
             </CardContent>
           </Card>
         </div>
@@ -587,15 +587,15 @@ export const CareTeamManagement = () => {
                         <div className="text-xs font-bold">
                           {assignment.staff?.first_name} {assignment.staff?.last_name}
                         </div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           {assignment.role?.role_name || "N/A"}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           {assignment.assignment_type}
                         </Badge>
                       </td>
@@ -604,9 +604,9 @@ export const CareTeamManagement = () => {
                       </td>
                       <td className="px-4 py-3">
                         {assignment.is_active ? (
-                          <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
+                          <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                         ) : (
-                          <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
+                          <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-xs">Inactive</Badge>
                         )}
                       </td>
                     </tr>
@@ -637,7 +637,7 @@ export const CareTeamManagement = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{role.role_name}</CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{role.role_type}</div>
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">{role.role_type}</div>
                         </div>
                       </div>
                     </div>
@@ -645,13 +645,13 @@ export const CareTeamManagement = () => {
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-2">
                       {role.can_prescribe && (
-                        <Badge className="bg-primary-500 text-white text-[10px]">Can Prescribe</Badge>
+                        <Badge className="bg-primary-500 text-white text-xs">Can Prescribe</Badge>
                       )}
                       {role.can_order_tests && (
-                        <Badge className="bg-purple-500 text-white text-[10px]">Can Order Tests</Badge>
+                        <Badge className="bg-purple-500 text-white text-xs">Can Order Tests</Badge>
                       )}
                       {role.can_perform_procedures && (
-                        <Badge className="bg-success-500 text-white text-[10px]">Can Perform Procedures</Badge>
+                        <Badge className="bg-success-500 text-white text-xs">Can Perform Procedures</Badge>
                       )}
                     </div>
                     <div className="text-xs text-graphite-500 dark:text-slate-400">
@@ -704,13 +704,13 @@ export const CareTeamManagement = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{task.task_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{task.task_type}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Badge className={getPriorityColor(task.priority) + " text-[10px]"}>
+                        <Badge className={getPriorityColor(task.priority) + " text-xs"}>
                           {task.priority}
                         </Badge>
-                        <Badge className={getStatusColor(task.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(task.status) + " text-xs"}>
                           {task.status}
                         </Badge>
                       </div>

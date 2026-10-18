@@ -242,7 +242,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
                   <td className="py-2 px-3 font-medium">
                     {p.procedure_name}
                     {p.is_custom && (
-                      <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-100 text-primary-600 dark:bg-primary-900">
+                      <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded bg-primary-100 text-primary-600 dark:bg-primary-900">
                         CUSTOM
                       </span>
                     )}
@@ -293,7 +293,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
                       )}
                     </div>
                     {p.custom_price != null && (
-                      <p className="text-[10px] text-primary-500 font-bold text-right mt-0.5">
+                      <p className="text-xs text-primary-500 font-bold text-right mt-0.5">
                         Effective: K{effective.toLocaleString()}
                       </p>
                     )}

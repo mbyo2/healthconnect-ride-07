@@ -107,7 +107,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           >
             <Zap className="h-4 w-4" />
             <span>Automate</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-extrabold">
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-xs font-extrabold">
               3
             </span>
           </button>
@@ -119,7 +119,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           >
             <Layers className="h-4 w-4" />
             <span>Integrate</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-mono text-[10px] font-extrabold">
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-mono text-xs font-extrabold">
               5
             </span>
           </button>

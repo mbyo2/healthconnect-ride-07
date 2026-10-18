@@ -321,7 +321,7 @@ html {
 
   /* ── Time Slot Pills (Screen 2: 8:00 a.m., 9:00 a.m. [active dark], 10:00 a.m.) ── */
   .doc-time-slot {
-    @apply px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer text-center border;
+    @apply px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-xs font-black transition-all cursor-pointer text-center border;
   }
   .doc-time-slot-idle {
     @apply bg-[#f8fafc] dark:bg-slate-800/60 border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0073ea]/40 hover:bg-white;

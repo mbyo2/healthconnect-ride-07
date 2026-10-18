@@ -159,7 +159,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">HL7 FHIR Interoperability &amp; Data Exchange Engine</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
                 HL7 FHIR R4 / R5
               </span>
             </div>
@@ -214,7 +214,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
           </Select>
         )}
         {profile && (
-          <span className="text-[11px] text-slate-500">
+          <span className="text-xs text-slate-500">
             {metrics.length} recorded measurement{metrics.length === 1 ? "" : "s"} available for conversion
           </span>
         )}
@@ -238,7 +238,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
               HL7 FHIR R4 Output • {selectedResourceType}
             </span>
           </div>
-          <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1">
+          <span className="text-xs text-slate-500 font-sans flex items-center gap-1">
             <FileCode className="h-3 w-3" /> MIME: application/fhir+json
           </span>
         </div>

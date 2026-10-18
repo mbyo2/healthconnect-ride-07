@@ -231,7 +231,7 @@ export const HospitalManagement = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-extrabold tracking-tight">{hospital.name}</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold text-white bg-success-500">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold text-white bg-success-500">
                   Live HMS Board
                 </span>
               </div>

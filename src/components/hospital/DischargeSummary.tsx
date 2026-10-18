@@ -114,7 +114,7 @@ export const DischargeSummary = ({ hospital, admissions }: { hospital: any; admi
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm text-foreground">{nameFor(a.patient_id)}</span>
-                    <Badge variant={a.status === 'discharged' ? 'default' : 'secondary'} className="text-[10px] capitalize">{a.status}</Badge>
+                    <Badge variant={a.status === 'discharged' ? 'default' : 'secondary'} className="text-xs capitalize">{a.status}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">{a.admission_number} • {a.admission_type || 'Admission'}</p>
                   <p className="text-xs text-muted-foreground">

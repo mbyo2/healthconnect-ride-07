@@ -13,9 +13,9 @@ type Tab = "rotations" | "research" | "discussions";
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const rotStatusPill = (s: string) => {
-  if (s === "active") return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Active</span>;
-  if (s === "completed") return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">Completed</span>;
-  return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-graphite-400">Cancelled</span>;
+  if (s === "active") return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Active</span>;
+  if (s === "completed") return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">Completed</span>;
+  return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-graphite-400">Cancelled</span>;
 };
 
 const studyStatusPill = (s: string) => {
@@ -27,7 +27,7 @@ const studyStatusPill = (s: string) => {
     published: "bg-purple-500",
   };
   const label = s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${map[s] || "bg-graphite-400"}`}>{label}</span>;
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-bold text-white ${map[s] || "bg-graphite-400"}`}>{label}</span>;
 };
 
 const studyTypeLabel = (t: string) =>
@@ -186,7 +186,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === t.key ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t.icon}{t.label}
-              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-primary-500 text-white">{t.badge}</span> : null}
+              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold bg-primary-500 text-white">{t.badge}</span> : null}
             </button>
           ))}
         </div>
@@ -220,8 +220,8 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
                   </div>
                   {r.status === "active" && (
                     <div className="flex gap-1.5 shrink-0">
-                      <button onClick={() => handleRotationStatus(r, "completed")} className="text-[11px] font-medium px-2 py-1 rounded-md border border-border hover:bg-muted">Complete</button>
-                      <button onClick={() => handleRotationStatus(r, "cancelled")} className="text-[11px] font-medium px-2 py-1 rounded-md border border-border hover:bg-muted text-error-600">Cancel</button>
+                      <button onClick={() => handleRotationStatus(r, "completed")} className="text-xs font-medium px-2 py-1 rounded-md border border-border hover:bg-muted">Complete</button>
+                      <button onClick={() => handleRotationStatus(r, "cancelled")} className="text-xs font-medium px-2 py-1 rounded-md border border-border hover:bg-muted text-error-600">Cancel</button>
                     </div>
                   )}
                 </div>
@@ -258,7 +258,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
                       <button
                         onClick={() => advanceStudy(s)}
                         disabled={advancingId === s.id}
-                        className="shrink-0 text-[11px] font-medium px-2 py-1 rounded-md bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+                        className="shrink-0 text-xs font-medium px-2 py-1 rounded-md bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
                       >
                         {advancingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : `→ ${STUDY_FLOW[s.status].replace("_", " ")}`}
                       </button>

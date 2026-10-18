@@ -217,12 +217,12 @@ const NotificationsPage = () => {
                           <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">
                             {notification.message}
                           </p>
-                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-1">
+                          <p className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-1">
                             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                           </p>
                         </div>
                         {!notification.read && (
-                          <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">New</span>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">New</span>
                         )}
                       </div>
 

@@ -219,16 +219,16 @@ const Marketplace = () => {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                             order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
                           }`}>
                             {order.status.replace("_", " ")}
                           </span>
                         </div>
-                        <p className="text-[11px] text-graphite-500 dark:text-slate-400 mt-1 font-medium">
+                        <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1 font-medium">
                           Total: <strong>K{order.total_amount}</strong> • {new Date(order.created_at).toLocaleDateString()}
                         </p>
-                        <p className="text-[11px] text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
+                        <p className="text-xs text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {order.status === "pending" && (

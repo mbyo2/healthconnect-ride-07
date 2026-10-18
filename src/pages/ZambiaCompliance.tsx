@@ -285,7 +285,7 @@ export const ZambiaCompliance = () => {
                 </div>
                 <div>
                   <div className="text-xs font-bold">NHIMA Accreditation</div>
-                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs text-graphite-500 dark:text-slate-400">
                     {nhimaConfig?.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export const ZambiaCompliance = () => {
                 </div>
                 <div>
                   <div className="text-xs font-bold">Medical Council</div>
-                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs text-graphite-500 dark:text-slate-400">
                     {medicalCouncilConfig?.compliance_status || "Not Configured"}
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export const ZambiaCompliance = () => {
                 </div>
                 <div>
                   <div className="text-xs font-bold">ZRA Tax Compliance</div>
-                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs text-graphite-500 dark:text-slate-400">
                     {taxConfig?.tax_compliance_status || "Not Configured"}
                   </div>
                 </div>
@@ -443,24 +443,24 @@ export const ZambiaCompliance = () => {
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Provider Code</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Provider Code</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_provider_code || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Facility Type</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Facility Type</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_facility_type || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Accreditation #</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Accreditation #</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_accreditation_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Processing Days</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Processing Days</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_claim_processing_days} days</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
-                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-500 text-white text-[10px]" : "bg-error-500 text-white text-[10px]"}>
+                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-500 text-white text-xs" : "bg-error-500 text-white text-xs"}>
                       {nhimaConfig.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                     </Badge>
                   </div>
@@ -547,11 +547,11 @@ export const ZambiaCompliance = () => {
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Registration #</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Registration #</div>
                       <div className="text-sm font-bold">{medicalCouncilConfig.council_registration_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">License Expiry</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">License Expiry</div>
                       <div className="text-sm font-bold">
                         {medicalCouncilConfig.license_expiry_date 
                           ? new Date(medicalCouncilConfig.license_expiry_date).toLocaleDateString()
@@ -560,7 +560,7 @@ export const ZambiaCompliance = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                    <Badge className={getComplianceStatusColor(medicalCouncilConfig.compliance_status) + " text-[10px]"}>
+                    <Badge className={getComplianceStatusColor(medicalCouncilConfig.compliance_status) + " text-xs"}>
                       {medicalCouncilConfig.compliance_status || "Not Configured"}
                     </Badge>
                     {medicalCouncilConfig.next_audit_date && (
@@ -690,20 +690,20 @@ export const ZambiaCompliance = () => {
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">VAT Rate</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">VAT Rate</div>
                       <div className="text-sm font-bold">{taxConfig.vat_rate}%</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Withholding Tax</div>
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">Withholding Tax</div>
                       <div className="text-sm font-bold">{taxConfig.withholding_tax_rate}%</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
-                    <Badge className={getComplianceStatusColor(taxConfig.tax_compliance_status) + " text-[10px]"}>
+                    <Badge className={getComplianceStatusColor(taxConfig.tax_compliance_status) + " text-xs"}>
                       {taxConfig.tax_compliance_status || "Not Configured"}
                     </Badge>
                     {taxConfig.requires_ecfd_system && (
-                      <Badge className="bg-purple-500 text-white text-[10px]">ECFD Required</Badge>
+                      <Badge className="bg-purple-500 text-white text-xs">ECFD Required</Badge>
                     )}
                   </div>
                 </CardContent>
@@ -738,9 +738,9 @@ export const ZambiaCompliance = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{regulation.regulation_name}</CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{regulation.regulation_code}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{regulation.regulation_code}</div>
                       </div>
-                      <Badge variant="outline" className="text-[10px]">{regulation.regulation_category}</Badge>
+                      <Badge variant="outline" className="text-xs">{regulation.regulation_category}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">

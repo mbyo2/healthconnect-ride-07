@@ -380,8 +380,8 @@ export const SelfServiceKiosk: React.FC = () => {
 
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Amount From Your Invoice (K)</span>
-                <span className="px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-extrabold text-[10px]">
+                <span className="text-xs font-bold text-slate-400 uppercase">Amount From Your Invoice (K)</span>
+                <span className="px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-extrabold text-xs">
                   Payable Slip
                 </span>
               </div>
@@ -449,10 +449,10 @@ export const SelfServiceKiosk: React.FC = () => {
 
             {billRef ? (
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 text-center space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Bill Slip Ready</p>
+                <p className="text-xs font-black uppercase tracking-wider text-slate-500">Bill Slip Ready</p>
                 <p className="text-lg font-black font-mono text-slate-900 dark:text-slate-100">{billRef}</p>
                 <p className="text-2xl font-black text-emerald-600">K{billAmount.toFixed(2)}</p>
-                <p className="text-[11px] text-slate-500 font-medium">
+                <p className="text-xs text-slate-500 font-medium">
                   Pay at the billing counter (cash / card / MoMo POS) or in the Doc' O Clock app using this reference.
                 </p>
                 <div className="flex gap-2 pt-1">

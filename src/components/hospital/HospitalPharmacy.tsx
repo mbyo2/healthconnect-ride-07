@@ -281,7 +281,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           <div key={c.label} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-center shadow-xs">
             <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
             <p className="text-xl font-black font-mono" style={{ color: c.color }}>{c.value}</p>
-            <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{c.label}</p>
+            <p className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">{c.label}</p>
           </div>
         ))}
       </div>
@@ -311,7 +311,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Patient</th>
                     <th className="py-2.5 px-3">Medication</th>
                     <th className="py-2.5 px-3">Dosage</th>
@@ -327,9 +327,9 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{rx.medication_name}</td>
                       <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{rx.strength || rx.dosage || '—'}</td>
                       <td className="py-3 px-3 font-extrabold">{rx.quantity ?? '1'}</td>
-                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-warning-500 capitalize">{rx.status}</span></td>
+                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500 capitalize">{rx.status}</span></td>
                       <td className="py-3 px-3 text-center">
-                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-success-500 text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
+                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center gap-1 mx-auto">
                           <CheckCircle2 className="h-3 w-3" /> Dispense
                         </button>
                       </td>
@@ -367,10 +367,10 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <p className="font-semibold text-xs text-foreground">{item.product_name}</p>
-                            <p className="text-[10px] text-muted-foreground">{item.category} • Stock: {item.quantity}</p>
+                            <p className="text-xs text-muted-foreground">{item.category} • Stock: {item.quantity}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs font-bold text-foreground">K{price}</span>
-                              <Badge variant="outline" className="text-[9px] px-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+                              <Badge variant="outline" className="text-xs px-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
                                 +{marginPct}%
                               </Badge>
                             </div>
@@ -400,7 +400,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       <div key={item.id} className="flex justify-between items-center text-xs border rounded p-2">
                         <div>
                           <p className="font-medium text-foreground">{item.product_name}</p>
-                          <p className="text-muted-foreground text-[10px]">K{item.unit_price} × {item.cartQty} = <strong>K{(item.unit_price * item.cartQty).toFixed(2)}</strong></p>
+                          <p className="text-muted-foreground text-xs">K{item.unit_price} × {item.cartQty} = <strong>K{(item.unit_price * item.cartQty).toFixed(2)}</strong></p>
                         </div>
                         <div className="flex gap-1">
                           <Button size="icon" variant="outline" className="h-6 w-6" aria-label={`Decrease quantity of ${item.product_name || 'item'}`} onClick={() => setPosCart(p => p.map(i => i.id === item.id ? { ...i, cartQty: Math.max(1, i.cartQty - 1) } : i))}>-</Button>
@@ -414,10 +414,10 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
                 {/* Payment method */}
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase">Payment</Label>
+                  <Label className="text-xs font-medium text-muted-foreground uppercase">Payment</Label>
                   <div className="grid grid-cols-4 gap-1">
                     {(['cash', 'mobile_money', 'card', 'insurance'] as const).map(m => (
-                      <Button key={m} size="sm" type="button" variant={posPayment === m ? 'default' : 'outline'} className="text-[9px] h-6 px-1" onClick={() => setPosPayment(m)}>
+                      <Button key={m} size="sm" type="button" variant={posPayment === m ? 'default' : 'outline'} className="text-xs h-6 px-1" onClick={() => setPosPayment(m)}>
                         {m === 'cash' ? 'Cash' : m === 'mobile_money' ? 'Mobile' : m === 'card' ? 'Card' : 'Insure'}
                       </Button>
                     ))}
@@ -464,7 +464,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Drug Name</th>
                     <th className="py-2.5 px-3">Category</th>
                     <th className="py-2.5 px-3">Batch</th>
@@ -492,16 +492,16 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                         <td className="py-3 px-3 text-graphite-500 dark:text-slate-400 text-right">K{cost.toFixed(2)}</td>
                         <td className="py-3 px-3 font-bold text-right">K{price.toFixed(2)}</td>
                         <td className="py-3 px-3 text-center">
-                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">+{marginPct}%</span>
+                          <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">+{marginPct}%</span>
                         </td>
                         <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{i.expiry_date || '—'}</td>
                         <td className="py-3 px-3 text-center">
                           {isExpired ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">Expired</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Expired</span>
                           ) : (i.quantity ?? 0) <= (i.reorder_level ?? 20) ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-warning-500">Low</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Low</span>
                           ) : (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">OK</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">OK</span>
                           )}
                         </td>
                       </tr>
@@ -533,7 +533,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — EXPIRED</p>
                 <p className="text-xs text-graphite-500 dark:text-slate-400">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Action Needed</span>
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Action Needed</span>
             </div>
           ))}
 
@@ -544,7 +544,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — Expiring Soon</p>
                 <p className="text-xs text-graphite-500 dark:text-slate-400">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Near Expiry</span>
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Near Expiry</span>
             </div>
           ))}
 
@@ -607,7 +607,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               </div>
             </div>
             {drugForm.unit_price > 0 && drugForm.cost_price > 0 && (
-              <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-600 dark:text-emerald-400 text-[11px]">
+              <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-600 dark:text-emerald-400 text-xs">
                 Profit Margin: +K{(drugForm.unit_price - drugForm.cost_price).toFixed(2)} ({(((drugForm.unit_price - drugForm.cost_price) / drugForm.cost_price) * 100).toFixed(1)}%)
               </div>
             )}
@@ -646,7 +646,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                   variant="outline"
                   size="sm"
                   onClick={() => setRxMedications(prev => [...prev, { id: `${Date.now()}`, medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take as directed' }])}
-                  className="h-7 text-[11px] text-primary-500"
+                  className="h-7 text-xs text-primary-500"
                 >
                   <Plus className="h-3 w-3 mr-1" /> Add Drug
                 </Button>
@@ -655,7 +655,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               {rxMedications.map((item, idx) => (
                 <div key={item.id} className="p-3 border rounded-xl bg-slate-50 dark:bg-slate-900/60 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[10px] bg-primary-500 text-white px-2 py-0.5 rounded">
+                    <span className="font-bold text-xs bg-primary-500 text-white px-2 py-0.5 rounded">
                       Drug #{idx + 1}
                     </span>
                     {rxMedications.length > 1 && (
@@ -670,7 +670,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                   </div>
 
                   <div>
-                    <Label className="text-[11px]">Medication Name *</Label>
+                    <Label className="text-xs">Medication Name *</Label>
                     <Input
                       value={item.medication_name}
                       onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, medication_name: e.target.value } : m))}
@@ -682,7 +682,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="col-span-2">
-                      <Label className="text-[11px]">Dosage &amp; Frequency</Label>
+                      <Label className="text-xs">Dosage &amp; Frequency</Label>
                       <Input
                         value={item.dosage}
                         onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, dosage: e.target.value } : m))}
@@ -691,7 +691,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       />
                     </div>
                     <div>
-                      <Label className="text-[11px]">Quantity</Label>
+                      <Label className="text-xs">Quantity</Label>
                       <Input
                         type="number"
                         min={1}
@@ -703,7 +703,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                   </div>
 
                   <div>
-                    <Label className="text-[11px]">Instructions</Label>
+                    <Label className="text-xs">Instructions</Label>
                     <Input
                       value={item.instructions}
                       onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, instructions: e.target.value } : m))}

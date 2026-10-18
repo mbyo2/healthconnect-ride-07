@@ -603,13 +603,13 @@ const InstitutionSettings = () => {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-xs truncate">{m.module_name}</p>
-                      <p className="text-[10px] text-muted-foreground">{sub}</p>
+                      <p className="text-xs text-muted-foreground">{sub}</p>
                     </div>
                     {/* Institution admins can toggle modules for their own facility */}
                     {m.effective !== "disabled" && (
                       <button
                         onClick={() => handleModuleToggle(m.module_key, m.module_name, m.effective === "live")}
-                        className={`shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                        className={`shrink-0 px-2 py-1 rounded-lg text-xs font-bold transition-colors ${
                           m.effective === "live"
                             ? "bg-error-100 text-error-600 hover:bg-error-200"
                             : "bg-success-100 text-success-600 hover:bg-success-200"
@@ -622,7 +622,7 @@ const InstitutionSettings = () => {
                     {m.effective === "disabled" && (
                       <button
                         onClick={() => handleModuleToggle(m.module_key, m.module_name, false)}
-                        className="shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold bg-success-100 text-success-600 hover:bg-success-200 transition-colors"
+                        className="shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-success-100 text-success-600 hover:bg-success-200 transition-colors"
                         title="Re-enable this module"
                       >
                         Enable

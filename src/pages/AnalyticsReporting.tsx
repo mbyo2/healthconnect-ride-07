@@ -394,41 +394,41 @@ export const AnalyticsReporting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Reports</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Reports</span>
                 <FileText className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{totalReports}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All time</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All time</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled</span>
                 <Calendar className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">{scheduledReports}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Auto-generated</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Auto-generated</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Financial Reports</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Financial Reports</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
               <div className="text-2xl font-black font-mono text-success-500">{financialReports}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Revenue & costs</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Revenue & costs</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent (7d)</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent (7d)</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{recentReports}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Generated this week</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Generated this week</div>
             </CardContent>
           </Card>
         </div>
@@ -605,24 +605,24 @@ export const AnalyticsReporting = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{report.report_name}</CardTitle>
-                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">
+                          <div className="text-xs text-graphite-500 dark:text-slate-400">
                             {new Date(report.generated_at).toLocaleString()}
                           </div>
                         </div>
                       </div>
                       {report.is_scheduled && (
-                        <Badge className="bg-purple-500 text-white text-[10px]">Scheduled</Badge>
+                        <Badge className="bg-purple-500 text-white text-xs">Scheduled</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Type</span>
-                      <Badge variant="outline" className="text-[10px]">{report.report_type}</Badge>
+                      <Badge variant="outline" className="text-xs">{report.report_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Category</span>
-                      <Badge className={getCategoryColor(report.report_category) + " text-[10px]"}>
+                      <Badge className={getCategoryColor(report.report_category) + " text-xs"}>
                         {report.report_category}
                       </Badge>
                     </div>

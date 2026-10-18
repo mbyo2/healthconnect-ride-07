@@ -272,7 +272,7 @@ export const WholesalePharmacyWorkflow = () => {
                           </p>
                         </div>
                         <span className="text-sm font-semibold">{formatPrice(Number(o.total_amount))}</span>
-                        <Badge className={`${ORDER_STATUS_COLORS[o.status]} text-white text-[10px]`}>{o.status}</Badge>
+                        <Badge className={`${ORDER_STATUS_COLORS[o.status]} text-white text-xs`}>{o.status}</Badge>
                       </div>
                       {selling && next && (
                         <div className="flex gap-2 mt-2">

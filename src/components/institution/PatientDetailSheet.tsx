@@ -108,7 +108,7 @@ export const PatientDetailSheet = ({ patientId, open, onClose }: PatientDetailSh
                         <div key={adm.id} className="p-2 border rounded-md text-xs space-y-1">
                           <div className="flex justify-between">
                             <span className="font-medium">{adm.diagnosis || 'No diagnosis'}</span>
-                            <Badge variant={adm.status === 'admitted' ? 'destructive' : 'secondary'} className="text-[10px]">
+                            <Badge variant={adm.status === 'admitted' ? 'destructive' : 'secondary'} className="text-xs">
                               {adm.status}
                             </Badge>
                           </div>
@@ -140,7 +140,7 @@ export const PatientDetailSheet = ({ patientId, open, onClose }: PatientDetailSh
                         <div key={rx.id} className="p-2 border rounded-md text-xs space-y-1">
                           <div className="flex justify-between">
                             <span className="font-medium">{rx.medication_name}</span>
-                            <Badge variant="outline" className="text-[10px]">{rx.status || 'active'}</Badge>
+                            <Badge variant="outline" className="text-xs">{rx.status || 'active'}</Badge>
                           </div>
                           <p className="text-muted-foreground">{rx.dosage} • {rx.instructions}</p>
                         </div>

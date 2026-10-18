@@ -247,7 +247,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">ERP Stock &amp; Buying Procurement Hub</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
                 Live Stock
               </span>
             </div>
@@ -320,7 +320,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Item &amp; Code</th>
                   <th className="py-3 px-3">Batch Number</th>
                   <th className="py-3 px-3">Expiry Date</th>
@@ -347,26 +347,26 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                       <tr key={b.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
                         <td className="py-3 px-4">
                           <div className="font-extrabold text-slate-900 dark:text-slate-100">{b.itemName}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
+                          <div className="text-xs text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
                         </td>
                         <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
                         <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{b.expiryDate}</td>
                         <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{b.warehouse}</td>
                         <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
                           {b.quantity} units
-                          <div className="text-[10px] text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
+                          <div className="text-xs text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
                         </td>
                         <td className="py-3 px-3 text-right font-mono">
                           <div className="font-bold text-slate-900 dark:text-slate-100">{formatPrice(b.unitPrice)}</div>
-                          <div className="text-[10px] text-slate-400">Cost: {formatPrice(b.costPrice)}</div>
+                          <div className="text-xs text-slate-400">Cost: {formatPrice(b.costPrice)}</div>
                         </td>
                         <td className="py-3 px-3 text-center">
                           {isLow ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
                               Low Stock
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
                               In Stock
                             </span>
                           )}
@@ -449,7 +449,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">PO Number</th>
                   <th className="py-3 px-3">Supplier</th>
                   <th className="py-3 px-3 text-right">Total</th>
@@ -494,7 +494,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Item</th>
                   <th className="py-3 px-3">Movement</th>
                   <th className="py-3 px-3 text-right">Quantity</th>
@@ -561,7 +561,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                       {b.quantity} left · reorder at {b.reorderLevel} · {b.batchNo}
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 w-fit">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 w-fit">
                     Reorder needed
                   </span>
                 </div>
@@ -572,7 +572,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       )}
 
       {/* Trust strip */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5"><Layers className="h-3.5 w-3.5" aria-hidden /> Batches tracked</span>
         <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" aria-hidden /> Expiry monitored</span>
         <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden /> POs on record</span>

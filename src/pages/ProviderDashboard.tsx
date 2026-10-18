@@ -217,7 +217,7 @@ const MyPracticeEditor = () => {
       <Section icon={GraduationCap} title="Education">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
             <Input
               value={data.medical_school}
               onChange={e => setData(p => ({ ...p, medical_school: e.target.value }))}
@@ -226,7 +226,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
             <Input
               type="number" min="1960" max="2030"
               value={data.graduation_year}
@@ -252,7 +252,7 @@ const MyPracticeEditor = () => {
       <Section icon={MapPin} title="Practice Details">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
             <Input
               value={data.primary_practice_location}
               onChange={e => setData(p => ({ ...p, primary_practice_location: e.target.value }))}
@@ -261,7 +261,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
             <Input
               value={data.typical_wait_time}
               onChange={e => setData(p => ({ ...p, typical_wait_time: e.target.value }))}
@@ -305,7 +305,7 @@ const MyPracticeEditor = () => {
       <Section icon={DollarSign} title="Consultation Fees (ZMW)">
         <div className="flex items-center gap-3 max-w-xs">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_min}
@@ -316,7 +316,7 @@ const MyPracticeEditor = () => {
           </div>
           <span className="mt-6 text-graphite-500 dark:text-slate-400 font-bold text-sm">–</span>
           <div className="flex-1 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
+            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_max}
@@ -698,7 +698,7 @@ export const ProviderDashboard = () => {
           <div className="vf-card space-y-3">
             <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
             <div className="text-3xl font-black font-mono text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
-            <div className="text-[11px] font-bold text-emerald-500 mt-1">
+            <div className="text-xs font-bold text-emerald-500 mt-1">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"
                 : `${weekStats.revenueDeltaPct >= 0 ? "+" : ""}${weekStats.revenueDeltaPct}% vs last week`}
@@ -741,7 +741,7 @@ export const ProviderDashboard = () => {
             <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
               My Practice Modules
             </p>
-            <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
+            <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
               Chartered for your profession — {charter.filter((m) => m.status === "live").length} live now,{" "}
               {charter.filter((m) => m.status === "planned").length} coming soon.
             </p>
@@ -751,7 +751,7 @@ export const ProviderDashboard = () => {
                 const path = PROVIDER_MODULE_PATHS[m.module_key];
                 const inner = (
                   <>
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                       {m.status === "live" ? (
                         <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
                       ) : (
@@ -759,7 +759,7 @@ export const ProviderDashboard = () => {
                       )}
                       <span className="truncate">{m.module_name}</span>
                     </span>
-                    <span className={`text-[9px] font-extrabold uppercase tracking-wide ${m.status === "live" ? "text-success-500" : "text-graphite-400"}`}>
+                    <span className={`text-xs font-extrabold uppercase tracking-wide ${m.status === "live" ? "text-success-500" : "text-graphite-400"}`}>
                       {m.status === "live" ? "Live" : "Coming soon"}
                     </span>
                   </>

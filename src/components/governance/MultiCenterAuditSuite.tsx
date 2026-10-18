@@ -113,7 +113,7 @@ function FacilityOverview({ institutionId }: { institutionId: string }) {
           </div>
         ))}
       </div>
-      <p className="text-[11px] text-slate-500">Live from beds, admissions, billing and personnel records for this facility. Zero rows render as zero — never as estimates.</p>
+      <p className="text-xs text-slate-500">Live from beds, admissions, billing and personnel records for this facility. Zero rows render as zero — never as estimates.</p>
     </div>
   );
 }
@@ -246,8 +246,8 @@ function FacilityAuditTrail() {
                         <span className={`text-xs font-semibold font-mono ${ACTION_COLORS[entry.action] || "text-slate-300"}`}>
                           {entry.action.replace(/_/g, " ")}
                         </span>
-                        {entry.outcome ? <span className="text-[10px] text-slate-500">· {entry.outcome}</span> : null}
-                        {entry.category ? <span className="text-[10px] text-slate-500">· {entry.category}</span> : null}
+                        {entry.outcome ? <span className="text-xs text-slate-500">· {entry.outcome}</span> : null}
+                        {entry.category ? <span className="text-xs text-slate-500">· {entry.category}</span> : null}
                       </div>
                       <p className="text-xs text-slate-500 truncate">{entry.actorName} · {entry.resource || "—"}</p>
                     </div>
@@ -255,7 +255,7 @@ function FacilityAuditTrail() {
                   <p className="text-xs text-slate-500 shrink-0">{entry.created_at ? new Date(entry.created_at).toLocaleString() : "—"}</p>
                 </div>
                 {isExpanded && (
-                  <pre className="mt-3 pt-3 border-t border-slate-700/40 text-[11px] text-slate-300 font-mono whitespace-pre-wrap break-all" onClick={(e) => e.stopPropagation()}>
+                  <pre className="mt-3 pt-3 border-t border-slate-700/40 text-xs text-slate-300 font-mono whitespace-pre-wrap break-all" onClick={(e) => e.stopPropagation()}>
                     {JSON.stringify(entry.details || {}, null, 2)}
                   </pre>
                 )}

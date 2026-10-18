@@ -437,12 +437,12 @@ const LabManagement = () => {
 
   const getStatusPill = (status: string) => {
     switch (status) {
-      case "pending": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Pending</span>;
-      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-teal-500">Sample Collected</span>;
-      case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-primary-500">In Progress</span>;
-      case "completed": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-success-500">Completed</span>;
-      case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Cancelled</span>;
-      default: return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-graphite-500 dark:bg-slate-600">{status}</span>;
+      case "pending": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
+      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-teal-500">Sample Collected</span>;
+      case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">In Progress</span>;
+      case "completed": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
+      case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
+      default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">{status}</span>;
     }
   };
 
@@ -577,31 +577,31 @@ const LabManagement = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
               <Clock className="h-5 w-5 text-warning-500" />
             </div>
             <div className="text-2xl font-black font-mono text-warning-500">{pendingRequests.length}</div>
-            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting sample processing</div>
+            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting sample processing</div>
           </div>
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
+              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
               <FlaskConical className="h-5 w-5 text-primary-500" />
             </div>
             <div className="text-2xl font-black font-mono text-primary-500">{inProgressRequests.length}</div>
-            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently on bench</div>
+            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently on bench</div>
           </div>
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
               <CheckCircle2 className="h-5 w-5 text-success-500" />
             </div>
             <div className="text-2xl font-black font-mono text-success-500">
               {completedRequests.filter((r) => new Date(r.updated_at).toDateString() === new Date().toDateString()).length}
             </div>
-            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Signed off & released</div>
+            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Signed off & released</div>
           </div>
         </div>
 
@@ -627,7 +627,7 @@ const LabManagement = () => {
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Test Number</th>
                     <th className="py-2.5 px-3">Patient</th>
                     <th className="py-2.5 px-3">Test Requested</th>
@@ -655,11 +655,11 @@ const LabManagement = () => {
                         <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{request.provider?.last_name ? providerDisplayName({ first_name: request.provider?.first_name, last_name: request.provider?.last_name, role: (request.provider as any)?.role }) : "Staff"}</td>
                         <td className="py-3 px-3 text-center">
                           {request.priority === "urgent" || request.priority === "stat" ? (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500 flex items-center gap-1 mx-auto w-fit">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500 flex items-center gap-1 mx-auto w-fit">
                               <AlertCircle className="h-3 w-3" /> STAT
                             </span>
                           ) : (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-400">Routine</span>
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Routine</span>
                           )}
                         </td>
                         <td className="py-3 px-3 text-center">{getStatusPill(request.status)}</td>
@@ -668,7 +668,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => collectSample(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-[10px] font-extrabold disabled:opacity-50"
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50"
                             >
                               Collect Sample
                             </button>
@@ -677,7 +677,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => startAnalysis(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-teal-500 text-white text-[10px] font-extrabold disabled:opacity-50"
+                              className="px-3 py-1 rounded-md bg-teal-500 text-white text-xs font-extrabold disabled:opacity-50"
                             >
                               Start Analysis
                             </button>
@@ -685,7 +685,7 @@ const LabManagement = () => {
                           {request.status === "in_progress" && (
                             <button
                               onClick={() => { setSelectedRequest(request); setActiveTab("results"); }}
-                              className="px-3 py-1 rounded-md bg-success-500 text-white text-[10px] font-extrabold"
+                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold"
                             >
                               Enter Result
                             </button>
@@ -817,7 +817,7 @@ const LabManagement = () => {
                 <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
                   <div className="min-w-0">
                     <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{test.name}</h4>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="font-black text-sm font-mono text-primary-500 mr-1">{formatPrice(test.price)}</span>

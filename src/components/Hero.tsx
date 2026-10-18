@@ -79,7 +79,7 @@ export const Hero = () => {
               ].map((stat) => (
                 <div key={stat.label} className="text-center p-3 vf-card rounded-card">
                   <div className="text-lg font-display font-medium text-primary-500">{stat.value}</div>
-                  <div className="text-[10px] text-graphite-500 tracking-wide">{stat.label}</div>
+                  <div className="text-xs text-graphite-500 tracking-wide">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -138,7 +138,7 @@ export const Hero = () => {
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
-                <div className="w-12 h-12 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-[10px] font-bold px-1 text-center leading-tight">
+                <div className="w-12 h-12 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-bold px-1 text-center leading-tight">
                   {formatStat(stats.doctors)}
                 </div>
               </div>
@@ -181,7 +181,7 @@ export const Hero = () => {
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-[9px] font-medium px-0.5 text-center leading-tight">
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-medium px-0.5 text-center leading-tight">
                     {formatStat(stats.doctors)}
                   </div>
                 </div>

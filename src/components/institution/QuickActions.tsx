@@ -41,7 +41,7 @@ export const QuickActions = () => {
               <div className={`p-2 rounded-lg ${action.color}`}>
                 <action.icon className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-medium text-center leading-tight">{action.label}</span>
+              <span className="text-xs font-medium text-center leading-tight">{action.label}</span>
             </Button>
           ))}
         </div>

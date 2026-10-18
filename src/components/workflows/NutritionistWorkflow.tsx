@@ -95,7 +95,7 @@ export const NutritionistWorkflow = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Nutritionist Workspace</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-300">Nutritionist Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Nutrition Dashboard</h1>
             <p className="text-xs text-slate-400 font-medium">Diet plans, nutritional assessments & patient counseling</p>
@@ -122,12 +122,12 @@ export const NutritionistWorkflow = () => {
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label className="text-[11px]">BMI</Label><Input value={plan.bmi} onChange={e => setPlan({...plan, bmi: e.target.value})} placeholder="24.5" className="mt-1" /></div>
-              <div><Label className="text-[11px]">Daily Calories (kcal)</Label><Input value={plan.calories} onChange={e => setPlan({...plan, calories: e.target.value})} placeholder="2000" className="mt-1" /></div>
+              <div><Label className="text-xs">BMI</Label><Input value={plan.bmi} onChange={e => setPlan({...plan, bmi: e.target.value})} placeholder="24.5" className="mt-1" /></div>
+              <div><Label className="text-xs">Daily Calories (kcal)</Label><Input value={plan.calories} onChange={e => setPlan({...plan, calories: e.target.value})} placeholder="2000" className="mt-1" /></div>
             </div>
-            <div><Label className="text-[11px]">Breakfast</Label><Textarea value={plan.breakfast} onChange={e => setPlan({...plan, breakfast: e.target.value})} placeholder="Oatmeal with fruits..." className="mt-1" rows={2} /></div>
-            <div><Label className="text-[11px]">Lunch</Label><Textarea value={plan.lunch} onChange={e => setPlan({...plan, lunch: e.target.value})} placeholder="Grilled chicken salad..." className="mt-1" rows={2} /></div>
-            <div><Label className="text-[11px]">Dinner</Label><Textarea value={plan.dinner} onChange={e => setPlan({...plan, dinner: e.target.value})} placeholder="Fish with vegetables..." className="mt-1" rows={2} /></div>
+            <div><Label className="text-xs">Breakfast</Label><Textarea value={plan.breakfast} onChange={e => setPlan({...plan, breakfast: e.target.value})} placeholder="Oatmeal with fruits..." className="mt-1" rows={2} /></div>
+            <div><Label className="text-xs">Lunch</Label><Textarea value={plan.lunch} onChange={e => setPlan({...plan, lunch: e.target.value})} placeholder="Grilled chicken salad..." className="mt-1" rows={2} /></div>
+            <div><Label className="text-xs">Dinner</Label><Textarea value={plan.dinner} onChange={e => setPlan({...plan, dinner: e.target.value})} placeholder="Fish with vegetables..." className="mt-1" rows={2} /></div>
             <Button onClick={saveDietPlan} disabled={savingPlan} className="w-full min-h-[44px]">
               {savingPlan ? 'Saving…' : 'Save Diet Plan'}
             </Button>
@@ -143,11 +143,11 @@ export const NutritionistWorkflow = () => {
               <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-primary-500 group-hover:text-white transition-colors">{step.icon}</div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
-                <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
+                <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
               </div>
             </div>
             <button onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-[11px] font-black transition-all">Open Module</button>
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-black transition-all">Open Module</button>
           </div>
         ))}
       </div>

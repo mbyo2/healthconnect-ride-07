@@ -341,43 +341,43 @@ export const FinancialControls = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Flagged Transactions</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Flagged Transactions</span>
                 <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
               <div className="text-2xl font-black font-mono text-warning-500">{flaggedCount}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Requires review</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Requires review</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Audits</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Audits</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-black font-mono text-primary-500">{pendingCount}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting approval</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting approval</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Price Discrepancies</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Price Discrepancies</span>
                 <DollarSign className="h-4 w-4 text-error-500" />
               </div>
               <div className="text-2xl font-black font-mono text-error-500">{discrepancies.length}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Unresolved</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Unresolved</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
                 <TrendingUp className="h-4 w-4 text-purple-500" />
               </div>
               <div className="text-2xl font-black font-mono text-purple-500">
                 {institution.currency || "ZMW"} {totalDiscrepancyAmount.toFixed(2)}
               </div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">At risk amount</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">At risk amount</div>
             </CardContent>
           </Card>
         </div>
@@ -500,10 +500,10 @@ export const FinancialControls = () => {
                     <tr key={log.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{log.transaction_id?.slice(0, 8)}...</div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{log.reason || "No reason provided"}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">{log.reason || "No reason provided"}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           {log.transaction_type}
                         </Badge>
                       </td>
@@ -516,11 +516,11 @@ export const FinancialControls = () => {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={getStatusColor(log.status) + " text-[10px]"}>
+                        <Badge className={getStatusColor(log.status) + " text-xs"}>
                           {log.status}
                         </Badge>
                         {log.flagged_for_review && (
-                          <Badge className="bg-warning-500 text-white text-[10px] ml-1">Flagged</Badge>
+                          <Badge className="bg-warning-500 text-white text-xs ml-1">Flagged</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
@@ -577,11 +577,11 @@ export const FinancialControls = () => {
                           <AlertTriangle className="h-4 w-4 text-error-500" />
                           {discrepancy.transaction_type} Discrepancy
                         </CardTitle>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">
+                        <div className="text-xs text-graphite-500 dark:text-slate-400 mt-1">
                           {new Date(discrepancy.created_at).toLocaleString()}
                         </div>
                       </div>
-                      <Badge className="bg-error-500 text-white text-[10px]">
+                      <Badge className="bg-error-500 text-white text-xs">
                         {discrepancy.difference_percentage.toFixed(1)}% Diff
                       </Badge>
                     </div>
@@ -589,13 +589,13 @@ export const FinancialControls = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Expected</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Expected</div>
                         <div className="text-sm font-bold text-success-500">
                           {institution.currency || "ZMW"} {discrepancy.expected_price.toFixed(2)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Actual</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400">Actual</div>
                         <div className="text-sm font-bold text-error-500">
                           {institution.currency || "ZMW"} {discrepancy.actual_price.toFixed(2)}
                         </div>

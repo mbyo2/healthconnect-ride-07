@@ -226,7 +226,7 @@ export function BreakGlassDialog({
                       ))}
                     </ul>
                   )}
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Lookups are audit-logged. Search only for patients you are treating.
                   </p>
                 </>

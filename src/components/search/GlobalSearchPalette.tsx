@@ -130,7 +130,7 @@ export const GlobalSearchPalette = ({
       >
         <Search className="h-4 w-4" />
         <span className="text-xs">Search patients, invoices…</span>
-        <kbd className="text-[10px] font-semibold bg-background border border-border rounded px-1.5 py-0.5">{hint}</kbd>
+        <kbd className="text-xs font-semibold bg-background border border-border rounded px-1.5 py-0.5">{hint}</kbd>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -152,7 +152,7 @@ export const GlobalSearchPalette = ({
             )}
             {hits.length === 0 && query.trim().length < 2 && (
               <p className="px-4 py-6 text-sm text-muted-foreground text-center">
-                Type at least 2 characters. <kbd className="text-[10px] font-semibold bg-muted border border-border rounded px-1">esc</kbd> to close.
+                Type at least 2 characters. <kbd className="text-xs font-semibold bg-muted border border-border rounded px-1">esc</kbd> to close.
               </p>
             )}
             {hits.map((h) => (
@@ -169,7 +169,7 @@ export const GlobalSearchPalette = ({
                   <span className="block text-sm font-medium truncate">{h.title}</span>
                   <span className="block text-xs text-muted-foreground truncate">{h.subtitle}</span>
                 </span>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">{h.kind}</span>
+                <span className="text-xs uppercase font-semibold text-muted-foreground">{h.kind}</span>
               </button>
             ))}
           </div>

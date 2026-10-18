@@ -135,7 +135,7 @@ export function HealthMetricCards() {
                 <Icon className="h-5 w-5" aria-hidden />
               </span>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-graphite-500 dark:text-slate-400">
+                <p className="text-xs font-bold uppercase tracking-wide text-graphite-500 dark:text-slate-400">
                   {m.label}
                 </p>
                 <p className="text-2xl font-extrabold text-midnight dark:text-white leading-tight">

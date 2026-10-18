@@ -505,7 +505,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
                 >
                   {time}
                   {isExpiring && (
-                    <span className="absolute -top-2 -right-1 text-[9px] font-bold text-white bg-orange-500 px-1.5 py-px rounded-full doc-urgency-blink whitespace-nowrap">
+                    <span className="absolute -top-2 -right-1 text-xs font-bold text-white bg-orange-500 px-1.5 py-px rounded-full doc-urgency-blink whitespace-nowrap">
                       Expiring soon
                     </span>
                   )}
@@ -707,7 +707,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
                   <span
                     aria-current={i === stepIndex ? "step" : undefined}
                     className={cn(
-                      "flex h-6 flex-1 items-center justify-center rounded-full text-[10px] font-black sm:text-[11px]",
+                      "flex h-6 flex-1 items-center justify-center rounded-full text-xs font-black sm:text-xs",
                       i < stepIndex && "bg-primary/15 text-primary",
                       i === stepIndex && "bg-primary text-primary-foreground",
                       i > stepIndex && "bg-muted text-muted-foreground"

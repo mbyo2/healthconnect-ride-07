@@ -123,7 +123,7 @@ export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplet
             <ClipboardCheck className={`h-4 w-4 ${checklist.all_cleared ? 'text-emerald-500' : 'text-amber-500'}`} />
             Discharge Checklist
           </CardTitle>
-          <Badge variant={checklist.all_cleared ? 'default' : 'secondary'} className="text-[10px]">
+          <Badge variant={checklist.all_cleared ? 'default' : 'secondary'} className="text-xs">
             {completedCount}/{checklistItems.length}
           </Badge>
         </div>
@@ -134,7 +134,7 @@ export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplet
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="mb-3">
-          <Label className="text-[10px]">Staff Name (for sign-off)</Label>
+          <Label className="text-xs">Staff Name (for sign-off)</Label>
           <Input value={staffName} onChange={e => setStaffName(e.target.value)} placeholder="Your name" className="h-7 text-xs" />
         </div>
         {checklistItems.map(item => {
@@ -151,7 +151,7 @@ export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplet
                 <div>
                   <span className={`text-xs font-medium ${isChecked ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{item.label}</span>
                   {isChecked && checklist[item.clearedByField] && (
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       By: {checklist[item.clearedByField]} • {new Date(checklist[item.clearedAtField]).toLocaleString()}
                     </p>
                   )}

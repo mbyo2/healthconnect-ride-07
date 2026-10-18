@@ -62,7 +62,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             <span className="text-3xl font-black font-mono text-amber-500">{stats.avgTriageMinutes}m</span>
             <span className="text-xs font-semibold text-emerald-500">↓ 14% faster today</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">Target: &lt; 15 mins per patient intake</p>
+          <p className="text-xs text-slate-400 mt-2">Target: &lt; 15 mins per patient intake</p>
         </div>
 
         {/* Metric 3: Active Patient Flow */}
@@ -79,7 +79,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             <span className="text-3xl font-black font-mono text-blue-500">{stats.totalPatients}</span>
             <span className="text-xs font-semibold text-slate-400">Patients in Board</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">4 Group Sections • Live updates</p>
+          <p className="text-xs text-slate-400 mt-2">4 Group Sections • Live updates</p>
         </div>
 
         {/* Metric 4: Daily Revenue / Billing */}
@@ -96,7 +96,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             <span className="text-2xl font-black font-mono text-emerald-500">K48,250</span>
             <span className="text-xs font-semibold text-emerald-400">+22% vs yesterday</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">Medications & Consultations</p>
+          <p className="text-xs text-slate-400 mt-2">Medications & Consultations</p>
         </div>
       </div>
 
@@ -186,7 +186,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
                   </div>
                   <div>
                     <div className="font-bold text-xs text-slate-900 dark:text-slate-100">{doc.name}</div>
-                    <div className="text-[10px] text-slate-400">{doc.role}</div>
+                    <div className="text-xs text-slate-400">{doc.role}</div>
                   </div>
                 </div>
 

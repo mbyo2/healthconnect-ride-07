@@ -213,7 +213,7 @@ export const HealthPersonnelApplicationForm = () => {
               disabled={isSubmitting} required={f.field !== "phone_number"}
               className={`mt-1 ${inputCls(errors[f.field])}`}
             />
-            {errors[f.field] && <p className="text-[10px] text-error-500 font-bold mt-1">{errors[f.field]}</p>}
+            {errors[f.field] && <p className="text-xs text-error-500 font-bold mt-1">{errors[f.field]}</p>}
           </div>
         ))}
 
@@ -237,7 +237,7 @@ export const HealthPersonnelApplicationForm = () => {
                 {f.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors[f.field] && <p className="text-[10px] text-error-500 font-bold mt-1">{errors[f.field]}</p>}
+            {errors[f.field] && <p className="text-xs text-error-500 font-bold mt-1">{errors[f.field]}</p>}
           </div>
         ))}
       </div>
@@ -264,7 +264,7 @@ export const HealthPersonnelApplicationForm = () => {
               </SelectContent>
             </Select>
           </div>
-          {errors.profession && <p className="text-[10px] text-error-500 font-bold mt-1">{errors.profession}</p>}
+          {errors.profession && <p className="text-xs text-error-500 font-bold mt-1">{errors.profession}</p>}
         </div>
 
         <div>
@@ -294,11 +294,11 @@ export const HealthPersonnelApplicationForm = () => {
               disabled={isSubmitting} required
               className={`mt-1 ${inputCls(errors.license_number)}`}
             />
-            {errors.license_number && <p className="text-[10px] text-error-500 font-bold mt-1">{errors.license_number}</p>}
+            {errors.license_number && <p className="text-xs text-error-500 font-bold mt-1">{errors.license_number}</p>}
           </div>
         )}
         {selectedProfession && !selectedProfession.requiresLicense && (
-          <p className="text-[10px] text-graphite-400">No licence number required for {selectedProfession.label} — registration is verified during application review.</p>
+          <p className="text-xs text-graphite-400">No licence number required for {selectedProfession.label} — registration is verified during application review.</p>
         )}
 
         {[
@@ -313,7 +313,7 @@ export const HealthPersonnelApplicationForm = () => {
               disabled={isSubmitting} required
               className={`mt-1 ${inputCls(errors[f.field])}`}
             />
-            {errors[f.field] && <p className="text-[10px] text-error-500 font-bold mt-1">{errors[f.field]}</p>}
+            {errors[f.field] && <p className="text-xs text-error-500 font-bold mt-1">{errors[f.field]}</p>}
           </div>
         ))}
 
@@ -326,7 +326,7 @@ export const HealthPersonnelApplicationForm = () => {
             disabled={isSubmitting} required
             className={`mt-1 ${inputCls(errors.years_of_experience)}`}
           />
-          {errors.years_of_experience && <p className="text-[10px] text-error-500 font-bold mt-1">{errors.years_of_experience}</p>}
+          {errors.years_of_experience && <p className="text-xs text-error-500 font-bold mt-1">{errors.years_of_experience}</p>}
         </div>
       </div>
 
@@ -349,8 +349,8 @@ export const HealthPersonnelApplicationForm = () => {
                     {requirement.name}
                     {requirement.required && <span className="text-error-500">*</span>}
                   </p>
-                  <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{requirement.description}</p>
-                  {requirement.maxSizeMB && <p className="text-[10px] text-graphite-500 dark:text-slate-400">Max: {requirement.maxSizeMB}MB</p>}
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{requirement.description}</p>
+                  {requirement.maxSizeMB && <p className="text-xs text-graphite-500 dark:text-slate-400">Max: {requirement.maxSizeMB}MB</p>}
                 </div>
                 {uploadedDocuments[requirement.id] ? (
                   <div className="flex items-center gap-1">
@@ -399,7 +399,7 @@ export const HealthPersonnelApplicationForm = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
           <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-500 text-white text-xs font-black">4</span>
-          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Practice Details <span className="text-[10px] normal-case font-medium">(optional — can be completed after approval)</span></h3>
+          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
         </div>
 
         {/* Medical School & Graduation */}

@@ -579,7 +579,7 @@ export const InstitutionDashboard = () => {
                 <Icon className="h-4 w-4" />
                 <span>{tab.label}</span>
                 {isAtypical && (
-                  <span className="text-[10px] font-medium opacity-70" aria-hidden="true">•</span>
+                  <span className="text-xs font-medium opacity-70" aria-hidden="true">•</span>
                 )}
               </button>
             );
@@ -652,7 +652,7 @@ export const InstitutionDashboard = () => {
                     <span className="h-8 w-8 rounded-lg bg-canvas-mist dark:bg-slate-800 flex items-center justify-center text-graphite-500 dark:text-slate-400 group-hover:text-primary-500 group-hover:bg-primary-100 transition-colors">
                       {action.icon}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary-500">{action.label}</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary-500">{action.label}</span>
                   </button>
                 ))}
               </div>
@@ -668,7 +668,7 @@ export const InstitutionDashboard = () => {
                 <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
                   {headerLabel} Modules
                 </p>
-                <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
+                <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
                   {charter.filter((m) => m.effective === "live").length} live now,{" "}
                   {charter.filter((m) => m.effective === "planned").length} available to add.
                   {charter.some((m) => m.source === "admin_grant") && (
@@ -684,7 +684,7 @@ export const InstitutionDashboard = () => {
                     const badge = isGranted ? "New" : isLive ? "Live" : priceLabel ? `Available · ${priceLabel}` : "Available";
                     const inner = (
                       <>
-                        <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                           {isLive ? (
                             <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
                           ) : (
@@ -692,7 +692,7 @@ export const InstitutionDashboard = () => {
                           )}
                           <span className="truncate">{m.module_name}</span>
                         </span>
-                        <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
+                        <span className={`text-xs font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
                           {badge}
                         </span>
                       </>

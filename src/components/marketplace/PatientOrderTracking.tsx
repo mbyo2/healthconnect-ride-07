@@ -60,7 +60,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
                 >
                   <Icon className="h-3.5 w-3.5" aria-hidden />
                 </span>
-                <span className={cn("text-[9px] font-bold truncate", current ? "text-primary" : "text-muted-foreground")}>
+                <span className={cn("text-xs font-bold truncate", current ? "text-primary" : "text-muted-foreground")}>
                   {stage.label}
                 </span>
               </div>
@@ -72,7 +72,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
         })}
       </ol>
       {(tracking?.pickup_time || tracking?.delivery_time || tracking?.tracking_notes) && (
-        <p className="mt-2 text-[11px] text-muted-foreground">
+        <p className="mt-2 text-xs text-muted-foreground">
           {tracking.pickup_time && <>Picked up {format(new Date(tracking.pickup_time), "MMM d, h:mm a")}</>}
           {tracking.pickup_time && tracking.delivery_time && <> • </>}
           {tracking.delivery_time && <>Delivered {format(new Date(tracking.delivery_time), "MMM d, h:mm a")}</>}
@@ -82,7 +82,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
       {/* Live courier map — Yango-style (CEO 2026-10-10) */}
       {tracking?.id && tracking?.courier_id && tracking?.status !== "delivered" && (
         <div className="mt-3">
-          <p className="text-[11px] font-bold mb-1.5 flex items-center gap-1">
+          <p className="text-xs font-bold mb-1.5 flex items-center gap-1">
             <Truck className="h-3.5 w-3.5" /> Live courier location
           </p>
           <LiveDeliveryMap deliveryId={tracking.id} height={200} />

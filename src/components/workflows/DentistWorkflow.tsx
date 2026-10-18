@@ -47,7 +47,7 @@ export const DentistWorkflow = () => {
 
   const renderToothRow = (teeth: string[], label: string) => (
     <div className="mb-2">
-      <div className="text-[10px] font-bold text-slate-500 mb-1">{label}</div>
+      <div className="text-xs font-bold text-slate-500 mb-1">{label}</div>
       <div className="flex gap-1 flex-wrap">
         {teeth.map(tooth => {
           const condition = toothChart[tooth] || 'healthy';
@@ -56,7 +56,7 @@ export const DentistWorkflow = () => {
             <button
               key={tooth}
               onClick={() => setSelectedTooth(tooth)}
-              className={`w-10 h-12 rounded-lg border-2 flex flex-col items-center justify-center text-[10px] font-bold transition-all ${
+              className={`w-10 h-12 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-bold transition-all ${
                 selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-slate-200'
               } ${condInfo?.color} text-white hover:scale-105`}
               title={`Tooth ${tooth} - ${condInfo?.label}`}
@@ -99,7 +99,7 @@ export const DentistWorkflow = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Dentist Clinical Workspace</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-300">Dentist Clinical Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Dental Dashboard</h1>
             <p className="text-xs text-slate-400 font-medium">
@@ -149,7 +149,7 @@ export const DentistWorkflow = () => {
                   <div className="text-xs font-bold mb-2">Legend</div>
                   <div className="flex flex-wrap gap-2">
                     {TOOTH_CONDITIONS.map(cond => (
-                      <span key={cond.code} className="text-[10px] flex items-center gap-1">
+                      <span key={cond.code} className="text-xs flex items-center gap-1">
                         <span className={`w-2 h-2 rounded-full ${cond.color}`} />
                         {cond.label}
                       </span>
@@ -178,13 +178,13 @@ export const DentistWorkflow = () => {
                   <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">
                     {step.title}
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
+                  <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
                 </div>
               </div>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-[11px] font-black transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-black transition-all"
             >
               Open Module
             </button>

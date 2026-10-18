@@ -21,7 +21,7 @@ const STATUS_BG: Record<string, string> = {
 };
 
 const getStatusPill = (status: string) => (
-  <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${STATUS_COLORS[status] || "bg-slate-400"} capitalize`}>
+  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${STATUS_COLORS[status] || "bg-slate-400"} capitalize`}>
     {status}
   </span>
 );
@@ -235,7 +235,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                     </div>
                     {getStatusPill(bed.status)}
                   </div>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">{bed.ward_name}</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">{bed.ward_name}</p>
                   {bed.status === "occupied" && (
                     <div className="text-xs space-y-1">
                       <p className="font-bold text-graphite-800 dark:text-white">{nameFor(bed.patient_id)}</p>
@@ -255,7 +255,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                     {bed.status === "available" && (
                       <button
                         onClick={() => { setAdmitBed(bed); setShowAdmit(true); }}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600"
                       >
                         <UserPlus className="h-3 w-3" /> Admit
                       </button>
@@ -264,20 +264,20 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                       <>
                         <button
                           onClick={() => { setObsBed(bed); setShowObsForm(true); }}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600"
                         >
                           <Activity className="h-3 w-3" /> Chart
                         </button>
                         <button
                           onClick={() => { setTimelinePatientId(bed.patient_id); setActiveTab("observations"); }}
-                          className="px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-[11px] font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+                          className="px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
                         >
                           Timeline
                         </button>
                         <button
                           onClick={() => handleDischarge(bed)}
                           disabled={isSubmitting}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-success-500 text-white text-[11px] font-bold hover:bg-success-600 disabled:opacity-50"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-success-500 text-white text-xs font-bold hover:bg-success-600 disabled:opacity-50"
                         >
                           <LogOut className="h-3 w-3" /> Discharge
                         </button>
@@ -287,7 +287,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                       <button
                         onClick={() => handleMaintenance(bed)}
                         disabled={isSubmitting}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-[11px] font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 disabled:opacity-50"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 disabled:opacity-50"
                       >
                         <Wrench className="h-3 w-3" /> {bed.status === "maintenance" ? "Restore" : "Maintenance"}
                       </button>
@@ -385,7 +385,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
               <label className="text-xs font-bold">Search patient</label>
               <input value={patientQuery} onChange={(e) => searchPatients(e.target.value)}
                 className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="Type at least 2 characters…" />
-              {searching && <p className="text-[11px] text-graphite-500 mt-1">Searching…</p>}
+              {searching && <p className="text-xs text-graphite-500 mt-1">Searching…</p>}
               {searchResults.length > 0 && (
                 <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-canvas-silk">
                   {searchResults.map((p: any) => (
@@ -398,7 +398,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                   ))}
                 </div>
               )}
-              {admitPatientId && <p className="text-[11px] text-success-500 font-bold mt-1">Patient selected</p>}
+              {admitPatientId && <p className="text-xs text-success-500 font-bold mt-1">Patient selected</p>}
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowAdmit(false)} className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold">Cancel</button>

@@ -222,7 +222,7 @@ export const BillingStaffWorkflow = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">{invoice.invoice_number}</span>
-            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${status.pillColor}`}>
+            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${status.pillColor}`}>
               {status.label}
             </span>
           </div>
@@ -257,12 +257,12 @@ export const BillingStaffWorkflow = () => {
                   }
                 )
               }
-              className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-[11px] font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800"
+              className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800"
             >
               <Printer className="h-3 w-3" /> PDF
             </button>
             {invoice.balance > 0 && (
-              <button onClick={() => openPaymentDialog(invoice)} className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-[11px] font-extrabold flex items-center gap-1">
+              <button onClick={() => openPaymentDialog(invoice)} className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1">
                 <CreditCard className="h-3 w-3" /> Pay
               </button>
             )}
@@ -275,7 +275,7 @@ export const BillingStaffWorkflow = () => {
           {invoice.balance > 0 && <span className="text-error-500">Balance: K{invoice.balance?.toLocaleString()}</span>}
         </div>
         {invoice.insurance_provider && (
-          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-primary-50 dark:bg-primary-500/20 text-primary-500 dark:text-primary-300">
+          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-primary-50 dark:bg-primary-500/20 text-primary-500 dark:text-primary-300">
             {invoice.insurance_provider}
           </span>
         )}
@@ -308,7 +308,7 @@ export const BillingStaffWorkflow = () => {
                         type="button"
                         onClick={() => autoFillPatientSystemCharges(invoiceForm.patient_name)}
                         disabled={loadingCharges}
-                        className="text-[10px] font-bold text-primary-500 hover:underline flex items-center"
+                        className="text-xs font-bold text-primary-500 hover:underline flex items-center"
                       >
                         {loadingCharges ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                         Auto-fill charges
@@ -336,7 +336,7 @@ export const BillingStaffWorkflow = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items</label>
-                  <button onClick={addItem} className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-[10px] font-bold flex items-center gap-1">
+                  <button onClick={addItem} className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1">
                     <Plus className="h-3 w-3" /> Add Item
                   </button>
                 </div>
@@ -484,19 +484,19 @@ export const BillingStaffWorkflow = () => {
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
-          <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Today's Total Collections</p>
+          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Today's Total Collections</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-primary-500">{pendingInvoices.length}</p>
-          <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Pending Invoices</p>
+          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Invoices</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
           <p className="text-2xl font-black font-mono text-error-500">{pendingClaims.length}</p>
-          <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400">Pending Insurance Claims</p>
+          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Insurance Claims</p>
         </div>
       </div>
 
@@ -545,7 +545,7 @@ export const BillingStaffWorkflow = () => {
               <div key={claim.id} className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-slate-900 dark:text-slate-100">{claim.patient_name}</span>
-                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                     claim.status === "approved" ? "bg-success-500" : claim.status === "rejected" ? "bg-error-500" : "bg-warning-500"
                   }`}>
                     {claim.status}

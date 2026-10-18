@@ -111,12 +111,12 @@ export const PatientFeedback = ({ hospital, isPatientView }: Props) => {
                         <Star key={s} className={`h-3 w-3 ${s <= f.rating ? 'text-amber-400 fill-amber-400' : 'text-muted'}`} />
                       ))}
                     </div>
-                    <Badge variant="outline" className="text-[10px] uppercase">{f.visit_type}</Badge>
-                    <Badge variant={f.status === 'addressed' ? 'default' : 'secondary'} className="text-[10px]">{f.status}</Badge>
+                    <Badge variant="outline" className="text-xs uppercase">{f.visit_type}</Badge>
+                    <Badge variant={f.status === 'addressed' ? 'default' : 'secondary'} className="text-xs">{f.status}</Badge>
                   </div>
                   {f.comments && <p className="text-xs text-foreground mt-2">{f.comments}</p>}
                   {f.suggestions && <p className="text-xs text-muted-foreground mt-1 italic">Suggestion: {f.suggestions}</p>}
-                  <p className="text-[10px] text-muted-foreground mt-1">{new Date(f.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{new Date(f.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
             </CardContent>

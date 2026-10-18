@@ -241,10 +241,10 @@ export const PharmacyPOS = () => {
                 className="p-3 rounded-xl border border-canvas-silk cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
               >
                 <p className="font-extrabold text-xs text-slate-900 truncate">{item.medication_name}</p>
-                <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">{item.dosage} · {item.medication_type}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{item.dosage} · {item.medication_type}</p>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-black text-primary-500">{formatPrice(item.unit_price || 0)}</span>
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${item.quantity_available <= 5 ? "bg-error-500" : "bg-success-500"}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${item.quantity_available <= 5 ? "bg-error-500" : "bg-success-500"}`}>
                     {item.quantity_available}
                   </span>
                 </div>
@@ -266,7 +266,7 @@ export const PharmacyPOS = () => {
         <div className="p-3 border-b border-canvas-silk bg-canvas flex items-center gap-2">
           <ShoppingCart className="h-4 w-4 text-primary-500" />
           <span className="font-extrabold text-sm text-slate-900">Cart</span>
-          {cart.length > 0 && <span className="ml-auto inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">{cart.length}</span>}
+          {cart.length > 0 && <span className="ml-auto inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{cart.length}</span>}
         </div>
 
         {/* Customer Info */}
@@ -325,7 +325,7 @@ export const PharmacyPOS = () => {
           {/* Discount Selector */}
           <div className="flex gap-1">
             {[0, 5, 10, 15].map((d) => (
-              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-[10px] font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
+              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
                 {d === 0 ? "No Disc" : `${d}%`}
               </button>
             ))}
@@ -339,7 +339,7 @@ export const PharmacyPOS = () => {
               { value: "card", icon: <CreditCard className="h-3.5 w-3.5" />, label: "Card" },
               { value: "insurance", icon: <Shield className="h-3.5 w-3.5" />, label: "Insurance" },
             ].map((pm) => (
-              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-[10px] font-extrabold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
+              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-xs font-extrabold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
                 {pm.icon}{pm.label}
               </button>
             ))}

@@ -256,23 +256,23 @@ const BlockchainRecords = () => {
                           <FileText className="w-4 h-4 text-purple-500 shrink-0" />
                           <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate">{record.title}</h4>
                           {record.verified && (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500 flex items-center gap-1">
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Verified
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-graphite-500 dark:text-slate-400">Provider: <strong>{record.provider}</strong> • Date: {record.date}</p>
-                        <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-mono truncate mt-1 bg-white dark:bg-slate-800 p-1 rounded border border-canvas-silk dark:border-slate-700">
+                        <p className="text-xs text-graphite-500 dark:text-slate-400">Provider: <strong>{record.provider}</strong> • Date: {record.date}</p>
+                        <p className="text-xs text-graphite-500 dark:text-slate-400 font-mono truncate mt-1 bg-white dark:bg-slate-800 p-1 rounded border border-canvas-silk dark:border-slate-700">
                           Hash: {record.hash}
                         </p>
                         {record.shared_with && record.shared_with.length > 0 && (
-                          <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-primary-500">
+                          <div className="mt-2 flex items-center gap-1 text-xs font-bold text-primary-500">
                             <Share2 className="w-3 h-3" />
                             <span>Shared with: {record.shared_with.join(", ")}</span>
                           </div>
                         )}
                       </div>
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">
                         {record.category}
                       </span>
                     </div>
@@ -303,8 +303,8 @@ const BlockchainRecords = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-slate-900 dark:text-slate-100">{entry.action}</p>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400">Actor: {entry.user}</p>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{entry.timestamp}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400">Actor: {entry.user}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{entry.timestamp}</p>
                   </div>
                 </div>
               ))}
@@ -363,7 +363,7 @@ const BlockchainRecords = () => {
                   </button>
                 </div>
                 {showPayload && (
-                  <pre className="p-3 rounded-xl bg-canvas dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-[11px] font-mono overflow-x-auto whitespace-pre-wrap break-all">
+                  <pre className="p-3 rounded-xl bg-canvas dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">
                     {JSON.stringify(medicalRecords.find((r) => r.id === selectedRecord), null, 2)}
                   </pre>
                 )}

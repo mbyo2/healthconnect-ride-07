@@ -113,19 +113,19 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-black font-mono text-primary-500">{supplies.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Stock Items</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Stock Items</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning-500 mb-1" />
           <div className="text-2xl font-black font-mono text-warning-500">{lowStock.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Need Reorder</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Need Reorder</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-error-500 mb-1" />
           <div className="text-2xl font-black font-mono text-error-500">{expiringSoon.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Expiring ≤ 90d</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Expiring ≤ 90d</div>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
           <div className="overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Item Name</th>
                   <th className="py-2.5 px-3">Category</th>
                   <th className="py-2.5 px-3">Qty</th>

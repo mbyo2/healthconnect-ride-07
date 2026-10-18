@@ -166,7 +166,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           <div key={card.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
             <div style={{ color: card.color }} className="flex justify-center mb-1">{card.icon}</div>
             <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
-            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{card.label}</div>
+            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">{card.label}</div>
           </div>
         ))}
       </div>
@@ -209,7 +209,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Test # / Type</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
@@ -224,14 +224,14 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                 <tr key={order.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
                     <div className="font-mono font-bold text-slate-900">{order.test_number}</div>
-                    <div className="text-[10px] text-graphite-500 dark:text-slate-400">{order.test_type}</div>
+                    <div className="text-xs text-graphite-500 dark:text-slate-400">{order.test_type}</div>
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(order.patient_id) || "Inpatient"}</td>
                   <td className="py-3 px-3 text-center">{getStatusPill(order.status)}</td>
                   <td className="py-3 px-3 text-slate-500">{order.sample_type || "—"}</td>
                   <td className="py-3 px-3">
                     {order.priority && order.priority !== "routine" ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">{order.priority.toUpperCase()}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">{order.priority.toUpperCase()}</span>
                     ) : (
                       <span className="text-graphite-500 dark:text-slate-400">Routine</span>
                     )}
@@ -242,7 +242,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["pending", "ordered"].includes(order.status) && (
                         <button
                           onClick={() => advance(order, "sample_collected")}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-primary-400 text-white"
+                          className="px-2 py-1 rounded text-xs font-bold bg-primary-400 text-white"
                         >
                           Collect
                         </button>
@@ -250,7 +250,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {order.status === "sample_collected" && (
                         <button
                           onClick={() => advance(order, "processing")}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-warning-500 text-white"
+                          className="px-2 py-1 rounded text-xs font-bold bg-warning-500 text-white"
                         >
                           Process
                         </button>
@@ -258,7 +258,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["processing", "sample_collected"].includes(order.status) && (
                         <button
                           onClick={() => { setShowResultDialog(order); setResultInput(order.result_summary || ""); }}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-primary-500 text-white"
+                          className="px-2 py-1 rounded text-xs font-bold bg-primary-500 text-white"
                         >
                           Enter Result
                         </button>
@@ -266,7 +266,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["completed", "report_ready"].includes(order.status) && (
                         <button
                           onClick={() => window.print()}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-success-500 text-white flex items-center gap-0.5"
+                          className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white flex items-center gap-0.5"
                         >
                           <Printer className="h-3 w-3" /> Print
                         </button>

@@ -22,7 +22,7 @@ export const StatusBadge = ({ status, variant = "default" }: StatusBadgeProps) =
   };
 
   return (
-    <Badge className={`${getBadgeClass()} text-[10px]`}>
+    <Badge className={`${getBadgeClass()} text-xs`}>
       {status}
     </Badge>
   );

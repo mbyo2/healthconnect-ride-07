@@ -274,17 +274,17 @@ const MapPage = () => {
                   <p className="text-sm text-muted-foreground">{selectedProvider.specialty}</p>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {selectedProvider.telemedicine_available && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-primary/10 text-primary">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-primary/10 text-primary">
                         <Video className="h-3 w-3" aria-hidden /> Telemedicine
                       </span>
                     )}
                     {selectedProvider.consultation_fee_min && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700">
                         <Wallet className="h-3 w-3" aria-hidden /> From K{selectedProvider.consultation_fee_min}
                       </span>
                     )}
                     {selectedProvider.typical_wait_time && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-700">
                         <Clock className="h-3 w-3" aria-hidden /> {selectedProvider.typical_wait_time}
                       </span>
                     )}
@@ -292,7 +292,7 @@ const MapPage = () => {
                   {(selectedProvider.expertise || []).length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {(selectedProvider.expertise || []).slice(0, 3).map(e => (
-                        <span key={e} className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">{e}</span>
+                        <span key={e} className="px-1.5 py-0.5 rounded bg-muted text-xs font-medium">{e}</span>
                       ))}
                     </div>
                   )}

@@ -152,7 +152,7 @@ export const WalletHistory = () => {
                                             }`}>
                                             {transaction.transaction_type === 'credit' ? '+' : '-'}{formatPrice(Math.abs(transaction.amount))}
                                         </p>
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider tnum">
+                                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider tnum">
                                             Balance: {formatPrice(transaction.balance_after)}
                                         </p>
                                         <button
@@ -174,7 +174,7 @@ export const WalletHistory = () => {
                                                     notes: `Balance after: ${formatPrice(transaction.balance_after)}`,
                                                 })
                                             }
-                                            className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-primary-500 hover:underline"
+                                            className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-primary-500 hover:underline"
                                             title="Download PDF Receipt"
                                         >
                                             <Receipt className="h-3 w-3" /> PDF

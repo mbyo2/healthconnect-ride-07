@@ -231,7 +231,7 @@ export default function MedicalRecords() {
                         </div>
                         <div>
                           <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
-                          <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+                          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
                             {record.provider} • {new Date(record.date).toLocaleDateString()}
                           </p>
                         </div>
@@ -286,7 +286,7 @@ export default function MedicalRecords() {
                         <div>
                           <p className="font-bold text-xs text-slate-700 dark:text-slate-300">{metric.label}</p>
                           <p className="text-xl font-black font-mono text-primary-500">{metric.value}</p>
-                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{metric.date}</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{metric.date}</p>
                         </div>
                         <div>
                           {getStatusPill(metric.status)}

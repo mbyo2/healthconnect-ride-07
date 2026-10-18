@@ -69,7 +69,7 @@ export const RoleSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2 text-xs font-medium">
           {getRoleIcon(activeRole)}
-          <Badge variant="secondary" className="text-[10px] capitalize">
+          <Badge variant="secondary" className="text-xs capitalize">
             {getRoleLabel(activeRole)}
           </Badge>
           <ChevronDown className="h-3 w-3 opacity-60" />

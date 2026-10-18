@@ -200,7 +200,7 @@ export const CourierScreening = ({ pharmacyId }: { pharmacyId: string }) => {
                           <span className={passed ? "" : "text-muted-foreground"}>
                             {check.label}
                           </span>
-                          <Badge variant="outline" className="ml-auto text-[10px]">
+                          <Badge variant="outline" className="ml-auto text-xs">
                             {check.level}
                           </Badge>
                         </div>

@@ -123,7 +123,7 @@ export const MultiCountryAccounting = () => {
           <div className="text-2xl font-black font-mono text-primary-500 mt-1">
             {customRates.currency} {totalRevenue.toLocaleString()}
           </div>
-          <div className="text-[10px] text-slate-400 mt-0.5">Consultations & Pharmacy</div>
+          <div className="text-xs text-slate-400 mt-0.5">Consultations & Pharmacy</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
@@ -131,7 +131,7 @@ export const MultiCountryAccounting = () => {
           <div className="text-2xl font-black font-mono text-error-500 mt-1">
             {customRates.currency} {totalExpenses.toLocaleString()}
           </div>
-          <div className="text-[10px] text-slate-400 mt-0.5">Salaries & Consumables</div>
+          <div className="text-xs text-slate-400 mt-0.5">Salaries & Consumables</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
@@ -139,7 +139,7 @@ export const MultiCountryAccounting = () => {
           <div className="text-2xl font-black font-mono text-success-500 mt-1">
             {customRates.currency} {netProfit.toLocaleString()}
           </div>
-          <div className="text-[10px] text-emerald-500 font-bold mt-0.5">After VAT Deduction</div>
+          <div className="text-xs text-emerald-500 font-bold mt-0.5">After VAT Deduction</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
@@ -147,7 +147,7 @@ export const MultiCountryAccounting = () => {
           <div className="text-2xl font-black font-mono text-warning-500 mt-1">
             {customRates.currency} {estimatedVatTax.toLocaleString()}
           </div>
-          <div className="text-[10px] text-amber-500 font-bold mt-0.5">Statutory Liability</div>
+          <div className="text-xs text-amber-500 font-bold mt-0.5">Statutory Liability</div>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ export const MultiCountryAccounting = () => {
       <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Account Code</th>
               <th className="py-2.5 px-3">Account Title</th>
               <th className="py-2.5 px-3">Category</th>

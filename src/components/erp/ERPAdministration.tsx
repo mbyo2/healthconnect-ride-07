@@ -232,7 +232,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">ERP Administration &amp; Operations Suite</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-400 text-slate-950">
                 Live Data
               </span>
             </div>
@@ -297,7 +297,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Employee Name</th>
                   <th className="py-3 px-3">Designation &amp; Department</th>
                   <th className="py-3 px-3">Contact</th>
@@ -320,15 +320,15 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                       <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{emp.name}</td>
                       <td className="py-3 px-3">
                         <div className="font-bold text-primary-500">{emp.role}</div>
-                        <div className="text-[10px] text-slate-400">{emp.department}</div>
+                        <div className="text-xs text-slate-400">{emp.department}</div>
                       </td>
                       <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
                         <div>{emp.phone || "—"}</div>
-                        <div className="text-[10px] text-slate-400">{emp.email || ""}</div>
+                        <div className="text-xs text-slate-400">{emp.email || ""}</div>
                       </td>
                       <td className="py-3 px-3 font-semibold">{emp.shift}</td>
                       <td className="py-3 px-3 text-center">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
                           {emp.status}
                         </span>
                       </td>
@@ -336,7 +336,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                         <button
                           onClick={() => printPayslip(emp)}
                           aria-label={`Print advisory pay slip for ${emp.name}`}
-                          className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-colors"
+                          className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs transition-colors"
                         >
                           Payslip
                         </button>
@@ -355,21 +355,21 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Total Invoiced</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Total Invoiced</span>
               <div className="text-2xl font-black text-emerald-600 mt-1 tabular-nums">{formatPrice(totalInvoiced)}</div>
-              <span className="text-[10px] font-bold text-slate-500">All billing invoices</span>
+              <span className="text-xs font-bold text-slate-500">All billing invoices</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Outstanding</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Outstanding</span>
               <div className="text-2xl font-black text-rose-600 mt-1 tabular-nums">{formatPrice(totalOutstanding)}</div>
-              <span className="text-[10px] font-bold text-slate-500">Awaiting collection</span>
+              <span className="text-xs font-bold text-slate-500">Awaiting collection</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Collected</span>
+              <span className="text-xs font-extrabold uppercase text-slate-400">Collected</span>
               <div className="text-2xl font-black text-primary-500 mt-1 tabular-nums">{formatPrice(totalCollected)}</div>
-              <span className="text-[10px] font-bold text-slate-500">Invoiced minus outstanding</span>
+              <span className="text-xs font-bold text-slate-500">Invoiced minus outstanding</span>
             </div>
           </div>
 
@@ -381,7 +381,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-3 text-right">Total</th>
                   <th className="py-3 px-3 text-right">Balance</th>
@@ -491,7 +491,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Asset</th>
                   <th className="py-3 px-3">Department</th>
                   <th className="py-3 px-3">Serial #</th>
@@ -512,7 +512,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-900 dark:text-slate-100">{a.asset_name}</div>
-                        <div className="text-[10px] font-mono text-slate-400">{a.asset_tag || a.id.slice(0, 8)}</div>
+                        <div className="text-xs font-mono text-slate-400">{a.asset_tag || a.id.slice(0, 8)}</div>
                       </td>
                       <td className="py-3 px-3">{a.assigned_department || "—"}</td>
                       <td className="py-3 px-3 font-mono">{a.serial_number || "—"}</td>

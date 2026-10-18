@@ -87,7 +87,7 @@ export function FxConverterWidget() {
             const perUnit = snap.rates[code] ? 1 / snap.rates[code] : 0;
             return (
               <div key={code} className="rounded-xl border bg-muted/40 px-2.5 py-2 text-center">
-                <div className="text-[11px] font-semibold text-muted-foreground">{code}</div>
+                <div className="text-xs font-semibold text-muted-foreground">{code}</div>
                 <div className="text-sm font-bold tabular-nums flex items-center justify-center gap-1">
                   <TrendingUp className="h-3 w-3 text-emerald-500" aria-hidden />
                   {perUnit ? `K${perUnit.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "—"}
@@ -131,7 +131,7 @@ export function FxConverterWidget() {
               <span className="text-xs text-muted-foreground ml-2">ZMW you'll receive</span>
             </div>
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             Converted at the {snap.live ? "live mid-market rate" : "indicative rate"} shown above.
             Final settlement may vary slightly by payment rail.
           </p>

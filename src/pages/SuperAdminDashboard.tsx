@@ -166,8 +166,8 @@ const SuperAdminDashboard = () => {
       cell: ({ row }) => {
         const level = row.getValue("admin_level") as AdminLevel;
         return level === "superadmin"
-          ? <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-purple-500">Super Admin</span>
-          : <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-primary-500">Admin</span>;
+          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Super Admin</span>
+          : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Admin</span>;
       },
     },
     {
@@ -283,7 +283,7 @@ const SuperAdminDashboard = () => {
                 <span style={{ color: card.color }}>{card.icon}</span>
               </div>
               <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
-              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
             </div>
           ))}
         </div>

@@ -47,7 +47,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
           ~62px slot at 360px and would truncate to unreadable. The full label
           stays on aria-label for screen readers. */}
       <span className={cn(
-        "hidden min-[400px]:block max-w-full truncate text-[10px] font-medium leading-none tracking-wide mt-0.5",
+        "hidden min-[400px]:block max-w-full truncate text-xs font-medium leading-none tracking-wide mt-0.5",
         active ? "text-primary-500" : "text-graphite-500 dark:text-slate-400"
       )}>
         {label}

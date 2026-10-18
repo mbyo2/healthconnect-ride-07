@@ -148,7 +148,7 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
         </div>
       </div>
 
-      <p className="text-[11px] text-muted-foreground flex items-start gap-1">
+      <p className="text-xs text-muted-foreground flex items-start gap-1">
         <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
         Estimate only. Final cost depends on services rendered and verified coverage.
       </p>

@@ -91,7 +91,7 @@ export const CSSDManagement = ({ hospital }: { hospital: any }) => {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-sm text-foreground">{i.item_name}</span>
-                    <Badge variant={statusConfig[i.sterilization_status]?.variant || 'outline'} className="text-[10px]">
+                    <Badge variant={statusConfig[i.sterilization_status]?.variant || 'outline'} className="text-xs">
                       {statusConfig[i.sterilization_status]?.label || i.sterilization_status || 'Unknown'}
                     </Badge>
                   </div>

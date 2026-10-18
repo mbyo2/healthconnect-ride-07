@@ -155,20 +155,20 @@ const IoTMonitoring = () => {
                       </div>
                     </div>
                     {device.is_active ? (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Connected</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Connected</span>
                     ) : (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-graphite-500 dark:bg-slate-600">Offline</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">Offline</span>
                     )}
                   </div>
                   <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{device.device_name}</h3>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400 capitalize mb-3 font-medium">{device.device_type.replace("_", " ")}</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 capitalize mb-3 font-medium">{device.device_type.replace("_", " ")}</p>
                   <div className="space-y-1.5 text-xs">
                     <div className="flex items-center justify-between font-bold text-graphite-500 dark:text-slate-400">
                       <span>Battery Level</span>
                       <span className="text-slate-900 dark:text-slate-100">{device.battery_level}%</span>
                     </div>
                     <Progress value={device.battery_level || 0} className="h-1.5 bg-canvas-silk" />
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 pt-1">
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 pt-1">
                       Last sync: {device.last_sync ? new Date(device.last_sync).toLocaleTimeString() : "Never"}
                     </p>
                   </div>
@@ -194,45 +194,45 @@ const IoTMonitoring = () => {
             <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
                 <Heart className="w-5 h-5 text-error-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
+              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
               <p className="text-3xl font-black font-mono text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
-              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">bpm</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">bpm</p>
             </div>
 
             <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
                 <Activity className="w-5 h-5 text-primary-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
+              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
               <p className="text-3xl font-black font-mono text-primary-500 mt-1">
                 {vitalSigns?.blood_pressure
                   ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                   : "--/--"}
               </p>
-              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">mmHg</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">mmHg</p>
             </div>
 
             <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
                 <Thermometer className="w-5 h-5 text-warning-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
+              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
               <p className="text-3xl font-black font-mono text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
-              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">°C</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">°C</p>
             </div>
 
             <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
                 <Droplet className="w-5 h-5 text-purple-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
+              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
               <p className="text-3xl font-black font-mono text-purple-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
-              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">% SpO2</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">% SpO2</p>
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@ const IoTMonitoring = () => {
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-slate-900 dark:text-slate-100">{alert.message}</p>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{new Date(alert.triggered_at).toLocaleString()}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{new Date(alert.triggered_at).toLocaleString()}</p>
                   </div>
                 </div>
               ))}

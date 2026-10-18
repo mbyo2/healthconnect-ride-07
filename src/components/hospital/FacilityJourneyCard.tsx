@@ -26,7 +26,7 @@ export const FacilityJourneyCard = ({ facilityType }: FacilityJourneyCardProps) 
         <ol className="space-y-2">
           {profile.journey.map((step, i) => (
             <li key={step} className="flex items-start gap-3 text-sm">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                 {i + 1}
               </span>
               <span className="text-muted-foreground">{step}</span>

@@ -84,7 +84,7 @@ export const MidwifeWorkflow = () => {
 
   const ancField = (label: string, key: keyof typeof anc, placeholder: string) => (
     <div>
-      <Label className="text-[11px]">{label}</Label>
+      <Label className="text-xs">{label}</Label>
       <Input value={anc[key]} onChange={e => setAnc({ ...anc, [key]: e.target.value })} placeholder={placeholder} className="mt-1" />
     </div>
   );
@@ -102,7 +102,7 @@ export const MidwifeWorkflow = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Midwife Clinical Workspace</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-300">Midwife Clinical Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Maternal Health Dashboard</h1>
             <p className="text-xs text-slate-400 font-medium">Antenatal care, deliveries, postnatal care & maternal health</p>
@@ -143,7 +143,7 @@ export const MidwifeWorkflow = () => {
               {ancField('Hemoglobin (g/dL)', 'hemoglobin', '11.5')}
             </div>
             <div>
-              <Label className="text-[11px]">Visit Notes</Label>
+              <Label className="text-xs">Visit Notes</Label>
               <Input value={anc.notes} onChange={e => setAnc({ ...anc, notes: e.target.value })} placeholder="Findings, advice given, next appointment..." className="mt-1" />
             </div>
             <Button onClick={saveANC} disabled={savingANC} className="w-full min-h-[44px]">
@@ -166,12 +166,12 @@ export const MidwifeWorkflow = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
-                <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
+                <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
               </div>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-[11px] font-black transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-black transition-all"
             >
               Open Module
             </button>

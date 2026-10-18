@@ -425,9 +425,9 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-rose-500">Status changes to Stuck / Critical</span></div>
-                    <div className="text-[11px] text-slate-400">Send instant SMS alert to On-Call Chief Doctor & page ICU staff</div>
+                    <div className="text-xs text-slate-400">Send instant SMS alert to On-Call Chief Doctor & page ICU staff</div>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
 
                 <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
@@ -435,9 +435,9 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-blue-500">Patient intake completes</span></div>
-                    <div className="text-[11px] text-slate-400">Trigger MedGemma AI diagnostic triage classification & assign bed</div>
+                    <div className="text-xs text-slate-400">Trigger MedGemma AI diagnostic triage classification & assign bed</div>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
 
                 <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
@@ -445,9 +445,9 @@ export const BespokeWorkOSShowcase = () => {
                 }`}>
                   <div>
                     <div className="font-bold text-xs">When <span className="text-success-500">Status changes to Done</span></div>
-                    <div className="text-[11px] text-slate-400">Move patient item to Discharge Pipeline & generate PDF invoice</div>
+                    <div className="text-xs text-slate-400">Move patient item to Discharge Pipeline & generate PDF invoice</div>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">ACTIVE</span>
                 </div>
               </div>
 
@@ -628,12 +628,12 @@ export const BespokeWorkOSShowcase = () => {
                 {/* Status & Priority Strip */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className={`p-3 rounded-xl border ${isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Current Status</span>
+                    <span className="text-xs uppercase font-bold text-slate-400">Current Status</span>
                     <div className="mt-1 text-sm font-bold text-blue-500">{selectedPatient.status}</div>
                   </div>
 
                   <div className={`p-3 rounded-xl border ${isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"}`}>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Triage Priority</span>
+                    <span className="text-xs uppercase font-bold text-slate-400">Triage Priority</span>
                     <div className="mt-1 text-sm font-bold text-amber-500">{selectedPatient.priority}</div>
                   </div>
                 </div>

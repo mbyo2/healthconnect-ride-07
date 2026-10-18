@@ -552,7 +552,7 @@ export const Auth = () => {
                           </FormLabel>
                           <FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl>
                           {prof?.requiresLicense && (
-                            <p className="text-[10px] text-graphite-400">Required for {prof.label} — verified during application review.</p>
+                            <p className="text-xs text-graphite-400">Required for {prof.label} — verified during application review.</p>
                           )}
                           <FormMessage />
                         </FormItem>

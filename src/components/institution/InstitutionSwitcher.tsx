@@ -60,12 +60,12 @@ export const InstitutionSwitcher = ({ affiliations, activeId, onSwitch, tone = "
                 {a.id === active.id && <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" />}
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Badge variant="secondary" className="text-[10px] capitalize">
+                <Badge variant="secondary" className="text-xs capitalize">
                   {a.type.replace(/_/g, " ")}
                 </Badge>
                 <Badge
                   variant={a.affiliation === "admin" ? "default" : "outline"}
-                  className="text-[10px] capitalize"
+                  className="text-xs capitalize"
                 >
                   {a.affiliation === "admin" ? (
                     "Owner"

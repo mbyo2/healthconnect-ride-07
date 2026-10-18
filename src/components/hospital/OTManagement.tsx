@@ -263,11 +263,11 @@ export const OTManagement = ({ hospital }: OTProps) => {
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="font-semibold text-sm">{schedule.patient_name}</h4>
                           <Badge variant={getStatusColor(schedule.status) as any}>{schedule.status}</Badge>
-                          <Badge variant="outline" className="text-[10px]">{schedule.ot_room}</Badge>
-                          {info.isMinor && <Badge variant="secondary" className="text-[10px]">Minor</Badge>}
-                          {!schedule.consent_signed && <Badge variant="destructive" className="text-[10px]">No Consent</Badge>}
+                          <Badge variant="outline" className="text-xs">{schedule.ot_room}</Badge>
+                          {info.isMinor && <Badge variant="secondary" className="text-xs">Minor</Badge>}
+                          {!schedule.consent_signed && <Badge variant="destructive" className="text-xs">No Consent</Badge>}
                           {info.recentSurgeryAlert && (
-                            <Badge variant="destructive" className="text-[10px] gap-1">
+                            <Badge variant="destructive" className="text-xs gap-1">
                               <AlertTriangle className="h-3 w-3" /> Recent Surgery
                             </Badge>
                           )}

@@ -205,7 +205,7 @@ export const NurseWorkflow = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-[11px]">Patient *</Label>
+              <Label className="text-xs">Patient *</Label>
               <select
                 value={vitalsPatientId}
                 onChange={e => setVitalsPatientId(e.target.value)}
@@ -221,56 +221,56 @@ export const NurseWorkflow = () => {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <Label className="text-[11px]">BP Systolic (mmHg)</Label>
+                <Label className="text-xs">BP Systolic (mmHg)</Label>
                 <input type="number" min={50} max={300} value={vitals.sys}
                   onChange={e => setVitals({ ...vitals, sys: e.target.value })}
                   placeholder="120" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">BP Diastolic (mmHg)</Label>
+                <Label className="text-xs">BP Diastolic (mmHg)</Label>
                 <input type="number" min={30} max={200} value={vitals.dia}
                   onChange={e => setVitals({ ...vitals, dia: e.target.value })}
                   placeholder="80" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">Heart Rate (bpm)</Label>
+                <Label className="text-xs">Heart Rate (bpm)</Label>
                 <input type="number" min={20} max={250} value={vitals.hr}
                   onChange={e => setVitals({ ...vitals, hr: e.target.value })}
                   placeholder="72" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">Temperature (°C)</Label>
+                <Label className="text-xs">Temperature (°C)</Label>
                 <input type="number" step="0.1" min={30} max={45} value={vitals.temp}
                   onChange={e => setVitals({ ...vitals, temp: e.target.value })}
                   placeholder="36.6" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">SpO₂ (%)</Label>
+                <Label className="text-xs">SpO₂ (%)</Label>
                 <input type="number" min={50} max={100} value={vitals.spo2}
                   onChange={e => setVitals({ ...vitals, spo2: e.target.value })}
                   placeholder="98" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">Resp. Rate (/min)</Label>
+                <Label className="text-xs">Resp. Rate (/min)</Label>
                 <input type="number" min={5} max={60} value={vitals.rr}
                   onChange={e => setVitals({ ...vitals, rr: e.target.value })}
                   placeholder="16" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">Glucose (mmol/L)</Label>
+                <Label className="text-xs">Glucose (mmol/L)</Label>
                 <input type="number" step="0.1" min={1} max={40} value={vitals.glucose}
                   onChange={e => setVitals({ ...vitals, glucose: e.target.value })}
                   placeholder="5.5" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
               <div>
-                <Label className="text-[11px]">Weight (kg)</Label>
+                <Label className="text-xs">Weight (kg)</Label>
                 <input type="number" step="0.1" min={1} max={400} value={vitals.weight}
                   onChange={e => setVitals({ ...vitals, weight: e.target.value })}
                   placeholder="70" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
               </div>
             </div>
             <div>
-              <Label className="text-[11px]">Notes</Label>
+              <Label className="text-xs">Notes</Label>
               <Textarea value={vitalsNotes} onChange={e => setVitalsNotes(e.target.value)}
                 placeholder="Observation notes…" rows={2} className="mt-1" />
             </div>

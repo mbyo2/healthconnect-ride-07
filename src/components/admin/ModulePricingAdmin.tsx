@@ -86,7 +86,7 @@ export function ModulePricingAdmin() {
         <h2 className="font-extrabold text-sm flex items-center gap-2">
           <Puzzle className="h-4 w-4 text-primary-500" /> Module Add-on Pricing
         </h2>
-        <Badge variant="secondary" className="text-[10px] font-extrabold">
+        <Badge variant="secondary" className="text-xs font-extrabold">
           {pricedCount} of {rows.length} priced
         </Badge>
       </div>
@@ -116,7 +116,7 @@ export function ModulePricingAdmin() {
               >
                 <div className="min-w-0 flex-1 basis-48">
                   <p className="text-xs font-extrabold truncate" title={row.module_name}>{row.module_name}</p>
-                  <p className="text-[10px] text-graphite-400 font-mono">{row.module_key}</p>
+                  <p className="text-xs text-graphite-400 font-mono">{row.module_key}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-bold text-graphite-500">K</span>
@@ -131,9 +131,9 @@ export function ModulePricingAdmin() {
                     }
                     className="w-28 h-9 text-sm"
                   />
-                  <span className="text-[10px] text-graphite-400 font-bold">/mo</span>
+                  <span className="text-xs text-graphite-400 font-bold">/mo</span>
                 </div>
-                <label className="flex items-center gap-1.5 text-[11px] font-bold text-graphite-500 cursor-pointer">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-graphite-500 cursor-pointer">
                   <Switch
                     checked={draft.is_billable}
                     onCheckedChange={(v) =>

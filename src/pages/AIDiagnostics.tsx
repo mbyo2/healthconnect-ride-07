@@ -105,7 +105,7 @@ const AIDiagnostics = () => {
               >
                 <div style={{ color: card.color }} className="mb-2">{card.icon}</div>
                 <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{card.title}</p>
-                <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">{card.sub}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">{card.sub}</p>
               </div>
             ))}
           </div>

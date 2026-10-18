@@ -23,10 +23,10 @@ export function CurrencyToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 z-[70] text-xs">
-        <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground uppercase">
+        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase">
           Display Currency · ZMW default
         </DropdownMenuLabel>
-        <p className="px-2 pb-1 text-[10px] text-muted-foreground">
+        <p className="px-2 pb-1 text-xs text-muted-foreground">
           {ratesLive ? 'Live bank rates · charges settle in ZMW' : 'Loading live rates… · charges settle in ZMW'}
         </p>
         <DropdownMenuSeparator />
@@ -55,7 +55,7 @@ export function CurrencyToggle() {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-[10px] text-muted-foreground font-normal">
+        <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
           Other Global Currencies
         </DropdownMenuLabel>
 

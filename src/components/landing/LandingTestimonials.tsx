@@ -37,7 +37,7 @@ export const Testimonials = () => {
               <div>
                 <div className="font-display text-3xl sm:text-4xl font-medium text-midnight">{m.value}</div>
                 <div className="text-xs sm:text-sm text-midnight font-medium mt-1">{m.label}</div>
-                <div className="text-[11px] text-graphite-500 dark:text-slate-400 mt-0.5 leading-snug tracking-wide">{m.detail}</div>
+                <div className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 leading-snug tracking-wide">{m.detail}</div>
               </div>
             </div>
           ))}
@@ -59,7 +59,7 @@ export const Testimonials = () => {
               </div>
               <div className="text-left">
                 <span className="text-xs font-medium text-midnight block">{p.name}</span>
-                <span className="text-[10px] text-graphite-400 block">{p.fullName}</span>
+                <span className="text-xs text-graphite-400 block">{p.fullName}</span>
               </div>
             </div>
           ))}
@@ -90,7 +90,7 @@ export const Testimonials = () => {
                       <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-pill text-[10px] font-medium bg-success-50 text-success-500">
+                  <span className="px-2.5 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">
                     Illustrative story
                   </span>
                 </div>
@@ -113,7 +113,7 @@ export const Testimonials = () => {
                 />
                 <div>
                   <div className="font-medium text-sm text-midnight group-hover:text-primary-500 transition-colors">{t.name}</div>
-                  <div className="text-[11px] text-graphite-400">{t.role} · {t.city}</div>
+                  <div className="text-xs text-graphite-400">{t.role} · {t.city}</div>
                 </div>
               </div>
             </div>

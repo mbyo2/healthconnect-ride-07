@@ -99,17 +99,17 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Image className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-black font-mono text-primary-500">{orders.length}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Studies</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Studies</div>
         </div>
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Clock className="h-5 w-5 mx-auto text-warning-500 mb-1" />
           <div className="text-2xl font-black font-mono text-warning-500">{pending}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">In Queue</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">In Queue</div>
         </div>
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
           <div className="text-2xl font-black font-mono text-success-500">{reported}</div>
-          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Reports Signed</div>
+          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Reports Signed</div>
         </div>
       </div>
 
@@ -135,7 +135,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Order # / Modality</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3">Exam / Body Part</th>
@@ -149,16 +149,16 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
                 <tr key={o.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
                     <div className="font-mono font-bold text-slate-900">{o.request_number}</div>
-                    <div className="text-[10px] text-primary-500 font-bold">{o.exam_type}</div>
+                    <div className="text-xs text-primary-500 font-bold">{o.exam_type}</div>
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(o.patient_id) || "Patient"}</td>
                   <td className="py-3 px-3">
                     <div className="font-semibold">{o.exam_name || o.exam_type}</div>
-                    <div className="text-[10px] text-graphite-500 dark:text-slate-400">{o.body_part}</div>
+                    <div className="text-xs text-graphite-500 dark:text-slate-400">{o.body_part}</div>
                   </td>
                   <td className="py-3 px-3">
                     {o.priority && o.priority !== "routine" ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">{o.priority.toUpperCase()}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">{o.priority.toUpperCase()}</span>
                     ) : (
                       <span className="text-graphite-500 dark:text-slate-400">Routine</span>
                     )}
@@ -167,13 +167,13 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
                   <td className="py-3 px-3 text-center">
                     <div className="flex gap-1 justify-center">
                       {["requested", "scheduled"].includes(o.status) && (
-                        <button onClick={() => setStatus(o, "in_progress")} className="px-2 py-1 rounded text-[10px] font-bold bg-warning-500 text-white">Start Scan</button>
+                        <button onClick={() => setStatus(o, "in_progress")} className="px-2 py-1 rounded text-xs font-bold bg-warning-500 text-white">Start Scan</button>
                       )}
                       {o.status === "in_progress" && (
-                        <button onClick={() => setStatus(o, "report_pending")} className="px-2 py-1 rounded text-[10px] font-bold bg-purple-500 text-white">Finish Scan</button>
+                        <button onClick={() => setStatus(o, "report_pending")} className="px-2 py-1 rounded text-xs font-bold bg-purple-500 text-white">Finish Scan</button>
                       )}
                       {o.status === "report_pending" && (
-                        <button onClick={() => setStatus(o, "reported")} className="px-2 py-1 rounded text-[10px] font-bold bg-success-500 text-white flex items-center gap-0.5">
+                        <button onClick={() => setStatus(o, "reported")} className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white flex items-center gap-0.5">
                           <FileText className="h-3 w-3" /> Sign Report
                         </button>
                       )}
