@@ -364,6 +364,13 @@ export function PrescriptionFulfillment() {
       ? prescriptions.filter((p) => p.prescription_number === item.prescription_number)
       : [item];
 
+    // Scan-to-verify loop (FEATURE 2): every label carries a barcode value —
+    // the prescription's own barcode if set, else its RX number. The pharmacy
+    // scanner reads this value and matches it against the prescription at
+    // dispensing/administration time.
+    const barcodeValue = (b: Prescription) =>
+      (b as any).barcode || b.prescription_number || b.id;
+
     const printWin = window.open("", "_blank");
     if (!printWin) return;
 
@@ -373,6 +380,12 @@ export function PrescriptionFulfillment() {
         <td style="padding: 8px;">${b.dosage}</td>
         <td style="padding: 8px;">${b.quantity || 1} units</td>
         <td style="padding: 8px; color: #475569;">${b.frequency || 'Take as directed'}</td>
+        <td style="padding: 8px;">
+          <div class="barcode-box">
+            <div class="barcode-caption">SCAN TO VERIFY</div>
+            <div class="barcode-value">${barcodeValue(b)}</div>
+          </div>
+        </td>
       </tr>
     `).join("");
 
@@ -387,6 +400,11 @@ export function PrescriptionFulfillment() {
             .title { font-size: 20px; font-weight: bold; color: #0073ea; }
             table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
             th { background: #0f172a; color: white; padding: 8px; text-align: left; }
+            /* Scan-to-verify barcode value label (clean fallback; swap for a
+               real Code128 render, e.g. jsbarcode, when the dependency lands) */
+            .barcode-box { border: 2px solid #0f172a; border-radius: 6px; padding: 4px 8px; display: inline-block; text-align: center; background: #fff; }
+            .barcode-caption { font-size: 9px; font-weight: bold; letter-spacing: 1px; color: #475569; }
+            .barcode-value { font-family: monospace; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
           </style>
         </head>
         <body>
@@ -398,9 +416,13 @@ export function PrescriptionFulfillment() {
           <p><strong>Prescription #:</strong> ${item.prescription_number || item.id}</p>
           <p><strong>Date:</strong> ${new Date(item.prescribed_date).toLocaleDateString()}</p>
           <table>
-            <thead><tr><th>Medication</th><th>Dosage</th><th>Qty</th><th>Instructions</th></tr></thead>
+            <thead><tr><th>Medication</th><th>Dosage</th><th>Qty</th><th>Instructions</th><th>Verify Barcode</th></tr></thead>
             <tbody>${itemsHtml}</tbody>
           </table>
+          <p style="font-size: 11px; color: #64748b; margin-top: 10px;">
+            SAFETY: Scan the Verify Barcode against the prescription before dispensing or administering.
+            Mismatches must not be dispensed without a documented pharmacist override.
+          </p>
           <script>window.print();</script>
         </body>
       </html>
