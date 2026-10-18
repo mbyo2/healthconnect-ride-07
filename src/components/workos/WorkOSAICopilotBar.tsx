@@ -45,7 +45,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
             <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
               Doc' O Clock Clinical AI Assistant
               <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-mono font-bold border border-purple-500/20">
-                MedGemma Neural Agent
+                Doc'O Clock AI
               </span>
             </h2>
             <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
