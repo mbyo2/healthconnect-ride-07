@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Activity, Heart, TrendingUp, Users, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Calendar, Activity, Heart, TrendingUp, Users, Clock, AlertCircle, CheckCircle2, Siren } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useHealthData } from '@/hooks/useHealthData';
 import { providerDisplayName } from '@/utils/providerDisplay';
@@ -18,6 +19,8 @@ const AdvancedDashboard = () => {
     const [stepsToday, setStepsToday] = useState(0);
     const [recentActivity, setRecentActivity] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showEmergencyConfirm, setShowEmergencyConfirm] = useState(false);
+    const navigate = useNavigate();
 
     // Fetch health data using the existing hook
     const { vitalsData } = useHealthData(user?.id, '7days');
@@ -224,14 +227,45 @@ const AdvancedDashboard = () => {
                         <p className="text-muted-foreground mt-1">Here's your health overview for today</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                        <Button asChild variant="outline" className="w-full sm:w-auto">
+                        <Button asChild variant="outline" className="w-full sm:w-auto min-h-[44px]">
                             <Link to="/appointments">View All Appointments</Link>
                         </Button>
-                        <Button asChild className="w-full sm:w-auto">
-                            <Link to="/emergency">Emergency</Link>
+                        <Button
+                            variant="outline"
+                            className="w-full sm:w-auto min-h-[44px] border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
+                            onClick={() => setShowEmergencyConfirm(true)}
+                        >
+                            <Siren className="h-4 w-4 mr-1" /> Emergency
                         </Button>
                     </div>
                 </div>
+
+                {/* Emergency confirmation — prevent accidental taps on a high-stakes action */}
+                <Dialog open={showEmergencyConfirm} onOpenChange={setShowEmergencyConfirm}>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <Siren className="h-5 w-5 text-red-500" />
+                                Go to Emergency?
+                            </DialogTitle>
+                            <DialogDescription>
+                                This will take you to the emergency services page. Only continue if you or someone near you needs urgent medical help.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="gap-2">
+                            <Button variant="outline" onClick={() => setShowEmergencyConfirm(false)} className="min-h-[44px]">
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                className="min-h-[44px]"
+                                onClick={() => { setShowEmergencyConfirm(false); navigate('/emergency'); }}
+                            >
+                                <Siren className="h-4 w-4 mr-1" /> Yes, Emergency
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

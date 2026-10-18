@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, Baby, Heart
@@ -15,8 +18,11 @@ import {
 export const MidwifeWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
   const [showANC, setShowANC] = useState(false);
+  const [ancPatientId, setAncPatientId] = useState('');
+  const { patients: ancPatients } = useHospitalPatients(institutionId);
+  const [savingANC, setSavingANC] = useState(false);
   const [anc, setAnc] = useState({
     gestationalAge: '', fundalHeight: '', fetalHeartRate: '', bp: '',
     weight: '', urineProtein: '', hemoglobin: '', notes: ''
@@ -27,9 +33,37 @@ export const MidwifeWorkflow = () => {
     showSuccess({ message: `Opening ${title}...` });
   };
 
-  const saveANC = () => {
-    showSuccess({ message: 'Antenatal visit recorded' });
-    setShowANC(false);
+  const saveANC = async () => {
+    if (!ancPatientId) { toast.error('Select a patient for this ANC visit'); return; }
+    if (!institutionId) { toast.error('No institution selected'); return; }
+    // Parse BP "110/70" into systolic/diastolic
+    const bpMatch = anc.bp.match(/(\d+)\s*\/\s*(\d+)/);
+    const numOrNull = (v: string) => { const n = Number(v); return v.trim() !== '' && Number.isFinite(n) ? n : null; };
+    setSavingANC(true);
+    try {
+      const { error } = await supabase.from('anc_visits').insert({
+        institution_id: institutionId,
+        patient_id: ancPatientId,
+        visit_date: new Date().toISOString().split('T')[0],
+        gestational_age_weeks: numOrNull(anc.gestationalAge),
+        weight_kg: numOrNull(anc.weight),
+        bp_systolic: bpMatch ? parseInt(bpMatch[1], 10) : null,
+        bp_diastolic: bpMatch ? parseInt(bpMatch[2], 10) : null,
+        hemoglobin: numOrNull(anc.hemoglobin),
+        urine_protein: anc.urineProtein || null,
+        fetal_heart_rate: numOrNull(anc.fetalHeartRate),
+        notes: [anc.fundalHeight ? `Fundal height: ${anc.fundalHeight}cm` : null, anc.notes || null].filter(Boolean).join(' | ') || null,
+      });
+      if (error) throw error;
+      showSuccess({ message: 'Antenatal visit recorded' });
+      setShowANC(false);
+      setAncPatientId('');
+      setAnc({ gestationalAge: '', fundalHeight: '', fetalHeartRate: '', bp: '', weight: '', urineProtein: '', hemoglobin: '', notes: '' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save ANC visit');
+    } finally {
+      setSavingANC(false);
+    }
   };
 
   const workflowSteps = [
@@ -85,6 +119,20 @@ export const MidwifeWorkflow = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="anc-patient" className="text-xs font-semibold">Patient *</Label>
+              <select
+                id="anc-patient"
+                value={ancPatientId}
+                onChange={e => setAncPatientId(e.target.value)}
+                className="mt-1 w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Select patient…</option>
+                {ancPatients.map(p => (
+                  <option key={p.id} value={p.id}>{p.full_name || p.email || p.id}</option>
+                ))}
+              </select>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {ancField('Gestational Age (weeks)', 'gestationalAge', '28')}
               {ancField('Fundal Height (cm)', 'fundalHeight', '26')}
@@ -98,7 +146,9 @@ export const MidwifeWorkflow = () => {
               <Label className="text-[11px]">Visit Notes</Label>
               <Input value={anc.notes} onChange={e => setAnc({ ...anc, notes: e.target.value })} placeholder="Findings, advice given, next appointment..." className="mt-1" />
             </div>
-            <Button onClick={saveANC} className="w-full">Save ANC Visit</Button>
+            <Button onClick={saveANC} disabled={savingANC} className="w-full min-h-[44px]">
+              {savingANC ? 'Saving…' : 'Save ANC Visit'}
+            </Button>
           </CardContent>
         </Card>
       )}

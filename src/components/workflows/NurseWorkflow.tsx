@@ -38,9 +38,48 @@ export const NurseWorkflow = () => {
     return v.trim() !== '' && Number.isFinite(n) ? n : null;
   };
 
-  const saveVitals = async () => {
+  // Critical-value thresholds — returns list of human-readable warnings
+  const checkCriticalVitals = (): string[] => {
+    const warnings: string[] = [];
+    const sys = numOrNull(vitals.sys), dia = numOrNull(vitals.dia);
+    const hr = numOrNull(vitals.hr), temp = numOrNull(vitals.temp);
+    const spo2 = numOrNull(vitals.spo2), rr = numOrNull(vitals.rr);
+    const glucose = numOrNull(vitals.glucose);
+    if (spo2 !== null && spo2 < 90) warnings.push(`CRITICAL: SpO₂ ${spo2}% is below 90% — patient may need urgent oxygen/care`);
+    if (spo2 !== null && spo2 > 100) warnings.push(`SpO₂ ${spo2}% is above 100% — check reading`);
+    if (sys !== null && sys < 90) warnings.push(`CRITICAL: Systolic BP ${sys} mmHg is dangerously low`);
+    if (sys !== null && sys > 180) warnings.push(`CRITICAL: Systolic BP ${sys} mmHg is dangerously high`);
+    if (dia !== null && dia > 120) warnings.push(`CRITICAL: Diastolic BP ${dia} mmHg is dangerously high`);
+    if (hr !== null && hr < 40) warnings.push(`CRITICAL: Heart rate ${hr} bpm is dangerously low`);
+    if (hr !== null && hr > 120) warnings.push(`WARNING: Heart rate ${hr} bpm is elevated`);
+    if (hr !== null && hr > 150) warnings.push(`CRITICAL: Heart rate ${hr} bpm is dangerously high`);
+    if (temp !== null && temp < 35) warnings.push(`CRITICAL: Temperature ${temp}°C indicates hypothermia`);
+    if (temp !== null && temp > 39) warnings.push(`WARNING: Temperature ${temp}°C indicates high fever`);
+    if (temp !== null && temp > 41) warnings.push(`CRITICAL: Temperature ${temp}°C is dangerously high`);
+    if (rr !== null && rr < 8) warnings.push(`CRITICAL: Respiratory rate ${rr}/min is dangerously low`);
+    if (rr !== null && rr > 30) warnings.push(`CRITICAL: Respiratory rate ${rr}/min is dangerously high`);
+    if (glucose !== null && glucose < 3.0) warnings.push(`CRITICAL: Blood glucose ${glucose} mmol/L is dangerously low`);
+    if (glucose !== null && glucose > 15) warnings.push(`WARNING: Blood glucose ${glucose} mmol/L is very high`);
+    return warnings;
+  };
+
+  const [criticalWarnings, setCriticalWarnings] = useState<string[]>([]);
+  const [showCriticalConfirm, setShowCriticalConfirm] = useState(false);
+
+  const saveVitals = async (confirmed = false) => {
     if (!vitalsPatientId) { toast.error('Select a patient'); return; }
     if (!user) { toast.error('You must be signed in'); return; }
+    // Patient-safety: flag critical values BEFORE saving
+    if (!confirmed) {
+      const warnings = checkCriticalVitals();
+      if (warnings.length > 0) {
+        setCriticalWarnings(warnings);
+        setShowCriticalConfirm(true);
+        return;
+      }
+    }
+    setShowCriticalConfirm(false);
+    setCriticalWarnings([]);
     const payload = {
       user_id: vitalsPatientId,
       blood_pressure_systolic: numOrNull(vitals.sys),
@@ -235,11 +274,34 @@ export const NurseWorkflow = () => {
               <Textarea value={vitalsNotes} onChange={e => setVitalsNotes(e.target.value)}
                 placeholder="Observation notes…" rows={2} className="mt-1" />
             </div>
+            {showCriticalConfirm && criticalWarnings.length > 0 && (
+              <div className="rounded-xl border-2 border-red-500 bg-red-50 dark:bg-red-950/40 p-4 space-y-2" role="alert">
+                <p className="font-bold text-red-700 dark:text-red-300 text-sm flex items-center gap-2">
+                  ⚠️ Critical vital signs detected
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  {criticalWarnings.map((w, i) => (
+                    <li key={i} className="text-xs text-red-700 dark:text-red-300">{w}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-red-600 dark:text-red-400">
+                  These values may indicate a medical emergency. Verify the readings, escalate per protocol, then confirm to record.
+                </p>
+                <div className="flex gap-2 pt-1">
+                  <Button onClick={() => saveVitals(true)} variant="destructive" className="flex-1 min-h-[44px]">
+                    Confirm — Record Anyway
+                  </Button>
+                  <Button onClick={() => { setShowCriticalConfirm(false); setCriticalWarnings([]); }} variant="outline" className="flex-1 min-h-[44px]">
+                    Re-check Values
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="flex gap-2">
-              <Button onClick={saveVitals} className="flex-1" disabled={savingVitals}>
+              <Button onClick={() => saveVitals(false)} className="flex-1 min-h-[44px]" disabled={savingVitals}>
                 {savingVitals ? 'Saving…' : 'Save Vitals'}
               </Button>
-              <Button onClick={() => setShowVitals(false)} variant="outline" className="flex-1">
+              <Button onClick={() => { setShowVitals(false); setShowCriticalConfirm(false); setCriticalWarnings([]); }} variant="outline" className="flex-1 min-h-[44px]">
                 Cancel
               </Button>
             </div>

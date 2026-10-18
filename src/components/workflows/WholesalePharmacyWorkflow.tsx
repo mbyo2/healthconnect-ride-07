@@ -11,6 +11,10 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
@@ -57,6 +61,8 @@ export const WholesalePharmacyWorkflow = () => {
   const [showTierDialog, setShowTierDialog] = useState(false);
   const [tierForm, setTierForm] = useState({ product_name: '', min_quantity: '10', unit_price: '' });
   const [expandedOrder, setExpandedOrder] = useState<WholesaleOrder | null>(null);
+  const [declineTarget, setDeclineTarget] = useState<WholesaleOrder | null>(null);
+  const [tierDeleteTarget, setTierDeleteTarget] = useState<PriceTier | null>(null);
 
   const pharmacyId = institution?.id;
 
@@ -274,7 +280,7 @@ export const WholesalePharmacyWorkflow = () => {
                             <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Mark {next}
                           </Button>
                           {o.status === 'pending' && (
-                            <Button size="sm" variant="ghost" onClick={() => advanceOrder.mutate({ id: o.id, status: 'cancelled' })}>
+                            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeclineTarget(o)}>
                               <XCircle className="h-3.5 w-3.5 mr-1.5" /> Decline
                             </Button>
                           )}
@@ -359,7 +365,7 @@ export const WholesalePharmacyWorkflow = () => {
                       <p className="text-sm font-semibold truncate">{t.product_name}</p>
                       <p className="text-xs text-muted-foreground">{t.min_quantity}+ units · {formatPrice(Number(t.unit_price))}/unit</p>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => deleteTier.mutate(t.id)}>
+                    <Button size="icon" variant="ghost" onClick={() => setTierDeleteTarget(t)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </CardContent>
@@ -400,6 +406,64 @@ export const WholesalePharmacyWorkflow = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Decline (cancel) a B2B order — financial impact, requires confirmation */}
+      <AlertDialog open={declineTarget !== null} onOpenChange={(open) => !open && setDeclineTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Decline order {declineTarget?.order_number}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel a bulk order worth{' '}
+              {declineTarget ? formatPrice(Number(declineTarget.total_amount)) : '—'} (
+              {declineTarget?.items.length ?? 0} line items). The buyer will not be able to proceed
+              with this order, and you will need to create a new order to trade again.
+              This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={advanceOrder.isPending}
+              onClick={() => {
+                if (declineTarget) advanceOrder.mutate({ id: declineTarget.id, status: 'cancelled' });
+                setDeclineTarget(null);
+              }}
+            >
+              Decline Order
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Remove a volume price tier — buyers lose the discount, requires confirmation */}
+      <AlertDialog open={tierDeleteTarget !== null} onOpenChange={(open) => !open && setTierDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove price tier?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the volume discount for{' '}
+              {tierDeleteTarget?.product_name ?? 'this product'} (
+              {tierDeleteTarget?.min_quantity}+ units at{' '}
+              {tierDeleteTarget ? formatPrice(Number(tierDeleteTarget.unit_price)) : '—'}/unit).
+              Buyers will no longer see this tier when placing bulk orders.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteTier.isPending}
+              onClick={() => {
+                if (tierDeleteTarget) deleteTier.mutate(tierDeleteTarget.id);
+                setTierDeleteTarget(null);
+              }}
+            >
+              Remove Tier
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

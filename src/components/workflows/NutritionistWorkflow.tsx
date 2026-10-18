@@ -8,6 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, Apple, Scale
@@ -16,13 +20,52 @@ import {
 export const NutritionistWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
+  const { user } = useAuth();
   const [showPlan, setShowPlan] = useState(false);
+  const [planPatientId, setPlanPatientId] = useState('');
+  const { patients: planPatients } = useHospitalPatients(institutionId);
+  const [savingPlan, setSavingPlan] = useState(false);
   const [plan, setPlan] = useState({ bmi: '', calories: '', breakfast: '', lunch: '', dinner: '', snacks: '', notes: '' });
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
     showSuccess({ message: `Opening ${title}...` });
+  };
+
+  const saveDietPlan = async () => {
+    if (!planPatientId) { toast.error('Select a patient for this diet plan'); return; }
+    if (!user) { toast.error('You must be signed in'); return; }
+    setSavingPlan(true);
+    try {
+      const instructions = [
+        plan.breakfast ? `Breakfast: ${plan.breakfast}` : null,
+        plan.lunch ? `Lunch: ${plan.lunch}` : null,
+        plan.dinner ? `Dinner: ${plan.dinner}` : null,
+        plan.snacks ? `Snacks: ${plan.snacks}` : null,
+        plan.notes ? `Notes: ${plan.notes}` : null,
+      ].filter(Boolean).join('\n');
+      const { error } = await supabase.from('diet_plans').insert({
+        hospital_id: institutionId || null,
+        patient_id: planPatientId,
+        prescribed_by: user.id,
+        diet_type: 'Regular',
+        calories_per_day: plan.calories ? parseInt(plan.calories, 10) : null,
+        meal_frequency: 3,
+        instructions: instructions || null,
+        status: 'active',
+        start_date: new Date().toISOString().split('T')[0],
+      });
+      if (error) throw error;
+      showSuccess({ message: 'Diet plan saved' });
+      setShowPlan(false);
+      setPlanPatientId('');
+      setPlan({ bmi: '', calories: '', breakfast: '', lunch: '', dinner: '', snacks: '', notes: '' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save diet plan');
+    } finally {
+      setSavingPlan(false);
+    }
   };
 
   const workflowSteps = [
@@ -64,6 +107,20 @@ export const NutritionistWorkflow = () => {
         <Card className="border-primary-200">
           <CardHeader><CardTitle className="flex items-center gap-2"><Apple className="h-5 w-5 text-primary-500" />Diet Plan Builder</CardTitle></CardHeader>
           <CardContent className="space-y-3">
+            <div>
+              <Label htmlFor="plan-patient" className="text-xs font-semibold">Patient *</Label>
+              <select
+                id="plan-patient"
+                value={planPatientId}
+                onChange={e => setPlanPatientId(e.target.value)}
+                className="mt-1 w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Select patient…</option>
+                {planPatients.map(p => (
+                  <option key={p.id} value={p.id}>{p.full_name || p.email || p.id}</option>
+                ))}
+              </select>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-[11px]">BMI</Label><Input value={plan.bmi} onChange={e => setPlan({...plan, bmi: e.target.value})} placeholder="24.5" className="mt-1" /></div>
               <div><Label className="text-[11px]">Daily Calories (kcal)</Label><Input value={plan.calories} onChange={e => setPlan({...plan, calories: e.target.value})} placeholder="2000" className="mt-1" /></div>
@@ -71,7 +128,9 @@ export const NutritionistWorkflow = () => {
             <div><Label className="text-[11px]">Breakfast</Label><Textarea value={plan.breakfast} onChange={e => setPlan({...plan, breakfast: e.target.value})} placeholder="Oatmeal with fruits..." className="mt-1" rows={2} /></div>
             <div><Label className="text-[11px]">Lunch</Label><Textarea value={plan.lunch} onChange={e => setPlan({...plan, lunch: e.target.value})} placeholder="Grilled chicken salad..." className="mt-1" rows={2} /></div>
             <div><Label className="text-[11px]">Dinner</Label><Textarea value={plan.dinner} onChange={e => setPlan({...plan, dinner: e.target.value})} placeholder="Fish with vegetables..." className="mt-1" rows={2} /></div>
-            <Button onClick={() => { showSuccess({ message: 'Diet plan saved' }); setShowPlan(false); }} className="w-full">Save Diet Plan</Button>
+            <Button onClick={saveDietPlan} disabled={savingPlan} className="w-full min-h-[44px]">
+              {savingPlan ? 'Saving…' : 'Save Diet Plan'}
+            </Button>
           </CardContent>
         </Card>
       )}

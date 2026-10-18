@@ -99,6 +99,14 @@ export const OTStaffWorkflow = () => {
 
   const updateStatus = async (id: string, status: string) => {
     try {
+      // PATIENT SAFETY: never start surgery without signed informed consent
+      if (status === 'in_progress') {
+        const surgery = surgeries.find(s => s.id === id);
+        if (!surgery?.consent_signed) {
+          toast.error('Cannot start surgery — informed consent has not been signed. Obtain and record consent first.', { duration: 6000 });
+          return;
+        }
+      }
       const updates: any = { status };
       if (status === 'in_progress') updates.started_at = new Date().toISOString();
       if (status === 'completed') updates.completed_at = new Date().toISOString();
@@ -207,11 +215,24 @@ export const OTStaffWorkflow = () => {
                     <div>
                       <p className="font-medium">{s.patient_name} — {s.procedure_name}</p>
                       <p className="text-sm text-muted-foreground">{s.ot_room} • {s.scheduled_time} • Dr. {s.surgeon_name} • {s.anaesthesia_type}</p>
+                      {!s.consent_signed && s.status === 'scheduled' && (
+                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mt-1 flex items-center gap-1">
+                          ⚠️ Informed consent not signed — surgery cannot start
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className={statusColor(s.status)}>{s.status}</Badge>
                       {s.status === 'scheduled' && (
-                        <Button size="sm" variant="outline" onClick={() => updateStatus(s.id, 'in_progress')}>Start</Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="min-h-[44px]"
+                          title={s.consent_signed ? 'Start surgery' : 'Blocked: informed consent not signed'}
+                          onClick={() => updateStatus(s.id, 'in_progress')}
+                        >
+                          Start
+                        </Button>
                       )}
                       {s.status === 'in_progress' && (
                         <Button size="sm" onClick={() => updateStatus(s.id, 'completed')}>Complete</Button>

@@ -8,6 +8,10 @@ import { exportPayslipPDF } from "@/utils/pdfExport";
 import { useCurrency } from "@/hooks/use-currency";
 import { calculateZambiaPayroll } from "@/utils/zambiaPayroll";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: "Annual Leave",
@@ -29,10 +33,12 @@ export const HRManagerWorkflow = () => {
     todayAttendance,
     createLeaveRequest,
     approveLeave,
+    refetch,
   } = useHRModule();
   const { currency } = useCurrency();
   const [activeTab, setActiveTab] = useState("leaves");
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+  const [rejectTarget, setRejectTarget] = useState<LeaveRequest | null>(null);
   const [creating, setCreating] = useState(false);
   const [leaveForm, setLeaveForm] = useState({
     leave_type: "annual" as LeaveRequest["leave_type"],
@@ -61,6 +67,21 @@ export const HRManagerWorkflow = () => {
       default:
         return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending Review</span>;
     }
+  };
+
+  const getAttendancePill = (status: string) => {
+    const styles: Record<string, string> = {
+      present: "bg-success-500",
+      late: "bg-warning-500",
+      absent: "bg-error-500",
+      half_day: "bg-slate-400",
+      on_leave: "bg-slate-400",
+    };
+    return (
+      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${styles[status] || "bg-slate-400"}`}>
+        {status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+      </span>
+    );
   };
 
   return (
@@ -234,7 +255,7 @@ export const HRManagerWorkflow = () => {
                             Approve
                           </button>
                           <button
-                            onClick={() => approveLeave(l.id, false)}
+                            onClick={() => setRejectTarget(l)}
                             className="px-2.5 py-1 rounded-md bg-error-500 text-white text-[11px] font-bold"
                           >
                             Reject
@@ -246,6 +267,53 @@ export const HRManagerWorkflow = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "attendance" && (
+        <div className="space-y-4">
+          <BulkAttendanceImport onComplete={refetch} />
+          <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+            <div className="px-4 py-3 border-b border-canvas-silk">
+              <h3 className="font-extrabold text-sm">Today's Attendance ({todayAttendance.length})</h3>
+              <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium">Clock-in records for today</p>
+            </div>
+            {todayAttendance.length === 0 ? (
+              <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                <Clock className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                No attendance records for today yet.
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                      <th className="py-2.5 px-4">Staff</th>
+                      <th className="py-2.5 px-3 text-center">Status</th>
+                      <th className="py-2.5 px-3">Clock In</th>
+                      <th className="py-2.5 px-3">Clock Out</th>
+                      <th className="py-2.5 px-3">Hours</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-canvas-silk">
+                    {todayAttendance.map((a) => (
+                      <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                          Staff ({a.staff_id.slice(0, 8)})
+                        </td>
+                        <td className="py-3 px-3 text-center">{getAttendancePill(a.status)}</td>
+                        <td className="py-3 px-3 font-mono font-semibold">{a.clock_in || "—"}</td>
+                        <td className="py-3 px-3 font-mono font-semibold">{a.clock_out || "—"}</td>
+                        <td className="py-3 px-3 font-mono font-semibold">
+                          {a.hours_worked != null ? `${a.hours_worked}h` : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -303,6 +371,42 @@ export const HRManagerWorkflow = () => {
           })}
         </div>
       )}
+      {/* Reject a leave request — denies time off, requires confirmation */}
+      <AlertDialog open={rejectTarget !== null} onOpenChange={(open) => !open && setRejectTarget(null)}>
+        <AlertDialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-extrabold text-base">Reject leave request?</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              You are about to reject this leave request. The staff member will be denied the time off
+              and will need to submit a new request if they still need it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {rejectTarget && (
+            <div className="rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 p-3 text-xs space-y-1.5">
+              <p><span className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Type: </span>
+                <span className="font-bold">{LEAVE_TYPE_LABELS[rejectTarget.leave_type] || rejectTarget.leave_type}</span></p>
+              <p><span className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Duration: </span>
+                <span className="font-bold font-mono">
+                  {format(new Date(rejectTarget.start_date), "MMM d, yyyy")} → {format(new Date(rejectTarget.end_date), "MMM d, yyyy")}
+                </span></p>
+              <p><span className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reason: </span>
+                <span className="font-medium">{rejectTarget.reason || "—"}</span></p>
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-error-500 text-white hover:bg-error-600"
+              onClick={() => {
+                if (rejectTarget) approveLeave(rejectTarget.id, false);
+                setRejectTarget(null);
+              }}
+            >
+              Reject Request
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

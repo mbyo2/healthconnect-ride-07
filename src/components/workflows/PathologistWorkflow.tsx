@@ -6,7 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Microscope, Activity, ClipboardList, CheckCircle, Loader2, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Microscope, Activity, ClipboardList, CheckCircle, Loader2, Eye, AlertTriangle } from 'lucide-react';
 import { usePathologistReviews } from '@/hooks/usePathologistReviews';
 import { DigitalSlideViewer } from '@/components/pathology/DigitalSlideViewer';
 
@@ -16,10 +17,19 @@ export const PathologistWorkflow = () => {
   const [findings, setFindings] = useState('');
   const [significance, setSignificance] = useState('normal');
   const [showSlideViewer, setShowSlideViewer] = useState(false);
+  const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
 
   const selectedReport = reviews.find(r => r.id === selectedId);
 
   const releasedToday = released.filter(r => r.released_at?.startsWith(new Date().toISOString().split('T')[0]));
+
+  const handleConfirmRelease = () => {
+    if (!selectedReport) return;
+    signOff(selectedReport.id, findings, significance);
+    setShowReleaseConfirm(false);
+    setSelectedId(null);
+    setFindings('');
+  };
 
   return (
     <div className="space-y-6">
@@ -55,13 +65,40 @@ export const PathologistWorkflow = () => {
               <Textarea value={findings} onChange={e => setFindings(e.target.value)} rows={4} placeholder="Clinical interpretation, findings, recommendations..." />
             </div>
             <div className="flex gap-2">
-              <Button className="gap-1" onClick={() => { signOff(selectedReport.id, findings, significance); setSelectedId(null); setFindings(''); }}><CheckCircle className="h-4 w-4" /> Sign Off & Release</Button>
-              <Button variant="destructive" onClick={() => { flagCritical(selectedReport.id); setSelectedId(null); }}>Flag Critical</Button>
-              <Button variant="ghost" onClick={() => setSelectedId(null)}>Cancel</Button>
+              <Button className="gap-1 min-h-[44px]" onClick={() => setShowReleaseConfirm(true)}><CheckCircle className="h-4 w-4" /> Sign Off & Release</Button>
+              <Button variant="destructive" className="min-h-[44px]" onClick={() => { flagCritical(selectedReport.id); setSelectedId(null); }}>Flag Critical</Button>
+              <Button variant="ghost" className="min-h-[44px]" onClick={() => setSelectedId(null)}>Cancel</Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Release confirmation — publishing a clinical report cannot be undone */}
+      <Dialog open={showReleaseConfirm} onOpenChange={setShowReleaseConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Release this lab report?
+            </DialogTitle>
+            <DialogDescription>
+              You are about to sign off and release the report for{' '}
+              <strong>{selectedReport?.patient_name}</strong> — {selectedReport?.test_name}
+              {' '}({selectedReport?.result_value || 'no result recorded'}).
+              <br /><br />
+              Once released, this report becomes visible to the care team and the patient. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowReleaseConfirm(false)} className="min-h-[44px]">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmRelease} className="min-h-[44px]">
+              <CheckCircle className="h-4 w-4 mr-1" /> Confirm & Release
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Tabs defaultValue="queue">
         <TabsList>

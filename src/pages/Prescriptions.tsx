@@ -931,7 +931,7 @@ export const Prescriptions = () => {
                             </span>
                           )}
                           {p.instructions && (
-                            <div className="text-[10px] text-graphite-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
+                            <div className="text-xs text-graphite-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
                               {p.instructions}
                             </div>
                           )}
@@ -943,9 +943,9 @@ export const Prescriptions = () => {
                         </td>
 
                         {/* Dosage */}
-                        <td className="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                        <td className="py-3 px-3 font-semibold text-sm text-slate-800 dark:text-slate-200">
                           <div>{p.dosage}</div>
-                          <div className="text-[10px] text-slate-400">Qty: {p.quantity || 1} • {p.duration_days ? `${p.duration_days} days` : "As directed"}</div>
+                          <div className="text-xs text-slate-400">Qty: {p.quantity || 1} • {p.duration_days ? `${p.duration_days} days` : "As directed"}</div>
                         </td>
 
                         {/* Prescriber/Patient */}
