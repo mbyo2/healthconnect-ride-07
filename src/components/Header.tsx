@@ -15,6 +15,7 @@ import {
 import { Menu, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CurrencyToggle } from "@/components/CurrencyToggle";
+import { LanguageSelector } from "@/i18n/LanguageSelector";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -76,6 +77,7 @@ export function Header() {
 
           <CurrencyToggle />
           <ThemeToggle />
+          <LanguageSelector />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
