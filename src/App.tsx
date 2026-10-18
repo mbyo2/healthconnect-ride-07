@@ -65,6 +65,7 @@ const ProviderDashboard = lazyWithRetry(() => import('@/pages/ProviderDashboard'
 const SuperAdminDashboard = lazyWithRetry(() => import('@/pages/SuperAdminDashboard'));
 const HealthcareApplication = lazyWithRetry(() => import('@/pages/HealthcareApplication'));
 const PharmacyInventory = lazyWithRetry(() => import('@/pages/PharmacyInventory'));
+const PharmacyVerify = lazyWithRetry(() => import('@/pages/PharmacyVerify'));
 const Terms = lazyWithRetry(() => import('@/pages/Terms'));
 const Privacy = lazyWithRetry(() => import('@/pages/Privacy'));
 const About = lazyWithRetry(() => import('@/pages/About'));
@@ -275,6 +276,8 @@ const AppContent = () => {
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
             <Route path="/shared-equipment" element={<RouteGuard><SharedEquipment /></RouteGuard>} />
             <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
+            {/* Scan-to-verify barcode check at dispensing/administration (patient safety) */}
+            <Route path="/pharmacy-verify" element={<RouteGuard><PharmacyVerify /></RouteGuard>} />
             {/* Legacy path: old bookmarks/links to the pharmacy Rx view land here */}
             <Route path="/pharmacy-rx" element={<Navigate to="/prescriptions" replace />} />
             <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />

@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Package, Pill, ShoppingCart, FileText, Truck, Settings,
   BarChart3, Users, Shield, AlertTriangle, Wallet, ClipboardList,
-  Megaphone, CreditCard, BookOpen, ChevronRight
+  Megaphone, CreditCard, BookOpen, ChevronRight, ScanLine
 } from 'lucide-react';
 
 interface ActionItem {
@@ -93,6 +93,7 @@ export const PharmacistWorkflow = () => {
       title: 'Dispensing',
       primary: { title: 'Dispense Prescriptions', description: 'Process Rx with allergy & interaction checks', icon: icon(FileText), route: '/prescriptions' },
       secondary: [
+        { title: 'Verify Medication', description: 'Scan-to-verify barcode check before dispensing', icon: icon(ScanLine), route: '/pharmacy-verify' },
         { title: 'Drug Interaction Checker', description: 'Real-time interaction & contraindication alerts', icon: icon(Shield), route: '/prescriptions' },
         { title: 'Controlled Substances', description: 'Schedule tracking & compliance logs', icon: icon(ClipboardList), route: '/pharmacy-inventory' },
         { title: 'Insurance Verification', description: 'Verify patient insurance for Rx', icon: icon(CreditCard), route: '/prescriptions' },

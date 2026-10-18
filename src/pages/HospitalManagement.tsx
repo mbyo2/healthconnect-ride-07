@@ -29,6 +29,10 @@ import { ReportCenter } from "@/components/reports/ReportCenter";
 import { PatientQueue } from "@/components/hospital/PatientQueue";
 import { ReferralManagement } from "@/components/hospital/ReferralManagement";
 import { BloodBank } from "@/components/hospital/BloodBank";
+import { CampManagement } from "@/components/hospital/CampManagement";
+import { IndentManagement } from "@/components/hospital/IndentManagement";
+import { ARTModule } from "@/components/hospital/ARTModule";
+import { EmailCampaigns } from "@/components/hospital/EmailCampaigns";
 import { CSSDManagement } from "@/components/hospital/CSSDManagement";
 import { DietManagement } from "@/components/hospital/DietManagement";
 import { InfectionManagement } from "@/components/clinical/InfectionManagement";
@@ -55,6 +59,8 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "radiology", label: "Radiology" },
   { val: "pharmacy", label: "Pharmacy POS" },
   { val: "bloodbank", label: "Blood Bank" },
+  { val: "camps", label: "Health Camps" },
+  { val: "indents", label: "Indents" },
   { val: "beds", label: "Bed Wards" },
   { val: "departments", label: "Departments" },
   { val: "billing", label: "Billing" },
@@ -65,6 +71,8 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "discharge", label: "Discharge" },
   { val: "staff", label: "Staff Roster" },
   { val: "mis", label: "MIS Reports" },
+  { val: "art", label: "Fertility" },
+  { val: "campaigns", label: "Campaigns" },
 ];
 
 export const HospitalManagement = () => {
@@ -315,6 +323,8 @@ export const HospitalManagement = () => {
             <TabsContent value="radiology">{mod("radiology", <RadiologyImaging hospital={hospital} />)}</TabsContent>
             <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>
             <TabsContent value="bloodbank">{mod("bloodbank", <BloodBank hospital={hospital} />)}</TabsContent>
+            <TabsContent value="camps">{mod("camps", <CampManagement hospital={hospital} />)}</TabsContent>
+            <TabsContent value="indents">{mod("indents", <IndentManagement hospital={hospital} departments={departments} />)}</TabsContent>
             <TabsContent value="beds">{mod("beds", <BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="departments">
               <DepartmentManagement hospital={hospital} departments={departments} onRefresh={refreshAll} />
@@ -327,6 +337,8 @@ export const HospitalManagement = () => {
             <TabsContent value="discharge">{mod("discharge", <DischargeSummary hospital={hospital} admissions={admissions} />)}</TabsContent>
             <TabsContent value="staff">{mod("staff", <StaffRoster hospital={hospital} departments={departments} />)}</TabsContent>
             <TabsContent value="mis">{mod("mis", <ReportCenter hospital={hospital} />)}</TabsContent>
+            <TabsContent value="art">{mod("art", <ARTModule hospital={hospital} />)}</TabsContent>
+            <TabsContent value="campaigns">{mod("campaigns", <EmailCampaigns hospital={hospital} />)}</TabsContent>
 
           </div>
         </Tabs>

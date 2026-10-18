@@ -44,12 +44,16 @@ export const HMS_MODULES = [
   'pharmacy',
   'bloodbank',
   'beds',
+  'camps',
+  'indents',
   'billing',
   'tariffs',
   'insurance',
   'discharge',
   'staff',
   'mis',
+  'art',
+  'campaigns',
 ] as const;
 
 export type HmsModule = (typeof HMS_MODULES)[number];
@@ -686,6 +690,8 @@ export const TAB_TO_HMS_MODULE: Record<string, HmsModule> = {
   procedures: 'emr',
   lis_ris: 'lab',
   bloodbank: 'bloodbank',
+  camps: 'camps',
+  indents: 'indents',
   fhir: 'mis',
   rcm: 'insurance',
   governance: 'staff',
@@ -708,6 +714,8 @@ export const TAB_TO_HMS_MODULE: Record<string, HmsModule> = {
   discharge: 'discharge',
   mis: 'mis',
   notifications: 'notifications',
+  art: 'art',
+  campaigns: 'campaigns',
 };
 
 /** Relevance of an InstitutionDashboard tab for a facility type. */
@@ -763,12 +771,16 @@ const HMS_MODULE_LABELS: Record<HmsModule, string> = {
   pharmacy: 'Pharmacy',
   bloodbank: 'Blood Bank',
   beds: 'Bed Management',
+  camps: 'Health Camp Outreach',
+  indents: 'Indent Management',
   billing: 'Billing',
   tariffs: 'Tariffs & Pricing',
   insurance: 'Insurance',
   discharge: 'Discharge',
   staff: 'Staff Management',
   mis: 'MIS & Reports',
+  art: 'Fertility (ART/IVF)',
+  campaigns: 'Email Campaigns',
 };
 
 export function archetypeToCharter(

@@ -12,6 +12,7 @@ import { DollarSign, FileText, CreditCard, BarChart3, Receipt, Shield, Loader2, 
 import { useBillingModule, BillingInvoice } from "@/hooks/useBillingModule";
 import { format } from "date-fns";
 import { InsuranceClaimWorkflow } from "@/components/billing/InsuranceClaimWorkflow";
+import { DenialWorkqueue } from "@/components/billing/DenialWorkqueue";
 import { MultiCountryAccounting } from "@/components/accounting/MultiCountryAccounting";
 import { exportInvoicePDF } from "@/utils/pdfExport";
 import { useCurrency } from "@/hooks/use-currency";
@@ -515,6 +516,9 @@ export const BillingStaffWorkflow = () => {
           <TabsTrigger value="tpa" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             TPA Workflow
           </TabsTrigger>
+          <TabsTrigger value="denials" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            Denials
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="invoices" className="space-y-3 mt-4">
@@ -561,6 +565,10 @@ export const BillingStaffWorkflow = () => {
 
         <TabsContent value="tpa" className="mt-4">
           <InsuranceClaimWorkflow />
+        </TabsContent>
+
+        <TabsContent value="denials" className="mt-4">
+          <DenialWorkqueue />
         </TabsContent>
       </Tabs>
     </div>

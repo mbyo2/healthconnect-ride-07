@@ -14,6 +14,7 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [marketingOptOut, setMarketingOptOut] = useState(false);
   const [smsReminders, setSmsReminders] = useState(false);
   const [twoFactor, setTwoFactor] = useState(false);
 
@@ -88,6 +89,12 @@ const Settings = () => {
           setTimezone((userSettings as any).timezone || "UTC");
           setDateFormat((userSettings as any).date_format || "MM/DD/YYYY");
         }
+
+        const { data: profile } = await (supabase.from("profiles" as any) as any)
+          .select("email_marketing_opt_out")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (profile) setMarketingOptOut(profile.email_marketing_opt_out ?? false);
       } catch (error) {
         console.error("Error fetching settings:", error);
       } finally {
@@ -144,6 +151,23 @@ const Settings = () => {
       showSuccess({ message: `Email notifications ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update email settings");
+    }
+  };
+
+  const handleMarketingToggle = async (checked: boolean) => {
+    // checked = user wants marketing emails; opt_out is the inverse
+    setMarketingOptOut(!checked);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await (supabase.from("profiles" as any) as any)
+        .update({ email_marketing_opt_out: !checked })
+        .eq("id", user.id);
+      if (error) throw error;
+      showSuccess({ message: checked ? "Marketing emails enabled" : "You won't receive marketing emails" });
+    } catch (error) {
+      toast.error("Failed to update marketing preferences");
+      setMarketingOptOut(checked);
     }
   };
 
@@ -324,6 +348,13 @@ const Settings = () => {
                   <p className="text-xs text-graphite-600 dark:text-slate-300">Consultation receipts and appointment confirmations</p>
                 </div>
                 <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} aria-label="Email broadcasts"  className="scale-125" />
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                <div>
+                  <p className="font-bold text-xs">Health campaigns & tips</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Screening reminders and health tips from your facility</p>
+                </div>
+                <Switch checked={!marketingOptOut} onCheckedChange={handleMarketingToggle} aria-label="Health campaigns and tips" className="scale-125" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
