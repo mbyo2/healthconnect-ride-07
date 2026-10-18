@@ -4,6 +4,7 @@ import { Tent, Users, UserPlus, ClipboardCheck, CalendarClock, BarChart3, Plus, 
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -31,7 +32,9 @@ const fmtDate = (d: string | null) => {
   try { return new Date(d + (d.length === 10 ? "T00:00:00" : "")).toLocaleDateString(); } catch { return d; }
 };
 
-export const CampManagement = ({ hospital }: { hospital: any }) => {
+export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) => {
+  const { institution } = useInstitutionContext();
+  const hospital = hospitalProp || institution;
   const [activeTab, setActiveTab] = useState<"camps" | "registrations" | "followups" | "reports">("camps");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewCamp, setShowNewCamp] = useState(false);

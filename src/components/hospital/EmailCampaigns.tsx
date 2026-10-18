@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail, Plus, Loader2, Send, Eye, BarChart3, Users } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 
 const getStatusPill = (status: string) => {
@@ -28,7 +29,9 @@ interface Audience {
   last_visit_before: string;
 }
 
-export const EmailCampaigns = ({ hospital }: { hospital: any }) => {
+export const EmailCampaigns = ({ hospital: hospitalProp }: { hospital?: any }) => {
+  const { institution } = useInstitutionContext();
+  const hospital = hospitalProp || institution;
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<any | null>(null);

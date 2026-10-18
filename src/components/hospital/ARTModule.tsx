@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Baby, Plus, Loader2, ShieldAlert, ChevronRight, CalendarDays, UserPlus, FileText } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 
 const CYCLE_TYPES = ["IVF", "IUI", "ICSI", "FET"];
@@ -34,7 +35,9 @@ const getStagePill = (status: string) => {
   return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-blue-600">{STAGE_LABELS[status] || status}</span>;
 };
 
-export const ARTModule = ({ hospital }: { hospital: any }) => {
+export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
+  const { institution } = useInstitutionContext();
+  const hospital = hospitalProp || institution;
   const [cycles, setCycles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCycle, setSelectedCycle] = useState<any | null>(null);

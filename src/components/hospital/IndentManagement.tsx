@@ -4,6 +4,7 @@ import { ClipboardList, Hourglass, Siren, PackageCheck, History, Plus, Loader2, 
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { DepartmentSelect } from "@/components/hospital/DepartmentSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -32,7 +33,9 @@ interface ItemRow { item_name: string; quantity_requested: string; unit: string;
 
 const blankItem = (): ItemRow => ({ item_name: "", quantity_requested: "1", unit: "units", notes: "" });
 
-export const IndentManagement = ({ hospital, departments }: { hospital: any; departments?: any[] }) => {
+export const IndentManagement = ({ hospital: hospitalProp, departments }: { hospital?: any; departments?: any[] }) => {
+  const { institution } = useInstitutionContext();
+  const hospital = hospitalProp || institution;
   const [activeTab, setActiveTab] = useState<"raise" | "queue" | "history">("queue");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showReject, setShowReject] = useState(false);
