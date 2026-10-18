@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
+import LocalisationTaxCard from "@/components/settings/LocalisationTaxCard";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -893,6 +894,9 @@ const InstitutionSettings = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* ── Localisation & Tax Settings ── */}
+        {institution?.id && <LocalisationTaxCard institutionId={institution.id} />}
 
         {/* ── Save ── */}
         <Button type="submit" disabled={saving} className="w-full md:w-auto vf-btn-primary">
