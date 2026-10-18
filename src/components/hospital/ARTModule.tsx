@@ -385,3 +385,5 @@ export const ARTModule = ({ hospital }: { hospital: any }) => {
     </div>
   );
 };
+
+export default ARTModule;

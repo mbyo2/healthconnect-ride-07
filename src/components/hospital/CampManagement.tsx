@@ -588,3 +588,5 @@ export const CampManagement = ({ hospital }: { hospital: any }) => {
     </div>
   );
 };
+
+export default CampManagement;

@@ -454,3 +454,5 @@ export const IndentManagement = ({ hospital, departments }: { hospital: any; dep
     </div>
   );
 };
+
+export default IndentManagement;

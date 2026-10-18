@@ -320,3 +320,5 @@ export const EmailCampaigns = ({ hospital }: { hospital: any }) => {
     </div>
   );
 };
+
+export default EmailCampaigns;
