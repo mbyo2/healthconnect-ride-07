@@ -519,7 +519,7 @@ export const ProviderDashboard = () => {
     prescriptions: "/prescriptions",
     patients: "/institution/patients",
     schedule: "/provider-calendar",
-    billing: "/billing",
+    billing: "/wallet",
     dispense: "/pharmacy-portal",
     test_queue: "/lab-management",
     lab_orders: "/lab-orders",

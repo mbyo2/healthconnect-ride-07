@@ -260,7 +260,14 @@ const IoTMonitoring = () => {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="time" fontSize={11} />
                   <YAxis fontSize={11} />
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'var(--card)', 
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      color: 'var(--foreground)'
+                    }} 
+                  />
                   <Line type="monotone" dataKey="value" stroke="#397DFF" strokeWidth={3} dot={{ r: 3, fill: "#397DFF" }} />
                 </LineChart>
               </ResponsiveContainer>
