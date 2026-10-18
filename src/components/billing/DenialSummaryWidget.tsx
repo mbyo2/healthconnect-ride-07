@@ -12,7 +12,7 @@ interface DenialRow {
   denied_amount: number;
   denial_reason: string;
   appeal_deadline: string | null;
-  insurance_claims?: { patient_name?: string | null; claim_number?: string | null } | null;
+  insurance_claims?: { patient_name?: string | null; policy_number?: string | null } | null;
 }
 
 const OPEN_STATUSES = ['new', 'in_review', 'appealed'];
@@ -33,7 +33,7 @@ export const DenialSummaryWidget: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('claim_denials')
-        .select('id, status, denied_amount, denial_reason, appeal_deadline, insurance_claims ( patient_name, claim_number )')
+        .select('id, status, denied_amount, denial_reason, appeal_deadline, insurance_claims ( patient_name, policy_number )')
         .eq('institution_id', institutionId)
         .limit(500);
 

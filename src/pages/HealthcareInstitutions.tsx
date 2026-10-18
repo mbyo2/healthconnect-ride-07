@@ -99,6 +99,7 @@ export const HealthcareInstitutions = () => {
           accreditation_body
         `)
         .eq('list_in_marketplace', true)
+        .eq('payment_mode', 'platform')
         .eq('is_verified', true)
         .order('created_at', { ascending: false })
         .limit(60);

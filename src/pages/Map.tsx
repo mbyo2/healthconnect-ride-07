@@ -49,7 +49,8 @@ const MapPage = () => {
               accreditation_body
             `)
             .eq('is_verified', true)
-            .eq('list_in_marketplace', true),   // only marketplace-listed institutions
+            .eq('list_in_marketplace', true)   // only marketplace-listed institutions
+            .eq('payment_mode', 'platform'),   // HMS-only ('own') institutions never appear on the map
         ]);
       if (dirErr) throw dirErr;
       if (instErr) throw instErr;

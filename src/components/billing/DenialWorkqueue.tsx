@@ -36,7 +36,7 @@ interface ClaimDenial {
   resolved_at: string | null;
   updated_at: string;
   insurance_claims?: {
-    claim_number: string | null;
+    policy_number: string | null;
     patient_name: string | null;
     insurance_provider: string | null;
     denied?: boolean;
@@ -45,11 +45,11 @@ interface ClaimDenial {
 
 interface DeniedClaimOption {
   id: string;
-  claim_number: string;
+  policy_number: string;
   patient_name: string;
   insurance_provider: string;
-  claimed_amount: number;
-  denial_reason: string | null;
+  claim_amount: number;
+  rejection_reason: string | null;
 }
 
 interface StaffOption {
@@ -131,7 +131,7 @@ export const DenialWorkqueue: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('claim_denials')
-        .select('*, insurance_claims ( claim_number, patient_name, insurance_provider )')
+        .select('*, insurance_claims ( policy_number, patient_name, insurance_provider )')
         .eq('institution_id', institutionId)
         .limit(200);
 
@@ -172,7 +172,7 @@ export const DenialWorkqueue: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('insurance_claims')
-        .select('id, claim_number, patient_name, insurance_provider, claimed_amount, denial_reason')
+        .select('id, policy_number, patient_name, insurance_provider, claim_amount, rejection_reason')
         .eq('institution_id', institutionId)
         .eq('status', 'denied')
         .order('created_at', { ascending: false })
@@ -261,7 +261,7 @@ export const DenialWorkqueue: React.FC = () => {
       if (logForm.claim_id !== '__standalone__') {
         payload.claim_id = logForm.claim_id;
         const opt = deniedClaimOptions.find(c => c.id === logForm.claim_id);
-        if (opt && !payload.denied_amount) payload.denied_amount = opt.claimed_amount;
+        if (opt && !payload.denied_amount) payload.denied_amount = opt.claim_amount;
       }
       const { error } = await supabase.from('claim_denials').insert(payload);
       if (error) throw error;
@@ -418,7 +418,7 @@ export const DenialWorkqueue: React.FC = () => {
                     <div className="min-w-0 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-semibold">
-                          {denial.insurance_claims?.claim_number || 'Standalone denial'}
+                          {denial.insurance_claims?.policy_number || 'Standalone denial'}
                         </span>
                         <Badge className={`text-xs ${cfg.badgeClass}`}>
                           {cfg.icon}<span className="ml-1">{cfg.label}</span>
@@ -462,7 +462,7 @@ export const DenialWorkqueue: React.FC = () => {
               <DialogHeader>
                 <DialogTitle className="text-base flex items-center gap-2">
                   <FileX2 className="h-4 w-4 text-destructive" />
-                  {selected.insurance_claims?.claim_number || 'Standalone denial'}
+                  {selected.insurance_claims?.policy_number || 'Standalone denial'}
                 </DialogTitle>
                 <DialogDescription className="text-xs">
                   Logged {format(parseISO(selected.created_at), 'MMM d, yyyy')} ·
@@ -634,7 +634,7 @@ export const DenialWorkqueue: React.FC = () => {
                   <SelectItem value="__standalone__">Standalone denial (no claim)</SelectItem>
                   {deniedClaimOptions.map(c => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.claim_number} · {c.patient_name} · {formatMoney(Number(c.claimed_amount))}
+                      {c.policy_number} · {c.patient_name} · {formatMoney(Number(c.claim_amount))}
                     </SelectItem>
                   ))}
                 </SelectContent>

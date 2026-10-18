@@ -135,7 +135,9 @@ export const UserMarketplace = () => {
         servicesData = services || [];
       }
 
-      // Fetch institutions and their products
+      // Fetch institutions — CEO policy (2026-10-10): only platform-mode
+      // institutions that opted into public listing appear in the
+      // marketplace. HMS-only ('own') institutions must never surface here.
       const { data: institutions } = await supabase
         .from('healthcare_institutions')
         .select(`
@@ -143,8 +145,12 @@ export const UserMarketplace = () => {
           name,
           type,
           address,
-          admin_id
-        `);
+          admin_id,
+          payment_mode,
+          list_in_marketplace
+        `)
+        .eq('payment_mode', 'platform')
+        .eq('list_in_marketplace', true);
 
       const { data: products } = await supabase
         .from('marketplace_products')
