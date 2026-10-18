@@ -29,6 +29,8 @@ export type InstitutionTabKey =
   | "procedures"
   | "lis_ris"
   | "bloodbank"
+  | "camps"
+  | "indents"
   | "fhir"
   | "rcm"
   | "governance";
@@ -139,6 +141,20 @@ export const TAB_MODULE_MAP: TabModuleRule[] = [
     requiredModules: ["blood_bank"],
     essential: false,
     notes: "Exact charter match.",
+  },
+  {
+    tab: "camps",
+    label: "Health Camp Outreach",
+    requiredModules: ["camp_management"],
+    essential: false,
+    notes: "Dedicated camp management charter module (added 2026-10-18).",
+  },
+  {
+    tab: "indents",
+    label: "Indent Management",
+    requiredModules: ["indent_management"],
+    essential: false,
+    notes: "Dedicated indent management charter module (added 2026-10-18).",
   },
   {
     tab: "fhir",
