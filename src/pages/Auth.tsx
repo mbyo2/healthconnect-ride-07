@@ -120,7 +120,7 @@ const FALLBACK_BUSINESS_TYPES: Array<{ value: string; label: string }> = [
   { value: "physiotherapy_centre", label: "Physiotherapy Centre" },
   { value: "hospital", label: "Private Hospital" },
   { value: "retail_pharmacy", label: "Retail / Community Pharmacy" },
-  { value: "hospital_pharmacy", label: "Hospital Pharmacy" },
+  { value: "hospital_pharmacy", label: "Hospital Dispensary" },
   { value: "wholesale_pharmacy", label: "Wholesale Pharmacy / Distributor" },
   { value: "health_shop", label: "Health Shop" },
   { value: "laboratory", label: "Medical Laboratory" },

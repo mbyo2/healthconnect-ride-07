@@ -249,7 +249,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
         <div>
           <h3 className="text-base font-extrabold flex items-center gap-2">
-            <Pill className="h-5 w-5 text-primary-500" /> In-Hospital Pharmacy
+            <Pill className="h-5 w-5 text-primary-500" /> In-Hospital Dispensary
           </h3>
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Dispensing • Stock Management • Profit Margins • Damage Audit</p>
         </div>
@@ -459,7 +459,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           {loading ? (
             <ListSkeleton count={5} variant="compact" />
           ) : inventory.length === 0 ? (
-            <EmptyState icon={Pill} title="No pharmacy stock" description="Add drugs to enable dispensing and margin tracking." actionLabel="Add First Drug" onAction={() => setShowAddDrug(true)} />
+            <EmptyState icon={Pill} title="No dispensary stock" description="Add drugs to enable dispensing and margin tracking." actionLabel="Add First Drug" onAction={() => setShowAddDrug(true)} />
           ) : (
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
@@ -563,7 +563,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       {/* Add Drug Dialog */}
       <Dialog open={showAddDrug} onOpenChange={setShowAddDrug}>
         <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader><DialogTitle>Add Drug to Hospital Pharmacy</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Add Drug to Hospital Dispensary</DialogTitle></DialogHeader>
           <form onSubmit={handleAddDrug} className="space-y-3 py-2 text-xs">
             <div>
               <Label className="text-xs">Drug Name *</Label>
