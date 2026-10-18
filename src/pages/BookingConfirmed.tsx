@@ -274,6 +274,43 @@ const BookingConfirmed = () => {
         </CardContent>
       </Card>
 
+      {/* Prepare for your video visit */}
+      {isVideo && (
+        <Card className="border-primary/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Prepare for your video visit</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <ul className="space-y-2.5 text-sm text-foreground">
+              <li className="flex gap-2.5">
+                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                Find a quiet, well-lit place where you won't be interrupted
+              </li>
+              <li className="flex gap-2.5">
+                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                Have your ID and any current medicines nearby
+              </li>
+              <li className="flex gap-2.5">
+                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                Use Wi-Fi or make sure you have enough mobile data
+              </li>
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              When you join, you'll get a quick camera and microphone check before
+              the visit starts. The visit lasts about 30 minutes.
+            </p>
+            <Button
+              onClick={() => navigate(`/video-call/${appointment.id}`)}
+              className="w-full min-h-[44px]"
+            >
+              <Video className="h-4 w-4 mr-2" />
+              Join video visit
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Next Steps */}
       <Card>
         <CardHeader className="pb-3">

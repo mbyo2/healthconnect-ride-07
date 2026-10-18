@@ -150,15 +150,24 @@ export const VideoConsultation = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
   
-  // When connection is lost during a call
+  // When connection is lost during a call — calm, plain-language, with a path back.
   useEffect(() => {
     if (activeConsultation && !isOnline) {
-      toast.error("Connection lost during video call", {
-        duration: 10000,
-        id: "connection-lost-call"
+      toast.error("Your connection dropped — this happens sometimes.", {
+        description: "Your visit is still booked. Rejoin when you're back online.",
+        duration: 15000,
+        id: "connection-lost-call",
+        action: {
+          label: "Rejoin visit",
+          onClick: () => {
+            const c = activeConsultation;
+            setActiveConsultation(null);
+            setTimeout(() => handleJoinMeeting(c), 500);
+          },
+        },
       });
     }
-  }, [isOnline, activeConsultation]);
+  }, [isOnline, activeConsultation, handleJoinMeeting]);
 
   // Use profile data for user name, falling back to user email
   const userName = useMemo(() => 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { VideoRoom } from '@/components/video/VideoRoom';
+import { PreVisitChecklist } from '@/components/video/PreVisitChecklist';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { VideoOff } from 'lucide-react';
 import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -40,8 +42,11 @@ const VideoCall = () => {
   const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
   const [meetingToken, setMeetingToken] = useState<string | null>(null);
   const [consultationId, setConsultationId] = useState<string | null>(null);
+  const [consultation, setConsultation] = useState<any>(null);
   const [fatalError, setFatalError] = useState<string | null>(null);
   const [userName, setUserName] = useState('');
+  const [preCheckDone, setPreCheckDone] = useState(false);
+  const [startingCall, setStartingCall] = useState(false);
 
   useEffect(() => {
     if (profile?.first_name || user?.user_metadata?.full_name) {
@@ -58,15 +63,17 @@ const VideoCall = () => {
     }
   }, [user, profile]);
 
+  // Step 1 — load the consultation (fast). The Daily room is only minted
+  // after the patient passes the pre-visit checklist (startCall).
   useEffect(() => {
     if (!user || !roomId) return;
     let cancelled = false;
 
-    const prepare = async () => {
+    const load = async () => {
       setLoading(true);
       setFatalError(null);
       try {
-        let consultation: any = null;
+        let found: any = null;
         // ?instant=1 forces ad-hoc mode: the instant-room buttons navigate
         // with a UUID, which would otherwise be mistaken for a booked id.
         const forceInstant = searchParams.get('instant') === '1';
@@ -75,14 +82,19 @@ const VideoCall = () => {
           // Mode 1 — booked consultation: only participants may open it.
           const { data, error } = await supabase
             .from('video_consultations')
-            .select('*')
+            .select(`
+              *,
+              provider:profiles!video_consultations_provider_id_fkey(
+                first_name, last_name, specialty, role
+              )
+            `)
             .eq('id', roomId)
             .maybeSingle();
           if (error) throw error;
           if (!data) {
             // Fallback — roomId is an appointments UUID. The Appointments
-            // "Join" buttons link /video-call/<appointment_id>; resolve the
-            // appointment and mint its consultation row idempotently.
+            // "Join" buttons link that way; resolve the appointment and mint
+            // its consultation row idempotently.
             const { data: appt, error: apptError } = await supabase
               .from('appointments')
               .select('id, patient_id, provider_id, status')
@@ -104,7 +116,12 @@ const VideoCall = () => {
             const noteTag = `Video visit for appointment ${appt.id}`;
             const { data: existing, error: existingError } = await supabase
               .from('video_consultations')
-              .select('*')
+              .select(`
+                *,
+                provider:profiles!video_consultations_provider_id_fkey(
+                  first_name, last_name, specialty, role
+                )
+              `)
               .eq('notes', noteTag)
               .in('status', ['scheduled', 'active'])
               .order('created_at', { ascending: false })
@@ -112,7 +129,7 @@ const VideoCall = () => {
               .maybeSingle();
             if (existingError) throw existingError;
             if (existing) {
-              consultation = existing;
+              found = existing;
             } else {
               const now = new Date();
               const { data: minted, error: mintError } = await supabase
@@ -125,10 +142,15 @@ const VideoCall = () => {
                   status: 'scheduled',
                   notes: noteTag,
                 })
-                .select()
+                .select(`
+                  *,
+                  provider:profiles!video_consultations_provider_id_fkey(
+                    first_name, last_name, specialty, role
+                  )
+                `)
                 .single();
               if (mintError) throw mintError;
-              consultation = minted;
+              found = minted;
             }
           } else {
             if (data.patient_id !== user.id && data.provider_id !== user.id) {
@@ -136,7 +158,7 @@ const VideoCall = () => {
               setLoading(false);
               return;
             }
-            consultation = data;
+            found = data;
           }
         } else {
           // Mode 2 — instant room: track it as an ad-hoc consultation so it
@@ -152,53 +174,25 @@ const VideoCall = () => {
               status: 'scheduled',
               notes: `Instant teledoctor room (${roomId})`,
             })
-            .select()
+            .select(`
+              *,
+              provider:profiles!video_consultations_provider_id_fkey(
+                first_name, last_name, specialty, role
+              )
+            `)
             .single();
           if (error) throw error;
-          consultation = data;
+          found = data;
         }
 
         if (cancelled) return;
-        setConsultationId(consultation.id);
-
-        // Mint the Daily room on demand when missing.
-        if (!consultation.meeting_url) {
-          toast.loading('Setting up your secure video room…');
-          const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
-            body: { consultation_id: consultation.id },
-          });
-          if (cancelled) return;
-          if (fnError) throw fnError;
-          const url = (fnData as any)?.url;
-          const token = (fnData as any)?.token;
-          if (!url) throw new Error('Video service did not return a room URL.');
-          toast.dismiss();
-          setMeetingUrl(url);
-          if (token) setMeetingToken(token);
-        } else {
-          setMeetingUrl(consultation.meeting_url);
-        }
-
-        // Mark the visit live (idempotent). DB CHECK allows
-        // ('scheduled','active','completed','cancelled') — never 'in_progress'.
-        if (consultation.status === 'scheduled') {
-          await supabase
-            .from('video_consultations')
-            .update({ status: 'active' })
-            .eq('id', consultation.id);
-        }
-
-        logAnalyticsEvent('video_call_opened', {
-          consultation_id: consultation.id,
-          user_id: user?.id,
-          timestamp: new Date().toISOString(),
-        });
+        setConsultation(found);
+        setConsultationId(found.id);
       } catch (err: any) {
-        console.error('Failed to prepare video call:', err);
-        toast.dismiss();
+        console.error('Failed to load video consultation:', err);
         if (!cancelled) {
           setFatalError(
-            err?.message || 'Could not start the video call. Check your connection and try again.'
+            err?.message || 'Could not load this visit. Check your connection and try again.'
           );
         }
       } finally {
@@ -206,19 +200,68 @@ const VideoCall = () => {
       }
     };
 
-    prepare();
+    load();
     return () => {
       cancelled = true;
     };
   }, [user, roomId, searchParams]);
+
+  // Step 2 — mint the Daily room and join, after the pre-visit checklist.
+  const startCall = useCallback(async () => {
+    if (!consultation || !consultationId || meetingUrl || startingCall) return;
+    setStartingCall(true);
+    setFatalError(null);
+    try {
+      if (!consultation.meeting_url) {
+        toast.loading('Setting up your secure video room…');
+        const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
+          body: { consultation_id: consultationId },
+        });
+        if (fnError) throw fnError;
+        const url = (fnData as any)?.url;
+        const token = (fnData as any)?.token;
+        if (!url) throw new Error('Video service did not return a room URL.');
+        toast.dismiss();
+        setMeetingUrl(url);
+        if (token) setMeetingToken(token);
+      } else {
+        setMeetingUrl(consultation.meeting_url);
+      }
+
+      // Mark the visit live (idempotent). DB CHECK allows
+      // ('scheduled','active','completed','cancelled') — never 'in_progress'.
+      if (consultation.status === 'scheduled') {
+        await supabase
+          .from('video_consultations')
+          .update({ status: 'active' })
+          .eq('id', consultationId);
+      }
+
+      setPreCheckDone(true);
+      logAnalyticsEvent('video_call_opened', {
+        consultation_id: consultationId,
+        user_id: user?.id,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      console.error('Failed to start video call:', err);
+      toast.dismiss();
+      setFatalError(
+        err?.message || 'Could not start the video call. Check your connection and try again.'
+      );
+    } finally {
+      setStartingCall(false);
+    }
+  }, [consultation, consultationId, meetingUrl, startingCall, user]);
 
   const handleLeave = useCallback(async () => {
     logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
     // Only consultable clinicians close the visit on leave; patients can
     // rejoin while live, and non-consultable staff never own a visit.
     const role = (profile?.role || '').toLowerCase();
+    const isProvider = (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role);
     try {
-      if (consultationId && (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role)) {
+      if (consultationId && isProvider) {
         await supabase
           .from('video_consultations')
           .update({ status: 'completed' })
@@ -228,24 +271,66 @@ const VideoCall = () => {
     } catch (err) {
       console.error('Failed to close consultation:', err);
     }
-    navigate('/video-consultations', { replace: true });
+    // Patients land on the post-visit summary; providers go to the list.
+    if (consultationId && !isProvider) {
+      navigate(`/visit-summary/${consultationId}`, { replace: true });
+    } else {
+      navigate('/video-consultations', { replace: true });
+    }
   }, [consultationId, profile, navigate]);
+
+  // Derived display values for the pre-visit screen.
+
+  // Derived display values for the pre-visit screen.
+  const providerName = consultation?.provider
+    ? providerDisplayName({
+        first_name: consultation.provider.first_name,
+        last_name: consultation.provider.last_name,
+        role: consultation.provider.role,
+      })
+    : 'Your doctor';
+  const durationMinutes = (() => {
+    if (!consultation?.scheduled_start || !consultation?.scheduled_end) return 30;
+    return Math.max(
+      5,
+      Math.round(
+        (new Date(consultation.scheduled_end).getTime() -
+          new Date(consultation.scheduled_start).getTime()) /
+          60000
+      )
+    );
+  })();
 
   return (
     <ProtectedRoute>
       {loading ? (
-        <LoadingScreen message="Preparing your secure video room…" />
-      ) : fatalError || !meetingUrl ? (
+        <LoadingScreen message="Preparing your visit…" />
+      ) : fatalError ? (
         <div className="min-h-screen flex items-center justify-center p-6 bg-canvas">
           <div className="max-w-sm w-full vf-card text-center space-y-4">
             <VideoOff className="h-10 w-10 mx-auto text-error-500" />
-            <h1 className="font-display text-xl text-midnight">Cannot join this call</h1>
-            <p className="text-sm text-graphite-500">{fatalError || 'No video room is available for this link.'}</p>
-            <Button onClick={() => navigate('/video-consultations')} className="w-full">
-              Back to Video Consultations
-            </Button>
+            <h1 className="font-display text-xl text-midnight">Cannot join this visit</h1>
+            <p className="text-sm text-graphite-500">{fatalError}</p>
+            <div className="space-y-2">
+              <Button onClick={() => window.location.reload()} className="w-full min-h-[44px]">
+                Try again
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/video-consultations')} className="w-full min-h-[44px]">
+                Back to Video Consultations
+              </Button>
+            </div>
           </div>
         </div>
+      ) : !preCheckDone ? (
+        <PreVisitChecklist
+          providerName={providerName}
+          specialty={consultation?.provider?.specialty}
+          durationMinutes={durationMinutes}
+          onJoin={startCall}
+          onCancel={() => navigate('/video-consultations')}
+        />
+      ) : startingCall || !meetingUrl ? (
+        <LoadingScreen message="Joining your visit…" />
       ) : (
         <VideoRoom roomUrl={meetingUrl} userName={userName} meetingToken={meetingToken || undefined} onLeave={handleLeave} />
       )}

@@ -19,6 +19,8 @@ interface MobileLayoutProps {
 }
 
 const STANDALONE_ROUTES = ['/landing', '/auth', '/reset-password', '/terms', '/privacy', '/pricing'];
+// Prefix routes rendered full-screen (dynamic segments like /video-call/:roomId)
+const STANDALONE_PREFIXES = ['/video-call'];
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();
@@ -29,8 +31,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
     return <LoadingScreen />;
   }
 
-  // Standalone pages render without global chrome
+  // Standalone pages render without global chrome (full-screen call mode hides
+  // Header, BottomNav and the floating AI chat during active consultations)
   const isStandalone = STANDALONE_ROUTES.includes(location.pathname) || 
+    STANDALONE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
     (location.pathname === '/' && !isAuthenticated);
   
   if (isStandalone) {

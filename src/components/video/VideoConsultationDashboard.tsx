@@ -5,15 +5,17 @@ import { VideoConsultation } from './VideoConsultation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Video, Clock, User, Plus } from 'lucide-react';
+import { Calendar, Video, Clock, User, Plus, FileText, MessageCircle, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { providerDisplayName } from '@/utils/providerDisplay';
 
 export const VideoConsultationDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('upcoming');
 
   const { data: consultations, isLoading, refetch } = useQuery({
@@ -214,6 +216,28 @@ export const VideoConsultationDashboard = () => {
                       <Badge className={getStatusColor(consultation.status)}>
                         {consultation.status}
                       </Badge>
+                    </div>
+                    {/* Post-visit closure: summary, notes, provider contact */}
+                    <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 sm:flex-row">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-h-[44px] flex-1"
+                        onClick={() => navigate(`/visit-summary/${consultation.id}`)}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        View visit summary
+                        <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-[44px]"
+                        onClick={() => navigate('/chat')}
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        Message provider
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

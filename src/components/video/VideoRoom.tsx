@@ -7,7 +7,6 @@ import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", meetingToken, onLeave }: VideoRoomProps) {
   const [callFrame, setCallFrame] = useState<any>(null);
@@ -19,6 +18,9 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   const [hasJoined, setHasJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
+  const [isAudioOnly, setIsAudioOnly] = useState(false);
+  const [joinAttempt, setJoinAttempt] = useState(0);
+  const [startAudioOnly, setStartAudioOnly] = useState(false);
   
   // Use roomId if passed, otherwise use roomUrl
   const actualRoomUrl = roomId || roomUrl;
@@ -28,8 +30,20 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   
   const handleJoinedMeeting = useCallback(() => {
     setHasJoined(true);
-    toast.success("You've joined the meeting");
-  }, []);
+    toast.success("You've joined your visit");
+    // If the user chose "audio-only instead" from the error screen, apply it now.
+    if (startAudioOnly) {
+      setStartAudioOnly(false);
+      setTimeout(() => {
+        try {
+          callFrame?.setLocalVideo(false);
+          setIsVideoOff(true);
+          callFrame?.updateReceiveSettings({ '*': { video: 'off' } });
+          setIsAudioOnly(true);
+        } catch { /* best effort */ }
+      }, 500);
+    }
+  }, [startAudioOnly, callFrame]);
   
   const handleError = useCallback((e: any) => {
     console.error("Daily.co error:", e);
@@ -121,7 +135,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
     };
   }, [actualRoomUrl, userName, handleJoinedMeeting, handleError, 
       handleParticipantsChange, handleNetworkQualityChange, 
-      handleNetworkConnection, reconnecting]);
+      handleNetworkConnection, reconnecting, joinAttempt]);
 
   
   const handleToggleMute = () => {
@@ -135,6 +149,42 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
     setIsVideoOff(prev => !prev);
     callFrame.setLocalVideo(!isVideoOff);
   };
+
+  const handleToggleAudioOnly = useCallback(() => {
+    if (!callFrame) return;
+    const next = !isAudioOnly;
+    setIsAudioOnly(next);
+    try {
+      if (next) {
+        // Drop local camera and stop receiving remote video — keeps audio only.
+        callFrame.setLocalVideo(false);
+        setIsVideoOff(true);
+        callFrame.updateReceiveSettings({ '*': { video: 'off' } });
+        toast.success("Audio-only mode on. Your visit continues by voice.");
+      } else {
+        callFrame.setLocalVideo(true);
+        setIsVideoOff(false);
+        callFrame.updateReceiveSettings({ '*': { video: 'on' } });
+        toast.success("Video turned back on.");
+      }
+    } catch (e) {
+      console.error("Error toggling audio-only mode:", e);
+      toast.error("Could not switch modes. Try again.");
+      setIsAudioOnly(!next);
+    }
+  }, [callFrame, isAudioOnly]);
+
+  const handleRejoin = useCallback(() => {
+    // Destroy the broken frame and force a fresh join via joinAttempt bump.
+    if (callFrame) {
+      try { callFrame.destroy(); } catch { /* ignore */ }
+      setCallFrame(null);
+    }
+    setError(null);
+    setHasJoined(false);
+    setReconnecting(false);
+    setJoinAttempt(prev => prev + 1);
+  }, [callFrame]);
 
   const handleToggleScreenShare = async () => {
     if (!callFrame) return;
@@ -207,11 +257,31 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   return (
     <div className="relative h-full w-full">
       {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="mb-4 rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
+            <AlertCircle className="h-6 w-6 text-amber-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">Your connection dropped</h2>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+            This happens sometimes — usually a weak signal. Your visit is still
+            booked and the doctor is waiting. Try rejoining.
+          </p>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button onClick={handleRejoin} className="min-h-[44px]">
+              Rejoin visit
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-[44px]"
+              onClick={() => { setStartAudioOnly(true); handleRejoin(); }}
+            >
+              Try audio-only instead
+            </Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            If it keeps failing, check your data connection or move closer to your Wi-Fi router.
+          </p>
+        </div>
       )}
       
       <div id="video-container" className="relative h-full min-h-[60vh] w-full bg-black/5 rounded-lg overflow-hidden">
@@ -222,7 +292,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
                 <div className="w-4 h-4 bg-primary mx-auto rounded-full"></div>
               </div>
               <p className="font-medium">
-                {reconnecting ? "Reconnecting..." : "Joining meeting..."}
+                {reconnecting ? "Reconnecting…" : "Joining your visit…"}
               </p>
             </div>
           </div>
@@ -235,11 +305,13 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
           isVideoOff={isVideoOff}
           isScreenSharing={isScreenSharing}
           isRecording={isRecording}
+          isAudioOnly={isAudioOnly}
           currentQuality={videoQuality}
           onToggleMute={handleToggleMute}
           onToggleVideo={handleToggleVideo}
           onToggleScreenShare={handleToggleScreenShare}
           onToggleRecording={handleToggleRecording}
+          onToggleAudioOnly={handleToggleAudioOnly}
           onQualityChange={handleQualityChange}
         />
         
@@ -252,7 +324,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
             data-dpad-focusable={isTV ? "true" : undefined}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Leave Meeting
+            Leave Visit
           </Button>
         </div>
       </div>

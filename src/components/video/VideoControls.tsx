@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Video } from "lucide-react";
+import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Video, Phone } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +15,13 @@ interface VideoControlsProps {
   isVideoOff: boolean;
   isScreenSharing: boolean;
   isRecording?: boolean;
+  isAudioOnly?: boolean;
   currentQuality?: "high" | "medium" | "low";
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
   onToggleRecording?: () => void;
+  onToggleAudioOnly?: () => void;
   onQualityChange?: (quality: "high" | "medium" | "low") => void;
 }
 
@@ -28,11 +30,13 @@ export const VideoControls = ({
   isVideoOff,
   isScreenSharing,
   isRecording = false,
+  isAudioOnly = false,
   currentQuality = "high",
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
   onToggleRecording,
+  onToggleAudioOnly,
   onQualityChange,
 }: VideoControlsProps) => {
   const isTV = useIsTVDevice();
@@ -113,6 +117,22 @@ export const VideoControls = ({
         >
           <Video className={`${isRecording ? "animate-pulse" : ""} ${isTV ? "h-6 w-6 mr-2" : "h-5 w-5"}`} />
           {(isTV || isMobile) && (isRecording ? "Stop Rec" : "Record")}
+        </Button>
+      )}
+
+      {onToggleAudioOnly && (
+        <Button
+          variant={isAudioOnly ? "default" : "secondary"}
+          size={isTV ? "lg" : isMobile ? "default" : "icon"}
+          onClick={onToggleAudioOnly}
+          title={isAudioOnly ? "Turn video back on" : "Switch to audio only"}
+          aria-label={isAudioOnly ? "Turn video back on" : "Switch to audio only"}
+          aria-pressed={isAudioOnly}
+          className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
+          data-dpad-focusable={isTV ? "true" : undefined}
+        >
+          <Phone className={isTV ? "h-6 w-6 mr-2" : "h-5 w-5"} />
+          {(isTV || isMobile) && (isAudioOnly ? "Video On" : "Audio Only")}
         </Button>
       )}
 
