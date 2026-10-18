@@ -1,21 +1,26 @@
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { useStaffMetrics, StaffMetricKey } from "@/hooks/useStaffMetrics";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   Users, Calendar, Clock, Phone, Ticket, CreditCard, FileText,
   BarChart3, Settings, Wrench, Package, Truck, Siren, Heart,
   ClipboardList, UserCheck, DollarSign, TrendingUp, Headset,
-  Building2, Stethoscope, Activity, Bell
+  Building2, Stethoscope, Activity, Bell, Building
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+/** Single accent for every role — Doc'O Clock blue. Semantic status colors
+ *  are used only where a status is actually conveyed. No rainbow per-role accents. */
+const ACCENT = "bg-primary-500";
 
 interface RoleConfig {
   title: string;
   subtitle: string;
   icon: React.ReactNode;
-  color: string;
-  metrics: { label: string; icon: React.ReactNode }[];
+  metrics: { label: string; icon: React.ReactNode; metricKey: StaffMetricKey; format?: "number" | "currency" }[];
   quickActions: { label: string; path: string; icon: React.ReactNode; description: string }[];
   tabs: { id: string; label: string; icon: React.ReactNode }[];
 }
@@ -25,11 +30,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Reception Desk",
     subtitle: "Patient check-in, appointments & front office",
     icon: <Bell className="h-6 w-6" />,
-    color: "bg-blue-500",
     metrics: [
-      { label: "Today's Appointments", icon: <Calendar className="h-5 w-5" /> },
-      { label: "In Queue", icon: <Ticket className="h-5 w-5" /> },
-      { label: "Checked In", icon: <UserCheck className="h-5 w-5" /> },
+      { label: "Today's Appointments", icon: <Calendar className="h-5 w-5" />, metricKey: "appointments_today" },
+      { label: "In Queue", icon: <Ticket className="h-5 w-5" />, metricKey: "queue_waiting" },
+      { label: "Checked In", icon: <UserCheck className="h-5 w-5" />, metricKey: "checked_in" },
     ],
     quickActions: [
       { label: "Check In Patient", path: "/institution-dashboard?tab=queue", icon: <UserCheck className="h-5 w-5" />, description: "Register walk-in or appointment arrival" },
@@ -48,11 +52,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Billing & Revenue",
     subtitle: "Invoices, payments & financial reports",
     icon: <CreditCard className="h-6 w-6" />,
-    color: "bg-green-500",
     metrics: [
-      { label: "Pending Invoices", icon: <FileText className="h-5 w-5" /> },
-      { label: "Today's Revenue", icon: <DollarSign className="h-5 w-5" /> },
-      { label: "Overdue", icon: <Clock className="h-5 w-5" /> },
+      { label: "Pending Invoices", icon: <FileText className="h-5 w-5" />, metricKey: "invoices_pending" },
+      { label: "Today's Revenue", icon: <DollarSign className="h-5 w-5" />, metricKey: "revenue_today", format: "currency" },
+      { label: "Overdue", icon: <Clock className="h-5 w-5" />, metricKey: "invoices_overdue" },
     ],
     quickActions: [
       { label: "Create Invoice", path: "/hospital-management?tab=billing", icon: <FileText className="h-5 w-5" />, description: "Generate patient invoice" },
@@ -69,11 +72,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Human Resources",
     subtitle: "Staff management, shifts & payroll",
     icon: <Users className="h-6 w-6" />,
-    color: "bg-purple-500",
     metrics: [
-      { label: "Total Staff", icon: <Users className="h-5 w-5" /> },
-      { label: "On Shift", icon: <Clock className="h-5 w-5" /> },
-      { label: "On Leave", icon: <Calendar className="h-5 w-5" /> },
+      { label: "Total Staff", icon: <Users className="h-5 w-5" />, metricKey: "staff_total" },
+      { label: "On Shift", icon: <Clock className="h-5 w-5" />, metricKey: "on_shift_today" },
+      { label: "On Leave", icon: <Calendar className="h-5 w-5" />, metricKey: "on_leave_today" },
     ],
     quickActions: [
       { label: "Staff Directory", path: "/institution/personnel", icon: <Users className="h-5 w-5" />, description: "View all staff members" },
@@ -90,11 +92,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Executive Dashboard",
     subtitle: "Strategic overview & key metrics",
     icon: <TrendingUp className="h-6 w-6" />,
-    color: "bg-indigo-500",
     metrics: [
-      { label: "Total Revenue", icon: <DollarSign className="h-5 w-5" /> },
-      { label: "Patient Volume", icon: <Users className="h-5 w-5" /> },
-      { label: "Staff Count", icon: <Building2 className="h-5 w-5" /> },
+      { label: "Total Revenue", icon: <DollarSign className="h-5 w-5" />, metricKey: "revenue_total", format: "currency" },
+      { label: "Patient Volume", icon: <Users className="h-5 w-5" />, metricKey: "patient_volume" },
+      { label: "Staff Count", icon: <Building2 className="h-5 w-5" />, metricKey: "staff_total" },
     ],
     quickActions: [
       { label: "Institution Overview", path: "/institution-dashboard", icon: <Building2 className="h-5 w-5" />, description: "Full facility dashboard" },
@@ -110,11 +111,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Support Desk",
     subtitle: "Customer support & ticket management",
     icon: <Headset className="h-6 w-6" />,
-    color: "bg-orange-500",
     metrics: [
-      { label: "Open Tickets", icon: <Ticket className="h-5 w-5" /> },
-      { label: "Resolved Today", icon: <UserCheck className="h-5 w-5" /> },
-      { label: "Avg Response", icon: <Clock className="h-5 w-5" /> },
+      { label: "Open Tickets", icon: <Ticket className="h-5 w-5" />, metricKey: "tickets_open" },
+      { label: "Resolved Today", icon: <UserCheck className="h-5 w-5" />, metricKey: "resolved_today" },
+      { label: "Avg Response", icon: <Clock className="h-5 w-5" />, metricKey: "avg_response" },
     ],
     quickActions: [
       { label: "View Tickets", path: "/support", icon: <Ticket className="h-5 w-5" />, description: "Manage support requests" },
@@ -130,11 +130,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Ambulance Dispatch",
     subtitle: "Emergency transport coordination",
     icon: <Truck className="h-6 w-6" />,
-    color: "bg-red-500",
     metrics: [
-      { label: "Active Dispatches", icon: <Siren className="h-5 w-5" /> },
-      { label: "Available Units", icon: <Truck className="h-5 w-5" /> },
-      { label: "Completed Today", icon: <UserCheck className="h-5 w-5" /> },
+      { label: "Active Dispatches", icon: <Siren className="h-5 w-5" />, metricKey: "dispatches_active" },
+      { label: "Available Units", icon: <Truck className="h-5 w-5" />, metricKey: "units_available" },
+      { label: "Completed Today", icon: <UserCheck className="h-5 w-5" />, metricKey: "dispatches_completed_today" },
     ],
     quickActions: [
       { label: "Dispatch", path: "/ambulance", icon: <Siren className="h-5 w-5" />, description: "New emergency dispatch" },
@@ -149,11 +148,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Triage Station",
     subtitle: "Patient assessment & prioritization",
     icon: <Heart className="h-6 w-6" />,
-    color: "bg-pink-500",
     metrics: [
-      { label: "Waiting", icon: <Clock className="h-5 w-5" /> },
-      { label: "Critical", icon: <Siren className="h-5 w-5" /> },
-      { label: "Assessed Today", icon: <ClipboardList className="h-5 w-5" /> },
+      { label: "Waiting", icon: <Clock className="h-5 w-5" />, metricKey: "triage_waiting" },
+      { label: "Critical", icon: <Siren className="h-5 w-5" />, metricKey: "triage_critical" },
+      { label: "Assessed Today", icon: <ClipboardList className="h-5 w-5" />, metricKey: "assessed_today" },
     ],
     quickActions: [
       { label: "Triage Queue", path: "/opd", icon: <ClipboardList className="h-5 w-5" />, description: "Assess waiting patients" },
@@ -168,11 +166,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Operating Theatre",
     subtitle: "Surgical scheduling & theatre management",
     icon: <Stethoscope className="h-6 w-6" />,
-    color: "bg-teal-500",
     metrics: [
-      { label: "Today's Surgeries", icon: <Calendar className="h-5 w-5" /> },
-      { label: "In Progress", icon: <Activity className="h-5 w-5" /> },
-      { label: "Available Theatres", icon: <Building2 className="h-5 w-5" /> },
+      { label: "Today's Surgeries", icon: <Calendar className="h-5 w-5" />, metricKey: "surgeries_today" },
+      { label: "In Progress", icon: <Activity className="h-5 w-5" />, metricKey: "surgeries_in_progress" },
+      { label: "Available Theatres", icon: <Building2 className="h-5 w-5" />, metricKey: "theatres_available" },
     ],
     quickActions: [
       { label: "Theatre Schedule", path: "/theatre", icon: <Calendar className="h-5 w-5" />, description: "View OT bookings" },
@@ -187,11 +184,10 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     title: "Maintenance",
     subtitle: "Facility upkeep & equipment management",
     icon: <Wrench className="h-6 w-6" />,
-    color: "bg-yellow-600",
     metrics: [
-      { label: "Open Requests", icon: <Wrench className="h-5 w-5" /> },
-      { label: "In Progress", icon: <Clock className="h-5 w-5" /> },
-      { label: "Completed", icon: <UserCheck className="h-5 w-5" /> },
+      { label: "Open Requests", icon: <Wrench className="h-5 w-5" />, metricKey: "maintenance_open" },
+      { label: "In Progress", icon: <Clock className="h-5 w-5" />, metricKey: "maintenance_in_progress" },
+      { label: "Completed", icon: <UserCheck className="h-5 w-5" />, metricKey: "maintenance_completed" },
     ],
     quickActions: [
       { label: "Work Orders", path: "/maintenance", icon: <Wrench className="h-5 w-5" />, description: "Manage maintenance requests" },
@@ -205,12 +201,11 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
   inventory_manager: {
     title: "Inventory Control",
     subtitle: "Stock management & supply chain",
-    icon: <Package className="h-6 w-6" />,
-    color: "bg-cyan-500",
+    icon: <Package className="h-5 w-5" />,
     metrics: [
-      { label: "Total Items", icon: <Package className="h-5 w-5" /> },
-      { label: "Low Stock", icon: <Clock className="h-5 w-5" /> },
-      { label: "Out of Stock", icon: <Siren className="h-5 w-5" /> },
+      { label: "Total Items", icon: <Package className="h-5 w-5" />, metricKey: "inventory_total" },
+      { label: "Low Stock", icon: <Clock className="h-5 w-5" />, metricKey: "inventory_low_stock" },
+      { label: "Out of Stock", icon: <Siren className="h-5 w-5" />, metricKey: "inventory_out_of_stock" },
     ],
     quickActions: [
       { label: "Inventory", path: "/inventory", icon: <Package className="h-5 w-5" />, description: "View stock levels" },
@@ -225,24 +220,33 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
 
 const STAFF_ROLES = Object.keys(ROLE_CONFIGS);
 
+function formatMetric(value: number | null, format: "number" | "currency" = "number"): string {
+  if (value === null) return "—";
+  if (format === "currency") return `K ${value.toLocaleString()}`;
+  return value.toLocaleString();
+}
+
 export default function StaffDashboard() {
   const { availableRoles, loading: rolesLoading } = useUserRoles();
   const { profile } = useAuth();
+  const { institutionId, loading: instLoading } = useInstitutionContext();
+  const { metrics, loading: metricsLoading } = useStaffMetrics(institutionId);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
-  
+
   if (rolesLoading) return <LoadingScreen />;
-  
+
   // Find the staff role from available roles, fallback to profile
-  const staffRole = availableRoles.find(r => STAFF_ROLES.includes(r.toLowerCase())) 
+  const staffRole = availableRoles.find(r => STAFF_ROLES.includes(r.toLowerCase()))
     || STAFF_ROLES.find(r => r === (profile?.role || "").toLowerCase())
     || "receptionist";
-  
+
   const config = ROLE_CONFIGS[staffRole];
-  
+  const metricsBusy = instLoading || metricsLoading;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className={`${config.color} text-white px-6 py-8`}>
+      <div className={`${ACCENT} text-white px-6 py-8`}>
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/20 rounded-lg">
@@ -274,7 +278,7 @@ export default function StaffDashboard() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    ? "border-primary-500 text-primary-600 dark:text-primary-400"
                     : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
                 }`}
               >
@@ -287,20 +291,52 @@ export default function StaffDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {!instLoading && !institutionId && (
+          <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3">
+            <Building className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-amber-800 dark:text-amber-200">No institution linked</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Your account is not linked to an institution yet, so live metrics are unavailable.
+                Ask your administrator to link your account to see real numbers here.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {config.metrics.map((metric, idx) => (
-            <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 ${config.color} text-white rounded-lg`}>
-                  {metric.icon}
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">{metric.label}</p>
-                  <p className="text-2xl font-bold">0</p>
+          {config.metrics.map((metric, idx) => {
+            const value = institutionId ? metrics[metric.metricKey] : null;
+            return (
+              <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 ${ACCENT} text-white rounded-lg`}>
+                    {metric.icon}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-gray-500">{metric.label}</p>
+                    {metricsBusy ? (
+                      <div className="h-8 w-20 mt-1 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" aria-label="Loading metric" />
+                    ) : (
+                      <>
+                        <p
+                          className={`text-2xl font-bold ${value === null ? "text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"}`}
+                          title={value === null ? "Live tracking for this metric is not available yet" : undefined}
+                        >
+                          {formatMetric(value, metric.format)}
+                        </p>
+                        {value === null && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                            {!institutionId ? "No institution linked" : "Not tracked yet"}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Quick Actions</h2>
@@ -311,7 +347,7 @@ export default function StaffDashboard() {
               onClick={() => navigate(action.path)}
               className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow hover:shadow-md transition-shadow text-left"
             >
-              <div className={`p-2 ${config.color} text-white rounded-lg w-fit mb-3`}>
+              <div className={`p-2 ${ACCENT} text-white rounded-lg w-fit mb-3`}>
                 {action.icon}
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white">{action.label}</h3>

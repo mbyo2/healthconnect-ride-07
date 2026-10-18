@@ -6,12 +6,23 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
     const [heartRateData, setHeartRateData] = useState<any[]>([]);
     const [activityData, setActivityData] = useState<any[]>([]);
     const [sleepData, setSleepData] = useState<any[]>([]);
-    const [vitalsData, setVitalsData] = useState<any>({
-        bloodPressure: '120/80',
-        oxygenSaturation: '98%',
-        weight: '70 kg',
-        restingHeartRate: '62 bpm'
+    // NULL until real rows arrive — never present placeholder numbers as the
+    // user's live vitals (patient-safety rule).
+    const [vitalsData, setVitalsData] = useState<{
+        bloodPressure: string | null;
+        oxygenSaturation: string | null;
+        weight: string | null;
+        restingHeartRate: string | null;
+        recordedAt: string | null;
+    }>({
+        bloodPressure: null,
+        oxygenSaturation: null,
+        weight: null,
+        restingHeartRate: null,
+        recordedAt: null,
     });
+    const [hasVitals, setHasVitals] = useState(false);
+    const [hasMetrics, setHasMetrics] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,6 +33,12 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
 
     const fetchData = async () => {
         setLoading(true);
+        // Clear previous range's data so stale numbers are never shown as current.
+        setHeartRateData([]);
+        setActivityData([]);
+        setSleepData([]);
+        setHasVitals(false);
+        setHasMetrics(false);
         try {
             const endDate = new Date();
             let startDate = new Date();
@@ -58,7 +75,9 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
             if (vitalsError) throw vitalsError;
 
             processMetrics(metrics || []);
+            setHasMetrics((metrics || []).length > 0);
             processVitals(vitals || []);
+            setHasVitals((vitals || []).length > 0);
 
         } catch (error) {
             console.error('Error fetching health data:', error);
@@ -86,7 +105,9 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
 
         const processedData = Object.values(groupedByDate);
 
-        // Transform for charts
+        // Transform for charts — total recorded sleep hours only. The old code
+        // fabricated a 20/60/20 deep/light/REM stage split from total hours;
+        // never present invented sleep stages as measured data.
         setActivityData(processedData.map(d => ({
             date: d.date,
             steps: d.steps || 0,
@@ -97,11 +118,6 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         setSleepData(processedData.map(d => ({
             date: d.date,
             hours: d.sleep_hours || 0,
-            // Estimated stage split — only total hours are recorded, so the
-            // chart is labelled "estimated" in HealthAnalytics.
-            deep: (d.sleep_hours || 0) * 0.2,
-            light: (d.sleep_hours || 0) * 0.6,
-            rem: (d.sleep_hours || 0) * 0.2
         })));
     };
 
@@ -111,7 +127,8 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         // Group by day and calculate min/max/avg for heart rate
         const grouped: Record<string, number[]> = {};
 
-        // Latest vitals for the summary cards
+        // Latest vitals for the summary cards — real values only, NULL when
+        // the record does not carry a measurement.
         const latest = data[data.length - 1];
 
         data.forEach(d => {
@@ -133,10 +150,11 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         setVitalsData({
             bloodPressure: latest.blood_pressure_systolic && latest.blood_pressure_diastolic
                 ? `${latest.blood_pressure_systolic}/${latest.blood_pressure_diastolic}`
-                : '120/80',
-            oxygenSaturation: latest.oxygen_saturation ? `${latest.oxygen_saturation}%` : '98%',
-            weight: latest.weight ? `${latest.weight} kg` : '70 kg',
-            restingHeartRate: latest.heart_rate ? `${latest.heart_rate} bpm` : '62 bpm'
+                : null,
+            oxygenSaturation: latest.oxygen_saturation ? `${latest.oxygen_saturation}%` : null,
+            weight: latest.weight ? `${latest.weight} kg` : null,
+            restingHeartRate: latest.heart_rate ? `${latest.heart_rate} bpm` : null,
+            recordedAt: latest.recorded_at || null,
         });
     };
 
@@ -145,6 +163,8 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         activityData,
         sleepData,
         vitalsData,
-        loading
+        loading,
+        hasVitals,
+        hasMetrics,
     };
 }
