@@ -81,7 +81,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
           <div
             key={provider.id}
             onClick={() => (onProviderSelect ? onProviderSelect(provider) : navigate(`/provider/${provider.id}`))}
-            className={`p-4 rounded-2xl border bg-white transition-all cursor-pointer shadow-sm hover:shadow-md ${
+            className={`p-4 rounded-2xl border dark:border-slate-700 bg-white dark:bg-slate-900 transition-all cursor-pointer shadow-sm hover:shadow-md ${
               selectedProvider?.id === provider.id
                 ? "border-blue-600 ring-2 ring-blue-600/20"
                 : "border-gray-100 hover:border-blue-200"

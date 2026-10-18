@@ -231,7 +231,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
               {filtered.map((order) => (
                 <tr key={order.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
-                    <div className="font-mono font-bold text-slate-900">{order.test_number}</div>
+                    <div className="font-mono font-bold text-slate-900 dark:text-slate-100">{order.test_number}</div>
                     <div className="text-xs text-graphite-500 dark:text-slate-400">{order.test_type}</div>
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(order.patient_id) || "Inpatient"}</td>

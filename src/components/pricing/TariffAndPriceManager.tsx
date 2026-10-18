@@ -599,8 +599,8 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
               return (
                 <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900">{t.code}</td>
-                  <td className="py-3 px-3 font-extrabold text-slate-900">{t.name}</td>
+                  <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">{t.code}</td>
+                  <td className="py-3 px-3 font-extrabold text-slate-900 dark:text-slate-100">{t.name}</td>
                   <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{t.department}</td>
                   <td className="py-3 px-3 text-right font-mono">
                     {isEditing ? (

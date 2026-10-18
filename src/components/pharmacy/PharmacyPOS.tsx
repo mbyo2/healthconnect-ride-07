@@ -181,9 +181,9 @@ export const PharmacyPOS = () => {
   if (!activeSession && pharmacyId) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-full max-w-md p-8 rounded-2xl bg-white border border-canvas-silk shadow-md text-center font-sans">
+        <div className="w-full max-w-md p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 shadow-md text-center font-sans">
           <Package className="h-12 w-12 text-primary-500 mx-auto mb-3" />
-          <h2 className="text-xl font-extrabold text-slate-900">Open Cash Register</h2>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Open Cash Register</h2>
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1 mb-4">Start your cashier shift by entering the opening float</p>
           <div className="text-left mb-4">
             <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Opening Cash Balance ({getSymbol()})</label>
@@ -240,7 +240,7 @@ export const PharmacyPOS = () => {
                 onClick={() => addToCart(item)}
                 className="p-3 rounded-xl border border-canvas-silk cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
               >
-                <p className="font-extrabold text-xs text-slate-900 truncate">{item.medication_name}</p>
+                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate">{item.medication_name}</p>
                 <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{item.dosage} · {item.medication_type}</p>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-black text-primary-500">{formatPrice(item.unit_price || 0)}</span>
@@ -265,7 +265,7 @@ export const PharmacyPOS = () => {
         {/* Cart Header */}
         <div className="p-3 border-b border-canvas-silk bg-canvas flex items-center gap-2">
           <ShoppingCart className="h-4 w-4 text-primary-500" />
-          <span className="font-extrabold text-sm text-slate-900">Cart</span>
+          <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Cart</span>
           {cart.length > 0 && <span className="ml-auto inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{cart.length}</span>}
         </div>
 
@@ -283,7 +283,7 @@ export const PharmacyPOS = () => {
             {cart.map((item, index) => (
               <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-canvas text-xs">
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-slate-900 truncate">{item.item_name}</p>
+                  <p className="font-bold text-slate-900 dark:text-slate-100 truncate">{item.item_name}</p>
                   <p className="text-graphite-500 dark:text-slate-400">{formatPrice(item.unit_price)} each</p>
                 </div>
                 <div className="flex items-center gap-0.5">

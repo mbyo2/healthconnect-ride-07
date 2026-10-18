@@ -148,7 +148,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
               {orders.map((o) => (
                 <tr key={o.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
-                    <div className="font-mono font-bold text-slate-900">{o.request_number}</div>
+                    <div className="font-mono font-bold text-slate-900 dark:text-slate-100">{o.request_number}</div>
                     <div className="text-xs text-primary-500 font-bold">{o.exam_type}</div>
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(o.patient_id) || "Patient"}</td>

@@ -79,7 +79,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900">
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
               {user.first_name} {user.last_name}
             </h3>
             {user.specialty && (
@@ -125,7 +125,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
           <div className="space-y-1">
             {user.services.slice(0, 3).map((service) => (
               <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
-                <span className="font-bold text-slate-900">{service.name}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{service.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-success-500 font-black">K{service.price}</span>
                   {service.duration && (
@@ -149,7 +149,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
           <div className="space-y-1">
             {user.products.slice(0, 3).map((product) => (
               <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
-                <span className="font-bold text-slate-900">{product.medication_name}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{product.medication_name}</span>
                 <span className="text-success-500 font-black">K{product.price}</span>
               </div>
             ))}

@@ -177,7 +177,7 @@ export const CostEstimator = () => {
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="h-5 w-5 text-primary-500" />
             <div>
-              <div className="text-xs font-extrabold text-slate-900">{insuranceInfo.provider_name}</div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-slate-100">{insuranceInfo.provider_name}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400">Policy: {insuranceInfo.policy_number}</div>
             </div>
           </div>
@@ -241,7 +241,7 @@ export const CostEstimator = () => {
           <div className="space-y-1.5 text-xs font-medium">
             <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>K{estimate.total.toFixed(2)}</span></div>
             <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-K{estimate.coverage.toFixed(2)}</span></div>
-            <div className="flex justify-between text-slate-900 font-bold border-t border-canvas-silk pt-2 text-sm">
+            <div className="flex justify-between text-slate-900 dark:text-slate-100 font-bold border-t border-canvas-silk pt-2 text-sm">
               <span>Estimated Copay Due</span><span className="font-mono text-primary-500">K{estimate.outOfPocket.toFixed(2)}</span>
             </div>
           </div>

@@ -578,7 +578,7 @@ export const HRManagerWorkflow = () => {
             return (
               <div key={p.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-extrabold text-slate-900">
+                  <div className="font-extrabold text-slate-900 dark:text-slate-100">
                     Pay Period: {format(new Date(p.period_start), "MMM d")} - {format(new Date(p.period_end), "MMM d, yyyy")}
                   </div>
                   <div className="text-xs font-mono text-graphite-500 dark:text-slate-400 mt-0.5">

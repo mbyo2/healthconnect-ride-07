@@ -180,7 +180,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
                   <tr key={s.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                     <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{s.item_name}</td>
                     <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{s.category || "General"}</td>
-                    <td className="py-3 px-3 font-mono font-bold text-slate-900">{s.quantity_available ?? 0}</td>
+                    <td className="py-3 px-3 font-mono font-bold text-slate-900 dark:text-slate-100">{s.quantity_available ?? 0}</td>
                     <td className="py-3 px-3 text-slate-500">{s.unit || "boxes"}</td>
                     <td className="py-3 px-3 text-slate-600">{s.supplier || "—"}</td>
                     <td className="py-3 px-3 font-mono text-slate-500">{s.expiry_date || "—"}</td>

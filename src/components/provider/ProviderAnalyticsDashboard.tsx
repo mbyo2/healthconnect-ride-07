@@ -84,7 +84,7 @@ export const ProviderAnalyticsDashboard = () => {
   return (
     <div className="space-y-6 font-sans">
       <div className="border-b border-canvas-silk pb-3">
-        <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+        <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <BarChart3 className="h-4 w-4 text-primary-500" /> Practice Analytics & Patient Engagement Telemetry
         </h2>
         <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Track clinical throughput, patient satisfaction ratings, and appointment adherence metrics</p>
@@ -99,7 +99,7 @@ export const ProviderAnalyticsDashboard = () => {
                 <Icon className={`h-4 w-4 ${color}`} />
               </div>
               <div>
-                <p className="text-xl font-black font-mono text-slate-900">{value}</p>
+                <p className="text-xl font-black font-mono text-slate-900 dark:text-slate-100">{value}</p>
                 <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</p>
               </div>
             </div>
@@ -109,9 +109,9 @@ export const ProviderAnalyticsDashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Recent Appointments */}
-        <div className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs space-y-3">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-canvas-silk pb-2">
-            <h3 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+            <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-primary-500" /> Recent Patient Visits
             </h3>
             <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{recentAppointments.length} visits</span>
@@ -124,7 +124,7 @@ export const ProviderAnalyticsDashboard = () => {
               {recentAppointments.map((apt: any) => (
                 <div key={apt.id} className="flex items-center justify-between p-2.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
                   <div>
-                    <p className="font-extrabold text-slate-900">{apt.patient?.first_name} {apt.patient?.last_name}</p>
+                    <p className="font-extrabold text-slate-900 dark:text-slate-100">{apt.patient?.first_name} {apt.patient?.last_name}</p>
                     <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{apt.date} at {apt.time}</p>
                   </div>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
@@ -139,9 +139,9 @@ export const ProviderAnalyticsDashboard = () => {
         </div>
 
         {/* Recent Reviews & Patient Satisfaction */}
-        <div className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs space-y-3">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-canvas-silk pb-2">
-            <h3 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+            <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               <MessageSquareText className="h-4 w-4 text-warning-500" /> Patient Ratings & Feedback
             </h3>
             <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>

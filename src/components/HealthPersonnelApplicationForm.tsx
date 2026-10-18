@@ -375,7 +375,7 @@ export const HealthPersonnelApplicationForm = () => {
                     type="button"
                     onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
                     disabled={isSubmitting}
-                    className="w-full py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white text-xs font-bold flex items-center justify-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                    className="w-full py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center justify-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-700"
                   >
                     <Upload className="h-3.5 w-3.5" /> Upload Document
                   </button>

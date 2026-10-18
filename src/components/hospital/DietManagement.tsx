@@ -135,7 +135,7 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
           <tbody className="divide-y divide-canvas-silk">
             {plans.map((p) => (
               <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                <td className="py-3 px-4 font-bold text-slate-900">{nameFor(p.patient_id) || "Inpatient Resident"}</td>
+                <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{nameFor(p.patient_id) || "Inpatient Resident"}</td>
                 <td className="py-3 px-3 font-semibold text-primary-500">{p.diet_type || "Regular"}</td>
                 <td className="py-3 px-3 text-center">
                   {!p.end_date || p.end_date >= today ? (
