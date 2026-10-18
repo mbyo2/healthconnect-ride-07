@@ -163,6 +163,10 @@ const MedicalShiftHR = lazyWithRetry(() => import('@/pages/MedicalShiftHR'));
 const DenialWorkqueue = lazyWithRetry(() => import('@/components/billing/DenialWorkqueue'));
 const PatientDeliveryTracking = lazyWithRetry(() => import('@/components/delivery/PatientDeliveryTracking'));
 const CourierDeliveryDashboard = lazyWithRetry(() => import('@/components/delivery/CourierDeliveryDashboard'));
+const ARTModule = lazyWithRetry(() => import('@/components/hospital/ARTModule'));
+const CampManagement = lazyWithRetry(() => import('@/components/hospital/CampManagement'));
+const IndentManagement = lazyWithRetry(() => import('@/components/hospital/IndentManagement'));
+const EmailCampaigns = lazyWithRetry(() => import('@/components/hospital/EmailCampaigns'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -375,6 +379,10 @@ const AppContent = () => {
             <Route path="/denial-workqueue" element={<RouteGuard><DenialWorkqueue /></RouteGuard>} />
             <Route path="/my-deliveries" element={<RouteGuard><PatientDeliveryTracking /></RouteGuard>} />
             <Route path="/courier-deliveries" element={<RouteGuard><CourierDeliveryDashboard /></RouteGuard>} />
+            <Route path="/art" element={<RouteGuard><ARTModule /></RouteGuard>} />
+            <Route path="/camps" element={<RouteGuard><CampManagement /></RouteGuard>} />
+            <Route path="/indents" element={<RouteGuard><IndentManagement /></RouteGuard>} />
+            <Route path="/email-campaigns" element={<RouteGuard><EmailCampaigns /></RouteGuard>} />
 
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />

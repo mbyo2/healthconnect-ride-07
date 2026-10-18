@@ -78,6 +78,9 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
     '/ambient-scribe',      // AI consultation notes
+    '/art',                 // fertility/ART/IVF module
+    '/camps',               // health camp management
+    '/indents',             // department supply requests
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
@@ -255,6 +258,9 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/institution/settings',
     '/drug-stock',          // institutional drug inventory
     '/institution/devices',
+    '/email-campaigns',     // patient email campaigns
+    '/camps',               // health camp management
+    '/indents',             // department supply requests
     '/appointments',
     '/appointments/:id',
     '/chat',
