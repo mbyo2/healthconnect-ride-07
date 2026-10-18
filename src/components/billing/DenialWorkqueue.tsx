@@ -712,3 +712,5 @@ export const DenialWorkqueue: React.FC = () => {
     </div>
   );
 };
+
+export default DenialWorkqueue;
