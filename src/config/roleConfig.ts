@@ -59,6 +59,7 @@ export const USER_ROLES = {
   CXO: 'cxo',
   OT_STAFF: 'ot_staff',
   BILLING_STAFF: 'billing_staff',
+  FINANCE_MANAGER: 'finance_manager',
   INVENTORY_MANAGER: 'inventory_manager',
   TRIAGE_STAFF: 'triage_staff',
   MAINTENANCE_MANAGER: 'maintenance_manager',
