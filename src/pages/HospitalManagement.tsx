@@ -57,7 +57,7 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "ot", label: "OT Surgery" },
   { val: "lab", label: "Lab LIMS" },
   { val: "radiology", label: "Radiology" },
-  { val: "pharmacy", label: "Pharmacy POS" },
+  { val: "pharmacy", label: "Dispensary POS" },
   { val: "bloodbank", label: "Blood Bank" },
   { val: "camps", label: "Health Camps" },
   { val: "indents", label: "Indents" },
