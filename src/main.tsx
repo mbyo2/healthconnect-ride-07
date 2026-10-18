@@ -8,6 +8,7 @@ import './App.css';
 import { Toaster } from 'sonner';
 import { AppFeedbackProvider } from '@/components/feedback/AppFeedback';
 import { ThemeProvider } from './hooks/use-theme';
+import { LanguageProvider } from './i18n/LanguageContext';
 import { LoadingScreen } from './components/LoadingScreen';
 import { ErrorBoundary } from './components/ui/error-boundary';
 import { safeLocalClear, safeSessionClear } from './utils/storage';
@@ -142,6 +143,7 @@ function renderApp() {
           <React.Suspense fallback={<LoadingScreen message="Loading Doc' O Clock..." />}>
             <QueryClientProvider client={queryClient}>
               <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
+                <LanguageProvider>
                 <AppFeedbackProvider>
                   <App />
                 </AppFeedbackProvider>
@@ -158,6 +160,7 @@ function renderApp() {
                     },
                   }}
                 />
+                </LanguageProvider>
               </ThemeProvider>
             </QueryClientProvider>
           </React.Suspense>
