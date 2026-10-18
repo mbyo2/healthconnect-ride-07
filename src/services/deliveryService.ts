@@ -92,8 +92,8 @@ export async function createMedicineDelivery(params: {
 
   if (error) return { error: error.message };
   
-  // Auto-assign nearest available courier
-  await autoAssignCourier(data.id, params.pickupLat, params.pickupLng);
+  // Auto-assign nearest available courier (institution drivers first, then platform)
+  await autoAssignCourier(data.id, params.pickupLat, params.pickupLng, params.pharmacyId);
   
   return { data: data as DeliveryOrder };
 }
@@ -143,21 +143,48 @@ export async function createServiceDelivery(params: {
   return { data: data as DeliveryOrder };
 }
 
-/** Auto-assign the nearest available courier to a delivery order */
+/** Auto-assign the nearest available courier to a delivery order
+ * Priority: 1) Institution's own drivers, 2) Platform couriers
+ */
 export async function autoAssignCourier(
   orderId: string,
   pickupLat: number,
-  pickupLng: number
+  pickupLng: number,
+  pharmacyId?: string,
+  institutionId?: string
 ): Promise<boolean> {
-  // Find available couriers with recent location
-  const { data: couriers } = await supabase
-    .from('couriers')
-    .select('id, user_id')
-    .eq('is_active', true)
-    .eq('is_available', true)
-    .limit(20);
+  // First try: institution's own drivers
+  let couriers: any[] = [];
+  if (pharmacyId || institutionId) {
+    const { data: ownCouriers } = await supabase
+      .from('couriers')
+      .select('id, user_id')
+      .eq('is_active', true)
+      .eq('is_available', true)
+      .eq('verification_status', 'verified')
+      .or(
+        pharmacyId ? `pharmacy_id.eq.${pharmacyId}` : '' +
+        institutionId ? `${pharmacyId ? ',' : ''}institution_id.eq.${institutionId}` : ''
+      )
+      .limit(20);
+    couriers = ownCouriers || [];
+  }
 
-  if (!couriers || couriers.length === 0) return false;
+  // Fallback: platform couriers (no institution/pharmacy link)
+  if (couriers.length === 0) {
+    const { data: platformCouriers } = await supabase
+      .from('couriers')
+      .select('id, user_id')
+      .eq('is_active', true)
+      .eq('is_available', true)
+      .eq('verification_status', 'verified')
+      .is('pharmacy_id', null)
+      .is('institution_id', null)
+      .limit(20);
+    couriers = platformCouriers || [];
+  }
+
+  if (couriers.length === 0) return false;
 
   // Get their latest locations
   const courierIds = couriers.map((c: any) => c.id);
