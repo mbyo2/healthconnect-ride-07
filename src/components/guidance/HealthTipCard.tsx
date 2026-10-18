@@ -28,21 +28,21 @@ export const HealthTipCard = ({
   const categoryConfig = {
     wellness: {
       icon: Heart,
-      color: 'text-success-600',
-      bg: 'bg-success-50',
-      border: 'border-success-200',
+      color: 'text-success-600 dark:text-success-400',
+      bg: 'bg-success-50 dark:bg-success-950/30',
+      border: 'border-success-200 dark:border-success-800',
     },
     prevention: {
       icon: TrendingUp,
-      color: 'text-primary-600',
-      bg: 'bg-primary-50',
-      border: 'border-primary-200',
+      color: 'text-primary-600 dark:text-primary-400',
+      bg: 'bg-primary-50 dark:bg-primary-950/30',
+      border: 'border-primary-200 dark:border-primary-800',
     },
     lifestyle: {
       icon: Lightbulb,
-      color: 'text-warning-600',
-      bg: 'bg-warning-50',
-      border: 'border-warning-200',
+      color: 'text-warning-600 dark:text-warning-400',
+      bg: 'bg-warning-50 dark:bg-warning-950/30',
+      border: 'border-warning-200 dark:border-warning-800',
     },
   };
 
