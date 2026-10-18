@@ -132,10 +132,14 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         query = query.ilike('provider_type', selectedType);
       }
       if (searchTerm) {
+        // If searching for "General Practice", also match NULL specialty
+        // (providers without set specialty display as General Practice)
+        const isGeneralPracticeSearch = searchTerm.toLowerCase().includes('general practice');
         query = query.or(
           `first_name.ilike.%${searchTerm}%,` +
           `last_name.ilike.%${searchTerm}%,` +
-          `specialty.ilike.%${searchTerm}%`
+          `specialty.ilike.%${searchTerm}%` +
+          (isGeneralPracticeSearch ? `,specialty.is.null` : ``)
         );
       }
       // ── new filters ──
