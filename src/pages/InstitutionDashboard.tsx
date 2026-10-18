@@ -255,6 +255,7 @@ export const InstitutionDashboard = () => {
     pharmacy_inventory: "/pharmacy-inventory",
     billing: "/hospital-management?tab=billing",
     hr_staff: "/institution/personnel",
+    staff_management: "/institution/personnel",
     reports: "/institution/reports",
     ipd_wards: "/hospital-management?tab=ipd",
     emergency: "/hospital-management?tab=opd",
