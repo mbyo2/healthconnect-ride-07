@@ -89,6 +89,7 @@ export function useHRModule() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [payroll, setPayroll] = useState<PayrollRecord[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
@@ -195,13 +196,205 @@ export function useHRModule() {
     }
   };
 
+  // ─── Employee directory ──────────────────────────────────────────
+  const fetchEmployees = useCallback(async () => {
+    if (!institutionId) return;
+    try {
+      const { data: personnel, error } = await supabase
+        .from('institution_personnel')
+        .select('*')
+        .eq('institution_id', institutionId)
+        .order('joined_at', { ascending: false });
+      if (error) throw error;
+
+      const rows = (personnel as unknown as any[]) || [];
+      const userIds = [...new Set(rows.map((r) => r.user_id).filter(Boolean))];
+      let profileMap: Record<string, { first_name: string | null; last_name: string | null; email: string | null }> = {};
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email')
+          .in('id', userIds);
+        for (const p of (profiles as unknown as any[]) || []) {
+          profileMap[p.id] = p;
+        }
+      }
+
+      setEmployees(
+        rows.map((r) => ({
+          id: r.id,
+          institution_id: r.institution_id,
+          user_id: r.user_id,
+          role: r.role || 'staff',
+          department: r.department || null,
+          salary_monthly: Number(r.salary_monthly || 0),
+          status: r.status || 'active',
+          joined_at: r.joined_at,
+          first_name: profileMap[r.user_id]?.first_name || null,
+          last_name: profileMap[r.user_id]?.last_name || null,
+          email: profileMap[r.user_id]?.email || null,
+        }))
+      );
+    } catch (err) {
+      console.error('HR fetch employees error:', err);
+    }
+  }, [institutionId]);
+
+  useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
+
+  /** Look up a platform user by email so they can be added as an employee. */
+  const findUserByEmail = async (email: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .ilike('email', email.trim())
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data as unknown as { id: string; first_name: string | null; last_name: string | null; email: string | null } | null;
+  };
+
+  const upsertEmployee = async (data: {
+    user_id: string;
+    role: string;
+    department?: string;
+    salary_monthly: number;
+    status?: 'active' | 'inactive' | 'pending';
+  }) => {
+    if (!institutionId || !user) return null;
+    try {
+      const { error } = await supabase
+        .from('institution_personnel')
+        .upsert({
+          institution_id: institutionId,
+          user_id: data.user_id,
+          role: data.role,
+          department: data.department || null,
+          salary_monthly: data.salary_monthly,
+          status: data.status || 'active',
+        } as any, { onConflict: 'institution_id,user_id' });
+      if (error) throw error;
+      toast.success('Employee saved');
+      fetchEmployees();
+      return true;
+    } catch (err: any) {
+      toast.error('Failed to save employee: ' + err.message);
+      return null;
+    }
+  };
+
+  const setEmployeeStatus = async (employeeId: string, status: 'active' | 'inactive') => {
+    try {
+      const { error } = await supabase
+        .from('institution_personnel')
+        .update({ status } as any)
+        .eq('id', employeeId);
+      if (error) throw error;
+      toast.success(status === 'active' ? 'Employee reactivated' : 'Employee deactivated');
+      fetchEmployees();
+    } catch (err: any) {
+      toast.error('Failed to update employee: ' + err.message);
+    }
+  };
+
+  // ─── Payroll generation ────────────────────────────────────────────
+  /**
+   * Build a payroll preview for a pay period without writing anything.
+   * Throws if payroll was already run for the period.
+   */
+  const previewPayroll = async (periodStart: string, periodEnd: string): Promise<PayrollRunSummary> => {
+    if (!institutionId) throw new Error('No institution selected');
+
+    const { data: existing, error: dupError } = await supabase
+      .from('payroll_records')
+      .select('id')
+      .eq('institution_id', institutionId)
+      .eq('period_start', periodStart)
+      .eq('period_end', periodEnd)
+      .limit(1);
+    if (dupError) throw dupError;
+    if (existing && existing.length > 0) {
+      throw new Error('Payroll has already been run for this period');
+    }
+
+    const active = employees.filter((e) => e.status === 'active' && e.salary_monthly > 0);
+    if (active.length === 0) {
+      throw new Error('No active employees with a salary set. Add salaries in the Employee directory first.');
+    }
+
+    const lines = active.map((employee) => {
+      const zm = calculateZambiaPayroll(employee.salary_monthly);
+      return {
+        employee,
+        gross: zm.grossSalary,
+        napsa: zm.napsaEmployee,
+        nhima: zm.nhimaEmployee,
+        paye: zm.totalPaye,
+        net: zm.netPay,
+      };
+    });
+
+    return {
+      employeeCount: lines.length,
+      totalGross: lines.reduce((s, l) => s + l.gross, 0),
+      totalNapsa: lines.reduce((s, l) => s + l.napsa, 0),
+      totalNhima: lines.reduce((s, l) => s + l.nhima, 0),
+      totalPaye: lines.reduce((s, l) => s + l.paye, 0),
+      totalDeductions: lines.reduce((s, l) => s + l.napsa + l.nhima + l.paye, 0),
+      totalNet: lines.reduce((s, l) => s + l.net, 0),
+      lines,
+    };
+  };
+
+  /**
+   * Confirm and write a payroll run. Re-checks duplicates; the DB unique
+   * index is the final backstop against double runs.
+   */
+  const runPayroll = async (summary: PayrollRunSummary, periodStart: string, periodEnd: string, currency: string) => {
+    if (!institutionId || !user) return false;
+    try {
+      const rows = summary.lines.map((l) => ({
+        institution_id: institutionId,
+        staff_id: l.employee.user_id,
+        period_start: periodStart,
+        period_end: periodEnd,
+        basic_salary: l.gross,
+        overtime_pay: 0,
+        allowances: 0,
+        deductions: l.napsa + l.nhima,
+        tax: l.paye,
+        net_salary: l.net,
+        currency,
+        status: 'processed',
+        created_by: user.id,
+      }));
+
+      const { error } = await supabase.from('payroll_records').insert(rows as any);
+      if (error) {
+        // 23505 = unique violation → someone already ran this period
+        if ((error as any).code === '23505') {
+          throw new Error('Payroll has already been run for this period');
+        }
+        throw error;
+      }
+      toast.success(`Payroll processed for ${summary.employeeCount} employees`);
+      fetchAll();
+      return true;
+    } catch (err: any) {
+      toast.error('Failed to run payroll: ' + err.message);
+      return false;
+    }
+  };
+
   const pendingLeaves = leaveRequests.filter(l => l.status === 'pending');
   const todayAttendance = attendance.filter(a => a.date === new Date().toISOString().split('T')[0]);
 
   return {
-    leaveRequests, attendance, payroll, loading,
+    leaveRequests, attendance, payroll, employees, loading,
     pendingLeaves, todayAttendance,
     createLeaveRequest, approveLeave, recordAttendance,
+    fetchEmployees, findUserByEmail, upsertEmployee, setEmployeeStatus,
+    previewPayroll, runPayroll,
     refetch: fetchAll,
   };
 }

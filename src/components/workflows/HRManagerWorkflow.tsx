@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer, Building2 } from "lucide-react";
-import { useHRModule, LeaveRequest } from "@/hooks/useHRModule";
+import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer, Building2, PlayCircle, UserPlus, Search } from "lucide-react";
+import { useHRModule, LeaveRequest, Employee, PayrollRunSummary } from "@/hooks/useHRModule";
 import { format } from "date-fns";
 import { BulkAttendanceImport } from "@/components/hr/BulkAttendanceImport";
 import { ShiftScheduleCalendar } from "@/components/hr/ShiftScheduleCalendar";
@@ -28,11 +28,17 @@ export const HRManagerWorkflow = () => {
     leaveRequests,
     attendance,
     payroll,
+    employees,
     loading,
     pendingLeaves,
     todayAttendance,
     createLeaveRequest,
     approveLeave,
+    findUserByEmail,
+    upsertEmployee,
+    setEmployeeStatus,
+    previewPayroll,
+    runPayroll,
     refetch,
   } = useHRModule();
   const { currency } = useCurrency();
@@ -46,6 +52,124 @@ export const HRManagerWorkflow = () => {
     end_date: "",
     reason: "",
   });
+
+  // ─── Employee directory state ───
+  const [employeeDialogOpen, setEmployeeDialogOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [empEmail, setEmpEmail] = useState("");
+  const [empLookup, setEmpLookup] = useState<{ id: string; first_name: string | null; last_name: string | null; email: string | null } | null>(null);
+  const [empLookingUp, setEmpLookingUp] = useState(false);
+  const [empError, setEmpError] = useState<string | null>(null);
+  const [empRole, setEmpRole] = useState("staff");
+  const [empDepartment, setEmpDepartment] = useState("");
+  const [empSalary, setEmpSalary] = useState("");
+  const [empSaving, setEmpSaving] = useState(false);
+
+  // ─── Run payroll state ───
+  const [payrollDialogOpen, setPayrollDialogOpen] = useState(false);
+  const [payMonth, setPayMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [payrollPreview, setPayrollPreview] = useState<PayrollRunSummary | null>(null);
+  const [payrollPreviewError, setPayrollPreviewError] = useState<string | null>(null);
+  const [payrollPreviewing, setPayrollPreviewing] = useState(false);
+  const [payrollProcessing, setPayrollProcessing] = useState(false);
+
+  const openNewEmployeeDialog = () => {
+    setEditingEmployee(null);
+    setEmpEmail("");
+    setEmpLookup(null);
+    setEmpError(null);
+    setEmpRole("staff");
+    setEmpDepartment("");
+    setEmpSalary("");
+    setEmployeeDialogOpen(true);
+  };
+
+  const openEditEmployeeDialog = (e: Employee) => {
+    setEditingEmployee(e);
+    setEmpLookup({ id: e.user_id, first_name: e.first_name, last_name: e.last_name, email: e.email });
+    setEmpError(null);
+    setEmpRole(e.role);
+    setEmpDepartment(e.department || "");
+    setEmpSalary(String(e.salary_monthly || ""));
+    setEmployeeDialogOpen(true);
+  };
+
+  const handleLookupEmployee = async () => {
+    if (!empEmail.trim()) return;
+    setEmpLookingUp(true);
+    setEmpLookup(null);
+    setEmpError(null);
+    try {
+      const found = await findUserByEmail(empEmail.trim());
+      if (!found) {
+        setEmpError("No platform user found with that email. The person must register on Doc'O Clock first.");
+      } else {
+        setEmpLookup(found);
+      }
+    } catch (err: any) {
+      setEmpError("Lookup failed: " + err.message);
+    }
+    setEmpLookingUp(false);
+  };
+
+  const handleSaveEmployee = async () => {
+    const userId = editingEmployee ? editingEmployee.user_id : empLookup?.id;
+    const salary = parseFloat(empSalary);
+    setEmpError(null);
+    if (!userId) { setEmpError("Find the staff member by email first."); return; }
+    if (!salary || salary <= 0) { setEmpError("Enter a valid monthly salary."); return; }
+    setEmpSaving(true);
+    const ok = await upsertEmployee({
+      user_id: userId,
+      role: empRole,
+      department: empDepartment.trim() || undefined,
+      salary_monthly: salary,
+      status: "active",
+    });
+    setEmpSaving(false);
+    if (ok) setEmployeeDialogOpen(false);
+  };
+
+  const monthToPeriod = (ym: string) => {
+    const [y, m] = ym.split("-").map(Number);
+    const start = `${ym}-01`;
+    const lastDay = new Date(y, m, 0).getDate();
+    const end = `${ym}-${String(lastDay).padStart(2, "0")}`;
+    return { start, end };
+  };
+
+  const handlePreviewPayroll = async () => {
+    setPayrollPreviewing(true);
+    setPayrollPreview(null);
+    setPayrollPreviewError(null);
+    try {
+      const { start, end } = monthToPeriod(payMonth);
+      const summary = await previewPayroll(start, end);
+      setPayrollPreview(summary);
+    } catch (err: any) {
+      setPayrollPreviewError(err.message || "Could not build payroll preview");
+    }
+    setPayrollPreviewing(false);
+  };
+
+  const handleConfirmPayroll = async () => {
+    if (!payrollPreview) return;
+    setPayrollProcessing(true);
+    const { start, end } = monthToPeriod(payMonth);
+    const ok = await runPayroll(payrollPreview, start, end, currency);
+    setPayrollProcessing(false);
+    if (ok) {
+      setPayrollDialogOpen(false);
+      setPayrollPreview(null);
+      setPayMonth(() => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      });
+    }
+  };
 
   const handleCreateLeave = async () => {
     if (!leaveForm.start_date || !leaveForm.end_date) return;
@@ -66,6 +190,17 @@ export const HRManagerWorkflow = () => {
         return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
       default:
         return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending Review</span>;
+    }
+  };
+
+  const getEmployeeStatusPill = (status: string) => {
+    switch (status) {
+      case "active":
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active</span>;
+      case "inactive":
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-400">Inactive</span>;
+      default:
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
     }
   };
 
@@ -200,6 +335,7 @@ export const HRManagerWorkflow = () => {
       {/* Tabs bar */}
       <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
         {[
+          { id: "employees", label: `Employees (${employees.length})`, icon: Users },
           { id: "leaves", label: `Leave Requests (${leaveRequests.length})`, icon: ClipboardCheck },
           { id: "attendance", label: `Attendance (${todayAttendance.length})`, icon: Clock },
           { id: "shifts", label: "Shift Roster", icon: Calendar },
@@ -221,6 +357,83 @@ export const HRManagerWorkflow = () => {
       </div>
 
       {/* Main Tab Views */}
+      {activeTab === "employees" && (
+        <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+          <div className="px-4 py-3 border-b border-canvas-silk flex items-center justify-between">
+            <div>
+              <h3 className="font-extrabold text-sm">Employee Directory ({employees.length})</h3>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Staff, roles, departments and monthly salaries</p>
+            </div>
+            <button
+              onClick={openNewEmployeeDialog}
+              className="px-4 py-2.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 min-h-[44px]"
+            >
+              <UserPlus className="h-4 w-4" />
+              Add Employee
+            </button>
+          </div>
+          {employees.length === 0 ? (
+            <div className="p-8 text-center">
+              <Users className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">No employees yet.</p>
+              <button
+                onClick={openNewEmployeeDialog}
+                className="mt-3 px-4 py-2.5 rounded-md bg-primary-500 text-white font-extrabold text-xs min-h-[44px]"
+              >
+                Add your first employee
+              </button>
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                    <th className="py-2.5 px-4">Name</th>
+                    <th className="py-2.5 px-3">Role</th>
+                    <th className="py-2.5 px-3">Department</th>
+                    <th className="py-2.5 px-3 text-right">Salary / mo</th>
+                    <th className="py-2.5 px-3">Start Date</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-canvas-silk">
+                  {employees.map((e) => {
+                    const name = [e.first_name, e.last_name].filter(Boolean).join(" ") || e.email || `Staff (${e.user_id.slice(0, 8)})`;
+                    return (
+                      <tr key={e.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{name}</td>
+                        <td className="py-3 px-3 font-semibold capitalize">{e.role}</td>
+                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{e.department || "—"}</td>
+                        <td className="py-3 px-3 text-right font-mono font-semibold">K{e.salary_monthly.toLocaleString()}</td>
+                        <td className="py-3 px-3 font-mono font-semibold">{format(new Date(e.joined_at), "MMM d, yyyy")}</td>
+                        <td className="py-3 px-3 text-center">{getEmployeeStatusPill(e.status)}</td>
+                        <td className="py-3 px-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => openEditEmployeeDialog(e)}
+                              className="px-2.5 py-1.5 rounded-md bg-slate-200 dark:bg-slate-700 text-xs font-bold min-h-[44px]"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => setEmployeeStatus(e.id, e.status === "active" ? "inactive" : "active")}
+                              className={`px-2.5 py-1.5 rounded-md text-xs font-bold text-white min-h-[44px] ${e.status === "active" ? "bg-error-500" : "bg-success-500"}`}
+                            >
+                              {e.status === "active" ? "Deactivate" : "Reactivate"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {activeTab === "leaves" && (
         <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
           <div className="w-full overflow-x-auto">
@@ -321,7 +534,29 @@ export const HRManagerWorkflow = () => {
       {activeTab === "shifts" && <ShiftScheduleCalendar />}
 
       {activeTab === "payroll" && (
-        <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs">
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-extrabold text-sm">Payroll Runs</h3>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                Generate ZRA PAYE, NAPSA and NHIMA deductions for all active employees
+              </p>
+            </div>
+            <button
+              onClick={() => { setPayrollPreview(null); setPayrollPreviewError(null); setPayrollDialogOpen(true); }}
+              className="px-4 py-2.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 min-h-[44px] whitespace-nowrap"
+            >
+              <PlayCircle className="h-4 w-4" />
+              Run Payroll
+            </button>
+          </div>
+          <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs">
+          {payroll.length === 0 && (
+            <div className="p-8 text-center">
+              <DollarSign className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">No payroll runs yet. Use "Run Payroll" to generate the first one.</p>
+            </div>
+          )}
           {payroll.map((p) => {
             const zm = calculateZambiaPayroll(p.basic_salary);
             return (
@@ -369,6 +604,7 @@ export const HRManagerWorkflow = () => {
               </div>
             );
           })}
+          </div>
         </div>
       )}
       {/* Reject a leave request — denies time off, requires confirmation */}
@@ -407,6 +643,213 @@ export const HRManagerWorkflow = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add / Edit Employee */}
+      <Dialog open={employeeDialogOpen} onOpenChange={setEmployeeDialogOpen}>
+        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-extrabold text-base">
+              {editingEmployee ? "Edit Employee" : "Add Employee"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2 text-xs">
+            {!editingEmployee && (
+              <div>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Staff Email *</label>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="email"
+                    value={empEmail}
+                    onChange={(e) => setEmpEmail(e.target.value)}
+                    placeholder="staff@example.com"
+                    className="flex-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-medium min-h-[44px]"
+                  />
+                  <button
+                    onClick={handleLookupEmployee}
+                    disabled={empLookingUp || !empEmail.trim()}
+                    className="px-4 rounded-md bg-slate-200 dark:bg-slate-700 font-extrabold min-h-[44px] flex items-center gap-1 disabled:opacity-40"
+                  >
+                    {empLookingUp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    Find
+                  </button>
+                </div>
+                <p className="text-graphite-500 dark:text-slate-400 font-medium mt-1">
+                  The person must already have a Doc'O Clock account.
+                </p>
+              </div>
+            )}
+            {empLookup && (
+              <div className="rounded-xl border border-success-500/40 bg-success-500/10 p-3 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />
+                <span className="font-bold">
+                  {[empLookup.first_name, empLookup.last_name].filter(Boolean).join(" ") || empLookup.email}
+                </span>
+              </div>
+            )}
+            {empError && (
+              <div className="rounded-xl border border-error-500/40 bg-error-500/10 p-3 flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-error-500 shrink-0" />
+                <span className="font-medium">{empError}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Role *</label>
+                <select
+                  value={empRole}
+                  onChange={(e) => setEmpRole(e.target.value)}
+                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold min-h-[44px]"
+                >
+                  <option value="doctor">Doctor</option>
+                  <option value="nurse">Nurse</option>
+                  <option value="admin">Admin</option>
+                  <option value="staff">Staff</option>
+                  <option value="technician">Technician</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Department</label>
+                <input
+                  value={empDepartment}
+                  onChange={(e) => setEmpDepartment(e.target.value)}
+                  placeholder="e.g. Outpatient"
+                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-medium min-h-[44px]"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Monthly Salary (ZMW) *</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={empSalary}
+                onChange={(e) => setEmpSalary(e.target.value)}
+                placeholder="e.g. 8500"
+                className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono font-bold min-h-[44px]"
+              />
+              <p className="text-graphite-500 dark:text-slate-400 font-medium mt-1">
+                Gross monthly pay — PAYE, NAPSA and NHIMA are calculated automatically at payroll run.
+              </p>
+            </div>
+            <button
+              onClick={handleSaveEmployee}
+              disabled={empSaving}
+              className="w-full py-2.5 rounded-md bg-primary-500 text-white font-extrabold text-xs min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-1.5"
+            >
+              {empSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+              {editingEmployee ? "Save Changes" : "Add Employee"}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Run Payroll */}
+      <Dialog open={payrollDialogOpen} onOpenChange={(open) => { setPayrollDialogOpen(open); if (!open) { setPayrollPreview(null); setPayrollPreviewError(null); } }}>
+        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-extrabold text-base">Run Payroll</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2 text-xs">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+              <div className="flex-1">
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pay Period (month) *</label>
+                <input
+                  type="month"
+                  value={payMonth}
+                  onChange={(e) => { setPayMonth(e.target.value); setPayrollPreview(null); setPayrollPreviewError(null); }}
+                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold min-h-[44px]"
+                />
+              </div>
+              <button
+                onClick={handlePreviewPayroll}
+                disabled={payrollPreviewing || !payMonth}
+                className="px-4 py-2.5 rounded-md bg-primary-500 text-white font-extrabold min-h-[44px] disabled:opacity-40 flex items-center gap-1.5 whitespace-nowrap"
+              >
+                {payrollPreviewing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                Preview Payroll
+              </button>
+            </div>
+
+            {payrollPreviewError && (
+              <div className="rounded-xl border border-error-500/40 bg-error-500/10 p-3 flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-error-500 shrink-0" />
+                <span className="font-medium">{payrollPreviewError}</span>
+              </div>
+            )}
+
+            {payrollPreview && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="p-3 rounded-xl border border-canvas-silk bg-canvas">
+                    <div className="text-graphite-500 dark:text-slate-400 font-extrabold uppercase">Employees</div>
+                    <div className="text-xl font-black font-mono">{payrollPreview.employeeCount}</div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-canvas-silk bg-canvas">
+                    <div className="text-graphite-500 dark:text-slate-400 font-extrabold uppercase">Total Gross</div>
+                    <div className="text-xl font-black font-mono">K{payrollPreview.totalGross.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-canvas-silk bg-canvas">
+                    <div className="text-graphite-500 dark:text-slate-400 font-extrabold uppercase">Deductions</div>
+                    <div className="text-xl font-black font-mono text-warning-500">K{payrollPreview.totalDeductions.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-canvas-silk bg-canvas">
+                    <div className="text-graphite-500 dark:text-slate-400 font-extrabold uppercase">Total Net</div>
+                    <div className="text-xl font-black font-mono text-success-500">K{payrollPreview.totalNet.toLocaleString()}</div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-canvas-silk overflow-hidden">
+                  <div className="w-full overflow-x-auto max-h-64 overflow-y-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 bg-canvas">
+                        <tr className="text-graphite-500 dark:text-slate-400 font-extrabold uppercase">
+                          <th className="py-2 px-3">Employee</th>
+                          <th className="py-2 px-3 text-right">Gross</th>
+                          <th className="py-2 px-3 text-right">NAPSA</th>
+                          <th className="py-2 px-3 text-right">NHIMA</th>
+                          <th className="py-2 px-3 text-right">PAYE</th>
+                          <th className="py-2 px-3 text-right">Net</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-canvas-silk">
+                        {payrollPreview.lines.map((l) => {
+                          const name = [l.employee.first_name, l.employee.last_name].filter(Boolean).join(" ") || l.employee.email || "Staff";
+                          return (
+                            <tr key={l.employee.id}>
+                              <td className="py-2 px-3 font-bold">{name}</td>
+                              <td className="py-2 px-3 text-right font-mono">K{l.gross.toLocaleString()}</td>
+                              <td className="py-2 px-3 text-right font-mono">K{l.napsa.toLocaleString()}</td>
+                              <td className="py-2 px-3 text-right font-mono">K{l.nhima.toLocaleString()}</td>
+                              <td className="py-2 px-3 text-right font-mono">K{l.paye.toLocaleString()}</td>
+                              <td className="py-2 px-3 text-right font-mono font-bold text-success-500">K{l.net.toLocaleString()}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-warning-500/40 bg-warning-500/10 p-3 text-graphite-600 dark:text-slate-300 font-medium">
+                  This will create {payrollPreview.employeeCount} payroll record{payrollPreview.employeeCount === 1 ? "" : "s"} for{" "}
+                  <strong>{payMonth}</strong> with status "processed". Verify the figures above before confirming —
+                  a period can only be run once.
+                </div>
+
+                <button
+                  onClick={handleConfirmPayroll}
+                  disabled={payrollProcessing}
+                  className="w-full py-2.5 rounded-md bg-success-500 hover:bg-success-600 text-white font-extrabold text-xs min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-1.5"
+                >
+                  {payrollProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                  Confirm & Process Payroll — K{payrollPreview.totalNet.toLocaleString()} net
+                </button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
