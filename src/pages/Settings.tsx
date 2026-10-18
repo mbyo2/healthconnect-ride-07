@@ -8,9 +8,11 @@ import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAccessibility } from "@/context/AccessibilityContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage, SUPPORTED_LANGUAGES } from "@/i18n/LanguageContext";
 import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
 
 const Settings = () => {
+  const { language: i18nLang, setLanguage: setI18nLang } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -372,12 +374,16 @@ const Settings = () => {
               </h2>
               <div className="space-y-1.5">
                 <label htmlFor="settings-language" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>
-                <Select value={language} onValueChange={handleLanguageChange}>
+                <Select value={i18nLang} onValueChange={(val) => {
+                  setI18nLang(val as any);
+                  setLanguage(val);
+                  showSuccess({ message: `Language updated` });
+                }}>
                   <SelectTrigger id="settings-language" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>{lang.nativeName}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
