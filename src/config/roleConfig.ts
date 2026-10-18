@@ -288,6 +288,7 @@ export const COMMON_ROUTES = [
   '/privacy-security',
   '/payment-success',
   '/payment-cancel',
+  '/courier-deliveries',
 ];
 
 export const PROVIDER_CORE_ROUTES = [

@@ -161,6 +161,8 @@ const ZraSmartInvoiceIntegration = lazyWithRetry(() => import('@/pages/ZraSmartI
 const PayeTaxCalculations = lazyWithRetry(() => import('@/pages/PayeTaxCalculations'));
 const MedicalShiftHR = lazyWithRetry(() => import('@/pages/MedicalShiftHR'));
 const DenialWorkqueue = lazyWithRetry(() => import('@/components/billing/DenialWorkqueue'));
+const PatientDeliveryTracking = lazyWithRetry(() => import('@/components/delivery/PatientDeliveryTracking'));
+const CourierDeliveryDashboard = lazyWithRetry(() => import('@/components/delivery/CourierDeliveryDashboard'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -371,6 +373,8 @@ const AppContent = () => {
             <Route path="/paye-calculations" element={<RouteGuard><PayeTaxCalculations /></RouteGuard>} />
             <Route path="/medical-shift-hr" element={<RouteGuard><MedicalShiftHR /></RouteGuard>} />
             <Route path="/denial-workqueue" element={<RouteGuard><DenialWorkqueue /></RouteGuard>} />
+            <Route path="/my-deliveries" element={<RouteGuard><PatientDeliveryTracking /></RouteGuard>} />
+            <Route path="/courier-deliveries" element={<RouteGuard><CourierDeliveryDashboard /></RouteGuard>} />
 
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />
