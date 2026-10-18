@@ -203,7 +203,7 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 1: Check-in */}
               <button
                 onClick={() => setMode("checkin")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-primary-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
                 <div className="h-14 w-14 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-primary-500 flex items-center justify-center font-black mb-6 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                   <UserCheck className="h-7 w-7" />
@@ -225,7 +225,7 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 2: Walk-in Registration */}
               <button
                 onClick={() => setMode("register")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
                 <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center font-black mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   <HeartPulse className="h-7 w-7" />
@@ -247,7 +247,7 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 3: Bill Payment */}
               <button
                 onClick={() => setMode("pay")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-purple-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-purple-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
                 <div className="h-14 w-14 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center font-black mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                   <CreditCard className="h-7 w-7" />
@@ -281,7 +281,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <label className="font-bold text-xs text-slate-700 dark:text-slate-300">Mobile Phone Number</label>
               <input
                 type="tel"
-                className="w-full mt-2 px-4 py-3 rounded-2xl border-2 border-graphite-300 dark:border-slate-700 text-lg font-black text-center tracking-widest focus:border-primary-500 focus:outline-none"
+                className="w-full mt-2 px-4 py-3 rounded-2xl border border-graphite-300 dark:border-slate-700 text-lg font-black text-center tracking-widest focus:border-primary-500 focus:outline-none"
                 placeholder="+260 97X XXX XXX"
                 value={phoneSearch}
                 onChange={(e) => setPhoneSearch(e.target.value)}
@@ -391,7 +391,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 step="0.01"
                 inputMode="decimal"
                 aria-label="Bill amount in Kwacha from your hospital invoice"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-graphite-300 dark:border-slate-700 text-2xl font-black text-emerald-600 text-center focus:border-primary-500 focus:outline-none"
+                className="w-full px-4 py-3 rounded-2xl border border-graphite-300 dark:border-slate-700 text-2xl font-black text-emerald-600 text-center focus:border-primary-500 focus:outline-none"
                 placeholder="0.00"
                 value={billAmount || ''}
                 onChange={(e) => setBillAmount(Math.max(0, Number(e.target.value) || 0))}
@@ -405,7 +405,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   aria-pressed={payMethod === "mtn"}
                   onClick={() => setPayMethod("mtn")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
+                  className={`p-3 rounded-2xl border font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "mtn" ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
@@ -415,7 +415,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   aria-pressed={payMethod === "airtel"}
                   onClick={() => setPayMethod("airtel")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
+                  className={`p-3 rounded-2xl border font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "airtel" ? "border-rose-400 bg-rose-50 dark:bg-rose-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
@@ -425,7 +425,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   aria-pressed={payMethod === "card"}
                   onClick={() => setPayMethod("card")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
+                  className={`p-3 rounded-2xl border font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "card" ? "border-primary-500 bg-blue-50 dark:bg-blue-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
@@ -448,7 +448,7 @@ export const SelfServiceKiosk: React.FC = () => {
             )}
 
             {billRef ? (
-              <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 text-center space-y-2">
+              <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500 text-center space-y-2">
                 <p className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-300">Bill Slip Ready</p>
                 <p className="text-lg font-black font-mono text-slate-900 dark:text-slate-100">{billRef}</p>
                 <p className="text-2xl font-black text-emerald-600">K{billAmount.toFixed(2)}</p>
@@ -484,7 +484,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
         {/* 5. Success / Token Printed Screen */}
         {mode === "success" && (
-          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-emerald-500 shadow-xl text-center space-y-6">
+          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500 shadow-xl text-center space-y-6">
             <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center font-black mx-auto">
               <CheckCircle2 className="h-9 w-9" />
             </div>

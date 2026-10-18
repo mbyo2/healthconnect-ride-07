@@ -209,10 +209,10 @@ const AdvancedDashboard = () => {
     // recentActivity is now set from fetchDashboardData
 
     const healthMetrics = [
-        { label: 'Heart Rate', value: vitalsData.restingHeartRate, trend: '+2%', status: 'normal' },
-        { label: 'Blood Pressure', value: vitalsData.bloodPressure, trend: '-3%', status: 'normal' },
-        { label: 'Weight', value: vitalsData.weight, trend: '-1%', status: 'improving' },
-        { label: 'Steps Today', value: stepsToday.toLocaleString(), trend: '+15%', status: 'good' },
+        { label: 'Heart Rate', value: vitalsData.restingHeartRate, status: 'normal' },
+        { label: 'Blood Pressure', value: vitalsData.bloodPressure, status: 'normal' },
+        { label: 'Weight', value: vitalsData.weight, status: 'normal' },
+        { label: 'Steps Today', value: stepsToday.toLocaleString(), status: 'good' },
     ];
 
     return (
@@ -222,7 +222,7 @@ const AdvancedDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                            Welcome back, {profile?.first_name || 'User'}! 👋
+                            Welcome back, {profile?.first_name || 'User'}!
                         </h1>
                         <p className="text-muted-foreground mt-1">Here's your health overview for today</p>
                     </div>
@@ -359,13 +359,12 @@ const AdvancedDashboard = () => {
                                     <p className="text-sm text-muted-foreground">{metric.label}</p>
                                     <p className="text-2xl font-bold mt-1">{metric.value}</p>
                                     <div className="flex items-center gap-2 mt-2">
-                                        <span className={`text-sm font-medium ${metric.status === 'normal' || metric.status === 'good' || metric.status === 'improving'
+                                        <span className={`text-sm font-medium ${metric.status === 'normal' || metric.status === 'good'
                                             ? 'text-green-600 dark:text-green-400'
                                             : 'text-red-600 dark:text-red-400'
                                             }`}>
-                                            {metric.trend}
+                                            {metric.status === 'good' ? 'On track' : metric.status}
                                         </span>
-                                        <span className="text-xs text-muted-foreground">{metric.status}</span>
                                     </div>
                                 </div>
                             ))}

@@ -39,6 +39,7 @@ export const AppointmentsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [rescheduleTarget, setRescheduleTarget] = useState<any>(null);
+  const [cancelTarget, setCancelTarget] = useState<any>(null);
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
   const { availableRoles } = useUserRoles();
@@ -601,7 +602,7 @@ export const AppointmentsPage = () => {
                                     </button>
                                   )}
                                   <button
-                                    onClick={() => cancelAppointment.mutate(app.id)}
+                                    onClick={() => setCancelTarget(app)}
                                     className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     CANCEL
@@ -787,6 +788,33 @@ export const AppointmentsPage = () => {
               className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 disabled:opacity-50"
             >
               {rescheduleAppointment.isPending ? "Moving…" : "Confirm new slot"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel confirmation — consistent with AppointmentDetails */}
+      <Dialog open={!!cancelTarget} onOpenChange={(open) => { if (!open) setCancelTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel this appointment?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This will free the slot for other patients. This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <button
+              onClick={() => setCancelTarget(null)}
+              className="px-4 py-2 min-h-[44px] rounded-xl border border-canvas-silk text-sm font-semibold text-graphite-500 hover:bg-slate-50"
+            >
+              Keep appointment
+            </button>
+            <button
+              onClick={() => { cancelAppointment.mutate(cancelTarget.id); setCancelTarget(null); }}
+              disabled={cancelAppointment.isPending}
+              className="px-4 py-2 min-h-[44px] rounded-xl bg-error-500 hover:bg-error-600 text-white text-sm font-bold disabled:opacity-50"
+            >
+              {cancelAppointment.isPending ? "Cancelling…" : "Yes, cancel"}
             </button>
           </DialogFooter>
         </DialogContent>

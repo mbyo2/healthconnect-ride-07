@@ -357,13 +357,13 @@ const Profile = () => {
                     value={(formData as any)[f.id]}
                     onChange={e => handleInputChange(f.id, e.target.value)}
                     disabled={!isEditing}
-                    className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                    className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
                   />
                 </div>
               ))}
               <div className="space-y-1.5">
                 <Label htmlFor="profile-email" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
-                <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
+                <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="phone" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>
@@ -373,7 +373,7 @@ const Profile = () => {
                   value={formData.phone}
                   onChange={e => handleInputChange("phone", e.target.value)}
                   disabled={!isEditing}
-                  className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                  className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
                 />
               </div>
             </div>
@@ -385,7 +385,7 @@ const Profile = () => {
                 value={formData.location}
                 onChange={e => handleInputChange("location", e.target.value)}
                 disabled={!isEditing}
-                className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
               />
             </div>
 
@@ -397,7 +397,7 @@ const Profile = () => {
                 onChange={e => handleInputChange("bio", e.target.value)}
                 disabled={!isEditing}
                 rows={3}
-                className="rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs resize-none"
+                className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs resize-none"
               />
             </div>
 
@@ -406,7 +406,7 @@ const Profile = () => {
                 <Button onClick={handleSave} className="flex-1 rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs">
                   <Save className="h-4 w-4 mr-2" /> Save Changes
                 </Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 rounded-full h-11 border-2 font-extrabold text-xs">
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 rounded-full h-11 border font-extrabold text-xs">
                   Cancel
                 </Button>
               </div>

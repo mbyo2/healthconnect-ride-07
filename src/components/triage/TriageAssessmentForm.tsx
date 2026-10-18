@@ -150,7 +150,7 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, triageLevel: triage.level as typeof prev.triageLevel }))}
                 className={cn(
-                  'p-3 rounded-lg border-2 transition-all text-white',
+                  'p-3 rounded-lg border transition-all text-white',
                   triage.color,
                   formData.triageLevel === triage.level ? 'ring-2 ring-offset-2 ring-ring' : 'opacity-60 hover:opacity-100'
                 )}

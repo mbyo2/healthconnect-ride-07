@@ -231,10 +231,13 @@ export const TriageStaffWorkflow = () => {
                 <Input value={form.disposition} onChange={e => updateForm('disposition', e.target.value)} placeholder="e.g., Route to ER Bay 3, OPD Dr. Smith" />
               </div>
 
-              <Button onClick={handleSubmit} disabled={creating || !form.patient_name.trim() || !form.chief_complaint.trim()} className="w-full">
+              <Button onClick={handleSubmit} disabled={creating || !form.patient_name.trim() || !form.chief_complaint.trim()} className="w-full min-h-[44px]">
                 {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Stethoscope className="h-4 w-4 mr-2" />}
                 Submit Triage Assessment
               </Button>
+              {(!form.patient_name.trim() || !form.chief_complaint.trim()) && !creating && (
+                <p className="text-xs text-muted-foreground text-center">Enter the patient name and chief complaint above to enable submit.</p>
+              )}
             </div>
           </DialogContent>
         </Dialog>

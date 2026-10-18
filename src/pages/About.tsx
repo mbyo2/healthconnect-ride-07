@@ -19,7 +19,7 @@ const About = () => (
       <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_.9fr]">
         <section>
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">About us</p>
-          <h1 className="mb-5 text-4xl font-bold tracking-tight sm:text-5xl">Care, connected.</h1>
+          <h1 className="mb-5 text-3xl font-bold tracking-tight sm:text-4xl">Care, connected.</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Doc&apos; O Clock is a healthcare technology platform built to make it simpler for people to find care, book visits, manage prescriptions and connect with trusted healthcare organisations.
           </p>

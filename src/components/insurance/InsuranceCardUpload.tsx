@@ -277,7 +277,7 @@ export const InsuranceCardUpload = () => {
                 onChange={(e) => e.target.files?.[0] && handleFileSelect('front', e.target.files[0])}
               />
               {frontPreview ? (
-                <div className="relative rounded-xl overflow-hidden border-2 border-primary aspect-[1.6]">
+                <div className="relative rounded-xl overflow-hidden border border-primary aspect-[1.6]">
                   <img src={frontPreview} alt="Front" className="w-full h-full object-cover" />
                   <button
                     onClick={() => { setFrontPreview(null); setFrontFile(null); }}
@@ -290,7 +290,7 @@ export const InsuranceCardUpload = () => {
               ) : (
                 <button
                   onClick={() => frontInputRef.current?.click()}
-                  className="w-full aspect-[1.6] rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  className="w-full aspect-[1.6] rounded-xl border border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
                 >
                   <Camera className="h-8 w-8 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Tap to capture or upload</span>
@@ -309,7 +309,7 @@ export const InsuranceCardUpload = () => {
                 onChange={(e) => e.target.files?.[0] && handleFileSelect('back', e.target.files[0])}
               />
               {backPreview ? (
-                <div className="relative rounded-xl overflow-hidden border-2 border-primary aspect-[1.6]">
+                <div className="relative rounded-xl overflow-hidden border border-primary aspect-[1.6]">
                   <img src={backPreview} alt="Back" className="w-full h-full object-cover" />
                   <button
                     onClick={() => { setBackPreview(null); setBackFile(null); }}
@@ -322,7 +322,7 @@ export const InsuranceCardUpload = () => {
               ) : (
                 <button
                   onClick={() => backInputRef.current?.click()}
-                  className="w-full aspect-[1.6] rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  className="w-full aspect-[1.6] rounded-xl border border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
                 >
                   <Upload className="h-8 w-8 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Upload back (optional)</span>

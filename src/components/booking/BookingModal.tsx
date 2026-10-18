@@ -308,7 +308,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         <RadioGroup value={appointmentType} onValueChange={(v) => setAppointmentType(v as 'physical' | 'virtual')}>
           <div 
             className={cn(
-              "flex items-center space-x-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+              "flex items-center space-x-4 p-4 rounded-xl border cursor-pointer transition-all",
               appointmentType === 'physical' 
                 ? "border-primary bg-primary/5" 
                 : "border-border hover:border-primary/50"
@@ -337,7 +337,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
 
           <div 
             className={cn(
-              "flex items-center space-x-4 p-4 rounded-xl border-2 cursor-pointer transition-all mt-3",
+              "flex items-center space-x-4 p-4 rounded-xl border cursor-pointer transition-all mt-3",
               appointmentType === 'virtual' 
                 ? "border-primary bg-primary/5" 
                 : "border-border hover:border-primary/50"
@@ -610,7 +610,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         >
           <div
             className={cn(
-              "flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[44px]",
+              "flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all min-h-[44px]",
               visitType === 'new' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
             )}
             onClick={() => setVisitType('new')}
@@ -623,7 +623,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           </div>
           <div
             className={cn(
-              "flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[44px]",
+              "flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all min-h-[44px]",
               visitType === 'returning' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
             )}
             onClick={() => setVisitType('returning')}

@@ -56,7 +56,7 @@ export const DentistWorkflow = () => {
             <button
               key={tooth}
               onClick={() => setSelectedTooth(tooth)}
-              className={`min-w-[44px] min-h-[44px] w-11 h-12 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-bold transition-all ${
+              className={`min-w-[44px] min-h-[44px] w-11 h-12 rounded-lg border flex flex-col items-center justify-center text-xs font-bold transition-all ${
                 selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-slate-200 dark:border-slate-700'
               } ${condInfo?.color} text-white hover:scale-105`}
               title={`Tooth ${tooth} - ${condInfo?.label}`}

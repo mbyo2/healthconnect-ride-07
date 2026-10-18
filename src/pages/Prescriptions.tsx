@@ -773,7 +773,7 @@ export const Prescriptions = () => {
               aria-label="Search prescriptions"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 min-h-[44px] rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
             />
           </div>
 
@@ -781,7 +781,7 @@ export const Prescriptions = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             aria-label="Filter by prescription status"
-            className="px-4 py-2.5 min-h-[44px] rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
+            className="px-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
           >
             <option value="all">All Prescriptions</option>
             <option value="active">Active / Filled</option>

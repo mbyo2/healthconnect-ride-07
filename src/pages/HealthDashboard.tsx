@@ -326,7 +326,7 @@ export default function HealthDashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingAppointments.length > 0 ? upcomingAppointments.map((appointment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border-2 border-border/50 rounded-xl hover:border-primary/50 transition-colors">
+              <div key={index} className="flex items-center justify-between p-4 border border-border/50 rounded-xl hover:border-primary/50 transition-colors">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-base truncate">{appointment.type}</h3>
                   <p className="text-sm text-muted-foreground mt-1 truncate">{appointment.provider}</p>

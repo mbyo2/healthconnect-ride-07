@@ -2,15 +2,23 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ArrowLeft, Wallet as WalletIcon } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Wallet as WalletIcon, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
+interface PaymentDetails {
+  amount: number | null;
+  currency: string | null;
+  payment_method: string | null;
+  reference: string | null;
+}
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [isWalletTopUp, setIsWalletTopUp] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
 
   const paymentId = searchParams.get('payment_id') || searchParams.get('paymentId');
   const status = searchParams.get('status');
@@ -38,12 +46,21 @@ const PaymentSuccess = () => {
           if (data && data.success) {
             toast.success("Payment captured successfully!");
 
-            // Check if it was a wallet top-up
+            // Check if it was a wallet top-up and load receipt details
             const { data: paymentData } = await supabase
               .from('payments')
-              .select('metadata')
+              .select('metadata, amount, currency, payment_method, reference, transaction_id')
               .eq('id', paymentId)
               .single();
+
+            if (paymentData) {
+              setPaymentDetails({
+                amount: (paymentData as any).amount ?? null,
+                currency: (paymentData as any).currency ?? 'ZMW',
+                payment_method: (paymentData as any).payment_method ?? null,
+                reference: (paymentData as any).reference ?? (paymentData as any).transaction_id ?? paymentId,
+              });
+            }
 
             const requestedServiceId =
               paymentData?.metadata && typeof paymentData.metadata === 'object'
@@ -67,11 +84,17 @@ const PaymentSuccess = () => {
           // verifying the payment row; a cancel return lands here too.
           const { data: paymentRow } = await supabase
             .from('payments')
-            .select('status')
+            .select('status, amount, currency, payment_method, reference, transaction_id')
             .eq('id', paymentId)
             .maybeSingle();
           if (paymentRow?.status === 'completed') {
             toast.success("Payment processed successfully!");
+            setPaymentDetails({
+              amount: (paymentRow as any).amount ?? null,
+              currency: (paymentRow as any).currency ?? 'ZMW',
+              payment_method: (paymentRow as any).payment_method ?? null,
+              reference: (paymentRow as any).reference ?? (paymentRow as any).transaction_id ?? paymentId,
+            });
           } else {
             toast.info("Payment not confirmed yet — check your wallet for the updated balance.");
             navigate("/wallet");
@@ -121,6 +144,30 @@ const PaymentSuccess = () => {
         </CardHeader>
 
         <CardContent className="space-y-6 pt-4">
+          {paymentDetails && (paymentDetails.amount != null || paymentDetails.reference) && (
+            <div className="rounded-xl border p-4 space-y-2 bg-muted/40 dark:bg-slate-900">
+              {paymentDetails.amount != null && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Amount paid</span>
+                  <span className="text-lg font-bold">
+                    {paymentDetails.currency} {Number(paymentDetails.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+              {paymentDetails.payment_method && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Payment method</span>
+                  <span className="text-sm font-medium capitalize">{paymentDetails.payment_method.replace(/_/g, ' ')}</span>
+                </div>
+              )}
+              {paymentDetails.reference && (
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-muted-foreground shrink-0">Reference</span>
+                  <span className="text-xs font-mono truncate" title={paymentDetails.reference}>{paymentDetails.reference}</span>
+                </div>
+              )}
+            </div>
+          )}
           <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-xl border border-green-200 dark:border-green-800">
             <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
               {isWalletTopUp
@@ -155,6 +202,17 @@ const PaymentSuccess = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
+
+            {paymentId && (
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/billing?receipt=${paymentId}`)}
+                className="w-full min-h-[44px]"
+              >
+                <Receipt className="h-4 w-4 mr-2" />
+                View Receipt
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

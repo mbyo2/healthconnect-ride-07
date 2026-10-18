@@ -341,7 +341,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   };
 
   return (
-    <Card className="w-full h-[calc(100dvh-16rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
+    <Card className="w-full h-[calc(100dvh-16rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border">
       <CardHeader className="border-b py-2 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
         <CardTitle className="flex items-center justify-between text-sm sm:text-lg">
           <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                       }`}
                   >
                     {message.images && message.images.length > 0 && (
-                      <div className={`rounded-xl mb-3 overflow-hidden border-2 border-primary/20 ${
+                      <div className={`rounded-xl mb-3 overflow-hidden border border-primary/20 ${
                         message.images.length > 1 ? 'grid grid-cols-2 gap-2' : ''
                       }`}>
                         {message.images.map((img, imgIdx) => (
@@ -487,7 +487,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               <div className="grid grid-cols-5 gap-2">
                 {selectedImages.map((img, idx) => (
                   <div key={idx} className="relative group">
-                    <div className="rounded-lg overflow-hidden border-2 border-primary shadow-md aspect-square">
+                    <div className="rounded-lg overflow-hidden border border-primary shadow-md aspect-square">
                       <img
                         src={img}
                         alt={`Selected ${idx + 1}`}
@@ -546,7 +546,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               disabled={isLoading}
               size="icon"
               variant="outline"
-              className="flex-shrink-0 h-12 w-12 rounded-full border-2 hover:bg-primary/10 hover:border-primary transition-all"
+              className="flex-shrink-0 h-12 w-12 rounded-full border hover:bg-primary/10 hover:border-primary transition-all"
               title="Upload medical images (max 10): X-rays, lab results, scans, etc."
               aria-label="Upload medical images"
             >
@@ -569,7 +569,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 aria-label="Type your health question"
                 placeholder={selectedImages.length > 0 ? "Describe what you want to know about these images..." : "Ask me about your health..."}
                 disabled={isLoading}
-                className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border-2 focus-visible:ring-2 focus-visible:ring-primary"
+                className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border focus-visible:ring-2 focus-visible:ring-primary"
                 rows={1}
               />
               <Button
