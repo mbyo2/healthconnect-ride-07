@@ -160,6 +160,7 @@ const EnterpriseAccounting = lazyWithRetry(() => import('@/pages/EnterpriseAccou
 const ZraSmartInvoiceIntegration = lazyWithRetry(() => import('@/pages/ZraSmartInvoiceIntegration'));
 const PayeTaxCalculations = lazyWithRetry(() => import('@/pages/PayeTaxCalculations'));
 const MedicalShiftHR = lazyWithRetry(() => import('@/pages/MedicalShiftHR'));
+const DenialWorkqueue = lazyWithRetry(() => import('@/components/billing/DenialWorkqueue'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -369,6 +370,7 @@ const AppContent = () => {
             <Route path="/zra-smart-invoice" element={<RouteGuard><ZraSmartInvoiceIntegration /></RouteGuard>} />
             <Route path="/paye-calculations" element={<RouteGuard><PayeTaxCalculations /></RouteGuard>} />
             <Route path="/medical-shift-hr" element={<RouteGuard><MedicalShiftHR /></RouteGuard>} />
+            <Route path="/denial-workqueue" element={<RouteGuard><DenialWorkqueue /></RouteGuard>} />
 
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />

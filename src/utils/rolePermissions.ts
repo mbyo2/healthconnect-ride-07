@@ -380,6 +380,24 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-inventory',
     '/medications',
   ]),
+  [USER_ROLES.FINANCE_MANAGER]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/settings',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/enterprise-accounting',
+    '/zra-smart-invoice',
+    '/denial-workqueue',
+  ]),
   [USER_ROLES.INVENTORY_MANAGER]: dedupeRoutes([
     ...COMMON_ROUTES,
     '/institution-portal',
@@ -812,6 +830,17 @@ ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
   '/prescriptions',
 ]);
 
+ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] = dedupeRoutes([
+  '/staff-dashboard',
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/wallet',
+  '/institution/reports',
+  '/institution/settings',
+  '/enterprise-accounting',
+  '/zra-smart-invoice',
+  '/denial-workqueue',
+]);
+
 ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
@@ -919,6 +948,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.OT_STAFF]: '/institution-dashboard',
   [USER_ROLES.PHLEBOTOMIST]: '/lab-management',
   [USER_ROLES.BILLING_STAFF]: '/institution-dashboard',
+  [USER_ROLES.FINANCE_MANAGER]: '/institution-dashboard',
   [USER_ROLES.INVENTORY_MANAGER]: '/institution-dashboard',
   [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
   [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
