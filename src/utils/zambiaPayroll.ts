@@ -26,7 +26,17 @@
  * VAT: 16% standard rate on taxable supply
  * All remittances due by 10th of the following month
  * ============================================================
+ *
+ * CONFIG-DRIVEN ENGINE (2026-10-18):
+ * The Zambia defaults below are preserved verbatim for backward
+ * compatibility, but all calculation logic now flows through
+ * calculatePayroll(), which is driven by an InstitutionTaxConfig
+ * (see ./taxConfig.ts — mirrors public.country_statutory_configs).
+ * calculateZambiaPayroll() is a thin wrapper over that path using
+ * ZAMBIA_DEFAULT_CONFIG and produces byte-identical results.
  */
+
+import { ZAMBIA_DEFAULT_CONFIG, type InstitutionTaxConfig } from './taxConfig';
 
 // ─── Constants ───────────────────────────────────────────────
 export const ZM_PAYE_BANDS = [
@@ -122,58 +132,120 @@ export function calculatePAYE(chargeableMonthlyIncome: number): {
   };
 }
 
-// ─── Full Monthly Payroll Calculation ────────────────────────
+// ─── Generic progressive-band tax (config-driven) ──────────────
 /**
- * Calculate all statutory deductions for a single employee's monthly gross salary.
- * @param grossSalary - Employee's gross monthly salary (before any deductions)
- * @param annualPayroll - Employer's total annual payroll (used for SDL threshold check)
+ * Progressive tax over arbitrary {from, to, rate} bands — only the income
+ * inside each band is taxed at that band's rate. `to: Infinity` (converted
+ * from a null band max) means no upper limit.
+ * Same algorithm as universalPayroll's generic calculator; kept local so
+ * this module stays dependency-free (universalPayroll imports this file).
  */
-export function calculateZambiaPayroll(
+function calculateProgressiveBandTax(
+  income: number,
+  bands: { from: number; to: number; rate: number }[]
+): { total: number; perBand: number[] } {
+  let remaining = Math.max(0, income);
+  let total = 0;
+  const perBand: number[] = [];
+
+  for (const band of bands) {
+    if (remaining <= 0) {
+      perBand.push(0);
+      continue;
+    }
+    const bandWidth = band.to === Infinity ? remaining : Math.min(remaining, band.to - band.from);
+    const taxable = Math.min(remaining, bandWidth);
+    const tax = taxable * band.rate;
+    total += tax;
+    perBand.push(tax);
+    remaining -= taxable;
+  }
+
+  return { total, perBand };
+}
+
+// ─── Config-driven payroll (generic engine) ────────────────────
+/**
+ * Calculate all statutory deductions for a single employee's monthly gross
+ * salary, driven entirely by the institution's tax config.
+ *
+ * The result reuses the ZambiaPayrollResult shape so existing callers keep
+ * working: the `napsa*` fields are the config's pension/social-security
+ * slot and the `nhima*` fields are the config's health-levy slot, whatever
+ * country the institution is configured for.
+ *
+ * @param grossSalary - Employee's gross monthly salary (before deductions)
+ * @param config - Institution tax config (see ./taxConfig.ts)
+ * @param annualPayroll - Employer's total annual payroll (SDL threshold check)
+ */
+export function calculatePayroll(
   grossSalary: number,
+  config: InstitutionTaxConfig = ZAMBIA_DEFAULT_CONFIG,
   annualPayroll: number = 0
 ): ZambiaPayrollResult {
   const gross = Math.max(0, grossSalary);
 
-  // ── NAPSA ────────────────────────────────────────────────
-  // Applied to gross up to the ceiling
-  const napsaBase     = Math.min(gross, ZM_NAPSA_CEILING);
-  const napsaEmployee = napsaBase * ZM_NAPSA_RATE_EMPLOYEE;
-  const napsaEmployer = napsaBase * ZM_NAPSA_RATE_EMPLOYER;
+  // ── Pension / social security (NAPSA slot) ─────────────────
+  // Applied to gross up to the ceiling (no ceiling when null)
+  const pensionBase     = config.napsa_ceiling != null ? Math.min(gross, config.napsa_ceiling) : gross;
+  const pensionEmployee = pensionBase * (config.napsa_employee_rate / 100);
+  const pensionEmployer = pensionBase * (config.napsa_employer_rate / 100);
 
-  // ── NHIMA ────────────────────────────────────────────────
-  // Applied to FULL gross (no ceiling) — does NOT reduce PAYE taxable income
-  const nhimaEmployee = gross * ZM_NHIMA_RATE_EMPLOYEE;
-  const nhimaEmployer = gross * ZM_NHIMA_RATE_EMPLOYER;
+  // ── Health levy (NHIMA slot) ───────────────────────────────
+  // Applied to full gross unless the config sets a ceiling
+  const healthBase = config.nhima_has_ceiling && config.nhima_ceiling != null
+    ? Math.min(gross, config.nhima_ceiling)
+    : gross;
+  const healthEmployee = healthBase * (config.nhima_employee_rate / 100);
+  const healthEmployer = healthBase * (config.nhima_employer_rate / 100);
 
-  // ── Chargeable Income for PAYE ───────────────────────────
-  // NAPSA employee share reduces taxable income; NHIMA does NOT
-  const chargeableIncome = Math.max(0, gross - napsaEmployee);
+  // ── Chargeable income for PAYE ─────────────────────────────
+  // Pension and/or health reduce taxable income only when configured to
+  const chargeableIncome = Math.max(0,
+    gross
+    - (config.napsa_reduces_paye ? pensionEmployee : 0)
+    - (config.nhima_reduces_paye ? healthEmployee : 0)
+  );
 
-  // ── PAYE ─────────────────────────────────────────────────
-  const paye = calculatePAYE(chargeableIncome);
+  // ── PAYE: generic progressive bands ────────────────────────
+  const bands = (config.paye_brackets ?? []).map((b) => ({
+    from: b.min,
+    to: b.max === null || b.max === undefined ? Infinity : b.max,
+    rate: b.rate,
+  }));
+  const paye = calculateProgressiveBandTax(chargeableIncome, bands);
+  // The result shape carries 4 band slots (Zambia has exactly 4). For
+  // configs with more bands, everything past the third rolls into band 4.
+  const bandTax = (i: number) => paye.perBand[i] ?? 0;
+  const tailTax = paye.perBand.slice(3).reduce((sum, t) => sum + t, 0);
 
-  // ── SDL ──────────────────────────────────────────────────
-  // Employer only, triggered when employer's annual payroll > K1,000,000
-  const sdlApplicable = annualPayroll > ZM_SDL_ANNUAL_THRESHOLD;
-  const sdlAmount     = sdlApplicable ? gross * ZM_SDL_RATE : 0;
+  // ── SDL ────────────────────────────────────────────────────
+  // Employer only, triggered when the employer's annual payroll exceeds
+  // the configured threshold (and SDL is enabled for the institution)
+  const sdlApplicable = !!(
+    config.sdl_enabled &&
+    config.sdl_annual_threshold != null &&
+    annualPayroll > config.sdl_annual_threshold
+  );
+  const sdlAmount = sdlApplicable ? gross * (config.sdl_rate / 100) : 0;
 
-  // ── Totals ───────────────────────────────────────────────
-  const totalEmployeeDeductions = napsaEmployee + nhimaEmployee + paye.total;
-  const totalEmployerCost       = gross + napsaEmployer + nhimaEmployer + sdlAmount;
+  // ── Totals ─────────────────────────────────────────────────
+  const totalEmployeeDeductions = pensionEmployee + healthEmployee + paye.total;
+  const totalEmployerCost       = gross + pensionEmployer + healthEmployer + sdlAmount;
   const netPay                  = gross - totalEmployeeDeductions;
 
   return {
     grossSalary:            gross,
-    napsaEmployee,
-    napsaEmployer,
-    napsaCeiling:           ZM_NAPSA_CEILING,
-    nhimaEmployee,
-    nhimaEmployer,
+    napsaEmployee:          pensionEmployee,
+    napsaEmployer:          pensionEmployer,
+    napsaCeiling:           config.napsa_ceiling ?? 0, // 0 = no ceiling in effect
+    nhimaEmployee:          healthEmployee,
+    nhimaEmployer:          healthEmployer,
     chargeableIncome,
-    payeBand1Tax:           paye.band1,
-    payeBand2Tax:           paye.band2,
-    payeBand3Tax:           paye.band3,
-    payeBand4Tax:           paye.band4,
+    payeBand1Tax:           bandTax(0),
+    payeBand2Tax:           bandTax(1),
+    payeBand3Tax:           bandTax(2),
+    payeBand4Tax:           tailTax,
     totalPaye:              paye.total,
     sdlApplicable,
     sdlAmount,
@@ -181,6 +253,22 @@ export function calculateZambiaPayroll(
     totalEmployerCost,
     netPay,
   };
+}
+
+// ─── Full Monthly Payroll Calculation ────────────────────────
+/**
+ * Calculate all statutory deductions for a single employee's monthly gross salary.
+ * @param grossSalary - Employee's gross monthly salary (before any deductions)
+ * @param annualPayroll - Employer's total annual payroll (used for SDL threshold check)
+ *
+ * Backward-compatible thin wrapper: identical results to the legacy
+ * hardcoded implementation, via the config-driven engine with Zambia defaults.
+ */
+export function calculateZambiaPayroll(
+  grossSalary: number,
+  annualPayroll: number = 0
+): ZambiaPayrollResult {
+  return calculatePayroll(grossSalary, ZAMBIA_DEFAULT_CONFIG, annualPayroll);
 }
 
 // ─── Payslip Line Builder ─────────────────────────────────────

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
-import { calculateZambiaPayroll } from '@/utils/zambiaPayroll';
+import { calculatePayroll } from '@/utils/zambiaPayroll';
+import { fetchInstitutionTaxConfig } from '@/utils/taxConfig';
 import { toast } from 'sonner';
 
 export interface LeaveRequest {
@@ -322,8 +323,12 @@ export function useHRModule() {
       throw new Error('No active employees with a salary set. Add salaries in the Employee directory first.');
     }
 
+    // Config-driven payroll: each institution uses its own statutory rates
+    // (falls back to Zambia defaults when no config row exists yet).
+    const taxConfig = await fetchInstitutionTaxConfig(supabase, institutionId);
+
     const lines = active.map((employee) => {
-      const zm = calculateZambiaPayroll(employee.salary_monthly);
+      const zm = calculatePayroll(employee.salary_monthly, taxConfig);
       return {
         employee,
         gross: zm.grossSalary,

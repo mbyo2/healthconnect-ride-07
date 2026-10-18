@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer, Building2, PlayCircle, UserPlus, Search } from "lucide-react";
 import { useHRModule, LeaveRequest, Employee, PayrollRunSummary } from "@/hooks/useHRModule";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { BulkAttendanceImport } from "@/components/hr/BulkAttendanceImport";
 import { ShiftScheduleCalendar } from "@/components/hr/ShiftScheduleCalendar";
 import { exportPayslipPDF } from "@/utils/pdfExport";
 import { useCurrency } from "@/hooks/use-currency";
-import { calculateZambiaPayroll } from "@/utils/zambiaPayroll";
+import { calculatePayroll } from "@/utils/zambiaPayroll";
+import { fetchInstitutionTaxConfig, ZAMBIA_DEFAULT_CONFIG, type InstitutionTaxConfig } from "@/utils/taxConfig";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -42,6 +45,19 @@ export const HRManagerWorkflow = () => {
     refetch,
   } = useHRModule();
   const { currency } = useCurrency();
+  const { institutionId } = useInstitutionAffiliation();
+
+  // Institution statutory config for config-driven payroll. Starts on the
+  // Zambia defaults so the payslip view never breaks while loading (or when
+  // the user has no institution / no config row yet).
+  const [taxConfig, setTaxConfig] = useState<InstitutionTaxConfig>(ZAMBIA_DEFAULT_CONFIG);
+  useEffect(() => {
+    let cancelled = false;
+    fetchInstitutionTaxConfig(supabase, institutionId).then((cfg) => {
+      if (!cancelled) setTaxConfig(cfg);
+    });
+    return () => { cancelled = true; };
+  }, [institutionId]);
   const [activeTab, setActiveTab] = useState("leaves");
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<LeaveRequest | null>(null);
@@ -558,7 +574,7 @@ export const HRManagerWorkflow = () => {
             </div>
           )}
           {payroll.map((p) => {
-            const zm = calculateZambiaPayroll(p.basic_salary);
+            const zm = calculatePayroll(p.basic_salary, taxConfig);
             return (
               <div key={p.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex items-center justify-between text-xs">
                 <div>
