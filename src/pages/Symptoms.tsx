@@ -145,7 +145,7 @@ const Symptoms = () => {
           </div>
           <button
             onClick={() => navigate("/ai-diagnostics")}
-            className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all"
+            className="px-4 py-2 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-blue-950/30 font-extrabold text-xs flex items-center gap-1.5 transition-all"
           >
             <span>Analyze with AI</span>
             <ArrowRight className="h-4 w-4" />
@@ -156,8 +156,8 @@ const Symptoms = () => {
           {/* Category Symptom Selector */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <div className="border-b border-canvas-silk pb-3">
-              <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Select Active Symptoms</h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">Click any symptom tag to add it to your current case log.</p>
+              <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Select your symptoms</h2>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">Tap a symptom to add it to your list.</p>
             </div>
 
             <div className="space-y-4">
@@ -211,7 +211,7 @@ const Symptoms = () => {
           <div className="space-y-6">
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <div className="border-b border-canvas-silk dark:border-slate-800 pb-3">
-                <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Symptom Telemetry & Severity</h2>
+                <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Severity & details</h2>
               </div>
 
               <div className="space-y-3 text-xs">
@@ -232,7 +232,7 @@ const Symptoms = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="symptom-description" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Detailed Clinical Description</label>
+                  <label htmlFor="symptom-description" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Describe your symptoms</label>
                   <textarea
                     id="symptom-description"
                     value={description}
@@ -264,7 +264,7 @@ const Symptoms = () => {
 
             {selectedSymptoms.length > 0 && (
               <div className="rounded-2xl border border-primary-500/30 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
-                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Selected Symptoms Log ({selectedSymptoms.length})</p>
+                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Your selected symptoms ({selectedSymptoms.length})</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedSymptoms.map((symptom) => (
                     <button
