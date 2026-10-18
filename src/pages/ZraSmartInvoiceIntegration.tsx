@@ -310,7 +310,7 @@ export const ZraSmartInvoiceIntegration = () => {
     switch (status) {
       case "not_connected": return "bg-graphite-500 dark:bg-slate-600 text-white";
       case "pending_setup": return "bg-warning-500 text-white";
-      case "sandbox": return "bg-purple-500 text-white";
+      case "sandbox": return "bg-warning-500 text-white";
       case "active": return "bg-success-500 text-white";
       case "suspended": return "bg-error-500 text-white";
       case "error": return "bg-error-500 text-white";
@@ -318,7 +318,7 @@ export const ZraSmartInvoiceIntegration = () => {
       case "submitted": return "bg-primary-500 text-white";
       case "accepted": return "bg-success-500 text-white";
       case "rejected": return "bg-error-500 text-white";
-      case "retrying": return "bg-purple-500 text-white";
+      case "retrying": return "bg-warning-500 text-white";
       case "not_required": return "bg-graphite-500 dark:bg-slate-600 text-white";
       default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
@@ -525,9 +525,9 @@ export const ZraSmartInvoiceIntegration = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Mappings</span>
-                <Database className="h-4 w-4 text-purple-500" />
+                <Database className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{totalMappings}</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{totalMappings}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Catalog synced</div>
             </CardContent>
           </Card>
@@ -644,7 +644,7 @@ export const ZraSmartInvoiceIntegration = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
@@ -683,14 +683,14 @@ export const ZraSmartInvoiceIntegration = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
                           {(submission.status === "rejected" || submission.status === "error") && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 w-7 p-0"
+                              className="min-h-[44px] min-w-[44px] p-0"
                               onClick={() => handleRetrySubmission(submission.id)}
                             >
                               <RefreshCw className="h-3 w-3" />
@@ -700,6 +700,20 @@ export const ZraSmartInvoiceIntegration = () => {
                       </td>
                     </tr>
                   ))}
+                  {submissions.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <FileText className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No fiscal submissions yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">Connect your VSDC device and submitted invoices will be fiscalized here.</p>
+                          <Button onClick={() => setShowConfigDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                            <Settings className="h-4 w-4 mr-1" /> Configure VSDC
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>
@@ -710,15 +724,27 @@ export const ZraSmartInvoiceIntegration = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-extrabold">ZRA Item Mappings</h3>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <RefreshCw className="h-4 w-4 mr-1" /> Sync from ZRA
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Plus className="h-4 w-4 mr-1" /> Add Mapping
                 </Button>
               </div>
             </div>
 
+            {itemMappings.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <Link2 className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No item mappings yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Map your catalog items to ZRA item codes, or sync them from the ZRA portal.</p>
+                  <Button onClick={() => setShowMappingDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> Add Mapping
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {itemMappings.map((mapping) => (
                 <Card key={mapping.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -752,7 +778,7 @@ export const ZraSmartInvoiceIntegration = () => {
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Synced: {mapping.synced_at ? new Date(mapping.synced_at).toLocaleDateString() : "Never"}
                       </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Edit className="h-3 w-3" />
                       </Button>
                     </div>
@@ -766,7 +792,7 @@ export const ZraSmartInvoiceIntegration = () => {
           <TabsContent value="logs" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-extrabold">VSDC Operation Logs</h3>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
@@ -799,13 +825,24 @@ export const ZraSmartInvoiceIntegration = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {operationLogs.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <Activity className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No operations logged yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">VSDC device operations will be recorded here once the device is active.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>

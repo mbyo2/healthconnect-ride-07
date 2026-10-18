@@ -372,9 +372,9 @@ export const FinancialControls = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
-                <TrendingUp className="h-4 w-4 text-purple-500" />
+                <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">
+              <div className="text-2xl font-black font-mono text-error-500">
                 {institution.currency || "ZMW"} {totalDiscrepancyAmount.toFixed(2)}
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">At risk amount</div>
@@ -476,7 +476,7 @@ export const FinancialControls = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
@@ -528,11 +528,11 @@ export const FinancialControls = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
                           {log.status === "pending" && (
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-green-500">
+                            <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0 text-green-500">
                               <CheckCircle className="h-3 w-3" />
                             </Button>
                           )}
@@ -540,6 +540,20 @@ export const FinancialControls = () => {
                       </td>
                     </tr>
                   ))}
+                  {auditLogs.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <ShieldCheck className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No audit entries yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">Flagged transactions and manual audits will appear here for review.</p>
+                          <Button onClick={() => setShowAuditDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                            <Plus className="h-4 w-4 mr-1" /> Manual Audit
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>
@@ -562,11 +576,23 @@ export const FinancialControls = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]" onClick={fetchFinancialData}>
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
               </Button>
             </div>
 
+            {discrepancies.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <CheckCircle className="h-10 w-10 mx-auto text-success-500" />
+                  <p className="text-sm font-bold">No price discrepancies</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">All expected and actual prices match. New mismatches will be flagged here.</p>
+                  <Button onClick={fetchFinancialData} variant="outline" className="font-bold min-h-[44px]">
+                    <RefreshCw className="h-4 w-4 mr-1" /> Refresh
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {discrepancies.map((discrepancy) => (
                 <Card key={discrepancy.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -611,7 +637,7 @@ export const FinancialControls = () => {
                       <Button
                         size="sm"
                         onClick={() => handleResolveDiscrepancy(discrepancy.id)}
-                        className="text-xs bg-success-500 hover:bg-success-600 text-white"
+                        className="text-xs bg-success-500 hover:bg-success-600 text-white min-h-[44px]"
                       >
                         Resolve
                       </Button>
@@ -655,7 +681,7 @@ export const FinancialControls = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Auto-Lock Success</span>
-                      <span className="font-bold text-purple-500">91.8%</span>
+                      <span className="font-bold text-primary-500">91.8%</span>
                     </div>
                   </div>
                 </CardContent>

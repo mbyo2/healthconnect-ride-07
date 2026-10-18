@@ -178,10 +178,10 @@ export const ProcedureManagement = () => {
     switch (category) {
       case "telemedicine": return "bg-primary-500";
       case "consultation": return "bg-success-500";
-      case "laboratory": return "bg-purple-500";
+      case "laboratory": return "bg-primary-500";
       case "radiology": return "bg-warning-500";
       case "surgery": return "bg-error-500";
-      case "therapy": return "bg-indigo-500";
+      case "therapy": return "bg-primary-500";
       default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
@@ -190,7 +190,7 @@ export const ProcedureManagement = () => {
     switch (status) {
       case "completed": return "bg-success-500 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "scheduled": return "bg-purple-500 text-white";
+      case "scheduled": return "bg-warning-500 text-white";
       case "complications": return "bg-error-500 text-white";
       case "cancelled": return "bg-graphite-500 dark:bg-slate-600 text-white";
       default: return "bg-graphite-500 dark:bg-slate-600 text-white";
@@ -440,9 +440,9 @@ export const ProcedureManagement = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
-                <Clock className="h-4 w-4 text-purple-500" />
+                <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{recentExecutions}</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{recentExecutions}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Past 7 days</div>
             </CardContent>
           </Card>
@@ -495,11 +495,23 @@ export const ProcedureManagement = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
 
+            {procedures.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <Activity className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No procedures yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Add clinical procedures with pricing to make them bookable and billable.</p>
+                  <Button onClick={() => setShowProcedureDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> Add Procedure
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {procedures.map((procedure) => (
                 <Card key={procedure.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -519,7 +531,7 @@ export const ProcedureManagement = () => {
                           <Badge className="bg-warning-500 text-white text-xs">Auth Required</Badge>
                         )}
                         {procedure.requires_preparation && (
-                          <Badge className="bg-purple-500 text-white text-xs">Prep Required</Badge>
+                          <Badge className="bg-warning-500 text-white text-xs">Prep Required</Badge>
                         )}
                       </div>
                     </div>
@@ -542,10 +554,10 @@ export const ProcedureManagement = () => {
                         {procedure.description?.slice(0, 50)}...
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                           <Edit className="h-3 w-3" />
                         </Button>
                       </div>
@@ -584,7 +596,7 @@ export const ProcedureManagement = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button variant="outline" size="sm" className="text-xs">
+                  <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                     <Download className="h-4 w-4 mr-1" /> Export
                   </Button>
                 </div>
@@ -620,10 +632,10 @@ export const ProcedureManagement = () => {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                                 <Edit className="h-3 w-3" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-500">
+                              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0 text-red-500">
                                 <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
@@ -667,11 +679,20 @@ export const ProcedureManagement = () => {
                   </SelectContent>
                 </Select>
               </div>
-                  <Button variant="outline" size="sm" className="text-xs">
+                  <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                     <Download className="h-4 w-4 mr-1" /> Export
                   </Button>
                 </div>
 
+                {executions.length === 0 && (
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                    <CardContent className="p-12 text-center space-y-3">
+                      <Calendar className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                      <p className="text-sm font-bold">No procedure executions yet</p>
+                      <p className="text-xs text-graphite-500 dark:text-slate-400">Performed procedures will be recorded here with outcomes and complications.</p>
+                    </CardContent>
+                  </Card>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {executions.map((execution) => (
                     <Card key={execution.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -714,7 +735,7 @@ export const ProcedureManagement = () => {
                           <div className="text-xs text-graphite-500 dark:text-slate-400">
                             {execution.staff_involved.length} staff involved
                           </div>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
                         </div>

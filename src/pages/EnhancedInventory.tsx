@@ -367,9 +367,9 @@ export const EnhancedInventory = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Order Value</span>
-                <DollarSign className="h-4 w-4 text-purple-500" />
+                <DollarSign className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">
+              <div className="text-2xl font-black font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalOrderValue / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All orders</div>
@@ -419,7 +419,7 @@ export const EnhancedInventory = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
@@ -461,10 +461,10 @@ export const EnhancedInventory = () => {
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Filter className="h-4 w-4 mr-1" /> Filter
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
@@ -506,16 +506,30 @@ export const EnhancedInventory = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Edit className="h-3 w-3" />
                           </Button>
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {purchaseOrders.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <ShoppingCart className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No purchase orders yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">Create your first purchase order to restock supplies from a supplier.</p>
+                          <Button onClick={() => setShowOrderDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                            <Plus className="h-4 w-4 mr-1" /> New Purchase Order
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>
@@ -540,6 +554,18 @@ export const EnhancedInventory = () => {
               </div>
             </div>
 
+            {reconciliations.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <Package className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No stock reconciliations yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Run your first stock count to compare physical inventory against system records.</p>
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> New Reconciliation
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
                 <Card key={reconciliation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -574,7 +600,7 @@ export const EnhancedInventory = () => {
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <div className="text-xs text-graphite-500 dark:text-slate-400">{(reconciliation as any).notes || "No notes"}</div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Eye className="h-3 w-3" />
                       </Button>
                     </div>
@@ -623,7 +649,7 @@ export const EnhancedInventory = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Discrepancy Rate</span>
-                      <span className="font-bold text-purple-500">
+                      <span className="font-bold text-error-500">
                         {reconciliations.length > 0 
                           ? (reconciliations.reduce((sum, r) => sum + r.discrepancies_found, 0) / reconciliations.reduce((sum, r) => sum + r.total_items_checked, 1) * 100).toFixed(1)
                           : 0}%

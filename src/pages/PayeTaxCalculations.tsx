@@ -361,7 +361,7 @@ export const PayeTaxCalculations = () => {
             </Dialog>
             <Dialog open={showCalcDialog} onOpenChange={setShowCalcDialog}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="text-xs font-bold">
+                <Button variant="outline" className="text-xs font-bold min-h-[44px]">
                   <Calculator className="h-4 w-4 mr-1" /> Calculate PAYE
                 </Button>
               </DialogTrigger>
@@ -455,9 +455,9 @@ export const PayeTaxCalculations = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
-                <CheckCircle className="h-4 w-4 text-purple-500" />
+                <CheckCircle className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{processedPayroll}</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{processedPayroll}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Completed runs</div>
             </CardContent>
           </Card>
@@ -493,11 +493,23 @@ export const PayeTaxCalculations = () => {
           <TabsContent value="slabs" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-extrabold">PAYE Tax Slabs</h3>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
 
+            {taxSlabs.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <Calculator className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No tax slabs yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Configure PAYE tax bands, or the ZRA 2024/25 statutory bands apply automatically.</p>
+                  <Button onClick={() => setShowSlabDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> Add Tax Slab
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {taxSlabs.map((slab) => (
                 <Card key={slab.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -529,14 +541,14 @@ export const PayeTaxCalculations = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Plus % Above Min</span>
-                      <span className="font-bold text-purple-500">{slab.plus_percentage_above_min}%</span>
+                      <span className="font-bold text-primary-500">{slab.plus_percentage_above_min}%</span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {slab.description || "No description"}
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                           <Edit className="h-3 w-3" />
                         </Button>
                       </div>
@@ -563,7 +575,7 @@ export const PayeTaxCalculations = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
             </div>
@@ -612,13 +624,27 @@ export const PayeTaxCalculations = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {calculations.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <Calculator className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No PAYE calculations yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">Run your first PAYE calculation for an employee payroll period.</p>
+                          <Button onClick={() => setShowCalcDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                            <Calculator className="h-4 w-4 mr-1" /> Calculate PAYE
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>
@@ -641,15 +667,27 @@ export const PayeTaxCalculations = () => {
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <RefreshCw className="h-4 w-4 mr-1" /> Process Payroll
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
             </div>
 
+            {payroll.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <Users className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No payroll runs yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Calculate PAYE for an employee to generate their first payroll record.</p>
+                  <Button onClick={() => setShowCalcDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Calculator className="h-4 w-4 mr-1" /> Calculate PAYE
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {payroll.map((pay) => (
                 <Card key={pay.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -691,7 +729,7 @@ export const PayeTaxCalculations = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">NAPSA (Emp)</span>
-                      <span className="font-bold text-purple-500">
+                      <span className="font-bold text-primary-500">
                         {institution.currency || "ZMW"} {pay.napsa_employee.toFixed(2)}
                       </span>
                     </div>
@@ -705,7 +743,7 @@ export const PayeTaxCalculations = () => {
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Total Deductions: {institution.currency || "ZMW"} {(pay.paye_tax + pay.napsa_employee + pay.nhima_employee).toFixed(2)}
                       </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Eye className="h-3 w-3" />
                       </Button>
                     </div>

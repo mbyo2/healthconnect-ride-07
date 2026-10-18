@@ -438,7 +438,7 @@ const LabManagement = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "pending": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
-      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-teal-500">Sample Collected</span>;
+      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Sample Collected</span>;
       case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">In Progress</span>;
       case "completed": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
       case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
@@ -469,12 +469,12 @@ const LabManagement = () => {
           <div className="flex items-center gap-2">
             <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
                   <Plus className="h-4 w-4" />
                   <span>New Test Request</span>
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] bg-white border border-canvas-silk dark:border-slate-800">
+              <DialogContent className="sm:max-w-[500px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
                 <DialogHeader>
                   <DialogTitle className="font-extrabold text-base">Create New Lab Request</DialogTitle>
                 </DialogHeader>
@@ -488,7 +488,7 @@ const LabManagement = () => {
                       className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-medium"
                     />
                     {patientSearchTerm && !selectedPatientId && (
-                      <div className="max-h-32 overflow-y-auto border border-canvas-silk rounded-md bg-white mt-1 shadow-xs">
+                      <div className="max-h-32 overflow-y-auto border border-canvas-silk dark:border-slate-800 rounded-md bg-white dark:bg-slate-900 mt-1 shadow-xs">
                         {patients
                           ?.filter((p) => `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase()))
                           .map((p) => (
@@ -536,10 +536,10 @@ const LabManagement = () => {
                   )}
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setShowNewRequestDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
+                  <button onClick={() => setShowNewRequestDialog(false)} className="px-4 min-h-[44px] text-xs font-bold text-slate-500 dark:text-slate-400">
                     Cancel
                   </button>
-                  <button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">
+                  <button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="px-4 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-bold">
                     {isSubmitting && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />} Create Request
                   </button>
                 </DialogFooter>
@@ -560,7 +560,7 @@ const LabManagement = () => {
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+              className={`px-4 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
                   : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -668,7 +668,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => collectSample(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50"
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 min-h-[44px] min-w-[44px]"
                             >
                               Collect Sample
                             </button>
@@ -677,7 +677,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => startAnalysis(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-teal-500 text-white text-xs font-extrabold disabled:opacity-50"
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 min-h-[44px] min-w-[44px]"
                             >
                               Start Analysis
                             </button>
@@ -685,7 +685,7 @@ const LabManagement = () => {
                           {request.status === "in_progress" && (
                             <button
                               onClick={() => { setSelectedRequest(request); setActiveTab("results"); }}
-                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold"
+                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold min-h-[44px] min-w-[44px]"
                             >
                               Enter Result
                             </button>
@@ -697,7 +697,7 @@ const LabManagement = () => {
                                 setResultSummary((request as any).result_summary || "");
                                 setActiveTab("results");
                               }}
-                              className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold"
+                              className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold min-h-[44px] min-w-[44px]"
                             >
                               View Results
                             </button>
@@ -705,6 +705,23 @@ const LabManagement = () => {
                         </td>
                       </tr>
                     ))}
+                  {requests?.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center">
+                        <div className="space-y-3">
+                          <FlaskConical className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No lab orders yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">New test requests from providers will appear here for sample collection.</p>
+                          <button
+                            onClick={() => setShowNewRequestDialog(true)}
+                            className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold"
+                          >
+                            New Test Request
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -769,7 +786,7 @@ const LabManagement = () => {
                   />
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-bold cursor-pointer p-3 rounded-xl border border-error-500/30 bg-error-50">
+                <label className="flex items-center gap-2 text-xs font-bold cursor-pointer p-3 rounded-xl border border-error-500/30 bg-error-50 dark:bg-red-950/40">
                   <Checkbox checked={isCritical} onCheckedChange={(v) => setIsCritical(v === true)} />
                   <span>Flag as <strong className="text-error-500">CRITICAL VALUE</strong> — triggers automated push, SMS, & clinician dispatch alerts</span>
                 </label>
@@ -803,11 +820,11 @@ const LabManagement = () => {
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-extrabold text-sm flex items-center gap-2">
-                <Microscope className="h-4 w-4 text-purple-500" /> Diagnostic Test Catalog
+                <Microscope className="h-4 w-4 text-primary-500" /> Diagnostic Test Catalog
               </h2>
               <button
                 onClick={openNewTestDialog}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" /> Add Test
               </button>
@@ -824,14 +841,14 @@ const LabManagement = () => {
                     <button
                       onClick={() => openEditTestDialog(test)}
                       title="Edit test"
-                      className="p-1.5 rounded-lg hover:bg-white text-slate-500 hover:text-primary-600 transition-colors"
+                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors flex items-center justify-center"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => setTestToDelete(test)}
                       title="Remove test"
-                      className="p-1.5 rounded-lg hover:bg-white text-slate-500 hover:text-rose-600 transition-colors"
+                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-rose-600 transition-colors flex items-center justify-center"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -847,7 +864,7 @@ const LabManagement = () => {
 
         {/* Add / Edit Test Dialog */}
         <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
-          <DialogContent className="sm:max-w-[440px] bg-white border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="sm:max-w-[440px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
             <DialogHeader>
               <DialogTitle className="font-extrabold text-base">{editingTest ? "Edit Test" : "Add Test to Catalog"}</DialogTitle>
             </DialogHeader>
@@ -918,7 +935,7 @@ const LabManagement = () => {
 
         {/* Remove Test confirmation */}
         <Dialog open={!!testToDelete} onOpenChange={(open) => { if (!open) setTestToDelete(null); }}>
-          <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
             <DialogHeader>
               <DialogTitle className="text-sm font-black">Remove test from catalog?</DialogTitle>
               <DialogDescription className="text-xs">

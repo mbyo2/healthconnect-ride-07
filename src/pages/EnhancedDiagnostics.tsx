@@ -188,9 +188,9 @@ export const EnhancedDiagnostics = () => {
 
   const getOrderTypeColor = (type: string) => {
     switch (type) {
-      case "lab": return "bg-purple-500";
+      case "lab": return "bg-primary-500";
       case "radiology": return "bg-primary-500";
-      case "both": return "bg-indigo-500";
+      case "both": return "bg-primary-500";
       default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
@@ -208,7 +208,7 @@ export const EnhancedDiagnostics = () => {
     switch (status) {
       case "completed": return "bg-success-500 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "approved": return "bg-purple-500 text-white";
+      case "approved": return "bg-success-500 text-white";
       case "pending": return "bg-warning-500 text-white";
       case "cancelled": return "bg-error-500 text-white";
       default: return "bg-graphite-500 dark:bg-slate-600 text-white";
@@ -469,9 +469,9 @@ export const EnhancedDiagnostics = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
-                <Clock className="h-4 w-4 text-purple-500" />
+                <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{pendingOrders}</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{pendingOrders}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
@@ -552,10 +552,10 @@ export const EnhancedDiagnostics = () => {
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Filter className="h-4 w-4 mr-1" /> Filter
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
@@ -607,10 +607,10 @@ export const EnhancedDiagnostics = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Edit className="h-3 w-3" />
                           </Button>
                         </div>
@@ -654,7 +654,7 @@ export const EnhancedDiagnostics = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export Schedule
               </Button>
             </div>
@@ -697,7 +697,7 @@ export const EnhancedDiagnostics = () => {
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {schedule.assigned_patients.length} patients assigned
                       </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Edit className="h-3 w-3" />
                       </Button>
                     </div>

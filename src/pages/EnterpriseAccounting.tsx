@@ -491,10 +491,10 @@ export const EnterpriseAccounting = () => {
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Filter className="h-4 w-4 mr-1" /> Filter
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
@@ -550,16 +550,30 @@ export const EnterpriseAccounting = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                             <Edit className="h-3 w-3" />
                           </Button>
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {glEntries.length === 0 && (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-12 text-center">
+                        <div className="space-y-3">
+                          <BookOpen className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                          <p className="text-sm font-bold">No GL entries yet</p>
+                          <p className="text-xs text-graphite-500 dark:text-slate-400">Record your first journal, receipt, payment or adjustment entry.</p>
+                          <Button onClick={() => setShowGlDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                            <Plus className="h-4 w-4 mr-1" /> New GL Entry
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table></div>
             </Card>
@@ -695,12 +709,24 @@ export const EnterpriseAccounting = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
             </div>
 
+            {assets.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <FileText className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No fixed assets yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Register medical equipment, vehicles, buildings and IT assets to track depreciation.</p>
+                  <Button onClick={() => setShowAssetDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> Add Asset
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {assets.map((asset) => (
                 <Card key={asset.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -736,7 +762,7 @@ export const EnterpriseAccounting = () => {
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Year {asset.current_depreciation_year} of {asset.useful_life_years}
                       </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Edit className="h-3 w-3" />
                       </Button>
                     </div>
@@ -844,12 +870,24 @@ export const EnterpriseAccounting = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <Download className="h-4 w-4 mr-1" /> Export
                 </Button>
               </div>
             </div>
 
+            {reconciliations.length === 0 && (
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <CardContent className="p-12 text-center space-y-3">
+                  <RefreshCw className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
+                  <p className="text-sm font-bold">No bank reconciliations yet</p>
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">Start your first reconciliation to match statement and book balances.</p>
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                    <Plus className="h-4 w-4 mr-1" /> New Reconciliation
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
                 <Card key={reconciliation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -885,7 +923,7 @@ export const EnterpriseAccounting = () => {
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(reconciliation.statement_date).toLocaleDateString()}
                       </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Eye className="h-3 w-3" />
                       </Button>
                     </div>

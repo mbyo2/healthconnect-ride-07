@@ -174,7 +174,16 @@ export const PhlebotomistWorkflow = () => {
         <CardHeader><CardTitle>Collection Queue</CardTitle></CardHeader>
         <CardContent>
           {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-            samples.length === 0 ? <p className="text-muted-foreground text-center py-4">No samples in queue</p> : (
+            samples.length === 0 ? (
+              <div className="text-center py-8 space-y-3">
+                <Droplets className="h-10 w-10 mx-auto text-muted-foreground" />
+                <p className="text-muted-foreground font-medium">No samples in queue</p>
+                <p className="text-sm text-muted-foreground">Start a new collection to add samples to the queue.</p>
+                <Button className="min-h-[44px]" onClick={() => setShowAdd(true)}>
+                  <Plus className="h-4 w-4 mr-1" /> New Collection
+                </Button>
+              </div>
+            ) : (
               <div className="space-y-2">
                 {samples.map(s => (
                   <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border">
@@ -191,10 +200,10 @@ export const PhlebotomistWorkflow = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{s.status}</Badge>
                       {s.status === 'pending' && (
-                        <Button size="sm" onClick={() => updateStatus(s.id, 'collected')}>Collect</Button>
+                        <Button size="sm" className="min-h-[44px]" onClick={() => updateStatus(s.id, 'collected')}>Collect</Button>
                       )}
                       {s.status === 'collected' && (
-                        <Button size="sm" variant="outline" onClick={() => updateStatus(s.id, 'in_transit')}>Send to Lab</Button>
+                        <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => updateStatus(s.id, 'in_transit')}>Send to Lab</Button>
                       )}
                     </div>
                   </div>

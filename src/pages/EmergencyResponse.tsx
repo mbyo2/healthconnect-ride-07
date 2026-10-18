@@ -213,7 +213,7 @@ const EmergencyResponse = () => {
                   </div>
                   <button
                     onClick={() => callNumber(contact.phone)}
-                    className="px-3 py-1.5 rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center gap-1"
+                    className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center justify-center gap-1"
                   >
                     <Phone className="w-3.5 h-3.5" /> Call
                   </button>
@@ -241,7 +241,7 @@ const EmergencyResponse = () => {
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-error-50 border border-error-500/30">
+                <div className="p-3 rounded-xl bg-error-50 dark:bg-red-950/40 border border-error-500/30">
                   <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
                   <p className="text-2xl font-black font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
@@ -256,7 +256,7 @@ const EmergencyResponse = () => {
                   <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Medical Conditions</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.conditions.map((condition, index) => (
-                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-purple-500">{condition}</span>
+                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{condition}</span>
                     ))}
                     {medicalInfo.conditions.length === 0 && <span className="text-graphite-500 dark:text-slate-400">None listed</span>}
                   </div>
@@ -296,10 +296,10 @@ const EmergencyResponse = () => {
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{h.address || "Lusaka Medical District"}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white text-xs font-bold flex items-center gap-1">
+                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center justify-center gap-1">
                     <Navigation className="w-3.5 h-3.5" /> Directions
                   </button>
-                  <button onClick={() => callNumber(h.phone)} className="px-3 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1">
+                  <button onClick={() => callNumber(h.phone)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-primary-500 text-white text-xs font-bold flex items-center justify-center gap-1">
                     <Phone className="w-3.5 h-3.5" /> Call
                   </button>
                 </div>
@@ -321,7 +321,7 @@ const EmergencyResponse = () => {
           </div>
           <button
             onClick={handleShareLocation}
-            className={`px-5 py-2.5 rounded-xl font-extrabold text-xs text-white shadow-xs transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
+            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-extrabold text-xs text-white shadow-xs transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
           >
             {locationSharing ? "Stop Location Telemetry" : "Activate GPS Telemetry Broadcast"}
           </button>
