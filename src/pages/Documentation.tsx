@@ -102,7 +102,7 @@ export default function Documentation() {
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">Documentation</h1>
+        <h1 className="text-3xl font-bold">Documentation</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Everything you need to know about using Doc' O Clock - your comprehensive healthcare platform
         </p>
@@ -126,22 +126,22 @@ export default function Documentation() {
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
             <div className="text-center p-4 border rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-600 font-bold">1</span>
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-primary-600 font-bold">1</span>
               </div>
               <h3 className="font-semibold">Sign Up</h3>
               <p className="text-sm text-muted-foreground">Create your account and verify your email</p>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-600 font-bold">2</span>
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-primary-600 font-bold">2</span>
               </div>
               <h3 className="font-semibold">Complete Profile</h3>
               <p className="text-sm text-muted-foreground">Add your personal and medical information</p>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-600 font-bold">3</span>
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-primary-600 font-bold">3</span>
               </div>
               <h3 className="font-semibold">Start Using</h3>
               <p className="text-sm text-muted-foreground">Find providers and book your first appointment</p>
@@ -161,7 +161,7 @@ export default function Documentation() {
             <Card key={index} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+                  <div className="p-2 bg-primary-100 rounded-lg">
                     {feature.icon}
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
@@ -193,7 +193,7 @@ export default function Documentation() {
                 <ul className="space-y-2">
                   {section.items.map((item, itemIndex) => (
                     <li key={itemIndex} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                      <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
                       <span className="text-sm">{item}</span>
                     </li>
                   ))}

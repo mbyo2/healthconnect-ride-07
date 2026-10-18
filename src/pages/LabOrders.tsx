@@ -174,7 +174,7 @@ const LabOrders = () => {
           </div>
         </div>
 
-        <Card>
+        <Card id="new-lab-order" className="scroll-mt-6">
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <Plus className="h-4 w-4" /> New lab order
@@ -300,7 +300,15 @@ const LabOrders = () => {
             {ordersLoading ? (
               <p className="text-xs text-slate-500">Loading orders…</p>
             ) : myOrders.length === 0 ? (
-              <p className="text-xs text-slate-500">No lab orders yet.</p>
+              <div className="py-6 text-center space-y-3">
+                <p className="text-xs text-slate-500">No lab orders yet.</p>
+                <Button
+                  onClick={() => document.getElementById("new-lab-order")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="min-h-[44px]"
+                >
+                  <Plus className="h-4 w-4 mr-1.5" /> New order
+                </Button>
+              </div>
             ) : (
               <div className="space-y-3">
                 {myOrders.map((o: any) => (

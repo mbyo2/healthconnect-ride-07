@@ -309,7 +309,7 @@ const AdvancedDashboard = () => {
                                             }`}>
                                             {apt.status}
                                         </span>
-                                        <Button variant="outline" size="sm">View</Button>
+                                        <Button variant="outline" size="sm" className="min-h-[44px]">View</Button>
                                     </div>
                                 </div>
                             ))}

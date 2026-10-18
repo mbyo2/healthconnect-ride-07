@@ -126,9 +126,10 @@ export const AdminDashboard = () => {
     }));
 
     const userTypeDistribution = [
-      { name: 'Patients', value: patients.length, color: '#397dff' },
+      // Semantic theme palette: primary / success / accent / warning
+      { name: 'Patients', value: patients.length, color: '#397DFF' },
       { name: 'Providers', value: providers.length, color: '#22C55E' },
-      { name: 'Institutions', value: institutions.length, color: '#f55c15' },
+      { name: 'Institutions', value: institutions.length, color: '#F55C15' },
       { name: 'Admins', value: admins.length, color: '#F59E0B' },
     ];
 
@@ -176,7 +177,7 @@ export const AdminDashboard = () => {
             <div>
               <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 Executive Admin Dashboard
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 System-wide governance, security audit logs, platform revenue & accreditation controls
@@ -201,7 +202,7 @@ export const AdminDashboard = () => {
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="text-xs font-extrabold px-3.5 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
+                  className="text-xs font-extrabold px-3.5 py-1.5 min-h-[44px] rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{label}</span>
@@ -283,9 +284,9 @@ export const AdminDashboard = () => {
                     <TrendChart
                       data={overview.userGrowthData}
                       lines={[
-                        { dataKey: 'patients', name: 'Patients', color: '#397dff' },
+                        { dataKey: 'patients', name: 'Patients', color: '#397DFF' },
                         { dataKey: 'providers', name: 'Providers', color: '#22C55E' },
-                        { dataKey: 'institutions', name: 'Institutions', color: '#f55c15' },
+                        { dataKey: 'institutions', name: 'Institutions', color: '#F55C15' },
                       ]}
                       height={280}
                     />

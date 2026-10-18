@@ -142,7 +142,7 @@ const AppointmentRemindersPage = () => {
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-primary-500">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-primary-500">
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
@@ -155,7 +155,7 @@ const AppointmentRemindersPage = () => {
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-success-500">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-success-500">
                   <MessageSquare className="h-4 w-4" />
                 </div>
                 <div>
@@ -171,7 +171,7 @@ const AppointmentRemindersPage = () => {
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-purple-500">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-primary-500">
                   <Smartphone className="h-4 w-4" />
                 </div>
                 <div>
@@ -233,7 +233,7 @@ const AppointmentRemindersPage = () => {
                     className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-white rounded-xl text-primary-500 border border-canvas-silk dark:border-slate-800">
+                      <div className="p-2.5 bg-white dark:bg-slate-800 rounded-xl text-primary-500 border border-canvas-silk dark:border-slate-800">
                         <Clock className="h-4 w-4" />
                       </div>
                       <div>

@@ -423,13 +423,13 @@ const Profile = () => {
                   <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice &amp; Professional Details
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">Visible to patients on your public provider profile.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Visible to patients on your public provider profile.</p>
               </div>
               <Button
                 size="sm"
                 onClick={() => provEditing ? handleProvSave() : setProvEditing(true)}
                 disabled={provSaving}
-                className={`rounded-full px-5 text-xs font-extrabold ${
+                className={`rounded-full px-5 min-h-[44px] text-xs font-extrabold ${
                   provEditing ? "bg-slate-900 hover:bg-black text-white" : "bg-primary-500 hover:bg-primary-600 text-white"
                 }`}
               >
@@ -449,17 +449,17 @@ const Profile = () => {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Medical School</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Medical School</Label>
                     <Input
                       value={provData.medical_school}
                       onChange={e => setProvData(p => ({ ...p, medical_school: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. UNZA School of Medicine"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Graduation Year</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Graduation Year</Label>
                     <Input
                       type="number"
                       min="1960"
@@ -468,7 +468,7 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, graduation_year: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 2015"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -486,7 +486,7 @@ const Profile = () => {
                       type="button"
                       disabled={!provEditing}
                       onClick={() => toggleArr("board_certifications", cert)}
-                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                      className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.board_certifications.includes(cert)
                           ? "bg-primary-500 text-white border-primary-500"
                           : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-primary-500 hover:text-primary-500"
@@ -510,7 +510,7 @@ const Profile = () => {
                       type="button"
                       disabled={!provEditing}
                       onClick={() => toggleArr("subspecialties", sub)}
-                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                      className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.subspecialties.includes(sub)
                           ? "bg-purple-500 text-white border-purple-500"
                           : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-purple-500 hover:text-purple-500"
@@ -529,23 +529,23 @@ const Profile = () => {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2 space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Primary Practice Location</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Primary Practice Location</Label>
                     <Input
                       value={provData.primary_practice_location}
                       onChange={e => setProvData(p => ({ ...p, primary_practice_location: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. Woodlands Clinic, Lusaka"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Avg. Wait Time</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Avg. Wait Time</Label>
                     <Input
                       value={provData.typical_wait_time}
                       onChange={e => setProvData(p => ({ ...p, typical_wait_time: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 15 mins"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -561,7 +561,7 @@ const Profile = () => {
                     <Badge key={h} variant="secondary" className="gap-1 pr-1">
                       {h}
                       {provEditing && (
-                        <button onClick={() => removeHospital(h)} className="ml-0.5 hover:text-destructive">
+                        <button onClick={() => removeHospital(h)} aria-label={`Remove ${h}`} className="ml-0.5 hover:text-destructive min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full">
                           <X className="h-3 w-3" />
                         </button>
                       )}
@@ -578,9 +578,9 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, newHospital: e.target.value }))}
                       onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addHospital())}
                       placeholder="Hospital name…"
-                      className="h-9 rounded-xl border border-canvas-silk text-xs"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs"
                     />
-                    <Button type="button" size="sm" onClick={addHospital} className="rounded-xl h-9 px-3">
+                    <Button type="button" size="sm" onClick={addHospital} className="rounded-xl min-h-[44px] px-3" aria-label="Add hospital">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -594,7 +594,7 @@ const Profile = () => {
                 </h3>
                 <div className="grid grid-cols-2 gap-4 max-w-xs">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Min</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Min</Label>
                     <Input
                       type="number"
                       min="0"
@@ -602,11 +602,11 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, consultation_fee_min: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 200"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 uppercase">Max</Label>
+                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Max</Label>
                     <Input
                       type="number"
                       min="0"
@@ -614,7 +614,7 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, consultation_fee_max: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 500"
-                      className="h-10 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -657,7 +657,7 @@ const Profile = () => {
                         type="button"
                         disabled={!provEditing}
                         onClick={() => toggleArr("insurance_providers_accepted", ins)}
-                        className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                        className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                           provData.insurance_providers_accepted.includes(ins)
                             ? "bg-success-500 text-white border-success-500"
                             : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-success-500 hover:text-success-500"
@@ -682,7 +682,7 @@ const Profile = () => {
                       type="button"
                       disabled={!provEditing}
                       onClick={() => toggleArr("languages_spoken", lang)}
-                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                      className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.languages_spoken.includes(lang)
                           ? "bg-warning-500 text-white border-warning-500"
                           : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-warning-500 hover:text-warning-500"

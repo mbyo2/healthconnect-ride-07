@@ -194,7 +194,7 @@ const Medications = () => {
                 My Medications
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{activeMedications.length} active</span>
               </h1>
-              <p className="text-sm text-graphite-500 font-medium tracking-wide">
+              <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
                 {activeMedications.length} active medication{activeMedications.length !== 1 ? 's' : ''} · reminders & refills
               </p>
             </div>

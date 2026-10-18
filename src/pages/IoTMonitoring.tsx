@@ -72,7 +72,7 @@ const IoTMonitoring = () => {
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 IoT Medical Device & Telemetry Board
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Live stream monitoring for wearables, Bluetooth monitors, and continuous vital telemetry
@@ -116,7 +116,7 @@ const IoTMonitoring = () => {
                   <Cable className="w-4 h-4 mr-2 text-warning-500" /> Serial Port
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("wifi")} className="text-xs font-bold">
-                  <Wifi className="w-4 h-4 mr-2 text-purple-500" /> Wi-Fi / Cloud Stream
+                  <Wifi className="w-4 h-4 mr-2 text-primary-500" /> Wi-Fi / Cloud Stream
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -176,8 +176,18 @@ const IoTMonitoring = () => {
               );
             })}
             {devices.length === 0 && (
-              <div className="col-span-full text-center py-8 text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                No active IoT devices connected. Click "Connect Device" above to initiate pairing.
+              <div className="col-span-full text-center py-8 space-y-3">
+                <Watch className="h-10 w-10 mx-auto text-primary-500 opacity-40" />
+                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                  No devices connected yet. Pair a wearable or monitor to stream live vitals here.
+                </p>
+                <button
+                  onClick={() => scanAndConnectDevice("bluetooth")}
+                  disabled={isScanning}
+                  className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-extrabold transition-colors"
+                >
+                  {isScanning ? "Scanning…" : "Connect a device"}
+                </button>
               </div>
             )}
           </div>
@@ -197,7 +207,7 @@ const IoTMonitoring = () => {
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
               <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
-              <p className="text-3xl font-black font-mono text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
+              <p className="text-3xl font-black text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">bpm</p>
             </div>
 
@@ -207,7 +217,7 @@ const IoTMonitoring = () => {
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
               <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
-              <p className="text-3xl font-black font-mono text-primary-500 mt-1">
+              <p className="text-3xl font-black text-primary-500 mt-1">
                 {vitalSigns?.blood_pressure
                   ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                   : "--/--"}
@@ -221,17 +231,17 @@ const IoTMonitoring = () => {
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
               <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
-              <p className="text-3xl font-black font-mono text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
+              <p className="text-3xl font-black text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">°C</p>
             </div>
 
             <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
-                <Droplet className="w-5 h-5 text-purple-500" />
+                <Droplet className="w-5 h-5 text-primary-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
               <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
-              <p className="text-3xl font-black font-mono text-purple-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
+              <p className="text-3xl font-black text-primary-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">% SpO2</p>
             </div>
           </div>
@@ -251,7 +261,7 @@ const IoTMonitoring = () => {
                   <XAxis dataKey="time" fontSize={11} />
                   <YAxis fontSize={11} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#0073ea" strokeWidth={3} dot={{ r: 3, fill: "#0073ea" }} />
+                  <Line type="monotone" dataKey="value" stroke="#397DFF" strokeWidth={3} dot={{ r: 3, fill: "#397DFF" }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

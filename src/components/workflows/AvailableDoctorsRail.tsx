@@ -23,7 +23,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
         </div>
         <button
           onClick={onViewAll}
-          className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1 px-2 py-2 -mr-2 min-h-[40px]"
+          className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1 px-2 py-2 -mr-2 min-h-[44px]"
         >
           <span>View all</span>
           <ChevronRight className="h-3.5 w-3.5" />

@@ -139,7 +139,7 @@ export const ProviderDetail = () => {
     const isFetchError = !!error && (error as Error).message !== "Provider not found";
     return (
       <div className="min-h-screen bg-canvas p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-canvas-silk text-center space-y-3">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-center space-y-3">
           <h2 className="text-lg font-extrabold">
             {isFetchError ? "Couldn't load this profile" : "Provider Profile Not Found"}
           </h2>

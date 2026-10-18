@@ -173,7 +173,7 @@ const MapPage = () => {
               size="sm"
               onClick={getCurrentLocation}
               disabled={locationLoading}
-              className="flex items-center gap-2 w-full sm:w-auto"
+              className="flex items-center gap-2 w-full sm:w-auto min-h-[44px]"
             >
               {locationLoading ? (
                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -279,12 +279,12 @@ const MapPage = () => {
                       </span>
                     )}
                     {selectedProvider.consultation_fee_min && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                         <Wallet className="h-3 w-3" aria-hidden /> From K{selectedProvider.consultation_fee_min}
                       </span>
                     )}
                     {selectedProvider.typical_wait_time && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-700">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300">
                         <Clock className="h-3 w-3" aria-hidden /> {selectedProvider.typical_wait_time}
                       </span>
                     )}
@@ -302,10 +302,10 @@ const MapPage = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="flex-1" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
+                <Button size="sm" className="flex-1 min-h-[44px]" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
                   Book Appointment
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
+                <Button variant="outline" size="sm" className="flex-1 min-h-[44px]" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
                   View Profile
                 </Button>
               </div>

@@ -56,6 +56,7 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "pharmacy", label: "Pharmacy POS" },
   { val: "bloodbank", label: "Blood Bank" },
   { val: "beds", label: "Bed Wards" },
+  { val: "departments", label: "Departments" },
   { val: "billing", label: "Billing" },
   { val: "tariffs", label: "Tariff Rates" },
   { val: "procedure-prices", label: "Procedure Prices" },
@@ -283,6 +284,23 @@ export const HospitalManagement = () => {
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
             <TabsContent value="dashboard" className="space-y-6">
+              {departments.length === 0 && (
+                <Card>
+                  <CardContent className="p-8 text-center space-y-3">
+                    <Building2 className="h-10 w-10 mx-auto text-primary-500" />
+                    <p className="text-sm font-extrabold">No departments set up yet</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 max-w-md mx-auto">
+                      Departments organize your wards, beds, and staff. Add your first department to populate the live HMS board.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab("departments")}
+                      className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-colors"
+                    >
+                      Set up departments
+                    </button>
+                  </CardContent>
+                </Card>
+              )}
               <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
               <FacilityJourneyCard facilityType={hospital.type} />
             </TabsContent>
@@ -298,6 +316,9 @@ export const HospitalManagement = () => {
             <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>
             <TabsContent value="bloodbank">{mod("bloodbank", <BloodBank hospital={hospital} />)}</TabsContent>
             <TabsContent value="beds">{mod("beds", <BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="departments">
+              <DepartmentManagement hospital={hospital} departments={departments} onRefresh={refreshAll} />
+            </TabsContent>
             <TabsContent value="billing">{mod("billing", <HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="tariffs">{mod("tariffs", <TariffAndPriceManager />)}</TabsContent>
             <TabsContent value="procedure-prices">{mod("procedure-prices", hospitalId ? <ClinicalProcedurePricing institutionId={hospitalId} /> : null)}</TabsContent>

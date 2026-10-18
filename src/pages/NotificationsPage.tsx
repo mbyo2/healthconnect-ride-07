@@ -174,7 +174,7 @@ const NotificationsPage = () => {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+              className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
                 filter === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
                   : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -205,7 +205,7 @@ const NotificationsPage = () => {
                   className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-canvas dark:bg-slate-950"}`}
                 >
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 rounded-xl bg-white border border-canvas-silk shadow-2xs">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 shadow-2xs">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -231,7 +231,7 @@ const NotificationsPage = () => {
                     <button
                       onClick={() => markAsRead(notification.id)}
                       aria-label={`Mark as read: ${notification.title}`}
-                      className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                      className="px-3 py-1 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
                     >
                       <Check className="h-3.5 w-3.5 text-success-500" /> Mark Read
                     </button>
@@ -239,7 +239,7 @@ const NotificationsPage = () => {
                   <button
                     onClick={() => deleteNotification(notification.id)}
                     aria-label={`Delete notification: ${notification.title}`}
-                    className="px-3 py-1 rounded-md text-error-500 hover:bg-error-50 dark:hover:bg-rose-950/30 text-xs font-bold flex items-center gap-1"
+                    className="px-3 py-1 min-h-[44px] rounded-md text-error-500 hover:bg-error-50 dark:hover:bg-rose-950/30 text-xs font-bold flex items-center gap-1"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Delete
                   </button>

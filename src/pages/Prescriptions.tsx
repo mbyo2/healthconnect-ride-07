@@ -518,7 +518,7 @@ export const Prescriptions = () => {
                     <span>Write E-Prescription</span>
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-canvas-silk rounded-card p-6">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card p-6">
                   <DialogHeader>
                     <DialogTitle className="font-display text-xl font-medium text-midnight flex items-center gap-2">
                       <Pill className="h-6 w-6 text-primary-500" />
@@ -531,13 +531,13 @@ export const Prescriptions = () => {
                     <div>
                       <label className="font-medium text-graphite-600 uppercase text-xs">1. Select Patient *</label>
                       <input
-                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk bg-white font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-950 font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         placeholder="Search patient by name or email..."
                         value={searchPatient}
                         onChange={(e) => setSearchPatient(e.target.value)}
                       />
                       {patients.length > 0 && !selectedPatient && (
-                        <div className="mt-2 border rounded-xl max-h-36 overflow-y-auto bg-white shadow-card">
+                        <div className="mt-2 border rounded-xl max-h-36 overflow-y-auto bg-white dark:bg-slate-950 shadow-card">
                           {patients.map((p: any) => (
                             <button
                               key={p.id}

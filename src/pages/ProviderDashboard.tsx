@@ -245,7 +245,7 @@ const MyPracticeEditor = () => {
 
       {/* Subspecialties */}
       <Section icon={Stethoscope} title="Subspecialties">
-        <PillSelector options={SUBSPECIALTY_OPTIONS} field="subspecialties" activeColor="bg-purple-500" />
+        <PillSelector options={SUBSPECIALTY_OPTIONS} field="subspecialties" activeColor="bg-primary-500" />
       </Section>
 
       {/* Practice */}
@@ -697,7 +697,7 @@ export const ProviderDashboard = () => {
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-black font-mono text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-3xl font-black text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-xs font-bold text-emerald-500 mt-1">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"
@@ -810,7 +810,7 @@ export const ProviderDashboard = () => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="text-xs font-extrabold px-4 py-1.5 rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
+                  className="text-xs font-extrabold px-4 py-1.5 min-h-[44px] rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
                 >
                   {tab.label}
                 </TabsTrigger>

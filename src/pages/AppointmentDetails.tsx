@@ -182,7 +182,7 @@ export const AppointmentDetails = () => {
             <button
               onClick={() => navigate("/appointments")}
               aria-label="Back to appointments"
-              className="p-2 rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors shrink-0"
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-700 transition-colors shrink-0"
             >
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
             </button>
@@ -203,7 +203,7 @@ export const AppointmentDetails = () => {
             {appointment.type === "video_consultation" && videoConsultation && appointment.status !== "cancelled" && (
               <button
                 onClick={() => navigate(`/video-consultations?join=${videoConsultation.id}`)}
-                className="px-3.5 py-1.5 rounded-md bg-success-500 hover:bg-success-600 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-success-500 hover:bg-success-600 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
               >
                 <Video className="h-3.5 w-3.5" />
                 Join Meeting
@@ -228,7 +228,7 @@ export const AppointmentDetails = () => {
                       toast.error("Failed to mark as completed");
                     }
                   }}
-                  className="px-3.5 py-1.5 rounded-md bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors flex items-center gap-1.5"
                 >
                   <CheckCircle className="h-3.5 w-3.5" />
                   Mark Complete
@@ -236,7 +236,7 @@ export const AppointmentDetails = () => {
                 )}
                 <button
                   onClick={() => setShowCancelDialog(true)}
-                  className="px-3.5 py-1.5 rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 min-h-[44px] rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
                 >
                   <X className="h-3.5 w-3.5" />
                   Cancel appointment

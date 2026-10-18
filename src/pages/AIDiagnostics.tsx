@@ -37,7 +37,7 @@ const AIDiagnostics = () => {
               <div>
                 <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                   Multimodal Medical AI Diagnostic Workspace
-                  <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
                 <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                   Evidence-based clinical decision support powered by MedGemma 27B & 3D Volumetric Imaging
@@ -46,7 +46,7 @@ const AIDiagnostics = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">
                 Clinical AI Engine Active
               </span>
             </div>
@@ -83,11 +83,11 @@ const AIDiagnostics = () => {
           {/* Feature Quick-Access Bento Grid */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
-              { id: "chat", title: "AI Assistant", sub: "Chat & image analysis", color: "#0073ea", icon: <MessageSquare className="h-5 w-5" /> },
-              { id: "documents", title: "Doc OCR", sub: "Lab & Rx data extraction", color: "#00c875", icon: <FileText className="h-5 w-5" /> },
-              { id: "imaging", title: "3D Volumetric", sub: "CT / MRI / PET-CT", color: "#a25ddc", icon: <Layers className="h-5 w-5" /> },
-              { id: "symptoms", title: "Symptom Analysis", sub: "Guided intake collector", color: "#fdab3d", icon: <ClipboardList className="h-5 w-5" /> },
-              { id: "history", title: "Consult History", sub: "Past AI audit logs", color: "#676879", icon: <History className="h-5 w-5" /> },
+              { id: "chat", title: "AI Assistant", sub: "Chat & image analysis", color: "#397DFF", icon: <MessageSquare className="h-5 w-5" /> },
+              { id: "documents", title: "Doc OCR", sub: "Lab & Rx data extraction", color: "#22C55E", icon: <FileText className="h-5 w-5" /> },
+              { id: "imaging", title: "3D Volumetric", sub: "CT / MRI / PET-CT", color: "#F59E0B", icon: <Layers className="h-5 w-5" /> },
+              { id: "symptoms", title: "Symptom Analysis", sub: "Guided intake collector", color: "#F55C15", icon: <ClipboardList className="h-5 w-5" /> },
+              { id: "history", title: "Consult History", sub: "Past AI audit logs", color: "#64748B", icon: <History className="h-5 w-5" /> },
             ].map((card) => (
               <div
                 key={card.id}

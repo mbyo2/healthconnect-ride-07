@@ -145,7 +145,7 @@ const Symptoms = () => {
           </div>
           <button
             onClick={() => navigate("/ai-diagnostics")}
-            className="px-4 py-2 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-blue-950/30 font-extrabold text-xs flex items-center gap-1.5 transition-all"
+            className="px-4 py-2 min-h-[44px] rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-blue-950/30 font-extrabold text-xs flex items-center gap-1.5 transition-all"
           >
             <span>Analyze with AI</span>
             <ArrowRight className="h-4 w-4" />

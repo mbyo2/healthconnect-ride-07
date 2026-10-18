@@ -48,6 +48,7 @@ export const Billing = () => {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showReceipt, setShowReceipt] = useState<Invoice | null>(null);
+  const [markPaidInvoice, setMarkPaidInvoice] = useState<Invoice | null>(null);
   const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
 
   // Form state
@@ -371,10 +372,10 @@ export const Billing = () => {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setShowReceipt(invoice)}>
+                    <Button variant="outline" size="sm" className="min-h-[44px]" onClick={() => setShowReceipt(invoice)}>
                       <Receipt className="h-4 w-4 mr-1" /> Receipt
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDownloadReceipt(invoice)}>
+                    <Button variant="outline" size="sm" className="min-h-[44px]" onClick={() => handleDownloadReceipt(invoice)}>
                       <Download className="h-4 w-4 mr-1" /> PDF
                     </Button>
                     {invoice.status !== "paid" && (
@@ -384,11 +385,11 @@ export const Billing = () => {
                             This facility handles its own payments — please pay them directly.
                           </p>
                         ) : (
-                          <Button size="sm" onClick={() => handlePayOnline(invoice)} className="bg-blue-600 hover:bg-blue-700">
+                          <Button size="sm" className="min-h-[44px] bg-blue-600 hover:bg-blue-700" onClick={() => handlePayOnline(invoice)}>
                             <CheckCircle className="h-4 w-4 mr-1" /> Pay Online
                           </Button>
                         )}
-                        <Button size="sm" variant="outline" onClick={() => handleMarkPaid(invoice)}>
+                        <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => setMarkPaidInvoice(invoice)}>
                           <CheckCircle className="h-4 w-4 mr-1" /> Mark Paid
                         </Button>
                       </>
@@ -502,7 +503,7 @@ export const Billing = () => {
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
           {showReceipt && (
-            <div className="bg-white rounded-lg overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
               {/* Header with Doc'O Clock branding */}
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
                 <div className="flex items-center justify-between">
@@ -515,18 +516,18 @@ export const Billing = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-blue-200">RECEIPT</p>
-                    <p className="font-mono font-bold">{showReceipt.invoice_number}</p>
+                    <p className="font-bold">{showReceipt.invoice_number}</p>
                   </div>
                 </div>
               </div>
 
               {/* Institution info */}
               {institution && (
-                <div className="bg-blue-50 px-6 py-4 border-b">
-                  <p className="font-semibold text-gray-900">{institution.name}</p>
-                  {institution.address && <p className="text-sm text-gray-600">{institution.address}</p>}
+                <div className="bg-blue-50 dark:bg-blue-950/40 px-6 py-4 border-b dark:border-slate-700">
+                  <p className="font-semibold text-gray-900 dark:text-slate-100">{institution.name}</p>
+                  {institution.address && <p className="text-sm text-gray-600 dark:text-slate-400">{institution.address}</p>}
                   {(institution.city || institution.phone) && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-slate-400">
                       {[institution.city, institution.phone].filter(Boolean).join(" • ")}
                     </p>
                   )}
@@ -537,15 +538,15 @@ export const Billing = () => {
                 {/* Patient and invoice info */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-500 text-xs uppercase tracking-wide">Billed To</p>
+                    <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide">Billed To</p>
                     <p className="font-semibold">{showReceipt.patient_name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-gray-500 text-xs uppercase tracking-wide">Date</p>
+                    <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide">Date</p>
                     <p className="font-semibold">{new Date(showReceipt.created_at).toLocaleDateString()}</p>
                     {showReceipt.due_date && (
                       <>
-                        <p className="text-gray-500 text-xs uppercase tracking-wide mt-2">Due Date</p>
+                        <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide mt-2">Due Date</p>
                         <p className="font-semibold">{new Date(showReceipt.due_date).toLocaleDateString()}</p>
                       </>
                     )}
@@ -560,11 +561,11 @@ export const Billing = () => {
                 {/* Items table */}
                 <div className="border rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 dark:bg-slate-800">
                       <tr>
-                        <th className="text-left px-4 py-2 font-medium text-gray-600">Description</th>
-                        <th className="text-center px-4 py-2 font-medium text-gray-600">Qty</th>
-                        <th className="text-right px-4 py-2 font-medium text-gray-600">Amount</th>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Description</th>
+                        <th className="text-center px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Qty</th>
+                        <th className="text-right px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -581,9 +582,9 @@ export const Billing = () => {
 
                 {/* Totals */}
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-600">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
                   <div className="flex justify-between font-bold text-base pt-2 border-t">
                     <span>Total:</span><span>{formatPrice(showReceipt.total_amount)}</span>
                   </div>
@@ -592,13 +593,13 @@ export const Billing = () => {
                 </div>
 
                 {showReceipt.notes && (
-                  <div className="bg-gray-50 p-3 rounded text-sm text-gray-600 italic">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded text-sm text-gray-600 dark:text-slate-400 italic">
                     {showReceipt.notes}
                   </div>
                 )}
 
                 {/* Footer */}
-                <div className="text-center text-xs text-gray-500 pt-4 border-t">
+                <div className="text-center text-xs text-gray-500 dark:text-slate-400 pt-4 border-t">
                   <p>Thank you for choosing Doc'O Clock</p>
                   <p className="mt-1">Powered by Doc'O Clock • doc0clock.online</p>
                 </div>
@@ -612,6 +613,33 @@ export const Billing = () => {
                 <Download className="h-4 w-4 mr-2" /> Download PDF
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Mark Paid — manual/offline payment confirmation (trust gate: never record unverified) */}
+      <Dialog open={!!markPaidInvoice} onOpenChange={(o) => { if (!o) setMarkPaidInvoice(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Record manual payment?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This marks invoice <span className="font-bold text-foreground">{markPaidInvoice?.invoice_number}</span> as
+            paid based on an offline/cash payment. Only continue if you have received the funds.
+          </p>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" className="min-h-[44px]" onClick={() => setMarkPaidInvoice(null)}>
+              Cancel
+            </Button>
+            <Button
+              className="min-h-[44px]"
+              onClick={async () => {
+                if (markPaidInvoice) await handleMarkPaid(markPaidInvoice);
+                setMarkPaidInvoice(null);
+              }}
+            >
+              Yes, mark paid
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

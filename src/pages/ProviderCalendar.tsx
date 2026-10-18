@@ -342,7 +342,7 @@ const ProviderCalendar = () => {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-6 text-xs p-1"
+                                    className="min-h-[44px] min-w-[44px] text-xs p-1"
                                     onClick={() => toggleSlotAvailability(slot.id, slot.is_available)}
                                   >
                                     {slot.is_available ? 'Block' : 'Open'}
@@ -350,7 +350,7 @@ const ProviderCalendar = () => {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-6 p-1"
+                                    className="min-h-[44px] min-w-[44px] p-1"
                                     onClick={() => deleteSlot(slot.id)}
                                   >
                                     <X className="h-3 w-3" />

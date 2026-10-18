@@ -83,7 +83,7 @@ const HealthAnalytics = () => {
             <button
               onClick={exportReport}
               disabled={!hasAnyData || loading}
-              className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Download className="h-4 w-4" />
               <span>Export Report</span>

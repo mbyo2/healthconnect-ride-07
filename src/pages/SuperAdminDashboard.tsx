@@ -166,7 +166,7 @@ const SuperAdminDashboard = () => {
       cell: ({ row }) => {
         const level = row.getValue("admin_level") as AdminLevel;
         return level === "superadmin"
-          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Super Admin</span>
+          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Super Admin</span>
           : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Admin</span>;
       },
     },
@@ -182,7 +182,7 @@ const SuperAdminDashboard = () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-8 w-8 min-h-[44px] min-w-[44px] p-0">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -220,7 +220,7 @@ const SuperAdminDashboard = () => {
             <div>
               <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 Super Admin Dashboard
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">Root-level governance, admin provisioning, and platform payments oversight</p>
             </div>
@@ -273,16 +273,16 @@ const SuperAdminDashboard = () => {
         {/* KPI Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: "Admin Users", value: admins.length, sub: `${admins.filter(a => a.admin_level === "superadmin").length} superadmins`, color: "#a25ddc", icon: <ShieldAlert className="h-5 w-5" /> },
-            { label: "Access Controls", value: "Active", sub: "Role-based security enabled", color: "#00c875", icon: <Settings className="h-5 w-5" /> },
-            { label: "Users Managed", value: "All", sub: "Full platform access", color: "#0073ea", icon: <Users className="h-5 w-5" /> },
+            { label: "Admin Users", value: admins.length, sub: `${admins.filter(a => a.admin_level === "superadmin").length} superadmins`, color: "#397DFF", icon: <ShieldAlert className="h-5 w-5" /> },
+            { label: "Access Controls", value: "Active", sub: "Role-based security enabled", color: "#22C55E", icon: <Settings className="h-5 w-5" /> },
+            { label: "Users Managed", value: "All", sub: "Full platform access", color: "#F59E0B", icon: <Users className="h-5 w-5" /> },
           ].map((card) => (
             <div key={card.label} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{card.label}</span>
                 <span style={{ color: card.color }}>{card.icon}</span>
               </div>
-              <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
+              <div className="text-2xl font-black" style={{ color: card.color }}>{card.value}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
             </div>
           ))}
@@ -291,7 +291,7 @@ const SuperAdminDashboard = () => {
         {/* Admin Management Table */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-purple-500" /> Admin & Superadmin Management
+            <Shield className="h-4 w-4 text-primary-500" /> Admin & Superadmin Management
           </h2>
           <DataTable columns={adminColumns} data={admins} searchColumn="email" />
         </div>

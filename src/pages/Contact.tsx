@@ -137,7 +137,7 @@ const Contact = () => {
                         onChange={update("message")}
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={sending}>
+                    <Button type="submit" className="w-full min-h-[44px]" disabled={sending}>
                       {sending ? "Preparing..." : "Send Message"}
                     </Button>
                   </form>

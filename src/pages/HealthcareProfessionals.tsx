@@ -236,6 +236,14 @@ const HealthcareProfessionals = () => {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <User className="h-16 w-16 text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No professionals found</p>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">Try adjusting your search or clearing the filters.</p>
+              <Button
+                variant="outline"
+                className="min-h-[44px]"
+                onClick={() => { setSearchTerm(''); setSpecialtyFilter('all'); setSortBy('rating'); }}
+              >
+                Reset filters
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -331,12 +339,12 @@ const HealthcareProfessionals = () => {
                     const consultable = (CONSULTABLE_PROVIDER_ROLES as string[]).includes((prof as any)?.role);
                     return (
                       <>
-                        <Button size="sm" className="flex-1" onClick={() => navigate(`/provider/${prof.id}`)}>
+                        <Button size="sm" className="flex-1 min-h-[44px]" onClick={() => navigate(`/provider/${prof.id}`)}>
                           <Calendar className="h-4 w-4 mr-2" />
                           {consultable ? "Book" : "View Profile"}
                         </Button>
                         {consultable && (
-                          <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${prof.id}`)}>
+                          <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => navigate(`/provider/${prof.id}`)}>
                             Profile
                           </Button>
                         )}

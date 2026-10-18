@@ -156,6 +156,9 @@ const ApplicationStatus = () => {
             <p className="text-muted-foreground text-center mb-6">
               You haven't submitted any applications yet.
             </p>
+            <Button onClick={() => navigate('/healthcare-application')} className="min-h-[44px]">
+              Start a new application
+            </Button>
           </CardContent>
         </Card>
       ) : (

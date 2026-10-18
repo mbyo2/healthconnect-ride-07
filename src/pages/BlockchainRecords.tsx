@@ -118,7 +118,7 @@ const BlockchainRecords = () => {
           <div className="flex items-center gap-2">
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
                   <Plus className="w-4 h-4" />
                   <span>Add Record</span>
                 </button>
@@ -182,14 +182,14 @@ const BlockchainRecords = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <button onClick={handleAddRecord} className="px-4 py-2 rounded-md bg-primary-500 text-white font-extrabold text-xs">
+                  <button onClick={handleAddRecord} className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs">
                     Commit to Blockchain
                   </button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
-            <button className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1.5">
+            <button className="px-4 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1.5">
               <Download className="w-4 h-4 text-graphite-500 dark:text-slate-400" />
               <span>Export All</span>
             </button>
@@ -331,7 +331,7 @@ const BlockchainRecords = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveDetailsTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+                  className={`px-3.5 py-1.5 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
                     activeDetailsTab === tab.id
                       ? "bg-primary-500 text-white shadow-xs"
                       : "bg-canvas dark:bg-slate-800 text-graphite-500 dark:text-slate-400"
@@ -350,14 +350,14 @@ const BlockchainRecords = () => {
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setShowPayload((v) => !v)}
-                    className="px-4 py-2 rounded-md bg-primary-500 text-white font-extrabold text-xs"
+                    className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs"
                     aria-expanded={showPayload}
                   >
                     {showPayload ? 'Hide Record Payload' : 'View Full Record Payload'}
                   </button>
                   <button
                     onClick={() => printRecordPayload()}
-                    className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs"
+                    className="px-4 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs"
                   >
                     Download Signed PDF
                   </button>
@@ -388,7 +388,7 @@ const BlockchainRecords = () => {
                 <p className="text-graphite-500 dark:text-slate-400">
                   Manage patient access grants. Every permission change emits a signed transaction to the audit trail.
                 </p>
-                <button className="px-4 py-2 rounded-md bg-primary-500 text-white font-extrabold text-xs flex items-center gap-1">
+                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs flex items-center gap-1">
                   <Share2 className="w-4 h-4" /> Grant Provider Access
                 </button>
               </div>

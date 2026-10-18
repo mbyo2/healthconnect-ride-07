@@ -143,7 +143,7 @@ export default function HealthDashboard() {
       <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
         <div className="text-center space-y-2">
           <div className="h-8 w-8 mx-auto rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden />
-          <p className="text-sm font-medium text-graphite-500">Loading your health dashboard…</p>
+          <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading your health dashboard…</p>
         </div>
       </div>
     );
@@ -203,7 +203,7 @@ export default function HealthDashboard() {
                   label="Heart Rate"
                   value={`${vitalHistory.latest.heartRate} bpm`}
                   icon={Heart}
-                  color="#e2445c"
+                  color="#E2445C" /* theme: error-500 */
                   sparklineData={vitalHistory.heartRate}
                 />
               )}
@@ -212,7 +212,7 @@ export default function HealthDashboard() {
                   label="Blood Pressure"
                   value={`${vitalHistory.latest.systolic}/${vitalHistory.latest.diastolic ?? '–'} mmHg`}
                   icon={Activity}
-                  color="#397dff"
+                  color="#397DFF" /* theme: primary-500 */
                   sparklineData={vitalHistory.systolic}
                 />
               )}
@@ -221,7 +221,7 @@ export default function HealthDashboard() {
                   label="Oxygen Saturation"
                   value={`${vitalHistory.latest.spo2}%`}
                   icon={Droplets}
-                  color="#00a86b"
+                  color="#22C55E" /* theme: success-500 */
                   sparklineData={vitalHistory.spo2}
                 />
               )}
@@ -230,7 +230,7 @@ export default function HealthDashboard() {
                   label="Weight"
                   value={`${vitalHistory.latest.weight} kg`}
                   icon={Target}
-                  color="#a25ddc"
+                  color="#F59E0B" /* theme: warning-500 (was off-palette purple) */
                   sparklineData={vitalHistory.weight}
                 />
               )}
@@ -263,7 +263,7 @@ export default function HealthDashboard() {
             <div className="col-span-full rounded-2xl border border-dashed border-canvas-silk bg-white dark:bg-slate-900 p-10 text-center">
               <Heart className="h-8 w-8 mx-auto text-primary-500 mb-3" />
               <p className="font-medium text-midnight">No health metrics yet</p>
-              <p className="text-sm text-graphite-500 mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
+              <p className="text-sm text-graphite-500 dark:text-slate-400 mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/iot-monitoring')}>Record vitals</Button>
                 <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/symptoms')}>Log symptoms</Button>

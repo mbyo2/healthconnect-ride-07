@@ -547,7 +547,7 @@ export const AppointmentsPage = () => {
 
                               <td className="py-4 px-3">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
-                                  isVideo ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"
+                                  isVideo ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30"
                                 }`}>
                                   {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
                                   <span>{isVideo ? "Video" : "In-Person"}</span>
@@ -563,7 +563,7 @@ export const AppointmentsPage = () => {
                                   {isVideo && isToday(apptDate) && (
                                     <Link
                                       to={`/video-call/${app.id}`}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-success-500 text-white text-xs font-black hover:bg-success-500 transition-all inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-success-500 text-white text-xs font-black hover:bg-success-500 transition-all inline-flex items-center"
                                     >
                                       JOIN
                                     </Link>
@@ -572,13 +572,13 @@ export const AppointmentsPage = () => {
                                     <>
                                       <button
                                         onClick={() => acceptAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-green-600 text-white text-xs font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
+                                        className="px-3 py-1.5 min-h-[44px] rounded-lg bg-green-600 text-white text-xs font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
                                       >
                                         ACCEPT
                                       </button>
                                       <button
                                         onClick={() => declineAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[40px] rounded-lg bg-red-600 text-white text-xs font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
+                                        className="px-3 py-1.5 min-h-[44px] rounded-lg bg-red-600 text-white text-xs font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
                                       >
                                         DECLINE
                                       </button>
@@ -587,7 +587,7 @@ export const AppointmentsPage = () => {
                                   {isProvider && app.status !== "pending" && (
                                     <button
                                       onClick={() => completeAppointment.mutate(app.id)}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-slate-900 text-white text-xs font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-slate-900 text-white text-xs font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
                                     >
                                       DONE
                                     </button>
@@ -595,14 +595,14 @@ export const AppointmentsPage = () => {
                                   {isProvider && (
                                     <button
                                       onClick={() => openReschedule(app)}
-                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-primary-200 text-primary-600 text-xs font-black hover:bg-primary-50 transition-all active:scale-95 inline-flex items-center"
+                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-500/40 text-primary-600 dark:text-primary-400 text-xs font-black hover:bg-primary-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
                                     >
                                       RESCHEDULE
                                     </button>
                                   )}
                                   <button
                                     onClick={() => cancelAppointment.mutate(app.id)}
-                                    className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-black hover:bg-slate-50 transition-all active:scale-95 inline-flex items-center"
+                                    className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     CANCEL
                                   </button>
@@ -703,7 +703,7 @@ export const AppointmentsPage = () => {
                                 {!isProvider && app.provider_id && (
                                   <button
                                     onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1.5 min-h-[40px] rounded-xl bg-primary-500 text-white text-xs font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
+                                    className="px-3 py-1.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     Re-Book
                                   </button>
@@ -726,7 +726,7 @@ export const AppointmentsPage = () => {
           slot. Validated against working hours + double-booking; the patient
           is notified automatically. */}
       <Dialog open={!!rescheduleTarget} onOpenChange={(open) => !open && setRescheduleTarget(null)}>
-        <DialogContent className="max-w-md bg-white border border-canvas-silk rounded-card p-6">
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card p-6">
           <DialogHeader>
             <DialogTitle className="font-display text-xl font-medium text-midnight">
               Reschedule appointment

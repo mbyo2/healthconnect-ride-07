@@ -170,7 +170,7 @@ export const AnalyticsReporting = () => {
     switch (type) {
       case "summary": return "bg-primary-500";
       case "detailed": return "bg-success-500";
-      case "comparative": return "bg-purple-500";
+      case "comparative": return "bg-accent-500";
       case "trend": return "bg-warning-500";
       default: return "bg-graphite-500 dark:bg-slate-600";
     }
@@ -180,9 +180,9 @@ export const AnalyticsReporting = () => {
     switch (category) {
       case "financial": return "bg-primary-500 text-white";
       case "operational": return "bg-success-500 text-white";
-      case "clinical": return "bg-purple-500 text-white";
+      case "clinical": return "bg-accent-500 text-white";
       case "patient": return "bg-warning-500 text-white";
-      case "staff": return "bg-indigo-500 text-white";
+      case "staff": return "bg-slate-500 text-white";
       default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
@@ -217,12 +217,13 @@ export const AnalyticsReporting = () => {
   }).length;
 
   // Derived chart data from real reports (launch-safe: renders empty states, never placeholder text).
+  // Semantic theme palette for charts (primary / success / accent / warning / slate)
   const CATEGORY_COLORS: Record<string, string> = {
-    financial: "#0073ea",
-    operational: "#00c875",
-    clinical: "#a25ddc",
-    patient: "#fdab3d",
-    staff: "#6366f1",
+    financial: "#397DFF",
+    operational: "#22C55E",
+    clinical: "#F55C15",
+    patient: "#F59E0B",
+    staff: "#64748B",
   };
   const reportsByCategory = Object.entries(
     reports.reduce<Record<string, number>>((acc, r) => {
@@ -230,7 +231,7 @@ export const AnalyticsReporting = () => {
       acc[key] = (acc[key] ?? 0) + 1;
       return acc;
     }, {})
-  ).map(([name, value]) => ({ name, value, fill: CATEGORY_COLORS[name] ?? "#676879" }));
+  ).map(([name, value]) => ({ name, value, fill: CATEGORY_COLORS[name] ?? "#64748B" }));
   const reportsByType = Object.entries(
     reports.reduce<Record<string, number>>((acc, r) => {
       const key = r.report_type || "summary";
@@ -397,7 +398,7 @@ export const AnalyticsReporting = () => {
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Reports</span>
                 <FileText className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{totalReports}</div>
+              <div className="text-2xl font-black text-primary-500">{totalReports}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All time</div>
             </CardContent>
           </Card>
@@ -405,9 +406,9 @@ export const AnalyticsReporting = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled</span>
-                <Calendar className="h-4 w-4 text-purple-500" />
+                <Calendar className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{scheduledReports}</div>
+              <div className="text-2xl font-black text-primary-500">{scheduledReports}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Auto-generated</div>
             </CardContent>
           </Card>
@@ -417,7 +418,7 @@ export const AnalyticsReporting = () => {
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Financial Reports</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{financialReports}</div>
+              <div className="text-2xl font-black text-success-500">{financialReports}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Revenue & costs</div>
             </CardContent>
           </Card>
@@ -427,7 +428,7 @@ export const AnalyticsReporting = () => {
                 <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent (7d)</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{recentReports}</div>
+              <div className="text-2xl font-black text-warning-500">{recentReports}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Generated this week</div>
             </CardContent>
           </Card>
@@ -478,7 +479,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Area type="monotone" dataKey="count" stroke="#0073ea" fill="#0073ea" fillOpacity={0.2} />
+                            <Area type="monotone" dataKey="count" stroke="#397DFF" fill="#397DFF" fillOpacity={0.2} />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -498,7 +499,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Bar dataKey="count" fill="#00c875" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="count" fill="#22C55E" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -507,7 +508,7 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-purple-500" /> Reports by Category
+                        <Activity className="h-4 w-4 text-primary-500" /> Reports by Category
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -591,6 +592,12 @@ export const AnalyticsReporting = () => {
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Generate your first analytics report to see it listed here.
                   </p>
+                  <Button
+                    onClick={() => setShowReportDialog(true)}
+                    className="mt-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs min-h-[44px]"
+                  >
+                    <FileText className="h-4 w-4 mr-1.5" /> Generate report
+                  </Button>
                 </CardContent>
               </Card>
             ) : (
@@ -611,7 +618,7 @@ export const AnalyticsReporting = () => {
                         </div>
                       </div>
                       {report.is_scheduled && (
-                        <Badge className="bg-purple-500 text-white text-xs">Scheduled</Badge>
+                        <Badge className="bg-primary-500 text-white text-xs">Scheduled</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -681,7 +688,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Bar dataKey="value" fill="#0073ea" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="value" fill="#397DFF" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -706,7 +713,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Bar dataKey="count" fill="#00c875" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="count" fill="#22C55E" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -728,7 +735,7 @@ export const AnalyticsReporting = () => {
                           <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                           <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                           <Tooltip />
-                          <Line type="monotone" dataKey="count" stroke="#0073ea" strokeWidth={2} dot={false} />
+                          <Line type="monotone" dataKey="count" stroke="#397DFF" strokeWidth={2} dot={false} />
                         </ReLineChart>
                       </ResponsiveContainer>
                     </div>
@@ -767,7 +774,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Line type="monotone" dataKey="count" stroke="#a25ddc" strokeWidth={2} dot={false} />
+                            <Line type="monotone" dataKey="count" stroke="#F55C15" strokeWidth={2} dot={false} />
                           </ReLineChart>
                         </ResponsiveContainer>
                       </div>
@@ -787,7 +794,7 @@ export const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Bar dataKey="count" fill="#0073ea" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="count" fill="#397DFF" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -809,7 +816,7 @@ export const AnalyticsReporting = () => {
                           <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                           <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                           <Tooltip />
-                          <Area type="monotone" dataKey="count" stroke="#00c875" fill="#00c875" fillOpacity={0.2} />
+                          <Area type="monotone" dataKey="count" stroke="#22C55E" fill="#22C55E" fillOpacity={0.2} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>

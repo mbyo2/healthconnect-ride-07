@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+// Semantic theme palette for the status pie (primary / success / warning / error + slate neutrals)
+const COLORS = ['hsl(var(--primary))', '#22C55E', '#F59E0B', '#E2445C', '#64748B', '#94A3B8'];
 
 const InstitutionReports = () => {
   const { institution, loading: instLoading } = useInstitutionContext();
@@ -154,6 +155,13 @@ const InstitutionReports = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {appointmentChart.every((d) => !d.total) ? (
+                <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-2">
+                  <Calendar className="h-10 w-10 text-muted-foreground opacity-40" />
+                  <p className="text-sm font-bold">No appointment data yet</p>
+                  <p className="text-xs text-muted-foreground">Booked appointments will appear here as monthly trends.</p>
+                </div>
+              ) : (
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={appointmentChart}>
@@ -164,6 +172,7 @@ const InstitutionReports = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -177,6 +186,13 @@ const InstitutionReports = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {revenueChart.every((d) => !d.revenue) ? (
+                <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-2">
+                  <DollarSign className="h-10 w-10 text-muted-foreground opacity-40" />
+                  <p className="text-sm font-bold">No revenue recorded yet</p>
+                  <p className="text-xs text-muted-foreground">Collected invoice payments will appear here as a monthly trend.</p>
+                </div>
+              ) : (
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={revenueChart}>
@@ -187,6 +203,7 @@ const InstitutionReports = () => {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
