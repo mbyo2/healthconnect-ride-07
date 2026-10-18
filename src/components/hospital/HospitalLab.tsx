@@ -10,6 +10,7 @@ import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSele
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
 
 const getStatusPill = (status: string) => {
   switch (status) {
@@ -69,6 +70,13 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
     setIsSubmitting(true);
     try {
       const testNum = `LAB-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+      // Resolve price from the institution's tariff book (never hardcode).
+      // Falls back to 200 only when the institution has no lab tariffs at all.
+      let price = 200;
+      try {
+        const tariffs = await fetchInstitutionTariffs(hospital.id);
+        price = resolveTariffPrice(tariffs, 'lab', orderForm.test_type, 200);
+      } catch { /* tariff lookup is best-effort */ }
       const { error: err } = await (supabase.from("lab_tests" as any) as any).insert({
         lab_id: hospital.id,
         patient_id: orderForm.patient_id,
@@ -80,7 +88,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         sample_type: orderForm.sample_type,
         status: "pending",
         payment_status: "pending",
-        price: 200,
+        price,
       });
       if (err) throw err;
       toast.success(`Lab Test ${testNum} ordered`);

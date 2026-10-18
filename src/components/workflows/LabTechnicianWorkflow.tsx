@@ -42,23 +42,27 @@ export const LabTechnicianWorkflow = () => {
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
 
+        // NOTE: lab orders live in `lab_tests` (see HospitalLab.tsx).
+        // The legacy lab_requests/lab_results/sample_collections tables are
+        // not written by any active flow — querying them always returned 0.
         const { count: pending } = await supabase
-          .from('lab_requests')
+          .from('lab_tests')
           .select('id', { count: 'exact', head: true })
           .eq('status', 'pending');
         setPendingOrders(pending ?? 0);
 
+        // Completed but not yet verified by a pathologist/supervisor
         const { count: critical } = await supabase
-          .from('lab_results')
+          .from('lab_tests')
           .select('id', { count: 'exact', head: true })
-          .eq('is_abnormal', true)
-          .is('verified_at', null);
+          .eq('status', 'completed')
+          .is('verified_by', null);
         setCriticalResults(critical ?? 0);
 
         const { count: samples } = await supabase
-          .from('sample_collections')
+          .from('lab_tests')
           .select('id', { count: 'exact', head: true })
-          .gte('collected_at', startOfDay.toISOString());
+          .gte('sample_collected_at', startOfDay.toISOString());
         setSamplesToday(samples ?? 0);
       } catch {
         setPendingOrders(0);
@@ -142,8 +146,8 @@ export const LabTechnicianWorkflow = () => {
               <ChevronRight className="h-4 w-4 text-slate-400" />
             </div>
             <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{criticalResults ?? '–'}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Critical results</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">Abnormal, awaiting review</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Results awaiting review</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">Completed, not yet verified</p>
           </button>
 
           <button
