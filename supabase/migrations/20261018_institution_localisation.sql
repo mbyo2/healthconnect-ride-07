@@ -12,6 +12,10 @@ ALTER TABLE public.country_statutory_configs
   ADD COLUMN IF NOT EXISTS fiscal_year_start INT DEFAULT 1
   CHECK (fiscal_year_start BETWEEN 1 AND 12);
 
+-- 2b) NHIMA/health ceiling (null = no ceiling, like Zambia's uncapped 1%)
+ALTER TABLE public.country_statutory_configs
+  ADD COLUMN IF NOT EXISTS nhima_ceiling DECIMAL(10,2);
+
 -- 3) Backfill Zambia defaults from the rigid band columns for existing rows
 --    that don't have paye_brackets yet.
 UPDATE public.country_statutory_configs
