@@ -266,7 +266,7 @@ html {
     @apply inline-flex items-center justify-center gap-2 rounded-pill bg-primary-500 px-6 py-3 text-sm font-medium tracking-wide text-white shadow-button transition-all hover:bg-primary-600 hover:shadow-button-hover;
   }
   .vf-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-graphite-300 bg-white px-6 py-3 text-sm font-medium tracking-wide text-charcoal transition-all hover:border-graphite-400 hover:bg-graphite-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-3 text-sm font-medium tracking-wide text-charcoal dark:text-slate-200 transition-all hover:border-graphite-400 hover:bg-graphite-50 dark:hover:bg-slate-700;
   }
   .vf-card {
     @apply rounded-card border border-canvas-silk bg-white p-6 shadow-card transition-all hover:shadow-card-hover dark:border-slate-800 dark:bg-slate-900;
