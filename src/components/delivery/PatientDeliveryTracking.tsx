@@ -200,3 +200,5 @@ export function PatientDeliveryTracking() {
     </div>
   );
 }
+
+export default PatientDeliveryTracking;

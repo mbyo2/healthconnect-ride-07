@@ -264,3 +264,5 @@ export function CourierDeliveryDashboard() {
     </div>
   );
 }
+
+export default CourierDeliveryDashboard;
