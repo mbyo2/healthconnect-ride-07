@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { exportToCSV } from "@/utils/pdfExport";
+import { getCoaTemplate, listCoaTemplates, type CoaTemplate } from "@/utils/chartOfAccountsTemplates";
+import { COUNTRY_CONFIGS } from "@/utils/universalPayroll";
 
 export interface CountryTaxConfig {
   countryCode: string;
@@ -45,7 +47,13 @@ export interface JournalEntryRow {
   amount: number;
 }
 
-const STANDARD_CHART: { code: string; name: string; account_type: AccountType }[] = [
+/**
+ * Chart templates now live in @/utils/chartOfAccountsTemplates (Odoo-style:
+ * per-country templates, institution picks one when seeding). Kept here as a
+ * deprecated alias so nothing breaks if imported elsewhere.
+ * @deprecated Use getCoaTemplate() from @/utils/chartOfAccountsTemplates
+ */
+export const STANDARD_CHART = [
   { code: "1010", name: "Cash & Bank Accounts", account_type: "Asset" },
   { code: "1020", name: "Accounts Receivable (Patients)", account_type: "Asset" },
   { code: "1030", name: "Medical & Pharmacy Stock Inventory", account_type: "Asset" },
@@ -58,7 +66,7 @@ const STANDARD_CHART: { code: string; name: string; account_type: AccountType }[
   { code: "5010", name: "Staff Salaries & Clinical Payroll", account_type: "Expense" },
   { code: "5020", name: "Medical Consumables & Reagents", account_type: "Expense" },
   { code: "5030", name: "Facility Utilities & Maintenance", account_type: "Expense" },
-];
+] as { code: string; name: string; account_type: AccountType }[];
 
 /** Debit-normal account types (balance = debits − credits). Others are credit-normal. */
 const DEBIT_NORMAL: AccountType[] = ["Asset", "Expense"];
@@ -74,6 +82,9 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
+  // Odoo-style: institution picks which country template to seed from.
+  // Defaults to the institution's configured country template.
+  const [templateCode, setTemplateCode] = useState<string>("ZM");
 
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showJournalModal, setShowJournalModal] = useState(false);
@@ -113,6 +124,8 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           currency: cfgRes.data.currency,
           vatRate: Number(cfgRes.data.vat_rate),
         });
+        // Default the COA template picker to the institution's country
+        setTemplateCode(cfgRes.data.country_code ?? "ZM");
       }
     } catch (e: any) {
       setLoadError(e?.message ?? "Could not load the financial ledger.");
@@ -163,7 +176,8 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     if (!institutionId) return;
     setSeeding(true);
     try {
-      const rows = STANDARD_CHART.map((a) => ({
+      const template: CoaTemplate = getCoaTemplate(templateCode);
+      const rows = template.accounts.map((a) => ({
         institution_id: institutionId,
         code: a.code,
         name: a.name,
@@ -172,7 +186,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       }));
       const { error } = await supabase.from("chart_of_accounts").insert(rows);
       if (error) throw error;
-      toast.success("Chart of accounts created — all balances start at zero.");
+      toast.success(`"${template.label}" chart loaded — all balances start at zero.`);
       await load();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not create the chart of accounts.");
@@ -261,8 +275,17 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
   const handleCountryChange = async (code: string) => {
     const preset = COUNTRY_PRESETS.find((c) => c.countryCode === code) ?? COUNTRY_PRESETS[0];
     setCountry(preset);
+    setTemplateCode(preset.countryCode);
     if (!institutionId) return;
     try {
+      // Pull the full statutory preset so PAYE brackets stay in sync with the
+      // config-driven payroll engine (paye_brackets JSONB).
+      const full = COUNTRY_CONFIGS[preset.countryCode];
+      const brackets = full?.payeBands?.map((b) => ({
+        min: b.from,
+        max: b.to === Infinity ? null : b.to,
+        rate: b.rate,
+      })) ?? null;
       const { error } = await supabase.from("country_statutory_configs").upsert(
         {
           institution_id: institutionId,
@@ -270,6 +293,19 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           country_name: preset.countryName,
           currency: preset.currency,
           vat_rate: preset.vatRate,
+          ...(brackets ? { paye_brackets: brackets } : {}),
+          ...(full ? {
+            napsa_employee_rate: full.pensionEmployeeRate,
+            napsa_employer_rate: full.pensionEmployerRate,
+            napsa_ceiling: full.pensionCeiling ?? null,
+            napsa_reduces_paye: full.pensionReducesPaye,
+            nhima_employee_rate: full.healthEmployeeRate,
+            nhima_employer_rate: full.healthEmployerRate,
+            nhima_reduces_paye: full.healthReducesPaye,
+            sdl_rate: full.sdlRate ?? 0,
+            sdl_annual_threshold: full.sdlAnnualThreshold ?? 0,
+            sdl_enabled: full.sdlEnabled ?? false,
+          } : {}),
         },
         { onConflict: "institution_id" }
       );
@@ -358,11 +394,26 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           <Landmark className="h-10 w-10 mx-auto text-graphite-400 mb-3" />
           <p className="text-sm font-extrabold">No chart of accounts yet</p>
           <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
-            This institution has no ledger accounts. Create the standard healthcare chart of accounts to get started — every account starts at zero.
+            This institution has no ledger accounts. Pick a country template to load a standard healthcare chart of accounts — every account starts at zero, and you can add, rename, or remove accounts afterwards.
           </p>
-          <button onClick={seedChart} disabled={seeding} className={`${btnPrimary} mt-4 mx-auto`}>
-            {seeding ? "Creating…" : "Create standard chart of accounts"}
-          </button>
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400" htmlFor="coa-template">
+              Template
+            </label>
+            <select
+              id="coa-template"
+              value={templateCode}
+              onChange={(e) => setTemplateCode(e.target.value)}
+              className="min-h-[44px] px-3 rounded-xl border border-graphite-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm"
+            >
+              {listCoaTemplates().map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+            <button onClick={seedChart} disabled={seeding} className={btnPrimary}>
+              {seeding ? "Creating…" : `Load ${getCoaTemplate(templateCode).label} chart`}
+            </button>
+          </div>
         </div>
       ) : (
         <>
