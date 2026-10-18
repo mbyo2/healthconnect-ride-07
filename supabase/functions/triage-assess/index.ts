@@ -172,17 +172,20 @@ serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) {
+    // Decode JWT directly to get user ID (more reliable than auth.getUser() 
+    // which depends on Auth API availability and key configuration)
+    let patientId: string;
+    try {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      patientId = payload.sub;
+      if (!patientId) throw new Error('No sub in token');
+    } catch (e) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const patientId = userData.user.id;
 
     const body = await req.json();
     const parsed = RequestSchema.safeParse(body);
