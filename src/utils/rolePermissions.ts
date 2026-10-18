@@ -76,6 +76,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
+    '/ambient-scribe',      // AI consultation notes
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
@@ -95,6 +96,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // specialists can prescribe
+    '/ambient-scribe',      // AI consultation notes
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
@@ -151,6 +153,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal',
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/pharmacy-verify',      // barcode medication verification
     '/drug-stock',          // institutional drug inventory
     '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
