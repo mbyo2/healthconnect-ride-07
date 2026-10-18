@@ -18,7 +18,7 @@ import {
   ClipboardList, MessageSquare, Wallet, AlertTriangle,
   Activity, Thermometer, Home, Pill, Stethoscope,
   Shield, Bug, Video, Megaphone, Code2, Bell, CreditCard,
-  ChevronRight
+  ChevronRight, Tent
 } from 'lucide-react';
 
 interface ActionItem {
@@ -235,6 +235,7 @@ export const NurseWorkflow = () => {
         { title: 'Infection Control', description: 'Infection tracking & preventive protocols', icon: icon(Bug), route: '/institution/patients' },
         { title: 'Discharge Checklists', description: 'Nursing clearance for patient discharge', icon: icon(ClipboardList), route: '/institution/patients' },
         { title: 'IoT Vitals Monitor', description: 'Real-time device vitals streaming', icon: icon(Activity), route: '/iot-monitoring' },
+        { title: 'Health Camps', description: 'Screenings at outreach camps', icon: icon(Tent), route: '/hospital-management?tab=camps' },
       ],
     },
     {

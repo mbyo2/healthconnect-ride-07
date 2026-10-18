@@ -145,14 +145,14 @@ export const TAB_MODULE_MAP: TabModuleRule[] = [
   {
     tab: "camps",
     label: "Health Camp Outreach",
-    requiredModules: ["camp_management"],
+    requiredModules: ["camps"],
     essential: false,
     notes: "Dedicated camp management charter module (added 2026-10-18).",
   },
   {
     tab: "indents",
     label: "Indent Management",
-    requiredModules: ["indent_management"],
+    requiredModules: ["indents"],
     essential: false,
     notes: "Dedicated indent management charter module (added 2026-10-18).",
   },

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, UserPlus, Search, Play, CheckCircle, XCircle, AlertTriangle, Loader2, ChevronRight, ClipboardList } from 'lucide-react';
+import { Users, Calendar, Clock, UserPlus, Search, Play, CheckCircle, XCircle, AlertTriangle, Loader2, ChevronRight, ClipboardList, Tent } from 'lucide-react';
 import { useQueueTokens, QueueToken } from '@/hooks/useQueueTokens';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
@@ -79,6 +79,7 @@ export const ReceptionistWorkflow = () => {
       secondary: [
         { title: 'Patient Registration', description: 'Register a new patient record', icon: icon(ClipboardList), action: () => { navigate('/patient-registration'); showSuccess({ message: 'Opening Patient Registration...' }); } },
         { title: 'Find Patient', description: 'Search existing patients', icon: icon(Search), action: () => { navigate('/search'); showSuccess({ message: 'Opening Patient Search...' }); } },
+        { title: 'Health Camps', description: 'Register walk-ins at outreach camps', icon: icon(Tent), action: () => { navigate('/hospital-management?tab=camps'); showSuccess({ message: 'Opening Health Camps...' }); } },
       ],
     },
     {
