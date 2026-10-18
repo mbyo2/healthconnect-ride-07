@@ -1,82 +1,226 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
-import { 
+import { supabase } from '@/integrations/supabase/client';
+import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
-  Shield, Video, Activity, Pill, Bug, Megaphone, Code2, Bell, CreditCard
+  Shield, Video, Activity, Pill, Bug, Megaphone, Code2, Bell, CreditCard,
+  ChevronRight
 } from 'lucide-react';
+
+interface ActionItem {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  route: string;
+}
+
+interface ActionGroup {
+  title: string;
+  primary: ActionItem;
+  secondary: ActionItem[];
+}
 
 export const HealthPersonnelWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
-  
+  const [todayCount, setTodayCount] = useState<number | null>(null);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
+
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
     showSuccess({ message: `Opening ${title}...` });
   };
 
-  const workflowSteps = [
-    { title: "My Schedule", description: "View and manage your availability & appointments", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
-    { title: "Patient Appointments", description: "Today's queue, upcoming & past consultations", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records", description: "Access and update patient medical records", icon: <Stethoscope className="h-5 w-5" />, route: '/institution/patients' },
-    { title: "Write Prescriptions", description: "Digital Rx with allergy & interaction safety", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' },
-    { title: "Allergy & Drug Safety", description: "Check patient allergies & drug interactions", icon: <Shield className="h-5 w-5" />, route: '/prescriptions' },
-    { title: "AI Clinical Assistant", description: "AI-powered CDSS & diagnostic support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
-    { title: "Infection Management", description: "Track HAI cases & antibiotic stewardship", icon: <Bug className="h-5 w-5" />, route: '/institution/patients' },
-    { title: "Video Consultations", description: "Telemedicine & remote patient care", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
-    { title: "My Patients", description: "Your connected patient network", icon: <Users className="h-5 w-5" />, route: '/connections' },
-    { title: "Patient Chat", description: "Secure messaging with patients", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
-    { title: "Medication Management", description: "Review active medications & refills", icon: <Pill className="h-5 w-5" />, route: '/medications' },
-    { title: "Health Analytics", description: "Patient trends & clinical outcomes", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
-    ...(!isInstitutionAffiliated ? [{ title: "Earnings & Wallet", description: "View consultations revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' }] : []),
-    { title: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
-    { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
-    { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
-    { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
-    { title: "Appointment Reminders", description: "Automated SMS/email reminders", icon: <Bell className="h-5 w-5" />, route: '/appointments' },
-    { title: "Insurance Verification", description: "Verify patient insurance cards", icon: <CreditCard className="h-5 w-5" />, route: '/appointments' },
-    { title: "Professional Profile", description: "Credentials, specializations & bio", icon: <Stethoscope className="h-5 w-5" />, route: '/profile' },
-    { title: "Settings", description: "Configure practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
+  useEffect(() => {
+    const loadGlance = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const today = new Date().toISOString().split('T')[0];
+
+        const { count: appts } = await supabase
+          .from('appointments')
+          .select('id', { count: 'exact', head: true })
+          .eq('provider_id', user.id)
+          .eq('date', today)
+          .neq('status', 'cancelled');
+        setTodayCount(appts ?? 0);
+
+        const { count: pending } = await supabase
+          .from('appointments')
+          .select('id', { count: 'exact', head: true })
+          .eq('provider_id', user.id)
+          .eq('status', 'pending');
+        setPendingCount(pending ?? 0);
+      } catch {
+        setTodayCount(0);
+        setPendingCount(0);
+      }
+    };
+    loadGlance();
+  }, []);
+
+  const icon = (Icon: React.ElementType) => <Icon className="h-5 w-5" />;
+
+  const groups: ActionGroup[] = [
+    {
+      title: 'Clinical',
+      primary: { title: 'Patient Appointments', description: "Today's queue, upcoming & past consultations", icon: icon(ClipboardList), route: '/appointments' },
+      secondary: [
+        { title: 'My Schedule', description: 'View and manage your availability & appointments', icon: icon(Calendar), route: '/provider-calendar' },
+        { title: 'Patient Records', description: 'Access and update patient medical records', icon: icon(Stethoscope), route: '/institution/patients' },
+        { title: 'Write Prescriptions', description: 'Digital Rx with allergy & interaction safety', icon: icon(FileText), route: '/prescriptions' },
+        { title: 'Video Consultations', description: 'Telemedicine & remote patient care', icon: icon(Video), route: '/video-consultations' },
+      ],
+    },
+    {
+      title: 'Safety',
+      primary: { title: 'Allergy & Drug Safety', description: 'Check patient allergies & drug interactions', icon: icon(Shield), route: '/prescriptions' },
+      secondary: [
+        { title: 'AI Clinical Assistant', description: 'AI-powered CDSS & diagnostic support', icon: icon(Brain), route: '/ai-diagnostics' },
+        { title: 'Infection Management', description: 'Track HAI cases & antibiotic stewardship', icon: icon(Bug), route: '/institution/patients' },
+        { title: 'Medication Management', description: 'Review active medications & refills', icon: icon(Pill), route: '/medications' },
+      ],
+    },
+    {
+      title: 'Communication',
+      primary: { title: 'Patient Chat', description: 'Secure messaging with patients', icon: icon(MessageSquare), route: '/chat' },
+      secondary: [
+        { title: 'My Patients', description: 'Your connected patient network', icon: icon(Users), route: '/connections' },
+        { title: 'Patient Waitlist', description: 'Manage waitlisted patients', icon: icon(Bell), route: '/provider-dashboard' },
+        { title: 'Appointment Reminders', description: 'Automated SMS/email reminders', icon: icon(Bell), route: '/appointments' },
+      ],
+    },
+    {
+      title: 'Practice',
+      primary: isInstitutionAffiliated
+        ? { title: 'Health Analytics', description: 'Patient trends & clinical outcomes', icon: icon(Activity), route: '/health-analytics' }
+        : { title: 'Earnings & Wallet', description: 'View consultations revenue and payouts', icon: icon(Wallet), route: '/wallet' },
+      secondary: [
+        ...(!isInstitutionAffiliated ? [{ title: 'Health Analytics', description: 'Patient trends & clinical outcomes', icon: icon(Activity), route: '/health-analytics' }] : []),
+        { title: 'Emergency Protocols', description: 'Emergency response tools', icon: icon(AlertTriangle), route: '/emergency' },
+        { title: 'Insurance Verification', description: 'Verify patient insurance cards', icon: icon(CreditCard), route: '/appointments' },
+        { title: 'Professional Profile', description: 'Credentials, specializations & bio', icon: icon(Stethoscope), route: '/profile' },
+        { title: 'Promote Practice', description: 'Sponsored listings & growth tools', icon: icon(Megaphone), route: '/provider-dashboard' },
+        { title: 'Booking Widget', description: 'Embed booking on your website', icon: icon(Code2), route: '/provider-dashboard' },
+        { title: 'Settings', description: 'Configure practice preferences', icon: icon(Settings), route: '/settings' },
+      ],
+    },
   ];
 
   return (
-    <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
-      <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">Healthcare Provider Dashboard</h2>
-        <p className="text-muted-foreground text-sm md:text-base px-4">
-          Manage your practice, patients, and consultations
-        </p>
+
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-md">
+          <Stethoscope className="h-7 w-7" />
+        </div>
+        <div>
+          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Healthcare Provider Workspace</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Provider Dashboard</h1>
+        </div>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
-            onClick={() => handleNavigation(step.route, step.title)}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg shrink-0">
-                  {step.icon}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-foreground truncate">{step.title}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
-                </div>
+      {/* Today at a Glance */}
+      <section>
+        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <button
+            onClick={() => handleNavigation('/appointments', 'Patient Appointments')}
+            className="rounded-2xl bg-primary-500 p-5 text-left text-white shadow-sm transition-all hover:bg-primary-600 active:scale-[0.98]"
+          >
+            <div className="flex items-center justify-between">
+              <ClipboardList className="h-5 w-5 opacity-80" />
+              <ChevronRight className="h-4 w-4 opacity-60" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none">{todayCount ?? '–'}</p>
+            <p className="mt-1 text-[15px] font-medium">Today's appointments</p>
+            <p className="text-[13px] opacity-80">Open patient queue</p>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/appointments', 'Pending Actions')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <Bell className="h-5 w-5 text-amber-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{pendingCount ?? '–'}</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Pending actions</p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">Bookings awaiting confirmation</p>
+          </button>
+
+          <button
+            onClick={() => handleNavigation(isInstitutionAffiliated ? '/health-analytics' : '/wallet', 'Practice')}
+            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              {isInstitutionAffiliated
+                ? <Activity className="h-5 w-5 text-emerald-500" />
+                : <Wallet className="h-5 w-5 text-emerald-500" />}
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </div>
+            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">···</p>
+            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">
+              {isInstitutionAffiliated ? 'Practice analytics' : 'Earnings & wallet'}
+            </p>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400">
+              {isInstitutionAffiliated ? 'View trends & outcomes' : 'Revenue, payouts & history'}
+            </p>
+          </button>
+        </div>
+      </section>
+
+      {/* Grouped Actions */}
+      {groups.map((group) => (
+        <section key={group.title}>
+          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
+          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            {/* Primary action */}
+            <button
+              onClick={() => handleNavigation(group.primary.route, group.primary.title)}
+              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
+                {group.primary.icon}
               </div>
-              <Button 
-                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
-                size="sm" className="w-full text-xs mt-2">Open</Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+            </button>
+            {/* Secondary actions */}
+            <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+              {group.secondary.map((item) => (
+                <button
+                  key={item.title}
+                  onClick={() => handleNavigation(item.route, item.title)}
+                  className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    {item.icon}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
+                    <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
     </div>
   );
 };
