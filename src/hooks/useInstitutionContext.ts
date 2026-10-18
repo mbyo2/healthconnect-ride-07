@@ -241,6 +241,17 @@ export function useInstitutionContext() {
             staffRole: staffRoles.get(inst.id) ?? null,
           });
         }
+        // If we found staff links but couldn't fetch institution details
+        // (RLS blocking), do NOT auto-provision a new institution.
+        // Set a flag to skip auto-provisioning below — the UI will show
+        // "No institution linked" which is honest about the RLS issue.
+        if (affils.length === 0 && staffInstIds.size > 0) {
+          console.warn(
+            '[useInstitutionContext] Found staff links but could not fetch institution details (RLS). Skipping auto-provision.'
+          );
+          // Use a sentinel to prevent auto-provisioning
+          (fetchInstitution as any)._hasStaffLinks = true;
+        }
       }
 
       if (affils.length > 0) {
@@ -294,6 +305,20 @@ export function useInstitutionContext() {
         'inventory_manager', 'maintenance_manager', 'ambulance_staff', 'pathologist',
         'ot_staff', 'triage_staff',
       ].includes(userRole) || businessType.length > 0;
+
+      // Skip auto-provisioning if we found staff links but couldn't fetch
+      // institution details (RLS issue). The user is staff somewhere —
+      // don't create a confusing empty institution.
+      if ((fetchInstitution as any)._hasStaffLinks) {
+        console.warn('[useInstitutionContext] Skipping auto-provision: staff links exist but institution details blocked by RLS');
+        (fetchInstitution as any)._hasStaffLinks = false; // reset for next fetch
+        setInstitution(null);
+        setAffiliations([]);
+        setIsAdmin(false);
+        setIsStaff(false);
+        setLoading(false);
+        return;
+      }
 
       if (isInstitutionalRole) {
         const institutionName =
