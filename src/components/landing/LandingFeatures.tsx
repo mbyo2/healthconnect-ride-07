@@ -56,13 +56,13 @@ export const HowItWorks = () => {
                   height={500}
                 />
               </span>
-              <h2 className="mt-6 font-display text-4xl font-medium tracking-tight text-midnight sm:text-5xl">
+              <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-midnight">
                 {item.title}
               </h2>
-              <p className="mt-4 max-w-sm text-sm leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400 sm:text-base">
+              <p className="mt-4 max-w-sm text-base leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400">
                 {item.desc}
               </p>
-              <span className="mt-5 inline-flex items-center text-sm font-medium text-primary-500 group-hover:gap-2">
+              <span className="mt-5 inline-flex items-center text-base font-medium text-primary-500 group-hover:gap-2">
                 Learn more <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </button>
@@ -90,7 +90,7 @@ export const PlatformScale = () => (
       <div className="absolute inset-0 bg-gradient-to-b from-midnight/40 via-transparent to-midnight/40" />
     </div>
     <div className="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
-      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-white sm:text-5xl">
+      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-white">
         Built for everyday care. Ready for Zambia at scale.
       </h2>
       <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-10">
@@ -101,11 +101,11 @@ export const PlatformScale = () => (
           { value: "24/7", unit: "access", label: "Emergency & bookings" },
         ].map((stat) => (
           <div key={stat.label} className="text-center lg:text-left">
-            <div className="font-display text-4xl font-medium tracking-tight text-white sm:text-5xl">
+            <div className="font-display text-3xl font-medium tracking-tight text-white">
               {stat.value}
-              <span className="ml-1 text-xl text-white/60 sm:text-2xl">{stat.unit}</span>
+              <span className="ml-1 text-base text-white/60">{stat.unit}</span>
             </div>
-            <p className="mt-2 text-sm text-white/70">{stat.label}</p>
+            <p className="mt-2 text-xs text-white/70">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -121,10 +121,10 @@ export const CareExperience = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-6">
             <div className="vf-eyebrow">
-              <HeartPulse className="h-3.5 w-3.5 text-accent-500" />
+              <HeartPulse className="h-3.5 w-3.5 text-primary-500" />
               Complete Healthcare Ecosystem
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight leading-[1.15]">
+            <h2 className="font-display text-3xl font-medium text-midnight tracking-tight leading-[1.15]">
               Care that fits into{" "}
               <span className="text-primary-500">your everyday life.</span>
             </h2>
@@ -144,10 +144,10 @@ export const CareExperience = () => {
                   onClick={() => navigate(item.route)}
                   className="vf-card !p-4 text-left cursor-pointer group"
                 >
-                  <span className="inline-block px-2.5 py-0.5 rounded-pill text-[10px] font-medium mb-2 bg-primary-50 text-primary-600 border border-primary-100">
+                  <span className="inline-block px-2.5 py-0.5 rounded-pill text-xs font-medium mb-2 bg-primary-50 text-primary-600 border border-primary-100">
                     {item.badge}
                   </span>
-                  <div className="font-medium text-sm text-midnight group-hover:text-primary-500 transition-colors">{item.title}</div>
+                  <div className="font-medium text-base text-midnight group-hover:text-primary-500 transition-colors">{item.title}</div>
                   <div className="text-xs text-graphite-500 dark:text-slate-400 mt-1 leading-snug tracking-wide">{item.desc}</div>
                 </button>
               ))}
@@ -170,8 +170,8 @@ export const CareExperience = () => {
               <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-midnight/80 to-transparent">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="font-medium text-sm text-white">Video consultations</div>
-                    <div className="text-[11px] text-white/70">Connect with a certified doctor in minutes</div>
+                    <div className="font-medium text-base text-white">Video consultations</div>
+                    <div className="text-xs text-white/70">Connect with a certified doctor in minutes</div>
                   </div>
                   <button
                     onClick={() => navigate("/video-dashboard")}
@@ -211,11 +211,11 @@ export const Features = () => {
             <div key={`${d.spec}-${i}`} className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
               <div>
                 <div className="font-medium text-sm text-midnight">{d.spec}</div>
-                <div className="text-[11px] text-graphite-500 dark:text-slate-400">{d.detail}</div>
+                <div className="text-xs text-graphite-500 dark:text-slate-400">{d.detail}</div>
               </div>
               <div className="text-right shrink-0">
                 <div className="text-xs font-bold text-primary-600">{d.price}</div>
-                <span className="text-[10px] text-graphite-400 font-medium">Illustrative preview</span>
+                <span className="text-xs text-graphite-400 font-medium">Illustrative preview</span>
               </div>
             </div>
           ))}
@@ -238,9 +238,9 @@ export const Features = () => {
             <div key={p.med} className="p-3.5 rounded-2xl bg-canvas-bone border border-canvas-silk space-y-1">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-midnight">{p.med}</span>
-                <span className="px-2 py-0.5 rounded-pill text-[10px] font-medium bg-success-50 text-success-500">{p.status}</span>
+                <span className="px-2 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">{p.status}</span>
               </div>
-              <div className="text-[11px] text-graphite-500 dark:text-slate-400">{p.doc}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400">{p.doc}</div>
             </div>
           ))}
         </div>
@@ -257,15 +257,15 @@ export const Features = () => {
         <div className="p-4 rounded-2xl bg-canvas-bone border border-canvas-silk space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-canvas-silk">
             <span className="text-xs font-medium text-midnight">NHIMA Insurance Card #8829104</span>
-            <span className="px-2 py-0.5 rounded-pill text-[10px] font-medium bg-success-50 text-success-500">ACTIVE</span>
+            <span className="px-2 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">ACTIVE</span>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <span className="text-[10px] text-graphite-400 block">Consultation Co-pay</span>
+              <span className="text-xs text-graphite-400 block">Consultation Co-pay</span>
               <span className="font-medium text-success-500">100% Covered (K0)</span>
             </div>
             <div>
-              <span className="text-[10px] text-graphite-400 block">Prescription Benefit</span>
+              <span className="text-xs text-graphite-400 block">Prescription Benefit</span>
               <span className="font-medium text-success-500">Full Coverage</span>
             </div>
           </div>
@@ -288,9 +288,9 @@ export const Features = () => {
             <div key={h.facility} className="p-3 rounded-2xl bg-canvas-bone border border-canvas-silk flex items-center justify-between gap-2">
               <div>
                 <div className="text-xs font-medium text-midnight">{h.facility}</div>
-                <div className="text-[10px] text-accent-600 font-medium">{h.detail} · <span className="text-graphite-400">Illustrative preview</span></div>
+                <div className="text-xs text-primary-600 font-medium">{h.detail} · <span className="text-graphite-400">Illustrative preview</span></div>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-graphite-400 shrink-0">
+              <div className="flex items-center gap-1 text-xs text-graphite-400 shrink-0">
                 <MapPin className="h-3 w-3" /> {h.dist}
               </div>
             </div>
@@ -307,10 +307,10 @@ export const Features = () => {
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
-            <Sparkles className="h-3.5 w-3.5 text-accent-500" />
+            <Sparkles className="h-3.5 w-3.5 text-primary-500" />
             Doc&apos; O Clock Core Features
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
+          <h2 className="font-display text-3xl font-medium text-midnight tracking-tight">
             Modern healthcare, designed around you.
           </h2>
         </div>
@@ -326,7 +326,7 @@ export const Features = () => {
               }`}
             >
               <f.icon className="mb-3 h-5 w-5 text-primary-500" />
-              <div className="text-sm font-medium text-midnight">{f.tab}</div>
+              <div className="text-base font-medium text-midnight">{f.tab}</div>
               <p className="mt-1 text-xs leading-relaxed text-graphite-500 dark:text-slate-400">{f.badge}</p>
             </button>
           ))}
@@ -337,8 +337,8 @@ export const Features = () => {
             <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium bg-primary-50 text-primary-600 border border-primary-100">
               {active.badge}
             </span>
-            <h3 className="font-display text-2xl sm:text-4xl font-light text-midnight leading-tight">{active.title}</h3>
-            <p className="text-sm sm:text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide">{active.desc}</p>
+            <h3 className="font-display text-xl font-medium text-midnight leading-tight">{active.title}</h3>
+            <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide">{active.desc}</p>
             <div className="flex flex-wrap gap-2 pt-1">
               {active.metrics.map((m) => (
                 <span key={m} className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-xs font-medium text-graphite-700 dark:text-slate-200">
@@ -358,7 +358,7 @@ export const Features = () => {
                 <active.icon className="h-4 w-4 text-primary-500" />
                 <span className="text-xs font-medium text-graphite-700">{active.tab} Preview</span>
               </div>
-              <span className="px-2.5 py-0.5 rounded-pill text-[10px] font-medium bg-primary-50 text-primary-600">
+              <span className="px-2.5 py-0.5 rounded-pill text-xs font-medium bg-primary-50 text-primary-600">
                 {active.badge}
               </span>
             </div>
@@ -378,10 +378,10 @@ export const ForProviders = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-6">
             <div className="vf-eyebrow">
-              <Building2 className="h-3.5 w-3.5 text-accent-500" />
+              <Building2 className="h-3.5 w-3.5 text-primary-500" />
               For Doctors, Clinics & Hospitals
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight leading-tight">
+            <h2 className="font-display text-3xl font-medium text-midnight tracking-tight leading-tight">
               Grow your medical practice{" "}
               <span className="text-primary-500">with Doc&apos; O Clock.</span>
             </h2>
@@ -394,10 +394,10 @@ export const ForProviders = () => {
                 { title: "HD Video Telehealth Suite", desc: "Consult patients remotely with encrypted video and automated notes." },
                 { title: "Digital Prescription & EMR", desc: "Send digital scripts straight to pharmacies and manage patient records securely." },
               ].map((item) => (
-                <div key={item.title} className="flex items-start gap-3.5 p-4 rounded-card bg-white dark:bg-slate-900 border border-canvas-silk">
+                <div key={item.title} className="flex items-start gap-4 p-4 rounded-card bg-white dark:bg-slate-900 border border-canvas-silk">
                   <CheckCircle2 className="h-5 w-5 text-primary-500 mt-0.5 shrink-0" />
                   <div>
-                    <div className="font-medium text-sm text-midnight">{item.title}</div>
+                    <div className="font-medium text-base text-midnight">{item.title}</div>
                     <div className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 tracking-wide">{item.desc}</div>
                   </div>
                 </div>
@@ -432,9 +432,9 @@ export const ForProviders = () => {
                 <Activity className="h-5 w-5 text-primary-500" />
                 <h3 className="font-display text-xl text-midnight">Practitioner Overview</h3>
               </div>
-              <span className="px-3 py-1 rounded-pill text-[10px] font-medium text-white bg-success-500">Preview</span>
+              <span className="px-3 py-1 rounded-pill text-xs font-medium text-white bg-success-500">Preview</span>
             </div>
-            <div className="grid grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-2 gap-4">
               {[
                 { label: "Visit Types", value: "Video + Clinic", sub: "In-person or remote" },
                 { label: "Records", value: "Digital", sub: "History in one place" },
@@ -442,9 +442,9 @@ export const ForProviders = () => {
                 { label: "Coverage", value: "Nationwide", sub: "All of Zambia" },
               ].map((m) => (
                 <div key={m.label} className="p-4 rounded-card bg-canvas-bone border border-canvas-silk">
-                  <div className="text-[11px] text-graphite-400 font-medium uppercase tracking-wider">{m.label}</div>
+                  <div className="text-xs text-graphite-400 font-medium uppercase tracking-wider">{m.label}</div>
                   <div className="text-2xl font-display font-light text-primary-500 mt-1">{m.value}</div>
-                  <div className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{m.sub}</div>
+                  <div className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{m.sub}</div>
                 </div>
               ))}
             </div>

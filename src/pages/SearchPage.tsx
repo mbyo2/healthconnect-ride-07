@@ -121,7 +121,9 @@ const SearchPage = () => {
               <button
                 onClick={handleSearch}
                 disabled={!searchQuery.trim()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm min-h-[40px] disabled:opacity-50"
+                title={searchQuery.trim() ? "Search providers" : "Type a doctor name, specialty, or city to search"}
+                aria-label={searchQuery.trim() ? "Search providers" : "Search (type something first)"}
+                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm min-h-[44px] disabled:opacity-50"
               >
                 Search
               </button>

@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, Video, Building2, ChevronLeft, ChevronRight, Check, Loader2, Bell, UserPlus, UserCheck } from "lucide-react";
+import { Calendar, Clock, MapPin, Video, Building2, ChevronLeft, ChevronRight, Check, Loader2, Bell } from "lucide-react";
 import { format, addDays, startOfWeek, isSameDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { Provider } from "@/types/provider";
 import { providerDisplayName } from "@/utils/providerDisplay";
@@ -38,6 +38,8 @@ interface BookingModalProps {
   /** Preselect a slot (e.g. tapped from "Nearest available slots"). Jumps to the time step. */
   initialDate?: Date | null;
   initialTime?: string | null;
+  /** Preselect the appointment type (e.g. 'virtual' when entering from a telehealth entry point). */
+  initialAppointmentType?: 'physical' | 'virtual' | null;
 }
 
 const TIME_SLOTS = [
@@ -46,10 +48,10 @@ const TIME_SLOTS = [
   "15:30", "16:00", "16:30", "17:00"
 ];
 
-export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime }: BookingModalProps) => {
+export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime, initialAppointmentType }: BookingModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState<'visit' | 'type' | 'datetime' | 'confirm'>('visit');
+  const [step, setStep] = useState<'type' | 'datetime' | 'confirm'>('type');
   const [visitType, setVisitType] = useState<'new' | 'returning'>('new');
   const [appointmentType, setAppointmentType] = useState<'physical' | 'virtual'>('physical');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -118,7 +120,6 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
   };
 
   const STEPS = [
-    { id: "visit", label: "Visit" },
     { id: "type", label: "Type" },
     { id: "datetime", label: "Time" },
     { id: "confirm", label: "Confirm" },
@@ -151,11 +152,14 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       setSelectedTime(null);
       setReason("");
       setSubmitError(null);
-      setStep('visit');
+      // Telehealth entry points preselect the virtual appointment type;
+      // everything else defaults to in-person.
+      setAppointmentType(initialAppointmentType ?? 'physical');
+      setStep('type');
       setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, initialAppointmentType]);
 
   // Resume a booking started before login: restore selections and reopen
   // at the confirm step. Nothing is created until the user confirms.
@@ -283,10 +287,6 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
 
   const renderTypeSelection = () => (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={() => setStep('visit')} className="mb-2 h-11">
-        <ChevronLeft className="h-4 w-4 mr-1" />
-        Back
-      </Button>
       <div className="text-center pb-4 border-b border-border">
         <div className="flex items-center justify-center gap-3 mb-2">
           {provider.avatar_url ? (
@@ -526,6 +526,15 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         Continue
         <ChevronRight className="h-4 w-4 ml-2" />
       </Button>
+
+      <Button
+        variant="link"
+        onClick={() => setShowWaitlist(true)}
+        className="w-full text-sm min-h-[44px]"
+      >
+        <Bell className="h-3 w-3 mr-1" />
+        No available times? Join the waitlist
+      </Button>
     </div>
     );
   };
@@ -591,6 +600,44 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       />
 
       <div>
+        <Label className="text-sm font-medium">
+          Have you seen {providerDisplayName(provider as any)} before?
+        </Label>
+        <RadioGroup
+          value={visitType}
+          onValueChange={(v) => setVisitType(v as 'new' | 'returning')}
+          className="mt-2 grid grid-cols-2 gap-2"
+        >
+          <div
+            className={cn(
+              "flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[44px]",
+              visitType === 'new' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+            )}
+            onClick={() => setVisitType('new')}
+          >
+            <RadioGroupItem value="new" id="confirm-visit-new" />
+            <Label htmlFor="confirm-visit-new" className="flex-1 cursor-pointer">
+              <span className="text-sm font-medium text-foreground">New patient</span>
+              <span className="block text-xs text-muted-foreground">45 min</span>
+            </Label>
+          </div>
+          <div
+            className={cn(
+              "flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[44px]",
+              visitType === 'returning' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+            )}
+            onClick={() => setVisitType('returning')}
+          >
+            <RadioGroupItem value="returning" id="confirm-visit-returning" />
+            <Label htmlFor="confirm-visit-returning" className="flex-1 cursor-pointer">
+              <span className="text-sm font-medium text-foreground">Returning</span>
+              <span className="block text-xs text-muted-foreground">30 min</span>
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div>
         <Label htmlFor="reason" className="text-sm font-medium">
           Reason for visit (optional)
         </Label>
@@ -639,87 +686,6 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
     </div>
   );
 
-  const renderVisitTypeSelection = () => (
-    <div className="space-y-6">
-      <div className="text-center pb-4 border-b border-border">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          {provider.avatar_url ? (
-            <img src={provider.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary">
-              {provider.first_name?.[0]}{provider.last_name?.[0]}
-            </div>
-          )}
-        </div>
-        <h3 className="text-lg font-semibold text-foreground">
-          {providerDisplayName(provider as any)}
-        </h3>
-        <p className="text-sm text-muted-foreground">{provider.specialty}</p>
-      </div>
-
-      <div>
-        <h4 className="text-sm font-medium mb-4 text-foreground">Have you seen this provider before?</h4>
-        <RadioGroup value={visitType} onValueChange={(v) => setVisitType(v as 'new' | 'returning')}>
-          <div 
-            className={cn(
-              "flex items-center space-x-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
-              visitType === 'new' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-            )}
-            onClick={() => setVisitType('new')}
-          >
-            <RadioGroupItem value="new" id="visit-new" />
-            <Label htmlFor="visit-new" className="flex-1 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <UserPlus className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">I'm a New Patient</p>
-                  <p className="text-xs text-muted-foreground">First visit — 45 min appointment</p>
-                </div>
-              </div>
-            </Label>
-          </div>
-
-          <div 
-            className={cn(
-              "flex items-center space-x-4 p-4 rounded-xl border-2 cursor-pointer transition-all mt-3",
-              visitType === 'returning' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-            )}
-            onClick={() => setVisitType('returning')}
-          >
-            <RadioGroupItem value="returning" id="visit-returning" />
-            <Label htmlFor="visit-returning" className="flex-1 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <UserCheck className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">I'm a Returning Patient</p>
-                  <p className="text-xs text-muted-foreground">Follow-up visit — 30 min appointment</p>
-                </div>
-              </div>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <Button className="w-full" size="lg" onClick={() => setStep('type')}>
-        Continue
-        <ChevronRight className="h-4 w-4 ml-2" />
-      </Button>
-
-      <Button
-        variant="link"
-        onClick={() => setShowWaitlist(true)}
-        className="w-full text-sm"
-      >
-        <Bell className="h-3 w-3" />
-        No available times? Join the waitlist
-      </Button>
-    </div>
-  );
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -730,7 +696,6 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
               Book Appointment
             </DialogTitle>
             <DialogDescription>
-              {step === 'visit' && 'Tell us about your visit'}
               {step === 'type' && 'Choose your preferred consultation type'}
               {step === 'datetime' && 'Select a convenient date and time'}
               {step === 'confirm' && 'Review and confirm your appointment'}
@@ -759,7 +724,6 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
             </ol>
           </DialogHeader>
 
-          {step === 'visit' && renderVisitTypeSelection()}
           {step === 'type' && renderTypeSelection()}
           {step === 'datetime' && renderDateTimeSelection()}
           {step === 'confirm' && renderConfirmation()}

@@ -47,7 +47,7 @@ export function SpecialtyTiles() {
         {selectedSpecialty && (
           <button
             onClick={() => { setSelectedSpecialty(null); refreshProviders(); }}
-            className="text-xs font-bold text-primary-600 hover:text-primary-500 min-h-[32px] px-2"
+            className="text-xs font-bold text-primary-600 hover:text-primary-500 min-h-[44px] min-w-[44px] px-3 flex items-center justify-center"
           >
             Clear
           </button>

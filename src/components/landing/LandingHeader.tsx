@@ -56,7 +56,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
               key={item.label}
               type="button"
               onClick={() => navigate(item.route)}
-              className={`rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide transition-colors ${
+              className={`rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide transition-colors min-h-[44px] inline-flex items-center ${
                 isActive(item.route)
                   ? "bg-canvas-mist text-midnight"
                   : "text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight"
@@ -68,7 +68,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => navigate("/emergency")}
-            className="rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide text-accent-600 hover:bg-accent-50"
+            className="rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide text-accent-600 hover:bg-accent-50 min-h-[44px] inline-flex items-center"
           >
             Emergency
           </button>

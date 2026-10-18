@@ -9,13 +9,14 @@ import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
 import { Volume2, MapPin, List } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const MemoizedProviderMap = memo(ProviderMap);
 
 export const SearchResults = () => {
   const navigate = useNavigate();
-  const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm } = useSearch();
+  const [searchParams] = useSearchParams();
+  const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm, setSearchTerm, setSearchQuery, setSelectedSpecialty, refreshProviders } = useSearch();
   const { speak } = useVoiceCommands();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   
@@ -64,14 +65,18 @@ export const SearchResults = () => {
       {/* Header with simple controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-trust-900 dark:text-trust-100">
+          <h2 className="text-2xl font-bold text-midnight">
             {providers.length > 0 
               ? `${totalCount} Healthcare Providers`
               : "No Providers Found"}
           </h2>
-          {searchTerm && (
-            <p className="text-trust-600 dark:text-trust-400 mt-1">
+          {searchTerm ? (
+            <p className="text-graphite-500 mt-1">
               Results for "{searchTerm}"
+            </p>
+          ) : providers.length === 0 && (
+            <p className="text-graphite-500 mt-1">
+              Try a different search or browse all doctors below.
             </p>
           )}
         </div>
@@ -117,6 +122,33 @@ export const SearchResults = () => {
         </div>
       </div>
       
+      {/* Empty state actions */}
+      {!isLoading && providers.length === 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 py-8 text-center">
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setSearchQuery("");
+              setSelectedSpecialty(null);
+              refreshProviders();
+            }}
+            className="vf-btn-primary min-h-[44px]"
+          >
+            Browse all doctors
+          </button>
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setSearchQuery("");
+              refreshProviders();
+            }}
+            className="vf-btn-secondary min-h-[44px]"
+          >
+            Clear search and try again
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       {viewMode === 'map' ? (
         <div className="trust-card p-1 rounded-xl">
@@ -129,7 +161,12 @@ export const SearchResults = () => {
       ) : (
         <ProviderList
           providers={providers}
-          onProviderSelect={(p) => navigate(`/provider/${p.id}`)}
+          onProviderSelect={(p) => {
+            // Preserve the telehealth context (?mode=online) so the booking
+            // modal preselects the virtual appointment type.
+            const mode = searchParams.get("mode");
+            navigate(`/provider/${p.id}${mode ? `?mode=${mode}` : ""}`);
+          }}
         />
       )}
       

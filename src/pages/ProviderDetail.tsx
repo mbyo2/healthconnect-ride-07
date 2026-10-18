@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
   MapPin, Clock, Star, CalendarPlus, Video, Shield,
@@ -43,9 +43,13 @@ const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) =>
 export const ProviderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [preselectedSlot, setPreselectedSlot] = useState<{ date: Date; time: string } | null>(null);
+  // Telehealth entry points (e.g. ?mode=online from search) preselect the
+  // virtual appointment type in the booking modal.
+  const initialAppointmentType = searchParams.get("mode") === "online" ? "virtual" as const : null;
 
   const openBookingWithSlot = (date: Date, time: string) => {
     setPreselectedSlot({ date, time });
@@ -537,6 +541,7 @@ export const ProviderDetail = () => {
             onRequestOpen={() => setIsBookingOpen(true)}
             initialDate={preselectedSlot?.date ?? null}
             initialTime={preselectedSlot?.time ?? null}
+            initialAppointmentType={initialAppointmentType}
           />
         )}
         {provider && (

@@ -112,7 +112,7 @@ main {
 }
 
 html {
-  font-size: clamp(14px, 0.8vw + 12px, 18px);
+  font-size: clamp(16px, 0.8vw + 12px, 18px);
 }
 
 #root {

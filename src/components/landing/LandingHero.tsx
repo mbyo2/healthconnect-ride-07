@@ -38,29 +38,16 @@ export const LandingHero = () => {
         </h1>
 
         <p
-          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400 opacity-0 animate-hero-rise sm:text-lg"
+          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400 opacity-0 animate-hero-rise"
           style={{ animationDelay: "0.12s" }}
         >
           Zambia&apos;s healthcare platform for booking verified doctors, encrypted video consults, NHIMA cover, digital prescriptions, and pharmacy delivery — from Lusaka to every province.
         </p>
 
-        <div
-          className="mt-8 flex flex-wrap items-center justify-center gap-3 opacity-0 animate-hero-rise"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <button type="button" onClick={() => navigate("/search")} className="vf-btn-primary">
-            Find a doctor
-            <ArrowRight className="h-4 w-4" />
-          </button>
-          <button type="button" onClick={() => navigate("/pricing")} className="vf-btn-secondary">
-            Transparent pricing
-          </button>
-        </div>
-
         <form
           onSubmit={onSearch}
-          className="mx-auto mt-6 flex max-w-xl items-center gap-2 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
-          style={{ animationDelay: "0.28s" }}
+          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
+          style={{ animationDelay: "0.2s" }}
           role="search"
         >
           <Search className="ml-3 h-4 w-4 shrink-0 text-graphite-400" aria-hidden />
@@ -73,12 +60,25 @@ export const LandingHero = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search doctors, specialties, or pharmacies"
-            className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-midnight outline-none placeholder:text-graphite-400"
+            className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-midnight outline-none placeholder:text-graphite-400"
           />
           <button type="submit" className="vf-btn-primary !px-5 !py-3 shrink-0">
-            Search
+            Find a doctor
           </button>
         </form>
+
+        <p
+          className="mt-4 opacity-0 animate-hero-rise"
+          style={{ animationDelay: "0.24s" }}
+        >
+          <button
+            type="button"
+            onClick={() => navigate("/pricing")}
+            className="text-xs font-medium text-primary-500 hover:text-primary-600 hover:underline"
+          >
+            See transparent pricing
+          </button>
+        </p>
       </div>
 
       <div
@@ -90,7 +90,7 @@ export const LandingHero = () => {
             <span className="h-2.5 w-2.5 rounded-full bg-canvas-silk" />
             <span className="h-2.5 w-2.5 rounded-full bg-canvas-silk" />
             <span className="h-2.5 w-2.5 rounded-full bg-canvas-silk" />
-            <span className="ml-3 truncate text-[11px] font-medium text-graphite-400">
+            <span className="ml-3 truncate text-xs font-medium text-graphite-400">
               doc0clock.online — live care
             </span>
           </div>
@@ -108,12 +108,12 @@ export const LandingHero = () => {
               decoding="async"
             />
             <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 sm:left-auto sm:right-6 sm:mx-0">
-              <p className="font-display text-lg leading-snug text-midnight">
+              <p className="font-display text-base leading-snug text-midnight">
                 &ldquo;{featured.content}&rdquo;
               </p>
               <div className="mt-4 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium text-midnight">{featured.name}</p>
+                  <p className="text-base font-medium text-midnight">{featured.name}</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     {featured.role} · {featured.city}
                   </p>
@@ -121,7 +121,7 @@ export const LandingHero = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/about")}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary-500 hover:text-primary-600"
                 >
                   Patient stories <ArrowRight className="h-4 w-4" />
                 </button>
