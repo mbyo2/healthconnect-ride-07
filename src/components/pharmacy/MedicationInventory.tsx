@@ -297,7 +297,7 @@ export const MedicationInventory = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  {lowStockItems.length} {lowStockItems.length === 1 ? 'item is' : 'items are'} below minimum stock level
+                  {lowStockItems.length}&nbsp;{lowStockItems.length === 1 ? 'item is' : 'items are'}&nbsp;below minimum stock level
                 </p>
               </CardContent>
             </Card>
@@ -313,7 +313,7 @@ export const MedicationInventory = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-red-700 dark:text-red-400">
-                  {expiringItems.length} {expiringItems.length === 1 ? 'item is' : 'items are'} expiring within 90 days
+                  {expiringItems.length}&nbsp;{expiringItems.length === 1 ? 'item is' : 'items are'}&nbsp;expiring within 90 days
                 </p>
               </CardContent>
             </Card>
