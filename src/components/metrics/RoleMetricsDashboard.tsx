@@ -390,6 +390,42 @@ export function LabMetricsDashboard() {
     },
   });
 
+  const { data: weeklyTrend, isLoading: trendLoading } = useQuery({
+    queryKey: ["lab-weekly-trend", user?.id],
+    queryFn: async () => {
+      const weekAgo = format(subDays(new Date(), 7), "yyyy-MM-dd");
+      const { data } = await supabase
+        .from("lab_tests" as any)
+        .select("created_at, status")
+        .gte("created_at", weekAgo)
+        .order("created_at", { ascending: true });
+      const rows = (data as any[]) || [];
+      const byDay: Record<string, { date: string; completed: number; pending: number }> = {};
+      rows.forEach((r: any) => {
+        const day = r.created_at?.substring(0, 10) || '';
+        if (!byDay[day]) byDay[day] = { date: day, completed: 0, pending: 0 };
+        if (r.status === 'completed') byDay[day].completed++;
+        else byDay[day].pending++;
+      });
+      return Object.values(byDay);
+    },
+  });
+
+  const { data: statusBreakdown } = useQuery({
+    queryKey: ["lab-status-breakdown", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("lab_tests" as any)
+        .select("status");
+      const rows = (data as any[]) || [];
+      const counts: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        counts[r.status || 'unknown'] = (counts[r.status || 'unknown'] || 0) + 1;
+      });
+      return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    },
+  });
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -419,6 +455,18 @@ export function LabMetricsDashboard() {
           iconColor="text-primary-500"
           subtitle="Hours (coming soon)"
         />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Tests — Last 7 Days" description="Completed vs pending">
+          {trendLoading ? (
+            <div className="h-48 rounded-lg bg-muted animate-pulse" />
+          ) : (
+            <TrendAreaChart data={weeklyTrend || []} dataKey="completed" />
+          )}
+        </ChartCard>
+        <ChartCard title="Orders by Status" description="Current breakdown">
+          <MetricsDonutChart data={statusBreakdown || []} />
+        </ChartCard>
       </div>
     </div>
   );
@@ -633,13 +681,22 @@ export function NurseMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: vitals } = useQuery({
+  const { data: vitals, isLoading: vitalsLoading } = useQuery({
     queryKey: ['nurse-vitals', fromISO, toISO],
     queryFn: async () => {
-      const { count } = await supabase.from('vital_signs' as any)
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
-      return count || 0;
+      const { data } = await supabase.from('vital_signs' as any)
+        .select('id, created_at')
+        .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`)
+        .order('created_at', { ascending: true });
+      const rows = (data as any[]) || [];
+      // Daily trend
+      const byDay: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        const day = r.created_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const trend = Object.entries(byDay).map(([date, count]) => ({ date, vitals: count }));
+      return { count: rows.length, trend };
     },
   });
   const { data: vaccinations } = useQuery({
@@ -671,14 +728,40 @@ export function NurseMetricsDashboard() {
     },
   });
 
+  if (vitalsLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const activityBreakdown = [
+    { name: 'Vitals', value: vitals?.count || 0 },
+    { name: 'Vaccinations', value: vaccinations || 0 },
+    { name: 'ANC Visits', value: anc || 0 },
+  ];
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <DashboardFilters from={from} to={to} setFrom={setFrom} setTo={setTo} />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <MetricsCard label="Vitals Recorded" value={vitals || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
+        <MetricsCard label="Vitals Recorded" value={vitals?.count || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
         <MetricsCard label="Vaccinations Given" value={vaccinations || 0} icon={CheckCircle2} iconColor="text-success-500" />
         <MetricsCard label="ANC Visits" value={anc || 0} icon={Heart} iconColor="text-pink-500" />
         <MetricsCard label="Queue Waiting" value={queueWaiting || 0} icon={Clock} iconColor="text-warning-500" subtitle="Right now" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Vitals Trend" description="Daily vitals recorded">
+          <TrendAreaChart data={vitals?.trend || []} dataKey="vitals" />
+        </ChartCard>
+        <ChartCard title="Activity Breakdown" description="By activity type">
+          <MetricsDonutChart data={activityBreakdown} />
+        </ChartCard>
       </div>
     </div>
   );
@@ -955,16 +1038,58 @@ export function RadiologistMetricsDashboard() {
 // ── HR Manager Metrics ─────────────────────────────────────────────
 
 export function HRMetricsDashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['hr-stats'],
     queryFn: async () => {
       const [staff, shifts] = await Promise.all([
-        supabase.from('institution_staff' as any).select('id', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('medical_shifts' as any).select('id', { count: 'exact', head: true }).gte('shift_date', format(new Date(), 'yyyy-MM-dd')),
+        supabase.from('institution_staff' as any).select('id, role').eq('is_active', true),
+        supabase.from('medical_shifts' as any).select('id, shift_date').gte('shift_date', format(subDays(new Date(), 7), 'yyyy-MM-dd')),
       ]);
-      return { activeStaff: staff.count || 0, todayShifts: shifts.count || 0 };
+      const staffRows = (staff.data as any[]) || [];
+      const shiftRows = (shifts.data as any[]) || [];
+      
+      // Staff by role
+      const byRole: Record<string, number> = {};
+      staffRows.forEach((s: any) => {
+        const role = s.role || 'unknown';
+        byRole[role] = (byRole[role] || 0) + 1;
+      });
+      const roleBreakdown = Object.entries(byRole)
+        .map(([name, value]) => ({ name: name.replace(/_/g, ' '), value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6);
+      
+      // Shifts trend (last 7 days)
+      const byDay: Record<string, number> = {};
+      shiftRows.forEach((s: any) => {
+        const day = s.shift_date?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const shiftTrend = Object.entries(byDay).map(([date, shifts]) => ({ date, shifts }));
+      
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const todayShifts = shiftRows.filter((s: any) => s.shift_date?.substring(0, 10) === today).length;
+      
+      return { 
+        activeStaff: staffRows.length, 
+        todayShifts,
+        roleBreakdown,
+        shiftTrend,
+      };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -973,6 +1098,14 @@ export function HRMetricsDashboard() {
         <MetricsCard label="Shifts Today" value={stats?.todayShifts || 0} icon={Calendar} iconColor="text-success-500" />
         <MetricsCard label="On Leave" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
         <MetricsCard label="Open Roles" value="—" icon={UserCheck} iconColor="text-purple-500" subtitle="Coming soon" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Staff by Role" description="Distribution across roles">
+          <MetricsDonutChart data={stats?.roleBreakdown || []} />
+        </ChartCard>
+        <ChartCard title="Shifts — Last 7 Days" description="Daily shift volume">
+          <TrendAreaChart data={stats?.shiftTrend || []} dataKey="shifts" />
+        </ChartCard>
       </div>
     </div>
   );
