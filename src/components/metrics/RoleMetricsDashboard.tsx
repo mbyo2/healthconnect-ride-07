@@ -479,7 +479,7 @@ export function InstitutionMetricsDashboard() {
   const { user } = useAuth();
   const { formatCurrency } = useCurrency();
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ["institution-metrics", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -492,27 +492,72 @@ export function InstitutionMetricsDashboard() {
       if (!inst) return null;
 
       const today = format(new Date(), "yyyy-MM-dd");
-      const { count: todayAppts } = await supabase
-        .from("appointments")
-        .select("id", { count: "exact", head: true })
-        .eq("institution_id", (inst as any).id)
-        .eq("date", today);
+      const weekAgo = format(subDays(new Date(), 7), "yyyy-MM-dd");
+      
+      const [todayAppts, totalStaff, weeklyAppts, staffRoles] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("institution_id", (inst as any).id)
+          .eq("date", today),
+        supabase
+          .from("user_roles" as any)
+          .select("id", { count: "exact", head: true })
+          .eq("institution_id", (inst as any).id),
+        supabase
+          .from("appointments")
+          .select("date")
+          .eq("institution_id", (inst as any).id)
+          .gte("date", weekAgo)
+          .order("date", { ascending: true }),
+        supabase
+          .from("user_roles" as any)
+          .select("role")
+          .eq("institution_id", (inst as any).id),
+      ]);
 
-      const { count: totalStaff } = await supabase
-        .from("user_roles" as any)
-        .select("id", { count: "exact", head: true })
-        .eq("institution_id", (inst as any).id);
+      // Weekly appointments trend
+      const byDay: Record<string, number> = {};
+      ((weeklyAppts.data as any[]) || []).forEach((a: any) => {
+        byDay[a.date] = (byDay[a.date] || 0) + 1;
+      });
+      const apptTrend = Object.entries(byDay).map(([date, appointments]) => ({ date, appointments }));
+
+      // Staff by role
+      const byRole: Record<string, number> = {};
+      ((staffRoles.data as any[]) || []).forEach((s: any) => {
+        const role = s.role || 'unknown';
+        byRole[role] = (byRole[role] || 0) + 1;
+      });
+      const roleBreakdown = Object.entries(byRole)
+        .map(([name, value]) => ({ name: name.replace(/_/g, ' '), value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6);
 
       return {
-        todayAppointments: todayAppts || 0,
-        totalStaff: totalStaff || 0,
+        todayAppointments: todayAppts.count || 0,
+        totalStaff: totalStaff.count || 0,
         institutionId: (inst as any).id,
+        apptTrend,
+        roleBreakdown,
       };
     },
     enabled: !!user?.id,
   });
 
   const { data: revenue } = useWalletBalance(user?.id);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -542,6 +587,14 @@ export function InstitutionMetricsDashboard() {
           iconColor="text-primary-500"
           subtitle="Coming soon"
         />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Appointments — Last 7 Days" description="Daily volume">
+          <TrendAreaChart data={stats?.apptTrend || []} dataKey="appointments" />
+        </ChartCard>
+        <ChartCard title="Staff by Role" description="Team composition">
+          <MetricsDonutChart data={stats?.roleBreakdown || []} />
+        </ChartCard>
       </div>
     </div>
   );
@@ -974,18 +1027,53 @@ export function CXOMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: kpis } = useQuery({
+  const { data: kpis, isLoading } = useQuery({
     queryKey: ['cxo-kpis', fromISO, toISO],
     queryFn: async () => {
       const [inv, appts, adm] = await Promise.all([
-        supabase.from('hospital_billing' as any).select('total_amount').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`),
+        supabase.from('hospital_billing' as any).select('total_amount, created_at').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).gte('date', fromISO).lte('date', toISO),
         supabase.from('hospital_admissions' as any).select('id', { count: 'exact', head: true }).gte('admission_date', fromISO).lte('admission_date', toISO),
       ]);
-      const revenue = ((inv.data as any[]) || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
-      return { revenue, appointments: appts.count || 0, admissions: adm.count || 0 };
+      const invRows = (inv.data as any[]) || [];
+      const revenue = invRows.reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      
+      // Revenue trend by day
+      const byDay: Record<string, number> = {};
+      invRows.forEach((r: any) => {
+        const day = r.created_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + (Number(r.total_amount) || 0);
+      });
+      const revenueTrend = Object.entries(byDay)
+        .map(([date, revenue]) => ({ date, revenue }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      
+      return { 
+        revenue, 
+        appointments: appts.count || 0, 
+        admissions: adm.count || 0,
+        revenueTrend,
+      };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const kpiBreakdown = [
+    { name: 'Revenue', value: kpis?.revenue || 0 },
+    { name: 'Appointments', value: (kpis?.appointments || 0) * 150 }, // est. value
+    { name: 'Admissions', value: (kpis?.admissions || 0) * 500 }, // est. value
+  ];
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -995,6 +1083,14 @@ export function CXOMetricsDashboard() {
         <MetricsCard label="Appointments" value={kpis?.appointments || 0} icon={CalendarCheck} iconColor="text-primary-500" />
         <MetricsCard label="Admissions" value={kpis?.admissions || 0} icon={BedDouble} iconColor="text-warning-500" />
         <MetricsCard label="Growth" value="—" icon={TrendingUp} iconColor="text-purple-500" subtitle="vs prior period" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Revenue Trend" description="Daily revenue">
+          <TrendAreaChart data={kpis?.revenueTrend || []} dataKey="revenue" />
+        </ChartCard>
+        <ChartCard title="Activity Mix" description="Revenue by source (est.)">
+          <MetricsDonutChart data={kpiBreakdown} />
+        </ChartCard>
       </div>
     </div>
   );
