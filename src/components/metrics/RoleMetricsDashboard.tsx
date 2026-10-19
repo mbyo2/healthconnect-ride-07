@@ -1291,18 +1291,47 @@ export function OTMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['ot-stats', fromISO, toISO],
     queryFn: async () => {
       const { data } = await supabase.from('procedure_executions' as any)
-        .select('id, status').gte('execution_date', fromISO).lte('execution_date', toISO);
+        .select('id, status, execution_date').gte('execution_date', fromISO).lte('execution_date', toISO)
+        .order('execution_date', { ascending: true });
       const rows = (data as any[]) || [];
+      
+      const byDay: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        const day = r.execution_date?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const trend = Object.entries(byDay).map(([date, procedures]) => ({ date, procedures }));
+      
+      const byStatus: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        byStatus[r.status || 'unknown'] = (byStatus[r.status || 'unknown'] || 0) + 1;
+      });
+      const statusBreakdown = Object.entries(byStatus).map(([name, value]) => ({ name, value }));
+      
       return {
         total: rows.length,
         completed: rows.filter((r) => r.status === 'completed').length,
+        trend,
+        statusBreakdown,
       };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1313,6 +1342,14 @@ export function OTMetricsDashboard() {
         <MetricsCard label="Theatre Utilization" value="—" icon={TrendingUp} iconColor="text-warning-500" subtitle="Coming soon" />
         <MetricsCard label="Avg Duration" value="—" icon={Clock} iconColor="text-purple-500" subtitle="Coming soon" />
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Procedures Trend" description="Daily procedure volume">
+          <TrendAreaChart data={stats?.trend || []} dataKey="procedures" />
+        </ChartCard>
+        <ChartCard title="By Status" description="Procedure status breakdown">
+          <MetricsDonutChart data={stats?.statusBreakdown || []} />
+        </ChartCard>
+      </div>
     </div>
   );
 }
@@ -1320,18 +1357,42 @@ export function OTMetricsDashboard() {
 // ── Inventory Manager Metrics ──────────────────────────────────────
 
 export function InventoryMetricsDashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['inventory-stats'],
     queryFn: async () => {
       const { data } = await supabase.from('pharmacy_inventory' as any).select('quantity, reorder_level');
       const rows = (data as any[]) || [];
+      const totalItems = rows.length;
+      const lowStock = rows.filter((r) => (r.quantity || 0) <= (r.reorder_level || 10) && (r.quantity || 0) > 0).length;
+      const outOfStock = rows.filter((r) => (r.quantity || 0) <= 0).length;
+      const inStock = totalItems - lowStock - outOfStock;
+      
+      const stockBreakdown = [
+        { name: 'In Stock', value: inStock },
+        { name: 'Low Stock', value: lowStock },
+        { name: 'Out of Stock', value: outOfStock },
+      ];
+      
       return {
-        totalItems: rows.length,
-        lowStock: rows.filter((r) => (r.quantity || 0) <= (r.reorder_level || 10)).length,
-        outOfStock: rows.filter((r) => (r.quantity || 0) <= 0).length,
+        totalItems,
+        lowStock,
+        outOfStock,
+        stockBreakdown,
       };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1341,6 +1402,16 @@ export function InventoryMetricsDashboard() {
         <MetricsCard label="Out of Stock" value={stats?.outOfStock || 0} icon={AlertTriangle} iconColor="text-destructive" />
         <MetricsCard label="Stock Value" value="—" icon={DollarSign} iconColor="text-success-500" subtitle="Coming soon" />
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Stock Status" description="Inventory health breakdown">
+          <MetricsDonutChart data={stats?.stockBreakdown || []} />
+        </ChartCard>
+        <ChartCard title="Stock Alerts" description="Items needing attention">
+          <div className="p-4 text-sm text-muted-foreground">
+            {(stats?.lowStock || 0) + (stats?.outOfStock || 0)} items need reordering
+          </div>
+        </ChartCard>
+      </div>
     </div>
   );
 }
@@ -1348,17 +1419,43 @@ export function InventoryMetricsDashboard() {
 // ── Triage Staff Metrics ───────────────────────────────────────────
 
 export function TriageMetricsDashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['triage-stats'],
     queryFn: async () => {
       const today = format(new Date(), 'yyyy-MM-dd');
-      const [waiting, triaged] = await Promise.all([
+      const weekAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
+      const [waiting, triaged, weekly] = await Promise.all([
         supabase.from('queue_tokens' as any).select('id', { count: 'exact', head: true }).eq('status', 'waiting'),
         supabase.from('vital_signs' as any).select('id', { count: 'exact', head: true }).gte('created_at', today),
+        supabase.from('vital_signs' as any).select('created_at').gte('created_at', weekAgo).order('created_at', { ascending: true }),
       ]);
-      return { waiting: waiting.count || 0, triagedToday: triaged.count || 0 };
+      
+      const byDay: Record<string, number> = {};
+      ((weekly.data as any[]) || []).forEach((v: any) => {
+        const day = v.created_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const trend = Object.entries(byDay).map(([date, triaged]) => ({ date, triaged }));
+      
+      return { 
+        waiting: waiting.count || 0, 
+        triagedToday: triaged.count || 0,
+        trend,
+      };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1367,6 +1464,17 @@ export function TriageMetricsDashboard() {
         <MetricsCard label="Triaged Today" value={stats?.triagedToday || 0} icon={CheckCircle2} iconColor="text-success-500" />
         <MetricsCard label="Avg Wait" value="—" icon={Activity} iconColor="text-primary-500" subtitle="Coming soon" />
         <MetricsCard label="Emergency" value="—" icon={AlertTriangle} iconColor="text-destructive" subtitle="Coming soon" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Triage Volume — Last 7 Days" description="Daily patients triaged">
+          <TrendAreaChart data={stats?.trend || []} dataKey="triaged" />
+        </ChartCard>
+        <ChartCard title="Queue Status" description="Current waiting vs processed">
+          <MetricsDonutChart data={[
+            { name: 'Waiting', value: stats?.waiting || 0 },
+            { name: 'Triaged Today', value: stats?.triagedToday || 0 },
+          ]} />
+        </ChartCard>
       </div>
     </div>
   );
@@ -1380,15 +1488,47 @@ export function AmbulanceMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['ambulance-stats', fromISO, toISO],
     queryFn: async () => {
       const { data } = await supabase.from('ambulance_trips' as any)
-        .select('status').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+        .select('status, created_at').gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`)
+        .order('created_at', { ascending: true });
       const rows = (data as any[]) || [];
-      return { total: rows.length, completed: rows.filter((r) => r.status === 'completed').length };
+      
+      const byDay: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        const day = r.created_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const trend = Object.entries(byDay).map(([date, trips]) => ({ date, trips }));
+      
+      const byStatus: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        byStatus[r.status || 'unknown'] = (byStatus[r.status || 'unknown'] || 0) + 1;
+      });
+      const statusBreakdown = Object.entries(byStatus).map(([name, value]) => ({ name, value }));
+      
+      return { 
+        total: rows.length, 
+        completed: rows.filter((r) => r.status === 'completed').length,
+        trend,
+        statusBreakdown,
+      };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1399,6 +1539,14 @@ export function AmbulanceMetricsDashboard() {
         <MetricsCard label="Avg Response" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
         <MetricsCard label="Vehicles Active" value="—" icon={CheckCircle2} iconColor="text-purple-500" subtitle="Coming soon" />
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Trips Trend" description="Daily ambulance trips">
+          <TrendAreaChart data={stats?.trend || []} dataKey="trips" />
+        </ChartCard>
+        <ChartCard title="By Status" description="Trip status breakdown">
+          <MetricsDonutChart data={stats?.statusBreakdown || []} />
+        </ChartCard>
+      </div>
     </div>
   );
 }
@@ -1406,7 +1554,7 @@ export function AmbulanceMetricsDashboard() {
 // ── Maintenance Manager Metrics ────────────────────────────────────
 
 export function MaintenanceMetricsDashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['maintenance-stats'],
     queryFn: async () => {
       const [assets, tickets] = await Promise.all([
@@ -1414,13 +1562,34 @@ export function MaintenanceMetricsDashboard() {
         supabase.from('maintenance_tickets' as any).select('status').neq('status', 'resolved'),
       ]);
       const assetRows = (assets.data as any[]) || [];
+      const ticketRows = (tickets.data as any[]) || [];
+      
+      const byStatus: Record<string, number> = {};
+      assetRows.forEach((a: any) => {
+        byStatus[a.status || 'unknown'] = (byStatus[a.status || 'unknown'] || 0) + 1;
+      });
+      const assetBreakdown = Object.entries(byStatus).map(([name, value]) => ({ name, value }));
+      
       return {
         totalAssets: assetRows.length,
         operational: assetRows.filter((a) => a.status === 'operational').length,
-        openTickets: ((tickets.data as any[]) || []).length,
+        openTickets: ticketRows.length,
+        assetBreakdown,
       };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1429,6 +1598,17 @@ export function MaintenanceMetricsDashboard() {
         <MetricsCard label="Operational" value={stats?.operational || 0} icon={CheckCircle2} iconColor="text-success-500" />
         <MetricsCard label="Open Tickets" value={stats?.openTickets || 0} icon={AlertTriangle} iconColor="text-warning-500" />
         <MetricsCard label="Downtime" value="—" icon={Clock} iconColor="text-destructive" subtitle="Coming soon" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Assets by Status" description="Equipment health breakdown">
+          <MetricsDonutChart data={stats?.assetBreakdown || []} />
+        </ChartCard>
+        <ChartCard title="Maintenance Load" description="Open tickets vs assets">
+          <MetricsDonutChart data={[
+            { name: 'Operational', value: stats?.operational || 0 },
+            { name: 'Open Tickets', value: stats?.openTickets || 0 },
+          ]} />
+        </ChartCard>
       </div>
     </div>
   );
