@@ -11,6 +11,7 @@ import { User, MapPin, Star, Calendar, Search, GraduationCap, DollarSign, Shield
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { providerDisplayName } from '@/utils/providerDisplay';
+import { FavoriteProviderButton } from '@/components/patient/FavoriteProviders';
 
 interface Professional {
   id: string;
@@ -348,6 +349,7 @@ const HealthcareProfessionals = () => {
                             Profile
                           </Button>
                         )}
+                        <FavoriteProviderButton providerId={prof.id} />
                       </>
                     );
                   })()}
