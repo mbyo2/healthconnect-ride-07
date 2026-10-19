@@ -18,7 +18,7 @@ BEGIN
   END IF;
 
   -- Get the ordering doctor from the lab test
-  SELECT ordered_by, test_name INTO v_ordering_doctor_id, v_test_name
+  SELECT ordered_by, test_type INTO v_ordering_doctor_id, v_test_name
   FROM public.lab_tests
   WHERE id = NEW.request_id
   LIMIT 1;
