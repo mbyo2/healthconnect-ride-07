@@ -1294,9 +1294,11 @@ export function HRMetricsDashboard() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['hr-stats'],
     queryFn: async () => {
-      const [staff, shifts] = await Promise.all([
+      const [staff, shifts, leave, jobs] = await Promise.all([
         supabase.from('institution_staff' as any).select('id, role').eq('is_active', true),
         supabase.from('medical_shifts' as any).select('id, shift_date').gte('shift_date', format(subDays(new Date(), 7), 'yyyy-MM-dd')),
+        supabase.from('leave_requests' as any).select('id').eq('status', 'approved'),
+        supabase.from('job_postings' as any).select('id').eq('status', 'open'),
       ]);
       const staffRows = (staff.data as any[]) || [];
       const shiftRows = (shifts.data as any[]) || [];
@@ -1326,6 +1328,8 @@ export function HRMetricsDashboard() {
       return { 
         activeStaff: staffRows.length, 
         todayShifts,
+        onLeave: (leave.data as any[])?.length || 0,
+        openRoles: (jobs.data as any[])?.length || 0,
         roleBreakdown,
         shiftTrend,
       };
@@ -1349,8 +1353,8 @@ export function HRMetricsDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricsCard label="Active Staff" value={stats?.activeStaff || 0} icon={Users} iconColor="text-primary-500" />
         <MetricsCard label="Shifts Today" value={stats?.todayShifts || 0} icon={Calendar} iconColor="text-success-500" />
-        <MetricsCard label="On Leave" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
-        <MetricsCard label="Open Roles" value="—" icon={UserCheck} iconColor="text-purple-500" subtitle="Coming soon" />
+        <MetricsCard label="On Leave" value={stats?.onLeave || 0} icon={Clock} iconColor="text-warning-500" />
+        <MetricsCard label="Open Roles" value={stats?.openRoles || 0} icon={UserCheck} iconColor="text-purple-500" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Staff by Role" description="Distribution across roles">
@@ -1505,10 +1509,12 @@ export function TriageMetricsDashboard() {
     queryFn: async () => {
       const today = format(new Date(), 'yyyy-MM-dd');
       const weekAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
-      const [waiting, triaged, weekly] = await Promise.all([
+      const [waiting, triaged, weekly, waitTimes, emergency] = await Promise.all([
         supabase.from('queue_tokens' as any).select('id', { count: 'exact', head: true }).eq('status', 'waiting'),
         supabase.from('vital_signs' as any).select('id', { count: 'exact', head: true }).gte('created_at', today),
         supabase.from('vital_signs' as any).select('created_at').gte('created_at', weekAgo).order('created_at', { ascending: true }),
+        supabase.from('queue_tokens' as any).select('check_in_time, serving_start_time').gte('created_at', today).not('serving_start_time', 'is', null).not('check_in_time', 'is', null),
+        supabase.from('queue_tokens' as any).select('id', { count: 'exact', head: true }).eq('priority', 'emergency').eq('status', 'waiting'),
       ]);
       
       const byDay: Record<string, number> = {};
@@ -1518,9 +1524,23 @@ export function TriageMetricsDashboard() {
       });
       const trend = Object.entries(byDay).map(([date, triaged]) => ({ date, triaged }));
       
+      // Calculate average wait time in minutes
+      let avgWait = 0;
+      const waits = (waitTimes.data as any[]) || [];
+      if (waits.length > 0) {
+        const totalMinutes = waits.reduce((sum, w) => {
+          const checkIn = new Date(w.check_in_time).getTime();
+          const serving = new Date(w.serving_start_time).getTime();
+          return sum + Math.max(0, (serving - checkIn) / 60000);
+        }, 0);
+        avgWait = Math.round(totalMinutes / waits.length);
+      }
+      
       return { 
         waiting: waiting.count || 0, 
         triagedToday: triaged.count || 0,
+        avgWait,
+        emergency: emergency.count || 0,
         trend,
       };
     },
@@ -1543,8 +1563,8 @@ export function TriageMetricsDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricsCard label="Waiting for Triage" value={stats?.waiting || 0} icon={Clock} iconColor="text-warning-500" subtitle="Right now" />
         <MetricsCard label="Triaged Today" value={stats?.triagedToday || 0} icon={CheckCircle2} iconColor="text-success-500" />
-        <MetricsCard label="Avg Wait" value="—" icon={Activity} iconColor="text-primary-500" subtitle="Coming soon" />
-        <MetricsCard label="Emergency" value="—" icon={AlertTriangle} iconColor="text-destructive" subtitle="Coming soon" />
+        <MetricsCard label="Avg Wait" value={stats?.avgWait ? `${stats.avgWait} min` : '—'} icon={Activity} iconColor="text-primary-500" />
+        <MetricsCard label="Emergency" value={stats?.emergency || 0} icon={AlertTriangle} iconColor="text-destructive" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Triage Volume — Last 7 Days" description="Daily patients triaged">
