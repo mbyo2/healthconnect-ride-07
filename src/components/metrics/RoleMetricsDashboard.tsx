@@ -197,7 +197,7 @@ export function PatientMetricsDashboard() {
     queryFn: async () => {
       if (!user?.id) return 0;
       const { count } = await supabase
-        .from("prescriptions" as any)
+        .from("pharmacy_prescriptions" as any)
         .select("id", { count: "exact", head: true })
         .eq("patient_id", user.id);
       return count || 0;
@@ -279,7 +279,7 @@ export function PharmacyMetricsDashboard() {
     queryKey: ["pharmacy-pending-rx", user?.id],
     queryFn: async () => {
       const { count } = await supabase
-        .from("prescriptions" as any)
+        .from("pharmacy_prescriptions" as any)
         .select("id", { count: "exact", head: true })
         .eq("status", "pending");
       return count || 0;
