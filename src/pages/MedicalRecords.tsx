@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
 import { HealthHistoryTransfer } from "@/components/medical/HealthHistoryTransfer";
+import { FHIRImportPanel } from "@/components/medical/FHIRImportPanel";
 import { useAuth } from "@/context/AuthContext";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
@@ -277,6 +278,12 @@ export default function MedicalRecords() {
               {user?.id && (
                 <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                   <HealthHistoryTransfer patientId={user.id} />
+                </div>
+              )}
+
+              {user?.id && (
+                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                  <FHIRImportPanel patientId={user.id} />
                 </div>
               )}
 
