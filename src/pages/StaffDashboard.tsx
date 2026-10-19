@@ -280,6 +280,10 @@ export default function StaffDashboard() {
                     navigate("/institution-dashboard?tab=queue");
                   } else if (tab.id === "patients") {
                     navigate("/institution/patients");
+                  } else if (tab.id === "staff") {
+                    navigate("/institution/personnel");
+                  } else if (tab.id === "shifts") {
+                    navigate("/medical-shift-hr");
                   }
                 }}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${

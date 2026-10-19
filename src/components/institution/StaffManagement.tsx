@@ -18,6 +18,16 @@ import {
   Mail, Clock, CheckCircle, XCircle, AlertCircle, Search, Download
 } from "lucide-react";
 
+// Format role identifiers like "hr_manager" -> "HR Manager", "lab_technician" -> "Lab Technician"
+function formatRoleLabel(role: string | null | undefined): string {
+  if (!role) return '—';
+  const acronyms: Record<string, string> = { hr: 'HR', it: 'IT', cxo: 'CXO' };
+  return role
+    .split('_')
+    .map(word => acronyms[word.toLowerCase()] || word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 interface StaffMember {
   id: string;
   provider_id: string | null;
@@ -642,7 +652,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                             <div className="text-xs text-muted-foreground">{s.email || s.profile?.email}</div>
                           </div>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell capitalize text-sm">{s.role}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-sm">{formatRoleLabel(s.role)}</TableCell>
                         <TableCell className="hidden md:table-cell text-sm">{s.department || '—'}</TableCell>
                         <TableCell className="hidden md:table-cell">
                           <Badge variant="outline" className="text-xs capitalize">{s.staff_type || s.employment_type || '—'}</Badge>
