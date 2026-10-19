@@ -23,6 +23,7 @@ import {
 import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { ReviewPromptCard } from "@/components/patient/ReviewPrompts";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "@/components/charts";
 import { useGamification } from "@/hooks/useGamification";
@@ -312,6 +313,9 @@ export default function HealthDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Review Prompts - post-visit feedback */}
+        <ReviewPromptCard />
 
         {/* Upcoming Appointments */}
         <Card className="vf-card !p-0 overflow-hidden">
