@@ -730,18 +730,39 @@ import { Stethoscope } from "lucide-react";
 // Priority: 1) Triage/vitals today 2) Queue 3) Vaccinations 4) ANC visits
 
 export function NurseMetricsDashboard() {
+  const { user } = useAuth();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: vitals, isLoading: vitalsLoading } = useQuery({
-    queryKey: ['nurse-vitals', fromISO, toISO],
+  // Get user's institutions for multi-tenancy filtering
+  const { data: userInstitutions } = useQuery({
+    queryKey: ['user-institutions', user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from('vital_signs' as any)
+      if (!user?.id) return [];
+      const { data } = await supabase
+        .from('institution_staff' as any)
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true);
+      return ((data as any[]) || []).map((r: any) => r.institution_id).filter(Boolean);
+    },
+    enabled: !!user?.id,
+  });
+
+  const { data: vitals, isLoading: vitalsLoading } = useQuery({
+    queryKey: ['nurse-vitals', fromISO, toISO, userInstitutions],
+    queryFn: async () => {
+      let query = supabase.from('vital_signs' as any)
         .select('id, created_at')
         .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`)
         .order('created_at', { ascending: true });
+      // Multi-tenancy: filter by user's institutions
+      if (userInstitutions && userInstitutions.length > 0) {
+        query = query.in('institution_id', userInstitutions);
+      }
+      const { data } = await query;
       const rows = (data as any[]) || [];
       // Daily trend
       const byDay: Record<string, number> = {};
