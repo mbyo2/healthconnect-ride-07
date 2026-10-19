@@ -936,18 +936,38 @@ export function ReceptionistMetricsDashboard() {
 // Priority: 1) Revenue 2) Collected 3) Outstanding 4) Claims
 
 export function FinanceMetricsDashboard() {
+  const { user } = useAuth();
   const { formatPrice } = useCurrency();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: invoices, isLoading: invoicesLoading } = useQuery({
-    queryKey: ['finance-invoices', fromISO, toISO],
+  // Get user's institutions for multi-tenancy filtering
+  const { data: userInstitutions } = useQuery({
+    queryKey: ['user-institutions-finance', user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from('hospital_billing' as any)
+      if (!user?.id) return [];
+      const { data } = await supabase
+        .from('institution_staff' as any)
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true);
+      return ((data as any[]) || []).map((r: any) => r.institution_id).filter(Boolean);
+    },
+    enabled: !!user?.id,
+  });
+
+  const { data: invoices, isLoading: invoicesLoading } = useQuery({
+    queryKey: ['finance-invoices', fromISO, toISO, userInstitutions],
+    queryFn: async () => {
+      let query = supabase.from('hospital_billing' as any)
         .select('total_amount, balance, payment_status')
         .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+      if (userInstitutions && userInstitutions.length > 0) {
+        query = query.in('institution_id', userInstitutions);
+      }
+      const { data } = await query;
       const rows = (data as any[]) || [];
       return {
         billed: rows.reduce((s, r) => s + (Number(r.total_amount) || 0), 0),
