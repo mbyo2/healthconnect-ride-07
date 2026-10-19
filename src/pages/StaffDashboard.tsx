@@ -37,7 +37,7 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
     ],
     quickActions: [
       { label: "Check In Patient", path: "/institution-dashboard?tab=queue", icon: <UserCheck className="h-5 w-5" />, description: "Register walk-in or appointment arrival" },
-      { label: "Book Appointment", path: "/appointments", icon: <Calendar className="h-5 w-5" />, description: "Schedule patient visit" },
+      { label: "Book Appointment", path: "/search", icon: <Calendar className="h-5 w-5" />, description: "Find doctors & schedule patient visit" },
       { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-5 w-5" />, description: "Manage live queue" },
       { label: "Patient Search", path: "/institution/patients", icon: <Users className="h-5 w-5" />, description: "Find patient records" },
     ],
@@ -274,6 +274,12 @@ export default function StaffDashboard() {
                   );
                   if (matchingAction && tab.id !== "overview") {
                     navigate(matchingAction.path);
+                  } else if (tab.id === "appointments") {
+                    navigate("/institution-dashboard?tab=appointments");
+                  } else if (tab.id === "queue") {
+                    navigate("/institution-dashboard?tab=queue");
+                  } else if (tab.id === "patients") {
+                    navigate("/institution/patients");
                   }
                 }}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
