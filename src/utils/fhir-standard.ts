@@ -314,3 +314,147 @@ export function createFHIRBundle(resources: any[]): FHIRBundle {
     })),
   };
 }
+
+/**
+ * Converts a prescription to FHIR MedicationRequest
+ */
+export function toFHIRMedicationRequest(rx: any, patientId: string): FHIRMedicationRequest {
+  return {
+    resourceType: "MedicationRequest",
+    id: rx.id,
+    status: rx.status === "dispensed" ? "completed" : rx.status === "cancelled" ? "cancelled" : "active",
+    intent: "order",
+    medicationCodeableConcept: {
+      coding: [
+        {
+          system: "http://www.nlm.nih.gov/research/umls/rxnorm",
+          code: rx.medication_code || rx.id.substring(0, 8),
+          display: rx.medication_name || rx.drug_name || "Medication",
+        },
+      ],
+      text: rx.medication_name || rx.drug_name || "Prescribed medication",
+    },
+    subject: {
+      reference: `Patient/${patientId}`,
+    },
+    authoredOn: rx.created_at || new Date().toISOString(),
+    dosageInstruction: rx.dosage || rx.instructions ? [
+      {
+        text: rx.dosage || rx.instructions || "As directed",
+      },
+    ] : undefined,
+  };
+}
+
+/**
+ * Converts a lab test to FHIR DiagnosticReport
+ */
+export function toFHIRDiagnosticReport(lab: any, patientId: string): FHIRDiagnosticReport {
+  return {
+    resourceType: "DiagnosticReport",
+    id: lab.id,
+    status: lab.status === "completed" ? "final" : lab.status === "pending" ? "registered" : "preliminary",
+    category: [
+      {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/v2-0074",
+            code: "LAB",
+            display: "Laboratory",
+          },
+        ],
+      },
+    ],
+    code: {
+      coding: [
+        {
+          system: "http://loinc.org",
+          code: lab.loinc_code || lab.test_code || "33747-0",
+          display: lab.test_type || lab.test_name || "Lab test",
+        },
+      ],
+      text: lab.test_type || lab.test_name || "Laboratory test",
+    },
+    subject: {
+      reference: `Patient/${patientId}`,
+    },
+    effectiveDateTime: lab.created_at || new Date().toISOString(),
+    issued: lab.updated_at || lab.created_at || new Date().toISOString(),
+    conclusion: lab.result_value || lab.result || undefined,
+  };
+}
+
+/**
+ * Converts an allergy to FHIR AllergyIntolerance
+ */
+export function toFHIRAllergy(allergy: any, patientId: string): any {
+  return {
+    resourceType: "AllergyIntolerance",
+    id: allergy.id,
+    clinicalStatus: {
+      coding: [
+        {
+          system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+          code: allergy.status === "inactive" ? "inactive" : "active",
+        },
+      ],
+    },
+    verificationStatus: {
+      coding: [
+        {
+          system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+          code: "confirmed",
+        },
+      ],
+    },
+    code: {
+      coding: [
+        {
+          system: "http://snomed.info/sct",
+          code: allergy.snomed_code || "293594007",
+          display: allergy.allergen || allergy.allergy_name || "Allergen",
+        },
+      ],
+      text: allergy.allergen || allergy.allergy_name || "Allergy",
+    },
+    patient: {
+      reference: `Patient/${patientId}`,
+    },
+    recordedDate: allergy.created_at || new Date().toISOString(),
+    reaction: allergy.reaction ? [
+      {
+        manifestation: [
+          {
+            text: allergy.reaction,
+          },
+        ],
+      },
+    ] : undefined,
+  };
+}
+
+/**
+ * Converts an immunization to FHIR Immunization
+ */
+export function toFHIRImmunization(imm: any, patientId: string): any {
+  return {
+    resourceType: "Immunization",
+    id: imm.id,
+    status: "completed",
+    vaccineCode: {
+      coding: [
+        {
+          system: "http://hl7.org/fhir/sid/cvx",
+          code: imm.vaccine_code || "998",
+          display: imm.vaccine_name || "Vaccine",
+        },
+      ],
+      text: imm.vaccine_name || "Immunization",
+    },
+    patient: {
+      reference: `Patient/${patientId}`,
+    },
+    occurrenceDateTime: imm.administered_at || imm.created_at || new Date().toISOString(),
+    lotNumber: imm.lot_number || undefined,
+  };
+}
