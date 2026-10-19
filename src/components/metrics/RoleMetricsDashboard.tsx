@@ -989,21 +989,50 @@ export function SuperAdminMetricsDashboard() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['superadmin-stats', from, to],
     queryFn: async () => {
-      const [inst, users, subs] = await Promise.all([
+      const [inst, users, subs, userGrowth] = await Promise.all([
         supabase.from('healthcare_institutions').select('id', { count: 'exact', head: true }),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('institution_subscriptions' as any).select('status').eq('status', 'active'),
+        supabase.from('profiles').select('created_at').gte('created_at', format(subDays(new Date(), 30), 'yyyy-MM-dd')).order('created_at', { ascending: true }),
       ]);
+      
+      // User growth trend (last 30 days)
+      const byDay: Record<string, number> = {};
+      ((userGrowth.data as any[]) || []).forEach((u: any) => {
+        const day = u.created_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const growthTrend = Object.entries(byDay).map(([date, users]) => ({ date, users }));
+      
       return {
         institutions: inst.count || 0,
         users: users.count || 0,
         activeSubs: ((subs.data as any[]) || []).length,
+        growthTrend,
       };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const platformBreakdown = [
+    { name: 'Institutions', value: stats?.institutions || 0 },
+    { name: 'Users', value: stats?.users || 0 },
+    { name: 'Subscriptions', value: stats?.activeSubs || 0 },
+  ];
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1013,6 +1042,14 @@ export function SuperAdminMetricsDashboard() {
         <MetricsCard label="Total Users" value={stats?.users || 0} icon={Users} iconColor="text-success-500" subtitle="All roles" />
         <MetricsCard label="Active Subscriptions" value={stats?.activeSubs || 0} icon={CheckCircle2} iconColor="text-warning-500" />
         <MetricsCard label="Platform Scope" value="Global" icon={Activity} iconColor="text-purple-500" subtitle="All countries" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="User Growth — Last 30 Days" description="New user registrations">
+          <TrendAreaChart data={stats?.growthTrend || []} dataKey="users" />
+        </ChartCard>
+        <ChartCard title="Platform Breakdown" description="Key entities">
+          <MetricsDonutChart data={platformBreakdown} />
+        </ChartCard>
       </div>
     </div>
   );
@@ -1104,19 +1141,50 @@ export function RadiologistMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 7), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['radio-stats', fromISO, toISO],
     queryFn: async () => {
       const { data } = await supabase.from('imaging_orders' as any)
-        .select('status').gte('ordered_at', fromISO).lte('ordered_at', `${toISO}T23:59:59`);
+        .select('status, ordered_at').gte('ordered_at', fromISO).lte('ordered_at', `${toISO}T23:59:59`)
+        .order('ordered_at', { ascending: true });
       const rows = (data as any[]) || [];
+      
+      // Daily trend
+      const byDay: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        const day = r.ordered_at?.substring(0, 10) || '';
+        byDay[day] = (byDay[day] || 0) + 1;
+      });
+      const trend = Object.entries(byDay).map(([date, orders]) => ({ date, orders }));
+      
+      // Status breakdown
+      const byStatus: Record<string, number> = {};
+      rows.forEach((r: any) => {
+        byStatus[r.status || 'unknown'] = (byStatus[r.status || 'unknown'] || 0) + 1;
+      });
+      const statusBreakdown = Object.entries(byStatus).map(([name, value]) => ({ name, value }));
+      
       return {
         total: rows.length,
         pending: rows.filter((r) => r.status === 'ordered').length,
         completed: rows.filter((r) => r.status === 'completed').length,
+        trend,
+        statusBreakdown,
       };
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -1126,6 +1194,14 @@ export function RadiologistMetricsDashboard() {
         <MetricsCard label="Pending" value={stats?.pending || 0} icon={Clock} iconColor="text-warning-500" />
         <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
         <MetricsCard label="Completion" value={stats?.total ? `${Math.round((stats.completed / stats.total) * 100)}%` : '—'} icon={TrendingUp} iconColor="text-purple-500" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <ChartCard title="Orders Trend" description="Daily imaging orders">
+          <TrendAreaChart data={stats?.trend || []} dataKey="orders" />
+        </ChartCard>
+        <ChartCard title="By Status" description="Order status breakdown">
+          <MetricsDonutChart data={stats?.statusBreakdown || []} />
+        </ChartCard>
       </div>
     </div>
   );
