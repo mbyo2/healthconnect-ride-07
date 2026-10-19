@@ -15,6 +15,7 @@ import { FHIRImportPanel } from "@/components/medical/FHIRImportPanel";
 import { PatientPortal } from "@/components/patient/PatientPortal";
 import { VitalsFlowsheet } from "@/components/clinical/VitalsFlowsheet";
 import { ProblemList } from "@/components/clinical/ProblemList";
+import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { useAuth } from "@/context/AuthContext";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
@@ -343,6 +344,12 @@ export default function MedicalRecords() {
               {user?.id && (
                 <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                   <ProblemList patientId={user.id} canEdit={false} />
+                </div>
+              )}
+
+              {user?.id && (
+                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                  <ClinicalReminders patientId={user.id} />
                 </div>
               )}
             </div>
