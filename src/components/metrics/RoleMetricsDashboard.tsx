@@ -745,7 +745,7 @@ export function FinanceMetricsDashboard() {
   const fromISO = from || format(subDays(new Date(), 30), 'yyyy-MM-dd');
   const toISO = to || format(new Date(), 'yyyy-MM-dd');
 
-  const { data: invoices } = useQuery({
+  const { data: invoices, isLoading: invoicesLoading } = useQuery({
     queryKey: ['finance-invoices', fromISO, toISO],
     queryFn: async () => {
       const { data } = await supabase.from('hospital_billing' as any)
@@ -759,7 +759,7 @@ export function FinanceMetricsDashboard() {
       };
     },
   });
-  const { data: claims } = useQuery({
+  const { data: claims, isLoading: claimsLoading } = useQuery({
     queryKey: ['finance-claims', fromISO, toISO],
     queryFn: async () => {
       const { data } = await supabase.from('insurance_claims' as any)
@@ -772,6 +772,18 @@ export function FinanceMetricsDashboard() {
       };
     },
   });
+
+  if (invoicesLoading || claimsLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const billed = invoices?.billed || 0;
   const outstanding = invoices?.outstanding || 0;

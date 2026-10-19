@@ -36,6 +36,7 @@ export const FinanceManagerWorkflow = () => {
   const [followUpClaim, setFollowUpClaim] = useState<any>(null);
   const [followUpNote, setFollowUpNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
 
   // ── Invoices ──────────────────────────────────────────────────
   const { data: invoices = [], isLoading: invoicesLoading } = useQuery({
@@ -224,7 +225,7 @@ export const FinanceManagerWorkflow = () => {
                     </thead>
                     <tbody className="divide-y divide-border">
                       {filteredInvoices.map((inv: any) => (
-                        <tr key={inv.id} className="hover:bg-muted/40">
+                        <tr key={inv.id} className="hover:bg-muted/40 cursor-pointer" onClick={() => setSelectedInvoice(inv)}>
                           <td className="px-4 py-2.5 font-medium text-xs">{inv.invoice_number}</td>
                           <td className="px-4 py-2.5 text-right text-xs">{formatPrice(inv.total_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-right text-xs text-success-600 dark:text-success-400">{formatPrice(inv.paid_amount || 0)}</td>
@@ -385,6 +386,41 @@ export const FinanceManagerWorkflow = () => {
               Approve
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Detail Dialog */}
+      <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invoice {selectedInvoice?.invoice_number}</DialogTitle>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Amount</span>
+                <span className="font-medium">{formatPrice(selectedInvoice.total_amount || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Paid</span>
+                <span className="font-medium text-success-600">{formatPrice(selectedInvoice.paid_amount || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Balance</span>
+                <span className="font-medium text-destructive">{formatPrice(selectedInvoice.balance || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Status</span>
+                <Badge variant={selectedInvoice.payment_status === "paid" ? "default" : "secondary"}>
+                  {selectedInvoice.payment_status || "pending"}
+                </Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Date</span>
+                <span>{selectedInvoice.created_at ? new Date(selectedInvoice.created_at).toLocaleDateString() : "—"}</span>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
