@@ -275,13 +275,32 @@ export function PharmacyMetricsDashboard() {
   const { formatCurrency } = useCurrency();
   const { data: revenue } = useWalletBalance(user?.id);
 
-  const { data: pendingRx } = useQuery({
-    queryKey: ["pharmacy-pending-rx", user?.id],
+  // Get user's institutions for multi-tenancy filtering
+  const { data: userInstitutions } = useQuery({
+    queryKey: ['user-institutions-pharmacy', user?.id],
     queryFn: async () => {
-      const { count } = await supabase
+      if (!user?.id) return [];
+      const { data } = await supabase
+        .from('institution_staff' as any)
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true);
+      return ((data as any[]) || []).map((r: any) => r.institution_id).filter(Boolean);
+    },
+    enabled: !!user?.id,
+  });
+
+  const { data: pendingRx } = useQuery({
+    queryKey: ["pharmacy-pending-rx", user?.id, userInstitutions],
+    queryFn: async () => {
+      let query = supabase
         .from("pharmacy_prescriptions" as any)
         .select("id", { count: "exact", head: true })
         .eq("status", "pending");
+      if (userInstitutions && userInstitutions.length > 0) {
+        query = query.in("institution_id", userInstitutions);
+      }
+      const { count } = await query;
       return count || 0;
     },
   });
