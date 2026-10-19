@@ -375,6 +375,7 @@ export function LabMetricsDashboard() {
         .eq("status", "pending");
       return count || 0;
     },
+    refetchInterval: 30000, // Real-time: refresh every 30s
   });
 
   const { data: completedToday } = useQuery({
@@ -779,6 +780,7 @@ export function NurseMetricsDashboard() {
         .eq('status', 'waiting');
       return count || 0;
     },
+    refetchInterval: 30000, // Real-time: refresh every 30s
   });
 
   if (vitalsLoading) {
