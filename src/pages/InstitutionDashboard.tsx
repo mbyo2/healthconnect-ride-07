@@ -19,6 +19,7 @@ import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, t
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
 import { Lock } from "lucide-react";
+import { PatientInstitutionManager } from "@/components/institution/PatientInstitutionManager";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, subDays, startOfMonth, startOfDay, endOfMonth } from "date-fns";
 import { toast } from "sonner";
@@ -803,7 +804,12 @@ export const InstitutionDashboard = () => {
         )}
 
         {/* 2. Patient Hub */}
-        {activeTab === "patients" && <UnifiedPatientHub institutionId={institution.id} />}
+        {activeTab === "patients" && (
+          <div className="space-y-6">
+            <UnifiedPatientHub institutionId={institution.id} />
+            <PatientInstitutionManager institutionId={institution.id} />
+          </div>
+        )}
 
         {/* 3. Queue & Live Calling Desk */}
         {activeTab === "queue" && <CentralizedQueueDesk institutionId={institution.id} />}

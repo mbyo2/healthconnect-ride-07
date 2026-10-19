@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BreakGlassDialog } from "@/components/clinical/BreakGlassDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { checkProviderAccess } from "@/utils/provider-patient-access";
 
 interface PatientRecord {
   id: string;
@@ -78,16 +79,29 @@ export const PatientRecords = () => {
 
       const rows = (data as any[]) || [];
       const patientIds = [...new Set(rows.map((r) => r.patient_id).filter(Boolean))];
+      
+      // 3-layer access control: filter to only patients the provider can access
+      // Layer 1: has appointment relationship, Layer 2: shared institution, Layer 3: role scope
+      const accessiblePatientIds: string[] = [];
+      for (const pid of patientIds) {
+        const access = await checkProviderAccess(user.id, pid);
+        if (access.allowed) {
+          accessiblePatientIds.push(pid);
+        }
+      }
+      
+      const filteredRows = rows.filter(r => accessiblePatientIds.includes(r.patient_id));
+      
       let patientMap: Record<string, any> = {};
-      if (patientIds.length > 0) {
+      if (accessiblePatientIds.length > 0) {
         const { data: patients } = await supabase
           .from('profiles')
           .select('id, first_name, last_name')
-          .in('id', patientIds);
+          .in('id', accessiblePatientIds);
         patientMap = Object.fromEntries((patients || []).map((p: any) => [p.id, p]));
       }
 
-      return rows.map(record => ({
+      return filteredRows.map(record => ({
         id: record.id,
         patient_id: record.patient_id,
         record_type: record.record_type,
