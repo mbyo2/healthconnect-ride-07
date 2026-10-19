@@ -10,11 +10,14 @@ import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveM
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
+import { HealthHistoryTransfer } from "@/components/medical/HealthHistoryTransfer";
+import { useAuth } from "@/context/AuthContext";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
 import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
 
 export default function MedicalRecords() {
+  const { user } = useAuth();
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [healthMetrics, setHealthMetrics] = useState<HealthMetric[]>([]);
   const [loading, setLoading] = useState(true);
@@ -270,6 +273,12 @@ export default function MedicalRecords() {
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                 <FHIRExportPanel />
               </div>
+
+              {user?.id && (
+                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                  <HealthHistoryTransfer patientId={user.id} />
+                </div>
+              )}
 
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                 <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
