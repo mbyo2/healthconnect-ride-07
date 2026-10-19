@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Loader2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { NoShowManager } from "@/components/appointments/NoShowWorkflow";
 
 const InstitutionAppointments = () => {
     const { user } = useAuth();
@@ -89,6 +90,7 @@ const InstitutionAppointments = () => {
             </div>
           </div>
           <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+            <NoShowManager institutionId={institutionId} />
             <div className="vf-card !p-0 overflow-hidden">
               <div className="px-5 py-4 border-b border-canvas-silk flex items-center justify-between">
                 <h2 className="font-medium text-base flex items-center gap-2"><Calendar className="h-4 w-4 text-primary-500" /> All Appointments ({appointments.length})</h2>
