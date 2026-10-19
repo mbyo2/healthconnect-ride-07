@@ -366,13 +366,32 @@ export function LabMetricsDashboard() {
   const { formatCurrency } = useCurrency();
   const { data: revenue } = useWalletBalance(user?.id);
 
-  const { data: pendingOrders } = useQuery({
-    queryKey: ["lab-pending-orders", user?.id],
+  // Get user's institutions for multi-tenancy filtering
+  const { data: userInstitutions } = useQuery({
+    queryKey: ['user-institutions-lab', user?.id],
     queryFn: async () => {
-      const { count } = await supabase
+      if (!user?.id) return [];
+      const { data } = await supabase
+        .from('institution_staff' as any)
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true);
+      return ((data as any[]) || []).map((r: any) => r.institution_id).filter(Boolean);
+    },
+    enabled: !!user?.id,
+  });
+
+  const { data: pendingOrders } = useQuery({
+    queryKey: ["lab-pending-orders", user?.id, userInstitutions],
+    queryFn: async () => {
+      let query = supabase
         .from("lab_tests" as any)
         .select("id", { count: "exact", head: true })
         .eq("status", "pending");
+      if (userInstitutions && userInstitutions.length > 0) {
+        query = query.in("institution_id", userInstitutions);
+      }
+      const { count } = await query;
       return count || 0;
     },
     refetchInterval: 30000, // Real-time: refresh every 30s
