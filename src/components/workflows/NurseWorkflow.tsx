@@ -162,6 +162,8 @@ export const NurseWorkflow = () => {
       setVitals({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
       setVitalsNotes('');
       setVitalsPatientId('');
+      // Refresh the dashboard stats to show the new vitals count
+      setVitalsToday((prev) => (prev ?? 0) + 1);
     } catch (e: any) {
       toast.error(e?.message || 'Failed to record vitals');
     } finally {
@@ -352,7 +354,7 @@ export const NurseWorkflow = () => {
                 <option value="">Select patient…</option>
                 {vitalsPatients.map(p => (
                   <option key={p.id} value={p.id}>
-                    {[p.first_name, p.last_name].filter(Boolean).join(' ') || p.id.slice(0, 8)}
+                    {(p as any).name || [p.first_name, p.last_name].filter(Boolean).join(' ') || p.id.slice(0, 8)}
                   </option>
                 ))}
               </select>
