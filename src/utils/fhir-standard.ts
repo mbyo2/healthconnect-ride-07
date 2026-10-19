@@ -319,6 +319,11 @@ export function createFHIRBundle(resources: any[]): FHIRBundle {
  * Converts a prescription to FHIR MedicationRequest
  */
 export function toFHIRMedicationRequest(rx: any, patientId: string): FHIRMedicationRequest {
+  // Medications is a JSON array; extract first medication name
+  const meds = Array.isArray(rx.medications) ? rx.medications : [];
+  const firstMed = meds[0] || {};
+  const medName = firstMed.name || firstMed.medication_name || rx.medication_name || rx.drug_name || "Medication";
+  
   return {
     resourceType: "MedicationRequest",
     id: rx.id,
@@ -329,10 +334,10 @@ export function toFHIRMedicationRequest(rx: any, patientId: string): FHIRMedicat
         {
           system: "http://www.nlm.nih.gov/research/umls/rxnorm",
           code: rx.medication_code || rx.id.substring(0, 8),
-          display: rx.medication_name || rx.drug_name || "Medication",
+          display: medName,
         },
       ],
-      text: rx.medication_name || rx.drug_name || "Prescribed medication",
+      text: medName,
     },
     subject: {
       reference: `Patient/${patientId}`,
