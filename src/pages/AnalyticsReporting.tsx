@@ -35,6 +35,38 @@ import {
   Area,
 } from "recharts";
 
+/**
+ * Analytics & Reporting — data-source note (2026-10-20):
+ *
+ * This page used to read/write a `analytics_reports` table. That table does
+ * NOT exist in the live database (verified 2026-10-20 via the Supabase REST
+ * API: GET /rest/v1/analytics_reports -> 404 PGRST205 "Could not find the
+ * table 'public.analytics_reports'"), so every fetch/insert failed and the
+ * page could only ever show empty states.
+ *
+ * The page now computes everything from real, live-verified tables, scoped
+ * to the viewer's institution and respecting RLS (all queries run as the
+ * signed-in user):
+ *   - appointments              (institution_id direct; id, patient_id,
+ *                                provider_id, status, date, created_at)
+ *   - payments                  (NO institution_id column live — scoped via
+ *                                provider_id IN institution provider ids;
+ *                                amount, status, created_at, payment_method)
+ *   - institution_personnel     (user_id per institution — provider scope)
+ *   - institution_staff         (provider_id per institution — provider scope)
+ *   - institution_patient_registry (id per institution — registered patients)
+ *   - lab_tests                 (institution_id direct; id, status, created_at)
+ *   - comprehensive_prescriptions (NO institution_id column live — scoped via
+ *                                provider_id IN institution provider ids)
+ *
+ * "Generated reports" are snapshots of those real aggregates for a chosen
+ * date range. Because there is no reports table to persist them in, the
+ * snapshots are kept in this browser (localStorage, per institution) and
+ * can be viewed / downloaded as JSON. No query on this page touches a
+ * non-existent table, so an institution admin sees real data with no
+ * missing-table errors.
+ */
+
 interface AnalyticsReport {
   id: string;
   institution_id: string;
@@ -53,12 +85,111 @@ interface AnalyticsReport {
   file_url?: string;
 }
 
+interface LiveData {
+  appointments: any[];
+  payments: any[];
+  prescriptions: any[];
+  labTests: any[];
+  patientCount: number;
+  staffCount: number;
+}
+
+const EMPTY_LIVE: LiveData = {
+  appointments: [],
+  payments: [],
+  prescriptions: [],
+  labTests: [],
+  patientCount: 0,
+  staffCount: 0,
+};
+
+const PAGE_SIZE = 1000;
+const MAX_ROWS = 10000;
+
+/** PostgREST caps a single response (default 1000 rows) — page through with
+ *  .range() so large institutions are not silently truncated. */
+async function fetchPaged(build: (from: number, to: number) => any): Promise<any[]> {
+  const rows: any[] = [];
+  for (let from = 0; from < MAX_ROWS; from += PAGE_SIZE) {
+    const { data, error } = await build(from, from + PAGE_SIZE - 1);
+    if (error) {
+      console.warn("AnalyticsReporting: query failed", error.message);
+      break;
+    }
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
+const isCollected = (status: string) =>
+  ["paid", "completed", "successful", "success"].includes((status || "").toLowerCase());
+
+/** 12 weekly buckets ending today. Returns oldest -> newest. */
+function buildWeeklySeries(
+  items: any[],
+  dateOf: (item: any) => string | null | undefined,
+  valueOf?: (item: any) => number
+) {
+  const DAY = 24 * 60 * 60 * 1000;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const buckets: { week: string; count: number; total: number }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const start = new Date(today.getTime() - i * 7 * DAY);
+    buckets.push({
+      week: start.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      count: 0,
+      total: 0,
+    });
+  }
+  items.forEach((item) => {
+    const raw = dateOf(item);
+    if (!raw) return;
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) return;
+    d.setHours(0, 0, 0, 0);
+    const weeksAgo = Math.floor((today.getTime() - d.getTime()) / (7 * DAY));
+    if (weeksAgo < 0 || weeksAgo > 11) return;
+    const bucket = buckets[11 - weeksAgo];
+    bucket.count += 1;
+    if (valueOf) bucket.total += valueOf(item) || 0;
+  });
+  return buckets;
+}
+
+const reportsStorageKey = (institutionId: string) =>
+  `dococlock.analytics_reports.${institutionId}`;
+
+function loadStoredReports(institutionId: string): AnalyticsReport[] {
+  try {
+    const raw = localStorage.getItem(reportsStorageKey(institutionId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function storeReports(institutionId: string, reports: AnalyticsReport[]) {
+  try {
+    localStorage.setItem(reportsStorageKey(institutionId), JSON.stringify(reports));
+  } catch {
+    /* storage unavailable — reports simply won't persist across reloads */
+  }
+}
+
 export const AnalyticsReporting = () => {
   const navigate = useNavigate();
-  const { institution } = useInstitutionContext();
+  const { institution, loading: institutionLoading } = useInstitutionContext();
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState<AnalyticsReport[]>([]);
+  const [live, setLive] = useState<LiveData>(EMPTY_LIVE);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [viewedReport, setViewedReport] = useState<AnalyticsReport | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   // Form states
   const [reportForm, setReportForm] = useState({
@@ -74,21 +205,122 @@ export const AnalyticsReporting = () => {
   useEffect(() => {
     if (institution) {
       fetchAnalyticsData();
+    } else if (!institutionLoading) {
+      // No institution context (and none coming) — stop the spinner so the
+      // "Institution Required" card below can render.
+      setLoading(false);
     }
-  }, [institution]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [institution?.id, institutionLoading]);
+
+  /** Provider/user ids that belong to this institution, used to scope tables
+   *  that have no institution_id column (payments, prescriptions). Sources:
+   *  institution_personnel.user_id + institution_staff.provider_id, plus the
+   *  institution owner (admin_id) and any provider seen on the institution's
+   *  own appointments. */
+  const resolveProviderIds = async (extra: string[] = []): Promise<string[]> => {
+    if (!institution) return [];
+    const ids = new Set<string>();
+    if (institution.admin_id) ids.add(institution.admin_id);
+    extra.forEach((id) => id && ids.add(id));
+
+    const [personnelRes, staffRes] = await Promise.all([
+      supabase.from("institution_personnel").select("user_id").eq("institution_id", institution.id),
+      supabase.from("institution_staff").select("provider_id").eq("institution_id", institution.id).eq("is_active", true),
+    ]);
+    (personnelRes.data || []).forEach((r: any) => r.user_id && ids.add(r.user_id));
+    (staffRes.data || []).forEach((r: any) => r.provider_id && ids.add(r.provider_id));
+    return [...ids];
+  };
 
   const fetchAnalyticsData = async () => {
     if (!institution) return;
-
+    setLoading(true);
     try {
-      const reportsRes = await supabase
-        .from("analytics_reports" as any)
-        .select("*")
-        .eq("institution_id", institution.id)
-        .order("generated_at", { ascending: false })
-        .limit(50);
+      setReports(loadStoredReports(institution.id));
 
-      if (reportsRes.data) setReports(reportsRes.data as any);
+      // 1. Institution-scoped appointments (direct institution_id).
+      const appointmentsByInstitution = await fetchPaged((from, to) =>
+        supabase
+          .from("appointments")
+          .select("id, patient_id, provider_id, status, date, created_at")
+          .eq("institution_id", institution.id)
+          .order("date", { ascending: true })
+          .range(from, to)
+      );
+
+      // 2. Resolve the institution's providers, then pull appointments that
+      //    carry one of them but no institution_id (marketplace bookings).
+      const providerIds = await resolveProviderIds(
+        appointmentsByInstitution.map((a: any) => a.provider_id)
+      );
+      let appointments = appointmentsByInstitution;
+      if (providerIds.length > 0) {
+        const byProvider = await fetchPaged((from, to) =>
+          supabase
+            .from("appointments")
+            .select("id, patient_id, provider_id, status, date, created_at")
+            .in("provider_id", providerIds)
+            .order("date", { ascending: true })
+            .range(from, to)
+        );
+        const seen = new Set(appointments.map((a: any) => a.id));
+        appointments = [...appointments, ...byProvider.filter((a: any) => !seen.has(a.id))];
+      }
+
+      // 3. Payments + prescriptions have no institution_id — scope by provider.
+      //    Lab tests and the patient registry scope by institution_id directly.
+      const [payments, prescriptions, labTests, registryRes] = await Promise.all([
+        providerIds.length > 0
+          ? fetchPaged((from, to) =>
+              supabase
+                .from("payments")
+                .select("id, amount, status, created_at, provider_id, patient_id, payment_method, currency")
+                .in("provider_id", providerIds)
+                .order("created_at", { ascending: true })
+                .range(from, to)
+            )
+          : Promise.resolve([]),
+        providerIds.length > 0
+          ? fetchPaged((from, to) =>
+              (supabase as any)
+                .from("comprehensive_prescriptions")
+                .select("id, provider_id, patient_id, status, created_at")
+                .in("provider_id", providerIds)
+                .order("created_at", { ascending: true })
+                .range(from, to)
+            )
+          : Promise.resolve([]),
+        fetchPaged((from, to) =>
+          supabase
+            .from("lab_tests")
+            .select("id, institution_id, patient_id, status, created_at")
+            .eq("institution_id", institution.id)
+            .order("created_at", { ascending: true })
+            .range(from, to)
+        ),
+        supabase
+          .from("institution_patient_registry")
+          .select("id", { count: "exact", head: true })
+          .eq("institution_id", institution.id),
+      ]);
+
+      // Registered patients: registry count, falling back to the distinct
+      // patients actually seen in this institution's appointments.
+      let patientCount = registryRes.count ?? 0;
+      if (registryRes.error || patientCount === 0) {
+        const unique = new Set(appointments.map((a: any) => a.patient_id).filter(Boolean));
+        if (unique.size > patientCount) patientCount = unique.size;
+      }
+
+      setLive({
+        appointments,
+        payments,
+        prescriptions,
+        labTests,
+        patientCount,
+        staffCount: providerIds.length,
+      });
     } catch (error) {
       console.error("Error fetching analytics data:", error);
     } finally {
@@ -100,20 +332,23 @@ export const AnalyticsReporting = () => {
     if (!institution) return;
 
     try {
-      // Compute REAL metrics instead of empty placeholder
+      // Compute REAL metrics from the live aggregates already loaded for
+      // this institution (appointments / payments / prescriptions / labs),
+      // filtered to the requested date range.
       const startDate = reportForm.date_range_start;
       const endDate = reportForm.date_range_end;
+      const inRange = (raw: string | null | undefined) => {
+        if (!raw) return false;
+        const day = String(raw).slice(0, 10);
+        return day >= startDate && day <= endDate;
+      };
 
-      const [appointmentsRes, paymentsRes, patientsRes, prescriptionsRes] = await Promise.all([
-        supabase.from("appointments").select("id, status").eq("institution_id", institution.id).gte("date", startDate).lte("date", endDate),
-        supabase.from("payments").select("amount, status").eq("institution_id", institution.id).gte("created_at", startDate).lte("created_at", endDate),
-        supabase.from("institution_patient_registry").select("id").eq("institution_id", institution.id),
-        supabase.from("comprehensive_prescriptions").select("id").eq("institution_id", institution.id).gte("created_at", startDate).lte("created_at", endDate),
-      ]);
-
-      const appointments = appointmentsRes.data || [];
-      const payments = paymentsRes.data || [];
-      const totalRevenue = payments.filter((p: any) => p.status === "completed").reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+      const appointments = live.appointments.filter((a: any) => inRange(a.date || a.created_at));
+      const payments = live.payments.filter((p: any) => inRange(p.created_at));
+      const prescriptions = live.prescriptions.filter((p: any) => inRange(p.created_at));
+      const labTests = live.labTests.filter((t: any) => inRange(t.created_at));
+      const collected = payments.filter((p: any) => isCollected(p.status));
+      const totalRevenue = collected.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
 
       const metricsData = {
         period: { start: startDate, end: endDate },
@@ -125,35 +360,62 @@ export const AnalyticsReporting = () => {
         },
         revenue: {
           total: totalRevenue,
-          currency: "ZMW",
+          currency: institution.currency || "ZMW",
           transaction_count: payments.length,
+          collected_count: collected.length,
         },
         patients: {
-          total_registered: (patientsRes.data || []).length,
+          total_registered: live.patientCount,
         },
         prescriptions: {
-          total: (prescriptionsRes.data || []).length,
+          total: prescriptions.length,
+        },
+        lab_tests: {
+          total: labTests.length,
         },
         generated_at: new Date().toISOString(),
       };
 
-      const { error } = await (supabase as any).from("analytics_reports").insert({
+      const { data: userData } = await supabase.auth.getUser();
+      const report: AnalyticsReport = {
+        id: typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `report-${Date.now()}`,
         institution_id: institution.id,
-        generated_by: (await supabase.auth.getUser()).data.user?.id,
-        ...reportForm,
+        report_name: reportForm.report_name.trim() ||
+          `${reportForm.report_category} ${reportForm.report_type} report`,
+        report_type: reportForm.report_type,
+        report_category: reportForm.report_category,
+        generated_by: userData.user?.id,
+        generated_at: new Date().toISOString(),
+        date_range_start: startDate,
+        date_range_end: endDate,
         metrics_data: metricsData,
         filters_applied: { date_range: { start: startDate, end: endDate } },
+        is_scheduled: reportForm.is_scheduled,
+        schedule_frequency: reportForm.is_scheduled ? reportForm.schedule_frequency : undefined,
         recipients: [],
-      });
+      };
 
-      if (error) throw error;
+      const next = [report, ...reports];
+      setReports(next);
+      storeReports(institution.id, next);
       setShowReportDialog(false);
-      fetchAnalyticsData();
       toast.success("Report generated with real metrics");
     } catch (error) {
       console.error("Error generating report:", error);
       toast.error("Failed to generate report");
     }
+  };
+
+  const handleDownloadReport = (report: AnalyticsReport) => {
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${report.report_name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "analytics-report"}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const getReportTypeIcon = (type: string) => {
@@ -206,17 +468,19 @@ export const AnalyticsReporting = () => {
     );
   }
 
-  const totalReports = reports.length;
-  const scheduledReports = reports.filter((r) => r.is_scheduled).length;
-  const financialReports = reports.filter((r) => r.report_category === "financial").length;
-  const recentReports = reports.filter((r) => {
-    const reportDate = new Date(r.generated_at);
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return reportDate > weekAgo;
-  }).length;
+  const currency = institution.currency || "ZMW";
 
-  // Derived chart data from real reports (launch-safe: renders empty states, never placeholder text).
+  // ---- Live aggregates (real institution data) ----
+  const collectedPayments = live.payments.filter((p: any) => isCollected(p.status));
+  const totalRevenue = collectedPayments.reduce(
+    (sum: number, p: any) => sum + (Number(p.amount) || 0), 0
+  );
+  const hasLiveData =
+    live.appointments.length + live.payments.length + live.labTests.length +
+      live.prescriptions.length > 0 || live.patientCount > 0;
+
+  const scheduledReports = reports.filter((r) => r.is_scheduled).length;
+
   // Semantic theme palette for charts (primary / success / accent / warning / slate)
   const CATEGORY_COLORS: Record<string, string> = {
     financial: "#397DFF",
@@ -225,37 +489,56 @@ export const AnalyticsReporting = () => {
     patient: "#F59E0B",
     staff: "#64748B",
   };
-  const reportsByCategory = Object.entries(
-    reports.reduce<Record<string, number>>((acc, r) => {
-      const key = r.report_category || "other";
-      acc[key] = (acc[key] ?? 0) + 1;
-      return acc;
-    }, {})
-  ).map(([name, value]) => ({ name, value, fill: CATEGORY_COLORS[name] ?? "#64748B" }));
-  const reportsByType = Object.entries(
-    reports.reduce<Record<string, number>>((acc, r) => {
-      const key = r.report_type || "summary";
+  const categoryActivity = [
+    { name: "financial", value: live.payments.length },
+    { name: "operational", value: live.appointments.length },
+    { name: "clinical", value: live.labTests.length + live.prescriptions.length },
+    { name: "patient", value: live.patientCount },
+    { name: "staff", value: live.staffCount },
+  ].map((entry) => ({ ...entry, fill: CATEGORY_COLORS[entry.name] ?? "#64748B" }));
+
+  const appointmentsByStatus = Object.entries(
+    live.appointments.reduce<Record<string, number>>((acc, a: any) => {
+      const key = a.status || "unknown";
       acc[key] = (acc[key] ?? 0) + 1;
       return acc;
     }, {})
   ).map(([name, count]) => ({ name, count }));
-  const reportsOverTime = (() => {
-    const buckets = new Map<string, number>();
-    for (let i = 11; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i * 7);
-      buckets.set(d.toLocaleDateString(undefined, { month: "short", day: "numeric" }), 0);
-    }
-    reports.forEach((r) => {
-      const d = new Date(r.generated_at);
-      if (Number.isNaN(d.getTime())) return;
-      // Bucket into nearest week label
-      const label = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-      if (buckets.has(label)) buckets.set(label, (buckets.get(label) ?? 0) + 1);
-    });
-    return [...buckets.entries()].map(([week, count]) => ({ week, count }));
-  })();
-  const hasChartData = reports.length > 0;
+
+  const activityOverTime = buildWeeklySeries(live.appointments, (a: any) => a.date || a.created_at)
+    .map(({ week, count }) => ({ week, count }));
+  const revenueOverTime = buildWeeklySeries(
+    collectedPayments, (p: any) => p.created_at, (p: any) => Number(p.amount) || 0
+  ).map(({ week, total }) => ({ week, revenue: total }));
+
+  const revenueByMethod = Object.entries(
+    collectedPayments.reduce<Record<string, number>>((acc, p: any) => {
+      const key = p.payment_method || "other";
+      acc[key] = (acc[key] ?? 0) + (Number(p.amount) || 0);
+      return acc;
+    }, {})
+  ).map(([name, value]) => ({ name, value }));
+
+  const paymentStatusBars = [
+    { name: "Collected", count: collectedPayments.length },
+    {
+      name: "Pending",
+      count: live.payments.filter((p: any) =>
+        ["pending", "processing", "initiated"].includes((p.status || "").toLowerCase())).length,
+    },
+    {
+      name: "Failed / other",
+      count: live.payments.filter((p: any) =>
+        !isCollected(p.status) &&
+        !["pending", "processing", "initiated"].includes((p.status || "").toLowerCase())).length,
+    },
+  ];
+
+  const filteredReports = reports.filter((r) => {
+    if (categoryFilter !== "all" && r.report_category !== categoryFilter) return false;
+    if (searchQuery && !r.report_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
@@ -390,46 +673,46 @@ export const AnalyticsReporting = () => {
       </div>
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
-        {/* KPI Cards */}
+        {/* KPI Cards — live institution aggregates */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Reports</span>
-                <FileText className="h-4 w-4 text-primary-500" />
-              </div>
-              <div className="text-2xl font-black text-primary-500">{totalReports}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All time</div>
-            </CardContent>
-          </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Appointments</span>
                 <Calendar className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black text-primary-500">{scheduledReports}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Auto-generated</div>
+              <div className="text-2xl font-black text-primary-500">{live.appointments.length}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Booked at this institution</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Financial Reports</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Revenue Collected</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black text-success-500">{financialReports}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Revenue & costs</div>
+              <div className="text-2xl font-black text-success-500">{currency} {totalRevenue.toLocaleString()}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{collectedPayments.length} collected payments</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent (7d)</span>
-                <Clock className="h-4 w-4 text-warning-500" />
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Registered Patients</span>
+                <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black text-warning-500">{recentReports}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Generated this week</div>
+              <div className="text-2xl font-black text-primary-500">{live.patientCount}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In this institution's registry</div>
+            </CardContent>
+          </Card>
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reports Generated</span>
+                <FileText className="h-4 w-4 text-warning-500" />
+              </div>
+              <div className="text-2xl font-black text-warning-500">{reports.length}</div>
+              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{scheduledReports} scheduled</div>
             </CardContent>
           </Card>
         </div>
@@ -452,13 +735,13 @@ export const AnalyticsReporting = () => {
 
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-4">
-            {!hasChartData ? (
+            {!hasLiveData ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <BarChart3 className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-extrabold">No analytics yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
-                    Generate your first report to populate revenue, category, and activity trends.
+                    Appointments, payments and clinical activity for this institution will appear here as they happen.
                   </p>
                 </CardContent>
               </Card>
@@ -468,13 +751,13 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-primary-500" /> Reports Over Time
+                        <TrendingUp className="h-4 w-4 text-primary-500" /> Appointments Over Time
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={reportsOverTime}>
+                          <AreaChart data={activityOverTime}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
@@ -488,13 +771,13 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-success-500" /> Reports by Type
+                        <Users className="h-4 w-4 text-success-500" /> Appointments by Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={reportsByType}>
+                          <BarChart data={appointmentsByStatus}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
@@ -508,19 +791,19 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-primary-500" /> Reports by Category
+                        <Activity className="h-4 w-4 text-primary-500" /> Activity by Category
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={reportsByCategory} layout="vertical">
+                          <BarChart data={categoryActivity} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
                             <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={80} />
                             <Tooltip />
                             <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-                              {reportsByCategory.map((entry, i) => (
+                              {categoryActivity.map((entry, i) => (
                                 <Cell key={i} fill={entry.fill} />
                               ))}
                             </Bar>
@@ -541,8 +824,8 @@ export const AnalyticsReporting = () => {
                     <div className="h-[220px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <RePieChart>
-                          <Pie data={reportsByCategory} dataKey="value" nameKey="name" outerRadius={80} label>
-                            {reportsByCategory.map((entry, i) => (
+                          <Pie data={categoryActivity.filter((e) => e.value > 0)} dataKey="value" nameKey="name" outerRadius={80} label>
+                            {categoryActivity.filter((e) => e.value > 0).map((entry, i) => (
                               <Cell key={i} fill={entry.fill} />
                             ))}
                           </Pie>
@@ -560,8 +843,15 @@ export const AnalyticsReporting = () => {
           <TabsContent value="reports" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input type="search" aria-label="Search reports..." className="w-64 h-9 text-xs" />
-                <Select defaultValue="all">
+                <Input
+                  type="search"
+                  aria-label="Search reports"
+                  placeholder="Search reports..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 h-9 text-xs"
+                />
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -575,16 +865,13 @@ export const AnalyticsReporting = () => {
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
-                  <Filter className="h-4 w-4 mr-1" /> Filter
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button variant="outline" size="sm" className="text-xs" onClick={fetchAnalyticsData}>
                   <RefreshCw className="h-4 w-4 mr-1" /> Refresh
                 </Button>
               </div>
             </div>
 
-            {reports.length === 0 ? (
+            {filteredReports.length === 0 ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <FileText className="h-8 w-8 mx-auto text-primary-500" />
@@ -602,7 +889,7 @@ export const AnalyticsReporting = () => {
               </Card>
             ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {reports.map((report) => (
+              {filteredReports.map((report) => (
                 <Card key={report.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -639,15 +926,29 @@ export const AnalyticsReporting = () => {
                         {report.date_range_start ? new Date(report.date_range_start).toLocaleDateString() : "—"} - {report.date_range_end ? new Date(report.date_range_end).toLocaleDateString() : "—"}
                       </span>
                     </div>
+                    {report.metrics_data?.appointments && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-graphite-500 dark:text-slate-400">Appointments in range</span>
+                        <span className="font-bold">{report.metrics_data.appointments.total}</span>
+                      </div>
+                    )}
+                    {report.metrics_data?.revenue && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-graphite-500 dark:text-slate-400">Revenue in range</span>
+                        <span className="font-bold">
+                          {report.metrics_data.revenue.currency} {Number(report.metrics_data.revenue.total || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {(report.recipients || []).length} recipients
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" aria-label="View report" onClick={() => setViewedReport(report)}>
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" aria-label="Download report" onClick={() => handleDownloadReport(report)}>
                           <Download className="h-3 w-3" />
                         </Button>
                       </div>
@@ -661,13 +962,13 @@ export const AnalyticsReporting = () => {
 
           {/* Financial Analytics Tab */}
           <TabsContent value="financial" className="space-y-4">
-            {!hasChartData ? (
+            {live.payments.length === 0 ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <DollarSign className="h-8 w-8 mx-auto text-success-500" />
-                  <p className="text-sm font-extrabold">No financial reports yet</p>
+                  <p className="text-sm font-extrabold">No payments yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
-                    Financial analytics appear here once financial-category reports are generated.
+                    Financial analytics appear here once payments are recorded for this institution's providers.
                   </p>
                 </CardContent>
               </Card>
@@ -677,17 +978,17 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-primary-500" /> Reports by Category
+                        <DollarSign className="h-4 w-4 text-primary-500" /> Collected Revenue by Payment Method
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={reportsByCategory}>
+                          <BarChart data={revenueByMethod}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
-                            <Tooltip />
+                            <YAxis tick={{ fontSize: 10 }} />
+                            <Tooltip formatter={(v: number) => [`${currency} ${Number(v).toLocaleString()}`, "Collected"]} />
                             <Bar dataKey="value" fill="#397DFF" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
@@ -697,18 +998,13 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-primary-500" /> Scheduled vs Ad-hoc
+                        <TrendingUp className="h-4 w-4 text-primary-500" /> Payments by Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            data={[
-                              { name: "Scheduled", count: scheduledReports },
-                              { name: "Ad-hoc", count: totalReports - scheduledReports },
-                            ]}
-                          >
+                          <BarChart data={paymentStatusBars}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
@@ -724,18 +1020,18 @@ export const AnalyticsReporting = () => {
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <LineChart className="h-4 w-4 text-primary-500" /> Reporting Activity Trend
+                      <LineChart className="h-4 w-4 text-primary-500" /> Revenue Trend (last 12 weeks)
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[200px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <ReLineChart data={reportsOverTime}>
+                        <ReLineChart data={revenueOverTime}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                           <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
-                          <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="count" stroke="#397DFF" strokeWidth={2} dot={false} />
+                          <YAxis tick={{ fontSize: 10 }} />
+                          <Tooltip formatter={(v: number) => [`${currency} ${Number(v).toLocaleString()}`, "Revenue"]} />
+                          <Line type="monotone" dataKey="revenue" stroke="#397DFF" strokeWidth={2} dot={false} />
                         </ReLineChart>
                       </ResponsiveContainer>
                     </div>
@@ -747,13 +1043,13 @@ export const AnalyticsReporting = () => {
 
           {/* Operational Analytics Tab */}
           <TabsContent value="operational" className="space-y-4">
-            {!hasChartData ? (
+            {live.appointments.length + live.labTests.length + live.prescriptions.length === 0 ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <Activity className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-extrabold">No operational data yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
-                    Operational analytics appear here once reports are generated for this institution.
+                    Operational analytics appear here once appointments, lab tests or prescriptions are recorded for this institution.
                   </p>
                 </CardContent>
               </Card>
@@ -763,13 +1059,13 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-primary-500" /> Reporting Cadence
+                        <Activity className="h-4 w-4 text-primary-500" /> Appointment Cadence
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <ReLineChart data={reportsOverTime}>
+                          <ReLineChart data={activityOverTime}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
@@ -783,13 +1079,13 @@ export const AnalyticsReporting = () => {
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary-500" /> Reports by Type
+                        <Users className="h-4 w-4 text-primary-500" /> Appointments by Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={reportsByType}>
+                          <BarChart data={appointmentsByStatus}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
@@ -805,20 +1101,23 @@ export const AnalyticsReporting = () => {
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-primary-500" /> Recent Activity (last 12 weeks)
+                      <Clock className="h-4 w-4 text-primary-500" /> Clinical Activity
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={reportsOverTime}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
-                          <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
-                          <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
-                          <Tooltip />
-                          <Area type="monotone" dataKey="count" stroke="#22C55E" fill="#22C55E" fillOpacity={0.2} />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-black text-primary-500">{live.labTests.length}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Lab tests ordered</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-black text-success-500">{live.prescriptions.length}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Prescriptions written</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-black text-warning-500">{live.staffCount}</div>
+                        <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Providers & staff in scope</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -827,6 +1126,30 @@ export const AnalyticsReporting = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* View-report dialog: shows the stored snapshot's real metrics */}
+      <Dialog open={!!viewedReport} onOpenChange={(open) => { if (!open) setViewedReport(null); }}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-extrabold">{viewedReport?.report_name}</DialogTitle>
+          </DialogHeader>
+          {viewedReport && (
+            <div className="space-y-3 py-2">
+              <p className="text-xs text-graphite-500 dark:text-slate-400">
+                {viewedReport.report_category} · {viewedReport.report_type} ·{" "}
+                {new Date(viewedReport.date_range_start).toLocaleDateString()} –{" "}
+                {new Date(viewedReport.date_range_end).toLocaleDateString()}
+              </p>
+              <pre className="max-h-[380px] overflow-auto rounded-lg bg-slate-50 dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-3 text-[11px] leading-relaxed">
+                {JSON.stringify(viewedReport.metrics_data, null, 2)}
+              </pre>
+              <Button onClick={() => handleDownloadReport(viewedReport)} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                <Download className="h-4 w-4 mr-2" /> Download JSON
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
