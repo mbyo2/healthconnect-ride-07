@@ -14,6 +14,7 @@ import { HealthHistoryTransfer } from "@/components/medical/HealthHistoryTransfe
 import { FHIRImportPanel } from "@/components/medical/FHIRImportPanel";
 import { PatientPortal } from "@/components/patient/PatientPortal";
 import NotificationPreferences from "@/components/patient/NotificationPreferences";
+import GrowthChart from "@/components/clinical/GrowthChart";
 import { VitalsFlowsheet } from "@/components/clinical/VitalsFlowsheet";
 import { ProblemList } from "@/components/clinical/ProblemList";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
@@ -288,6 +289,11 @@ export default function MedicalRecords() {
 
               {user?.id && (
                 <NotificationPreferences />
+              )}
+
+              {/* Pediatric growth tracking (self-hides for adults) */}
+              {user?.id && (
+                <GrowthChart patientId={user.id} />
               )}
 
               {user?.id && (
