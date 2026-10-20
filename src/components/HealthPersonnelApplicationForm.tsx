@@ -34,6 +34,7 @@ const FALLBACK_PROVIDER_TYPES: ProviderTypeOption[] = [
   { value: "occupational_therapist", label: "Occupational Therapist", requiresLicense: true },
   { value: "nutritionist", label: "Nutritionist / Dietician", requiresLicense: true },
   { value: "optometrist", label: "Optometrist / Optician", requiresLicense: true },
+  { value: "optician", label: "Optician (Dispensing)", requiresLicense: true },
   { value: "psychologist", label: "Clinical Psychologist", requiresLicense: true },
   { value: "environmental_health_officer", label: "Environmental Health Officer", requiresLicense: true },
   { value: "community_health_worker", label: "Community Health Worker", requiresLicense: true },

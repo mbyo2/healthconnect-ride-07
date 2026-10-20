@@ -1,7 +1,7 @@
 /**
- * Least-Privilege Provider Access Control - Complete 47-Role Matrix
- * 
- * Research-based access scopes for all 47 user roles in Doc'O Clock.
+ * Least-Privilege Provider Access Control - Complete 48-Role Matrix
+ *
+ * Research-based access scopes for all 48 user roles in Doc'O Clock.
  * Based on: ~/workspace/goals/doc0clock-clinic-launch/files/47-roles-least-privilege-research.md
  * 
  * Principle: Each role sees ONLY what it needs for its function.
@@ -144,6 +144,12 @@ export const ROLE_DATA_SCOPES: Record<string, PatientDataScope> = {
     labResults: false, prescriptions: true, // Eye meds
     allergies: true, immunizations: false, clinicalNotes: false,
     billing: false, staffData: false, inventory: false, analytics: false,
+  },
+  optician: {
+    demographics: true, appointments: true, vitals: false,
+    labResults: false, prescriptions: true, // Optical Rx — needed to dispense lenses
+    allergies: true, immunizations: false, clinicalNotes: false,
+    billing: false, staffData: false, inventory: true, analytics: false, // Frame/lens stock
   },
   psychologist: {
     demographics: true, appointments: true, vitals: false,

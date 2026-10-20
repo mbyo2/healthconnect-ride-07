@@ -88,6 +88,7 @@ const FALLBACK_PROVIDER_TYPES: Array<{ value: string; label: string }> = [
   { value: "occupational_therapist", label: "Occupational Therapist" },
   { value: "nutritionist", label: "Nutritionist / Dietician" },
   { value: "optometrist", label: "Optometrist / Optician" },
+  { value: "optician", label: "Optician (Dispensing)" },
   { value: "psychologist", label: "Clinical Psychologist" },
   { value: "environmental_health_officer", label: "Environmental Health Officer" },
   { value: "community_health_worker", label: "Community Health Worker" },

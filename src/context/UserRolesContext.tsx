@@ -44,7 +44,7 @@ const CLINICAL_WITH_PERSONNEL = new Set([
   'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
   'dentist', 'dental_therapist', 'radiologist', 'radiographer',
   'pathologist', 'physiotherapist', 'occupational_therapist',
-  'nutritionist', 'optometrist', 'psychologist',
+  'nutritionist', 'optometrist', 'optician', 'psychologist',
   'environmental_health_officer', 'community_health_worker',
   'traditional_practitioner', 'pharmacist', 'pharmacy_technologist',
   'lab_technician', 'registered_nurse', 'enrolled_nurse', 'midwife',

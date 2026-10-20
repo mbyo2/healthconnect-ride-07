@@ -47,6 +47,7 @@ export const USER_ROLES = {
   OCCUPATIONAL_THERAPIST: 'occupational_therapist',
   NUTRITIONIST: 'nutritionist',
   OPTOMETRIST: 'optometrist',
+  OPTICIAN: 'optician',
   PSYCHOLOGIST: 'psychologist',
   // ── Public & community health ──
   ENVIRONMENTAL_HEALTH_OFFICER: 'environmental_health_officer',
@@ -114,6 +115,7 @@ export const ROLE_META: Record<UserRole, RoleMeta> = {
   [USER_ROLES.OCCUPATIONAL_THERAPIST]: { label: 'Occupational Therapist', icon: 'Hand',      category: 'allied',      landingPage: '/provider-dashboard' },
   [USER_ROLES.NUTRITIONIST]:        { label: 'Nutritionist',        icon: 'Apple',           category: 'allied',      landingPage: '/provider-dashboard' },
   [USER_ROLES.OPTOMETRIST]:         { label: 'Optometrist',         icon: 'Eye',             category: 'allied',      landingPage: '/provider-dashboard' },
+  [USER_ROLES.OPTICIAN]:            { label: 'Optician',            icon: 'Glasses',         category: 'allied',      landingPage: '/provider-dashboard' },
   [USER_ROLES.PSYCHOLOGIST]:        { label: 'Psychologist',        icon: 'Brain',           category: 'allied',      landingPage: '/provider-dashboard' },
   // ── Public & community health ──
   [USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER]: { label: 'Environmental Health Officer', icon: 'Leaf', category: 'community', landingPage: '/provider-dashboard' },
@@ -173,6 +175,7 @@ export const ROLE_PRIORITY: UserRole[] = [
   USER_ROLES.OCCUPATIONAL_THERAPIST,
   USER_ROLES.NUTRITIONIST,
   USER_ROLES.OPTOMETRIST,
+  USER_ROLES.OPTICIAN,
   USER_ROLES.PSYCHOLOGIST,
   USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER,
   USER_ROLES.COMMUNITY_HEALTH_WORKER,
@@ -209,6 +212,7 @@ export const CONSULTABLE_PROVIDER_ROLES: UserRole[] = [
   USER_ROLES.PSYCHOLOGIST,
   USER_ROLES.NUTRITIONIST,
   USER_ROLES.OPTOMETRIST,
+  USER_ROLES.OPTICIAN,
   USER_ROLES.PHYSIOTHERAPIST,
   USER_ROLES.OCCUPATIONAL_THERAPIST,
   USER_ROLES.DENTAL_THERAPIST,

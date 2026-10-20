@@ -673,8 +673,20 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/health-analytics',
   ]),
 
-  // ── Optometrist / Optician (HPCZ) ────────────────────────────
+  // ── Optometrist (HPCZ) ───────────────────────────────────────
   [USER_ROLES.OPTOMETRIST]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    ...PROVIDER_CORE_ROUTES,
+    '/telemedicine',
+    '/health-analytics',
+  ]),
+
+  // ── Optician (HPCZ) ──────────────────────────────────────────
+  // Dispenses glasses/contacts from optical prescriptions (the
+  // OpticianWorkflow workspace on the provider dashboard) — distinct
+  // from the optometrist, who performs eye exams. No orthodox
+  // prescribing: '/prescriptions' is intentionally NOT granted.
+  [USER_ROLES.OPTICIAN]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/telemedicine',
@@ -957,6 +969,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.OCCUPATIONAL_THERAPIST]: '/provider-dashboard',
   [USER_ROLES.NUTRITIONIST]: '/provider-dashboard',
   [USER_ROLES.OPTOMETRIST]: '/provider-dashboard',
+  [USER_ROLES.OPTICIAN]: '/provider-dashboard',
   [USER_ROLES.PSYCHOLOGIST]: '/provider-dashboard',
   [USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER]: '/provider-dashboard',
   [USER_ROLES.COMMUNITY_HEALTH_WORKER]: '/provider-dashboard',
@@ -1064,7 +1077,7 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
 
     // ── Shared patient + provider routes ──
     // (clinical/allied/community cadres included via spread groups below)
-    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'radiographer', 'physiotherapist', 'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist', 'environmental_health_officer', 'community_health_worker', 'traditional_practitioner', 'institution_admin', 'institution_staff', 'medical_records_officer', 'super_admin'] },
+    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'radiographer', 'physiotherapist', 'occupational_therapist', 'nutritionist', 'optometrist', 'optician', 'psychologist', 'environmental_health_officer', 'community_health_worker', 'traditional_practitioner', 'institution_admin', 'institution_staff', 'medical_records_officer', 'super_admin'] },
     { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'psychologist', 'community_health_worker', 'admin', 'institution_admin', 'institution_staff', 'medical_records_officer', 'super_admin'] },
     { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'pharmacy', 'pharmacist', 'pharmacy_technologist', 'super_admin'] },
     { path: '/map', label: 'Map', icon: 'MapPin', roles: ['patient', 'health_personnel', 'doctor', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'community_health_worker', 'environmental_health_officer', 'pharmacy', 'pharmacist', 'wholesale_pharmacy', 'lab', 'lab_technician', 'admin', 'super_admin'] },
@@ -1082,7 +1095,7 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     { path: '/emergency-response', label: 'Emergency Response', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'doctor', 'nurse', 'registered_nurse', 'clinical_officer', 'admin', 'super_admin'] },
 
     // ── Provider routes (all consultable cadres + legacy catch-all) ──
-    { path: '/provider-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'radiographer', 'physiotherapist', 'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist', 'environmental_health_officer', 'community_health_worker', 'traditional_practitioner', 'super_admin'] },
+    { path: '/provider-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'radiographer', 'physiotherapist', 'occupational_therapist', 'nutritionist', 'optometrist', 'optician', 'psychologist', 'environmental_health_officer', 'community_health_worker', 'traditional_practitioner', 'super_admin'] },
     { path: '/provider-portal', label: 'Provider Portal', icon: 'Building2', roles: ['health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'nurse', 'registered_nurse', 'midwife', 'super_admin'] },
     { path: '/provider-calendar', label: 'Schedule', icon: 'Calendar', roles: ['health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'super_admin'] },
 

@@ -298,7 +298,7 @@ export function useInstitutionContext() {
         'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
         'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse',
         'midwife', 'radiologist', 'radiographer', 'physiotherapist',
-        'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist',
+        'occupational_therapist', 'nutritionist', 'optometrist', 'optician', 'psychologist',
         'environmental_health_officer', 'community_health_worker',
         'traditional_practitioner', 'phlebotomist', 'cxo',
         'receptionist', 'hr_manager', 'billing_staff',

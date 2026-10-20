@@ -64,6 +64,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     if (availableRoles.includes('occupational_therapist')) return 'Occupational Therapist';
     if (availableRoles.includes('nutritionist')) return 'Nutritionist';
     if (availableRoles.includes('optometrist')) return 'Optometrist';
+    if (availableRoles.includes('optician')) return 'Optician';
     if (availableRoles.includes('psychologist')) return 'Psychologist';
     if (availableRoles.includes('environmental_health_officer')) return 'Environmental Health Officer';
     if (availableRoles.includes('community_health_worker')) return 'Community Health Worker';

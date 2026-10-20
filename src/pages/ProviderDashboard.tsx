@@ -28,6 +28,7 @@ import { AgendaTimeline } from "@/components/provider/AgendaTimeline";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { DentistWorkflow } from "@/components/workflows/DentistWorkflow";
 import { OptometristWorkflow } from "@/components/workflows/OptometristWorkflow";
+import { OpticianWorkflow } from "@/components/workflows/OpticianWorkflow";
 import { MidwifeWorkflow } from "@/components/workflows/MidwifeWorkflow";
 import { NutritionistWorkflow } from "@/components/workflows/NutritionistWorkflow";
 import { PsychologistWorkflow } from "@/components/workflows/PsychologistWorkflow";
@@ -510,12 +511,13 @@ export const ProviderDashboard = () => {
   // For multi-role users, prefer the specialty profession over the priority
   // admin role (mirrors hasSpecialtyTools logic below).
   const SpecialtyTools = () => {
-    const specialtyRole = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].find(r => (availableRoles as string[]).includes(r))
+    const specialtyRole = ['dentist', 'optometrist', 'optician', 'midwife', 'nutritionist', 'psychologist'].find(r => (availableRoles as string[]).includes(r))
       || (NURSING_ROLES as readonly string[]).find(r => (availableRoles as string[]).includes(r))
       || currentRole || availableRoles[0];
     switch (specialtyRole) {
       case 'dentist': return <DentistWorkflow />;
       case 'optometrist': return <OptometristWorkflow />;
+      case 'optician': return <OpticianWorkflow />;
       case 'midwife': return <MidwifeWorkflow />;
       case 'nutritionist': return <NutritionistWorkflow />;
       case 'psychologist': return <PsychologistWorkflow />;
@@ -532,7 +534,7 @@ export const ProviderDashboard = () => {
   // display role by filtering out admin/institution categories; the tab logic
   // must not use a different role resolution or multi-role users lose tools.)
   const _roles = new Set([_role, ...availableRoles]);
-  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].some(r => _roles.has(r))
+  const hasSpecialtyTools = ['dentist', 'optometrist', 'optician', 'midwife', 'nutritionist', 'psychologist'].some(r => _roles.has(r))
     || (NURSING_ROLES as readonly string[]).some(r => _roles.has(r));
 
   // Only the five legal prescribing professions may see write-prescription

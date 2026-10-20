@@ -312,6 +312,11 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
       { label: 'HPCZ Registration', description: 'Current HPCZ registration in the optician cadre', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
       { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
     ],
+    optician: [
+      { label: 'Optical Dispensing Qualification', description: 'Diploma/certificate in optical dispensing or ophthalmic practice', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration in the optician cadre', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
     psychologist: [
       { label: 'Psychology Degree', description: 'Degree in clinical psychology or counselling', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
       { label: 'HPCZ Registration', description: 'Current HPCZ registration as clinical psychologist', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
