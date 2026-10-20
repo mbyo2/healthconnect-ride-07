@@ -13,6 +13,7 @@ import { format, subDays } from "date-fns";
 import { SuperAdminMetricsDashboard } from "@/components/metrics/RoleMetricsDashboard";
 import { ChartCard, TrendAreaChart } from "@/components/metrics/MetricsCharts";
 import { useCurrency } from "@/hooks/use-currency";
+import { getEffectiveSubscriptionStatus } from "@/services/subscriptionStatus";
 
 const TABS = [
   { id: "overview", label: "Platform Overview", icon: LayoutDashboard },
@@ -415,7 +416,7 @@ function SubscriptionsTab({ formatPrice }: { formatPrice: (n: number) => string 
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_subscriptions")
-        .select("id, status, billing_cycle, current_period_start, current_period_end, created_at, plan:subscription_plans(name, target_audience, price_monthly, price_annual, currency)")
+        .select("id, status, billing_cycle, current_period_start, current_period_end, trial_end, created_at, plan:subscription_plans(name, target_audience, price_monthly, price_annual, currency, plan_type)")
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -424,7 +425,16 @@ function SubscriptionsTab({ formatPrice }: { formatPrice: (n: number) => string 
   });
 
   const [statusFilter, setStatusFilter] = useState("all");
-  const filtered = (subs || []).filter((s: any) => statusFilter === "all" || s.status === statusFilter);
+  // Show the EFFECTIVE status (stored status corrected by the period
+  // end date): a paid period that ran out reads "expired" here even
+  // before the stored row is flipped by expire_lapsed_subscriptions().
+  const withEffective = (subs || []).map((s: any) => ({
+    ...s,
+    effectiveStatus: getEffectiveSubscriptionStatus(s),
+  }));
+  const filtered = withEffective.filter(
+    (s: any) => statusFilter === "all" || s.effectiveStatus === statusFilter || s.status === statusFilter
+  );
 
   return (
     <div className="space-y-4">
@@ -443,6 +453,11 @@ function SubscriptionsTab({ formatPrice }: { formatPrice: (n: number) => string 
           </button>
         ))}
         <span className="text-xs text-muted-foreground ml-auto self-center">{filtered.length} subscriptions</span>
+        {withEffective.some((s: any) => s.effectiveStatus === "expired" || s.effectiveStatus === "past_due") && (
+          <span className="text-xs font-semibold text-destructive self-center">
+            {withEffective.filter((s: any) => s.effectiveStatus === "expired" || s.effectiveStatus === "past_due").length} expired / past due
+          </span>
+        )}
       </div>
 
       {isLoading ? (
@@ -465,7 +480,16 @@ function SubscriptionsTab({ formatPrice }: { formatPrice: (n: number) => string 
                   <td className="px-4 py-2.5 font-medium">{s.plan?.name || "—"}</td>
                   <td className="px-4 py-2.5 text-xs text-muted-foreground">{s.plan?.target_audience || "—"}</td>
                   <td className="px-4 py-2.5 text-xs">{s.billing_cycle || "—"}</td>
-                  <td className="px-4 py-2.5">{getStatusPill(s.status)}</td>
+                  <td className="px-4 py-2.5">
+                    <span className="inline-flex items-center gap-1.5">
+                      {getStatusPill(s.effectiveStatus)}
+                      {s.effectiveStatus !== (s.status || "").toLowerCase() && (
+                        <span className="text-xs text-muted-foreground" title={`Stored status is still "${s.status}" — the period has ended, so it is treated as ${s.effectiveStatus}`}>
+                          (stored: {s.status})
+                        </span>
+                      )}
+                    </span>
+                  </td>
                   <td className="px-4 py-2.5 text-xs text-muted-foreground">
                     {s.current_period_end ? format(new Date(s.current_period_end), "MMM d, yyyy") : "—"}
                   </td>

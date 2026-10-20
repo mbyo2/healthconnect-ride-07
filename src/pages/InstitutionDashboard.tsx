@@ -16,6 +16,8 @@ import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed"
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { getFacilityArchetype, getTabRelevance, atypicalTabExplanation } from "@/config/facilityProfiles";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
+import { getInstitutionSubscriptionGate, type SubscriptionGateState } from "@/services/subscriptionStatus";
+import { SubscriptionExpiryBanner } from "@/components/subscription/SubscriptionExpiryBanner";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
 import { Lock } from "lucide-react";
@@ -247,6 +249,12 @@ export const InstitutionDashboard = () => {
   const [preciseTypeLabel, setPreciseTypeLabel] = useState<string | null>(null);
   const [charter, setCharter] = useState<EffectiveModule[]>([]);
   const [modulePrices, setModulePrices] = useState<Record<string, ModulePrice>>({});
+  // Subscription-expiry enforcement: effective status of the institution's
+  // subscription (admin user's row). Drives the renewal banner and, via
+  // getEffectiveInstitutionModules' subscriptionGate option, suspension of
+  // PAID add-on modules when a paid subscription has lapsed. Fail-open:
+  // no row / free / trial never blocks (see subscriptionStatus.ts).
+  const [subscriptionGate, setSubscriptionGate] = useState<SubscriptionGateState | null>(null);
   // Real chart data (never static placeholders): weekly visit flow + visit-type mix.
   const [weeklyFlow, setWeeklyFlow] = useState<{ name: string; visits: number }[]>([]);
   const [visitMix, setVisitMix] = useState<{ name: string; value: number; color: string }[]>([]);
@@ -411,18 +419,21 @@ export const InstitutionDashboard = () => {
     let cancelled = false;
     (async () => {
       try {
-        const [{ label, modules }, priceMap] = await Promise.all([
-          getEffectiveInstitutionModules(
-            supabase as any,
-            institution.id,
-            institution.type_code
-          ),
+        const [gate, priceMap] = await Promise.all([
+          getInstitutionSubscriptionGate(supabase as any, institution.id).catch(() => null),
           getModulePriceMap(supabase as any).catch(() => ({} as Record<string, ModulePrice>)),
         ]);
+        const { label, modules } = await getEffectiveInstitutionModules(
+          supabase as any,
+          institution.id,
+          institution.type_code,
+          { subscriptionGate: gate, modulePrices: priceMap }
+        );
         if (cancelled) return;
         if (label) setPreciseTypeLabel(label);
         setCharter(modules);
         setModulePrices(priceMap);
+        setSubscriptionGate(gate);
       } catch {
         /* modules are progressive enhancement — dashboard works without them */
       }
@@ -518,6 +529,14 @@ export const InstitutionDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Subscription renewal notice — only for effectively expired /
+          past-due subscriptions; renders nothing otherwise. */}
+      {subscriptionGate && (
+        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
+          <SubscriptionExpiryBanner gate={subscriptionGate} isAdmin={isAdmin} />
+        </div>
+      )}
 
         {/* Main Suite Tab Navigation */}
         <div className="max-w-content mx-auto px-4 sm:px-6 pt-4 sticky top-[7.5rem] lg:top-[8.5rem] z-20 bg-canvas dark:bg-slate-950">

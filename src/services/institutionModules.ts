@@ -4,6 +4,7 @@ import {
   archetypeToCharter,
   type FacilityArchetype,
 } from "@/config/facilityProfiles";
+import type { SubscriptionGateState } from "@/services/subscriptionStatus";
 
 export type CharterModule = {
   module_key: string;
@@ -17,7 +18,7 @@ export type EffectiveModule = CharterModule & {
   /** Effective state after admin overrides: 'live' | 'planned' | 'disabled'. */
   effective: "live" | "planned" | "disabled";
   /** Where the effective state came from. */
-  source: "charter" | "admin_grant" | "admin_revoke";
+  source: "charter" | "admin_grant" | "admin_revoke" | "subscription_expired";
   granted_by?: string | null;
   granted_at?: string | null;
   note?: string | null;
@@ -146,17 +147,73 @@ export function mergeEffectiveModules(
   return merged;
 }
 
+/**
+ * A module is a PAID add-on only when the superadmin price list sells
+ * it: billable AND priced above zero. NULL price, billable=false, or
+ * K0 all mean "included / not sold" (see the pricing migration), so
+ * those modules are core access and are never subscription-gated.
+ */
+export function isPaidModulePrice(price: ModulePrice | undefined | null): boolean {
+  return !!price && price.is_billable && price.price_monthly != null && Number(price.price_monthly) > 0;
+}
+
+/**
+ * Subscription-expiry gate, applied at the entitlement-resolution
+ * layer: when the institution's paid subscription is effectively
+ * expired / past due (see subscriptionStatus.ts), PAID add-on modules
+ * that are currently live are suspended (effective -> "disabled",
+ * source -> "subscription_expired"). Everything else — charter/core
+ * modules, free add-ons, already-planned/disabled modules — is
+ * returned untouched, and a non-blocking gate returns the list as-is.
+ * Pure and reversible: renewing the subscription restores access on
+ * the next resolution, with no entitlement rows written or removed.
+ */
+export function applySubscriptionGate(
+  modules: EffectiveModule[],
+  priceMap: Record<string, ModulePrice>,
+  gate: SubscriptionGateState | null | undefined
+): EffectiveModule[] {
+  if (!gate?.blocksPaidModules) return modules;
+  return modules.map((m) =>
+    m.effective === "live" && isPaidModulePrice(priceMap[m.module_key])
+      ? { ...m, effective: "disabled" as const, source: "subscription_expired" as const }
+      : m
+  );
+}
+
 /** One call: tier + charter + entitlements → effective module list. */
 export async function getEffectiveInstitutionModules(
   supabase: SupabaseClient,
   institutionId: string,
-  typeCode: string | null | undefined
+  typeCode: string | null | undefined,
+  options?: {
+    /**
+     * When supplied, the subscription-expiry gate is applied to the
+     * resolved modules (paid add-ons suspended for a lapsed paid
+     * subscription). Callers must also supply modulePrices (or let
+     * this function load them) so "paid" can be determined. Admin
+     * surfaces should omit this — they manage the raw entitlements.
+     */
+    subscriptionGate?: SubscriptionGateState | null;
+    modulePrices?: Record<string, ModulePrice>;
+  }
 ): Promise<{ tier: string | null; label: string | null; modules: EffectiveModule[]; source: "archetype" | "tier" }> {
   // Primary: archetype-based charter from facilityProfiles.ts (single source
   // of truth shared with the frontend tab de-emphasis). Falls back to the
   // DB tier charter only if the archetype cannot be resolved.
   const archetype: FacilityArchetype = getFacilityArchetype(typeCode);
   const entitlements = await getEntitlements(supabase, institutionId);
+
+  // Subscription-expiry gate (opt-in): suspend paid add-ons when the
+  // institution's paid subscription has lapsed. Price lookup failures
+  // fail open — no price information means nothing is treated as paid.
+  const gateModules = async (modules: EffectiveModule[]): Promise<EffectiveModule[]> => {
+    if (!options?.subscriptionGate?.blocksPaidModules) return modules;
+    const priceMap =
+      options.modulePrices ??
+      (await getModulePriceMap(supabase).catch(() => ({} as Record<string, ModulePrice>)));
+    return applySubscriptionGate(modules, priceMap, options.subscriptionGate);
+  };
 
   if (archetype) {
     const archetypeCharter = archetypeToCharter(typeCode);
@@ -172,7 +229,7 @@ export async function getEffectiveInstitutionModules(
     return {
       tier: archetype,
       label: label || archetype,
-      modules: mergeEffectiveModules(charter, entitlements),
+      modules: await gateModules(mergeEffectiveModules(charter, entitlements)),
       source: "archetype",
     };
   }
@@ -181,7 +238,7 @@ export async function getEffectiveInstitutionModules(
   const { tier, label } = await resolveInstitutionTier(supabase, typeCode);
   if (!tier) return { tier: null, label, modules: [], source: "tier" };
   const charter = await getTierCharter(supabase, tier);
-  return { tier, label, modules: mergeEffectiveModules(charter, entitlements), source: "tier" };
+  return { tier, label, modules: await gateModules(mergeEffectiveModules(charter, entitlements)), source: "tier" };
 }
 
 /**
