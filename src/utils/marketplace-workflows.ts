@@ -130,9 +130,11 @@ const transitionOrderStatus = async (
             };
         }
 
-        // Update status with history. public.orders has status_history and
-        // updated_at, but NO status_updated_at/status_updated_by columns
-        // (verified live) — the actor lives inside the history entries.
+        // Update status with history. status_history is added by migration
+        // 20261020_orders_status_history.sql (it did not exist live);
+        // status_updated_at/status_updated_by are not used — the actor
+        // lives inside the history entries and orders.updated_at tracks
+        // the last write.
         const statusHistory: OrderStatusHistory[] = order.status_history || [];
         statusHistory.push({
             status: newStatus,
