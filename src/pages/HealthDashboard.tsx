@@ -24,6 +24,7 @@ import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthSta
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { ReviewPromptCard } from "@/components/patient/ReviewPrompts";
+import DependentManager from "@/components/patient/DependentManager";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "@/components/charts";
 import { useGamification } from "@/hooks/useGamification";
@@ -316,6 +317,9 @@ export default function HealthDashboard() {
 
         {/* Review Prompts - post-visit feedback */}
         <ReviewPromptCard />
+
+        {/* Family members - book appointments for dependents */}
+        <DependentManager />
 
         {/* Upcoming Appointments */}
         <Card className="vf-card !p-0 overflow-hidden">

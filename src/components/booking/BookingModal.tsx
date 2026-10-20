@@ -28,6 +28,10 @@ import {
   authRedirectUrl,
   currentReturnTo,
 } from "@/utils/pendingAction";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 
 interface BookingModalProps {
   provider: Provider;
@@ -53,10 +57,27 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
   const navigate = useNavigate();
   const [step, setStep] = useState<'type' | 'datetime' | 'confirm'>('type');
   const [visitType, setVisitType] = useState<'new' | 'returning'>('new');
+  const [bookingFor, setBookingFor] = useState<string>('self');
   const [appointmentType, setAppointmentType] = useState<'physical' | 'virtual'>('physical');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [reason, setReason] = useState("");
+
+  // Family members the user can book for (dependent booking)
+  const { data: myDependents } = useQuery({
+    queryKey: ["booking-dependents", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data } = await supabase
+        .from("patient_dependents")
+        .select("id, first_name, last_name, relationship")
+        .eq("guardian_id", user.id)
+        .eq("is_active", true)
+        .order("created_at");
+      return data || [];
+    },
+    enabled: !!user?.id && isOpen,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -223,9 +244,18 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         ? Math.round(baseFee * (appointmentType === "virtual" ? 0.7 : 1))
         : null;
 
+      const selectedDependent =
+        bookingFor !== 'self'
+          ? (myDependents || []).find((d) => d.id === bookingFor)
+          : null;
+
       const { data: booked, error } = await supabase.from('appointments').insert({
         patient_id: user.id,
         provider_id: provider.id,
+        dependent_id: selectedDependent?.id ?? null,
+        booked_for_name: selectedDependent
+          ? `${selectedDependent.first_name} ${selectedDependent.last_name}`
+          : null,
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
         type: appointmentType === 'virtual' ? 'video_consultation' : 'in_person',
@@ -625,6 +655,29 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         feeMin={provider.consultation_fee_min}
         feeMax={provider.consultation_fee_max}
       />
+
+      {/* Who is this visit for? (self or a family member/dependent) */}
+      <div>
+        <Label className="text-sm font-medium">Who is this appointment for?</Label>
+        <Select value={bookingFor} onValueChange={setBookingFor}>
+          <SelectTrigger className="mt-2">
+            <SelectValue placeholder="Myself" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="self">Myself</SelectItem>
+            {(myDependents || []).map((d) => (
+              <SelectItem key={d.id} value={d.id}>
+                {d.first_name} {d.last_name} ({d.relationship})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {bookingFor !== 'self' && (
+          <p className="text-xs text-muted-foreground mt-1">
+            You are booking for a family member. The appointment stays on your account.
+          </p>
+        )}
+      </div>
 
       <div>
         <Label className="text-sm font-medium">
