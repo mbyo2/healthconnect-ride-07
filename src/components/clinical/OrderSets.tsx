@@ -29,7 +29,7 @@ interface OrderSet {
   is_system: boolean;
 }
 
-interface OrderSetItem {
+export interface OrderSetItem {
   id: string;
   item_type: string;
   item_name: string;
@@ -113,7 +113,6 @@ export function OrderSetPicker({
       selectedItems.has(i.id) || !i.is_optional
     );
     onApply?.(selected);
-    toast.success(`Applied ${selected.length} orders from ${selectedSet?.name}`);
     setSelectedSet(null);
     setSelectedItems(new Set());
   };

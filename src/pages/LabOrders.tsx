@@ -13,9 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { FlaskConical, Plus, Loader2, Receipt } from "lucide-react";
+import { FlaskConical, Plus, Loader2, Receipt, ClipboardList } from "lucide-react";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { Navigate } from "react-router-dom";
+import { OrderSetPicker, type OrderSetItem } from "@/components/clinical/OrderSets";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 /**
  * Clinician lab ordering. The six ordering roles (doctor, specialist,
@@ -37,6 +41,8 @@ const LabOrders = () => {
   const [patientSearch, setPatientSearch] = useState("");
   const [patientId, setPatientId] = useState("");
   const [labId, setLabId] = useState("");
+  const [showOrderSets, setShowOrderSets] = useState(false);
+  const [applyingSet, setApplyingSet] = useState(false);
   const [testType, setTestType] = useState("");
   const [testCategory, setTestCategory] = useState("");
   const [priority, setPriority] = useState("routine");
@@ -281,16 +287,87 @@ const LabOrders = () => {
                 rows={3}
               />
             </div>
-            <Button
-              onClick={() => createOrder.mutate()}
-              disabled={createOrder.isPending || !patientId || !labId || !testType}
-              className="w-full sm:w-auto"
-            >
-              {createOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-              Place order
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => createOrder.mutate()}
+                disabled={createOrder.isPending || !patientId || !labId || !testType}
+                className="w-full sm:w-auto"
+              >
+                {createOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                Place order
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (!patientId) { toast.error("Select a patient first"); return; }
+                  if (!labId) { toast.error("Select the receiving laboratory first"); return; }
+                  setShowOrderSets(true);
+                }}
+                className="w-full sm:w-auto"
+              >
+                <ClipboardList className="h-4 w-4 mr-2" />
+                Apply order set
+              </Button>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Order set picker: applies lab items as real orders */}
+        <Dialog open={showOrderSets} onOpenChange={setShowOrderSets}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Apply an order set</DialogTitle>
+            </DialogHeader>
+            <OrderSetPicker
+              onApply={async (items: OrderSetItem[]) => {
+                if (!user) return;
+                setApplyingSet(true);
+                try {
+                  const labItems = items.filter((i) => i.item_type === "lab");
+                  const otherItems = items.filter((i) => i.item_type !== "lab");
+                  let placed = 0;
+                  for (const item of labItems) {
+                    const { error } = await supabase.from("lab_tests").insert({
+                      patient_id: patientId,
+                      ordered_by: user.id,
+                      lab_id: labId,
+                      test_type: item.item_name,
+                      test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                      priority: "routine",
+                      notes: "From order set",
+                      price: 0,
+                      total_amount: 0,
+                      balance: 0,
+                      payment_status: "paid",
+                      status: "pending",
+                    });
+                    if (!error) placed++;
+                  }
+                  queryClient.invalidateQueries({ queryKey: ["lab-my-orders"] });
+                  setShowOrderSets(false);
+                  if (placed > 0) {
+                    toast.success(`${placed} lab order${placed === 1 ? "" : "s"} placed from the order set`);
+                  }
+                  if (otherItems.length > 0) {
+                    toast.info(
+                      `${otherItems.length} non-lab item${otherItems.length === 1 ? "" : "s"} (${otherItems.map((i) => i.item_name).join(", ")}) — handle from the patient chart (prescribe / book / refer).`
+                    );
+                  }
+                  if (placed === 0 && otherItems.length === 0) {
+                    toast.info("No items selected");
+                  }
+                } finally {
+                  setApplyingSet(false);
+                }
+              }}
+            />
+            {applyingSet && (
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                <Loader2 className="h-3 w-3 animate-spin" /> Placing orders...
+              </p>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <Card>
           <CardHeader>

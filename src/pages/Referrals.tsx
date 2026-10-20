@@ -1,4 +1,5 @@
 import { ReferralManagement } from "@/components/hospital/ReferralManagement";
+import ReferralFeedback from "@/components/referrals/ReferralFeedback";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { Loader2 } from "lucide-react";
 
@@ -18,8 +19,9 @@ export default function Referrals() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl">
+    <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
       <ReferralManagement hospital={hospital} />
+      <ReferralFeedback />
     </div>
   );
 }
