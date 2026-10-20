@@ -83,13 +83,32 @@ export interface AllergyMatch {
 }
 
 /**
- * Fetch the patient's recorded allergies from the institution patient registry.
+ * Fetch the patient's recorded allergies — union of patient_allergies (the
+ * structured table the allergy UI writes), the institution patient registry,
+ * comprehensive medical records, and intake forms.
  * Returns a list of allergen strings (may be comma/semicolon separated in storage).
  * Safe — never throws, returns [] on failure.
  */
 export async function getPatientAllergies(patientId: string): Promise<string[]> {
   if (!patientId) return [];
   const allergens = new Set<string>();
+  try {
+    // Source 0: patient_allergies — the structured table the AllergyAlertSystem
+    // UI writes to. This is the canonical clinician/patient-recorded source;
+    // without it, allergies entered in the allergy UI displayed on screen but
+    // never blocked a prescription (audit 2026-10-20).
+    const { data: allergyRows } = await (supabase.from('patient_allergies' as any) as any)
+      .select('allergen_name, is_active')
+      .eq('patient_id', patientId)
+      .limit(50);
+    for (const r of (allergyRows as any[]) ?? []) {
+      if (r.is_active === false) continue;
+      const name = (r.allergen_name || '').trim();
+      if (name) allergens.add(name);
+    }
+  } catch {
+    // non-fatal — fall through to the legacy sources
+  }
   try {
     // Source 1: institution patient registry (structured allergies field)
     const { data } = await (supabase.from('institution_patient_registry' as any) as any)

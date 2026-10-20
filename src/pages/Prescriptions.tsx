@@ -14,7 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { checkInteractions, getPatientAllergies, checkAllergyMatches } from "@/utils/drug-interactions";
+import { checkInteractions, getPatientAllergies, checkAllergyMatches, getPatientActiveMedications, isBlocking, type DrugInteraction } from "@/utils/drug-interactions";
+import { loadDoseRanges, checkDose, type DoseCheckResult, type DoseRange } from "@/utils/dose-check";
+import { TemplatePicker } from "@/components/clinical/NoteTemplates";
 import { RefillRequestsQueue } from "@/components/provider/RefillRequestsQueue";
 import { DrugInteractionAlert } from "@/components/clinical/DrugInteractionAlert";
 import { AllergyAlertSystem } from "@/components/clinical/AllergyAlertSystem";
@@ -97,6 +99,19 @@ export const Prescriptions = () => {
   const [interactionAlerts, setInteractionAlerts] = useState<string[]>([]);
   const [allergyAlerts, setAllergyAlerts] = useState<{ medication: string; allergen: string }[]>([]);
   const [allergyOverride, setAllergyOverride] = useState(false);
+  // Dose-range + blocking-interaction gating (submit-time safety, audit 2026-10-20)
+  const [doseAlerts, setDoseAlerts] = useState<{ medication: string; result: DoseCheckResult }[]>([]);
+  const [doseOverride, setDoseOverride] = useState(false);
+  const [blockingInteractions, setBlockingInteractions] = useState<DrugInteraction[]>([]);
+  const [interactionOverride, setInteractionOverride] = useState(false);
+
+  // Dose-range reference data (medication_dose_ranges) — same source the
+  // PrescriptionWriter component uses.
+  const { data: doseRanges = [] } = useQuery<DoseRange[]>({
+    queryKey: ["dose-ranges"],
+    queryFn: loadDoseRanges,
+    staleTime: 1000 * 60 * 30,
+  });
 
   // Multi-medication item list
   const [medicationItems, setMedicationItems] = useState<MedicationItem[]>([
@@ -236,6 +251,53 @@ export const Prescriptions = () => {
     );
   };
 
+  // Extract a checkable strength ("500mg", "100mcg", "5ml") from a medication
+  // name — the live form keeps strength in the name and frequency in the
+  // dosage text, unlike PrescriptionWriter's separate fields.
+  const extractStrength = (medicationName: string): string | null => {
+    const m = medicationName.match(/(\d+(?:\.\d+)?)\s*(mg|g|mcg|µg|ml|units?|iu)\b/i);
+    return m ? `${m[1]}${m[2].toLowerCase()}` : null;
+  };
+
+  // Dose-range check for every line (dose-check.ts + medication_dose_ranges).
+  const computeDoseAlerts = (items: MedicationItem[]) => {
+    const out: { medication: string; result: DoseCheckResult }[] = [];
+    for (const item of items) {
+      const name = item.medication_name.trim();
+      if (!name) continue;
+      const result = checkDose({
+        medicationName: name,
+        dosage: extractStrength(name) || item.dosage,
+        frequency: item.dosage,
+        ranges: doseRanges,
+      });
+      if (result.status === "low" || result.status === "high") {
+        out.push({ medication: name, result });
+      }
+    }
+    return out;
+  };
+
+  // Full interaction set: pairs inside this prescription PLUS each new drug
+  // against the patient's existing active medications. Deduped by pair.
+  const collectInteractions = async (patientId: string, names: string[]): Promise<DrugInteraction[]> => {
+    const existing = patientId ? await getPatientActiveMedications(patientId) : [];
+    const found: DrugInteraction[] = [];
+    const seen = new Set<string>();
+    for (const name of names) {
+      const others = names.filter((n) => n !== name).concat(existing);
+      const res = await checkInteractions(name, others);
+      for (const inter of res) {
+        const key = `${inter.drug_a}|${inter.drug_b}|${inter.severity}`.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          found.push(inter);
+        }
+      }
+    }
+    return found;
+  };
+
   // Check drug interactions across all medications in list + allergy screening
   const runSafetyChecks = async () => {
     const names = medicationItems.map((m) => m.medication_name.trim()).filter(Boolean);
@@ -249,20 +311,23 @@ export const Prescriptions = () => {
       setAllergyAlerts([]);
     }
 
-    if (names.length < 2) {
+    // DOSE-RANGE display check (gating happens again at submit)
+    setDoseAlerts(computeDoseAlerts(medicationItems));
+
+    if (names.length < 2 && !selectedPatient) {
       setInteractionAlerts([]);
+      setBlockingInteractions([]);
       return;
     }
+    const interactions = selectedPatient
+      ? await collectInteractions(selectedPatient.id, names)
+      : await collectInteractions("", names);
+    setBlockingInteractions(interactions.filter((i) => isBlocking(i.severity)));
     const alerts: string[] = [];
-    for (let i = 0; i < names.length; i++) {
-      const candidate = names[i];
-      const others = names.filter((_, idx) => idx !== i);
-      const interactions = await checkInteractions(candidate, others);
-      interactions.forEach((inter) => {
-        const text = `${inter.drug_a} + ${inter.drug_b} (${inter.severity.toUpperCase()}): ${inter.description || 'Potential interaction detected'}`;
-        if (!alerts.includes(text)) alerts.push(text);
-      });
-    }
+    interactions.forEach((inter) => {
+      const text = `${inter.drug_a} + ${inter.drug_b} (${inter.severity.toUpperCase()}): ${inter.description || 'Potential interaction detected'}`;
+      if (!alerts.includes(text)) alerts.push(text);
+    });
     setInteractionAlerts(alerts);
   };
 
@@ -292,6 +357,55 @@ export const Prescriptions = () => {
       return;
     }
 
+    // DOSE-RANGE GATE: out-of-range doses (per medication_dose_ranges) need
+    // an explicit acknowledgement before the prescription can be issued.
+    const freshDoseAlerts = computeDoseAlerts(medicationItems);
+    setDoseAlerts(freshDoseAlerts);
+    if (freshDoseAlerts.length > 0 && !doseOverride) {
+      toast.error(
+        `DOSE WARNING: ${freshDoseAlerts.map((a) => a.result.message).join("; ")}`,
+        { duration: 8000, description: "Tick the dose acknowledgement box to proceed with clinical justification." }
+      );
+      return;
+    }
+
+    // INTERACTION GATE: re-check at submit (not just on blur/display).
+    // Contraindicated/major pairs — within this prescription or against the
+    // patient's active medications — need an explicit acknowledgement.
+    const allInteractions = await collectInteractions(selectedPatient.id, names);
+    const freshBlocking = allInteractions.filter((i) => isBlocking(i.severity));
+    setBlockingInteractions(freshBlocking);
+    if (freshBlocking.length > 0 && !interactionOverride) {
+      toast.error(
+        `INTERACTION WARNING: ${freshBlocking.map((i) => `${i.drug_a} + ${i.drug_b} (${i.severity.toUpperCase()})`).join("; ")}`,
+        { duration: 8000, description: "Tick the interaction acknowledgement box to override with clinical justification." }
+      );
+      return;
+    }
+
+    // Structured override record — appended to the prescription notes AND
+    // written to security_audit_log after a successful insert (below).
+    const overrideLines: string[] = [];
+    if (allergyMatches.length > 0 && allergyOverride) {
+      overrideLines.push(
+        `[SAFETY OVERRIDE ${new Date().toISOString()}] Allergy override acknowledged by prescriber: ` +
+        allergyMatches.map((m) => `${m.medication} vs recorded allergy "${m.allergen}"`).join("; ")
+      );
+    }
+    if (freshDoseAlerts.length > 0 && doseOverride) {
+      overrideLines.push(
+        `[SAFETY OVERRIDE ${new Date().toISOString()}] Dose-range override acknowledged by prescriber: ` +
+        freshDoseAlerts.map((a) => `${a.medication}: ${a.result.message}`).join("; ")
+      );
+    }
+    if (freshBlocking.length > 0 && interactionOverride) {
+      overrideLines.push(
+        `[SAFETY OVERRIDE ${new Date().toISOString()}] Interaction override acknowledged by prescriber: ` +
+        freshBlocking.map((i) => `${i.drug_a} + ${i.drug_b} (${i.severity})`).join("; ")
+      );
+    }
+    const finalNotes = [rxNotes?.trim(), ...overrideLines].filter(Boolean).join("\n") || null;
+
     setIsSubmitting(true);
     try {
       const rxNumber = `RX-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 900 + 100)}`;
@@ -312,7 +426,7 @@ export const Prescriptions = () => {
         // Status CHECK only allows pending/filled/partially_filled/cancelled/expired.
         status: "pending",
         prescribed_date: prescribedDate,
-        notes: rxNotes || null,
+        notes: finalNotes,
       }));
 
       const { error } = await (supabase as any)
@@ -321,12 +435,46 @@ export const Prescriptions = () => {
 
       if (error) throw error;
 
+      // Record any acknowledged safety override in the security audit log.
+      // security_audit_log's INSERT policy is WITH CHECK (true) ("System can
+      // insert security logs"), so a clinician insert is permitted; it uses
+      // the event_type/event_data columns from the table's migration. The
+      // same override text is already appended to the prescription notes
+      // above, so a failure here is logged but never blocks the prescription.
+      if (overrideLines.length > 0) {
+        try {
+          const { error: auditError } = await (supabase as any)
+            .from("security_audit_log")
+            .insert({
+              user_id: user.id,
+              event_type: "prescription_safety_override",
+              event_data: {
+                patient_id: selectedPatient.id,
+                prescription_number: rxNumber,
+                overrides: overrideLines,
+                allergy_matches: allergyMatches,
+                dose_alerts: freshDoseAlerts.map((a) => ({ medication: a.medication, status: a.result.status, message: a.result.message })),
+                blocking_interactions: freshBlocking.map((i) => ({ drug_a: i.drug_a, drug_b: i.drug_b, severity: i.severity })),
+              },
+            });
+          if (auditError) console.warn("security_audit_log override insert failed", auditError);
+        } catch (auditErr) {
+          console.warn("security_audit_log override insert failed", auditErr);
+        }
+      }
+
       toast.success(`E-Prescription issued with ${medicationItems.length} medication(s) (Rx #${rxNumber})`);
       setShowNewPrescription(false);
       setSelectedPatient(null);
       setSearchPatient("");
       setRxNotes("");
       setInteractionAlerts([]);
+      setAllergyAlerts([]);
+      setAllergyOverride(false);
+      setDoseAlerts([]);
+      setDoseOverride(false);
+      setBlockingInteractions([]);
+      setInteractionOverride(false);
       setMedicationItems([
         {
           id: "med-1",
@@ -637,6 +785,7 @@ export const Prescriptions = () => {
                                 placeholder="1 tablet 2x daily"
                                 value={item.dosage}
                                 onChange={(e) => handleUpdateMedication(item.id, "dosage", e.target.value)}
+                                onBlur={runSafetyChecks}
                                 list={`dosage-list-${item.id}`}
                               />
                               <datalist id={`dosage-list-${item.id}`}>
@@ -700,6 +849,57 @@ export const Prescriptions = () => {
                       </div>
                     )}
 
+                    {blockingInteractions.length > 0 && (
+                      <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-900 dark:text-red-300 space-y-2">
+                        <div className="flex items-center gap-2 font-bold">
+                          <ShieldAlert className="h-4 w-4 text-red-600" />
+                          <span>BLOCKING DRUG INTERACTION — Acknowledgement Required</span>
+                        </div>
+                        {blockingInteractions.map((inter, i) => (
+                          <p key={i} className="text-xs pl-6 font-medium">
+                            • {inter.drug_a} + {inter.drug_b} ({inter.severity.toUpperCase()})
+                            {inter.clinical_effect ? ` — ${inter.clinical_effect}` : inter.description ? ` — ${inter.description}` : ""}
+                          </p>
+                        ))}
+                        <label className="flex items-start gap-2 pl-6 pt-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={interactionOverride}
+                            onChange={(e) => setInteractionOverride(e.target.checked)}
+                            className="mt-1"
+                          />
+                          <span className="text-xs">
+                            I acknowledge this interaction risk and override with clinical justification.
+                            This override will be recorded in the audit trail.
+                          </span>
+                        </label>
+                      </div>
+                    )}
+
+                    {doseAlerts.length > 0 && (
+                      <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-500 text-amber-900 dark:text-amber-300 space-y-2">
+                        <div className="flex items-center gap-2 font-bold">
+                          <AlertTriangle className="h-4 w-4 text-amber-600" />
+                          <span>DOSE OUT OF RANGE — Acknowledgement Required</span>
+                        </div>
+                        {doseAlerts.map((a, i) => (
+                          <p key={i} className="text-xs pl-6 font-medium">• {a.result.message}</p>
+                        ))}
+                        <label className="flex items-start gap-2 pl-6 pt-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={doseOverride}
+                            onChange={(e) => setDoseOverride(e.target.checked)}
+                            className="mt-1"
+                          />
+                          <span className="text-xs">
+                            I acknowledge this dose is outside the usual range and proceed with clinical justification.
+                            This override will be recorded in the audit trail.
+                          </span>
+                        </label>
+                      </div>
+                    )}
+
                     {allergyAlerts.length > 0 && (
                       <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-900 dark:text-red-300 space-y-2">
                         <div className="flex items-center gap-2 font-bold">
@@ -728,7 +928,15 @@ export const Prescriptions = () => {
 
                     {/* Overall Notes */}
                     <div>
-                      <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">3. Clinical Notes / Remarks</label>
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">3. Clinical Notes / Remarks</label>
+                        <TemplatePicker
+                          patientName={selectedPatient?.name}
+                          onInsert={(text) =>
+                            setRxNotes((prev) => (prev.trim() ? `${prev.replace(/\s+$/, "")}\n${text}` : text))
+                          }
+                        />
+                      </div>
                       <textarea
                         rows={2}
                         className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
