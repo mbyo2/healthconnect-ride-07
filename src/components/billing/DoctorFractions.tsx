@@ -101,7 +101,15 @@ export function DoctorFractionManager({ institutionId }: { institutionId: string
       if (error) throw error;
       
       const rows = (data as FractionRule[]) || [];
-      const doctorMap = Object.fromEntries((doctors || []).map((d: any) => [d.id, d]));
+      if (rows.length === 0) return [];
+      
+      // Fetch doctor profiles directly (avoids race with separate doctors query)
+      const doctorIds = [...new Set(rows.map(r => r.doctor_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', doctorIds);
+      const doctorMap = Object.fromEntries((profiles || []).map((d: any) => [d.id, d]));
       
       return rows.map(r => ({
         ...r,
@@ -152,6 +160,9 @@ export function DoctorFractionManager({ institutionId }: { institutionId: string
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fraction-rules', institutionId] });
       toast.success("Rule deactivated");
+    },
+    onError: () => {
+      toast.error("Failed to deactivate rule. You may not have permission.");
     },
   });
 
@@ -315,7 +326,7 @@ export function DoctorFractionEarnings({ doctorId }: { doctorId?: string }) {
   });
 
   const totalPending = (earnings || [])
-    .filter(e => e.status === 'pending')
+    .filter(e => e.status === 'pending' || e.status === 'approved')
     .reduce((sum, e) => sum + Number(e.doctor_amount), 0);
   
   const totalPaid = (earnings || [])

@@ -22,7 +22,7 @@ export function FavoriteProviderButton({
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: isFavorite } = useQuery({
+  const { data: isFavorite, isLoading: favLoading } = useQuery({
     queryKey: ['favorite-provider', user?.id, providerId],
     queryFn: async () => {
       if (!user?.id) return false;
@@ -72,7 +72,7 @@ export function FavoriteProviderButton({
       variant="ghost"
       size="sm"
       onClick={() => toggleMutation.mutate()}
-      disabled={toggleMutation.isPending}
+      disabled={toggleMutation.isPending || favLoading}
       className={cn("gap-2", className)}
       aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >
@@ -151,7 +151,9 @@ export function FavoriteProvidersList() {
           <CardContent className="pt-4 flex items-center justify-between">
             <div>
               <p className="font-medium">
-                {fav.provider?.first_name} {fav.provider?.last_name}
+                {fav.provider 
+                  ? `${fav.provider.first_name || ''} ${fav.provider.last_name || ''}`.trim() || 'Unknown provider'
+                  : 'Unknown provider'}
               </p>
               <p className="text-xs text-muted-foreground">
                 Saved {new Date(fav.created_at).toLocaleDateString()}

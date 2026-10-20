@@ -103,7 +103,7 @@ export function ReviewPromptCard() {
           provider_id: selected.provider_id,
           appointment_id: selected.appointment_id,
           rating,
-          comment: comment.trim() || null,
+          review_text: comment.trim() || null,
         });
       if (error) throw error;
     },

@@ -54,10 +54,11 @@ export function parseHL7ORU(message: string): HL7ParsedResult[] {
         break;
         
       case 'OBR':
-        // OBR-3: Sample/Placer Order Number, OBR-4: Test Code^Test Name
+        // OBR-2: Placer Order Number (sample ID in most LIS setups)
+        // OBR-3: Filler Order Number, OBR-4: Test Code^Test Name
         const testParts = (fields[4] || '').split('^');
         obr = {
-          sampleId: fields[3] || '',
+          sampleId: fields[3] || fields[2] || '',
           testCode: testParts[0] || '',
           testName: testParts[1] || testParts[0] || '',
         };
@@ -96,6 +97,8 @@ export function parseASTM(message: string): HL7ParsedResult[] {
   // ASTM uses different framing but similar concepts
   // This is a simplified parser - real implementation needs ENQ/ACK/NAK handling
   const results: HL7ParsedResult[] = [];
+  // One ID per message (not per result, and unique even within the same millisecond)
+  const messageId = `ASTM-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   
   // ASTM records start with record type identifier
   const lines = message.split(/\r?\n/).filter(l => l.trim());
@@ -117,7 +120,7 @@ export function parseASTM(message: string): HL7ParsedResult[] {
       case 'R': // Result record
         // R|seq|test_code|value|unit|ref_range|flag
         results.push({
-          messageId: `ASTM-${Date.now()}`,
+          messageId,
           timestamp: new Date().toISOString(),
           patientId: currentPatient,
           sampleId: currentSample,
@@ -157,19 +160,40 @@ export function mapTestCode(
 }
 
 /**
- * Supported LIS machine manufacturers and models (from Danphe list)
+ * Supported LIS machine manufacturers and models
+ * Comprehensive list covering Danphe, MocDoc, Insta HMS (Practo), and Epic (Beaker) compatible analyzers.
+ * All communicate via HL7 v2.x or ASTM E1381/E1394 — the parser handles both.
  */
 export const SUPPORTED_MACHINES = [
-  { manufacturer: 'Randox', models: ['RX Daytona+', 'RX Imola', 'RX Modena'] },
-  { manufacturer: 'Sysmex', models: ['XN-330', 'XN-350', 'XN-1000', 'XS-1000i'] },
-  { manufacturer: 'Mindray', models: ['BC-5000', 'BC-6000', 'CL-1000i'] },
-  { manufacturer: 'Snibe', models: ['Maglumi X3', 'Maglumi 1000', 'Maglumi 2000', 'Maglumi X8', 'Biossays 240'] },
-  { manufacturer: 'Horiba', models: ['Pentra XLR', 'Micros 60', 'YP8'] },
-  { manufacturer: 'Abbott', models: ['Alinity', 'Cell-Dyn'] },
-  { manufacturer: 'Siemens', models: ['Atellica', 'ADVIA'] },
-  { manufacturer: 'Roche', models: ['Cobas', 'Elecsys'] },
-  { manufacturer: 'Beckman', models: ['DxH 500', 'DxH 560', 'AU480'] },
-  { manufacturer: 'Erba', models: ['XL 200', 'XL 640', 'XL 1000'] },
-  { manufacturer: 'Diatron', models: ['P500', 'P70'] },
-  { manufacturer: 'Medonic', models: ['M51'] },
+  { manufacturer: 'Abbott', models: ['Alinity c', 'Alinity h', 'Alinity i', 'Alinity i (immunoassay)', 'Alinity m', 'Architect c4000', 'Architect c8000', 'Architect i1000', 'Architect i1000SR', 'Architect i2000', 'Architect i2000SR', 'CELL-DYN Emerald', 'CELL-DYN Ruby', 'CELL-DYN Sapphire', 'm2000 RealTime'] },
+  { manufacturer: 'Alifax', models: ['Roller 20', 'Test 1'] },
+  { manufacturer: 'Arkray', models: ['Aution Eleven', 'Aution Max AX-4280'] },
+  { manufacturer: 'BD', models: ['BACTEC 9000', 'BACTEC FX', 'Bruker MALDI', 'Phoenix 100', 'Phoenix M50'] },
+  { manufacturer: 'Beckman Coulter', models: ['AU2700', 'AU480', 'AU5800', 'AU680', 'AcT 5diff', 'Access 2', 'DxC 500i', 'DxC 700 AU', 'DxH 500', 'DxH 560', 'DxH 800', 'DxH 900', 'MicroScan WalkAway', 'MicroScan autoSCAN-4', 'UniCel DxI 600', 'UniCel DxI 800'] },
+  { manufacturer: 'Cepheid', models: ['GeneXpert', 'GeneXpert Infinity', 'GeneXpert Xpress'] },
+  { manufacturer: 'Diasorin', models: ['Liaison', 'Liaison XL', 'Liaison XS'] },
+  { manufacturer: 'Diatron', models: ['P500', 'P70', 'P780'] },
+  { manufacturer: 'Diesse', models: ['Ves-Matic Cube 30', 'Ves-Matic Cube 80'] },
+  { manufacturer: 'Dymind', models: ['DH36', 'DH51', 'DH76'] },
+  { manufacturer: 'Erba', models: ['EM 360', 'Elite 580', 'H360', 'H560', 'XL 1000', 'XL 200', 'XL 300', 'XL 640'] },
+  { manufacturer: 'Hologic', models: ['Aptima', 'Panther', 'Panther Fusion'] },
+  { manufacturer: 'Horiba', models: ['ABX Micros', 'Micros 60', 'Micros ES60', 'Pentra 80', 'Pentra XLR'] },
+  { manufacturer: 'Human', models: ['HumaStar 200', 'HumaStar 300', 'HumaStar 600'] },
+  { manufacturer: 'Medonic', models: ['M32', 'M51'] },
+  { manufacturer: 'Mindray', models: ['BC-2800', 'BC-3000', 'BC-5000', 'BC-5100', 'BC-6000', 'BC-6800', 'BS-200', 'BS-240', 'BS-360E', 'BS-480', 'BS-600M', 'BS-800', 'CL-1000i', 'CL-1200i', 'CL-2000i', 'CL-6000i', 'CL-900i'] },
+  { manufacturer: 'Nihon Kohden', models: ['Celltac Alpha', 'Celltac G', 'MEK-9100'] },
+  { manufacturer: 'Nova Biomedical', models: ['Stat Profile Prime', 'StatSensor'] },
+  { manufacturer: 'Ortho Clinical', models: ['VITROS 250', 'VITROS 350', 'VITROS 4600', 'VITROS 5600', 'VITROS ECI', 'VITROS XT 7600'] },
+  { manufacturer: 'Qiagen', models: ['NeuMoDx', 'QIAcube', 'QIAstat-Dx'] },
+  { manufacturer: 'Radiometer', models: ['ABL800 FLEX', 'ABL9', 'ABL90 FLEX'] },
+  { manufacturer: 'Randox', models: ['RX Daytona Plus', 'RX Daytona+', 'RX Imola', 'RX Modena', 'RX Monaco'] },
+  { manufacturer: 'Roche', models: ['Cobas 4800', 'Cobas 6000', 'Cobas 6800', 'Cobas 8000', 'Cobas 8800', 'Cobas Pro', 'Cobas c311', 'Cobas c501', 'Cobas c702', 'Cobas e411', 'Cobas e601', 'Cobas e801', 'Cobas u 601', 'Cobas u 701', 'Elecsys 2010', 'LightCycler 480', 'Urisys 2400'] },
+  { manufacturer: 'Selectra', models: ['Mach 5', 'Pro M', 'Pro S', 'Pro XS'] },
+  { manufacturer: 'Siemens', models: ['ADVIA 1800', 'ADVIA 2400', 'ADVIA Centaur XP', 'ADVIA Centaur XPT', 'Atellica CH', 'Atellica IM', 'Atellica IM 1300', 'Atellica IM 1600', 'BCS XP', 'CLINITEK Advantus', 'CLINITEK Atlas', 'CLINITEK Novus', 'CS-5100 System', 'Dimension EXL', 'Dimension Vista', 'Immulite 2000', 'RAPIDLab 1200', 'RAPIDPoint 500', 'Sysmex CA-1500', 'epoc BGEM'] },
+  { manufacturer: 'Snibe', models: ['Biossays 240 Plus', 'Maglumi 1000', 'Maglumi 2000', 'Maglumi 4000', 'Maglumi 800', 'Maglumi X3', 'Maglumi X8'] },
+  { manufacturer: 'Stago', models: ['STA Compact', 'STA R Max', 'STA Satellite'] },
+  { manufacturer: 'Sysmex', models: ['CA-600 series', 'CS-2000i', 'CS-5100', 'KX-21N', 'UF-1000i', 'UF-5000', 'UN-3000', 'XE-2100', 'XN-1000', 'XN-2000', 'XN-330', 'XN-350', 'XS-1000i', 'XT-4000i'] },
+  { manufacturer: 'Thermo Fisher', models: ['Applied Biosystems 7500', 'Gallery', 'Indiko', 'Indiko Plus', 'Konelab 60', 'QuantStudio 5', 'QuantStudio 7'] },
+  { manufacturer: 'Werfen', models: ['ACL TOP 350', 'ACL TOP 550', 'ACL TOP 750', 'GEM Premier', 'GEM Premier 3500', 'GEM Premier 4000', 'GEM Premier 5000'] },
+  { manufacturer: 'bioMérieux', models: ['BACT/ALERT 3D', 'BacT/ALERT Virtuo', 'VIDAS', 'VIDAS 3', 'VITEK 2', 'VITEK MS', 'mini VIDAS'] },
 ];

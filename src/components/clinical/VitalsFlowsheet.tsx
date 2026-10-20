@@ -16,23 +16,22 @@ import { format } from "date-fns";
 interface VitalReading {
   id: string;
   user_id: string;
-  created_at: string;
+  recorded_at: string;
   // Vitals are stored in various columns - check actual schema
   [key: string]: any;
 }
 
 // Standard vital types with normal ranges and units
+// Keys match the actual vital_signs schema column names
 const VITAL_TYPES = [
-  { key: 'systolic_bp', label: 'BP Systolic', unit: 'mmHg', normal: [90, 120] },
-  { key: 'diastolic_bp', label: 'BP Diastolic', unit: 'mmHg', normal: [60, 80] },
+  { key: 'blood_pressure_systolic', label: 'BP Systolic', unit: 'mmHg', normal: [90, 120] },
+  { key: 'blood_pressure_diastolic', label: 'BP Diastolic', unit: 'mmHg', normal: [60, 80] },
   { key: 'heart_rate', label: 'Heart Rate', unit: 'bpm', normal: [60, 100] },
   { key: 'respiratory_rate', label: 'Resp Rate', unit: '/min', normal: [12, 20] },
   { key: 'temperature', label: 'Temperature', unit: '°C', normal: [36.1, 37.2] },
-  { key: 'spo2', label: 'SpO2', unit: '%', normal: [95, 100] },
+  { key: 'oxygen_saturation', label: 'SpO2', unit: '%', normal: [95, 100] },
   { key: 'blood_glucose', label: 'Glucose', unit: 'mg/dL', normal: [70, 140] },
   { key: 'weight', label: 'Weight', unit: 'kg', normal: null },
-  { key: 'height', label: 'Height', unit: 'cm', normal: null },
-  { key: 'pain_score', label: 'Pain', unit: '/10', normal: [0, 3] },
 ];
 
 function isAbnormal(value: number, normal: [number, number] | null): boolean {
@@ -50,7 +49,7 @@ export function VitalsFlowsheet({ patientId }: { patientId: string }) {
         .from('vital_signs')
         .select('*')
         .eq('user_id', patientId)
-        .order('created_at', { ascending: false })
+        .order('recorded_at', { ascending: false })
         .limit(limit);
       if (error) throw error;
       // Reverse to show oldest first (left to right)
@@ -83,23 +82,32 @@ export function VitalsFlowsheet({ patientId }: { patientId: string }) {
   // Extract vital values - check both direct columns and metadata
   const getVitalValue = (reading: VitalReading, key: string): number | null => {
     // Try direct column first
-    if (reading[key] != null) return Number(reading[key]);
+    if (reading[key] != null) {
+      const v = Number(reading[key]);
+      if (Number.isFinite(v)) return v;
+    }
     // Try metadata JSONB
     if (reading.metadata && typeof reading.metadata === 'object') {
       const meta = reading.metadata as Record<string, any>;
-      if (meta[key] != null) return Number(meta[key]);
-      // Common aliases
+      if (meta[key] != null) {
+        const v = Number(meta[key]);
+        if (Number.isFinite(v)) return v;
+      }
+      // Common aliases (for legacy/metadata-stored vitals)
       const aliases: Record<string, string[]> = {
-        'systolic_bp': ['systolic', 'bp_systolic', 'sbp'],
-        'diastolic_bp': ['diastolic', 'bp_diastolic', 'dbp'],
+        'blood_pressure_systolic': ['systolic_bp', 'systolic', 'bp_systolic', 'sbp'],
+        'blood_pressure_diastolic': ['diastolic_bp', 'diastolic', 'bp_diastolic', 'dbp'],
         'heart_rate': ['hr', 'pulse', 'bpm'],
         'respiratory_rate': ['rr', 'resp_rate'],
         'temperature': ['temp'],
-        'spo2': ['o2_sat', 'oxygen_saturation', 'saturation'],
+        'oxygen_saturation': ['spo2', 'o2_sat', 'saturation'],
         'blood_glucose': ['glucose', 'bg', 'blood_sugar'],
       };
       for (const alias of (aliases[key] || [])) {
-        if (meta[alias] != null) return Number(meta[alias]);
+        if (meta[alias] != null) {
+          const v = Number(meta[alias]);
+          if (Number.isFinite(v)) return v;
+        }
       }
     }
     return null;
@@ -127,10 +135,10 @@ export function VitalsFlowsheet({ patientId }: { patientId: string }) {
                 {vitals.map((v) => (
                   <TableHead key={v.id} className="text-center min-w-[90px]">
                     <div className="text-xs font-medium">
-                      {format(new Date(v.created_at), 'MMM d')}
+                      {format(new Date(v.recorded_at), 'MMM d')}
                     </div>
                     <div className="text-xs text-muted-foreground font-normal">
-                      {format(new Date(v.created_at), 'HH:mm')}
+                      {format(new Date(v.recorded_at), 'HH:mm')}
                     </div>
                   </TableHead>
                 ))}

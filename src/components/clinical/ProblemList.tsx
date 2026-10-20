@@ -129,10 +129,17 @@ export function ProblemList({ patientId, canEdit = false }: {
       queryClient.invalidateQueries({ queryKey: ['problem-list', patientId] });
       toast.success("Marked as resolved");
     },
+    onError: () => {
+      toast.error("Failed to mark as resolved");
+    },
   });
 
-  const activeConditions = (conditions || []).filter(c => c.status === 'active' || c.status === 'chronic');
-  const resolvedConditions = (conditions || []).filter(c => c.status === 'resolved' || c.status === 'in_remission');
+  const activeConditions = (conditions || []).filter(c => 
+    c.status === 'active' || c.status === 'chronic' || !c.status
+  );
+  const resolvedConditions = (conditions || []).filter(c => 
+    c.status === 'resolved' || c.status === 'in_remission'
+  );
 
   if (isLoading) {
     return <div className="text-sm text-muted-foreground">Loading problem list...</div>;

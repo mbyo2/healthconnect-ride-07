@@ -77,7 +77,7 @@ export function OrderSetPicker({
     },
   });
 
-  const { data: items } = useQuery({
+  const { data: items, isLoading: itemsLoading } = useQuery({
     queryKey: ['order-set-items', selectedSet?.id],
     queryFn: async () => {
       if (!selectedSet) return [];
@@ -166,7 +166,11 @@ export function OrderSetPicker({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {(items || []).length === 0 ? (
+            {itemsLoading ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Loading order set items...
+              </p>
+            ) : (items || []).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
                 No items in this order set yet.
               </p>

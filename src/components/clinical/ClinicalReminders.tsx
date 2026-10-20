@@ -205,20 +205,21 @@ export function ClinicalReminders({ patientId }: { patientId: string }) {
       // Get last vitals date
       const { data: vitals } = await supabase
         .from('vital_signs')
-        .select('created_at')
+        .select('recorded_at')
         .eq('user_id', patientId)
-        .order('created_at', { ascending: false })
+        .order('recorded_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
-      // Get last lab date
+      // Get last diabetes-relevant lab date (HbA1c / glucose) for screening reminder
       const { data: labs } = await supabase
         .from('lab_tests')
         .select('created_at')
         .eq('patient_id', patientId)
+        .or('test_type.ilike.%hba1c%,test_type.ilike.%glucose%,test_type.ilike.%a1c%')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       return generateReminders(
         {
@@ -226,7 +227,7 @@ export function ClinicalReminders({ patientId }: { patientId: string }) {
           gender: (profile as any)?.gender,
         },
         (conditions || []).map((c: any) => c.condition_name),
-        (vitals as any)?.created_at,
+        (vitals as any)?.recorded_at,
         (labs as any)?.created_at,
       );
     },

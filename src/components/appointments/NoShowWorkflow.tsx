@@ -33,10 +33,12 @@ export function NoShowManager({ institutionId }: { institutionId?: string }) {
   const { data: noShows, isLoading } = useQuery({
     queryKey: ['no-shows', institutionId],
     queryFn: async () => {
+      if (!institutionId) return [];
       let query = supabase
         .from('appointments')
         .select('id, patient_id, provider_id, appointment_date, status')
         .eq('status', 'no_show')
+        .eq('institution_id', institutionId)
         .order('appointment_date', { ascending: false })
         .limit(50);
       
@@ -125,7 +127,9 @@ export function NoShowManager({ institutionId }: { institutionId?: string }) {
                 <div>
                   <p className="font-medium text-sm">{appt.patient_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {appt.provider_name} • {format(new Date(appt.appointment_date), 'MMM d, yyyy HH:mm')}
+                    {appt.provider_name} • {appt.appointment_date 
+                      ? format(new Date(appt.appointment_date), 'MMM d, yyyy HH:mm')
+                      : 'Date not recorded'}
                   </p>
                 </div>
                 <div className="flex gap-2">
