@@ -13,6 +13,8 @@ import { IPDManagement } from "@/components/hospital/IPDManagement";
 import { BedWardManagement } from "@/components/hospital/BedWardManagement";
 import { DepartmentManagement } from "@/components/hospital/DepartmentManagement";
 import { OTManagement } from "@/components/hospital/OTManagement";
+import { ICU } from "@/components/hospital/ICU";
+import { AmbulanceStaffWorkflow } from "@/components/workflows/AmbulanceStaffWorkflow";
 import { StaffRoster } from "@/components/hospital/StaffRoster";
 import { HospitalBilling } from "@/components/hospital/HospitalBilling";
 import { EMRCaseSheets } from "@/components/hospital/EMRCaseSheets";
@@ -55,6 +57,8 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "ipd", label: "IPD / ADT" },
   { val: "emergency", label: "A&E Triage" },
   { val: "ot", label: "OT Surgery" },
+  { val: "icu", label: "ICU" },
+  { val: "ambulance", label: "Ambulance" },
   { val: "lab", label: "Lab LIMS" },
   { val: "radiology", label: "Radiology" },
   { val: "pharmacy", label: "Dispensary POS" },
@@ -319,6 +323,8 @@ export const HospitalManagement = () => {
             <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} discharged={dischargedAdmissions} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="emergency">{mod("emergency", <EmergencyTriage hospital={hospital} />)}</TabsContent>
             <TabsContent value="ot">{mod("ot", <OTManagement hospital={hospital} />)}</TabsContent>
+            <TabsContent value="icu">{mod("icu", <ICU hospital={hospital} />)}</TabsContent>
+            <TabsContent value="ambulance">{mod("ambulance", <AmbulanceStaffWorkflow />)}</TabsContent>
             <TabsContent value="lab">{mod("lab", <HospitalLab hospital={hospital} />)}</TabsContent>
             <TabsContent value="radiology">{mod("radiology", <RadiologyImaging hospital={hospital} />)}</TabsContent>
             <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>

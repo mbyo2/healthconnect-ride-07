@@ -39,6 +39,8 @@ export const HMS_MODULES = [
   'ipd',
   'emergency',
   'ot',
+  'icu',
+  'ambulance',
   'lab',
   'radiology',
   'pharmacy',
