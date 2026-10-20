@@ -36,6 +36,12 @@ import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, NURSING_ROLES, type UserRo
 import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
+import { ProblemList } from "@/components/clinical/ProblemList";
+import { VitalsFlowsheet } from "@/components/clinical/VitalsFlowsheet";
+import GrowthChart from "@/components/clinical/GrowthChart";
+import VaccinationSchedule from "@/components/clinical/VaccinationSchedule";
+import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ── constants (match Profile.tsx) ────────────────────────────────────────────
 
@@ -379,6 +385,88 @@ const MyPracticeEditor = () => {
   );
 };
 
+// ── Patient Record panel ─────────────────────────────────────────────────────
+// The five clinical record components existed but were only ever mounted in
+// the patient's own self-view. This panel gives the provider the same record
+// for a patient picked from their own appointment history (audit 2026-10-20).
+
+const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) => {
+  const [selectedPatientId, setSelectedPatientId] = useState<string>("");
+
+  const { data: patients = [], isLoading } = useQuery({
+    queryKey: ["provider-record-patients"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [] as { id: string; name: string }[];
+      const { data } = await supabase
+        .from("appointments")
+        .select(`patient_id, patient:profiles!appointments_patient_id_fkey (first_name, last_name)`)
+        .eq("provider_id", user.id)
+        .order("date", { ascending: false })
+        .limit(300);
+      const seen = new Map<string, { id: string; name: string }>();
+      for (const row of (data || []) as any[]) {
+        if (!row.patient_id || seen.has(row.patient_id)) continue;
+        const name = `${row.patient?.first_name || ""} ${row.patient?.last_name || ""}`.trim() || "Patient";
+        seen.set(row.patient_id, { id: row.patient_id, name });
+      }
+      return [...seen.values()];
+    },
+  });
+
+  useEffect(() => {
+    if (!selectedPatientId && patients.length > 0) {
+      setSelectedPatientId(patients[0].id);
+    }
+  }, [patients, selectedPatientId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (patients.length === 0) {
+    return (
+      <p className="text-sm text-graphite-500 dark:text-slate-400 text-center py-10">
+        No patients yet — patients from your appointments will appear here so you can open their clinical record.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 shrink-0">
+          Patient
+        </Label>
+        <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+          <SelectTrigger className="w-full sm:w-80 h-11 rounded-xl">
+            <SelectValue placeholder="Select a patient" />
+          </SelectTrigger>
+          <SelectContent>
+            {patients.map((p) => (
+              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {selectedPatientId && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+          <ProblemList patientId={selectedPatientId} canEdit={canEditProblems} />
+          <ClinicalReminders patientId={selectedPatientId} />
+          <VitalsFlowsheet patientId={selectedPatientId} />
+          <GrowthChart patientId={selectedPatientId} />
+          <VaccinationSchedule patientId={selectedPatientId} />
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 
 export const ProviderDashboard = () => {
@@ -453,6 +541,13 @@ export const ProviderDashboard = () => {
   const canPrescribe = availableRoles.some((r) =>
     (PRESCRIBING_ROLES as readonly string[]).includes(r)
   );
+
+  // Clinicians (clinical + nursing cadres in user_roles) may edit the
+  // problem list from the Patient Record tab; everyone else gets read-only.
+  const canEditProblems = availableRoles.some((r) => {
+    const category = (ROLE_META[r as keyof typeof ROLE_META] as any)?.category;
+    return category === "clinical" || category === "nursing";
+  });
 
   // Dashboard identity follows the taxonomy — every cadre gets a named
   // console derived from its role metadata, never a hardcoded trio.
@@ -802,6 +897,7 @@ export const ProviderDashboard = () => {
                 { value: "schedule", label: "Schedule Manager" },
                 { value: "availability", label: "Working Hours" },
                 { value: "patients", label: "Patient Directory" },
+                { value: "record", label: "Patient Record" },
                 { value: "waitlist", label: "Waitlist Triage" },
                 { value: "analytics", label: "Analytics" },
                 ...(hasSpecialtyTools ? [{ value: "specialty", label: "Specialty Tools" }] : []),
@@ -828,6 +924,7 @@ export const ProviderDashboard = () => {
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
             <TabsContent value="availability"><AvailabilityManager /></TabsContent>
             <TabsContent value="patients"><PatientRecords /></TabsContent>
+            <TabsContent value="record"><PatientRecordPanel canEditProblems={canEditProblems} /></TabsContent>
             <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
             <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
             {hasSpecialtyTools && <TabsContent value="specialty"><SpecialtyTools /></TabsContent>}
