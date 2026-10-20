@@ -281,6 +281,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    // Drop the service worker's offline API cache with the session, so
+    // cached directory data never outlives the signed-in user on a device.
+    try {
+      navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_API_CACHE' });
+    } catch { /* non-fatal */ }
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error('Error signing out');

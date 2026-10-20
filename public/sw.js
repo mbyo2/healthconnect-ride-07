@@ -6,11 +6,19 @@
 // '/' HTML references pruned bundles and the app can never boot again until
 // the service worker updates. Navigation requests already use network-first
 // (handleNavigationRequest) — keep it that way.
-const CACHE_NAME = 'healthconnect-v1.1.0';
-const STATIC_CACHE = 'healthconnect-static-v3';
-const DYNAMIC_CACHE = 'healthconnect-dynamic-v3';
-const API_CACHE = 'healthconnect-api-v3';
+const CACHE_NAME = 'healthconnect-v1.2.0';
+const STATIC_CACHE = 'healthconnect-static-v4';
+const DYNAMIC_CACHE = 'healthconnect-dynamic-v4';
+const API_CACHE = 'healthconnect-api-v4';
 const IMAGE_CACHE = 'healthconnect-images-v1';
+// Runtime-only caches (never precached at install):
+// - SHELL: the last successfully fetched '/' HTML, so an offline reload can
+//   boot the app. Paired with BUNDLE below, the HTML and its hashed assets
+//   always come from the same session, so they can never mismatch.
+// - BUNDLE: hashed /assets/* files. Content-hashed names are immutable, so
+//   cache-first is safe; a new deploy references new hashes.
+const SHELL_CACHE = 'healthconnect-shell-v4';
+const BUNDLE_CACHE = 'healthconnect-bundles-v4';
 
 // Resources to cache immediately
 // (deliberately excludes '/' — see note above)
@@ -23,12 +31,16 @@ const STATIC_ASSETS = [
   '/logo512.png'
 ];
 
-// API endpoints to cache
-const CACHEABLE_APIS = [
-  '/api/user/profile',
-  '/api/appointments',
-  '/api/medications',
-  '/api/providers'
+// Supabase REST tables whose GET responses may be cached for offline use.
+// Directory-class, non-patient data ONLY (facility directory, help articles,
+// lab catalog, taxonomy). Patient data is never cached by the worker —
+// privacy rule. The app clears API_CACHE on sign-out (CLEAR_API_CACHE).
+const OFFLINE_CACHEABLE_TABLES = [
+  'healthcare_institutions',
+  'kb_articles',
+  'lab_test_catalog',
+  'institution_types',
+  'provider_types',
 ];
 
 // Install event - cache static assets
@@ -51,7 +63,6 @@ self.addEventListener('install', (event) => {
       })
       .then(() => self.skipWaiting())
   );
-  );
 });
 
 // Activate event - clean up old caches
@@ -63,9 +74,11 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName !== STATIC_CACHE && 
-                cacheName !== DYNAMIC_CACHE && 
-                cacheName !== API_CACHE) {
+            if (cacheName !== STATIC_CACHE &&
+                cacheName !== DYNAMIC_CACHE &&
+                cacheName !== API_CACHE &&
+                cacheName !== SHELL_CACHE &&
+                cacheName !== BUNDLE_CACHE) {
               console.log('[SW] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
@@ -89,23 +102,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Bypass service worker for built asset files to avoid serving fallback HTML
-  // when an old hashed filename is requested (lets the server return correct MIME).
+  // Hashed build bundles: cache-first (immutable content hashes). This is
+  // what lets a cached shell actually boot offline — the pair stays in sync.
   if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(handleBundleAsset(request));
     return;
   }
 
   // Handle different types of requests
-  if (isStaticAsset(request)) {
+  if (isNavigationRequest(request)) {
+    event.respondWith(handleNavigationRequest(request));
+  } else if (isStaticAsset(request)) {
     event.respondWith(handleStaticAsset(request));
   } else if (isAPIRequest(request)) {
     event.respondWith(handleAPIRequest(request));
-  } else if (isNavigationRequest(request)) {
-    event.respondWith(handleNavigationRequest(request));
   } else {
     event.respondWith(handleDynamicRequest(request));
   }
 });
+
+// Cache-first for content-hashed build assets
+async function handleBundleAsset(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const networkResponse = await fetch(request);
+  if (networkResponse.ok) {
+    const cache = await caches.open(BUNDLE_CACHE);
+    cache.put(request, networkResponse.clone());
+  }
+  return networkResponse;
+}
 
 // Check if request is for a static asset
 function isStaticAsset(request) {
@@ -114,11 +140,12 @@ function isStaticAsset(request) {
          url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2)$/);
 }
 
-// Check if request is for API
+// Check if request is for API — Supabase REST only. Auth and storage
+// traffic is never intercepted: credentials and private files must not be
+// cached or synthesised by the worker.
 function isAPIRequest(request) {
   const url = new URL(request.url);
-  return url.pathname.startsWith('/api/') || 
-         url.hostname.includes('supabase.co');
+  return url.hostname.includes('supabase.co') && url.pathname.startsWith('/rest/v1/');
 }
 
 // Check if request is navigation
@@ -185,8 +212,8 @@ async function handleAPIRequest(request) {
       return cachedResponse;
     }
     
-    // Return offline response for critical endpoints
-    if (isCriticalAPI(request)) {
+    // Return a structured offline response for cacheable directory reads
+    if (isCacheableAPI(request)) {
       return new Response(JSON.stringify({
         error: 'Service temporarily unavailable',
         offline: true,
@@ -196,31 +223,27 @@ async function handleAPIRequest(request) {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    
+
     return new Response('Service unavailable', { status: 503 });
   }
 }
 
-// Handle navigation requests
+// Handle navigation requests — network-first; the last good HTML is kept
+// in SHELL_CACHE so an offline reload can still boot the app shell.
 async function handleNavigationRequest(request) {
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
+      const cache = await caches.open(SHELL_CACHE);
+      cache.put('/', networkResponse.clone());
       return networkResponse;
     }
-    
-    // Serve SPA index.html shell for client-side routing fallback
-    const cachedAppShell = await caches.match('/index.html') || await caches.match('/');
-    if (cachedAppShell) {
-      return cachedAppShell;
-    }
-    const offlinePage = await caches.match('/offline.html');
-    return offlinePage || new Response('Offline', { status: 503 });
+    throw new Error(`Navigation failed: ${networkResponse.status}`);
   } catch (error) {
-    console.error('[SW] Navigation request failed:', error);
-    const cachedAppShell = await caches.match('/index.html') || await caches.match('/');
-    if (cachedAppShell) {
-      return cachedAppShell;
+    const shellCache = await caches.open(SHELL_CACHE);
+    const cachedShell = await shellCache.match('/');
+    if (cachedShell) {
+      return cachedShell;
     }
     const offlinePage = await caches.match('/offline.html');
     return offlinePage || new Response('Offline', { status: 503 });
@@ -258,120 +281,17 @@ async function handleDynamicRequest(request) {
   }
 }
 
-// Check if API endpoint should be cached
+// Check if a Supabase REST GET may be cached: directory-class tables only
 function isCacheableAPI(request) {
   const url = new URL(request.url);
-  return CACHEABLE_APIS.some(api => url.pathname.startsWith(api));
+  const table = url.pathname.replace('/rest/v1/', '').split('/')[0];
+  return OFFLINE_CACHEABLE_TABLES.includes(table);
 }
 
-// Check if API endpoint is critical
-function isCriticalAPI(request) {
-  const url = new URL(request.url);
-  const criticalEndpoints = [
-    '/api/user/profile',
-    '/api/appointments',
-    '/api/emergency'
-  ];
-  return criticalEndpoints.some(endpoint => url.pathname.startsWith(endpoint));
-}
-
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync triggered:', event.tag);
-  
-  if (event.tag === 'background-sync-appointments') {
-    event.waitUntil(syncAppointments());
-  } else if (event.tag === 'background-sync-messages') {
-    event.waitUntil(syncMessages());
-  } else if (event.tag === 'background-sync-payments') {
-    event.waitUntil(syncPayments());
-  }
-});
-
-// Sync appointments when back online
-async function syncAppointments() {
-  try {
-    console.log('[SW] Syncing appointments...');
-    
-    // Get pending appointments from IndexedDB
-    const pendingAppointments = await getPendingData('appointments');
-    
-    for (const appointment of pendingAppointments) {
-      try {
-        const response = await fetch('/api/appointments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(appointment.data)
-        });
-        
-        if (response.ok) {
-          await removePendingData('appointments', appointment.id);
-          console.log('[SW] Appointment synced successfully');
-        }
-      } catch (error) {
-        console.error('[SW] Failed to sync appointment:', error);
-      }
-    }
-  } catch (error) {
-    console.error('[SW] Background sync failed:', error);
-  }
-}
-
-// Sync messages when back online
-async function syncMessages() {
-  try {
-    console.log('[SW] Syncing messages...');
-    
-    const pendingMessages = await getPendingData('messages');
-    
-    for (const message of pendingMessages) {
-      try {
-        const response = await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(message.data)
-        });
-        
-        if (response.ok) {
-          await removePendingData('messages', message.id);
-          console.log('[SW] Message synced successfully');
-        }
-      } catch (error) {
-        console.error('[SW] Failed to sync message:', error);
-      }
-    }
-  } catch (error) {
-    console.error('[SW] Message sync failed:', error);
-  }
-}
-
-// Sync payments when back online
-async function syncPayments() {
-  try {
-    console.log('[SW] Syncing payments...');
-    
-    const pendingPayments = await getPendingData('payments');
-    
-    for (const payment of pendingPayments) {
-      try {
-        const response = await fetch('/api/payments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payment.data)
-        });
-        
-        if (response.ok) {
-          await removePendingData('payments', payment.id);
-          console.log('[SW] Payment synced successfully');
-        }
-      } catch (error) {
-        console.error('[SW] Failed to sync payment:', error);
-      }
-    }
-  } catch (error) {
-    console.error('[SW] Payment sync failed:', error);
-  }
-}
+// Offline write queueing lives in the app (useOfflineSync hook):
+// allowlisted tables/fields are queued in IndexedDB and replayed through
+// the real Supabase client on reconnect. The worker deliberately does NOT
+// replay writes — it cannot hold the user's session safely.
 
 // Push notification handling
 self.addEventListener('push', (event) => {
@@ -465,50 +385,6 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// Utility functions for IndexedDB operations
-async function getPendingData(storeName) {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('HealthConnectOffline', 1);
-    
-    request.onerror = () => reject(request.error);
-    
-    request.onsuccess = () => {
-      const db = request.result;
-      const transaction = db.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const getAllRequest = store.getAll();
-      
-      getAllRequest.onsuccess = () => resolve(getAllRequest.result);
-      getAllRequest.onerror = () => reject(getAllRequest.error);
-    };
-    
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(storeName)) {
-        db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
-      }
-    };
-  });
-}
-
-async function removePendingData(storeName, id) {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('HealthConnectOffline', 1);
-    
-    request.onerror = () => reject(request.error);
-    
-    request.onsuccess = () => {
-      const db = request.result;
-      const transaction = db.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const deleteRequest = store.delete(id);
-      
-      deleteRequest.onsuccess = () => resolve();
-      deleteRequest.onerror = () => reject(deleteRequest.error);
-    };
-  });
-}
-
 // Message handling for communication with main thread
 self.addEventListener('message', (event) => {
   console.log('[SW] Message received:', event.data);
@@ -524,6 +400,12 @@ self.addEventListener('message', (event) => {
       case 'CLEAR_CACHE':
         clearAllCaches().then(() => {
           event.ports[0].postMessage({ success: true });
+        });
+        break;
+      case 'CLEAR_API_CACHE':
+        // Sign-out hygiene: drop cached directory reads with the session.
+        caches.delete(API_CACHE).then(() => {
+          if (event.ports[0]) event.ports[0].postMessage({ success: true });
         });
         break;
     }

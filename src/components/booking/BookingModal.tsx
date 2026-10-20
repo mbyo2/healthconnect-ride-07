@@ -32,6 +32,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 interface BookingModalProps {
   provider: Provider;
@@ -54,6 +55,7 @@ const TIME_SLOTS = [
 
 export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime, initialAppointmentType }: BookingModalProps) => {
   const { user } = useAuth();
+  const { queueAction } = useOfflineSync();
   const navigate = useNavigate();
   const [step, setStep] = useState<'type' | 'datetime' | 'confirm'>('type');
   const [visitType, setVisitType] = useState<'new' | 'returning'>('new');
@@ -249,7 +251,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           ? (myDependents || []).find((d) => d.id === bookingFor)
           : null;
 
-      const { data: booked, error } = await supabase.from('appointments').insert({
+      const appointmentPayload = {
         patient_id: user.id,
         provider_id: provider.id,
         dependent_id: selectedDependent?.id ?? null,
@@ -264,7 +266,28 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         duration: visitType === 'new' ? 45 : 30,
         patient_visit_type: visitType,
         consultation_fee: consultationFee
-      }).select('id').single();
+      };
+
+      // Offline: queue the booking on-device and replay it on reconnect
+      // (useOfflineSync allowlist). It is NOT confirmed until it syncs —
+      // the patient is told exactly that.
+      if (!navigator.onLine) {
+        const queued = await queueAction({
+          table: 'appointments',
+          operation: 'insert',
+          data: appointmentPayload,
+        });
+        if (queued) {
+          toast.info(
+            "You're offline — booking saved on this device. It will be sent when you reconnect and is not confirmed yet."
+          );
+          onClose();
+          return;
+        }
+        throw new Error('Could not save the booking on this device. Please reconnect and try again.');
+      }
+
+      const { data: booked, error } = await supabase.from('appointments').insert(appointmentPayload).select('id').single();
 
       if (error) throw error;
 

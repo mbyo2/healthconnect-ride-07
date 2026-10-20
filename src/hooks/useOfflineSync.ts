@@ -28,7 +28,7 @@ const ALLOWED_SYNC_TABLES = new Set<string>([
 // Per-table allowlist of field names permitted in the queued payload.
 // Anything else is stripped before replay.
 const ALLOWED_FIELDS: Record<string, Set<string>> = {
-  appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','status','notes']),
+  appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','status','notes','dependent_id','booked_for_name','duration','patient_visit_type','consultation_fee']),
   symptoms_diary: new Set(['id','patient_id','symptom','severity','notes','recorded_at']),
   health_reminders: new Set(['id','patient_id','title','description','remind_at','frequency','is_active']),
   medication_reminders: new Set(['id','patient_id','medication_id','remind_at','frequency','is_active']),

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { MobileLayout } from '@/components/MobileLayout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { OfflineBanner } from '@/components/shared/OfflineBanner';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
@@ -188,6 +189,9 @@ const AppContent = () => {
     <SearchProvider>
       <MobileLayout>
         <ErrorBoundary>
+        <div className="sticky top-0 z-50">
+          <OfflineBanner />
+        </div>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
