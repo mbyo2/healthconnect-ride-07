@@ -11,6 +11,7 @@ import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import DeteriorationScores from '@/components/clinical/DeteriorationScores';
 import { useAuth } from '@/context/AuthContext';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -40,6 +41,7 @@ export const NurseWorkflow = () => {
   const { showSuccess } = useSuccessFeedback();
   const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
   const { user } = useAuth();
+  const { queueAction } = useOfflineSync();
 
   // Structured vitals entry (previously "coming soon").
   const [showVitals, setShowVitals] = useState(false);
@@ -121,6 +123,46 @@ export const NurseWorkflow = () => {
     if (!hasAny) { toast.error('Enter at least one vital sign'); return; }
     setSavingVitals(true);
     try {
+      const recordedAt = payload.recorded_at as string;
+      const mirrorRows = [
+        { name: 'Blood Pressure (Systolic)', value: payload.blood_pressure_systolic, unit: 'mmHg' },
+        { name: 'Blood Pressure (Diastolic)', value: payload.blood_pressure_diastolic, unit: 'mmHg' },
+        { name: 'Heart Rate', value: payload.heart_rate, unit: 'bpm' },
+        { name: 'Temperature', value: payload.temperature, unit: '°C' },
+        { name: 'Oxygen Saturation', value: payload.oxygen_saturation, unit: '%' },
+        { name: 'Respiratory Rate', value: payload.respiratory_rate, unit: '/min' },
+        { name: 'Blood Glucose', value: payload.blood_glucose, unit: 'mmol/L' },
+        { name: 'Weight', value: payload.weight, unit: 'kg' },
+      ].filter(r => r.value !== null).map(r => ({
+        user_id: vitalsPatientId,
+        metric_category: 'vital_signs',
+        metric_name: r.name,
+        value: r.value,
+        unit: r.unit,
+        recorded_at: recordedAt,
+        recorded_by: user.id,
+        is_patient_entered: false,
+        notes: vitalsNotes || null,
+        status: 'normal',
+      }));
+
+      // Offline: queue the vitals + their patient-visible mirror rows
+      // on-device; useOfflineSync replays them on reconnect.
+      if (!navigator.onLine) {
+        const queuedMain = await queueAction({ table: 'vital_signs', operation: 'insert', data: payload });
+        if (!queuedMain) throw new Error('Could not save vitals on this device');
+        for (const row of mirrorRows) {
+          await queueAction({ table: 'comprehensive_health_metrics', operation: 'insert', data: row });
+        }
+        toast.info("You're offline — vitals saved on this device and will sync when you reconnect.");
+        setShowVitals(false);
+        setVitals({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
+        setVitalsNotes('');
+        setVitalsPatientId('');
+        setVitalsToday((prev) => (prev ?? 0) + 1);
+        return;
+      }
+
       const { error } = await supabase.from('vital_signs').insert(payload);
       if (error) throw error;
       // Mirror into comprehensive_health_metrics so the patient can see
@@ -128,28 +170,6 @@ export const NurseWorkflow = () => {
       // table, not vital_signs). Best-effort: a mirror failure must not roll
       // back the clinical record.
       try {
-        const recordedAt = payload.recorded_at as string;
-        const mirrorRows = [
-          { name: 'Blood Pressure (Systolic)', value: payload.blood_pressure_systolic, unit: 'mmHg' },
-          { name: 'Blood Pressure (Diastolic)', value: payload.blood_pressure_diastolic, unit: 'mmHg' },
-          { name: 'Heart Rate', value: payload.heart_rate, unit: 'bpm' },
-          { name: 'Temperature', value: payload.temperature, unit: '°C' },
-          { name: 'Oxygen Saturation', value: payload.oxygen_saturation, unit: '%' },
-          { name: 'Respiratory Rate', value: payload.respiratory_rate, unit: '/min' },
-          { name: 'Blood Glucose', value: payload.blood_glucose, unit: 'mmol/L' },
-          { name: 'Weight', value: payload.weight, unit: 'kg' },
-        ].filter(r => r.value !== null).map(r => ({
-          user_id: vitalsPatientId,
-          metric_category: 'vital_signs',
-          metric_name: r.name,
-          value: r.value,
-          unit: r.unit,
-          recorded_at: recordedAt,
-          recorded_by: user.id,
-          is_patient_entered: false,
-          notes: vitalsNotes || null,
-          status: 'normal',
-        }));
         if (mirrorRows.length > 0) {
           const { error: mirrorError } = await supabase.from('comprehensive_health_metrics').insert(mirrorRows);
           if (mirrorError) console.warn('Vitals metrics mirror failed:', mirrorError.message);

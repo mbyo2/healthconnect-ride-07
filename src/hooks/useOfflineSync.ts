@@ -26,18 +26,19 @@ const ALLOWED_SYNC_TABLES = new Set<string>([
 ]);
 
 // Per-table allowlist of field names permitted in the queued payload.
-// Anything else is stripped before replay.
+// Anything else is stripped before replay. Column names verified against
+// the live schema (types.ts) 2026-10-20 — vital_signs/health tables key
+// the patient as user_id; symptoms_diary uses patient_id.
 const ALLOWED_FIELDS: Record<string, Set<string>> = {
   appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','status','notes','dependent_id','booked_for_name','duration','patient_visit_type','consultation_fee']),
-  symptoms_diary: new Set(['id','patient_id','symptom','severity','notes','recorded_at']),
-  health_reminders: new Set(['id','patient_id','title','description','remind_at','frequency','is_active']),
-  medication_reminders: new Set(['id','patient_id','medication_id','remind_at','frequency','is_active']),
-  vital_signs: new Set(['id','patient_id','heart_rate','blood_pressure_systolic','blood_pressure_diastolic','temperature','respiratory_rate','oxygen_saturation','glucose','weight','recorded_at','notes']),
-  comprehensive_health_metrics: new Set(['id','patient_id','metric_type','value','unit','recorded_at','notes']),
+  symptoms_diary: new Set(['id','patient_id','symptoms','severity','notes','date']),
+  health_reminders: new Set(['id','user_id','title','description','frequency','is_active','scheduled_time','next_trigger','type','priority']),
+  medication_reminders: new Set(['id','user_id','medication_name','dosage','frequency','reminder_time','start_date','end_date','active']),
+  vital_signs: new Set(['id','user_id','heart_rate','blood_pressure_systolic','blood_pressure_diastolic','temperature','respiratory_rate','oxygen_saturation','blood_glucose','weight','recorded_at','metadata']),
+  comprehensive_health_metrics: new Set(['id','user_id','metric_name','metric_category','value','unit','recorded_at','notes','recorded_by','is_patient_entered','status']),
 };
 
-function sanitizePayload(table: string, data: any): Record<string, unknown> | null {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+function sanitizePayload(table: string, data: any): Record<string, unknown> | null { if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
   const allowed = ALLOWED_FIELDS[table];
   if (!allowed) return null;
   const out: Record<string, unknown> = {};
@@ -82,6 +83,11 @@ function openDB(): Promise<IDBDatabase> {
     }
   });
 }
+
+// Shared across all hook instances: only one replay loop may run at a
+// time, or two mounted consumers (banner, booking modal) could insert the
+// same queued action twice.
+let syncInProgress = false;
 
 export function useOfflineSync() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -160,11 +166,18 @@ export function useOfflineSync() {
   }, [countPending]);
 
   const syncAll = useCallback(async () => {
-    if (!navigator.onLine || syncingRef.current) return;
+    if (!navigator.onLine || syncInProgress) return;
+    syncInProgress = true;
     syncingRef.current = true;
     setSyncing(true);
     try {
       const { supabase } = await import('@/integrations/supabase/client');
+      // Identity guard: queued actions are replayed ONLY under the account
+      // that created them. On a shared device, another user's queued items
+      // are dropped rather than replayed under the wrong identity (RLS
+      // would reject most, but never rely on that for privacy).
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUserId = authData?.user?.id ?? null;
       const db = await openDB();
       const tx = db.transaction(STORE_NAME, 'readonly');
       const store = tx.objectStore(STORE_NAME);
@@ -192,6 +205,18 @@ export function useOfflineSync() {
 
         if (typeof action.table !== 'string' || !ALLOWED_SYNC_TABLES.has(action.table)) {
           // Unknown/unauthorized table — drop from queue silently.
+          drop = true;
+        } else if (
+          currentUserId &&
+          typeof (action.data?.patient_id ?? action.data?.user_id) === 'string' &&
+          (action.data.patient_id ?? action.data.user_id) !== currentUserId &&
+          action.table !== 'vital_signs' &&
+          action.table !== 'comprehensive_health_metrics'
+        ) {
+          // Patient-owned action queued by a different account — drop it.
+          // (vital_signs / metrics are excluded: a nurse queues them for a
+          // patient, so their user_id is the patient's, not the nurse's;
+          // RLS on the server remains the enforcement for those.)
           drop = true;
         } else if (action.operation === 'insert') {
           const clean = sanitizePayload(action.table, action.data);
@@ -239,14 +264,18 @@ export function useOfflineSync() {
     } catch (err) {
       console.error('Offline sync error:', err);
     } finally {
+      syncInProgress = false;
       syncingRef.current = false;
       setSyncing(false);
     }
   }, [countPending]); // Stable deps - no syncing in deps
 
-  // Auto-sync when coming online
+  // Auto-sync when coming online, and once on mount — items queued in a
+  // previous session (e.g. a full day offline, app closed overnight) have
+  // no 'online' transition to trigger them. syncAll reads the queue itself
+  // and no-ops when empty or offline.
   useEffect(() => {
-    if (isOnline && pendingCount > 0) {
+    if (isOnline) {
       syncAll();
     }
   }, [isOnline]); // Only trigger on online status change, not pendingCount

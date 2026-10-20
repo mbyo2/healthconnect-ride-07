@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { HeartPulse, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 /**
  * Patient self-reported vitals entry.
@@ -15,6 +16,7 @@ import { toast } from "sonner";
  */
 export const ManualVitalsEntry = ({ onSaved }: { onSaved?: () => void }) => {
   const { user } = useAuth();
+  const { queueAction } = useOfflineSync();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -57,6 +59,23 @@ export const ManualVitalsEntry = ({ onSaved }: { onSaved?: () => void }) => {
       if (form.weight.trim()) payload.weight = parseFloat(form.weight);
       if (form.blood_sugar.trim()) {
         payload.metadata.blood_sugar = parseFloat(form.blood_sugar);
+      }
+
+      // Offline: queue on-device; syncs automatically on reconnect.
+      if (!navigator.onLine) {
+        const queued = await queueAction({ table: 'vital_signs', operation: 'insert', data: payload });
+        if (!queued) throw new Error('queue failed');
+        toast.info("You're offline — vitals saved on this device and will sync when you reconnect.");
+        setOpen(false);
+        setForm({
+          heart_rate: "",
+          blood_pressure_systolic: "",
+          blood_pressure_diastolic: "",
+          temperature: "",
+          weight: "",
+          blood_sugar: "",
+        });
+        return;
       }
 
       const { error } = await supabase.from("vital_signs").insert(payload);

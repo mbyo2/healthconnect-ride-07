@@ -42,6 +42,19 @@ export const registerServiceWorker = async () => {
       });
       console.info('ServiceWorker registration successful with scope:', registration.scope);
 
+      // Offline is a core feature (rural clinics may be offline for
+      // weeks): ask the browser to treat our storage as persistent so the
+      // offline queue (IndexedDB) and caches aren't evicted under storage
+      // pressure. Best-effort — the browser decides based on engagement.
+      try {
+        if (navigator.storage?.persist) {
+          const persisted = await navigator.storage.persist();
+          console.info('Persistent storage:', persisted ? 'granted' : 'not granted');
+        }
+      } catch (e) {
+        console.warn('Persistent storage request failed:', e);
+      }
+
       // Check for updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;

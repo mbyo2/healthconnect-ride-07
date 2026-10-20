@@ -9,7 +9,7 @@
 const CACHE_NAME = 'healthconnect-v1.2.0';
 const STATIC_CACHE = 'healthconnect-static-v4';
 const DYNAMIC_CACHE = 'healthconnect-dynamic-v4';
-const API_CACHE = 'healthconnect-api-v4';
+const API_CACHE = 'healthconnect-api-v5';
 const IMAGE_CACHE = 'healthconnect-images-v1';
 // Runtime-only caches (never precached at install):
 // - SHELL: the last successfully fetched '/' HTML, so an offline reload can
@@ -128,7 +128,7 @@ async function handleBundleAsset(request) {
   const networkResponse = await fetch(request);
   if (networkResponse.ok) {
     const cache = await caches.open(BUNDLE_CACHE);
-    cache.put(request, networkResponse.clone());
+    cache.put(request, networkResponse.clone()).then(() => trimCache(BUNDLE_CACHE, 200));
   }
   return networkResponse;
 }
@@ -173,25 +173,76 @@ async function handleStaticAsset(request) {
   }
 }
 
-// Handle API requests with network-first strategy
+// Handle API requests with network-first strategy.
+// Offline reads: a signed-in user's GET responses are cached under a key
+// partitioned by their user id (decoded from the JWT `sub` claim), so a
+// shared clinic device never serves one user's data to another. Anonymous
+// requests are cached only for the public directory tables. The token
+// itself is never stored — only the id partition. Cache is wiped on
+// sign-out (CLEAR_API_CACHE) and on worker upgrade (cache version bump).
+// Keep runtime caches bounded over long offline periods: oldest entries
+// are evicted first (Cache API keys() preserves insertion order).
+async function trimCache(cacheName, maxEntries) {
+  try {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    if (keys.length > maxEntries) {
+      await Promise.all(keys.slice(0, keys.length - maxEntries).map((k) => cache.delete(k)));
+    }
+  } catch (e) { /* best-effort */ }
+}
+
+function userIdFromRequest(request) {
+  const auth = request.headers.get('Authorization') || '';
+  if (!auth.startsWith('Bearer ')) return null;
+  const parts = auth.slice(7).split('.');
+  if (parts.length !== 3) return null;
+  try {
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload.sub || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function apiCacheKey(request) {
+  const url = new URL(request.url);
+  const uid = userIdFromRequest(request);
+  if (uid) {
+    url.searchParams.set('__sb_user', uid);
+  }
+  // PostgREST returns an object vs an array for the same URL depending on
+  // the Accept header (.single() vs list) — keep those entries separate.
+  const accept = request.headers.get('Accept') || '';
+  if (accept.includes('vnd.pgrst.object')) {
+    url.searchParams.set('__sb_single', '1');
+  }
+  return url.toString();
+}
+
+function isCacheableRequest(request) {
+  // Signed-in traffic: the user's own data, partitioned by user id.
+  // Anonymous traffic: public directory tables only.
+  return userIdFromRequest(request) !== null || isCacheableAPI(request);
+}
+
 async function handleAPIRequest(request) {
+  const cache = await caches.open(API_CACHE);
+  const cacheKey = apiCacheKey(request);
   try {
     // Try network first
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
-      // Cache successful responses for critical endpoints
-      if (isCacheableAPI(request)) {
-        const cache = await caches.open(API_CACHE);
-        cache.put(request, networkResponse.clone());
+      if (isCacheableRequest(request)) {
+        cache.put(cacheKey, networkResponse.clone()).then(() => trimCache(API_CACHE, 400));
       }
       return networkResponse;
     }
-    
-    // If network fails, try cache
-    const cachedResponse = await caches.match(request);
+
+    // Server error: fall back to the cached copy if we have one
+    const cachedResponse = await cache.match(cacheKey);
     if (cachedResponse) {
-      // Add offline indicator to response without mutating headers
       const body = await cachedResponse.clone().arrayBuffer();
       const headers = new Headers(cachedResponse.headers);
       headers.set('X-Served-From', 'cache');
@@ -201,19 +252,23 @@ async function handleAPIRequest(request) {
         headers
       });
     }
-    
+
     return networkResponse;
   } catch (error) {
-    console.error('[SW] API request failed:', error);
-    
-    // Try to serve from cache
-    const cachedResponse = await caches.match(request);
+    // Offline: serve this user's cached copy
+    const cachedResponse = await cache.match(cacheKey);
     if (cachedResponse) {
-      return cachedResponse;
+      const body = await cachedResponse.clone().arrayBuffer();
+      const headers = new Headers(cachedResponse.headers);
+      headers.set('X-Served-From', 'cache');
+      return new Response(body, {
+        status: cachedResponse.status,
+        statusText: cachedResponse.statusText,
+        headers
+      });
     }
-    
-    // Return a structured offline response for cacheable directory reads
-    if (isCacheableAPI(request)) {
+
+    if (isCacheableRequest(request)) {
       return new Response(JSON.stringify({
         error: 'Service temporarily unavailable',
         offline: true,
