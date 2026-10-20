@@ -17,6 +17,19 @@ import { usePatientNames } from '@/hooks/usePatientNames';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { ListSkeleton } from '@/components/ui/list-skeleton';
+import { USER_ROLES } from '@/config/roleConfig';
+
+// Roles a referral can be addressed to (receiving clinician who can act on
+// it and close the feedback loop). ReferralFeedback matches on the doctor's
+// auth UUID, so the picker must store UUIDs — never free-text names.
+const REFERRAL_DOCTOR_ROLES: string[] = [
+  USER_ROLES.DOCTOR,
+  USER_ROLES.SPECIALIST,
+  USER_ROLES.MEDICAL_LICENTIATE,
+  USER_ROLES.CLINICAL_OFFICER,
+  USER_ROLES.DENTIST,
+  USER_ROLES.RADIOLOGIST,
+];
 
 export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   const { data: outgoing, loading, error, refresh } = useHospitalModule<any>(
@@ -80,11 +93,15 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     referred_to_hospital_id: '',
     referred_to_department: '',
     referred_to_doctor: '',
+    referred_to_name: '',
     reason_for_referral: '',
     diagnosis: '',
     priority: 'routine',
     notes: '',
   });
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
+  const [doctorsScopedToFacility, setDoctorsScopedToFacility] = useState(false);
 
   // Network directory: verified facilities eligible to receive referrals.
   // Loaded when the dialog opens so inter-facility routing always works.
@@ -100,6 +117,41 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       setFacilities(data || []);
     } catch {
       setFacilities([]);
+    }
+  };
+
+  // Doctor picker: provider_directory rows for referral-addressable roles.
+  // When a destination facility is chosen, prefer doctors on that facility's
+  // active staff roster (institution_staff); if the facility has no roster
+  // entries (common for network facilities), fall back to the full directory
+  // so the picker is never empty. referred_to_doctor stores the auth UUID —
+  // ReferralFeedback matches incoming referrals on it.
+  const loadDoctors = async (facilityId: string) => {
+    setDoctorsLoading(true);
+    try {
+      let staffIds: string[] = [];
+      if (facilityId) {
+        const { data: staff } = await supabase
+          .from('institution_staff')
+          .select('provider_id')
+          .eq('institution_id', facilityId)
+          .eq('is_active', true);
+        staffIds = (staff || []).map((s: any) => s.provider_id).filter(Boolean);
+      }
+      let query = (supabase.from('provider_directory' as any) as any)
+        .select('id, first_name, last_name, specialty, role')
+        .in('role', REFERRAL_DOCTOR_ROLES)
+        .order('last_name')
+        .limit(300);
+      if (staffIds.length > 0) query = query.in('id', staffIds);
+      const { data } = await query;
+      setDoctors(data || []);
+      setDoctorsScopedToFacility(staffIds.length > 0);
+    } catch {
+      setDoctors([]);
+      setDoctorsScopedToFacility(false);
+    } finally {
+      setDoctorsLoading(false);
     }
   };
 
@@ -124,7 +176,10 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         referral_date: new Date().toISOString().slice(0, 10),
         referred_to_hospital_id: form.referred_to_hospital_id || null,
         referred_to_department: form.referred_to_department || null,
-        referred_to_doctor: form.referred_to_doctor || dest?.name || null,
+        // UUID of the picked doctor (feedback loop matches on it); NULL for
+        // facility-only referrals. The display name goes to referred_to_name.
+        referred_to_doctor: form.referred_to_doctor || null,
+        referred_to_name: form.referred_to_doctor ? (form.referred_to_name || null) : null,
         reason_for_referral: form.reason_for_referral,
         diagnosis: form.diagnosis || null,
         priority: form.priority,
@@ -136,7 +191,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         dest ? `Referral sent to ${dest.name} — they will see it under Incoming` : 'Referral created'
       );
       setOpen(false);
-      setForm({ patient_id: '', referred_to_hospital_id: '', referred_to_department: '', referred_to_doctor: '', reason_for_referral: '', diagnosis: '', priority: 'routine', notes: '' });
+      setForm({ patient_id: '', referred_to_hospital_id: '', referred_to_department: '', referred_to_doctor: '', referred_to_name: '', reason_for_referral: '', diagnosis: '', priority: 'routine', notes: '' });
       refresh();
       refreshIncoming();
     } catch (e: any) {
@@ -165,6 +220,18 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     </div>
   );
 
+  // Display label for the receiving doctor: new rows carry the name in
+  // referred_to_name (referred_to_doctor holds the UUID); legacy rows hold
+  // free text in referred_to_doctor. Never render a raw UUID.
+  const doctorLabel = (r: any): string | null => {
+    if (r.referred_to_name) return r.referred_to_name;
+    const raw = r.referred_to_doctor;
+    if (!raw) return null;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw)
+      ? 'Assigned doctor'
+      : raw;
+  };
+
   const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => {
     // Patient name lookup: facility list → search results → selected name → fallback to raw id
     const nameFor = (patientId: string) => {
@@ -183,7 +250,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
           <p className="text-xs text-muted-foreground">{r.reason_for_referral}</p>
           <p className="text-xs text-muted-foreground">
             {r.referral_number} · {r.referred_to_department || 'No department'}
-            {r.referred_to_doctor ? ` · → ${r.referred_to_doctor}` : ''} · {r.referral_date}
+            {doctorLabel(r) ? ` · → ${doctorLabel(r)}` : ''} · {r.referral_date}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -199,7 +266,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                 customerName: nameFor(r.patient_id),
                 items: [
                   {
-                    description: `Referral to ${r.referred_to_doctor || r.referred_to_department || "Specialist"}`,
+                    description: `Referral to ${doctorLabel(r) || r.referred_to_department || "Specialist"}`,
                     quantity: 1,
                     unitPrice: 0,
                     note: r.reason_for_referral,
@@ -236,7 +303,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (v) loadFacilities(); }}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (v) { loadFacilities(); loadDoctors(form.referred_to_hospital_id); } }}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Create Referral</DialogTitle></DialogHeader>
           <div className="space-y-4">
@@ -280,7 +347,13 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
             )}
             <div className="space-y-1.5">
               <Label>Destination facility (network referral)</Label>
-              <Select value={form.referred_to_hospital_id} onValueChange={(v) => setForm({ ...form, referred_to_hospital_id: v === 'none' ? '' : v })}>
+              <Select value={form.referred_to_hospital_id} onValueChange={(v) => {
+                const facilityId = v === 'none' ? '' : v;
+                // Changing destination invalidates the picked doctor — the new
+                // facility's roster may not include them.
+                setForm({ ...form, referred_to_hospital_id: facilityId, referred_to_doctor: '', referred_to_name: '' });
+                loadDoctors(facilityId);
+              }}>
                 <SelectTrigger><SelectValue placeholder="Select receiving facility (optional)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">External / not on network</SelectItem>
@@ -300,8 +373,35 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
               <Input value={form.referred_to_department} onChange={(e) => setForm({ ...form, referred_to_department: e.target.value })} placeholder="e.g. Cardiology" />
             </div>
             <div className="space-y-1.5">
-              <Label>Refer to doctor / contact</Label>
-              <Input value={form.referred_to_doctor} onChange={(e) => setForm({ ...form, referred_to_doctor: e.target.value })} placeholder="e.g. Dr. Banda" />
+              <Label>Refer to doctor (optional)</Label>
+              <Select
+                value={form.referred_to_doctor || 'facility'}
+                onValueChange={(v) => {
+                  if (v === 'facility') {
+                    setForm({ ...form, referred_to_doctor: '', referred_to_name: '' });
+                    return;
+                  }
+                  const doc = doctors.find((d: any) => d.id === v);
+                  const name = doc ? `${doc.first_name || ''} ${doc.last_name || ''}`.trim() : '';
+                  setForm({ ...form, referred_to_doctor: v, referred_to_name: name });
+                }}
+              >
+                <SelectTrigger><SelectValue placeholder={doctorsLoading ? 'Loading doctors…' : 'Select a doctor (optional)'} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="facility">No specific doctor — facility / department only</SelectItem>
+                  {doctors.map((d: any) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {`${d.first_name || ''} ${d.last_name || ''}`.trim() || d.id}
+                      {d.specialty ? ` · ${d.specialty}` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {doctorsScopedToFacility
+                  ? 'Showing doctors on the destination facility’s staff roster. Picking a doctor lets them receive the referral personally and send outcome feedback back to you.'
+                  : 'Picking a doctor lets them receive the referral personally and send outcome feedback back to you. Leave unset for a facility-level referral.'}
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label>Reason for referral *</Label>
