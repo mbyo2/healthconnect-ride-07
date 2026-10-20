@@ -574,7 +574,7 @@ export function BarcodeVerify() {
       {/* ================================================= MISMATCH HARD STOP
            Full-screen, non-dismissible except by re-scan or typed override. */}
       {mismatched && lastResult && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-red-600 p-4" role="alertdialog" aria-modal="true" aria-label="Barcode mismatch — do not dispense">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-red-600 p-4" role="alertdialog" aria-modal="true" aria-label="Barcode mismatch — do not dispense" tabIndex={-1} ref={(el) => el?.focus()}>
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 text-center shadow-2xl dark:bg-slate-950 sm:p-8">
             <AlertOctagon className="mx-auto h-16 w-16 text-red-600" />
             <h2 className="mt-3 text-[28px] font-bold tracking-tight text-red-700 dark:text-red-400">

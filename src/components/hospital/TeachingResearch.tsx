@@ -202,7 +202,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">Student Rotations {activeRotations > 0 && <span className="text-xs font-normal text-muted-foreground">({activeRotations} active)</span>}</h3>
-            <button onClick={refreshRot} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshRot} aria-label="Refresh student rotations" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {rotLoading ? <ListSkeleton rows={4} /> : rotations.length === 0 ? (
             <EmptyState title="No rotations yet" description="Register the first student rotation to start the roster." />
@@ -236,7 +236,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">Research Studies</h3>
-            <button onClick={refreshStudy} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshStudy} aria-label="Refresh research studies" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {studyLoading ? <ListSkeleton rows={4} /> : studies.length === 0 ? (
             <EmptyState title="No research studies yet" description="Register the first study to start the research registry." />
@@ -276,7 +276,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">Case Discussions</h3>
-            <button onClick={refreshDisc} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshDisc} aria-label="Refresh case discussions" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {discLoading ? <ListSkeleton rows={4} /> : discussions.length === 0 ? (
             <EmptyState title="No case discussions yet" description="Schedule the first case discussion for the teaching calendar." />

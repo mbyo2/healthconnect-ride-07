@@ -215,7 +215,7 @@ export const PsychologistWorkflow = () => {
 
       {/* Safety-critical: Crisis resources for self-harm risk (PHQ-9 Q9 > 0) */}
       {showCrisisAlert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" role="alertdialog" aria-modal="true" aria-label="Crisis support needed" tabIndex={-1} ref={(el) => el?.focus()}>
           <Card className="max-w-md w-full border-4 border-red-600">
             <CardHeader className="bg-red-600 text-white">
               <CardTitle className="flex items-center gap-2 text-lg">

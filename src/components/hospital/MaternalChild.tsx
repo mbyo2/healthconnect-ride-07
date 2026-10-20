@@ -214,7 +214,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">ANC Visit History</h3>
-            <button onClick={refreshAnc} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshAnc} aria-label="Refresh ANC visit history" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {/* WHO 8-contact schedule reference */}
           <div className="px-4 py-3 border-b border-border bg-muted/30">
@@ -258,7 +258,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">Delivery Register</h3>
-            <button onClick={refreshDel} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshDel} aria-label="Refresh delivery register" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {delLoading ? <ListSkeleton rows={4} /> : deliveries.length === 0 ? (
             <EmptyState title="No deliveries recorded" description="Record each delivery in the facility register." />
@@ -286,7 +286,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm">Immunization Register {dueVaccines.length > 0 && <span className="ml-1 text-xs text-error-500">({dueVaccines.length} pending)</span>}</h3>
-            <button onClick={refreshImm} className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
+            <button onClick={refreshImm} aria-label="Refresh immunization register" className="p-1.5 rounded-md hover:bg-muted"><RefreshCw className="h-4 w-4" /></button>
           </div>
           {immLoading ? <ListSkeleton rows={4} /> : immunizations.length === 0 ? (
             <EmptyState title="No vaccinations scheduled" description="Schedule the first vaccination to build the immunization register." />

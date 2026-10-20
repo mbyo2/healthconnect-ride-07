@@ -60,6 +60,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                 </div>
 
                 <button
+                  aria-label="Add new item"
                   onClick={onAddNewItem}
                   className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                 >

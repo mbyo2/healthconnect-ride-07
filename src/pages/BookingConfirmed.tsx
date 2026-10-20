@@ -199,7 +199,7 @@ const BookingConfirmed = () => {
           {/* Provider Info */}
           <div className="flex items-center gap-3 pb-4 border-b border-border">
             {provider?.avatar_url ? (
-              <img src={provider.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover" />
+              <img src={provider.avatar_url} alt={`${provider?.first_name || ""} ${provider?.last_name || ""}`.trim() || "Healthcare provider"} className="w-14 h-14 rounded-full object-cover" />
             ) : (
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
                 {provider?.first_name?.[0]}{provider?.last_name?.[0]}

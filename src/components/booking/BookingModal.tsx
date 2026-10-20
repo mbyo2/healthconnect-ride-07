@@ -347,7 +347,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       <div className="text-center pb-4 border-b border-border">
         <div className="flex items-center justify-center gap-3 mb-2">
           {provider.avatar_url ? (
-            <img src={provider.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
+            <img src={provider.avatar_url} alt={`${provider.first_name || ""} ${provider.last_name || ""}`.trim() || "Healthcare provider"} className="w-16 h-16 rounded-full object-cover" />
           ) : (
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary">
               {provider.first_name?.[0]}{provider.last_name?.[0]}
@@ -609,7 +609,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             {provider.avatar_url ? (
-              <img src={provider.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+              <img src={provider.avatar_url} alt={`${provider.first_name || ""} ${provider.last_name || ""}`.trim() || "Healthcare provider"} className="w-12 h-12 rounded-full object-cover" />
             ) : (
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
                 {provider.first_name?.[0]}{provider.last_name?.[0]}

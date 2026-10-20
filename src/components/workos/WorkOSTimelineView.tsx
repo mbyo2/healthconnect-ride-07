@@ -34,11 +34,11 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button className={`p-1.5 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-slate-100 border-slate-200"}`}>
+            <button aria-label="Previous shift" className={`p-1.5 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-slate-100 border-slate-200"}`}>
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-xs font-bold px-2">Shift 1 (Day Operational)</span>
-            <button className={`p-1.5 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-slate-100 border-slate-200"}`}>
+            <button aria-label="Next shift" className={`p-1.5 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-slate-100 border-slate-200"}`}>
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>

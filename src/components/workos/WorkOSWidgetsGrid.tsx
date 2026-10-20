@@ -190,7 +190,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
                   </div>
                 </div>
 
-                <button className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors">
+                <button aria-label="Call" className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors">
                   <PhoneCall className="h-3.5 w-3.5" />
                 </button>
               </div>

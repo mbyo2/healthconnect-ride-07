@@ -288,6 +288,7 @@ export const PharmacyManagement = () => {
                   </div>
 
                   <button
+                    aria-label={`Add ${item.product_name || "item"} to dispense list`}
                     disabled={item.quantity <= 0}
                     className="p-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-30 transition-all"
                   >

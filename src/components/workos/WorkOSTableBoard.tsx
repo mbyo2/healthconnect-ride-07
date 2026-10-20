@@ -182,7 +182,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                         <th className="py-2.5 px-3 w-[130px] text-right">Est. Cost (ZMW)</th>
                         <th className="py-2.5 px-3 w-[160px]">AI Clinical Copilot</th>
                         <th className="py-2.5 px-2 w-[40px] text-center">
-                          <button title="Add Column" className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400">
+                          <button title="Add Column" aria-label="Add column" className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400">
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                         </th>
