@@ -290,6 +290,7 @@ export const COMMON_ROUTES = [
   '/profile',
   '/settings',
   '/notifications',
+  '/help',
   '/privacy-security',
   '/payment-success',
   '/payment-cancel',

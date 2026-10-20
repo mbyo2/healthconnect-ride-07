@@ -106,6 +106,7 @@ const TeachingResearchPage = lazyWithRetry(() => import('@/pages/TeachingResearc
 const ProcurementPage = lazyWithRetry(() => import('@/pages/Procurement'));
 const Map = lazyWithRetry(() => import('@/pages/Map'));
 const NotificationsPage = lazyWithRetry(() => import('@/pages/NotificationsPage'));
+const HelpSupport = lazyWithRetry(() => import('@/pages/HelpSupport'));
 const PrivacySecurityPage = lazyWithRetry(() => import('@/pages/PrivacySecurityPage'));
 const Medications = lazyWithRetry(() => import('@/pages/Medications'));
 const ProviderCalendar = lazyWithRetry(() => import('@/pages/ProviderCalendar'));
@@ -344,6 +345,8 @@ const AppContent = () => {
 
             {/* Additional User Pages */}
             <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />
+            {/* Patient-facing help: knowledge base + own support tickets (staff-only before) */}
+            <Route path="/help" element={<RouteGuard><HelpSupport /></RouteGuard>} />
             <Route path="/privacy-security" element={<RouteGuard><PrivacySecurityPage /></RouteGuard>} />
             <Route path="/medications" element={<RouteGuard><Medications /></RouteGuard>} />
             <Route path="/provider-calendar" element={<RouteGuard><ProviderCalendar /></RouteGuard>} />

@@ -105,7 +105,8 @@ export function Header() {
                   <DropdownMenuItem asChild><Link to="/search" className="font-medium text-primary-500">Find Doctors & Care</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link to="/contact" className="font-medium">Help & Support</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/help" className="font-medium">Help & Support</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/contact" className="font-medium">Contact Us</Link></DropdownMenuItem>
                   {isHealthPersonnel && (
                     <DropdownMenuItem asChild><Link to="/provider-dashboard" className="font-medium">Provider Dashboard</Link></DropdownMenuItem>
                   )}
