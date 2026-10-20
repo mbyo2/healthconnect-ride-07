@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Loader2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { NoShowManager } from "@/components/appointments/NoShowWorkflow";
+import { NoShowManager, MarkNoShowButton } from "@/components/appointments/NoShowWorkflow";
 
 const InstitutionAppointments = () => {
     const { user } = useAuth();
@@ -57,6 +57,17 @@ const InstitutionAppointments = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    // A no-show can only be marked once the appointment time has arrived:
+    // status still scheduled/confirmed and the slot is today or in the past.
+    const canMarkNoShow = (appt: any) => {
+        if (!["scheduled", "confirmed"].includes(appt.status) || !appt.date) return false;
+        const dt = new Date(`${appt.date}T${appt.time || "00:00"}`);
+        if (isNaN(dt.getTime())) return false;
+        const today = new Date();
+        const isToday = dt.getFullYear() === today.getFullYear() && dt.getMonth() === today.getMonth() && dt.getDate() === today.getDate();
+        return isToday || dt.getTime() <= Date.now();
     };
 
     const getStatusColor = (status: string) => {
@@ -109,6 +120,7 @@ const InstitutionAppointments = () => {
                                     <TableHead>Provider</TableHead>
                                     <TableHead>Type</TableHead>
                                     <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -137,6 +149,11 @@ const InstitutionAppointments = () => {
                                             <Badge variant={getStatusColor(appt.status) as any}>
                                                 {appt.status}
                                             </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {canMarkNoShow(appt) && (
+                                                <MarkNoShowButton appointmentId={appt.id} onMarked={fetchAppointments} />
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}

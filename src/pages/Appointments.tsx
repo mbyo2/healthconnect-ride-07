@@ -12,6 +12,7 @@ import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { createNotification } from "@/services/notifications";
+import { MarkNoShowButton } from "@/components/appointments/NoShowWorkflow";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Calendar,
@@ -600,6 +601,9 @@ export const AppointmentsPage = () => {
                                     >
                                       RESCHEDULE
                                     </button>
+                                  )}
+                                  {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
+                                    <MarkNoShowButton appointmentId={app.id} />
                                   )}
                                   <button
                                     onClick={() => setCancelTarget(app)}
