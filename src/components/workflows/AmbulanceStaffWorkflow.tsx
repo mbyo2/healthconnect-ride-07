@@ -8,14 +8,35 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone, Map } from 'lucide-react';
+import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone, Map, LocateFixed, LocateOff } from 'lucide-react';
 import { useAmbulanceDispatch } from '@/hooks/useAmbulanceDispatch';
+import { useAmbulancePositionPublisher, useLatestAmbulancePositions, positionAgeLabel } from '@/hooks/useAmbulancePosition';
 import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMap';
+
+const MOVING_STATUSES = ['en_route', 'on_scene', 'transporting'];
 
 export const AmbulanceStaffWorkflow = () => {
   const { dispatches, loading, active, inTransit, completedToday, createDispatch, updateStatus } = useAmbulanceDispatch();
   const [showAdd, setShowAdd] = useState(false);
   const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
+  // Crew GPS: the dispatch this device is publishing its position for.
+  const [sharingId, setSharingId] = useState<string | null>(null);
+
+  const sharingDispatch = dispatches.find(d => d.id === sharingId) || null;
+  const publisher = useAmbulancePositionPublisher({
+    dispatchId: sharingId,
+    institutionId: sharingDispatch?.institution_id ?? null,
+  });
+
+  // Stop publishing automatically once the run leaves a moving status.
+  React.useEffect(() => {
+    if (sharingId && (!sharingDispatch || !MOVING_STATUSES.includes(sharingDispatch.status))) {
+      setSharingId(null);
+    }
+  }, [sharingId, sharingDispatch]);
+
+  // Latest live position per active dispatch for the board.
+  const latestPositions = useLatestAmbulancePositions(active.map(d => d.id));
   const [form, setForm] = useState({ patient_name: '', pickup_location: '', destination: '', priority: 'urgent', ambulance_unit: 'AMB-01', contact_phone: '', notes: '' });
 
   const statusFlow: Record<string, string> = {
@@ -69,6 +90,31 @@ export const AmbulanceStaffWorkflow = () => {
         <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> Completed Today</CardTitle></CardHeader><CardContent><p className="text-3xl font-bold">{completedToday.length}</p></CardContent></Card>
       </div>
 
+      {sharingId && sharingDispatch && (
+        <div
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+            publisher.error
+              ? 'border-destructive/30 bg-destructive/5 text-destructive'
+              : 'border-primary/30 bg-primary/5 text-foreground'
+          }`}
+          role="status"
+        >
+          {publisher.sharing ? <LocateFixed className="h-4 w-4 shrink-0 text-primary" /> : <LocateOff className="h-4 w-4 shrink-0 text-muted-foreground" />}
+          {publisher.error ? (
+            <span>{publisher.error}</span>
+          ) : publisher.sharing ? (
+            <span>
+              Sharing this device's live location for <strong>{sharingDispatch.ambulance_unit}</strong>
+              {publisher.lastPosition && <> · {publisher.lastPosition.lat.toFixed(5)}, {publisher.lastPosition.lng.toFixed(5)}</>}
+              {' '}— the dispatch board sees the unit move in near-real time.
+            </span>
+          ) : (
+            <span>Starting location sharing for {sharingDispatch.ambulance_unit}…</span>
+          )}
+          <Button size="sm" variant="outline" className="ml-auto shrink-0" onClick={() => setSharingId(null)}>Stop</Button>
+        </div>
+      )}
+
       <Tabs defaultValue="map">
         <TabsList>
           <TabsTrigger value="map"><Map className="h-4 w-4 mr-1" /> Live Map</TabsTrigger>
@@ -90,20 +136,54 @@ export const AmbulanceStaffWorkflow = () => {
               {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
                 dispatches.length === 0 ? <p className="text-muted-foreground text-center py-4">No dispatches</p> : (
                   <div className="space-y-2">
-                    {dispatches.map(d => (
+                    {dispatches.map(d => {
+                      const pos = latestPositions[d.id];
+                      const isMoving = MOVING_STATUSES.includes(d.status);
+                      return (
                       <div key={d.id} className="flex items-center justify-between p-3 rounded-lg border">
                         <div>
                           <p className="font-medium">{d.patient_name} — {d.ambulance_unit}</p>
                           <p className="text-sm text-muted-foreground"><MapPin className="inline h-3 w-3" /> {d.pickup_location} → <Navigation className="inline h-3 w-3" /> {d.destination}</p>
                           {d.contact_phone && <p className="text-xs text-muted-foreground"><Phone className="inline h-3 w-3" /> {d.contact_phone}</p>}
+                          {isMoving && (
+                            pos ? (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                <LocateFixed className="inline h-3 w-3 text-primary" /> Live: {pos.lat.toFixed(5)}, {pos.lng.toFixed(5)} · updated {positionAgeLabel(pos.recorded_at)}{' '}
+                                <a
+                                  className="underline underline-offset-2 font-medium"
+                                  href={`https://www.google.com/maps?q=${pos.lat},${pos.lng}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Open in Maps
+                                </a>
+                              </p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                <LocateOff className="inline h-3 w-3" /> No live position yet — the crew device must start location sharing.
+                              </p>
+                            )
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className={priorityColor(d.priority)}>{d.priority}</Badge>
                           <Badge variant="outline">{d.status.replace(/_/g, ' ')}</Badge>
+                          {isMoving && (
+                            sharingId === d.id ? (
+                              <Button size="sm" variant="outline" onClick={() => setSharingId(null)}>
+                                <LocateOff className="h-3.5 w-3.5 mr-1" /> Stop sharing
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="outline" onClick={() => setSharingId(d.id)}>
+                                <LocateFixed className="h-3.5 w-3.5 mr-1" /> Share my location
+                              </Button>
+                            )
+                          )}
                           {statusFlow[d.status] && <Button size="touch" className="min-h-[44px]" onClick={() => updateStatus(d.id, statusFlow[d.status])}>{statusFlow[d.status].replace(/_/g, ' ')}</Button>}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )
               }
