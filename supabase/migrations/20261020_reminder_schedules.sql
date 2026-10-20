@@ -1,0 +1,79 @@
+-- ============================================================================
+-- Scheduled jobs for the messaging workers — ACTIVATION REQUIRED, NOT ACTIVE
+-- ============================================================================
+-- Status today (2026-10-20): NOTHING in this repo schedules the two worker
+-- edge functions. There is no pg_cron job, no net.http_post call, and no
+-- other in-repo scheduler for them:
+--
+--   * send-messages  — drains public.message_queue (WhatsApp-first via Meta
+--                      Cloud API, then SMS fallbacks). If it is never
+--                      invoked, queued appointment/lab reminders ACCUMULATE
+--                      and are never delivered.
+--   * send-reminder  — dispatches the 24h appointment reminders and stamps
+--                      appointments.reminder_sent_at.
+--
+-- (send-appointment-reminder is different: BookingModal invokes it
+-- synchronously at booking time, so it works without any schedule.)
+--
+-- Everything below is COMMENTED OUT on purpose: cron jobs embed the project
+-- ref and the CRON_SECRET value, and secrets must never be committed to the
+-- repo. To activate, a human runs the two Dashboard steps in
+-- docs/scheduled-jobs.md, then pastes these statements into the Supabase
+-- SQL editor with <PROJECT_REF> and <CRON_SECRET> replaced.
+-- Date: 2026-10-20
+-- ============================================================================
+
+-- ── Step 0 (Dashboard, one-time) ──────────────────────────────────────────
+-- Database -> Extensions: enable "pg_cron" and "pg_net".
+-- (Equivalently, run the two CREATE EXTENSION lines below uncommented.)
+
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- CREATE EXTENSION IF NOT EXISTS pg_net;
+
+-- ── Step 1 (Dashboard, one-time) ──────────────────────────────────────────
+-- Project Settings -> Edge Functions -> Secrets: set CRON_SECRET to a long
+-- random value. send-messages and send-reminder both reject invocations
+-- whose x-cron-secret header does not match it.
+--   CLI equivalent:  supabase secrets set CRON_SECRET=<the-secret>
+
+-- ── Job A: drain the message queue every 5 minutes ───────────────────────
+-- SELECT cron.schedule(
+--   'send-messages-drain',
+--   '*/5 * * * *',
+--   $$
+--   SELECT net.http_post(
+--     url     := 'https://<PROJECT_REF>.supabase.co/functions/v1/send-messages',
+--     headers := jsonb_build_object(
+--                  'Content-Type', 'application/json',
+--                  'x-cron-secret', '<CRON_SECRET>'
+--                ),
+--     body    := '{}'::jsonb
+--   );
+--   $$
+-- );
+
+-- ── Job B: appointment reminder dispatch, hourly ─────────────────────────
+-- SELECT cron.schedule(
+--   'send-reminder-hourly',
+--   '0 * * * *',
+--   $$
+--   SELECT net.http_post(
+--     url     := 'https://<PROJECT_REF>.supabase.co/functions/v1/send-reminder',
+--     headers := jsonb_build_object(
+--                  'Content-Type', 'application/json',
+--                  'x-cron-secret', '<CRON_SECRET>'
+--                ),
+--     body    := '{}'::jsonb
+--   );
+--   $$
+-- );
+
+-- ── Verify after activation ───────────────────────────────────────────────
+-- SELECT jobname, schedule, active FROM cron.job;
+-- SELECT * FROM cron.job_run_details ORDER BY start_time DESC LIMIT 10;
+-- (send-reminder is idempotent via the reminder_sent_at guard, and
+-- send-messages only touches queued rows, so overlapping runs are safe.)
+
+-- ── To remove ─────────────────────────────────────────────────────────────
+-- SELECT cron.unschedule('send-messages-drain');
+-- SELECT cron.unschedule('send-reminder-hourly');
