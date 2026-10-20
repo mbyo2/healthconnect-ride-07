@@ -79,9 +79,13 @@ async function lencoFetch(path: string, init?: RequestInit): Promise<LencoEnvelo
   return json;
 }
 
-/** Normalize a Zambian/Malawian MSISDN: strip spaces, dashes and a leading '+'. */
+/** Normalize a Zambian/Malawian MSISDN to the LOCAL format Lenco's docs
+ * and examples use (e.g. 0977433571): strip spaces, dashes, a leading '+',
+ * and convert a 260/265 country-code prefix to the trunk '0'. */
 export function normalizePhone(phone: string): string {
-  return String(phone || '').replace(/[\s\-().]/g, '').replace(/^\+/, '');
+  let p = String(phone || '').replace(/[\s\-().]/g, '').replace(/^\+/, '');
+  if (/^26[05]\d{9}$/.test(p)) p = '0' + p.slice(3);
+  return p;
 }
 
 export interface InitiateCollectionInput {
@@ -103,12 +107,13 @@ export async function initiateMobileMoneyCollection(
   input: InitiateCollectionInput,
 ): Promise<LencoCollectionData> {
   const body = {
-    amount: Number(input.amount).toFixed(2),
+    amount: Number(input.amount),
     currency: input.currency.toUpperCase(),
     reference: input.reference,
     phone: normalizePhone(input.phone),
     operator: input.operator,
-    country: (input.country || 'zm').toLowerCase(),
+    // tnm is Malawi's operator — the tnm+'zm' combination is invalid.
+    country: input.operator === 'tnm' ? 'mw' : (input.country || 'zm').toLowerCase(),
     bearer: input.bearer || 'merchant',
   };
   const env = await lencoFetch('/collections/mobile-money', {
@@ -160,6 +165,16 @@ export async function verifyAndSettleLenco(
   const data = await getCollectionStatus(lencoReference);
   const status = mapLencoStatus(data.status);
 
+  // Read the existing row first: metadata carries creation-time facts
+  // (description, email) that settlement needs. Merging — never replacing —
+  // the metadata JSONB (an earlier version overwrote it on every status
+  // check and wiped those fields before settlement read them).
+  const { data: existing } = await admin
+    .from('lenco_payments')
+    .select()
+    .eq('lenco_reference', lencoReference)
+    .maybeSingle();
+
   const { data: row } = await admin
     .from('lenco_payments')
     .update({
@@ -168,6 +183,7 @@ export async function verifyAndSettleLenco(
       lenco_lenco_reference: data.lencoReference || null,
       result_message: data.reasonForFailure || data.status || null,
       metadata: {
+        ...((existing?.metadata as any) ?? {}),
         last_status_check: new Date().toISOString(),
         lenco_status: data.status,
         fee: data.fee ?? null,
@@ -295,7 +311,7 @@ export async function getLencoBanks(): Promise<LencoBank[]> {
     throw new Error('LENCO_SECRET_KEY not configured');
   }
 
-  const resp = await fetch(`${LENCO_API_URL}/banks`, {
+  const resp = await fetch(`${LENCO_API_URL}/banks?country=zm`, {
     headers: { Authorization: `Bearer ${LENCO_SECRET_KEY}` },
   });
 
@@ -390,6 +406,7 @@ export async function initiateTransfer(params: LencoTransferParams): Promise<{
   const body: any = {
     accountId: LENCO_ACCOUNT_ID,
     amount: params.amount,
+    currency: (params.currency || 'ZMW').toUpperCase(),
     reference: params.reference,
     narration: params.narration || `Doc'O Clock payout ${params.reference}`,
   };
@@ -401,7 +418,9 @@ export async function initiateTransfer(params: LencoTransferParams): Promise<{
   } else {
     body.accountNumber = params.accountNumber;
     body.bankId = params.bankId;
-    if (params.accountName) body.accountName = params.accountName;
+    // NOTE: params.accountName is accepted for caller compatibility but NOT
+    // sent — the v2.0 bank-account transfer contract has no accountName
+    // field, and strict APIs may reject unknown fields.
   }
 
   try {
@@ -471,6 +490,114 @@ export async function checkTransferStatus(reference: string): Promise<{
   } catch (err: any) {
     return { status: "unknown", error: err.message };
   }
+}
+
+/**
+ * Settle a payout transfer by its merchant reference — the asynchronous
+ * completion path for withdrawals. Re-queries Lenco (authoritative), then:
+ *   successful -> withdrawal processing->paid (atomic), wallet debited,
+ *                 ledger row -> paid
+ *   failed     -> withdrawal processing->approved (admin can retry),
+ *                 ledger row -> failed
+ * Idempotent: the withdrawal update is guarded on status='processing', so
+ * a duplicate webhook or a race with the synchronous path settles once.
+ * Used by lenco-webhook (transfer.* events) and lenco-process-payout.
+ */
+export async function settleTransferByReference(
+  admin: Admin,
+  reference: string,
+): Promise<{ status: string; settled: boolean; reason?: string }> {
+  const st = await checkTransferStatus(reference);
+  if (st.status !== 'successful' && st.status !== 'failed') {
+    return { status: st.status, settled: false };
+  }
+
+  const { data: ledger } = await admin
+    .from('lenco_payments')
+    .select('id, user_id, amount, currency, metadata')
+    .eq('lenco_reference', reference)
+    .eq('reference_type', 'payout')
+    .maybeSingle();
+  const withdrawalId = (ledger?.metadata as any)?.withdrawal_id;
+  if (!ledger || !withdrawalId) {
+    return { status: st.status, settled: false, reason: 'no payout ledger row for reference' };
+  }
+
+  const { data: withdrawal } = await admin
+    .from('withdrawal_requests')
+    .select('id, provider_id, amount, currency, status')
+    .eq('id', withdrawalId)
+    .maybeSingle();
+  if (!withdrawal) {
+    return { status: st.status, settled: false, reason: 'withdrawal not found' };
+  }
+  if ((withdrawal as any).status !== 'processing') {
+    // Already in a terminal state (paid synchronously, or reverted) — the
+    // atomic guard below would no-op anyway; report current truth.
+    return { status: st.status, settled: (withdrawal as any).status === 'paid' };
+  }
+
+  if (st.status === 'failed') {
+    await admin
+      .from('withdrawal_requests')
+      .update({ status: 'approved', updated_at: new Date().toISOString() })
+      .eq('id', withdrawalId)
+      .eq('status', 'processing');
+    await admin
+      .from('lenco_payments')
+      .update({ status: 'failed', result_message: st.error || 'Transfer failed' })
+      .eq('id', (ledger as any).id);
+    return { status: 'failed', settled: true };
+  }
+
+  // successful — claim paid atomically, then debit the wallet
+  const { data: claimed } = await admin
+    .from('withdrawal_requests')
+    .update({ status: 'paid', paid_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', withdrawalId)
+    .eq('status', 'processing')
+    .select('id')
+    .maybeSingle();
+  if (!claimed) {
+    return { status: st.status, settled: false, reason: 'claim race lost (already settled)' };
+  }
+
+  const payoutAmount = Number((withdrawal as any).amount);
+  const providerId = (withdrawal as any).provider_id;
+  const { data: wallet } = await admin
+    .from('user_wallets')
+    .select('balance')
+    .eq('user_id', providerId)
+    .maybeSingle();
+  const currentBalance = Number((wallet as any)?.balance || 0);
+  if (currentBalance < payoutAmount) {
+    // The money has LEFT with Lenco — a shortfall means an earlier debit
+    // was missed. Debit in full (truthful negative liability) and shout.
+    console.error(
+      `settleTransferByReference: wallet shortfall for ${reference}: balance ${currentBalance} < payout ${payoutAmount}`,
+    );
+  }
+  await admin
+    .from('user_wallets')
+    .update({ balance: currentBalance - payoutAmount, updated_at: new Date().toISOString() })
+    .eq('user_id', providerId);
+  await admin.from('wallet_transactions').insert({
+    user_id: providerId,
+    transaction_type: 'debit',
+    amount: payoutAmount,
+    description: `Withdrawal payout ${reference}`,
+    gateway_ref: `PAYOUT:${withdrawalId}`,
+  });
+  await admin
+    .from('lenco_payments')
+    .update({
+      status: 'paid',
+      lenco_lenco_reference: st.lencoReference || null,
+      result_message: 'successful',
+    })
+    .eq('id', (ledger as any).id);
+
+  return { status: 'successful', settled: true };
 }
 
 // Legacy aliases (renamed for clarity — use initiateTransfer/checkTransferStatus)

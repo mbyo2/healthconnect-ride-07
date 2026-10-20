@@ -3,7 +3,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { verifyAndSettleLenco, verifyWebhookSignature } from '../_shared/lenco.ts';
+import { verifyAndSettleLenco, verifyWebhookSignature, settleTransferByReference } from '../_shared/lenco.ts';
 
 // Lenco webhook receiver.
 //
@@ -48,8 +48,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Lenco nests the collection under data / event.data depending on version;
+    // Lenco event envelope: { event: '<name>', data: { ... } }.
     // our reference is always the merchant-supplied one.
+    const eventName: string = String(payload?.event || '');
     const data = payload?.data ?? payload?.event?.data ?? payload;
     const reference: string | null =
       data?.reference || data?.merchantReference || payload?.reference || null;
@@ -65,7 +66,17 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Re-query Lenco (authoritative) and settle only on 'successful'.
+    // Route by event family. Transfer events complete/reverse WITHDRAWALS
+    // via the transfers status API — routing them into the collections
+    // lookup (the old behaviour) meant async payouts never settled.
+    if (eventName.startsWith('transfer.')) {
+      const outcome = await settleTransferByReference(admin as any, reference);
+      return new Response(JSON.stringify({ ok: true, ...outcome }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Collections: re-query Lenco (authoritative), settle only on 'successful'.
     const { status, settlement } = await verifyAndSettleLenco(admin as any, reference);
 
     return new Response(JSON.stringify({ ok: true, status, settled: !!(settlement as any)?.settled }), {

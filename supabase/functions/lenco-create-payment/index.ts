@@ -163,7 +163,13 @@ Deno.serve(async (req) => {
     }
 
     const lencoStatus = String(collection.status || 'pending').toLowerCase();
-    const status = lencoStatus === 'successful' ? 'paid' : lencoStatus === 'failed' ? 'failed' : 'pay_offline';
+    // 'pending' (created, prompt not yet pushed) stays distinct from
+    // 'pay-offline' (prompt on the customer's phone, awaiting approval) —
+    // collapsing them hid collections that never reached the customer.
+    const status = lencoStatus === 'successful' ? 'paid'
+      : lencoStatus === 'failed' ? 'failed'
+      : lencoStatus === 'pending' ? 'pending'
+      : 'pay_offline';
 
     const { data: inserted, error: insErr } = await admin.from('lenco_payments').insert({
       user_id: userId,
@@ -203,7 +209,7 @@ Deno.serve(async (req) => {
       account_name: collection.mobileMoneyDetails?.accountName ?? null,
       payment_id: inserted?.id,
       // UX copy: Lenco pushes an authorization prompt to the customer's phone.
-      message: status === 'pay_offline'
+      message: status === 'pay_offline' || status === 'pending'
         ? `Approve the K${amount.toFixed(2)} payment on your ${operator.toUpperCase()} phone, then tap "I've approved".`
         : 'Payment initiated.',
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
