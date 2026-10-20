@@ -429,6 +429,27 @@ export function LabMetricsDashboard() {
     },
   });
 
+  // Average turnaround: order created -> results reported (last 30 days)
+  const { data: avgTurnaroundHours } = useQuery({
+    queryKey: ["lab-avg-turnaround", user?.id],
+    queryFn: async () => {
+      const since = format(subDays(new Date(), 30), "yyyy-MM-dd");
+      const { data } = await supabase
+        .from("lab_tests" as any)
+        .select("created_at, results_date")
+        .eq("status", "completed")
+        .not("results_date", "is", null)
+        .gte("created_at", since)
+        .limit(500);
+      const rows = (data as any[]) || [];
+      const hours = rows
+        .map((r) => (new Date(r.results_date).getTime() - new Date(r.created_at).getTime()) / 3600000)
+        .filter((h) => Number.isFinite(h) && h >= 0);
+      if (hours.length === 0) return null;
+      return Math.round((hours.reduce((a, b) => a + b, 0) / hours.length) * 10) / 10;
+    },
+  });
+
   const { data: weeklyTrend, isLoading: trendLoading } = useQuery({
     queryKey: ["lab-weekly-trend", user?.id],
     queryFn: async () => {
@@ -489,10 +510,10 @@ export function LabMetricsDashboard() {
         />
         <MetricsCard
           label="Avg Turnaround"
-          value="—"
+          value={avgTurnaroundHours != null ? `${avgTurnaroundHours}h` : "—"}
           icon={Clock}
           iconColor="text-primary-500"
-          subtitle="Hours (coming soon)"
+          subtitle={avgTurnaroundHours != null ? "Last 30 days" : "No completed results yet"}
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
@@ -533,7 +554,7 @@ export function InstitutionMetricsDashboard() {
       const today = format(new Date(), "yyyy-MM-dd");
       const weekAgo = format(subDays(new Date(), 7), "yyyy-MM-dd");
       
-      const [todayAppts, totalStaff, weeklyAppts, staffRoles] = await Promise.all([
+      const [todayAppts, totalStaff, weeklyAppts, staffRoles, beds] = await Promise.all([
         supabase
           .from("appointments")
           .select("id", { count: "exact", head: true })
@@ -553,7 +574,20 @@ export function InstitutionMetricsDashboard() {
           .from("user_roles" as any)
           .select("role")
           .eq("institution_id", (inst as any).id),
+        supabase
+          .from("ward_beds" as any)
+          .select("status, patient_id")
+          .eq("institution_id", (inst as any).id),
       ]);
+
+      // Bed occupancy: beds with a patient / total beds
+      const bedRows = (beds.data as any[]) || [];
+      const totalBeds = bedRows.length;
+      const occupiedBeds = bedRows.filter(
+        (b: any) => b.patient_id != null || b.status === "occupied"
+      ).length;
+      const bedOccupancy =
+        totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : null;
 
       // Weekly appointments trend
       const byDay: Record<string, number> = {};
@@ -579,6 +613,9 @@ export function InstitutionMetricsDashboard() {
         institutionId: (inst as any).id,
         apptTrend,
         roleBreakdown,
+        bedOccupancy,
+        occupiedBeds,
+        totalBeds,
       };
     },
     enabled: !!user?.id,
@@ -621,10 +658,10 @@ export function InstitutionMetricsDashboard() {
         />
         <MetricsCard
           label="Bed Occupancy"
-          value="—"
+          value={stats?.bedOccupancy != null ? `${stats.bedOccupancy}%` : "—"}
           icon={BedDouble}
           iconColor="text-primary-500"
-          subtitle="Coming soon"
+          subtitle={stats?.totalBeds ? `${stats.occupiedBeds} of ${stats.totalBeds} beds` : "No beds registered"}
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
@@ -1400,6 +1437,18 @@ export function OTMetricsDashboard() {
       return {
         total: rows.length,
         completed: rows.filter((r) => r.status === 'completed').length,
+        scheduled: rows.filter((r) => r.status === 'scheduled' || r.status === 'planned').length,
+        utilization: (() => {
+          // Theatre utilization: % of days in the range with at least one procedure
+          const rangeDays = Math.max(
+            1,
+            Math.round(
+              (new Date(toISO).getTime() - new Date(fromISO).getTime()) / 86400000
+            ) + 1
+          );
+          const activeDays = Object.keys(byDay).length;
+          return Math.round((activeDays / rangeDays) * 100);
+        })(),
         trend,
         statusBreakdown,
       };
@@ -1424,8 +1473,8 @@ export function OTMetricsDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricsCard label="Procedures" value={stats?.total || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
         <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
-        <MetricsCard label="Theatre Utilization" value="—" icon={TrendingUp} iconColor="text-warning-500" subtitle="Coming soon" />
-        <MetricsCard label="Avg Duration" value="—" icon={Clock} iconColor="text-purple-500" subtitle="Coming soon" />
+        <MetricsCard label="Theatre Utilization" value={stats?.total ? `${stats.utilization}%` : "—"} icon={TrendingUp} iconColor="text-warning-500" subtitle="Days with cases in range" />
+        <MetricsCard label="Scheduled" value={stats?.scheduled || 0} icon={Clock} iconColor="text-purple-500" subtitle="Planned procedures" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Procedures Trend" description="Daily procedure volume">
@@ -1445,12 +1494,16 @@ export function InventoryMetricsDashboard() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['inventory-stats'],
     queryFn: async () => {
-      const { data } = await supabase.from('pharmacy_inventory' as any).select('quantity, reorder_level');
+      const { data } = await supabase.from('pharmacy_inventory' as any).select('quantity, reorder_level, unit_price');
       const rows = (data as any[]) || [];
       const totalItems = rows.length;
       const lowStock = rows.filter((r) => (r.quantity || 0) <= (r.reorder_level || 10) && (r.quantity || 0) > 0).length;
       const outOfStock = rows.filter((r) => (r.quantity || 0) <= 0).length;
       const inStock = totalItems - lowStock - outOfStock;
+      const stockValue = rows.reduce(
+        (sum, r) => sum + (Number(r.quantity) || 0) * (Number(r.unit_price) || 0),
+        0
+      );
       
       const stockBreakdown = [
         { name: 'In Stock', value: inStock },
@@ -1462,6 +1515,7 @@ export function InventoryMetricsDashboard() {
         totalItems,
         lowStock,
         outOfStock,
+        stockValue,
         stockBreakdown,
       };
     },
@@ -1485,7 +1539,7 @@ export function InventoryMetricsDashboard() {
         <MetricsCard label="Stock Items" value={stats?.totalItems || 0} icon={Pill} iconColor="text-primary-500" />
         <MetricsCard label="Low Stock" value={stats?.lowStock || 0} icon={AlertTriangle} iconColor="text-warning-500" />
         <MetricsCard label="Out of Stock" value={stats?.outOfStock || 0} icon={AlertTriangle} iconColor="text-destructive" />
-        <MetricsCard label="Stock Value" value="—" icon={DollarSign} iconColor="text-success-500" subtitle="Coming soon" />
+        <MetricsCard label="Stock Value" value={formatCurrency(stats?.stockValue || 0)} icon={DollarSign} iconColor="text-success-500" subtitle="At unit prices" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Stock Status" description="Inventory health breakdown">
@@ -1609,10 +1663,38 @@ export function AmbulanceMetricsDashboard() {
         byStatus[r.status || 'unknown'] = (byStatus[r.status || 'unknown'] || 0) + 1;
       });
       const statusBreakdown = Object.entries(byStatus).map(([name, value]) => ({ name, value }));
-      
-      return { 
-        total: rows.length, 
+
+      // Response metrics from dispatches (best-effort: richer table when present)
+      let avgResponseMin: number | null = null;
+      let vehiclesActive: number | null = null;
+      try {
+        const { data: disp } = await supabase.from('ambulance_dispatches' as any)
+          .select('created_at, arrived_at, ambulance_unit, status')
+          .gte('created_at', fromISO).lte('created_at', `${toISO}T23:59:59`);
+        const drows = (disp as any[]) || [];
+        const responses = drows
+          .filter((d) => d.arrived_at && d.created_at)
+          .map((d) => (new Date(d.arrived_at).getTime() - new Date(d.created_at).getTime()) / 60000)
+          .filter((m) => Number.isFinite(m) && m >= 0);
+        if (responses.length > 0) {
+          avgResponseMin = Math.round(responses.reduce((a, b) => a + b, 0) / responses.length);
+        }
+        const activeUnits = new Set(
+          drows
+            .filter((d) => d.status && !['completed', 'cancelled'].includes(d.status))
+            .map((d) => d.ambulance_unit)
+            .filter(Boolean)
+        );
+        vehiclesActive = activeUnits.size;
+      } catch {
+        // dispatches table unavailable — metrics stay null and render as "—"
+      }
+
+      return {
+        total: rows.length,
         completed: rows.filter((r) => r.status === 'completed').length,
+        avgResponseMin,
+        vehiclesActive,
         trend,
         statusBreakdown,
       };
@@ -1637,8 +1719,8 @@ export function AmbulanceMetricsDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricsCard label="Trips" value={stats?.total || 0} icon={Activity} iconColor="text-primary-500" subtitle={`${fromISO} → ${toISO}`} />
         <MetricsCard label="Completed" value={stats?.completed || 0} icon={CheckCircle2} iconColor="text-success-500" />
-        <MetricsCard label="Avg Response" value="—" icon={Clock} iconColor="text-warning-500" subtitle="Coming soon" />
-        <MetricsCard label="Vehicles Active" value="—" icon={CheckCircle2} iconColor="text-purple-500" subtitle="Coming soon" />
+        <MetricsCard label="Avg Response" value={stats?.avgResponseMin != null ? `${stats.avgResponseMin} min` : "—"} icon={Clock} iconColor="text-warning-500" subtitle={stats?.avgResponseMin != null ? "Request to arrival" : "No dispatch data"} />
+        <MetricsCard label="Vehicles Active" value={stats?.vehiclesActive ?? "—"} icon={CheckCircle2} iconColor="text-purple-500" subtitle="Units on active calls" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Trips Trend" description="Daily ambulance trips">
@@ -1674,6 +1756,7 @@ export function MaintenanceMetricsDashboard() {
       return {
         totalAssets: assetRows.length,
         operational: assetRows.filter((a) => a.status === 'operational').length,
+        down: assetRows.filter((a) => a.status !== 'operational').length,
         openTickets: ticketRows.length,
         assetBreakdown,
       };
@@ -1698,7 +1781,7 @@ export function MaintenanceMetricsDashboard() {
         <MetricsCard label="Total Assets" value={stats?.totalAssets || 0} icon={Activity} iconColor="text-primary-500" />
         <MetricsCard label="Operational" value={stats?.operational || 0} icon={CheckCircle2} iconColor="text-success-500" />
         <MetricsCard label="Open Tickets" value={stats?.openTickets || 0} icon={AlertTriangle} iconColor="text-warning-500" />
-        <MetricsCard label="Downtime" value="—" icon={Clock} iconColor="text-destructive" subtitle="Coming soon" />
+        <MetricsCard label="Assets Down" value={stats?.down || 0} icon={Clock} iconColor="text-destructive" subtitle="Non-operational equipment" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Assets by Status" description="Equipment health breakdown">
