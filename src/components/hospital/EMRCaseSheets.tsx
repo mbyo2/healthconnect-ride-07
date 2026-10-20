@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { FileText, Plus, Search, User, Clock, Stethoscope, Save } from 'lucide-react';
+import { TemplatePicker } from '@/components/clinical/NoteTemplates';
 
 interface Props {
   hospital: any;
@@ -40,6 +41,15 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
     follow_up_notes: '',
     icd_code: '',
   });
+
+  // SmartPhrases: insert an expanded template into a case-sheet field,
+  // appending to whatever the clinician has already written.
+  const insertTemplateInto = (field: 'chief_complaint' | 'history_present_illness' | 'examination_findings' | 'provisional_diagnosis' | 'treatment_plan' | 'follow_up_notes' | 'past_medical_history') =>
+    (text: string) =>
+      setCaseSheet(p => ({
+        ...p,
+        [field]: p[field]?.trim() ? `${p[field].replace(/\s+$/, '')}\n${text}` : text,
+      }));
 
   const { data: recentCases, loading, error, refresh } = useHospitalModule<any>(
     'comprehensive_medical_records', 'institution_id', hospital?.id, { orderBy: 'visit_date', ascending: false }
@@ -223,15 +233,24 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
 
                 <TabsContent value="consultation" className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-foreground">Chief Complaint</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">Chief Complaint</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('chief_complaint')} />
+                    </div>
                     <Textarea placeholder="Patient's main complaint..." value={caseSheet.chief_complaint} onChange={e => setCaseSheet(p => ({ ...p, chief_complaint: e.target.value }))} rows={2} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">History of Present Illness</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">History of Present Illness</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('history_present_illness')} />
+                    </div>
                     <Textarea placeholder="Detailed history..." value={caseSheet.history_present_illness} onChange={e => setCaseSheet(p => ({ ...p, history_present_illness: e.target.value }))} rows={3} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">Examination Findings</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">Examination Findings</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('examination_findings')} />
+                    </div>
                     <Textarea placeholder="Physical examination notes..." value={caseSheet.examination_findings} onChange={e => setCaseSheet(p => ({ ...p, examination_findings: e.target.value }))} rows={3} />
                   </div>
                 </TabsContent>
@@ -258,7 +277,10 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
                 <TabsContent value="diagnosis" className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
+                      <div className="flex items-center justify-between">
                       <label className="text-xs font-medium text-foreground">Provisional Diagnosis</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('provisional_diagnosis')} />
+                    </div>
                       <Textarea placeholder="Diagnosis..." value={caseSheet.provisional_diagnosis} onChange={e => setCaseSheet(p => ({ ...p, provisional_diagnosis: e.target.value }))} rows={2} />
                     </div>
                     <div>
@@ -271,18 +293,27 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
                     <Textarea placeholder="Labs, imaging..." value={caseSheet.investigations_ordered} onChange={e => setCaseSheet(p => ({ ...p, investigations_ordered: e.target.value }))} rows={2} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">Treatment Plan</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">Treatment Plan</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('treatment_plan')} />
+                    </div>
                     <Textarea placeholder="Treatment & prescriptions..." value={caseSheet.treatment_plan} onChange={e => setCaseSheet(p => ({ ...p, treatment_plan: e.target.value }))} rows={3} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">Follow-up Notes</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">Follow-up Notes</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('follow_up_notes')} />
+                    </div>
                     <Textarea placeholder="Follow-up instructions..." value={caseSheet.follow_up_notes} onChange={e => setCaseSheet(p => ({ ...p, follow_up_notes: e.target.value }))} rows={2} />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="history" className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-foreground">Past Medical History</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-foreground">Past Medical History</label>
+                      <TemplatePicker patientName={activeCase ? (nameFor(activeCase.patient_id) || undefined) : undefined} onInsert={insertTemplateInto('past_medical_history')} />
+                    </div>
                     <Textarea placeholder="Previous illnesses, surgeries..." value={caseSheet.past_medical_history} onChange={e => setCaseSheet(p => ({ ...p, past_medical_history: e.target.value }))} rows={3} />
                   </div>
                   <div>

@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Stethoscope, Calendar, Plus, Loader2, Clock, CheckCircle, Users, FileText } from 'lucide-react';
 import { useSpecialistSessions } from '@/hooks/useSpecialistSessions';
+import { TemplatePicker } from '@/components/clinical/NoteTemplates';
 
 const SPECIALTY_TYPES = [
   { value: 'dialysis', label: 'Dialysis' },
@@ -55,7 +56,16 @@ export const SpecialistWorkflow = () => {
                 <div className="space-y-1"><Label>Total Sessions</Label><Input type="number" value={form.total_sessions} onChange={e => setForm({...form, total_sessions: +e.target.value})} /></div>
                 <div className="space-y-1"><Label>Date</Label><Input type="date" value={form.session_date} onChange={e => setForm({...form, session_date: e.target.value})} /></div>
               </div>
-              <div className="space-y-1"><Label>Protocol Notes</Label><Textarea value={form.protocol_notes} onChange={e => setForm({...form, protocol_notes: e.target.value})} rows={3} placeholder="Pre-session notes, protocol details..." /></div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label>Protocol Notes</Label>
+                  <TemplatePicker
+                    patientName={form.patient_name || undefined}
+                    onInsert={(text) => setForm(f => ({ ...f, protocol_notes: f.protocol_notes.trim() ? `${f.protocol_notes.replace(/\s+$/, '')}\n${text}` : text }))}
+                  />
+                </div>
+                <Textarea value={form.protocol_notes} onChange={e => setForm({...form, protocol_notes: e.target.value})} rows={3} placeholder="Pre-session notes, protocol details..." />
+              </div>
               <Button className="w-full" onClick={async () => { await createSession(form as any); setShowAdd(false); }}>Schedule Session</Button>
             </div>
           </DialogContent>
