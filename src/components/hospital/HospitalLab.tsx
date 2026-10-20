@@ -11,8 +11,14 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
+import { dispatchNotification } from "@/hooks/useNotifications";
 
-const getStatusPill = (status: string) => {
+const getStatusPill = (status: string, order?: any) => {
+  // A completed result with no verifier is NOT a released report — it is
+  // sitting in the pathologist queue. Label it honestly.
+  if ((status === "completed" || status === "report_ready") && order && !order.verified_by) {
+    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Awaiting Verification</span>;
+  }
   switch (status) {
     case "completed":
     case "report_ready":
@@ -105,11 +111,65 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
     if (!showResultDialog || !resultInput.trim()) return;
     setIsSubmitting(true);
     try {
+      const order = showResultDialog;
+      // Results are saved UNVERIFIED (mirrors LabManagement.submitResult):
+      // lab_tests is the source of truth; the patient only sees values after
+      // a pathologist verifies. Nothing is "released" from this dialog.
       const { error: err } = await (supabase.from("lab_tests" as any) as any)
-        .update({ status: "completed", result_summary: resultInput, results_date: new Date().toISOString() })
-        .eq("id", showResultDialog.id);
+        .update({
+          status: "completed",
+          result_summary: resultInput,
+          results_date: new Date().toISOString(),
+          performed_by: user?.id ?? null,
+        })
+        .eq("id", order.id);
       if (err) throw err;
-      toast.success("Lab result submitted and released");
+
+      const patientName = nameFor(order.patient_id) || "Unknown Patient";
+      const testName = order.test_type || "Lab Test";
+      const isUrgent = ["stat", "critical", "urgent"].includes((order.priority || "").toLowerCase());
+
+      // Mirror row for the patient-facing results list (unverified).
+      try {
+        await (supabase.from("lab_results" as any) as any).insert({
+          request_id: order.id,
+          test_id: order.id,
+          patient_id: order.patient_id,
+          technician_id: user?.id ?? null,
+          test_name: testName,
+          test_date: new Date().toISOString().split("T")[0],
+          result_value: resultInput,
+          is_abnormal: false,
+          notes: "Pending pathologist review",
+        });
+      } catch (e) { console.error("lab_results push failed", e); }
+
+      // Pathologist verification queue row.
+      try {
+        await (supabase.from("pathologist_reviews" as any) as any).insert({
+          institution_id: hospital.id,
+          patient_name: patientName,
+          test_name: testName,
+          result_value: resultInput,
+          lab_tech_id: user?.id ?? null,
+          lab_tech_name: user?.email ?? null,
+          status: isUrgent ? "urgent_review" : "pending_review",
+        });
+      } catch (e) { console.error("pathologist queue push failed", e); }
+
+      // Notify the ordering doctor that a result was entered (in-app).
+      if (order.ordered_by && order.ordered_by !== user?.id) {
+        dispatchNotification({
+          userId: order.ordered_by,
+          title: "Lab result entered",
+          message: `${testName} result entered for ${patientName} — awaiting pathologist verification.`,
+          category: "lab",
+          link: "/lab-management",
+          channels: [],
+        });
+      }
+
+      toast.success("Result submitted for verification — a pathologist will sign it off before the patient sees it");
       setShowResultDialog(null);
       setResultInput("");
       refresh();
@@ -235,7 +295,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                     <div className="text-xs text-graphite-500 dark:text-slate-400">{order.test_type}</div>
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(order.patient_id) || "Inpatient"}</td>
-                  <td className="py-3 px-3 text-center">{getStatusPill(order.status)}</td>
+                  <td className="py-3 px-3 text-center">{getStatusPill(order.status, order)}</td>
                   <td className="py-3 px-3 text-slate-500">{order.sample_type || "—"}</td>
                   <td className="py-3 px-3">
                     {order.priority && order.priority !== "routine" ? (
@@ -376,7 +436,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
               disabled={!resultInput.trim() || isSubmitting}
               className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold"
             >
-              {isSubmitting ? "Releasing..." : "Submit & Release Result"}
+              {isSubmitting ? "Submitting..." : "Submit for Verification"}
             </button>
           </DialogFooter>
         </DialogContent>

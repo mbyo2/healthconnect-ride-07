@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { dispatchNotification } from "@/hooks/useNotifications";
+import { queueLabResultAlert } from "@/utils/sms-reminder-service";
 import { providerDisplayName } from "@/utils/providerDisplay";
 
 const LabManagement = () => {
@@ -34,6 +35,10 @@ const LabManagement = () => {
     : availableRoles.includes("phlebotomist")
       ? "Collection runs, specimen handover & chain of custody"
       : "Test queue, result entry & verification";
+  // Separation of duties: only a pathologist (or platform admin/super_admin)
+  // may verify & sign off a result — never the person who entered it by default.
+  // Roles come from user_roles via useUserRoles, never profiles.role.
+  const canVerify = availableRoles.some((r) => ["pathologist", "admin", "super_admin"].includes(r));
   const { institutionId: contextInstitutionId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const [searchTerm, setSearchTerm] = useState("");
@@ -268,6 +273,22 @@ const LabManagement = () => {
         if (orderingId && orderingId !== user?.id) {
           dispatchNotification({ userId: orderingId, title, message, category: "lab", channels: ["push", "sms", "email"] });
         }
+      } else {
+        // Routine results: the ordering doctor is still notified on entry
+        // (in-app; previously ONLY critical results notified anyone). The
+        // patient is notified at verification, when values become visible.
+        const orderingId = (selectedRequest as any).ordered_by;
+        if (orderingId && orderingId !== user?.id) {
+          const testName = (selectedRequest as any).test_type || "Lab Test";
+          dispatchNotification({
+            userId: orderingId,
+            title: "Lab result entered",
+            message: `${testName} result entered for ${patientName} — awaiting pathologist verification.`,
+            category: "lab",
+            link: "/lab-management",
+            channels: [],
+          });
+        }
       }
 
       toast.success(isUrgent ? "Critical result submitted — clinicians notified" : "Results submitted & sent for pathologist review");
@@ -285,6 +306,13 @@ const LabManagement = () => {
 
   const verifyResult = async () => {
     if (!selectedRequest) return;
+    // Separation of duties (audit 2026-10-20): verification is restricted to
+    // pathologists and platform admins — the button is also disabled for
+    // everyone else, this guard is the enforcement.
+    if (!canVerify) {
+      toast.error("Only a pathologist (or admin) can verify & sign off lab results.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const { error } = await supabase
@@ -320,6 +348,41 @@ const LabManagement = () => {
         if (notesError) console.warn("lab_results notes clear failed", notesError);
       } catch (e) {
         console.warn("lab_results verify mirror failed", e);
+      }
+
+      // Notify the patient now that the result is verified — this is when
+      // result values become visible to them (PatientLabResults hides values
+      // until verified). In-app always; WhatsApp/SMS via the lab_result_ready
+      // queue when we have a phone on file. Best-effort: never fail sign-off.
+      try {
+        const patientId = (selectedRequest as any).patient_id;
+        const testName = (selectedRequest as any).test_type || "Lab Test";
+        if (patientId) {
+          dispatchNotification({
+            userId: patientId,
+            title: "Lab result verified",
+            message: `Your ${testName} result has been verified by a pathologist and is ready to view.`,
+            category: "lab",
+            link: "/medical-records",
+            channels: [],
+          });
+          const { data: patientProfile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name, phone")
+            .eq("id", patientId)
+            .maybeSingle();
+          const phone = (patientProfile as any)?.phone;
+          if (phone) {
+            await queueLabResultAlert({
+              patientId,
+              patientPhone: phone,
+              patientName: `${(patientProfile as any)?.first_name ?? ""} ${(patientProfile as any)?.last_name ?? ""}`.trim() || "Patient",
+              institutionId: contextInstitutionId || undefined,
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("patient verify notification failed", e);
       }
 
       toast.success("Result verified & signed off");
@@ -766,13 +829,18 @@ const LabManagement = () => {
                       </button>
                       <button
                         onClick={verifyResult}
-                        disabled={isSubmitting || (selectedRequest as any).verified_by}
+                        disabled={isSubmitting || (selectedRequest as any).verified_by || !canVerify}
                         className="px-5 py-2 rounded-md bg-success-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs disabled:opacity-50"
                       >
                         {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                         {(selectedRequest as any).verified_by ? "Verified ✓" : "Verify & Sign Off"}
                       </button>
                     </div>
+                    {!canVerify && !(selectedRequest as any).verified_by && (
+                      <p className="text-xs text-graphite-500 dark:text-slate-400">
+                        Verification is restricted to pathologists (or platform admins) — results you enter are signed off by a pathologist.
+                      </p>
+                    )}
                   </>
                 ) : (
                   <>

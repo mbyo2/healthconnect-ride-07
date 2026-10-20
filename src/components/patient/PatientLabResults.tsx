@@ -101,12 +101,23 @@ export default function PatientLabResults() {
                         <Badge variant="secondary">Pending verification</Badge>
                       )}
                     </div>
-                    <p className="text-sm">{r.result_value ? `${r.result_value} ${r.unit || ''}`.trim() : 'Result pending'}</p>
-                    {r.reference_range && (
-                      <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
-                    )}
-                    {r.notes && !(isVerified && r.notes.trim() === "Pending pathologist review") && (
-                      <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>
+                    {/* Result values are only shown once a pathologist has
+                        verified the result — unverified entries must never
+                        leak values (or value-bearing notes) to the patient. */}
+                    {isVerified ? (
+                      <>
+                        <p className="text-sm">{r.result_value ? `${r.result_value} ${r.unit || ''}`.trim() : 'Result pending'}</p>
+                        {r.reference_range && (
+                          <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
+                        )}
+                        {r.notes && r.notes.trim() !== "Pending pathologist review" && (
+                          <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Awaiting verification — your result values will appear here once a pathologist signs them off.
+                      </p>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">
                       {resultDate ? format(new Date(resultDate), 'PPP') : 'Date not recorded'}
