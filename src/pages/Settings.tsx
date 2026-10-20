@@ -1,20 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Bell, Shield, User, Loader2, Globe, Clock, Type, Palette, Settings as SettingsIcon } from "lucide-react";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAccessibility } from "@/context/AccessibilityContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/i18n/LanguageContext";
 import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
 
+/**
+ * Real push state of THIS device/browser — deliberately not the saved
+ * account preference. A preference row saying "on" means nothing if this
+ * browser never granted permission or holds no push subscription, which
+ * is exactly the gap the 2026-10-20 audit found (switch showed enabled
+ * for users who could never receive a push).
+ */
+type PushUiState = "checking" | "enabled" | "disabled" | "blocked" | "unsupported";
+
+async function detectPushState(): Promise<PushUiState> {
+  // Native shells have no Web Push (FCM/APNs plugin not integrated) — the
+  // subscribe service says the same, so report it honestly as unsupported.
+  if (Capacitor.isNativePlatform()) return "unsupported";
+  if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+    return "unsupported";
+  }
+  if (Notification.permission === "denied") return "blocked";
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await (registration as any).pushManager.getSubscription();
+    return subscription ? "enabled" : "disabled";
+  } catch {
+    return "disabled";
+  }
+}
+
 const Settings = () => {
   const { language: i18nLang, setLanguage: setI18nLang } = useLanguage();
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(false);
+  const [pushState, setPushState] = useState<PushUiState>("checking");
+  const [pushBusy, setPushBusy] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [marketingOptOut, setMarketingOptOut] = useState(false);
   const [smsReminders, setSmsReminders] = useState(false);
@@ -75,7 +104,8 @@ const Settings = () => {
           .maybeSingle();
 
         if (notifSettings) {
-          setNotifications(notifSettings.push_notifications ?? true);
+          // Push switch state is NOT seeded from this preference row — it
+          // is driven by the real device subscription (see refreshPushState).
           setEmailNotifications(notifSettings.email_notifications ?? true);
           setSmsReminders(notifSettings.appointment_reminders ?? false);
         }
@@ -131,24 +161,44 @@ const Settings = () => {
     if (error) throw error;
   };
 
+  // Read the device's actual push subscription and mirror it in the UI.
+  const refreshPushState = useCallback(async () => {
+    const state = await detectPushState();
+    setPushState(state);
+    setNotifications(state === "enabled");
+  }, []);
+
+  useEffect(() => {
+    refreshPushState();
+  }, [refreshPushState]);
+
   const handleNotificationToggle = async (checked: boolean) => {
-    setNotifications(checked);
+    setPushBusy(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      await upsertNotificationSettings(user.id, { push_notifications: checked });
-
       if (checked) {
+        // Subscribe FIRST; only persist the preference once the device
+        // really holds a subscription.
         const success = await subscribeToNotifications();
-        if (!success) { setNotifications(false); return; }
+        if (!success) {
+          await refreshPushState();
+          return;
+        }
       } else {
         await unsubscribeFromNotifications();
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await upsertNotificationSettings(user.id, { push_notifications: checked });
+      }
+
+      await refreshPushState();
       showSuccess({ message: `Push notifications ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update notification settings");
+      await refreshPushState();
+    } finally {
+      setPushBusy(false);
     }
   };
 
@@ -369,8 +419,21 @@ const Settings = () => {
                 <div>
                   <p className="font-bold text-xs">Browser Push Notifications</p>
                   <p className="text-xs text-graphite-600 dark:text-slate-300">Instant alerts for messages, calls & lab updates</p>
+                  <p className="text-xs mt-1 font-semibold" role="status">
+                    {pushState === "checking" && <span className="text-graphite-500 dark:text-slate-400">Checking this device…</span>}
+                    {pushState === "enabled" && <span className="text-success-600 dark:text-success-400">Enabled on this device</span>}
+                    {pushState === "disabled" && <span className="text-graphite-500 dark:text-slate-400">Not enabled on this device — switch on to receive push alerts here</span>}
+                    {pushState === "blocked" && <span className="text-error-500">Blocked in your browser settings — allow notifications for this site, then switch on</span>}
+                    {pushState === "unsupported" && <span className="text-graphite-500 dark:text-slate-400">Not supported in this browser/app — in-app, WhatsApp and SMS alerts still work</span>}
+                  </p>
                 </div>
-                <Switch checked={notifications} onCheckedChange={handleNotificationToggle} aria-label="Browser push notifications"  className="scale-125" />
+                <Switch
+                  checked={notifications}
+                  onCheckedChange={handleNotificationToggle}
+                  disabled={pushBusy || pushState === "checking" || pushState === "blocked" || pushState === "unsupported"}
+                  aria-label="Browser push notifications"
+                  className="scale-125 shrink-0"
+                />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
