@@ -8,7 +8,7 @@ import {
   Baby, Dumbbell, Ticket, Share2, Layers, Tv,
   DollarSign, Wrench, FileCode, Clock, CreditCard, Network,
   BookOpen, FileText, Calculator, CheckCircle2, Hourglass, Droplet,
-  Siren, BedDouble
+  Siren, BedDouble, HeartPulse, Scissors, Ambulance
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -21,6 +21,10 @@ import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
 import { Lock } from "lucide-react";
 import { PatientInstitutionManager } from "@/components/institution/PatientInstitutionManager";
 import DuplicatePatients from "@/components/admin/DuplicatePatients";
+import { EmergencyTriage } from "@/components/hospital/EmergencyTriage";
+import { ICU } from "@/components/hospital/ICU";
+import { OTManagement } from "@/components/hospital/OTManagement";
+import { AmbulanceStaffWorkflow } from "@/components/workflows/AmbulanceStaffWorkflow";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, subDays, startOfMonth, startOfDay, endOfMonth } from "date-fns";
 import { toast } from "sonner";
@@ -520,6 +524,10 @@ export const InstitutionDashboard = () => {
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
             { id: "patients", label: "Patient Hub (Central MRN)", icon: UserRound },
             { id: "queue", label: "Queue & Calling Desk", icon: Ticket },
+            { id: "emergency", label: "Emergency & Triage", icon: Siren },
+            { id: "icu", label: "ICU", icon: HeartPulse },
+            { id: "theatre", label: "Operating Theatre", icon: Scissors },
+            { id: "ambulance", label: "Ambulance Dispatch", icon: Ambulance },
             { id: "pediatrics", label: "Pediatric Center", icon: Baby },
             { id: "physio", label: "Physiotherapy Center", icon: Dumbbell },
             { id: "dispensary", label: "Dispensary Operations", icon: Pill },
@@ -815,6 +823,18 @@ export const InstitutionDashboard = () => {
 
         {/* 3. Queue & Live Calling Desk */}
         {activeTab === "queue" && <CentralizedQueueDesk institutionId={institution.id} />}
+
+        {/* 3b. Emergency & Triage (hero module) */}
+        {activeTab === "emergency" && <EmergencyTriage hospital={institution} />}
+
+        {/* 3c. ICU (hero module) */}
+        {activeTab === "icu" && <ICU hospital={institution} />}
+
+        {/* 3d. Operating Theatre (hero module) */}
+        {activeTab === "theatre" && <OTManagement hospital={institution} />}
+
+        {/* 3e. Ambulance Dispatch (hero module) */}
+        {activeTab === "ambulance" && <AmbulanceStaffWorkflow />}
 
         {/* 4. Pediatric Center */}
         {activeTab === "pediatrics" && <PediatricCenter institutionId={institution.id} />}

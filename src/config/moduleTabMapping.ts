@@ -20,6 +20,10 @@ export type InstitutionTabKey =
   | "overview"
   | "patients"
   | "queue"
+  | "emergency"
+  | "icu"
+  | "theatre"
+  | "ambulance"
   | "pediatrics"
   | "physio"
   | "dispensary"
@@ -72,6 +76,34 @@ export const TAB_MODULE_MAP: TabModuleRule[] = [
     essential: false,
     notes:
       "Queue desk serves the outpatient/appointment flow. Visible when either OPD or Appointments is live.",
+  },
+  {
+    tab: "emergency",
+    label: "Emergency & Triage",
+    requiredModules: ["emergency"],
+    essential: false,
+    notes: "Emergency module (hero add-on).",
+  },
+  {
+    tab: "icu",
+    label: "ICU",
+    requiredModules: ["icu"],
+    essential: false,
+    notes: "ICU module (hero add-on).",
+  },
+  {
+    tab: "theatre",
+    label: "Operating Theatre",
+    requiredModules: ["theatre"],
+    essential: false,
+    notes: "Theatre module (hero add-on).",
+  },
+  {
+    tab: "ambulance",
+    label: "Ambulance Dispatch",
+    requiredModules: ["ambulance"],
+    essential: false,
+    notes: "Ambulance module (hero add-on).",
   },
   {
     tab: "pediatrics",

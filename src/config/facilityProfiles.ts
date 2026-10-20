@@ -704,6 +704,8 @@ export const TAB_TO_HMS_MODULE: Record<string, HmsModule> = {
   radiology: 'radiology',
   emergency: 'emergency',
   theatre: 'ot',
+  icu: 'icu',
+  ambulance: 'ambulance',
   ot: 'ot',
   wards: 'ipd',
   ipd: 'ipd',
