@@ -1,7 +1,11 @@
 // send-messages: drains the message_queue outbox (SMS / WhatsApp).
 //
 // Providers (env-driven, secrets-only swap like the payment gateways):
-//   Primary:  Africa's Talking — best Zambia coverage (MTN/Airtel/Zamtel)
+//   WhatsApp primary: Meta Cloud API direct (no BSP markup; utility
+//     templates — appointment_reminder, lab_result_ready):
+//     WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID,
+//     WHATSAPP_TEMPLATE_LANGUAGE (default 'en')
+//   SMS primary / WhatsApp fallback: Africa's Talking
 //     AT_API_KEY, AT_USERNAME, AT_SENDER_ID (default DOCOCLOCK)
 //   Fallback: Twilio
 //     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SMS_FROM, TWILIO_WHATSAPP_FROM
@@ -28,8 +32,115 @@ interface QueuedMessage {
   phone_number: string;
   channel: 'sms' | 'whatsapp' | 'email';
   message_body: string;
+  template_key: string | null;
+  patient_id: string | null;
+  appointment_id: string | null;
   attempts: number;
   institution_id: string | null;
+}
+
+// Meta WhatsApp Cloud API (direct). Proactive messages must use approved
+// utility templates; the template name is the queue row's template_key and
+// the parameters are pulled from platform data (patient, appointment,
+// institution) — never re-entered.
+async function sendViaMetaWhatsApp(
+  supabase: any,
+  msg: QueuedMessage,
+): Promise<{ ok: boolean; providerId?: string; error?: string }> {
+  const token = Deno.env.get('WHATSAPP_ACCESS_TOKEN');
+  const phoneNumberId = Deno.env.get('WHATSAPP_PHONE_NUMBER_ID');
+  if (!token || !phoneNumberId) return { ok: false, error: 'Meta WhatsApp not configured' };
+
+  const templateName =
+    msg.template_key || Deno.env.get('WHATSAPP_DEFAULT_TEMPLATE') || 'appointment_reminder';
+  const language = Deno.env.get('WHATSAPP_TEMPLATE_LANGUAGE') || 'en';
+
+  // Resolve template parameters from the platform's own records.
+  let patientName = 'there';
+  if (msg.patient_id) {
+    const { data: p } = await supabase
+      .from('profiles')
+      .select('first_name')
+      .eq('id', msg.patient_id)
+      .maybeSingle();
+    if ((p as any)?.first_name) patientName = (p as any).first_name;
+  }
+  let facilityName = "Doc'O Clock";
+  if (msg.institution_id) {
+    const { data: inst } = await supabase
+      .from('healthcare_institutions')
+      .select('name')
+      .eq('id', msg.institution_id)
+      .maybeSingle();
+    if ((inst as any)?.name) facilityName = (inst as any).name;
+  }
+
+  let params: string[];
+  if (templateName === 'lab_result_ready') {
+    params = [patientName, facilityName];
+  } else {
+    // appointment_confirmation / appointment_reminder: name, place, date, time
+    let dateStr = '';
+    let timeStr = '';
+    let withWhom = facilityName;
+    if (msg.appointment_id) {
+      const { data: appt } = await supabase
+        .from('appointments')
+        .select('date, time, provider_id')
+        .eq('id', msg.appointment_id)
+        .maybeSingle();
+      if (appt) {
+        const d = new Date(`${(appt as any).date}T${(appt as any).time || '09:00'}`);
+        if (!isNaN(d.getTime())) {
+          dateStr = d.toLocaleDateString('en-GB', {
+            weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+          });
+          timeStr = (appt as any).time?.slice(0, 5) || '';
+        } else {
+          dateStr = (appt as any).date || '';
+          timeStr = (appt as any).time || '';
+        }
+        if ((appt as any).provider_id) {
+          const { data: doc } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', (appt as any).provider_id)
+            .maybeSingle();
+          const docName = `${(doc as any)?.first_name || ''} ${(doc as any)?.last_name || ''}`.trim();
+          if (docName && !msg.institution_id) withWhom = `Dr. ${docName}`;
+        }
+      }
+    }
+    params = [patientName, withWhom, dateStr, timeStr];
+  }
+
+  const res = await fetch(`https://graph.facebook.com/v21.0/${phoneNumberId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: msg.phone_number.replace(/[^0-9]/g, ''),
+      type: 'template',
+      template: {
+        name: templateName,
+        language: { code: language },
+        components: [
+          {
+            type: 'body',
+            parameters: params.map((text) => ({ type: 'text', text: text || '-' })),
+          },
+        ],
+      },
+    }),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    return { ok: false, error: `Meta WhatsApp ${res.status}: ${json?.error?.message || JSON.stringify(json)}` };
+  }
+  return { ok: true, providerId: json?.messages?.[0]?.id };
 }
 
 async function sendViaAfricasTalking(
@@ -153,7 +264,7 @@ Deno.serve(async (req) => {
   // Claim due messages: queued and scheduled_for <= now
   const { data: due, error: fetchError } = await supabase
     .from('message_queue')
-    .select('id, phone_number, channel, message_body, attempts, institution_id')
+    .select('id, phone_number, channel, message_body, template_key, patient_id, appointment_id, attempts, institution_id')
     .eq('status', 'queued')
     .lte('scheduled_for', new Date().toISOString())
     .lt('attempts', 3)
@@ -199,14 +310,35 @@ Deno.serve(async (req) => {
       if ((settings as any)?.sms_sender_id) senderId = (settings as any).sms_sender_id;
     }
 
-    // Primary: Africa's Talking. Fallback: Twilio.
-    let attempt = await sendViaAfricasTalking(msg, senderId);
-    let provider = 'africas_talking';
-    if (!attempt.ok) {
-      const twilioAttempt = await sendViaTwilio(msg);
-      if (twilioAttempt.ok) {
-        attempt = twilioAttempt;
-        provider = 'twilio';
+    // WhatsApp goes Meta-direct first (no BSP markup); SMS starts at
+    // Africa's Talking. Each falls through to the next provider on failure.
+    let attempt: { ok: boolean; providerId?: string; error?: string };
+    let provider: string;
+    if (msg.channel === 'whatsapp') {
+      attempt = await sendViaMetaWhatsApp(supabase, msg);
+      provider = 'meta_whatsapp';
+      if (!attempt.ok) {
+        const atAttempt = await sendViaAfricasTalking(msg, senderId);
+        if (atAttempt.ok) {
+          attempt = atAttempt;
+          provider = 'africas_talking';
+        } else {
+          const twilioAttempt = await sendViaTwilio(msg);
+          if (twilioAttempt.ok) {
+            attempt = twilioAttempt;
+            provider = 'twilio';
+          }
+        }
+      }
+    } else {
+      attempt = await sendViaAfricasTalking(msg, senderId);
+      provider = 'africas_talking';
+      if (!attempt.ok) {
+        const twilioAttempt = await sendViaTwilio(msg);
+        if (twilioAttempt.ok) {
+          attempt = twilioAttempt;
+          provider = 'twilio';
+        }
       }
     }
 

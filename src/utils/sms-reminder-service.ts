@@ -111,10 +111,14 @@ export async function queueAppointmentReminders(args: {
   if (p.appointment_reminders === false) return 0;
 
   const phone = p.preferred_phone || args.patientPhone;
+  // WhatsApp-first (CEO directive 2026-10-20): Meta Cloud API is the live
+  // channel. WhatsApp queues unless the patient opted out. SMS queues only
+  // on explicit opt-in — it has no configured provider yet, so default
+  // SMS rows would only burn their retries and die before keys arrive.
   const channels: ("sms" | "whatsapp")[] = [];
-  if (p.sms_enabled !== false) channels.push("sms");
-  if (p.whatsapp_enabled === true) channels.push("whatsapp");
-  if (channels.length === 0) channels.push("sms"); // SMS is the Zambia default
+  if (p.whatsapp_enabled !== false) channels.push("whatsapp");
+  if (p.sms_enabled === true) channels.push("sms");
+  if (channels.length === 0) channels.push("whatsapp");
 
   const template =
     args.template ||
@@ -183,7 +187,7 @@ export async function queueLabResultAlert(args: {
   const id = await queueSmsMessage({
     patientId: args.patientId,
     phone: p.preferred_phone || args.patientPhone,
-    channel: p.sms_enabled !== false ? "sms" : "email",
+    channel: p.whatsapp_enabled !== false ? "whatsapp" : "email",
     templateKey: "lab_result_ready",
     messageBody: body,
     institutionId: args.institutionId,
