@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { checkInteractions, getPatientActiveMedications, isBlocking, summarize, getPatientAllergies, checkAllergyMatches, summarizeAllergies } from "@/utils/drug-interactions";
+import { loadDoseRanges, checkDose, type DoseCheckResult, type DoseRange } from "@/utils/dose-check";
 import { AlertTriangle, Plus, Trash2, Pill, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -54,6 +55,23 @@ export const PrescriptionWriter = () => {
     },
     enabled: patientSearch.length >= 2,
   });
+
+  // Dose-range reference data (patient safety checks)
+  const { data: doseRanges = [] } = useQuery<DoseRange[]>({
+    queryKey: ["dose-ranges"],
+    queryFn: loadDoseRanges,
+    staleTime: 1000 * 60 * 30,
+  });
+
+  const getDoseCheck = (m: MedicationItem): DoseCheckResult | null => {
+    if (!m.medication_name.trim() || !m.dosage.trim()) return null;
+    return checkDose({
+      medicationName: m.medication_name,
+      dosage: m.dosage,
+      frequency: m.frequency,
+      ranges: doseRanges,
+    });
+  };
 
   const handleAddMed = () => {
     setMedications((prev) => [
@@ -312,6 +330,40 @@ export const PrescriptionWriter = () => {
                   />
                 </div>
               </div>
+
+              {/* Dose-range safety check (warns, never blocks) */}
+              {(() => {
+                const check = getDoseCheck(m);
+                if (!check || check.status === "ok" || check.status === "unknown") return null;
+                return (
+                  <div
+                    className={
+                      check.status === "high"
+                        ? "flex items-start gap-2 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/30 dark:border-rose-800 px-3 py-2"
+                        : "flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-3 py-2"
+                    }
+                    role="alert"
+                  >
+                    <AlertTriangle
+                      className={
+                        check.status === "high"
+                          ? "h-4 w-4 mt-0.5 shrink-0 text-rose-600"
+                          : "h-4 w-4 mt-0.5 shrink-0 text-amber-600"
+                      }
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                        Dose check: {check.message}
+                      </p>
+                      {check.range?.notes && (
+                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                          {check.range.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
