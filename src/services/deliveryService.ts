@@ -4,6 +4,7 @@ export interface DeliveryOrder {
   id: string;
   order_type: 'medicine' | 'medical_service' | 'lab_sample';
   pharmacy_id?: string;
+  marketplace_order_id?: string;
   provider_id?: string;
   patient_id: string;
   patient_latitude?: number;
@@ -44,58 +45,171 @@ export function calculateDeliveryFee(distanceKm: number): number {
   return Math.round(15 + (distanceKm - 3) * 5);
 }
 
-/** Create a delivery order for medicine from pharmacy */
+/** Create a delivery order for medicine from pharmacy.
+ *
+ * Coordinates are optional: marketplace orders carry a delivery address but
+ * not always GPS coordinates. When both endpoints are known we compute the
+ * real distance + fee; otherwise the delivery is created with no distance
+ * and a K0 fee (staff confirm the fee with the patient) rather than
+ * inventing coordinates.
+ *
+ * When marketplaceOrderId is given the creation is idempotent — the
+ * one-delivery-per-order unique index (20261020_delivery_order_creation)
+ * turns a duplicate call into a lookup of the existing delivery.
+ */
 export async function createMedicineDelivery(params: {
   pharmacyId: string;
   patientId: string;
-  patientLat: number;
-  patientLng: number;
+  patientLat?: number | null;
+  patientLng?: number | null;
   patientAddress: string;
   patientPhone: string;
-  pickupLat: number;
-  pickupLng: number;
+  pickupLat?: number | null;
+  pickupLng?: number | null;
   pickupAddress: string;
   items: any[];
   totalAmount: number;
   prescriptionId?: string;
+  marketplaceOrderId?: string;
   notes?: string;
 }): Promise<{ data?: DeliveryOrder; error?: string }> {
-  const distanceKm = haversineKm(
-    params.pickupLat, params.pickupLng,
-    params.patientLat, params.patientLng
-  );
-  const deliveryFee = calculateDeliveryFee(distanceKm);
+  const hasRoute =
+    params.pickupLat != null && params.pickupLng != null &&
+    params.patientLat != null && params.patientLng != null;
+  const distanceKm = hasRoute
+    ? haversineKm(params.pickupLat!, params.pickupLng!, params.patientLat!, params.patientLng!)
+    : null;
+  const deliveryFee = distanceKm != null ? calculateDeliveryFee(distanceKm) : 0;
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('delivery_orders')
     .insert({
       order_type: 'medicine',
       pharmacy_id: params.pharmacyId,
       patient_id: params.patientId,
-      patient_latitude: params.patientLat,
-      patient_longitude: params.patientLng,
+      patient_latitude: params.patientLat ?? null,
+      patient_longitude: params.patientLng ?? null,
       patient_address: params.patientAddress,
       patient_phone: params.patientPhone,
-      pickup_latitude: params.pickupLat,
-      pickup_longitude: params.pickupLng,
+      pickup_latitude: params.pickupLat ?? null,
+      pickup_longitude: params.pickupLng ?? null,
       pickup_address: params.pickupAddress,
-      distance_km: Math.round(distanceKm * 10) / 10,
+      distance_km: distanceKm != null ? Math.round(distanceKm * 10) / 10 : null,
       delivery_fee: deliveryFee,
       items: params.items,
       total_amount: params.totalAmount,
       prescription_id: params.prescriptionId,
+      marketplace_order_id: params.marketplaceOrderId ?? null,
       notes: params.notes,
       status: 'pending',
     })
     .select()
     .single();
 
-  if (error) return { error: error.message };
-  
-  // Auto-assign nearest available courier (institution drivers first, then platform)
-  await autoAssignCourier(data.id, params.pickupLat, params.pickupLng, params.pharmacyId);
-  
+  if (error) {
+    // Duplicate handoff (unique marketplace_order_id): return the existing
+    // delivery order instead of failing — fulfilment retries stay safe.
+    if ((error as any).code === '23505' && params.marketplaceOrderId) {
+      const existing = await getDeliveryByMarketplaceOrder(params.marketplaceOrderId);
+      if (existing) return { data: existing };
+    }
+    return { error: error.message };
+  }
+
+  // Auto-assign nearest available courier (institution drivers first, then platform).
+  // Needs pickup coordinates; without them the delivery stays 'pending' for
+  // manual dispatch from the pharmacy board.
+  if (params.pickupLat != null && params.pickupLng != null) {
+    await autoAssignCourier(data.id, params.pickupLat, params.pickupLng, params.pharmacyId);
+  }
+
   return { data: data as DeliveryOrder };
+}
+
+/** Look up the courier delivery created for a marketplace order, if any. */
+export async function getDeliveryByMarketplaceOrder(
+  marketplaceOrderId: string
+): Promise<DeliveryOrder | null> {
+  const { data } = await (supabase as any)
+    .from('delivery_orders')
+    .select('*')
+    .eq('marketplace_order_id', marketplaceOrderId)
+    .maybeSingle();
+  return (data as DeliveryOrder) || null;
+}
+
+/**
+ * Pharmacy fulfilment handoff: make sure a marketplace order has a courier
+ * delivery order, creating one from data the platform already holds
+ * (smooth-data principle — nothing is re-typed):
+ *   - dropoff: the order's delivery_address / delivery_phone (+ the
+ *     patient's saved profile coordinates when present)
+ *   - pickup: the pharmacy institution's address + coordinates
+ *   - items: the order lines with product names
+ * Idempotent — safe to call on fulfil and again from a "hand to courier"
+ * retry action.
+ */
+export async function ensureDeliveryOrderForOrder(
+  orderId: string
+): Promise<{ data?: DeliveryOrder; created?: boolean; error?: string }> {
+  const existing = await getDeliveryByMarketplaceOrder(orderId);
+  if (existing) return { data: existing, created: false };
+
+  const sb: any = supabase;
+
+  const { data: order, error: orderError } = await sb
+    .from('orders')
+    .select('id, patient_id, pharmacy_id, total_amount, prescription_id, delivery_address, delivery_phone, delivery_instructions')
+    .eq('id', orderId)
+    .single();
+  if (orderError || !order) return { error: orderError?.message || 'Order not found' };
+  if (!order.pharmacy_id) return { error: 'Order has no pharmacy assigned' };
+
+  const [{ data: items }, { data: pharmacy }, { data: patientProfile }] = await Promise.all([
+    sb
+      .from('order_items')
+      .select('quantity, marketplace_products(medication_name)')
+      .eq('order_id', orderId),
+    sb
+      .from('healthcare_institutions')
+      .select('name, address, city, latitude, longitude')
+      .eq('id', order.pharmacy_id)
+      .maybeSingle(),
+    sb
+      .from('profiles')
+      .select('latitude, longitude')
+      .eq('id', order.patient_id)
+      .maybeSingle(),
+  ]);
+
+  const deliveryItems = (items || []).map((i: any) => ({
+    name: i.marketplace_products?.medication_name || 'Medication',
+    quantity: i.quantity,
+  }));
+
+  const pickupAddress = pharmacy
+    ? [pharmacy.name, pharmacy.address, pharmacy.city].filter(Boolean).join(', ')
+    : 'Pharmacy';
+
+  const result = await createMedicineDelivery({
+    pharmacyId: order.pharmacy_id,
+    patientId: order.patient_id,
+    patientLat: patientProfile?.latitude ?? null,
+    patientLng: patientProfile?.longitude ?? null,
+    patientAddress: order.delivery_address,
+    patientPhone: order.delivery_phone,
+    pickupLat: pharmacy?.latitude ?? null,
+    pickupLng: pharmacy?.longitude ?? null,
+    pickupAddress,
+    items: deliveryItems,
+    totalAmount: order.total_amount ?? 0,
+    prescriptionId: order.prescription_id ?? undefined,
+    marketplaceOrderId: order.id,
+    notes: order.delivery_instructions ?? undefined,
+  });
+
+  if (result.error) return { error: result.error };
+  return { data: result.data, created: true };
 }
 
 /** Create a delivery order for medical service (home visit) */
@@ -186,25 +300,27 @@ export async function autoAssignCourier(
 
   if (couriers.length === 0) return false;
 
-  // Get their latest locations
+  // Get their latest locations (courier_locations columns are lat/lng with
+  // recorded_at — see 20261010_courier_delivery_system.sql; the previous
+  // latitude/longitude/created_at names never existed and failed silently)
   const courierIds = couriers.map((c: any) => c.id);
-  const { data: locations } = await supabase
+  const { data: locations } = await (supabase as any)
     .from('courier_locations')
-    .select('courier_id, latitude, longitude')
+    .select('courier_id, lat, lng')
     .in('courier_id', courierIds)
-    .order('created_at', { ascending: false });
+    .order('recorded_at', { ascending: false });
 
   // Find nearest
   let nearest: any = null;
   let minDist = Infinity;
   const seen = new Set();
-  
+
   for (const loc of locations || []) {
     if (seen.has(loc.courier_id)) continue;
     seen.add(loc.courier_id);
-    if (loc.latitude == null || loc.longitude == null) continue;
-    
-    const dist = haversineKm(pickupLat, pickupLng, loc.latitude, loc.longitude);
+    if (loc.lat == null || loc.lng == null) continue;
+
+    const dist = haversineKm(pickupLat, pickupLng, loc.lat, loc.lng);
     if (dist < minDist) {
       minDist = dist;
       nearest = couriers.find((c: any) => c.id === loc.courier_id);

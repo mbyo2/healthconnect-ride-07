@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Package, Truck, CheckCircle, Clock, MapPin, ArrowRight, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 import { markDelivered, isValidOrderTransition } from "@/utils/marketplace-workflows";
+import { ensureDeliveryOrderForOrder } from "@/services/deliveryService";
 import { useAuth } from "@/context/AuthContext";
 import { AutoDispatch } from "@/components/delivery/AutoDispatch";
 import { LiveDeliveryMap } from "@/components/delivery/LiveDeliveryMap";
@@ -37,6 +38,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
   const queryClient = useQueryClient();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
   const [fulfillingId, setFulfillingId] = useState<string | null>(null);
+  const [handingId, setHandingId] = useState<string | null>(null);
 
   const { data: deliveries, isLoading } = useQuery({
     queryKey: ["pharmacy-deliveries", pharmacyId],
@@ -50,7 +52,23 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
-      return data as any[];
+      const rows = (data as any[]) || [];
+
+      // Attach the courier delivery order (delivery_orders stack) for each
+      // marketplace order, so the board can show whether the courier
+      // handoff already happened and offer it when it hasn't.
+      const orderIds = rows.map((r) => r.order_id).filter(Boolean);
+      if (orderIds.length > 0) {
+        const { data: courierDeliveries } = await (supabase as any)
+          .from("delivery_orders")
+          .select("id, status, courier_id, marketplace_order_id")
+          .in("marketplace_order_id", orderIds);
+        const byOrder = new Map(
+          (courierDeliveries || []).map((cd: any) => [cd.marketplace_order_id, cd])
+        );
+        for (const r of rows) r.courierDelivery = byOrder.get(r.order_id) || null;
+      }
+      return rows;
     },
     enabled: !!pharmacyId,
   });
@@ -107,6 +125,39 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
     }
   };
 
+  // Courier handoff: create the delivery_orders row the courier stack runs
+  // on (auto-dispatch included). Marketplace orders always carry a delivery
+  // address — delivery is the fulfilment path — so this runs right after
+  // dispensing, and stays available as a manual retry ("Hand to courier").
+  // Idempotent: a second call returns the existing delivery.
+  const handToCourier = async (orderId: string): Promise<boolean> => {
+    const result = await ensureDeliveryOrderForOrder(orderId);
+    if (result.error) {
+      toast.warning(
+        `Courier handoff failed: ${result.error}. The order itself is fulfilled — use "Hand to courier" to retry.`
+      );
+      return false;
+    }
+    if (result.created) {
+      toast.success(
+        result.data?.courier_id
+          ? "Courier delivery created — nearest courier assigned"
+          : "Courier delivery created — awaiting courier assignment"
+      );
+    }
+    return true;
+  };
+
+  const handleHandToCourier = async (delivery: any) => {
+    setHandingId(delivery.id);
+    try {
+      await handToCourier(delivery.order_id as string);
+      queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] });
+    } finally {
+      setHandingId(null);
+    }
+  };
+
   // GAP-04: pharmacy-side fulfillment. The RPC resolves every order line to a
   // medication_inventory item and FEFO-dispenses the batch ledger atomically —
   // any shortfall or unresolvable line aborts the whole order (no partial).
@@ -120,6 +171,9 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
       if (error) throw error;
       const lines = (data as any)?.lines ?? 0;
       toast.success(`Order fulfilled — ${lines} line${lines === 1 ? "" : "s"} dispensed via FEFO`);
+      // Stock is dispensed — now create the courier delivery so a rider is
+      // actually dispatched. Non-fatal: staff can retry via "Hand to courier".
+      await handToCourier(orderId);
       queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] });
     } catch (e: any) {
       toast.error(e?.message || "Fulfillment failed");
@@ -172,6 +226,28 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                     </p>
                   )}
                   <div className="mt-3 flex items-center justify-end gap-2">
+                    {d.courierDelivery ? (
+                      <span className="mr-auto text-xs font-semibold text-graphite-600 dark:text-slate-300 flex items-center gap-1.5">
+                        <Truck className="h-3.5 w-3.5" />
+                        Courier delivery: {String(d.courierDelivery.status).replace(/_/g, " ")}
+                        {d.courierDelivery.courier_id ? " · courier assigned" : " · awaiting courier"}
+                      </span>
+                    ) : (
+                      d.status !== "delivered" && (
+                        <button
+                          onClick={() => handleHandToCourier(d)}
+                          disabled={handingId === d.id}
+                          className="mr-auto px-4 py-2 rounded-xl border border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 disabled:opacity-50 text-xs font-extrabold flex items-center gap-1.5"
+                        >
+                          {handingId === d.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Truck className="h-3.5 w-3.5" />
+                          )}
+                          {handingId === d.id ? "Handing over…" : "Ready — Hand to Courier"}
+                        </button>
+                      )
+                    )}
                     {["assigned", "pending"].includes(d.status) && (
                       <button
                         onClick={() => handleFulfill(d)}

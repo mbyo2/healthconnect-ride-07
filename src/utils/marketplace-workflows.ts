@@ -105,9 +105,11 @@ const transitionOrderStatus = async (
     reason?: string
 ): Promise<OrderTransitionResult> => {
     try {
-        // Get current order
+        // Get current order. NOTE: the table is public.orders — the old
+        // 'marketplace_orders' name never existed live (PostgREST 404), so
+        // every transition through here silently failed before this fix.
         const { data: order, error: fetchError } = await sb
-            .from('marketplace_orders')
+            .from('orders')
             .select('status, status_history')
             .eq('id', orderId)
             .single();
@@ -128,7 +130,9 @@ const transitionOrderStatus = async (
             };
         }
 
-        // Update status with history
+        // Update status with history. public.orders has status_history and
+        // updated_at, but NO status_updated_at/status_updated_by columns
+        // (verified live) — the actor lives inside the history entries.
         const statusHistory: OrderStatusHistory[] = order.status_history || [];
         statusHistory.push({
             status: newStatus,
@@ -138,12 +142,11 @@ const transitionOrderStatus = async (
         });
 
         const { error: updateError } = await sb
-            .from('marketplace_orders')
+            .from('orders')
             .update({
                 status: newStatus,
                 status_history: statusHistory,
-                status_updated_at: new Date().toISOString(),
-                status_updated_by: userId,
+                updated_at: new Date().toISOString(),
             })
             .eq('id', orderId);
 
@@ -189,7 +192,7 @@ export const getOrderHistory = async (
 ): Promise<OrderStatusHistory[]> => {
     try {
         const { data, error } = await sb
-            .from('marketplace_orders')
+            .from('orders')
             .select('status_history')
             .eq('id', orderId)
             .single();

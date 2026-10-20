@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, MapPin, Phone, Navigation, CheckCircle } from 'lucide-react';
+import { Package, MapPin, Phone, Navigation, CheckCircle, Satellite, SatelliteDish } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { updateDeliveryStatus } from '@/services/deliveryService';
+import { useCourierLocation } from '@/hooks/useCourierLocation';
 import { toast } from 'sonner';
 
 interface DeliveryOrder {
@@ -29,6 +30,23 @@ export function CourierDeliveryDashboard() {
   const [deliveries, setDeliveries] = useState<DeliveryOrder[]>([]);
   const [courierId, setCourierId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Continuous GPS publishing while this courier has an active delivery
+  // (assigned / picked_up / in_transit). Previously this hook existed but
+  // was mounted nowhere, so the "live" map only ever saw one-shot snapshots
+  // on status changes. deliveryId is intentionally left null:
+  // courier_locations.delivery_id references delivery_tracking, not
+  // delivery_orders, and the couriers.current_* update is what the patient
+  // tracking + dispatch read.
+  const {
+    sharing: gpsSharing,
+    error: gpsError,
+    lastPosition,
+  } = useCourierLocation({
+    courierId,
+    enabled: deliveries.length > 0,
+    intervalMs: 15000,
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -88,12 +106,13 @@ export function CourierDeliveryDashboard() {
       lat = pos.coords.latitude;
       lng = pos.coords.longitude;
 
-      // Update courier location
+      // Update courier location (courier_locations columns are lat/lng —
+      // latitude/longitude never existed and the insert failed silently)
       if (courierId) {
-        await supabase.from('courier_locations').insert({
+        await (supabase as any).from('courier_locations').insert({
           courier_id: courierId,
-          latitude: lat,
-          longitude: lng,
+          lat,
+          lng,
         });
       }
     } catch {
@@ -145,6 +164,34 @@ export function CourierDeliveryDashboard() {
 
   return (
     <div className="space-y-4">
+      {/* Live GPS sharing status — publishing runs while a delivery is active */}
+      <div
+        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+          gpsError
+            ? 'border-error-500/30 bg-error-500/5 text-error-600 dark:text-error-400'
+            : 'border-success-500/30 bg-success-500/5 text-graphite-700 dark:text-slate-200'
+        }`}
+        role="status"
+      >
+        {gpsSharing ? (
+          <SatelliteDish className="h-4 w-4 shrink-0 text-success-500" />
+        ) : (
+          <Satellite className="h-4 w-4 shrink-0 text-muted-foreground" />
+        )}
+        {gpsError ? (
+          <span>{gpsError}</span>
+        ) : gpsSharing ? (
+          <span>
+            Live location sharing is ON — patients and the pharmacy can track this delivery
+            {lastPosition && (
+              <> · {lastPosition.lat.toFixed(5)}, {lastPosition.lng.toFixed(5)}</>
+            )}
+          </span>
+        ) : (
+          <span>Starting live location sharing…</span>
+        )}
+      </div>
+
       {deliveries.map((delivery) => (
         <Card key={delivery.id}>
           <CardHeader className="pb-3">

@@ -13,8 +13,19 @@ interface UseCourierLocationOptions {
  *
  * When a courier is on an active delivery, this shares their GPS position
  * with the platform every `intervalMs` (default 15s):
- * - Updates couriers.current_lat/lng (for dispatch + live map)
- * - Inserts into courier_locations (history/audit trail)
+ * - Updates couriers.current_latitude/current_longitude (for dispatch +
+ *   live map). NOTE: the live couriers table uses the *_latitude/_longitude
+ *   names from 20261010_yango_delivery_couriers.sql — the older
+ *   current_lat/lng names were verified NOT to exist live, so writes to
+ *   them failed silently.
+ * - Inserts into courier_locations (history/audit trail; columns lat/lng,
+ *   recorded_at per 20261010_courier_delivery_system.sql, table created
+ *   live by 20261020_delivery_order_creation.sql).
+ *
+ * deliveryId note: courier_locations.delivery_id references
+ * delivery_tracking (the pharmacy board stack), NOT delivery_orders —
+ * callers working with delivery_orders ids must leave deliveryId null or
+ * the insert violates the FK.
  *
  * Uses the browser Geolocation API. Stops when disabled or unmounted.
  */
@@ -48,9 +59,9 @@ export function useCourierLocation({
         await (supabase as any)
           .from("couriers")
           .update({
-            current_lat: lat,
-            current_lng: lng,
-            location_updated_at: new Date().toISOString(),
+            current_latitude: lat,
+            current_longitude: lng,
+            last_location_update: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
           .eq("id", courierId);
