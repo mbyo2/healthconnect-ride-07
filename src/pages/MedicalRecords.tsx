@@ -13,6 +13,7 @@ import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
 import { HealthHistoryTransfer } from "@/components/medical/HealthHistoryTransfer";
 import { FHIRImportPanel } from "@/components/medical/FHIRImportPanel";
 import { PatientPortal } from "@/components/patient/PatientPortal";
+import NotificationPreferences from "@/components/patient/NotificationPreferences";
 import { VitalsFlowsheet } from "@/components/clinical/VitalsFlowsheet";
 import { ProblemList } from "@/components/clinical/ProblemList";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
@@ -283,6 +284,10 @@ export default function MedicalRecords() {
                 <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                   <PatientPortal />
                 </div>
+              )}
+
+              {user?.id && (
+                <NotificationPreferences />
               )}
 
               {user?.id && (

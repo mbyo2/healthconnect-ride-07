@@ -253,6 +253,33 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         }).catch((reminderErr) => {
           console.error('Reminder dispatch failed (non-fatal):', reminderErr);
         });
+
+        // Queue SMS/WhatsApp reminders (Zambia-critical channel). Also
+        // non-blocking — respects the patient's notification preferences
+        // and schedules at their chosen lead times.
+        (async () => {
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('first_name, last_name, phone')
+              .eq('id', user.id)
+              .maybeSingle();
+            const phone = (profile as any)?.phone;
+            if (!phone) return;
+            const apptDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T${selectedTime}`);
+            const { queueAppointmentReminders } = await import('@/utils/sms-reminder-service');
+            await queueAppointmentReminders({
+              patientId: user.id,
+              patientPhone: phone,
+              patientName: `${(profile as any)?.first_name || ''} ${(profile as any)?.last_name || ''}`.trim() || 'Patient',
+              appointmentId: booked.id,
+              appointmentDate: apptDate,
+              doctorName: (provider as any)?.name || undefined,
+            });
+          } catch (smsErr) {
+            console.error('SMS reminder queue failed (non-fatal):', smsErr);
+          }
+        })();
       }
 
       toast.success("Appointment booked successfully!");

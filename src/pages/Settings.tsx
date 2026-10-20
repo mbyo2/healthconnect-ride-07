@@ -80,6 +80,14 @@ const Settings = () => {
           setSmsReminders(notifSettings.appointment_reminders ?? false);
         }
 
+        // SMS/WhatsApp prefs (canonical store for the reminder system)
+        const { data: smsPrefs } = await supabase
+          .from("notification_preferences")
+          .select("sms_enabled")
+          .eq("patient_id", user.id)
+          .maybeSingle();
+        if (smsPrefs) setSmsReminders((smsPrefs as any).sms_enabled ?? true);
+
         const { data: userSettings } = await supabase
           .from("user_settings" as any)
           .select("*")
@@ -173,9 +181,29 @@ const Settings = () => {
     }
   };
 
-  const handleSmsToggle = async () => {
-    // No SMS gateway exists yet — never claim the toggle works.
-    toast.info("SMS reminders are coming soon — the SMS gateway is not connected yet.");
+  const handleSmsToggle = async (checked: boolean) => {
+    // Persist to notification_preferences (SMS/WhatsApp reminder backend).
+    setSmsReminders(checked);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase
+        .from("notification_preferences")
+        .upsert(
+          {
+            patient_id: user.id,
+            sms_enabled: checked,
+            appointment_reminders: checked,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "patient_id" }
+        );
+      if (error) throw error;
+      toast.success(checked ? "SMS reminders on" : "SMS reminders off");
+    } catch {
+      toast.error("Failed to update SMS reminder preference");
+      setSmsReminders(!checked);
+    }
   };
 
   const handleTwoFactorToggle = async () => {
@@ -358,12 +386,26 @@ const Settings = () => {
                 </div>
                 <Switch checked={!marketingOptOut} onCheckedChange={handleMarketingToggle} aria-label="Health campaigns and tips" className="scale-125" />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                <div>
-                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-xs font-bold text-graphite-500">Coming soon</span></p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Text reminders once the SMS gateway is connected</p>
+              <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-xs">SMS &amp; WhatsApp Reminders</p>
+                    <p className="text-xs text-graphite-600 dark:text-slate-300">Appointment, lab-result and refill reminders by text — works on any phone</p>
+                  </div>
+                  <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} aria-label="SMS and WhatsApp reminders" className="scale-125" />
                 </div>
-                <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)"  className="scale-125" />
+                {smsReminders && (
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 mt-2">
+                    Manage channels, timing and your reminder phone number in{" "}
+                    <button
+                      onClick={() => navigate("/health-records")}
+                      className="font-bold text-primary-600 dark:text-primary-400 underline underline-offset-2"
+                    >
+                      Health Records → Notifications
+                    </button>
+                    .
+                  </p>
+                )}
               </div>
             </div>
 
