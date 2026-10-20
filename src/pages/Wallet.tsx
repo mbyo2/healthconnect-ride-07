@@ -17,6 +17,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { Wallet as WalletIcon, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { DoctorFractionEarnings } from "@/components/billing/DoctorFractions";
 
 const Wallet = () => {
     const { user, isLoading } = useAuth();
@@ -98,6 +99,8 @@ const Wallet = () => {
                 )}
 
                 <FxConverterWidget />
+
+                <DoctorFractionEarnings />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-6" id="wallet-topup">

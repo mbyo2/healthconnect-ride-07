@@ -21,6 +21,8 @@ import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
 import { Lock } from "lucide-react";
 import { PatientInstitutionManager } from "@/components/institution/PatientInstitutionManager";
 import DuplicatePatients from "@/components/admin/DuplicatePatients";
+import { DoctorFractionManager } from "@/components/billing/DoctorFractions";
+import { LISMachineManager } from "@/components/lab/LISIntegration";
 import { EmergencyTriage } from "@/components/hospital/EmergencyTriage";
 import { ICU } from "@/components/hospital/ICU";
 import { OTManagement } from "@/components/hospital/OTManagement";
@@ -858,7 +860,12 @@ export const InstitutionDashboard = () => {
         {activeTab === "procedures" && <ClinicalProceduresDesk institutionId={institution.id} />}
 
         {/* 11. LIS & RIS Imaging */}
-        {activeTab === "lis_ris" && <LISRadiologySuite institutionId={institution.id} />}
+        {activeTab === "lis_ris" && (
+          <div className="space-y-6">
+            <LISRadiologySuite institutionId={institution.id} />
+            <LISMachineManager institutionId={institution.id} />
+          </div>
+        )}
 
         {/* 11b. Blood Bank */}
         {activeTab === "bloodbank" && <BloodBank hospital={institution} />}
@@ -868,8 +875,11 @@ export const InstitutionDashboard = () => {
 
         {/* 13. Revenue Cycle Management & Insurance */}
         {activeTab === "rcm" && (
-          <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
-            <AdvancedRevenueCycle />
+          <div className="space-y-6">
+            <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
+              <AdvancedRevenueCycle />
+            </div>
+            <DoctorFractionManager institutionId={institution.id} />
           </div>
         )}
 
