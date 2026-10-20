@@ -20,6 +20,7 @@ import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { getTabRule, type InstitutionTabKey } from "@/config/moduleTabMapping";
 import { Lock } from "lucide-react";
 import { PatientInstitutionManager } from "@/components/institution/PatientInstitutionManager";
+import DuplicatePatients from "@/components/admin/DuplicatePatients";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, subDays, startOfMonth, startOfDay, endOfMonth } from "date-fns";
 import { toast } from "sonner";
@@ -808,6 +809,7 @@ export const InstitutionDashboard = () => {
           <div className="space-y-6">
             <UnifiedPatientHub institutionId={institution.id} />
             <PatientInstitutionManager institutionId={institution.id} />
+            <DuplicatePatients />
           </div>
         )}
 
