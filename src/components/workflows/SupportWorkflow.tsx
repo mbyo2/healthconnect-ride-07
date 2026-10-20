@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { SupportTicketSystem } from '@/components/support/SupportTicketSystem';
+import KnowledgeBase from '@/components/support/KnowledgeBase';
 import {
   Headphones, MessageSquare, Search, FileText,
   Settings, Calendar, BookOpen, Ticket
@@ -87,17 +88,7 @@ export const SupportWorkflow = () => {
         </TabsContent>
 
         <TabsContent value="kb" className="mt-4">
-          <Card>
-            <CardContent className="p-8 text-center">
-              <BookOpen className="h-10 w-10 mx-auto mb-3 text-muted-foreground opacity-50" />
-              <h3 className="text-base font-semibold mb-1">Knowledge Base — coming soon</h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Self-help articles and troubleshooting guides are on the roadmap.
-                For now, open a ticket and our support team will help you directly.
-              </p>
-              <Button className="mt-4" onClick={() => setActiveTab('tickets')}>Open a Ticket</Button>
-            </CardContent>
-          </Card>
+          <KnowledgeBase />
         </TabsContent>
       </Tabs>
     </div>
