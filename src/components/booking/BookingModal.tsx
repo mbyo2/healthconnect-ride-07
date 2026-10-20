@@ -47,12 +47,6 @@ interface BookingModalProps {
   initialAppointmentType?: 'physical' | 'virtual' | null;
 }
 
-const TIME_SLOTS = [
-  "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
-  "11:00", "11:30", "12:00", "14:00", "14:30", "15:00",
-  "15:30", "16:00", "16:30", "17:00"
-];
-
 export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime, initialAppointmentType }: BookingModalProps) => {
   const { user } = useAuth();
   const { queueAction } = useOfflineSync();
@@ -452,25 +446,28 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
 
   const renderDateTimeSelection = () => {
     // The time grid honors the provider's working hours for the selected
-    // day: a Tuesday 09:00-12:00 schedule shows 09:00-11:30, not the full
-    // static grid. Providers with no schedule info keep the previous static
-    // grid (booking stays possible for the 8 directory providers whose
-    // hours were never entered).
+    // day: a Tuesday 09:00-12:00 schedule shows 09:00-11:30, not a static
+    // grid. A provider with NO published schedule shows NO slots and an
+    // honest message — we never invent 08:00-16:30 availability the
+    // provider never set (audit 2026-10-20; the old TIME_SLOTS fallback
+    // masqueraded as real availability).
     const sched = (provider as any).availability_schedule as Record<
       string, { available: boolean; hours: string[] }
     > | null | undefined;
     const hasAnySchedule = !!sched && Object.keys(sched).length > 0;
     const dayKey = selectedDate ? format(selectedDate, "eeee").toLowerCase() : null;
     const dayHours: string[] = hasAnySchedule && dayKey ? (sched![dayKey]?.hours ?? []) : [];
-    const baseSlots = hasAnySchedule ? expandHoursToSlots(dayHours) : TIME_SLOTS;
-    // A tapped "nearest slot" chip can carry a time outside the standard
+    const baseSlots = hasAnySchedule ? expandHoursToSlots(dayHours) : [];
+    // A tapped "nearest slot" chip can carry a time outside the provider's
     // grid (e.g. a provider schedule of 08:35 or 17:10). Merge it in so the
     // preselected time always renders visibly selected — otherwise the user
-    // lands here with nothing highlighted and Continue disabled.
+    // lands here with nothing highlighted and Continue disabled. Only when
+    // the provider actually publishes a schedule.
     const displaySlots =
-      selectedTime && !baseSlots.includes(selectedTime)
+      hasAnySchedule && selectedTime && !baseSlots.includes(selectedTime)
         ? [...baseSlots, selectedTime].sort()
         : baseSlots;
+    const noScheduleAtAll = !!selectedDate && !hasAnySchedule;
     const noHoursToday = !!selectedDate && hasAnySchedule && displaySlots.length === 0;
     return (
     <div className="space-y-6">
@@ -552,7 +549,12 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
             <Clock className="h-4 w-4 text-primary" />
             Available times for {format(selectedDate, 'EEEE, MMM d')}
           </h4>
-          {noHoursToday ? (
+          {noScheduleAtAll ? (
+            <p className="text-sm text-muted-foreground bg-muted rounded-xl px-4 py-6 text-center">
+              This provider hasn't published availability yet — there are no bookable times right now.
+              You can join the waitlist below and we'll let you know when times open up.
+            </p>
+          ) : noHoursToday ? (
             <p className="text-sm text-muted-foreground bg-muted rounded-xl px-4 py-6 text-center">
               {providerDisplayName(provider)} doesn't see patients on {format(selectedDate, 'EEEE')}s.
               Please choose another day.

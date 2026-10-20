@@ -36,6 +36,41 @@ export const AvailabilityManager = () => {
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
   ];
 
+  // provider_availability.day_of_week is Monday-first (0=Mon..6=Sun).
+  const DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+  /**
+   * Availability unification (audit 2026-10-20): booking consumes ONLY
+   * profiles.availability_schedule (JSON), while this manager writes
+   * provider_availability rows — the two never synced, so hours set here had
+   * no effect on bookable slots. Every save now derives the JSON from the
+   * full row set and writes it to the profile, so both stores always agree
+   * and booking stays the single consumer of the JSON.
+   */
+  const syncProfileSchedule = async (slots: TimeSlot[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const schedule: Record<string, { available: boolean; hours: string[] }> = {};
+      for (const s of slots) {
+        const day = DAY_KEYS[s.day_of_week];
+        if (!day) continue;
+        if (!schedule[day]) schedule[day] = { available: true, hours: [] };
+        // Postgres TIME comes back as "HH:MM:SS" — the booking expander
+        // expects "HH:MM-HH:MM" ranges.
+        const range = `${String(s.start_time).slice(0, 5)}-${String(s.end_time).slice(0, 5)}`;
+        if (!schedule[day].hours.includes(range)) schedule[day].hours.push(range);
+      }
+      const { error } = await (supabase as any)
+        .from("profiles")
+        .update({ availability_schedule: schedule })
+        .eq("id", user.id);
+      if (error) console.warn("availability_schedule sync failed", error);
+    } catch (e) {
+      console.warn("availability_schedule sync failed", e);
+    }
+  };
+
   useEffect(() => {
     fetchTimeSlots();
   }, []);
@@ -76,8 +111,10 @@ export const AvailabilityManager = () => {
         .single();
 
       if (error) throw error;
-      
-      setTimeSlots([...timeSlots, data as TimeSlot]);
+
+      const next = [...timeSlots, data as TimeSlot];
+      setTimeSlots(next);
+      await syncProfileSchedule(next);
       toast.success("Time slot added successfully");
     } catch (error) {
       console.error("Error adding time slot:", error);
@@ -93,8 +130,10 @@ export const AvailabilityManager = () => {
         .eq('id', id);
 
       if (error) throw error;
-      
-      setTimeSlots(timeSlots.filter(slot => slot.id !== id));
+
+      const next = timeSlots.filter(slot => slot.id !== id);
+      setTimeSlots(next);
+      await syncProfileSchedule(next);
       toast.success("Time slot removed successfully");
     } catch (error) {
       console.error("Error deleting time slot:", error);
@@ -132,7 +171,9 @@ export const AvailabilityManager = () => {
 
       if (error) throw error;
 
-      setTimeSlots(timeSlots.map(s => s.id === editingId ? (data as TimeSlot) : s));
+      const next = timeSlots.map(s => s.id === editingId ? (data as TimeSlot) : s);
+      setTimeSlots(next);
+      await syncProfileSchedule(next);
       toast.success("Time slot updated successfully");
       cancelEdit();
     } catch (error) {
@@ -150,6 +191,9 @@ export const AvailabilityManager = () => {
       <h2 className="text-2xl font-semibold mb-4">
         {editingId ? "Edit Time Slot" : "Manage Availability"}
       </h2>
+      <p className="text-sm text-muted-foreground mb-4">
+        These are the hours patients can book. Saving here publishes them straight to your booking page.
+      </p>
       
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
