@@ -12,6 +12,7 @@ import { AdminLevel } from "@/types/user";
 import { syncAdminLevel } from "@/lib/adminLevelSync";
 import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
 import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
+import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
 import { Button } from "@/components/ui/button";
 
 type AdminUser = {
@@ -305,6 +306,9 @@ const SuperAdminDashboard = () => {
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <ModulePricingAdmin />
         </div>
+
+        {/* Payment Mode Approvals — institution mode-switch inbox */}
+        <PaymentModeApprovals />
 
       </div>
     </div>

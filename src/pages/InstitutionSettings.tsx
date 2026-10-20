@@ -238,31 +238,82 @@ const InstitutionSettings = () => {
     });
   };
 
-  /**
-   * Request admin approval to switch from 'own' to 'platform' for marketplace listing.
-   * Creates a notification for superadmins.
-   */
-  const requestMarketplaceApproval = async () => {
+  // ── Payment mode change requests ──────────────────────────────────
+  // Payment mode is platform-governed (CEO policy): institutions canNOT
+  // change their own payment_mode — a BEFORE UPDATE trigger on
+  // healthcare_institutions (migration 20261020_payment_mode_guard.sql)
+  // rejects any non-admin change. The institution requests a switch here;
+  // the request lands in the admin inbox (PaymentModeApprovals) as a
+  // security_audit_log row, and an admin's approval applies the change.
+  // NOTE: security_audit_log's real columns are event_type / event_data —
+  // the previous version of this code wrote to nonexistent action/details
+  // columns, so requests silently never landed.
+  const [pendingModeRequest, setPendingModeRequest] = useState<{ to_mode: string; created_at: string } | null>(null);
+  const [requestingMode, setRequestingMode] = useState(false);
+
+  useEffect(() => {
     if (!institution?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [{ data: reqs }, { data: decs }] = await Promise.all([
+          supabase
+            .from("security_audit_log")
+            .select("id, created_at, event_data")
+            .eq("event_type", "marketplace_approval_requested")
+            .filter("event_data->>institution_id", "eq", institution.id)
+            .order("created_at", { ascending: false })
+            .limit(20),
+          supabase
+            .from("security_audit_log")
+            .select("event_data")
+            .eq("event_type", "marketplace_approval_decided")
+            .filter("event_data->>institution_id", "eq", institution.id)
+            .limit(100),
+        ]);
+        if (cancelled) return;
+        const decidedIds = new Set((decs || []).map((d: any) => d.event_data?.request_log_id));
+        const pending = (reqs || []).find((r: any) => !decidedIds.has(r.id));
+        if (pending) {
+          setPendingModeRequest({
+            to_mode: (pending as any).event_data?.to_mode,
+            created_at: (pending as any).created_at,
+          });
+        }
+      } catch {
+        /* non-fatal: the request button still works without the banner */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [institution?.id]);
+
+  const requestPaymentModeChange = async (toMode: 'platform' | 'own') => {
+    if (!institution?.id || requestingMode) return;
+    setRequestingMode(true);
     try {
-      // Log the request — superadmins see it in their dashboard
-      await supabase.from("security_audit_log").insert({
-        action: "marketplace_approval_requested",
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        details: {
+      const { data: { user: me } } = await supabase.auth.getUser();
+      const { error } = await supabase.from("security_audit_log").insert({
+        event_type: "marketplace_approval_requested",
+        user_id: me?.id,
+        event_data: {
           institution_id: institution.id,
           institution_name: formData.name,
-          current_mode: "own",
-          requested_mode: "platform",
-          reason: "Marketplace listing requested",
+          from_mode: institution.payment_mode || formData.payment_mode,
+          to_mode: toMode,
+          requested_by: me?.id,
         },
       });
-      toast.success("Approval request sent.", {
-        description: "An admin will review your request to enable marketplace listing.",
-        duration: 5000,
+      if (error) throw error;
+      setPendingModeRequest({ to_mode: toMode, created_at: new Date().toISOString() });
+      toast.success("Change request sent to platform admins.", {
+        description: `An admin will review your request to switch to ${toMode === 'platform' ? 'platform payments' : 'own-money (HMS only)'} mode. Your current mode stays in effect until they approve.`,
+        duration: 6000,
       });
-    } catch (e) {
-      console.error("Failed to log approval request:", e);
+    } catch (e: any) {
+      console.error("Failed to log payment-mode request:", e);
+      toast.error(e?.message || "Could not send the change request. Please try again.");
+    } finally {
+      setRequestingMode(false);
     }
   };
 
@@ -319,9 +370,11 @@ const InstitutionSettings = () => {
           country: formData.country,
           operating_hours: formData.operating_hours,
           accepted_insurance_providers: formData.accepted_insurance_providers,
-          // New fields — exact migration column names
+          // New fields — exact migration column names.
+          // payment_mode is deliberately NOT saved here: it is governed by
+          // platform admins (see requestPaymentModeChange + the DB guard
+          // trigger in 20261020_payment_mode_guard.sql).
           list_in_marketplace: formData.list_in_marketplace,
-          payment_mode: formData.payment_mode,
           services_offered: formData.services_offered,
           equipment_available: formData.equipment_available,
           languages_spoken: formData.languages_spoken,
@@ -497,7 +550,7 @@ const InstitutionSettings = () => {
                       }
                     );
                     // Create an approval request for admin
-                    requestMarketplaceApproval();
+                    requestPaymentModeChange('platform');
                     return;
                   }
                   setFormData(p => ({ ...p, list_in_marketplace: checked }));
@@ -511,46 +564,49 @@ const InstitutionSettings = () => {
               />
             </div>
 
-            {/* Payment Mode: platform vs own */}
+            {/* Payment Mode: platform vs own — READ-ONLY. Mode changes are
+                approved by platform admins; institutions request them. */}
             <div className="mt-4 p-4 border rounded-lg bg-muted/30">
               <Label className="text-base font-medium">Payment Handling</Label>
-              <p className="text-sm text-muted-foreground mt-1 mb-3">
-                Choose who handles money for your institution's services.
-              </p>
-              <div className="space-y-2">
-                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/60 transition-colors">
-                  <input
-                    type="radio"
-                    name="payment_mode"
-                    checked={formData.payment_mode === 'platform'}
-                    onChange={() => setFormData(p => ({ ...p, payment_mode: 'platform' as const }))}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="font-medium text-sm">Doc'O Clock handles payments</p>
-                    <p className="text-xs text-muted-foreground">
-                      Patients pay via wallet/Lenco. We collect, take platform fee, and pay out to you.
-                      Required for marketplace listings.
-                    </p>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/60 transition-colors">
-                  <input
-                    type="radio"
-                    name="payment_mode"
-                    checked={formData.payment_mode === 'own'}
-                    onChange={() => setFormData(p => ({ ...p, payment_mode: 'own' as const }))}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="font-medium text-sm">We handle our own money (HMS only)</p>
-                    <p className="text-xs text-muted-foreground">
-                      Your institution collects payments directly. Doc'O Clock only provides the HMS software —
-                      we don't touch your money.
-                    </p>
-                  </div>
-                </label>
+              <div className="mt-3 p-3 border rounded-lg bg-background">
+                <p className="font-medium text-sm">
+                  {formData.payment_mode === 'platform'
+                    ? "Doc'O Clock handles payments"
+                    : "We handle our own money (HMS only)"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formData.payment_mode === 'platform'
+                    ? "Patients pay via wallet/Lenco. We collect, take the platform fee, and pay out to you. Required for marketplace listings."
+                    : "Your institution collects payments directly. Doc'O Clock only provides the HMS software — we don't touch your money."}
+                </p>
               </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Payment mode is controlled by the Doc&apos;O Clock platform team — it decides
+                whether patient payments flow through the platform, so it can&apos;t be changed
+                from this page. Request a switch and an admin will review it; your current mode
+                stays in effect until the request is approved.
+              </p>
+              {pendingModeRequest ? (
+                <p className="text-xs font-medium text-amber-600 mt-3">
+                  ⏳ Switch to {pendingModeRequest.to_mode === 'platform' ? 'platform payments' : 'own-money (HMS only)'} mode
+                  requested{pendingModeRequest.created_at ? ` on ${new Date(pendingModeRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review.
+                </p>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  disabled={requestingMode}
+                  onClick={() => requestPaymentModeChange(formData.payment_mode === 'platform' ? 'own' : 'platform')}
+                >
+                  {requestingMode
+                    ? "Sending request…"
+                    : formData.payment_mode === 'platform'
+                      ? "Request switch to own-money (HMS only) mode"
+                      : "Request switch to platform payments"}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -1,0 +1,258 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeftRight, CheckCircle2, XCircle, Hourglass } from "lucide-react";
+import { toast } from "sonner";
+
+/**
+ * Admin inbox: institution payment-mode change requests.
+ *
+ * Requests are security_audit_log rows (event_type
+ * 'marketplace_approval_requested', written by InstitutionSettings — an
+ * institution can no longer change its own payment_mode). A request is
+ * pending until a decision row exists (event_type
+ * 'marketplace_approval_decided', event_data.request_log_id = request id).
+ *
+ * Approve: set healthcare_institutions.payment_mode to the requested mode
+ * (the DB guard in migration 20261020_payment_mode_guard.sql permits this
+ * because the caller is a platform admin), then log the decision.
+ * Deny: log the decision only.
+ */
+
+type ModeRequest = {
+  id: string;
+  created_at: string | null;
+  user_id: string | null;
+  institution_id: string | null;
+  institution_name: string;
+  from_mode: string;
+  to_mode: string;
+  requested_by: string | null;
+  requester_name: string;
+  current_mode: string | null;
+  decision: "approved" | "denied" | null;
+  decided_at: string | null;
+};
+
+const MODE_LABELS: Record<string, string> = {
+  platform: "Platform (Doc'O Clock handles payments)",
+  own: "Own (HMS only — institution handles money)",
+};
+
+export const PaymentModeApprovals = () => {
+  const [requests, setRequests] = useState<ModeRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      const [{ data: reqRows, error: reqErr }, { data: decRows }] = await Promise.all([
+        supabase
+          .from("security_audit_log")
+          .select("id, created_at, user_id, event_data")
+          .eq("event_type", "marketplace_approval_requested")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("security_audit_log")
+          .select("created_at, event_data")
+          .eq("event_type", "marketplace_approval_decided")
+          .limit(500),
+      ]);
+      if (reqErr) throw reqErr;
+
+      const decisions = new Map<string, { decision: "approved" | "denied"; decided_at: string | null }>();
+      (decRows || []).forEach((d: any) => {
+        const rid = d.event_data?.request_log_id;
+        if (rid) decisions.set(rid, { decision: d.event_data?.decision, decided_at: d.created_at });
+      });
+
+      const parsed = (reqRows || []).map((r: any) => ({
+        id: r.id,
+        created_at: r.created_at,
+        user_id: r.user_id,
+        institution_id: r.event_data?.institution_id ?? null,
+        institution_name: r.event_data?.institution_name ?? "Unknown institution",
+        from_mode: r.event_data?.from_mode ?? "—",
+        to_mode: r.event_data?.to_mode ?? "—",
+        requested_by: r.event_data?.requested_by ?? r.user_id ?? null,
+      }));
+
+      // Enrich: live institution mode + requester names.
+      const instIds = Array.from(new Set(parsed.map((p) => p.institution_id).filter(Boolean))) as string[];
+      const userIds = Array.from(new Set(parsed.map((p) => p.requested_by).filter(Boolean))) as string[];
+      const instMap: Record<string, any> = {};
+      const userMap: Record<string, any> = {};
+      if (instIds.length) {
+        const { data } = await supabase
+          .from("healthcare_institutions")
+          .select("id, name, payment_mode")
+          .in("id", instIds);
+        (data || []).forEach((i: any) => { instMap[i.id] = i; });
+      }
+      if (userIds.length) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email")
+          .in("id", userIds);
+        (data || []).forEach((p: any) => { userMap[p.id] = p; });
+      }
+
+      setRequests(parsed.map((p) => {
+        const inst = p.institution_id ? instMap[p.institution_id] : null;
+        const requester = p.requested_by ? userMap[p.requested_by] : null;
+        const dec = decisions.get(p.id);
+        return {
+          ...p,
+          institution_name: inst?.name ?? p.institution_name,
+          current_mode: inst?.payment_mode ?? null,
+          requester_name: requester
+            ? (`${requester.first_name || ""} ${requester.last_name || ""}`.trim() || requester.email || "Institution admin")
+            : "Institution admin",
+          decision: dec?.decision ?? null,
+          decided_at: dec?.decided_at ?? null,
+        } as ModeRequest;
+      }));
+    } catch (error) {
+      console.error("Error fetching payment-mode requests:", error);
+      toast.error("Failed to load payment-mode requests");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const writeDecision = async (req: ModeRequest, decision: "approved" | "denied") => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("security_audit_log").insert({
+      event_type: "marketplace_approval_decided",
+      user_id: user?.id,
+      event_data: {
+        request_log_id: req.id,
+        decision,
+        institution_id: req.institution_id,
+        institution_name: req.institution_name,
+        from_mode: req.from_mode,
+        to_mode: req.to_mode,
+        decided_by: user?.id,
+      },
+    });
+    if (error) throw error;
+  };
+
+  const handleApprove = async (req: ModeRequest) => {
+    if (!req.institution_id) {
+      toast.error("Request is missing its institution — cannot approve");
+      return;
+    }
+    try {
+      setProcessing(req.id);
+      const { error: upErr } = await supabase
+        .from("healthcare_institutions")
+        .update({ payment_mode: req.to_mode as any })
+        .eq("id", req.institution_id);
+      if (upErr) throw upErr;
+      await writeDecision(req, "approved");
+      toast.success(`${req.institution_name} switched to ${req.to_mode} mode`);
+      fetchRequests();
+    } catch (error: any) {
+      console.error("Approve payment-mode request failed:", error);
+      toast.error(error.message || "Failed to approve request");
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleDeny = async (req: ModeRequest) => {
+    try {
+      setProcessing(req.id);
+      await writeDecision(req, "denied");
+      toast.success(`Request from ${req.institution_name} denied`);
+      fetchRequests();
+    } catch (error: any) {
+      console.error("Deny payment-mode request failed:", error);
+      toast.error(error.message || "Failed to deny request");
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const pending = requests.filter((r) => !r.decision);
+  const decided = requests.filter((r) => r.decision).slice(0, 10);
+
+  const Row = ({ req }: { req: ModeRequest }) => (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg bg-muted/30">
+      <div className="space-y-1 min-w-0">
+        <p className="font-medium text-sm truncate">{req.institution_name}</p>
+        <p className="text-xs text-muted-foreground">
+          Current: <span className="font-semibold">{req.current_mode ?? req.from_mode}</span>
+          {" "}→ Requested: <span className="font-semibold">{req.to_mode}</span>
+          {req.to_mode && MODE_LABELS[req.to_mode] ? <span className="block sm:inline"> · {MODE_LABELS[req.to_mode]}</span> : null}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Requested by {req.requester_name}
+          {req.created_at ? ` · ${new Date(req.created_at).toLocaleString()}` : ""}
+        </p>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {req.decision ? (
+          <Badge variant={req.decision === "approved" ? "default" : "secondary"} className="capitalize">
+            {req.decision}
+            {req.decided_at ? ` · ${new Date(req.decided_at).toLocaleDateString()}` : ""}
+          </Badge>
+        ) : (
+          <>
+            <Button size="sm" onClick={() => handleApprove(req)} disabled={processing === req.id} className="gap-1.5">
+              <CheckCircle2 className="h-4 w-4" /> Approve
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => handleDeny(req)} disabled={processing === req.id} className="gap-1.5">
+              <XCircle className="h-4 w-4" /> Deny
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ArrowLeftRight className="h-5 w-5 text-primary" />
+          Payment Mode Approvals
+          {pending.length > 0 && (
+            <Badge variant="destructive" className="ml-1">{pending.length} pending</Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          Institutions cannot change their own payment mode (platform vs own/HMS-only).
+          They request a change here; approving applies it immediately. Switching to
+          &quot;own&quot; removes the institution from marketplace payment flows.
+        </p>
+        {loading ? (
+          <p className="text-sm text-muted-foreground flex items-center gap-2">
+            <Hourglass className="h-4 w-4 animate-pulse" /> Loading requests…
+          </p>
+        ) : pending.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No pending payment-mode requests.</p>
+        ) : (
+          pending.map((r) => <Row key={r.id} req={r} />)
+        )}
+        {decided.length > 0 && (
+          <>
+            <p className="text-xs font-semibold text-muted-foreground pt-2 uppercase tracking-wide">Recent decisions</p>
+            {decided.map((r) => <Row key={r.id} req={r} />)}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

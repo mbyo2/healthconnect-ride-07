@@ -18,7 +18,7 @@ import { SuggestionBanner, RecommendationCard } from "@/components/guidance";
 import {
   Shield, ShieldCheck, Users, Activity, DollarSign, Building2, Stethoscope,
   UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw, TrendingUp,
-  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote, Trash2
+  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote, Trash2, ArrowLeftRight
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +28,7 @@ import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { SupportWorkflow } from "@/components/workflows/SupportWorkflow";
 import { WithdrawalAdminQueue } from "@/components/admin/WithdrawalAdminQueue";
+import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
 import { UserDeletionPanel } from "@/components/admin/UserDeletionPanel";
 import { format, subMonths, startOfMonth } from "date-fns";
 
@@ -41,6 +42,7 @@ const TABS = [
   { value: "modules", label: "Modules", icon: LayoutGrid },
   { value: "revenue", label: "Revenue", icon: DollarSign },
   { value: "payouts", label: "Payouts", icon: Banknote },
+  { value: "payment-modes", label: "Payment Modes", icon: ArrowLeftRight },
   { value: "commissions", label: "Commissions", icon: Percent },
   { value: "promos", label: "Promos", icon: Ticket },
   { value: "security", label: "Security", icon: Lock },
@@ -429,6 +431,7 @@ export const AdminDashboard = () => {
             <TabsContent value="modules"><InstitutionModuleManager /></TabsContent>
             <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
             <TabsContent value="payouts"><WithdrawalAdminQueue /></TabsContent>
+            <TabsContent value="payment-modes"><PaymentModeApprovals /></TabsContent>
             {isSuperAdmin && <TabsContent value="commissions"><CommissionSettings /></TabsContent>}
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>
             <TabsContent value="security"><SecurityDashboard /></TabsContent>
