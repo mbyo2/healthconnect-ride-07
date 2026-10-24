@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, AlertCircle, Building2, UserCheck, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { setActiveInstitutionOverride } from "@/hooks/useInstitutionContext";
+import { clearApiCaches } from "@/utils/service-worker";
 
 interface InvitationDetails {
   id: string;
@@ -243,7 +244,7 @@ const AcceptInvitation = () => {
 
           {emailMismatch && (
             <Button
-              onClick={async () => { await supabase.auth.signOut(); navigate(`/auth?redirect=${encodeURIComponent(`/accept-invitation?token=${token}`)}`); }}
+              onClick={async () => { await clearApiCaches(); await supabase.auth.signOut(); navigate(`/auth?redirect=${encodeURIComponent(`/accept-invitation?token=${token}`)}`); }}
               variant="outline"
               className="w-full"
             >

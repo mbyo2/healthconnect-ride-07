@@ -8,10 +8,12 @@ import { verifyAndSettleLenco, verifyWebhookSignature, settleTransferByReference
 // Lenco webhook receiver.
 //
 // SECURITY MODEL: the webhook payload is never trusted on its own. We
-// verify the HMAC signature when LENCO_WEBHOOK_SECRET is configured, then
-// re-query Lenco's status API for the reference and only settle when Lenco
-// itself reports 'successful'. A forged or replayed webhook therefore
-// cannot credit any wallet.
+// verify the HMAC signature, then re-query Lenco's status API for the
+// reference and only settle when Lenco itself reports 'successful'. A
+// forged or replayed webhook therefore cannot credit any wallet.
+// FAIL CLOSED (P2-25): if neither LENCO_WEBHOOK_SECRET nor
+// LENCO_SECRET_KEY is configured there is nothing to verify a signature
+// against, so every POST is refused with 503 until the Lenco keys land.
 //
 // Configure the webhook URL in the Lenco dashboard (API & Webhooks):
 //   https://<project-ref>.supabase.co/functions/v1/lenco-webhook
@@ -21,6 +23,19 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Fail closed (P2-25): verifyWebhookSignature derives its candidate keys
+  // from LENCO_WEBHOOK_SECRET and LENCO_SECRET_KEY (official spec: HMAC
+  // key = SHA256 of the API token). With neither configured, verification
+  // cannot be performed at all — refuse before touching the payload.
+  // (Outside the try/catch below: that catch returns 200 to stop retry
+  // storms, and a not-configured refusal must not be masked as success.)
+  if (!Deno.env.get('LENCO_WEBHOOK_SECRET') && !Deno.env.get('LENCO_SECRET_KEY')) {
+    console.error('lenco-webhook: no Lenco webhook secret/API key configured — refusing POST');
+    return new Response(JSON.stringify({ error: 'Webhook not configured' }), {
+      status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 

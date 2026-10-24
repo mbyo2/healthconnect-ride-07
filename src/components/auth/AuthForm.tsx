@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
 import { logSecurityEvent, SecurityEvents, authRateLimiter } from '@/utils/security-service';
+import { clearApiCaches } from '@/utils/service-worker';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +34,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
         if (!authRateLimiter(userIp)) {
           setRateLimitExceeded(true);
           toast.error('Too many login attempts. Please try again later.');
+          await clearApiCaches();
           await supabase.auth.signOut();
           return;
         }

@@ -257,6 +257,27 @@ export const updateServiceWorker = async (): Promise<boolean> => {
   return false;
 };
 
+// Clear ONLY the service worker's per-user API caches (P2-31).
+// sw.js stores authenticated Supabase API responses in caches named
+// `healthconnect-api-<user-id>` — dynamic names, so wipe by prefix.
+// Static shell/bundle caches are kept (they hold no user data).
+// Page-side mirror of the worker's CLEAR_API_CACHE handler: works even
+// when no service worker controller exists yet. Call on every sign-out.
+export const API_CACHE_PREFIX = 'healthconnect-api-';
+export const clearApiCaches = async (): Promise<void> => {
+  if (!('caches' in window)) return;
+  try {
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames
+        .filter((name) => name.startsWith(API_CACHE_PREFIX))
+        .map((name) => caches.delete(name))
+    );
+  } catch (error) {
+    console.error('Error clearing API caches:', error);
+  }
+};
+
 // Clear all cached data
 export const clearCache = async (): Promise<boolean> => {
   if ('caches' in window) {
