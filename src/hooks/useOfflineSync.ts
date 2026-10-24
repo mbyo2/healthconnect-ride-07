@@ -33,8 +33,9 @@ const ALLOWED_SYNC_TABLES = new Set<string>([
 // P1-32 (Stage B): authorship/timestamp fields are NEVER client-sent —
 // the server stamps them (BEFORE INSERT triggers force recorded_by =
 // auth.uid(), recorded_at = now(), and an honest is_patient_entered):
-//   - appointments: 'status' removed — a queued booking takes the DB
-//     default ('scheduled'); clients cannot mint a pre-confirmed status.
+//   - appointments: 'status' removed — a queued booking is pinned to
+//     'pending' server-side on insert (trg_appointment_status_pin_insert);
+//     clients cannot mint a pre-confirmed status.
 //   - vital_signs: 'recorded_at' removed (metadata.recorded_by is also
 //     stripped in sanitizePayload below and re-stamped server-side).
 //   - comprehensive_health_metrics: 'recorded_at', 'recorded_by' and

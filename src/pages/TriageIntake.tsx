@@ -142,7 +142,10 @@ export default function TriageIntake() {
           date: dateStr,
           time: timeStr,
           type: "consultation",
-          status: "scheduled",
+          // Born 'pending' like every client booking — the server pins
+          // this too (trg_appointment_status_pin_insert); the provider
+          // confirms it to 'scheduled'.
+          status: "pending",
           notes: `Doc'O Clock triage (${result.urgency}). Recommended specialty: ${result.recommended_specialty}. ${result.reasoning}`,
         })
         .select("id")
