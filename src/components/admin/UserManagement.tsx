@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { syncAdminLevel } from '@/lib/adminLevelSync';
-import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
+import { USER_ROLES, PRIVILEGED_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -138,8 +138,8 @@ export function UserManagement() {
       }
 
       // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
-      if ((selectedRole === 'admin' || (selectedRole as string) === 'super_admin') && !isSuperAdmin) {
-        toast.error('Only super admins can assign admin roles');
+      if ((PRIVILEGED_ROLES as readonly string[]).includes(selectedRole as string) && !isSuperAdmin) {
+        toast.error('Only super admins can assign privileged roles');
         return;
       }
 
@@ -172,8 +172,8 @@ export function UserManagement() {
 
   const handleRevokeRole = async (userId: string, role: UserRole) => {
     // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
-    if ((role === 'admin' || (role as string) === 'super_admin') && !isSuperAdmin) {
-      toast.error('Only super admins can revoke admin roles');
+    if ((PRIVILEGED_ROLES as readonly string[]).includes(role as string) && !isSuperAdmin) {
+      toast.error('Only super admins can revoke privileged roles');
       return;
     }
     try {

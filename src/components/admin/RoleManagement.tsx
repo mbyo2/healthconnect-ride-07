@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Search, UserPlus, UserMinus, Shield, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
+import { USER_ROLES, PRIVILEGED_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 import { syncAdminLevel } from '@/lib/adminLevelSync';
 import { useUserRoles } from '@/context/UserRolesContext';
 
@@ -37,7 +37,7 @@ export const RoleManagement: React.FC = () => {
   const availableRoles: AppRole[] = Object.values(USER_ROLES);
   const assignableRoles: AppRole[] = isSuperAdmin
     ? availableRoles
-    : availableRoles.filter(r => r !== USER_ROLES.ADMIN && r !== USER_ROLES.SUPER_ADMIN);
+    : availableRoles.filter(r => !(PRIVILEGED_ROLES as readonly string[]).includes(r));
 
   const CATEGORY_STYLES: Record<string, string> = {
     admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
@@ -108,10 +108,10 @@ export const RoleManagement: React.FC = () => {
 
   const assignRole = async (userId: string, role: AppRole) => {
     // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
-    if ((role === USER_ROLES.ADMIN || role === USER_ROLES.SUPER_ADMIN) && !isSuperAdmin) {
+    if ((PRIVILEGED_ROLES as readonly string[]).includes(role) && !isSuperAdmin) {
       toast({
         title: 'Not permitted',
-        description: 'Only super admins can assign admin roles',
+        description: 'Only super admins can assign privileged roles',
         variant: 'destructive'
       });
       return;
@@ -149,10 +149,10 @@ export const RoleManagement: React.FC = () => {
 
   const revokeRole = async (userId: string, role: AppRole) => {
     // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
-    if ((role === USER_ROLES.ADMIN || role === USER_ROLES.SUPER_ADMIN) && !isSuperAdmin) {
+    if ((PRIVILEGED_ROLES as readonly string[]).includes(role) && !isSuperAdmin) {
       toast({
         title: 'Not permitted',
-        description: 'Only super admins can revoke admin roles',
+        description: 'Only super admins can revoke privileged roles',
         variant: 'destructive'
       });
       return;

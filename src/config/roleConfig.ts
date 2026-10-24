@@ -3,6 +3,19 @@
  * Import from here instead of scattering role strings across the codebase.
  */
 
+// Privileged roles (P2-11): grant/revoke is a platform super_admin
+// prerogative — enforced server-side by the user_roles RLS policies
+// (migration 20261025_stagec2a_b_user_roles_privileged_grants). The
+// client guard mirrors the same set so plain admins never see a
+// doomed action.
+export const PRIVILEGED_ROLES = [
+  'admin',
+  'super_admin',
+  'institution_admin',
+  'finance_manager',
+  'hr_manager',
+] as const;
+
 // ─── Role identifiers ──────────────────────────────────────────────
 // Taxonomy sources:
 //  - HPCZ (Health Professions Council of Zambia) registrable professions
