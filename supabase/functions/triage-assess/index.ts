@@ -7,6 +7,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -187,6 +188,9 @@ serve(async (req) => {
       });
     }
     const patientId: string = user.id;
+
+    const rateLimited = await aiRateLimitResponse(user.id, 'triage-assess', 20, corsHeaders);
+    if (rateLimited) return rateLimited;
 
     const body = await req.json();
     const parsed = RequestSchema.safeParse(body);
