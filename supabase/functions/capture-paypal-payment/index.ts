@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { evaluateCapture } from '../_shared/paypal-capture-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -193,6 +194,88 @@ serve(async (req) => {
           ? (payment.metadata as Record<string, unknown>)
           : {};
 
+      // ── P2-22: never settle on status alone ──────────────────────────
+      // Compare what PayPal actually captured against what this ledger row
+      // says was owed (gateway_amount/gateway_currency from order creation
+      // when present, else the ledger amount/currency). Currency mismatch
+      // refuses settlement; an under-capture settles the lesser amount
+      // only; an over-capture never settles more than the ledger amount.
+      const decision = evaluateCapture({
+        ledgerAmount: Number(payment.amount),
+        ledgerCurrency: String(payment.currency || ''),
+        gatewayAmount:
+          existingMetadata.gateway_amount !== undefined
+            ? Number(existingMetadata.gateway_amount)
+            : null,
+        gatewayCurrency:
+          typeof existingMetadata.gateway_currency === 'string'
+            ? existingMetadata.gateway_currency
+            : null,
+        capturedAmount: Number(capture.amount.value),
+        capturedCurrency: capture.amount.currency_code,
+      });
+
+      if (decision.mismatch) {
+        // Alert for manual reconciliation (same audit pattern as
+        // send-email-campaign's security_audit_log rows). Best-effort:
+        // a failed alert write must not change the settlement decision.
+        const { error: auditErr } = await supabaseClient
+          .from('security_audit_log')
+          .insert({
+            user_id: payment.patient_id,
+            event_type: 'paypal_capture_mismatch',
+            event_data: {
+              payment_id: payment.id,
+              paypal_order_id: paypalOrderId,
+              paypal_capture_id: capture.id,
+              decision: decision.action,
+              settle_amount: decision.settleAmount,
+              ...decision.mismatch,
+            },
+          });
+        if (auditErr) {
+          console.error('Failed to record capture mismatch alert:', auditErr);
+        }
+        console.error('PayPal capture mismatch:', {
+          paymentId: payment.id,
+          ...decision.mismatch,
+          decision: decision.action,
+        });
+      }
+
+      if (decision.action === 'refuse') {
+        // Fail closed: PayPal holds captured funds but the platform ledger
+        // does NOT settle. The row stays non-completed with the mismatch
+        // recorded so finance can reconcile/refund manually.
+        await supabaseClient
+          .from('payments')
+          .update({
+            updated_at: new Date().toISOString(),
+            error_message: `PayPal capture mismatch (${decision.mismatch.kind}): captured ${capture.amount.value} ${capture.amount.currency_code}, expected ${decision.mismatch.expectedGatewayAmount} ${decision.mismatch.expectedGatewayCurrency}. Settlement held for review.`,
+            metadata: {
+              ...existingMetadata,
+              paypal_capture_id: capture.id,
+              paypal_capture_status: capture.status,
+              captured_amount: capture.amount.value,
+              captured_currency: capture.amount.currency_code,
+              captured_at: new Date().toISOString(),
+              capture_mismatch: decision.mismatch,
+              settlement_held: true,
+            },
+          })
+          .eq('id', paymentId);
+
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Captured amount does not match the payment amount — settlement held for review',
+          }),
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const settleAmount = decision.settleAmount;
+
       // Update payment record
       await supabaseClient
         .from('payments')
@@ -207,7 +290,11 @@ serve(async (req) => {
             paypal_capture_status: capture.status,
             captured_amount: capture.amount.value,
             captured_currency: capture.amount.currency_code,
-            captured_at: new Date().toISOString()
+            captured_at: new Date().toISOString(),
+            settled_amount: settleAmount,
+            ...(decision.mismatch
+              ? { capture_mismatch: decision.mismatch, partial_settlement: decision.action === 'settle_partial' }
+              : {})
           }
         })
         .eq('id', paymentId);
@@ -232,7 +319,7 @@ serve(async (req) => {
           const { error: walletError } = await supabaseClient.rpc('process_wallet_transaction', {
             p_user_id: payment.patient_id,
             p_transaction_type: 'credit',
-            p_amount: payment.amount,
+            p_amount: settleAmount,
             p_description: `PayPal wallet top-up - ${payment.invoice_number}`,
             p_payment_id: payment.id
           });
@@ -269,7 +356,7 @@ serve(async (req) => {
 
             const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
               p_payment_id: payment.id,
-              p_total_amount: payment.amount,
+              p_total_amount: settleAmount,
               p_provider_id: institution ? null : payment.provider_id,
               p_institution_id: institution ? institution.id : null,
               p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
@@ -296,7 +383,8 @@ serve(async (req) => {
           paymentId: payment.id,
           captureId: capture.id,
           amount: capture.amount.value,
-          currency: capture.amount.currency_code
+          currency: capture.amount.currency_code,
+          settledAmount: settleAmount
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
