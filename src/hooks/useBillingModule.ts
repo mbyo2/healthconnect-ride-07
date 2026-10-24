@@ -88,37 +88,29 @@ export function useBillingModule() {
   const createInvoice = async (data: {
     patient_name: string;
     patient_id?: string;
-    items: Array<{ description: string; quantity: number; unit_price: number; total: number }>;
-    subtotal: number;
+    // P1-26: lines reference the priced catalogue only. Prices and
+    // totals are derived server-side by create_manual_invoice; any
+    // client-computed amount is neither sent nor accepted.
+    lines: Array<{ service_pricing_id: string; quantity: number }>;
     tax?: number;
     discount?: number;
-    total_amount: number;
     due_date?: string;
     notes?: string;
     insurance_provider?: string;
   }) => {
     if (!institutionId || !user) return null;
     try {
-      const { data: result, error } = await supabase
-        .from('billing_invoices')
-        .insert({
-          institution_id: institutionId,
-          patient_name: data.patient_name,
-          patient_id: data.patient_id || null,
-          items: data.items as any,
-          subtotal: data.subtotal,
-          tax: data.tax || 0,
-          discount: data.discount || 0,
-          total_amount: data.total_amount,
-          balance: data.total_amount,
-          due_date: data.due_date || null,
-          notes: data.notes || null,
-          insurance_provider: data.insurance_provider || null,
-          created_by: user.id,
-          invoice_number: 'TEMP', // Overwritten by trigger
-        } as any)
-        .select()
-        .single();
+      const { data: result, error } = await (supabase as any).rpc('create_manual_invoice', {
+        p_institution_id: institutionId,
+        p_patient_id: data.patient_id || null,
+        p_patient_name: data.patient_name,
+        p_lines: data.lines,
+        p_tax: data.tax || 0,
+        p_discount: data.discount || 0,
+        p_due_date: data.due_date || null,
+        p_notes: data.notes || null,
+        p_insurance_provider: data.insurance_provider || null,
+      });
 
       if (error) throw error;
       toast.success(`Invoice ${(result as any).invoice_number} created`);

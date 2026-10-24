@@ -14,6 +14,13 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
+import { ServiceLineEditor, useInstitutionServices } from "@/components/billing/InvoiceServiceLines";
+import {
+  type InvoiceServiceLine,
+  emptyServiceLine,
+  buildInvoiceLinesPayload,
+  serviceLinesSubtotal,
+} from "@/lib/invoicePricing";
 
 interface Invoice {
   id: string;
@@ -51,9 +58,11 @@ export const Billing = () => {
   const [markPaidInvoice, setMarkPaidInvoice] = useState<Invoice | null>(null);
   const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
 
-  // Form state
+  // Form state — P1-26: invoice lines are priced services chosen from
+  // the institution's service_pricing list, never free-typed prices.
+  const { services } = useInstitutionServices(institutionId);
   const [patientId, setPatientId] = useState("");
-  const [items, setItems] = useState([{ description: "", quantity: 1, unit_price: 0 }]);
+  const [items, setItems] = useState<InvoiceServiceLine[]>([emptyServiceLine()]);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [dueDate, setDueDate] = useState("");
@@ -130,7 +139,9 @@ export const Billing = () => {
   };
 
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    // Display preview from the same catalogue the server prices from;
+    // create_manual_invoice re-derives every figure at write time.
+    const subtotal = serviceLinesSubtotal(items, services);
     const total = subtotal + tax - discount;
     return { subtotal, total };
   };
@@ -140,38 +151,30 @@ export const Billing = () => {
       toast.error("Select a patient");
       return;
     }
-    if (items.some(i => !i.description || i.unit_price <= 0)) {
-      toast.error("All items need a description and price");
+    if (items.some(i => !i.service_pricing_id)) {
+      toast.error("Choose a priced service for every line");
       return;
     }
 
     setSubmitting(true);
     try {
-      const { subtotal, total } = calculateTotals();
       const patient = patients.find(p => p.id === patientId);
-      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
 
-      const { data, error } = await supabase.from("billing_invoices").insert({
-        institution_id: institutionId,
-        patient_id: patientId,
-        invoice_number: invoiceNumber,
-        patient_name: patient?.name || "Unknown",
-        items: items,
-        subtotal,
-        tax,
-        discount,
-        total_amount: total,
-        paid_amount: 0,
-        balance: total,
-        status: "draft",
-        due_date: dueDate || null,
-        notes,
-        created_by: user?.id,
-      }).select().single();
+      const { data, error } = await (supabase as any).rpc("create_manual_invoice", {
+        p_institution_id: institutionId,
+        p_patient_id: patientId,
+        p_patient_name: patient?.name || "Unknown",
+        p_lines: buildInvoiceLinesPayload(items),
+        p_tax: tax,
+        p_discount: discount,
+        p_due_date: dueDate || null,
+        p_notes: notes || null,
+        p_insurance_provider: null,
+      });
 
       if (error) throw error;
 
-      toast.success(`Invoice ${invoiceNumber} created`);
+      toast.success(`Invoice ${(data as any)?.invoice_number} created`);
       setShowCreate(false);
       resetForm();
       fetchInvoices();
@@ -297,25 +300,11 @@ export const Billing = () => {
 
   const resetForm = () => {
     setPatientId("");
-    setItems([{ description: "", quantity: 1, unit_price: 0 }]);
+    setItems([emptyServiceLine()]);
     setTax(0);
     setDiscount(0);
     setDueDate("");
     setNotes("");
-  };
-
-  const addItem = () => {
-    setItems([...items, { description: "", quantity: 1, unit_price: 0 }]);
-  };
-
-  const updateItem = (index: number, field: string, value: any) => {
-    const updated = [...items];
-    updated[index] = { ...updated[index], [field]: value };
-    setItems(updated);
-  };
-
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
   };
 
   const getStatusBadge = (status: string) => {
@@ -424,37 +413,13 @@ export const Billing = () => {
             </div>
 
             <div>
-              <Label>Items</Label>
-              {items.map((item, idx) => (
-                <div key={idx} className="flex gap-2 mb-2">
-                  <Input
-                    placeholder="Description"
-                    value={item.description}
-                    onChange={(e) => updateItem(idx, "description", e.target.value)}
-                    className="flex-1"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(idx, "quantity", parseInt(e.target.value) || 1)}
-                    className="w-20"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Price"
-                    value={item.unit_price}
-                    onChange={(e) => updateItem(idx, "unit_price", parseFloat(e.target.value) || 0)}
-                    className="w-28"
-                  />
-                  {items.length > 1 && (
-                    <Button variant="outline" size="sm" onClick={() => removeItem(idx)}>×</Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="outline" size="sm" onClick={addItem}>
-                <Plus className="h-4 w-4 mr-1" /> Add Item
-              </Button>
+              <Label>Services (priced from the price list)</Label>
+              <ServiceLineEditor
+                lines={items}
+                services={services}
+                onChange={setItems}
+                formatPrice={formatPrice}
+              />
             </div>
 
             <div className="grid grid-cols-3 gap-4">

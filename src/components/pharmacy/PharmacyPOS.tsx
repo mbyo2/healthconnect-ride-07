@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
-import { dispenseLinesFEFO } from "./pharmacyStockService";
+import { buildPosSaleItemsPayload, POS_DISCOUNT_BANDS } from "@/lib/posSale";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import {
   Search, Plus, Minus, Trash2, ShoppingCart, Receipt, CreditCard, Banknote,
@@ -51,9 +51,6 @@ export const PharmacyPOS = () => {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastSale, setLastSale] = useState<any>(null);
-  const [customItemName, setCustomItemName] = useState("");
-  const [customItemPrice, setCustomItemPrice] = useState("");
-  const [showCustomItem, setShowCustomItem] = useState(false);
   const [openingBalanceInput, setOpeningBalanceInput] = useState("0");
   const [closingBalanceInput, setClosingBalanceInput] = useState("0");
   const [showCloseDialog, setShowCloseDialog] = useState(false);
@@ -89,13 +86,6 @@ export const PharmacyPOS = () => {
     });
   }, []);
 
-  const addCustomItem = () => {
-    if (!customItemName || !customItemPrice) return;
-    const price = parseFloat(customItemPrice);
-    setCart((prev) => [...prev, { medication_inventory_id: null, item_name: customItemName, quantity: 1, unit_price: price, discount: 0, total: price }]);
-    setCustomItemName(""); setCustomItemPrice(""); setShowCustomItem(false);
-  };
-
   const updateQuantity = (index: number, delta: number) => {
     setCart((prev) => prev.map((item, i) => {
       if (i !== index) return item;
@@ -115,39 +105,25 @@ export const PharmacyPOS = () => {
     mutationFn: async () => {
       if (!pharmacyId || !user) throw new Error("Not authorized");
       if (cart.length === 0) throw new Error("Cart is empty");
-      const { data: receiptData } = await (supabase as any).rpc("generate_receipt_number", { p_pharmacy_id: pharmacyId });
-      const receiptNumber = receiptData || `RCP-${Date.now()}`;
-      const { data: sale, error: saleError } = await (supabase as any).from("pos_sales").insert({ pharmacy_id: pharmacyId, cashier_id: user.id, customer_name: customerName || null, customer_phone: customerPhone || null, sale_type: "walk_in", subtotal, tax_amount: 0, discount_amount: discountAmount, total_amount: totalAmount, payment_method: paymentMethod, payment_reference: paymentRef || null, receipt_number: receiptNumber, status: "completed" }).select().single();
-      if (saleError) throw saleError;
-      const items = cart.map((item) => ({ sale_id: sale.id, medication_inventory_id: item.medication_inventory_id, item_name: item.item_name, quantity: item.quantity, unit_price: item.unit_price, discount: item.discount, total: item.total, batch_number: item.batch_number || null }));
-      const { error: itemsError } = await (supabase as any).from("pos_sale_items").insert(items);
-      if (itemsError) throw itemsError;
-      // GAP-02/GAP-03: auto-FEFO-dispense every inventoried cart line against
-      // the batch ledger (no per-batch UI). Custom items have no inventory
-      // mapping and are skipped. On failure the sale is rolled back so a
-      // recorded sale never lacks its ledger dispenses.
-      const fefoLines = cart
-        .filter((item) => item.medication_inventory_id)
-        .map((item) => ({
-          inventoryTable: "medication_inventory" as const,
-          inventoryItemId: item.medication_inventory_id as string,
-          quantity: Math.max(1, Math.round(item.quantity)),
-          productName: item.item_name,
-        }));
-      if (fefoLines.length > 0) {
-        try {
-          await dispenseLinesFEFO(pharmacyId, fefoLines, {
-            referenceType: "pos_sale",
-            referenceId: sale.id,
-            notes: `POS sale ${receiptNumber}`,
-          });
-        } catch (fefoError: any) {
-          await (supabase as any).from("pos_sales").delete().eq("id", sale.id);
-          throw new Error(`Sale rolled back: ${fefoError?.message || "FEFO dispense failed"}`);
-        }
-      }
-      if (customerPhone) await (supabase as any).from("pharmacy_customers").upsert({ pharmacy_id: pharmacyId, name: customerName || "Walk-in", phone: customerPhone, total_purchases: totalAmount, visit_count: 1, last_visit_at: new Date().toISOString() }, { onConflict: "pharmacy_id,phone", ignoreDuplicates: false }).select();
-      return { ...sale, items: cart };
+      // P1-26: the sale is created by the create_pos_sale RPC, which
+      // prices every line from this dispensary's catalogue, computes
+      // the totals, deducts stock and FEFO-dispenses atomically. The
+      // client sends item ids + quantities only — the prices and
+      // totals below are a display preview, never the charge.
+      const { data, error } = await (supabase as any).rpc("create_pos_sale", {
+        p_pharmacy_id: pharmacyId,
+        p_items: buildPosSaleItemsPayload(cart),
+        p_customer_name: customerName || null,
+        p_customer_phone: customerPhone || null,
+        p_payment_method: paymentMethod,
+        p_payment_reference: paymentRef || null,
+        p_discount_percent: discountPercent,
+      });
+      if (error) throw error;
+      const sale = (data as any)?.sale;
+      const soldItems = ((data as any)?.items || []) as CartItem[];
+      if (customerPhone) await (supabase as any).from("pharmacy_customers").upsert({ pharmacy_id: pharmacyId, name: customerName || "Walk-in", phone: customerPhone, total_purchases: Number(sale?.total_amount || 0), visit_count: 1, last_visit_at: new Date().toISOString() }, { onConflict: "pharmacy_id,phone", ignoreDuplicates: false }).select();
+      return { ...sale, items: soldItems };
     },
     onSuccess: (data) => {
       setLastSale(data); setShowReceipt(true); setCart([]); setCustomerName(""); setCustomerPhone(""); setPaymentRef(""); setDiscountPercent(0);
@@ -212,9 +188,6 @@ export const PharmacyPOS = () => {
               className="w-full pl-8 pr-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium"
             />
           </div>
-          <button onClick={() => setShowCustomItem(true)} className="px-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-extrabold flex items-center gap-1">
-            <Plus className="h-3.5 w-3.5" /> Custom Item
-          </button>
           <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-500 text-white text-xs font-extrabold">
             Close Register
           </button>
@@ -324,7 +297,7 @@ export const PharmacyPOS = () => {
 
           {/* Discount Selector */}
           <div className="flex gap-1">
-            {[0, 5, 10, 15].map((d) => (
+            {POS_DISCOUNT_BANDS.map((d) => (
               <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
                 {d === 0 ? "No Disc" : `${d}%`}
               </button>
@@ -359,27 +332,6 @@ export const PharmacyPOS = () => {
           </button>
         </div>
       </div>
-
-      {/* Custom Item Dialog */}
-      <Dialog open={showCustomItem} onOpenChange={setShowCustomItem}>
-        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <DialogHeader><DialogTitle className="font-extrabold text-base">Add Custom Item</DialogTitle></DialogHeader>
-          <div className="space-y-3 text-xs py-2">
-            <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Name</label>
-              <input value={customItemName} onChange={(e) => setCustomItemName(e.target.value)} className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
-            </div>
-            <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Price ({getSymbol()})</label>
-              <input type="number" value={customItemPrice} onChange={(e) => setCustomItemPrice(e.target.value)} className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
-            </div>
-          </div>
-          <DialogFooter>
-            <button onClick={() => setShowCustomItem(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-            <button onClick={addCustomItem} disabled={!customItemName || !customItemPrice} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">Add to Cart</button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Close Register Dialog */}
       <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>

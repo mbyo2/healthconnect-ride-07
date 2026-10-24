@@ -18,7 +18,14 @@ import { exportInvoicePDF } from "@/utils/pdfExport";
 import { useCurrency } from "@/hooks/use-currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
-import { fetchInstitutionTariffs, resolveTariffPrice, type ServiceTariff } from "@/components/pricing/TariffAndPriceManager";
+import { ServiceLineEditor, useInstitutionServices } from "@/components/billing/InvoiceServiceLines";
+import {
+  type InvoiceServiceLine,
+  emptyServiceLine,
+  buildInvoiceLinesPayload,
+  serviceLinesSubtotal,
+  matchService,
+} from "@/lib/invoicePricing";
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; pillColor: string }> = {
@@ -39,6 +46,8 @@ export const BillingStaffWorkflow = () => {
   } = useBillingModule();
   const { currency } = useCurrency();
   const { institutionId } = useInstitutionAffiliation();
+  // P1-26: invoice lines are priced services from service_pricing.
+  const { services } = useInstitutionServices(institutionId);
 
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -47,7 +56,7 @@ export const BillingStaffWorkflow = () => {
 
   const [invoiceForm, setInvoiceForm] = useState({
     patient_name: "",
-    items: [{ description: "", quantity: 1, unit_price: 0, total: 0 }] as Array<{ description: string; quantity: number; unit_price: number; total: number }>,
+    items: [emptyServiceLine()] as InvoiceServiceLine[],
     tax: 0,
     discount: 0,
     due_date: "",
@@ -74,36 +83,36 @@ export const BillingStaffWorkflow = () => {
           supabase.from("insurance_verifications" as any).select("provider_name, verified_at").eq("patient_id", patientId).order("verified_at", { ascending: false }).limit(1),
         ]);
 
-        // Prices resolve from the institution tariff book — never invented.
-        // Anything without a tariff (or recorded) price enters at 0 so staff
-        // set it explicitly instead of billing a fabricated figure.
-        let tariffs: ServiceTariff[] = [];
-        try {
-          tariffs = institutionId ? await fetchInstitutionTariffs(institutionId) : [];
-        } catch {
-          tariffs = [];
-        }
+        // P1-26: charges become invoice lines ONLY when they match a
+        // priced service on the institution's service_pricing list.
+        // Anything unmatched is reported as "not on the price list" —
+        // a price is never invented or typed in here, and the server
+        // re-derives every price again at creation.
         const needsRate: string[] = [];
-        const fetchedItems: Array<{ description: string; quantity: number; unit_price: number; total: number }> = [];
+        const fetchedItems: InvoiceServiceLine[] = [];
+        const pushCharge = (label: string, qty: number, ...keywords: string[]) => {
+          const svc = matchService(services, ...keywords);
+          if (!svc) {
+            needsRate.push(label);
+            return;
+          }
+          const existing = fetchedItems.find((i) => i.service_pricing_id === svc.id);
+          if (existing) existing.quantity += qty;
+          else fetchedItems.push({ service_pricing_id: svc.id, quantity: qty });
+        };
 
         (apptsRes.data || []).forEach((a: any) => {
           const label = `Consultation (${a.type?.replace("_", " ") || "General"})`;
-          const price = resolveTariffPrice(tariffs, "opd", a.type, 0);
-          if (!(price > 0)) needsRate.push(label);
-          fetchedItems.push({ description: label, quantity: 1, unit_price: price, total: price });
+          pushCharge(label, 1, a.type || "", "consultation");
         });
         (labsRes.data || []).forEach((l: any) => {
           const label = `Lab Test: ${l.test_type}`;
-          const price = Number(l.price || l.total_amount) || resolveTariffPrice(tariffs, "lab", l.test_type, 0);
-          if (!(price > 0)) needsRate.push(label);
-          fetchedItems.push({ description: label, quantity: 1, unit_price: price, total: price });
+          pushCharge(label, 1, l.test_type || "", "lab");
         });
         (rxsRes.data || []).forEach((r: any) => {
           const qty = r.quantity || 1;
           const label = `Rx: ${r.medication_name}`;
-          const price = resolveTariffPrice(tariffs, "pharmacy", r.medication_name, 0);
-          if (!(price > 0)) needsRate.push(label);
-          fetchedItems.push({ description: label, quantity: qty, unit_price: price, total: price * qty });
+          pushCharge(label, qty, r.medication_name || "");
         });
 
         if (fetchedItems.length > 0) {
@@ -118,11 +127,15 @@ export const BillingStaffWorkflow = () => {
           });
           if (needsRate.length > 0) {
             toast.warning(
-              `Auto-filled ${fetchedItems.length} items — ${needsRate.length} need${needsRate.length === 1 ? "s" : ""} a rate: ${needsRate.slice(0, 3).join(", ")}${needsRate.length > 3 ? "…" : ""}`
+              `Auto-filled ${fetchedItems.length} priced services — ${needsRate.length} charge${needsRate.length === 1 ? " is" : "s are"} not on the price list and were left off: ${needsRate.slice(0, 3).join(", ")}${needsRate.length > 3 ? "…" : ""}`
             );
           } else {
             toast.success(`Auto-filled ${fetchedItems.length} line items from patient system charges`);
           }
+        } else if (needsRate.length > 0) {
+          toast.warning(
+            `Found ${needsRate.length} charge${needsRate.length === 1 ? "" : "s"}, but none are on this institution's price list yet — add the services and their prices first: ${needsRate.slice(0, 3).join(", ")}${needsRate.length > 3 ? "…" : ""}`
+          );
         } else {
           toast.info("No pending system charges found for this patient");
         }
@@ -140,42 +153,21 @@ export const BillingStaffWorkflow = () => {
     reference_number: "",
   });
 
-  const addItem = () => {
-    setInvoiceForm((prev) => ({
-      ...prev,
-      items: [...prev.items, { description: "", quantity: 1, unit_price: 0, total: 0 }],
-    }));
-  };
-
-  const removeItem = (index: number) => {
-    setInvoiceForm((prev) => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updateItem = (index: number, field: string, value: any) => {
-    setInvoiceForm((prev) => {
-      const items = [...prev.items];
-      (items[index] as any)[field] = value;
-      items[index].total = items[index].quantity * items[index].unit_price;
-      return { ...prev, items };
-    });
-  };
-
-  const subtotal = invoiceForm.items.reduce((sum, item) => sum + item.total, 0);
+  const subtotal = serviceLinesSubtotal(invoiceForm.items, services);
   const totalAmount = subtotal + invoiceForm.tax - invoiceForm.discount;
 
   const handleCreateInvoice = async () => {
     if (!invoiceForm.patient_name.trim() || invoiceForm.items.length === 0) return;
+    if (invoiceForm.items.some((i) => !i.service_pricing_id)) {
+      toast.error("Choose a priced service for every line");
+      return;
+    }
     setCreating(true);
     const result = await createInvoice({
       patient_name: invoiceForm.patient_name,
-      items: invoiceForm.items,
-      subtotal,
+      lines: buildInvoiceLinesPayload(invoiceForm.items),
       tax: invoiceForm.tax,
       discount: invoiceForm.discount,
-      total_amount: totalAmount,
       due_date: invoiceForm.due_date || undefined,
       notes: invoiceForm.notes || undefined,
       insurance_provider: invoiceForm.insurance_provider || undefined,
@@ -183,7 +175,7 @@ export const BillingStaffWorkflow = () => {
     if (result) {
       setInvoiceForm({
         patient_name: "",
-        items: [{ description: "", quantity: 1, unit_price: 0, total: 0 }],
+        items: [emptyServiceLine()],
         tax: 0,
         discount: 0,
         due_date: "",
@@ -336,51 +328,14 @@ export const BillingStaffWorkflow = () => {
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items</label>
-                  <button onClick={addItem} className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1">
-                    <Plus className="h-3 w-3" /> Add Item
-                  </button>
+                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items (priced services)</label>
                 </div>
-                {invoiceForm.items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 mb-2 items-center">
-                    <div className="col-span-5">
-                      <input
-                        placeholder="Item description"
-                        value={item.description}
-                        onChange={(e) => updateItem(index, "description", e.target.value)}
-                        className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <input
-                        type="number"
-                        placeholder="Qty"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
-                        className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-center"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <input
-                        type="number"
-                        placeholder="Price"
-                        value={item.unit_price}
-                        onChange={(e) => updateItem(index, "unit_price", parseFloat(e.target.value) || 0)}
-                        className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
-                      />
-                    </div>
-                    <div className="col-span-2 font-mono font-bold text-slate-900 dark:text-slate-100 text-right pr-2">
-                      K{item.total.toLocaleString()}
-                    </div>
-                    <div className="col-span-1 text-center">
-                      {invoiceForm.items.length > 1 && (
-                        <button onClick={() => removeItem(index)} className="p-1 text-error-500">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                <ServiceLineEditor
+                  lines={invoiceForm.items}
+                  services={services}
+                  onChange={(items) => setInvoiceForm((prev) => ({ ...prev, items }))}
+                  formatPrice={(n) => `K${n.toLocaleString()}`}
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
