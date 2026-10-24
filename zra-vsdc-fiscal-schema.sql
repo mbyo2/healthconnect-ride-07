@@ -2,6 +2,15 @@
 -- ZRA SMART INVOICE VSDC FISCAL SUBMISSION SCHEMA
 -- Run this in Supabase SQL Editor
 -- ============================================================================
+-- SUPERSEDED — DO NOT RE-RUN (audit P2-13, verified 2026-10-24).
+-- This manual file's WITH CHECK (true) / USING (true) write policies
+-- were dropped live by a later migration, and its remaining policies
+-- were replaced by supabase/migrations/
+-- 20261025_stagec2a_c_zra_fiscal_lockdown.sql (the personnel-branch
+-- tautology `institution_id = institution_id` made every policy
+-- cross-institution). Re-running this file would recreate the
+-- world-writable policies. Kept for history only.
+-- ============================================================================
 
 -- ============================================================================
 -- 1. INSTITUTION SMART INVOICE SETTINGS

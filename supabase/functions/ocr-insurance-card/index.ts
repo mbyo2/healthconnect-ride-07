@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,6 +21,9 @@ Deno.serve(async (req) => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Unauthorized');
+
+    const rateLimited = await aiRateLimitResponse(user.id, 'ocr-insurance-card', 10, corsHeaders);
+    if (rateLimited) return rateLimited;
 
     const { imageBase64, imageUrl } = await req.json();
     if (!imageBase64 && !imageUrl) throw new Error('No image provided');
