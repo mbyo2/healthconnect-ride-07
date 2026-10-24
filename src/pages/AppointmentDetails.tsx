@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Clock, User, Video, FileText, X, ArrowLeft, CheckCircle } from "lucide-react";
+import { Calendar, Clock, User, Video, FileText, X, ArrowLeft, CheckCircle, MapPin, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -32,6 +32,8 @@ interface AppointmentData {
   reason?: string;
   type: string;
   provider_id: string;
+  consultation_fee?: number | null;
+  duration?: number | null;
 }
 
 export const AppointmentDetails = () => {
@@ -284,6 +286,42 @@ export const AppointmentDetails = () => {
                   <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Consultation Type</div>
                   <div className="font-semibold text-slate-800 dark:text-slate-200 capitalize">
                     {appointment.type === "video_consultation" ? "Video Consultation" : "In-Person Visit"}
+                  </div>
+                </div>
+              </div>
+
+              {appointment.consultation_fee != null && (
+                <div className="flex items-start gap-3">
+                  <Wallet className="h-4 w-4 text-slate-400 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Consultation Fee</div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200">
+                      K{appointment.consultation_fee}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {appointment.duration != null && (
+                <div className="flex items-start gap-3">
+                  <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Duration</div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200">
+                      {appointment.duration} minutes
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 text-slate-400 mt-0.5" />
+                <div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Location</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-200">
+                    {appointment.type === "video_consultation"
+                      ? "Video Consultation"
+                      : appointment.provider?.address || "In-Person Visit"}
                   </div>
                 </div>
               </div>

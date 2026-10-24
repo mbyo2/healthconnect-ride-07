@@ -121,26 +121,31 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="medical">Medical</TabsTrigger>
-            <TabsTrigger value="medications">Meds</TabsTrigger>
-            <TabsTrigger value="allergies">Allergies</TabsTrigger>
-            <TabsTrigger value="insurance">Insurance</TabsTrigger>
-            <TabsTrigger value="consent">Consent</TabsTrigger>
-          </TabsList>
+          <p className="text-xs font-medium text-muted-foreground mb-3">
+            Step {['medical', 'medications', 'allergies', 'insurance', 'consent'].indexOf(activeTab) + 1} of 5 — {({ medical: 'Medical', medications: 'Medications', allergies: 'Allergies', insurance: 'Insurance', consent: 'Consent' } as Record<string, string>)[activeTab]}
+          </p>
+          <div className="w-full overflow-x-auto">
+            <TabsList className="flex w-full justify-start">
+              <TabsTrigger value="medical">Medical</TabsTrigger>
+              <TabsTrigger value="medications">Meds</TabsTrigger>
+              <TabsTrigger value="allergies">Allergies</TabsTrigger>
+              <TabsTrigger value="insurance">Insurance</TabsTrigger>
+              <TabsTrigger value="consent">Consent</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="medical" className="space-y-4 mt-4">
             <div>
-              <Label>Current Medical Conditions</Label>
-              <Textarea placeholder="e.g., Diabetes, Hypertension..." value={conditions} onChange={e => setConditions(e.target.value)} rows={3} />
+              <Label htmlFor="intake-conditions">Current Medical Conditions</Label>
+              <Textarea id="intake-conditions" placeholder="e.g., Diabetes, Hypertension..." value={conditions} onChange={e => setConditions(e.target.value)} rows={3} />
             </div>
             <div>
-              <Label>Past Surgeries / Procedures</Label>
-              <Textarea placeholder="List any past surgeries with dates..." value={surgeries} onChange={e => setSurgeries(e.target.value)} rows={3} />
+              <Label htmlFor="intake-surgeries">Past Surgeries / Procedures</Label>
+              <Textarea id="intake-surgeries" placeholder="List any past surgeries with dates..." value={surgeries} onChange={e => setSurgeries(e.target.value)} rows={3} />
             </div>
             <div>
-              <Label>Family Medical History</Label>
-              <Textarea placeholder="Notable conditions in your family..." value={familyHistory} onChange={e => setFamilyHistory(e.target.value)} rows={3} />
+              <Label htmlFor="intake-family-history">Family Medical History</Label>
+              <Textarea id="intake-family-history" placeholder="Notable conditions in your family..." value={familyHistory} onChange={e => setFamilyHistory(e.target.value)} rows={3} />
             </div>
             <Button onClick={() => setActiveTab('medications')}>Next: Medications →</Button>
           </TabsContent>
@@ -148,9 +153,9 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
           <TabsContent value="medications" className="space-y-4 mt-4">
             {medications.map((med, i) => (
               <div key={i} className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:items-end">
-                <div><Label>Name</Label><Input value={med.name} onChange={e => { const m = [...medications]; m[i].name = e.target.value; setMedications(m); }} /></div>
-                <div><Label>Dosage</Label><Input value={med.dosage} onChange={e => { const m = [...medications]; m[i].dosage = e.target.value; setMedications(m); }} /></div>
-                <div><Label>Frequency</Label><Input value={med.frequency} onChange={e => { const m = [...medications]; m[i].frequency = e.target.value; setMedications(m); }} /></div>
+                <div><Label htmlFor={`med-name-${i}`}>Name</Label><Input id={`med-name-${i}`} value={med.name} onChange={e => { const m = [...medications]; m[i].name = e.target.value; setMedications(m); }} /></div>
+                <div><Label htmlFor={`med-dosage-${i}`}>Dosage</Label><Input id={`med-dosage-${i}`} value={med.dosage} onChange={e => { const m = [...medications]; m[i].dosage = e.target.value; setMedications(m); }} /></div>
+                <div><Label htmlFor={`med-frequency-${i}`}>Frequency</Label><Input id={`med-frequency-${i}`} value={med.frequency} onChange={e => { const m = [...medications]; m[i].frequency = e.target.value; setMedications(m); }} /></div>
                 <Button variant="ghost" size="icon" onClick={() => setMedications(medications.filter((_, j) => j !== i))} aria-label="Remove medication"><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))}
@@ -166,12 +171,12 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
           <TabsContent value="allergies" className="space-y-4 mt-4">
             {allergies.map((allergy, i) => (
               <div key={i} className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:items-end">
-                <div><Label>Allergen</Label><Input value={allergy.allergen} onChange={e => { const a = [...allergies]; a[i].allergen = e.target.value; setAllergies(a); }} /></div>
-                <div><Label>Reaction</Label><Input value={allergy.reaction} onChange={e => { const a = [...allergies]; a[i].reaction = e.target.value; setAllergies(a); }} /></div>
+                <div><Label htmlFor={`allergy-allergen-${i}`}>Allergen</Label><Input id={`allergy-allergen-${i}`} value={allergy.allergen} onChange={e => { const a = [...allergies]; a[i].allergen = e.target.value; setAllergies(a); }} /></div>
+                <div><Label htmlFor={`allergy-reaction-${i}`}>Reaction</Label><Input id={`allergy-reaction-${i}`} value={allergy.reaction} onChange={e => { const a = [...allergies]; a[i].reaction = e.target.value; setAllergies(a); }} /></div>
                 <div>
-                  <Label>Severity</Label>
+                  <Label htmlFor={`allergy-severity-${i}`}>Severity</Label>
                   <Select value={allergy.severity} onValueChange={v => { const a = [...allergies]; a[i].severity = v; setAllergies(a); }}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger id={`allergy-severity-${i}`}><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="mild">Mild</SelectItem>
                       <SelectItem value="moderate">Moderate</SelectItem>
@@ -192,16 +197,17 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
           </TabsContent>
 
           <TabsContent value="insurance" className="space-y-4 mt-4">
-            <div><Label>Insurance Provider</Label><Input placeholder="e.g., Aetna, Blue Cross..." value={insuranceProvider} onChange={e => setInsuranceProvider(e.target.value)} /></div>
-            <div><Label>Policy Number</Label><Input value={policyNumber} onChange={e => setPolicyNumber(e.target.value)} /></div>
-            <div><Label>Group Number (optional)</Label><Input value={groupNumber} onChange={e => setGroupNumber(e.target.value)} /></div>
+            <div><Label htmlFor="intake-insurance-provider">Insurance Provider</Label><Input id="intake-insurance-provider" placeholder="e.g., NHIMA, Madison, Prudential" value={insuranceProvider} onChange={e => setInsuranceProvider(e.target.value)} /></div>
+            <div><Label htmlFor="intake-policy-number">Policy Number</Label><Input id="intake-policy-number" value={policyNumber} onChange={e => setPolicyNumber(e.target.value)} /></div>
+            <div><Label htmlFor="intake-group-number">Group Number (optional)</Label><Input id="intake-group-number" value={groupNumber} onChange={e => setGroupNumber(e.target.value)} /></div>
+            <h4 className="text-sm font-semibold pt-2">Emergency contact</h4>
             <div>
-              <Label>Emergency Contact Name</Label>
-              <Input value={emergencyName} onChange={e => setEmergencyName(e.target.value)} />
+              <Label htmlFor="intake-emergency-name">Emergency Contact Name</Label>
+              <Input id="intake-emergency-name" value={emergencyName} onChange={e => setEmergencyName(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div><Label>Phone</Label><Input value={emergencyPhone} onChange={e => setEmergencyPhone(e.target.value)} /></div>
-              <div><Label>Relationship</Label><Input value={emergencyRelation} onChange={e => setEmergencyRelation(e.target.value)} /></div>
+              <div><Label htmlFor="intake-emergency-phone">Phone</Label><Input id="intake-emergency-phone" value={emergencyPhone} onChange={e => setEmergencyPhone(e.target.value)} /></div>
+              <div><Label htmlFor="intake-emergency-relation">Relationship</Label><Input id="intake-emergency-relation" value={emergencyRelation} onChange={e => setEmergencyRelation(e.target.value)} /></div>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setActiveTab('allergies')}>← Back</Button>

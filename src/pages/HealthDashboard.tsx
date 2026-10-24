@@ -31,6 +31,8 @@ import { useGamification } from "@/hooks/useGamification";
 import { Trophy, Award } from "lucide-react";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 import { PatientMetricsDashboard } from "@/components/metrics/RoleMetricsDashboard";
+import { DashboardSkeleton } from "@/components/shared/LoadingSkeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 interface VitalPoint { value: number }
 
@@ -142,10 +144,10 @@ export default function HealthDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
-        <div className="text-center space-y-2">
-          <div className="h-8 w-8 mx-auto rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden />
-          <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading your health dashboard…</p>
+      <div className="min-h-screen bg-canvas p-6">
+        <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8 py-8">
+          <p className="sr-only">Loading your health dashboard…</p>
+          <DashboardSkeleton />
         </div>
       </div>
     );
@@ -245,7 +247,7 @@ export default function HealthDashboard() {
           {healthStats.length > 0 ? healthStats.map((stat, index) => (
             <div key={index} className="vf-card space-y-3 group">
               <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-2xl bg-primary-50 border border-primary-100">
+                <div className="p-2.5 rounded-2xl bg-primary-50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/30">
                   {getIconComponent(stat.icon)}
                 </div>
                 {getTrendIcon(stat.trend)}
@@ -347,9 +349,11 @@ export default function HealthDashboard() {
                 </Button>
               </div>
             )) : (
-              <p className="text-muted-foreground text-center py-8 text-base">
-                No upcoming appointments scheduled.
-              </p>
+              <EmptyState
+                icon={Calendar}
+                title="No upcoming appointments"
+                description="You have no upcoming appointments scheduled. Your next visits will appear here."
+              />
             )}
             <Button
               className="w-full h-12 text-base"
