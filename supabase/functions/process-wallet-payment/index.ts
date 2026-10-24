@@ -172,7 +172,12 @@ serve(async (req) => {
           p_transaction_type: 'debit',
           p_amount: amount,
           p_description: orderId ? `Wallet payment for order ${orderId}` : `Wallet payment for service ${serviceId}`,
-          p_payment_id: null // Will be set after payment record creation
+          p_payment_id: null, // Will be set after payment record creation
+          // Disambiguates the PostgREST overload choice: two live overloads
+          // of process_wallet_transaction exist (5-arg and 6-arg); the 5-arg
+          // call shape fails with PGRST203. The 6-arg version is the newer
+          // row-locking (FOR UPDATE) implementation.
+          p_gateway_ref: null
         });
 
       if (transactionError) {
@@ -228,7 +233,8 @@ serve(async (req) => {
           p_transaction_type: 'credit',
           p_amount: amount,
           p_description: `Rollback for failed wallet payment of ${amount}`,
-          p_payment_id: null
+          p_payment_id: null,
+          p_gateway_ref: null
         });
         throw paymentError;
       }
