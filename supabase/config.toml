@@ -33,59 +33,83 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 
 [functions]
-[functions.send-email]
+# Function inventory completed 2026-10-24 (Stage C2b, audit P3-20): every
+# directory under supabase/functions/ has a section below. Convention:
+#   verify_jwt = true  — authenticated app functions. Each also verifies
+#                        the caller in-code (auth.getUser + role/ownership
+#                        checks); the gateway check is defence in depth.
+#   verify_jwt = false — ONLY for endpoints that cannot receive a Supabase
+#                        user JWT and self-verify instead (webhook HMAC,
+#                        cron secret, device-bridge HMAC, anon telemetry).
+#                        Each such function fails closed when its secret
+#                        is unset.
+# Deleted functions (setup-test-accounts, process-paypal-webhook) and the
+# dropped DPO gateway (dpo-create-token, dpo-verify-token,
+# process-dpo-payment — DPO dropped 2026-10-16, audit P3-18) have no
+# sections; do not re-add them.
+
+[functions.admin-delete-user]
+verify_jwt = true
+
+[functions.ambient-scribe]
+verify_jwt = true
+
+[functions.capture-paypal-payment]
+verify_jwt = true
+
+# P3-19: this is the authoritative value. create-admin-user requires an
+# authenticated admin caller (its own has_role check + the CreateAdmin /
+# SuperAdminDashboard call sites invoke it with the admin's session JWT),
+# so verify_jwt = true. supabase/functions/config.toml must agree.
+[functions.create-admin-user]
 verify_jwt = true
 
 [functions.create-daily-room]
 verify_jwt = true
 
-[functions.generate-receipt]
-verify_jwt = true
-
-[functions.process-dpo-payment]
-verify_jwt = true
-
-[functions.process-payment]
-verify_jwt = true
-
-[functions.process-refund]
-verify_jwt = true
-
-[functions.send-push]
-verify_jwt = true
-
-[functions.send-reminder]
+# Device bridge ingest: on-site bridges hold no Supabase JWT; the function
+# self-verifies a per-institution HMAC token (DEVICE_BRIDGE_SECRET) and
+# fails closed (503) when the secret is unset.
+[functions.device-bridge-ingest]
 verify_jwt = false
-
-# Webhooks must accept unauthenticated callbacks from payment providers
-# (they verify via HMAC signatures, not JWT)
-[functions.lenco-webhook]
-verify_jwt = false
-
-# WhatsApp webhook: Meta calls it without a Supabase JWT; the function
-# self-verifies (GET handshake token + POST HMAC, fail-closed — P2-24).
-[functions.whatsapp-webhook]
-verify_jwt = false
-
-[functions.process-paypal-webhook]
-verify_jwt = false
-
-[functions.send-appointment-reminder]
-verify_jwt = true
-
-[functions.process-wallet-payment]
-verify_jwt = true
-
-[functions.setup-test-accounts]
-verify_jwt = false
-
-[functions.medgemma-health-analysis]
-verify_jwt = true
 
 [functions.doc-chat]
 verify_jwt = true
 
+[functions.fhir-api]
+verify_jwt = true
+
+[functions.fhir-export]
+verify_jwt = true
+
+[functions.fhir-inbound]
+verify_jwt = true
+
+[functions.generate-receipt]
+verify_jwt = true
+
+[functions.lenco-create-payment]
+verify_jwt = true
+
+[functions.lenco-process-payout]
+verify_jwt = true
+
+[functions.lenco-verify-payment]
+verify_jwt = true
+
+# Lenco webhook: Lenco calls it without a Supabase JWT; the function
+# self-verifies via HMAC and fails closed (503) when no Lenco secret is
+# configured (P2-25).
+[functions.lenco-webhook]
+verify_jwt = false
+
+[functions.lenco-widget-init]
+verify_jwt = true
+
 [functions.med-ai]
+verify_jwt = true
+
+[functions.medgemma-3d-imaging]
 verify_jwt = true
 
 [functions.medgemma-chat]
@@ -94,11 +118,68 @@ verify_jwt = true
 [functions.medgemma-document-analysis]
 verify_jwt = true
 
-[functions.medgemma-3d-imaging]
+[functions.medgemma-health-analysis]
 verify_jwt = true
 
-[functions.create-admin-user]
+[functions.ocr-insurance-card]
 verify_jwt = true
+
+[functions.pair-device-bridge]
+verify_jwt = true
+
+[functions.process-payment]
+verify_jwt = true
+
+[functions.process-payment-with-splits]
+verify_jwt = true
+
+[functions.process-paypal-payment]
+verify_jwt = true
+
+[functions.process-refund]
+verify_jwt = true
+
+[functions.process-wallet-payment]
+verify_jwt = true
+
+[functions.send-appointment-reminder]
+verify_jwt = true
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.send-email-campaign]
+verify_jwt = true
+
+# Message-queue worker: invoked by cron / service role only, never by a
+# user session. The function requires the CRON_SECRET header or a
+# service-role bearer token and refuses everything else.
+[functions.send-messages]
+verify_jwt = false
+
+[functions.send-push]
+verify_jwt = true
+
+[functions.send-push-notification]
+verify_jwt = true
+
+# Cron worker: no user JWT exists for scheduler calls. The function
+# requires the x-cron-secret header and fails closed (503) when
+# CRON_SECRET is unset (P3-13).
+[functions.send-reminder]
+verify_jwt = false
+
+[functions.send-sms]
+verify_jwt = true
+
+[functions.totp-manage]
+verify_jwt = true
+
+# Public telemetry ingest: anonymous events are accepted by design
+# (best-effort JWT identification); payloads are sanitised and capped
+# in-code.
+[functions.track-analytics]
+verify_jwt = false
 
 # Audit P1-19: triage-assess previously ran with verify_jwt = false and
 # trusted an unverified JWT payload. The function now verifies via
@@ -106,15 +187,7 @@ verify_jwt = true
 [functions.triage-assess]
 verify_jwt = true
 
-[functions.fhir-inbound]
-verify_jwt = true
-
-[functions.send-email-campaign]
-verify_jwt = true
-
-
-[functions.dpo-create-token]
-verify_jwt = false
-
-[functions.dpo-verify-token]
+# WhatsApp webhook: Meta calls it without a Supabase JWT; the function
+# self-verifies (GET handshake token + POST HMAC, fail-closed — P2-24).
+[functions.whatsapp-webhook]
 verify_jwt = false
