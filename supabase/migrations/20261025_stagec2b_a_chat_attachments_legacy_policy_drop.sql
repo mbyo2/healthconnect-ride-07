@@ -1,0 +1,16 @@
+-- Stage C2b Cluster A — 2026-10-25
+--
+-- P3-3 (DB-side half of P1-23): the legacy storage policy
+-- "Authenticated users can upload chat attachments" (2024 era: any path,
+-- any authenticated user) defeated the folder-scoped 2026 policy set on
+-- the private chat-attachments bucket.
+--
+-- LIVE VERIFICATION (2026-10-25, pg_policies on storage.objects): the
+-- legacy policy is NOT present live. The binding upload policy is
+-- "Users can upload their chat attachments"
+-- (WITH CHECK bucket_id='chat-attachments' AND first folder segment =
+-- auth.uid()), which matches the current client
+-- (src/components/chat/FileUploader.tsx uploads to <userId>/<uuid>.<ext>).
+-- This DROP IF EXISTS codifies the removal in the repo so the policy can
+-- never silently return via a repo replay; it is a no-op live.
+DROP POLICY IF EXISTS "Authenticated users can upload chat attachments" ON storage.objects;
