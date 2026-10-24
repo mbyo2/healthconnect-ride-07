@@ -208,6 +208,9 @@ serve(async (req) => {
           status: 'pending',
           payment_method: 'paypal',
           invoice_number: paypalOrder.id,
+          // P2-28: persist the gateway order id so duplicate-settlement
+          // detection (which keys on external_payment_id) can work.
+          external_payment_id: paypalOrder.id,
           created_at: new Date().toISOString(),
         })
         .select()
@@ -234,74 +237,18 @@ serve(async (req) => {
         }
       );
     } else {
-      // Wallet payment — deduct funds via RPC BEFORE marking completed
-      const paymentId = crypto.randomUUID();
-      const invoiceNumber = `WAL-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-
-      const { data: debitResult, error: debitError } = await supabaseClient.rpc('process_wallet_transaction', {
-        p_user_id: patientId,
-        p_transaction_type: 'debit',
-        p_amount: amount,
-        p_description: `Payment for service ${serviceId}`,
-        p_payment_id: paymentId,
-      });
-
-      if (debitError) {
-        console.error('Wallet debit failed:', debitError);
-        const msg = String(debitError.message || '');
-        const isInsufficient = msg.toLowerCase().includes('insufficient');
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: isInsufficient ? 'Insufficient wallet funds' : 'Wallet payment failed'
-          }),
-          { status: isInsufficient ? 402 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const { data: payment, error: paymentError } = await supabaseClient
-        .from('payments')
-        .insert({
-          id: paymentId,
-          patient_id: patientId,
-          provider_id: providerId,
-          service_id: serviceId,
-          amount: amount,
-          currency: currency,
-          status: 'completed',
-          payment_method: 'wallet',
-          invoice_number: invoiceNumber,
-          payment_date: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (paymentError) {
-        // Rollback: credit the wallet back
-        console.error('Payment insert failed after wallet debit — rolling back credit:', paymentError);
-        await supabaseClient.rpc('process_wallet_transaction', {
-          p_user_id: patientId,
-          p_transaction_type: 'credit',
-          p_amount: amount,
-          p_description: `Rollback for failed payment ${paymentId}`,
-          p_payment_id: paymentId,
-        });
-        return new Response(
-          JSON.stringify({ success: false, error: 'Payment could not be recorded' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
+      // P2-28: the wallet branch that used to live here debited the patient
+      // and marked the payment completed WITHOUT crediting any split — a
+      // money sink. Nothing in src/ calls process-payment for wallet
+      // payments (the UI uses the guarded process-wallet-payment via
+      // useWalletPayment, which distributes splits). Refuse explicitly so
+      // no caller can reach an unsafe wallet path through this function.
       return new Response(
         JSON.stringify({
-          success: true,
-          paymentId: payment.id,
-          newBalance: (debitResult as any)?.new_balance,
-          amount,
-          currency
+          success: false,
+          error: 'Wallet payments are not accepted by process-payment. Use the process-wallet-payment function instead.'
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error: unknown) {
