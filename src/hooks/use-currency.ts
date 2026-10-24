@@ -103,6 +103,11 @@ export const useCurrency = () => {
     currency,
     setCurrency,
     formatPrice,
+    // Alias used by the role metrics dashboards (RoleMetricsDashboard) —
+    // they were written against `formatCurrency` and crashed at render
+    // ("formatCurrency is not a function") because the hook never
+    // exported it. Same semantics: canonical ZMW amount → display string.
+    formatCurrency: formatPrice,
     getSymbol,
     convertForCharge,
     toZmw,

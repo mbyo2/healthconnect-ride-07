@@ -349,6 +349,12 @@ export const AppointmentsPage = () => {
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-error-50 text-error-500 border border-error-100">✕ Cancelled</span>;
       case "in_progress":
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-warning-50 text-warning-500 border border-warning-100">● In Progress</span>;
+      case "pending":
+        // A pending booking is a request awaiting provider confirmation —
+        // it must never read "Scheduled" (matches BookingConfirmed's
+        // "Request sent" wording). Display mapping only; the stored
+        // server status stays "pending".
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-warning-50 text-warning-600 border border-warning-100">◉ Request sent</span>;
       default:
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-primary-50 text-primary-500 border border-primary-100">◉ Scheduled</span>;
     }
