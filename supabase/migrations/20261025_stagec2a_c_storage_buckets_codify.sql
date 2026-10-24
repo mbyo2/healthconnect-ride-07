@@ -20,6 +20,16 @@
 -- own patient/provider; generate-receipt writes with the service role
 -- (bypasses RLS), and clients read via authenticated downloads checked
 -- against these policies. Anon has no policy on either bucket.
+--
+-- DEFECT FOUND DURING PROOF (fixed here, was live): the pre-existing
+-- receipts policies compared `payments.id::text = storage.filename(name)`,
+-- but storage.filename() returns the name WITH its extension
+-- ('<uuid>.pdf'), so the comparison could NEVER be true — the policies
+-- matched nobody, and even the payment's own patient/provider was
+-- RLS-denied (proven live with QA users: INSERT -> 403 AccessDenied).
+-- The corrected predicate strips the extension:
+-- split_part(storage.filename(name), '.', 1). Payment ids are UUIDs
+-- (no dots), so the split is exact.
 
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('receipts', 'receipts', false),
@@ -28,8 +38,7 @@ ON CONFLICT (id) DO UPDATE SET public = false;
 
 -- ------------------------------------------------------------------
 -- receipts: owner = the linked payment's patient or provider.
--- The object name is `<paymentId>.pdf` (generate-receipt), and
--- storage.filename(name) strips the `.pdf` extension.
+-- The object name is `<paymentId>.pdf` (generate-receipt).
 -- ------------------------------------------------------------------
 DROP POLICY IF EXISTS "Users can view their own receipts" ON storage.objects;
 CREATE POLICY "Users can view their own receipts"
@@ -38,7 +47,7 @@ CREATE POLICY "Users can view their own receipts"
     bucket_id = 'receipts'
     AND EXISTS (
       SELECT 1 FROM public.payments
-      WHERE payments.id::text = storage.filename(objects.name)
+      WHERE payments.id::text = split_part(storage.filename(objects.name), '.', 1)
         AND (payments.patient_id = auth.uid() OR payments.provider_id = auth.uid())
     )
   );
@@ -50,7 +59,7 @@ CREATE POLICY "Users can upload own receipts"
     bucket_id = 'receipts'
     AND EXISTS (
       SELECT 1 FROM public.payments
-      WHERE payments.id::text = storage.filename(objects.name)
+      WHERE payments.id::text = split_part(storage.filename(objects.name), '.', 1)
         AND (payments.patient_id = auth.uid() OR payments.provider_id = auth.uid())
     )
   );
@@ -62,7 +71,7 @@ CREATE POLICY "Users can update own receipts"
     bucket_id = 'receipts'
     AND EXISTS (
       SELECT 1 FROM public.payments
-      WHERE payments.id::text = storage.filename(objects.name)
+      WHERE payments.id::text = split_part(storage.filename(objects.name), '.', 1)
         AND (payments.patient_id = auth.uid() OR payments.provider_id = auth.uid())
     )
   );
@@ -74,7 +83,7 @@ CREATE POLICY "Users can delete own receipts"
     bucket_id = 'receipts'
     AND EXISTS (
       SELECT 1 FROM public.payments
-      WHERE payments.id::text = storage.filename(objects.name)
+      WHERE payments.id::text = split_part(storage.filename(objects.name), '.', 1)
         AND (payments.patient_id = auth.uid() OR payments.provider_id = auth.uid())
     )
   );
