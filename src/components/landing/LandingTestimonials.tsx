@@ -70,7 +70,7 @@ export const Testimonials = () => {
             <ThumbsUp className="h-3.5 w-3.5 text-accent-500" />
             Community Stories
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight">
             {stats.patients > 0
               ? <>Loved by {formatStat(stats.patients)} Zambian patients</>
               : <>Built for Zambian patients</>}

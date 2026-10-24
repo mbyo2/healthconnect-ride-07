@@ -17,6 +17,7 @@ export interface Provider {
   consultation_fee?: number;
   default_service_id?: string;
   rating?: number;
+  reviews_count?: number;
   distance?: number;
   institution_id?: string;
   accepted_insurances?: InsuranceProvider[] | string[];

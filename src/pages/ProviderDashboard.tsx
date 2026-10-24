@@ -43,6 +43,7 @@ import GrowthChart from "@/components/clinical/GrowthChart";
 import VaccinationSchedule from "@/components/clinical/VaccinationSchedule";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoadingSkeleton, DashboardSkeleton } from "@/components/shared/LoadingSkeleton";
 
 // ── constants (match Profile.tsx) ────────────────────────────────────────────
 
@@ -177,8 +178,10 @@ const MyPracticeEditor = () => {
 
   if (!loaded) {
     return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
+      <div className="space-y-4 py-6">
+        <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading your practice details…</p>
+        <LoadingSkeleton type="text" />
+        <LoadingSkeleton type="card" count={2} />
       </div>
     );
   }
@@ -423,8 +426,10 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
+      <div className="space-y-4 py-6">
+        <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading patient records…</p>
+        <LoadingSkeleton type="text" />
+        <LoadingSkeleton type="card" count={2} />
       </div>
     );
   }
@@ -714,8 +719,13 @@ export const ProviderDashboard = () => {
   // ── Approval gate render ──
   if (!verificationChecked) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      <div className="min-h-screen bg-canvas p-6">
+        <div className="mx-auto space-y-6 pt-8" style={{ maxWidth: "var(--max-content, 1280px)" }}>
+          <DashboardSkeleton />
+          <p className="text-sm font-medium text-center text-graphite-500 dark:text-slate-400">
+            Checking your provider access…
+          </p>
+        </div>
       </div>
     );
   }
@@ -793,9 +803,9 @@ export const ProviderDashboard = () => {
             <div className="text-xs font-medium text-warning-500">Awaiting Triage</div>
           </div>
           <div className="vf-card space-y-3">
-            <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-black text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
-            <div className="text-xs font-bold text-emerald-500 mt-1">
+            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Shift Earnings (ZMW)</div>
+            <div className="text-3xl font-display font-medium text-success-500">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-xs font-medium text-emerald-500">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"
                 : `${weekStats.revenueDeltaPct >= 0 ? "+" : ""}${weekStats.revenueDeltaPct}% vs last week`}
@@ -896,10 +906,10 @@ export const ProviderDashboard = () => {
             <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
               {[
                 { value: "overview", label: "Overview" },
-                { value: "schedule", label: "Schedule Manager" },
-                { value: "availability", label: "Working Hours" },
-                { value: "patients", label: "Patient Directory" },
-                { value: "record", label: "Patient Record" },
+                { value: "schedule", label: "Schedule" },
+                { value: "availability", label: "Weekly Hours" },
+                { value: "patients", label: "My Patients" },
+                { value: "record", label: "Patient Chart" },
                 { value: "waitlist", label: "Waitlist Triage" },
                 { value: "analytics", label: "Analytics" },
                 ...(hasSpecialtyTools ? [{ value: "specialty", label: "Specialty Tools" }] : []),
@@ -915,13 +925,13 @@ export const ProviderDashboard = () => {
               ))}
             </TabsList>
           </div>
+          <p className="text-xs text-graphite-500 dark:text-slate-400 px-1">
+            Schedule shows your dated appointments. Weekly Hours sets your recurring availability that patients book into.
+          </p>
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <TabsContent value="overview">
-              {/* Temporarily disabled pending fix for "r is not a function" crash */}
-              <div className="p-8 text-center text-muted-foreground">
-                Dashboard overview coming soon.
-              </div>
+              <ProviderMetricsDashboard />
             </TabsContent>
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
             <TabsContent value="availability"><AvailabilityManager /></TabsContent>

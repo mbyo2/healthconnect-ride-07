@@ -51,6 +51,8 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
               {children}
             </div>
           </main>
+          <OfflineBanner />
+          <OfflineIndicator />
           <AccessibilityMenu />
           {isAuthenticated && <FloatingAIChat />}
         </div>

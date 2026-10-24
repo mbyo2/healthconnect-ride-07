@@ -7,8 +7,17 @@ html,
 body {
   height: 100%;
   overflow-x: hidden;
+  position: relative;
+  width: 100%;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS viewport fix (folded from the retired App.css) */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
 }
 
 /* Prevent sticky header from obscuring tab/anchor targets.
@@ -226,6 +235,16 @@ html {
     --canvas-silk: 24 8% 20%;
     --midnight: 40 10% 98%;
     --charcoal: 40 6% 90%;
+
+    /* ── Brand tokens (dark values) — the :root set is light-only ── */
+    --doc-blue-light:   #172554;
+    --doc-blue-mid:     #1e3a8a;
+    --doc-bg:           #0c0a09;
+    --doc-card:         #1c1917;
+    --doc-border:       #292524;
+    --doc-muted:        #a8a29e;
+    --doc-midnight:     #fafaf9;
+    --doc-charcoal:     #e7e5e4;
   }
 
   /* Lift secondary graphite text in dark mode so body copy stays legible. */
@@ -277,6 +296,17 @@ html {
   .vf-eyebrow {
     @apply inline-flex items-center gap-2 rounded-pill border border-canvas-silk bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-graphite-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300;
   }
+
+  /* ── Adaptive surfaces (canvas tokens flip in dark mode — no dark: pairs) ── */
+  .surface-card {
+    @apply rounded-card border border-canvas-silk bg-canvas shadow-card;
+  }
+  .surface-raised {
+    @apply rounded-card border border-canvas-silk bg-canvas shadow-card-hover;
+  }
+  .surface-inset {
+    @apply rounded-card bg-canvas-bone;
+  }
 }
 
 /* ─── Global Doc' O Clock Component Classes ─── */
@@ -284,23 +314,23 @@ html {
 
   /* ── App-wide white card with blue border and subtle shadow ── */
   .doc-card {
-    @apply bg-white dark:bg-slate-900 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
+    @apply bg-white dark:bg-slate-900 rounded-3xl border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
   }
 
   /* ── High-contrast Dark Highlight Banner (Screen 2 & 3: Next Appointment, Prescriptions) ── */
   .doc-dark-banner {
-    @apply bg-[#0f172a] text-white rounded-3xl p-4 sm:p-5 shadow-xl shadow-slate-900/10 border border-slate-800 relative overflow-hidden transition-all;
+    @apply bg-slate-900 text-white rounded-3xl p-4 sm:p-5 shadow-xl shadow-slate-900/10 border border-slate-800 relative overflow-hidden transition-all;
   }
 
   /* ── Care Mode Toggle Switch (Online / Offline) ── */
   .doc-mode-toggle {
-    @apply p-1 rounded-2xl bg-[#f0f2f7] dark:bg-slate-800/80 border border-[#e6e9ef] dark:border-slate-700 inline-flex items-center;
+    @apply p-1 rounded-2xl bg-canvas-bone dark:bg-slate-800/80 border border-canvas-silk dark:border-slate-700 inline-flex items-center;
   }
   .doc-mode-toggle-btn {
     @apply px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all;
   }
   .doc-mode-toggle-btn-active {
-    @apply bg-white dark:bg-slate-900 text-[#0073ea] shadow-sm border border-[#e6e9ef] dark:border-slate-700;
+    @apply bg-white dark:bg-slate-900 text-primary-600 shadow-sm border border-canvas-silk dark:border-slate-700;
   }
   .doc-mode-toggle-btn-inactive {
     @apply text-slate-500 hover:text-slate-800 dark:hover:text-slate-200;
@@ -308,15 +338,15 @@ html {
 
   /* ── Specialty Squircle Card (Screen 2: Dentistry, Cardiology, etc.) ── */
   .doc-specialty-card {
-    @apply p-3.5 sm:p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-[#0073ea]/40 hover:-translate-y-0.5 active:scale-95 transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer;
+    @apply p-3.5 sm:p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 hover:-translate-y-0.5 active:scale-95 transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer;
   }
   .doc-specialty-card-active {
-    @apply bg-[#e5f0ff] dark:bg-blue-950/40 border-[#0073ea]/50 ring-2 ring-[#0073ea]/20;
+    @apply bg-primary-100 dark:bg-primary-900/40 border-primary-500/50 ring-2 ring-primary-500/20;
   }
 
   /* ── Doctor Card with Selectable Time Slots ── */
   .doc-doctor-box {
-    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
+    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
   }
 
   /* ── Time Slot Pills (Screen 2: 8:00 a.m., 9:00 a.m. [active dark], 10:00 a.m.) ── */
@@ -324,26 +354,26 @@ html {
     @apply px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-xs font-black transition-all cursor-pointer text-center border;
   }
   .doc-time-slot-idle {
-    @apply bg-[#f8fafc] dark:bg-slate-800/60 border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0073ea]/40 hover:bg-white;
+    @apply bg-canvas dark:bg-slate-800/60 border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary-500/40 hover:bg-white;
   }
   .doc-time-slot-active {
-    @apply bg-[#0f172a] text-white border-[#0f172a] shadow-sm;
+    @apply bg-slate-900 text-white border-slate-900 shadow-sm;
   }
   .doc-time-slot-blue {
-    @apply bg-[#0073ea] text-white border-[#0073ea] shadow-sm shadow-[#0073ea]/25;
+    @apply bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-500/25;
   }
 
   /* ── Appointment Card (Screen 3) ── */
   .doc-appt-card {
-    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all space-y-3;
+    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all space-y-3;
   }
 
   /* ── Section container ── */
   .doc-section {
-    @apply py-12 sm:py-16 bg-[#f5f7fa] dark:bg-slate-950;
+    @apply py-12 sm:py-16 bg-canvas-bone dark:bg-slate-950;
   }
   .doc-section-white {
-    @apply py-12 sm:py-16 bg-white dark:bg-slate-900 border-t border-[#e6e9ef] dark:border-slate-800;
+    @apply py-12 sm:py-16 bg-white dark:bg-slate-900 border-t border-canvas-silk dark:border-slate-800;
   }
 
   /* ── Max-width page wrapper ── */
@@ -353,19 +383,19 @@ html {
 
   /* ── Primary blue button ── */
   .doc-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-[#0073ea] hover:bg-[#0060c7] text-white font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-primary-500 hover:bg-primary-600 text-white font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all;
   }
   .doc-btn-dark {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-[#0f172a] hover:bg-slate-800 text-white font-black text-sm shadow-md active:scale-95 transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-md active:scale-95 transition-all;
   }
   .doc-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl sm:rounded-full bg-white dark:bg-slate-900 border-2 border-[#0073ea] text-[#0073ea] font-black text-sm hover:bg-[#e5f0ff] dark:hover:bg-slate-800 active:scale-95 transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl sm:rounded-full bg-white dark:bg-slate-900 border-2 border-primary-500 text-primary-600 font-black text-sm hover:bg-primary-100 dark:hover:bg-slate-800 active:scale-95 transition-all;
   }
   .doc-btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-[#0073ea]/40 hover:text-[#0073ea] active:scale-95 transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-primary-500/40 hover:text-primary-600 active:scale-95 transition-all;
   }
   .doc-btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 dark:text-slate-400 hover:bg-[#f0f4ff] dark:hover:bg-slate-800 hover:text-[#0073ea] transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-all;
   }
 
   /* ── Status Pill Badges ── */
@@ -373,35 +403,35 @@ html {
     @apply px-3 py-1 rounded-full text-xs font-black inline-flex items-center gap-1;
   }
   .doc-pill-blue {
-    @apply doc-pill bg-[#e5f0ff] dark:bg-blue-950/40 text-[#0073ea] dark:text-blue-400;
+    @apply doc-pill bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400;
   }
   .doc-pill-dark {
-    @apply doc-pill bg-[#0f172a] text-white;
+    @apply doc-pill bg-slate-900 text-white;
   }
   .doc-pill-green {
-    @apply doc-pill bg-[#dcfce7] dark:bg-emerald-950/40 text-[#15803d] dark:text-emerald-400;
+    @apply doc-pill bg-green-100 dark:bg-emerald-950/40 text-green-700 dark:text-emerald-400;
   }
   .doc-pill-red {
-    @apply doc-pill bg-[#fee2e2] dark:bg-rose-950/40 text-[#dc2626] dark:text-rose-400;
+    @apply doc-pill bg-red-100 dark:bg-rose-950/40 text-red-600 dark:text-rose-400;
   }
   .doc-pill-amber {
-    @apply doc-pill bg-[#fef3c7] dark:bg-amber-950/40 text-[#d97706] dark:text-amber-400;
+    @apply doc-pill bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400;
   }
   .doc-pill-solid-blue {
-    @apply doc-pill bg-[#0073ea] text-white;
+    @apply doc-pill bg-primary-500 text-white;
   }
 
   /* ── Nav Active State ── */
   .doc-nav-active {
-    @apply bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 font-extrabold;
+    @apply bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 font-extrabold;
   }
   .doc-nav-inactive {
-    @apply text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-[#f5f7fa] dark:hover:bg-slate-800 font-medium;
+    @apply text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-canvas-bone dark:hover:bg-slate-800 font-medium;
   }
 
   /* ── Page header (sticky white bar) ── */
   .doc-header {
-    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-[#e6e9ef] dark:border-slate-800 shadow-xs;
+    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800 shadow-xs;
   }
 
   /* ── Page-level sticky sub-header ──
@@ -420,16 +450,16 @@ html {
 
   /* ── Section heading styles ── */
   .doc-badge {
-    @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 text-xs font-black;
+    @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs font-black;
   }
   .doc-h1 {
-    @apply text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-slate-100 leading-[1.1];
+    @apply text-3xl sm:text-5xl lg:text-6xl font-display font-medium tracking-tight text-midnight leading-[1.1];
   }
   .doc-h2 {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-display font-medium tracking-tight text-midnight;
   }
   .doc-h3 {
-    @apply text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100;
+    @apply text-lg sm:text-xl font-display font-medium text-midnight;
   }
   .doc-body {
     @apply text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed;
@@ -440,22 +470,22 @@ html {
 
   /* ── Blue gradient text ── */
   .doc-gradient-text {
-    @apply bg-gradient-to-r from-[#0073ea] via-[#2563eb] to-[#38bdf8] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-500 via-primary-600 to-primary-300 bg-clip-text text-transparent;
   }
 
   /* ── Doctor / specialty card ── */
   .doc-doctor-card {
-    @apply doc-card p-4 flex items-start gap-3 cursor-pointer hover:border-[#0073ea]/40 transition-all;
+    @apply doc-card p-4 flex items-start gap-3 cursor-pointer hover:border-primary-500/40 transition-all;
   }
 
   /* ── Appointment card pill ── */
   .doc-appointment-row {
-    @apply flex items-center justify-between p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea]/40 hover:shadow-md transition-all cursor-pointer;
+    @apply flex items-center justify-between p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500/40 hover:shadow-md transition-all cursor-pointer;
   }
 
   /* ── Bottom nav floating pill ── */
   .doc-bottom-nav {
-    @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-1 px-4 py-2 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-[#e6e9ef] dark:border-slate-800 shadow-xl shadow-slate-900/10;
+    @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-1 px-4 py-2 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-canvas-silk dark:border-slate-800 shadow-xl shadow-slate-900/10;
   }
 
   /* ── Mobile phone frame (for showcase) ── */
@@ -465,12 +495,12 @@ html {
 
   /* ── Input field ── */
   .doc-input {
-    @apply w-full px-4 py-3 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0073ea] focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-[#0073ea]/20 transition-all;
+    @apply w-full px-4 py-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 text-sm placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500/20 transition-all;
   }
 
   /* ── Search bar pill ── */
   .doc-search {
-    @apply flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#f5f7fa] dark:bg-slate-800/60 border border-[#e6e9ef] dark:border-slate-700 hover:border-[#0073ea]/40 hover:bg-white dark:hover:bg-slate-900 focus-within:border-[#0073ea] focus-within:ring-2 focus-within:ring-[#0073ea]/15 transition-all;
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-full bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 hover:bg-white dark:hover:bg-slate-900 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/15 transition-all;
   }
 
   /* ── Metric / KPI card ── */
@@ -480,7 +510,7 @@ html {
 
   /* ── Avatar with blue ring ── */
   .doc-avatar-ring {
-    @apply ring-2 ring-[#0073ea]/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900;
+    @apply ring-2 ring-primary-500/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900;
   }
 
   /* ── Responsive grid layouts ── */
@@ -506,12 +536,12 @@ html {
   }
 
   /* ── Legacy monday-pill compatibility ── */
-  .monday-pill-done    { @apply doc-pill bg-[#dcfce7] text-[#15803d]; }
-  .monday-pill-working { @apply doc-pill bg-[#fef3c7] text-[#d97706]; }
-  .monday-pill-stuck   { @apply doc-pill bg-[#fee2e2] text-[#dc2626]; }
-  .monday-pill-scheduled { @apply doc-pill bg-[#dbeafe] text-[#1d4ed8]; }
-  .monday-pill-review  { @apply doc-pill bg-[#f3e8ff] text-[#7c3aed]; }
-  .monday-row-hover    { @apply hover:bg-[#f0f4ff] transition-colors cursor-pointer; }
+  .monday-pill-done    { @apply doc-pill bg-green-100 text-green-700; }
+  .monday-pill-working { @apply doc-pill bg-amber-100 text-amber-600; }
+  .monday-pill-stuck   { @apply doc-pill bg-red-100 text-red-600; }
+  .monday-pill-scheduled { @apply doc-pill bg-primary-100 text-primary-700; }
+  .monday-pill-review  { @apply doc-pill bg-purple-100 text-purple-700; }
+  .monday-row-hover    { @apply hover:bg-primary-50 transition-colors cursor-pointer; }
   .modern-header       { @apply doc-header; }
   .container-modern    { @apply doc-container; }
 }

@@ -14,7 +14,7 @@ export const BrowseSpecialties = () => {
             <Globe className="h-3.5 w-3.5 text-accent-500" />
             National Healthcare Directory
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight">
             Browse medical specialties across Zambia
           </h2>
           <p className="text-base text-graphite-500 dark:text-slate-400 max-w-xl mx-auto mt-4 tracking-wide">
@@ -79,7 +79,7 @@ export const CTASection = () => {
               <span className="vf-eyebrow !bg-white/10 !border-white/20 !text-white/90">
                 Free forever for patients — no subscriptions
               </span>
-              <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-medium text-white tracking-tight leading-[1.1]">
+              <h2 className="font-display text-3xl sm:text-4xl font-medium text-white tracking-tight leading-[1.1]">
                 Ready to take control of your health with Doc&apos; O Clock?
               </h2>
               <p className="text-base text-white/70 leading-relaxed tracking-wide">

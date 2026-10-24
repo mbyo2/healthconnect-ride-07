@@ -3,8 +3,9 @@ import { Helmet } from "react-helmet-async";
 import {
   MapPin, Clock, Star, CalendarPlus, Video, Shield,
   Award, GraduationCap, Languages, CheckCircle, Building2,
-  DollarSign, Home, Phone, Mail, Stethoscope, Users,
+  Wallet, Home, Phone, Mail, Stethoscope, Users,
 } from "lucide-react";
+import { RatingDisplay } from "@/components/RatingDisplay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProviderReviews } from "@/components/reviews/ProviderReviews";
@@ -23,7 +24,7 @@ const Section = ({
   icon: Icon, title, children,
 }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
   <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
-    <h3 className="font-extrabold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
+    <h3 className="font-display text-lg font-medium flex items-center gap-2 text-midnight">
       <Icon className="h-4 w-4 text-primary-500" />
       {title}
     </h3>
@@ -32,7 +33,7 @@ const Section = ({
 );
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="flex items-start gap-2 text-xs">
+  <div className="flex items-start gap-2 text-sm">
     <span className="text-graphite-500 dark:text-slate-400 font-bold w-36 shrink-0">{label}</span>
     <span className="text-slate-800 dark:text-slate-200 font-medium">{value}</span>
   </div>
@@ -207,6 +208,70 @@ export const ProviderDetail = () => {
     <>
       <Helmet>
         <title>{providerName} — {providerSpecialty} | Doc' O Clock</title>
+        <meta
+          name="description"
+          content={`Book ${providerName}, ${providerSpecialty}${provider.primary_practice_location ? ` in ${provider.primary_practice_location}` : " in Zambia"}. ${rating !== null ? `Rated ${rating.toFixed(1)} from ${reviewCount} reviews. ` : ""}${feeLabel ? `Consultation fee ${feeLabel}. ` : ""}Verified provider on Doc' O Clock — book in person or by video.`}
+        />
+        <link rel="canonical" href={`https://doc0clock.online/provider/${provider.id}`} />
+        <meta property="og:title" content={`${providerName} — ${providerSpecialty} | Doc' O Clock`} />
+        <meta
+          property="og:description"
+          content={`Book ${providerName}, ${providerSpecialty}${provider.primary_practice_location ? ` in ${provider.primary_practice_location}` : " in Zambia"} on Doc' O Clock.`}
+        />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={`https://doc0clock.online/provider/${provider.id}`} />
+        <meta property="og:image" content="https://doc0clock.online/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${providerName} — ${providerSpecialty} | Doc' O Clock`} />
+        <meta
+          name="twitter:description"
+          content={`Book ${providerName}, ${providerSpecialty}${provider.primary_practice_location ? ` in ${provider.primary_practice_location}` : " in Zambia"} on Doc' O Clock.`}
+        />
+        <meta name="twitter:image" content="https://doc0clock.online/og-image.png" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Physician",
+            name: providerName,
+            medicalSpecialty: providerSpecialty,
+            ...(provider.primary_practice_location
+              ? {
+                  address: {
+                    "@type": "PostalAddress",
+                    addressLocality: provider.primary_practice_location,
+                    addressCountry: "ZM",
+                  },
+                }
+              : {}),
+            ...(rating !== null && reviewCount > 0
+              ? {
+                  aggregateRating: {
+                    "@type": "AggregateRating",
+                    ratingValue: rating,
+                    reviewCount: reviewCount,
+                  },
+                }
+              : {}),
+            ...(provider.consultation_fee_min || provider.consultation_fee_max
+              ? {
+                  makesOffer: {
+                    "@type": "Offer",
+                    priceCurrency: "ZMW",
+                    ...(provider.consultation_fee_min && provider.consultation_fee_max
+                      ? {
+                          priceSpecification: {
+                            "@type": "PriceSpecification",
+                            minPrice: provider.consultation_fee_min,
+                            maxPrice: provider.consultation_fee_max,
+                            priceCurrency: "ZMW",
+                          },
+                        }
+                      : { price: provider.consultation_fee_min ?? provider.consultation_fee_max }),
+                  },
+                }
+              : {}),
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
@@ -214,13 +279,13 @@ export const ProviderDetail = () => {
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-base font-extrabold tracking-tight truncate">{providerName}</h1>
+              <h1 className="font-display text-base font-medium tracking-tight truncate">{providerName}</h1>
               <p className="text-xs text-primary-500 font-bold truncate">{providerSpecialty}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsWaitlistOpen(true)}
-                className="px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                className="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-xs font-medium text-graphite-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
               >
                 Join Waitlist
               </button>
@@ -255,8 +320,11 @@ export const ProviderDetail = () => {
 
             <div className="flex-1 space-y-3 min-w-0">
               <div>
-                <h2 className="text-xl font-extrabold">{providerName}</h2>
-                <p className="text-sm text-primary-500 font-extrabold">{providerSpecialty}</p>
+                <h2 className="font-display text-3xl font-medium tracking-tight text-midnight">{providerName}</h2>
+                <p className="text-sm text-primary-500 font-semibold mt-1">{providerSpecialty}</p>
+                <div className="mt-2">
+                  <RatingDisplay rating={rating} reviewCount={reviewCount} size="md" />
+                </div>
               </div>
 
               {/* Capability badges */}
@@ -264,15 +332,6 @@ export const ProviderDetail = () => {
                 {provider.is_verified && (
                   <Badge className="bg-success-500 text-white border-0 gap-1">
                     <CheckCircle className="h-3 w-3" /> Verified
-                  </Badge>
-                )}
-                {rating !== null ? (
-                  <Badge className="bg-warning-500 text-white border-0">
-                    ★ {rating.toFixed(1)}{reviewCount > 0 ? ` (${reviewCount} review${reviewCount === 1 ? '' : 's'})` : ''}
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="gap-1">
-                    New provider — no reviews yet
                   </Badge>
                 )}
                 {provider.telemedicine_available && (
@@ -293,7 +352,7 @@ export const ProviderDetail = () => {
               </div>
 
               {/* Quick info row */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite-500 dark:text-slate-400">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-graphite-500 dark:text-slate-400">
                 {provider.primary_practice_location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5 shrink-0 text-primary-500" />
@@ -307,8 +366,7 @@ export const ProviderDetail = () => {
                   </span>
                 )}
                 {feeLabel && (
-                  <span className="flex items-center gap-1 font-semibold text-primary-500">
-                    <DollarSign className="h-3.5 w-3.5 shrink-0" />
+                  <span className="flex items-center gap-1 font-semibold text-primary-600">
                     {feeLabel}
                   </span>
                 )}
@@ -321,14 +379,14 @@ export const ProviderDetail = () => {
               </div>
 
               {provider.bio && (
-                <p className="text-xs text-graphite-500 dark:text-slate-400 leading-relaxed line-clamp-3">{provider.bio}</p>
+                <p className="text-sm text-graphite-500 dark:text-slate-400 leading-relaxed line-clamp-3">{provider.bio}</p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3">
             {/* ── Left column (2/3 wide) ── */}
-            <div className="lg:col-span-2 space-y-5">
+            <div className="order-2 lg:order-1 lg:col-span-2 space-y-5">
 
               {/* Nearest available slots — tap a chip to book it */}
               {canBook && (
@@ -386,7 +444,7 @@ export const ProviderDetail = () => {
                       <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Affiliated Hospitals</p>
                       <ul className="space-y-1">
                         {hospitals.map(h => (
-                          <li key={h} className="flex items-center gap-1.5 text-xs">
+                          <li key={h} className="flex items-center gap-1.5 text-sm">
                             <CheckCircle className="h-3.5 w-3.5 text-success-500 shrink-0" /> {h}
                           </li>
                         ))}
@@ -413,18 +471,18 @@ export const ProviderDetail = () => {
                       const info = (schedule as Record<string, { available: boolean; hours: string[] }>)[day];
                       return (
                         <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
-                          <p className="text-xs font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
+                          <p className="text-sm font-semibold capitalize text-graphite-700 dark:text-slate-200">{day}</p>
                           {info?.available ? (
                             <div className="space-y-0.5 mt-1">
                               {(info.hours || []).map(h => (
-                                <p key={h} className="text-xs text-primary-500 font-bold">{h}</p>
+                                <p key={h} className="text-sm text-primary-600 font-medium">{h}</p>
                               ))}
                               {(!info.hours || info.hours.length === 0) && (
-                                <p className="text-xs text-success-500 font-bold">Available</p>
+                                <p className="text-sm text-success-600 font-medium">Available</p>
                               )}
                             </div>
                           ) : (
-                            <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
+                            <p className="text-sm text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
                           )}
                         </div>
                       );
@@ -438,7 +496,7 @@ export const ProviderDetail = () => {
                 <Section icon={Stethoscope} title="Services Offered">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {services.map((svc: any) => (
-                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-canvas-silk dark:border-slate-700 text-xs">
+                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-canvas-silk dark:border-slate-700 text-sm">
                         <span className="font-medium">{svc.name}</span>
                         {svc.price && (
                           <span className="font-bold text-primary-500">K{svc.price}</span>
@@ -451,18 +509,18 @@ export const ProviderDetail = () => {
 
               {/* Reviews */}
               <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <h3 className="font-extrabold text-sm mb-3 flex items-center gap-2">
+                <h3 className="font-display text-lg font-medium text-midnight mb-3 flex items-center gap-2">
                   <Star className="h-4 w-4 text-primary-500" /> Patient Reviews
                 </h3>
                 <ProviderReviews providerId={id} />
               </div>
             </div>
 
-            {/* ── Right sidebar (1/3) ── */}
-            <div className="space-y-5">
+            {/* ── Right sidebar (1/3) — first on mobile so fees + booking sit directly under the hero ── */}
+            <div className="order-1 lg:order-2 space-y-5">
               {/* Fees & Insurance */}
               {(feeLabel || insurances.length > 0) && (
-                <Section icon={DollarSign} title="Fees & Insurance">
+                <Section icon={Wallet} title="Fees & Insurance">
                   {feeLabel && <InfoRow label="Consultation fee" value={<span className="font-bold text-primary-500">{feeLabel}</span>} />}
                   {insurances.length > 0 && (
                     <div>
@@ -479,6 +537,31 @@ export const ProviderDetail = () => {
                 </Section>
               )}
 
+              {/* Book CTA — directly after fees so mobile shows fees + booking under the hero */}
+              {canBook ? (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setIsBookingOpen(true)}
+                    className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-all"
+                  >
+                    <CalendarPlus className="h-4 w-4 inline mr-2" />
+                    Book Appointment
+                  </button>
+                  <button
+                    onClick={() => setIsWaitlistOpen(true)}
+                    className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-graphite-700 dark:text-slate-200 font-medium text-sm transition-all"
+                  >
+                    Join Waitlist
+                  </button>
+                </div>
+              ) : (
+                <div className="p-3 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-canvas-mist dark:bg-slate-800/60">
+                  <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium">
+                    This professional works through a health facility — appointments are arranged via the institution, not direct booking.
+                  </p>
+                </div>
+              )}
+
               {/* Languages */}
               {langs.length > 0 && (
                 <Section icon={Languages} title="Languages Spoken">
@@ -492,41 +575,16 @@ export const ProviderDetail = () => {
               {(provider.phone || provider.email) && (
                 <Section icon={Users} title="Contact">
                   {provider.phone && (
-                    <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-xs text-primary-500 hover:underline">
+                    <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-sm text-primary-600 hover:underline">
                       <Phone className="h-4 w-4" /> {provider.phone}
                     </a>
                   )}
                   {provider.email && (
-                    <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-xs text-primary-500 hover:underline">
+                    <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-sm text-primary-600 hover:underline">
                       <Mail className="h-4 w-4" /> {provider.email}
                     </a>
                   )}
                 </Section>
-              )}
-
-              {/* Book CTA — only for consultable cadres */}
-              {canBook ? (
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setIsBookingOpen(true)}
-                    className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
-                  >
-                    <CalendarPlus className="h-4 w-4 inline mr-2" />
-                    Book Appointment
-                  </button>
-                  <button
-                    onClick={() => setIsWaitlistOpen(true)}
-                    className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
-                  >
-                    Join Waitlist
-                  </button>
-                </div>
-              ) : (
-                <div className="p-3 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-canvas-mist dark:bg-slate-800/60">
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    This professional works through a health facility — appointments are arranged via the institution, not direct booking.
-                  </p>
-                </div>
               )}
             </div>
           </div>

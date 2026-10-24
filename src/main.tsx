@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
-import './App.css';
 import { Toaster } from 'sonner';
 import { AppFeedbackProvider } from '@/components/feedback/AppFeedback';
 import { ThemeProvider } from './hooks/use-theme';

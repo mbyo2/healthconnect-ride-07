@@ -42,6 +42,7 @@ import {
   ArrowRight,
   FileText
 } from 'lucide-react';
+import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
@@ -197,9 +198,13 @@ export const PatientWorkflow = React.memo(() => {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto py-12 text-center">
-        <div className="h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Loading your health dashboard...</h2>
+      <div className="space-y-6 max-w-4xl mx-auto py-12">
+        <p className="sr-only">Loading your health dashboard...</p>
+        <LoadingSkeleton type="text" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <LoadingSkeleton type="card" count={2} />
+        </div>
+        <LoadingSkeleton type="chart" />
       </div>
     );
   }
