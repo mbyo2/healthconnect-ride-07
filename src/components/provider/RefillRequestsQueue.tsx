@@ -67,29 +67,32 @@ export const RefillRequestsQueue = () => {
       setProcessing(requestId);
       const note = notes[requestId]?.trim() || null;
 
-      const { error } = await supabase
-        .from("prescription_refill_requests")
-        .update({
-          status: approved ? "approved" : "denied",
-          provider_note: note,
-          decided_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", requestId);
-
-      if (error) throw error;
-
-      // If approved, increment refills_remaining on the prescription
       if (approved) {
-        const req = requests.find((r) => r.id === requestId);
-        if (req?.prescription) {
-          await supabase
-            .from("comprehensive_prescriptions")
-            .update({
-              refills_remaining: (req.prescription.refills_remaining || 0) + 1,
-            })
-            .eq("id", req.prescription_id);
-        }
+        // Atomic server-side approval (P1-29): the RPC locks the request,
+        // re-screens the medication against the patient's allergies and
+        // active medications, then sets the status AND increments
+        // refills_remaining on the prescription in one transaction. The old
+        // two client writes were non-atomic — and the status write silently
+        // affected 0 rows, because prescription_refill_requests has no
+        // UPDATE policy. RPC errors (e.g. a safety block) surface as-is.
+        const { error } = await (supabase as any).rpc("approve_prescription_refill", {
+          p_refill_id: requestId,
+          p_provider_note: note,
+        });
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("prescription_refill_requests")
+          .update({
+            status: "denied",
+            provider_note: note,
+            decided_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+
+        if (error) throw error;
       }
 
       window.dispatchEvent(new CustomEvent("app-feedback", {
@@ -136,9 +139,9 @@ export const RefillRequestsQueue = () => {
         delete next[requestId];
         return next;
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deciding refill:", error);
-      toast.error("Failed to process request");
+      toast.error(error?.message || "Failed to process request");
     } finally {
       setProcessing(null);
     }

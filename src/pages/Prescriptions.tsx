@@ -427,6 +427,12 @@ export const Prescriptions = () => {
         status: "pending",
         prescribed_date: prescribedDate,
         notes: finalNotes,
+        // Server safety gate (Stage B): when the prescriber acknowledged a
+        // blocking allergy/interaction alert, the acknowledged alert text is
+        // the override reason the BEFORE INSERT trigger requires (>= 10
+        // non-space chars); the trigger stamps interaction_overridden_by
+        // and writes the security_audit_log row itself.
+        interaction_override_reason: overrideLines.length > 0 ? overrideLines.join("\n") : null,
       }));
 
       const { error } = await (supabase as any)

@@ -1,6 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export type InteractionSeverity = 'contraindicated' | 'major' | 'moderate' | 'minor' | 'unknown';
+// Live-schema note (verified 2026-10-24): drug_interactions columns are
+// drug_a / drug_b / severity / interaction_type / description /
+// clinical_effect / management, and its severity vocabulary in live data is
+// 'severe' | 'moderate' | 'contraindicated' (older rows may use 'major' /
+// 'minor'). patient_allergies uses allergen_name (not allergen). The
+// patient's current-medication list is the `medications` table
+// (user_id / name / is_active) plus comprehensive_prescriptions rows
+// (medication_name / generic_name columns — there is no medications jsonb).
+
+export type InteractionSeverity = 'contraindicated' | 'major' | 'severe' | 'moderate' | 'minor' | 'unknown';
 
 export interface DrugInteraction {
   id: string;
@@ -16,6 +25,84 @@ export interface DrugInteraction {
 const norm = (s: string) => (s || '').trim().toLowerCase();
 
 /**
+ * Normalise a medication name for matching: lowercase/trim, strip a trailing
+ * parenthetical brand note and any trailing dosage ("Amoxicillin 500mg" /
+ * "Paracetamol 500 mg" / "Warfarin 5 mg"). Mirrors the SQL
+ * public.normalize_drug_name used by the server-side safety gate.
+ */
+export function normalizeDrugName(name: string): string {
+  let v = norm(name).replace(/\s+/g, ' ');
+  v = v.replace(/\s*\([^)]*\)\s*$/, '');
+  v = v.replace(/\s+\d+(\.\d+)?\s*(mg|mcg|ug|g|ml|l|iu|units?|%|mg\/ml|mcg\/ml).*$/, '');
+  v = v.replace(/\s+\d+(\.\d+)?\s*$/, '');
+  return v.replace(/^[\s.,;]+|[\s.,;]+$/g, '');
+}
+
+/**
+ * Drug classes for allergy cross-matching (P1-31) — mirrors the SQL
+ * public.drug_classes_for. A recorded allergy to a class name (e.g.
+ * "penicillin") or to one member drug matches every member of the class,
+ * so allergen "penicillin" DOES match prescribed "Amoxicillin".
+ */
+export const DRUG_CLASSES: Record<string, string[]> = {
+  penicillins: [
+    'penicillin', 'penicillin v', 'penicillin g', 'benzathine penicillin',
+    'amoxicillin', 'ampicillin', 'flucloxacillin', 'cloxacillin',
+    'co-amoxiclav', 'amoxiclav', 'augmentin',
+  ],
+  cephalosporins: [
+    'cephalexin', 'cefalexin', 'cefuroxime', 'ceftriaxone', 'cefixime',
+    'cefotaxime', 'cefpodoxime', 'cephalothin',
+  ],
+  sulfonamides: [
+    'sulfamethoxazole', 'co-trimoxazole', 'cotrimoxazole', 'septrin',
+    'sulfasalazine', 'sulfadiazine', 'sulfadoxine',
+  ],
+  nsaids: [
+    'ibuprofen', 'diclofenac', 'naproxen', 'aspirin', 'acetylsalicylic acid',
+    'celecoxib', 'meloxicam', 'ketorolac', 'piroxicam', 'indomethacin',
+    'mefenamic acid',
+  ],
+};
+
+const CLASS_TERMS: Record<string, string> = {
+  penicillin: 'penicillins',
+  penicillins: 'penicillins',
+  cephalosporin: 'cephalosporins',
+  cephalosporins: 'cephalosporins',
+  sulfonamide: 'sulfonamides',
+  sulfonamides: 'sulfonamides',
+  sulfa: 'sulfonamides',
+  sulpha: 'sulfonamides',
+  nsaid: 'nsaids',
+  nsaids: 'nsaids',
+};
+
+export function drugClassesFor(name: string): string[] {
+  const v = normalizeDrugName(name);
+  if (!v) return [];
+  if (CLASS_TERMS[v]) return [CLASS_TERMS[v]];
+  const classes: string[] = [];
+  for (const [cls, members] of Object.entries(DRUG_CLASSES)) {
+    if (members.some((m) => v === m || v.startsWith(`${m} `) || v.startsWith(`${m}/`) || v.endsWith(`/${m}`))) {
+      classes.push(cls);
+    }
+  }
+  return classes;
+}
+
+/** True when two drug names refer to the same drug/class for screening. */
+function drugNamesMatch(a: string, b: string): boolean {
+  const na = normalizeDrugName(a);
+  const nb = normalizeDrugName(b);
+  if (!na || !nb) return false;
+  if (na.length >= 3 && nb.length >= 3 && (na.includes(nb) || nb.includes(na))) return true;
+  const ca = drugClassesFor(na);
+  const cb = drugClassesFor(nb);
+  return ca.some((c) => cb.includes(c));
+}
+
+/**
  * Check `candidateDrug` against a list of `existingDrugs`. Returns interactions
  * sorted by severity (most severe first). Safe — never throws.
  */
@@ -23,8 +110,8 @@ export async function checkInteractions(
   candidateDrug: string,
   existingDrugs: string[],
 ): Promise<DrugInteraction[]> {
-  const candidate = norm(candidateDrug);
-  const others = Array.from(new Set(existingDrugs.map(norm).filter(Boolean)));
+  const candidate = normalizeDrugName(candidateDrug);
+  const others = Array.from(new Set(existingDrugs.map(normalizeDrugName).filter(Boolean)));
   if (!candidate || others.length === 0) return [];
 
   try {
@@ -33,14 +120,13 @@ export async function checkInteractions(
       .or(`drug_a.ilike.%${candidate}%,drug_b.ilike.%${candidate}%`);
     if (error || !data) return [];
     const rank: Record<string, number> = {
-      contraindicated: 0, major: 1, moderate: 2, minor: 3, unknown: 4,
+      contraindicated: 0, major: 1, severe: 1, moderate: 2, minor: 3, unknown: 4,
     };
     return (data as DrugInteraction[])
       .filter(row => {
-        const a = norm(row.drug_a); const b = norm(row.drug_b);
-        const matchesCandidate = a.includes(candidate) || b.includes(candidate) || candidate.includes(a) || candidate.includes(b);
+        const matchesCandidate = drugNamesMatch(row.drug_a, candidate) || drugNamesMatch(row.drug_b, candidate);
         if (!matchesCandidate) return false;
-        return others.some(o => a.includes(o) || b.includes(o) || o.includes(a) || o.includes(b));
+        return others.some(o => drugNamesMatch(row.drug_a, o) || drugNamesMatch(row.drug_b, o));
       })
       .sort((x, y) => (rank[x.severity] ?? 9) - (rank[y.severity] ?? 9));
   } catch (e) {
@@ -51,6 +137,7 @@ export async function checkInteractions(
 
 export async function getPatientActiveMedications(patientId: string): Promise<string[]> {
   if (!patientId) return [];
+  const names = new Set<string>();
   try {
     const { data } = await (supabase.from('comprehensive_prescriptions' as any) as any)
       .select('medication_name, generic_name')
@@ -58,15 +145,32 @@ export async function getPatientActiveMedications(patientId: string): Promise<st
       // NOTE: the status CHECK has no 'active' value — dispensed/usable
       // prescriptions are 'pending', 'filled' or 'partially_filled'.
       .in('status', ['pending', 'filled', 'partially_filled']);
-    const names = (data || []).flatMap((r: any) => [r.medication_name, r.generic_name]).filter(Boolean);
-    return Array.from(new Set(names));
+    for (const r of (data || []) as any[]) {
+      if (r.medication_name) names.add(r.medication_name);
+      if (r.generic_name) names.add(r.generic_name);
+    }
   } catch {
-    return [];
+    // non-fatal — fall through to the medications table
   }
+  try {
+    // The patient's own current-medication list (medications table:
+    // user_id / name / is_active).
+    const { data } = await (supabase.from('medications' as any) as any)
+      .select('name, is_active')
+      .eq('user_id', patientId);
+    for (const r of (data || []) as any[]) {
+      if (r.is_active === false) continue;
+      if (r.name) names.add(r.name);
+    }
+  } catch {
+    // non-fatal
+  }
+  return [...names];
 }
 
 export function isBlocking(severity: InteractionSeverity) {
-  return severity === 'contraindicated' || severity === 'major';
+  // 'severe' is the live drug_interactions vocabulary for major interactions.
+  return severity === 'contraindicated' || severity === 'major' || severity === 'severe';
 }
 
 export function summarize(interactions: DrugInteraction[]): string {
@@ -94,9 +198,10 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
   const allergens = new Set<string>();
   try {
     // Source 0: patient_allergies — the structured table the AllergyAlertSystem
-    // UI writes to. This is the canonical clinician/patient-recorded source;
-    // without it, allergies entered in the allergy UI displayed on screen but
-    // never blocked a prescription (audit 2026-10-20).
+    // UI writes to (live column: allergen_name). This is the canonical
+    // clinician/patient-recorded source; without it, allergies entered in the
+    // allergy UI displayed on screen but never blocked a prescription
+    // (audit 2026-10-20).
     const { data: allergyRows } = await (supabase.from('patient_allergies' as any) as any)
       .select('allergen_name, is_active')
       .eq('patient_id', patientId)
@@ -145,7 +250,9 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
     // non-fatal
   }
   try {
-    // Source 3: digital intake forms (pre-visit allergy reports)
+    // Source 3: digital intake forms (pre-visit allergy reports).
+    // intake_forms.allergies is jsonb — Supabase returns it parsed, so it
+    // arrives as a string, an array of strings, or occasionally an object.
     const { data: intake } = await (supabase.from('intake_forms' as any) as any)
       .select('allergies')
       .eq('patient_id', patientId)
@@ -167,26 +274,36 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
 
 /**
  * Check prescribed medication names against the patient's known allergies.
- * Matches when the medication name contains (or is contained in) an allergen term,
- * e.g. allergen "penicillin" matches "Amoxicillin" via common stems is NOT attempted —
- * this is a conservative substring match; clinicians confirm.
+ * Matches on substring containment (either way, both sides >= 3 chars after
+ * dosage-stripping normalisation) OR on shared drug class — so allergen
+ * "penicillin" matches "Amoxicillin" (same penicillins class) — plus the
+ * penicillin <-> cephalosporin cross-reactivity pair. Mirrors the SQL
+ * public.screen_medications used by the server-side safety gate.
  * Safe — never throws.
  */
 export function checkAllergyMatches(
   medicationNames: string[],
   allergies: string[],
 ): AllergyMatch[] {
-  const meds = medicationNames.map(norm).filter(Boolean);
-  const allergens = allergies.map(norm).filter(Boolean);
+  const meds = medicationNames.map(normalizeDrugName).filter(Boolean);
+  const allergens = allergies.map(normalizeDrugName).filter(Boolean);
   if (!meds.length || !allergens.length) return [];
   const matches: AllergyMatch[] = [];
-  for (const med of meds) {
-    for (const allergen of allergens) {
-      if (allergen.length < 3) continue;
-      if (med.includes(allergen) || allergen.includes(med)) {
-        const originalMed = medicationNames[meds.indexOf(med)];
-        const originalAllergen = allergies[allergens.indexOf(allergen)];
-        matches.push({ medication: originalMed, allergen: originalAllergen });
+  for (let mi = 0; mi < meds.length; mi++) {
+    const med = meds[mi];
+    const medClasses = drugClassesFor(med);
+    for (let ai = 0; ai < allergens.length; ai++) {
+      const allergen = allergens[ai];
+      const allergenClasses = drugClassesFor(allergen);
+      const substringMatch =
+        allergen.length >= 3 && med.length >= 3 &&
+        (med.includes(allergen) || allergen.includes(med));
+      const sameClass = medClasses.some((c) => allergenClasses.includes(c));
+      const crossReactive =
+        (allergenClasses.includes('penicillins') && medClasses.includes('cephalosporins')) ||
+        (allergenClasses.includes('cephalosporins') && medClasses.includes('penicillins'));
+      if (substringMatch || sameClass || crossReactive) {
+        matches.push({ medication: medicationNames[mi], allergen: allergies[ai] });
       }
     }
   }

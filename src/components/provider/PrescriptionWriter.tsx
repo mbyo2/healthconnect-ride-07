@@ -176,7 +176,13 @@ export const PrescriptionWriter = () => {
         status: 'pending',
         notes: check.message
           ? `${generalNotes || ''}\n[Interaction alert acknowledged]: ${check.message}`
-          : generalNotes || null
+          : generalNotes || null,
+        // Server safety gate (Stage B): an acknowledged blocking alert is
+        // submitted as the override reason the BEFORE INSERT trigger
+        // requires (>= 10 non-space chars).
+        interaction_override_reason: check.blocking && overrideAck
+          ? (check.message || 'Prescriber reviewed the safety alert and chose to proceed.')
+          : null
       }));
 
       const { data: created, error } = await (supabase as any)
