@@ -118,7 +118,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   </span>
                   <span className="block text-xs text-graphite-500 truncate mt-0.5">
                     {provider.specialty || "General Practitioner"}
-                    {feeLabel && <span className="text-primary-600 font-medium"> · {feeLabel}</span>}
+                    {feeLabel ? <span className="text-primary-600 font-medium"> · {feeLabel}</span> : <span className="text-graphite-500 dark:text-slate-400"> · Fee confirmed at booking</span>}
                   </span>
                 </span>
               </Link>

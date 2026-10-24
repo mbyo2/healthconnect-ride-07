@@ -79,6 +79,13 @@ export const HowItWorks = () => {
 
 export const PlatformScale = () => {
   const stats = usePlatformStats();
+  const scaleStats = [
+    { value: formatStat(stats.doctors), unit: "providers", label: "Verified practitioners on the platform" },
+    { value: formatStat(stats.hospitals), unit: "facilities", label: "Hospitals & clinics listed" },
+    { value: formatStat(stats.pharmacies), unit: "pharmacies", label: "Dispensaries & pharmacies listed" },
+    { value: formatStat(stats.appointments), unit: "appointments", label: "Booked through the platform" },
+  ].filter((stat) => stat.value !== null);
+  if (scaleStats.length === 0) return null;
   return (
   <section className="vf-section relative overflow-hidden border-t border-canvas-silk">
     {/* Full-bleed photographic band — the "different colour" in the Apple-like rhythm. */}
@@ -100,12 +107,7 @@ export const PlatformScale = () => {
         Built for everyday care. Ready for Zambia at scale.
       </h2>
       <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-10">
-        {[
-          { value: formatStat(stats.doctors), unit: "providers", label: "Verified practitioners on the platform" },
-          { value: formatStat(stats.hospitals), unit: "facilities", label: "Hospitals & clinics listed" },
-          { value: formatStat(stats.pharmacies), unit: "pharmacies", label: "Dispensaries & pharmacies listed" },
-          { value: formatStat(stats.appointments), unit: "appointments", label: "Booked through the platform" },
-        ].map((stat) => (
+        {scaleStats.map((stat) => (
           <div key={stat.label} className="text-center lg:text-left">
             <div className="font-display text-3xl font-medium tracking-tight text-white">
               {stat.value}

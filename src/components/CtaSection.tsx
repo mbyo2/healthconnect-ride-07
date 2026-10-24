@@ -6,6 +6,12 @@ import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 export const CtaSection = () => {
   const stats = usePlatformStats();
+  const ctaStats = [
+    { value: formatStat(stats.doctors), label: "Doctors" },
+    { value: formatStat(stats.hospitals), label: "Hospitals" },
+    { value: formatStat(stats.pharmacies), label: "Pharmacies" },
+    { value: formatStat(stats.appointments), label: "Consultations" },
+  ].filter((stat) => stat.value !== null);
 
   return (
     <section className="py-16 md:py-24 bg-primary text-primary-foreground relative overflow-hidden">
@@ -59,19 +65,16 @@ export const CtaSection = () => {
             </Button>
           </div>
 
+          {ctaStats.length > 0 && (
           <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
-            {[
-              { value: formatStat(stats.doctors), label: "Doctors" },
-              { value: formatStat(stats.hospitals), label: "Hospitals" },
-              { value: formatStat(stats.pharmacies), label: "Pharmacies" },
-              { value: formatStat(stats.appointments), label: "Consultations" },
-            ].map((stat) => (
+            {ctaStats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-lg md:text-2xl font-bold">{stat.value}</div>
                 <div className="text-xs opacity-70">{stat.label}</div>
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
     </section>

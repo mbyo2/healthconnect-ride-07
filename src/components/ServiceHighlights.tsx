@@ -98,10 +98,12 @@ export const ServiceHighlights = () => {
                 <p className="text-graphite-500 text-xs md:text-sm leading-relaxed mb-3 line-clamp-2 tracking-wide">
                   {service.description}
                 </p>
+                {service.stat != null && (
                 <div className="flex items-baseline gap-1.5 text-xs">
                   <span className="font-display text-lg text-primary-500">{service.stat}</span>
                   <span className="text-graphite-400 tracking-wide">{service.statLabel}</span>
                 </div>
+                )}
               </div>
             </div>
           ))}
