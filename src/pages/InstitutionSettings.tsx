@@ -250,6 +250,8 @@ const InstitutionSettings = () => {
   // columns, so requests silently never landed.
   const [pendingModeRequest, setPendingModeRequest] = useState<{ to_mode: string; created_at: string } | null>(null);
   const [requestingMode, setRequestingMode] = useState(false);
+  const [pendingListingRequest, setPendingListingRequest] = useState<{ to_listed: boolean; created_at: string } | null>(null);
+  const [requestingListing, setRequestingListing] = useState(false);
 
   useEffect(() => {
     if (!institution?.id) return;
@@ -286,6 +288,73 @@ const InstitutionSettings = () => {
     })();
     return () => { cancelled = true; };
   }, [institution?.id]);
+
+  useEffect(() => {
+    if (!institution?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [{ data: reqs }, { data: decs }] = await Promise.all([
+          supabase
+            .from("security_audit_log")
+            .select("id, created_at, event_data")
+            .eq("event_type", "marketplace_listing_requested")
+            .filter("event_data->>institution_id", "eq", institution.id)
+            .order("created_at", { ascending: false })
+            .limit(20),
+          supabase
+            .from("security_audit_log")
+            .select("event_data")
+            .eq("event_type", "marketplace_listing_decided")
+            .filter("event_data->>institution_id", "eq", institution.id)
+            .limit(100),
+        ]);
+        if (cancelled) return;
+        const decidedIds = new Set((decs || []).map((d: any) => d.event_data?.request_log_id));
+        const pending = (reqs || []).find((r: any) => !decidedIds.has(r.id));
+        if (pending) {
+          setPendingListingRequest({
+            to_listed: !!(pending as any).event_data?.to_listed,
+            created_at: (pending as any).created_at,
+          });
+        }
+      } catch {
+        /* non-fatal */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [institution?.id]);
+
+  const requestListingChange = async (desired: boolean) => {
+    if (!institution?.id || requestingListing) return;
+    setRequestingListing(true);
+    try {
+      const { data: { user: me } } = await supabase.auth.getUser();
+      const current = !!(institution as any).list_in_marketplace;
+      const { error } = await supabase.from("security_audit_log").insert({
+        event_type: "marketplace_listing_requested",
+        user_id: me?.id,
+        event_data: {
+          institution_id: institution.id,
+          institution_name: formData.name || institution.name,
+          from_listed: current,
+          to_listed: desired,
+          requested_by: me?.id,
+        },
+      });
+      if (error) throw error;
+      setPendingListingRequest({ to_listed: desired, created_at: new Date().toISOString() });
+      toast.success("Listing change requested.", {
+        description: "The change takes effect only after admin approval. Your current listing status stays in effect until then.",
+        duration: 6000,
+      });
+    } catch (e: any) {
+      console.error("Failed to log listing request:", e);
+      toast.error(e?.message || "Could not send the listing request. Please try again.");
+    } finally {
+      setRequestingListing(false);
+    }
+  };
 
   const requestPaymentModeChange = async (toMode: 'platform' | 'own') => {
     if (!institution?.id || requestingMode) return;
@@ -374,7 +443,9 @@ const InstitutionSettings = () => {
           // payment_mode is deliberately NOT saved here: it is governed by
           // platform admins (see requestPaymentModeChange + the DB guard
           // trigger in 20261020_payment_mode_guard.sql).
-          list_in_marketplace: formData.list_in_marketplace,
+          // list_in_marketplace is likewise NOT saved here: the guard
+          // trigger refuses any non-admin change to that column, so
+          // listing changes go through requestListingChange (admin approval).
           services_offered: formData.services_offered,
           equipment_available: formData.equipment_available,
           languages_spoken: formData.languages_spoken,
@@ -408,7 +479,6 @@ const InstitutionSettings = () => {
         country: formData.country,
         operating_hours: formData.operating_hours,
         accepted_insurance_providers: formData.accepted_insurance_providers,
-        list_in_marketplace: formData.list_in_marketplace,
         services_offered: formData.services_offered,
         equipment_available: formData.equipment_available,
         languages_spoken: formData.languages_spoken,
@@ -535,12 +605,18 @@ const InstitutionSettings = () => {
                     ⚠️ Marketplace listing requires platform payment mode. Your request will need admin approval to switch.
                   </p>
                 )}
+                {pendingListingRequest && (
+                  <p className="text-xs font-medium text-amber-600 mt-2">
+                    ⏳ Listing change requested{pendingListingRequest.created_at ? ` on ${new Date(pendingListingRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review
+                  </p>
+                )}
               </div>
               <Switch
                 id="list_in_marketplace"
-                checked={formData.list_in_marketplace}
+                checked={!!(institution as any)?.list_in_marketplace}
+                disabled={!!pendingListingRequest || requestingListing}
                 onCheckedChange={checked => {
-                  if (checked && formData.payment_mode === 'own') {
+                  if (checked && (institution as any)?.payment_mode === 'own') {
                     // Block: own-mode institutions need admin approval to list
                     toast.error(
                       "Marketplace listing requires platform payments.",
@@ -553,13 +629,7 @@ const InstitutionSettings = () => {
                     requestPaymentModeChange('platform');
                     return;
                   }
-                  setFormData(p => ({ ...p, list_in_marketplace: checked }));
-                  toast.info(
-                    checked
-                      ? "Institution will appear in public searches after saving."
-                      : "Institution will be hidden from public searches after saving.",
-                    { duration: 4000 }
-                  );
+                  requestListingChange(checked);
                 }}
               />
             </div>

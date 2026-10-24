@@ -49,6 +49,10 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [shareLocation, setShareLocation] = useState(false);
   const [listInMarketplace, setListInMarketplace] = useState(false);
+  const [institutionName, setInstitutionName] = useState<string>("");
+  const [institutionPaymentMode, setInstitutionPaymentMode] = useState<string | null>(null);
+  const [pendingListingRequest, setPendingListingRequest] = useState<{ to_listed: boolean; created_at: string } | null>(null);
+  const [requestingListing, setRequestingListing] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -56,14 +60,39 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
         if (institutionId) {
           const { data } = await (supabase as any)
             .from("healthcare_institutions")
-            .select("latitude, longitude, list_in_marketplace")
+            .select("latitude, longitude, list_in_marketplace, name, payment_mode")
             .eq("id", institutionId)
             .maybeSingle();
           if (data?.latitude && data?.longitude) {
             setPosition([Number(data.latitude), Number(data.longitude)]);
           }
           setListInMarketplace(!!data?.list_in_marketplace);
+          setInstitutionName(data?.name || "");
+          setInstitutionPaymentMode(data?.payment_mode || null);
           setShareLocation(!!(data?.latitude && data?.longitude));
+          // Pending listing request check
+          try {
+            const [{ data: reqs }, { data: decs }] = await Promise.all([
+              (supabase as any)
+                .from("security_audit_log")
+                .select("id, created_at, event_data")
+                .eq("event_type", "marketplace_listing_requested")
+                .filter("event_data->>institution_id", "eq", institutionId)
+                .order("created_at", { ascending: false })
+                .limit(20),
+              (supabase as any)
+                .from("security_audit_log")
+                .select("event_data")
+                .eq("event_type", "marketplace_listing_decided")
+                .filter("event_data->>institution_id", "eq", institutionId)
+                .limit(100),
+            ]);
+            const decidedIds = new Set((decs || []).map((d: any) => d.event_data?.request_log_id));
+            const pending = (reqs || []).find((r: any) => !decidedIds.has(r.id));
+            if (pending) {
+              setPendingListingRequest({ to_listed: !!pending.event_data?.to_listed, created_at: pending.created_at });
+            }
+          } catch { /* non-fatal */ }
         } else if (userId) {
           const { data } = await (supabase as any)
             .from("profiles")
@@ -134,6 +163,42 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
     );
   };
 
+  const requestListingChange = async (desired: boolean) => {
+    if (!institutionId || requestingListing) return;
+    if (desired && institutionPaymentMode === 'own') {
+      toast.error("Marketplace listing requires platform payments.", {
+        description: "Listing requires platform payment mode approved by an admin. Your institution is in HMS-only (own) mode, so it cannot be listed until an admin approves a switch to platform payments.",
+        duration: 6000,
+      });
+      return;
+    }
+    setRequestingListing(true);
+    try {
+      const { data: { user: me } } = await supabase.auth.getUser();
+      const { error } = await (supabase as any).from("security_audit_log").insert({
+        event_type: "marketplace_listing_requested",
+        user_id: me?.id,
+        event_data: {
+          institution_id: institutionId,
+          institution_name: institutionName,
+          from_listed: listInMarketplace,
+          to_listed: desired,
+          requested_by: me?.id,
+        },
+      });
+      if (error) throw error;
+      setPendingListingRequest({ to_listed: desired, created_at: new Date().toISOString() });
+      toast.success("Listing change requested.", {
+        description: "The change takes effect only after admin approval. Your current listing status stays in effect until then.",
+        duration: 6000,
+      });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not send the listing request. Please try again.");
+    } finally {
+      setRequestingListing(false);
+    }
+  };
+
   const handleSave = async () => {
     if (shareLocation && !position) {
       toast.error("Please set a location on the map or use your current location");
@@ -147,7 +212,6 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
           .update({
             latitude: shareLocation ? position![0] : null,
             longitude: shareLocation ? position![1] : null,
-            list_in_marketplace: listInMarketplace,
           })
           .eq("id", institutionId);
         if (error) throw error;
@@ -194,13 +258,21 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
         </div>
 
         {institutionId && (
-          <div className="flex items-center justify-between">
-            <Label htmlFor="list-market">List on marketplace</Label>
-            <Switch
-              id="list-market"
-              checked={listInMarketplace}
-              onCheckedChange={setListInMarketplace}
-            />
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="list-market">List on marketplace</Label>
+              <Switch
+                id="list-market"
+                checked={listInMarketplace}
+                disabled={!!pendingListingRequest || requestingListing}
+                onCheckedChange={(checked) => { void requestListingChange(checked); }}
+              />
+            </div>
+            {pendingListingRequest && (
+              <p className="text-xs font-medium text-amber-600">
+                Listing change requested{pendingListingRequest.created_at ? ` on ${new Date(pendingListingRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review
+              </p>
+            )}
           </div>
         )}
 
