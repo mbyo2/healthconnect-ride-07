@@ -68,7 +68,16 @@ export const AllergyAlertSystem = ({ patientId, onAllergyCheck, compact }: Props
   };
 
   const removeAllergy = async (id: string) => {
-    await supabase.from('patient_allergies' as any).update({ is_active: false }).eq('id', id);
+    // Deletion is a clinical act (Stage C1 P2-37): patients can report
+    // allergies but cannot delete or edit existing records — the
+    // prescribing safety gate reads this table. Deletes go through the
+    // delete_patient_allergy RPC, which only allows a clinician with a
+    // care relationship (or an admin) and writes an audit row.
+    const { error } = await (supabase as any).rpc('delete_patient_allergy', { p_allergy_id: id });
+    if (error) {
+      toast.error('Only your care team can remove an allergy record — ask them at your next visit');
+      return;
+    }
     toast.success('Allergy removed');
     fetchAllergies();
   };
