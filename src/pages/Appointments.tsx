@@ -354,6 +354,187 @@ export const AppointmentsPage = () => {
     }
   };
 
+  // Mobile card rendering (below sm) — same data, same actions/handlers as
+  // the desktop tables below; markup follows the AgendaTimeline card idiom.
+  const renderUpcomingMobileCard = (app: any) => {
+    const person = isProvider ? app.patient : app.provider;
+    const isVideo = app.type === "video_consultation";
+    const apptDate = parseISO(app.date);
+    return (
+      <div
+        key={app.id}
+        className="m-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/60 p-3"
+      >
+        <div className="flex items-start gap-3">
+          <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-black text-xs flex items-center justify-center flex-shrink-0 uppercase">
+            {person?.first_name?.[0]}{person?.last_name?.[0]}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
+              {isProvider
+                ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
+                : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
+            </div>
+            {!isProvider && person?.specialty && (
+              <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
+            )}
+            {!isProvider && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {(person?.consultation_fee_min || person?.consultation_fee_max) && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-primary-50 text-primary-500">
+                    <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
+                      ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
+                      : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
+                  </span>
+                )}
+                {person?.telemedicine_available && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-emerald-50 text-emerald-700">
+                    <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
+                  </span>
+                )}
+                {person?.typical_wait_time && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-amber-50 text-amber-700">
+                    <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="shrink-0">{getStatusPill(app.status)}</div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+          <span className="font-mono font-bold text-slate-900 dark:text-slate-200 text-xs">
+            {format(apptDate, "MMM d, yyyy")} · {app.time}
+          </span>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+            isVideo ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30"
+          }`}>
+            {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
+            <span>{isVideo ? "Video" : "In-Person"}</span>
+          </span>
+          <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">
+            {person?.address || "Clinic Facility"}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          {isVideo && isToday(apptDate) && (
+            <Link
+              to={`/video-call/${app.id}`}
+              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-success-500 text-white text-xs font-black hover:bg-success-500 transition-all inline-flex items-center"
+            >
+              JOIN
+            </Link>
+          )}
+          {isProvider && app.status === "pending" && (
+            <>
+              <button
+                onClick={() => acceptAppointment.mutate(app.id)}
+                className="px-3 py-1.5 min-h-[44px] rounded-lg bg-green-600 text-white text-xs font-black hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
+              >
+                ACCEPT
+              </button>
+              <button
+                onClick={() => declineAppointment.mutate(app.id)}
+                className="px-3 py-1.5 min-h-[44px] rounded-lg bg-red-600 text-white text-xs font-black hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
+              >
+                DECLINE
+              </button>
+            </>
+          )}
+          {isProvider && app.status !== "pending" && (
+            <button
+              onClick={() => completeAppointment.mutate(app.id)}
+              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-slate-900 text-white text-xs font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
+            >
+              DONE
+            </button>
+          )}
+          {isProvider && (
+            <button
+              onClick={() => openReschedule(app)}
+              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-500/40 text-primary-600 dark:text-primary-400 text-xs font-black hover:bg-primary-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
+            >
+              RESCHEDULE
+            </button>
+          )}
+          {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
+            <MarkNoShowButton appointmentId={app.id} />
+          )}
+          <button
+            onClick={() => setCancelTarget(app)}
+            className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
+          >
+            CANCEL
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPastMobileCard = (app: any) => {
+    const person = isProvider ? app.patient : app.provider;
+    const apptDate = parseISO(app.date);
+    return (
+      <div
+        key={app.id}
+        className="m-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/60 p-3"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm text-slate-800 dark:text-slate-200">
+              {isProvider
+                ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
+                : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
+            </div>
+            {!isProvider && person?.specialty && (
+              <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
+            )}
+            {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {person?.consultation_fee_min && (
+                  <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
+                    <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
+                  </span>
+                )}
+                {person?.telemedicine_available && (
+                  <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                    <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="shrink-0">{getStatusPill(app.status)}</div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs">
+          <span className="font-mono text-slate-600 dark:text-slate-400">
+            {format(apptDate, "MMM d, yyyy")} • {app.time}
+          </span>
+          <span className="text-slate-500">
+            {app.type === "video_consultation" ? "Video Visit" : "In-Person"}
+          </span>
+          <span className="text-slate-500">
+            {person?.address || "To be confirmed"}
+          </span>
+        </div>
+
+        {!isProvider && app.provider_id && (
+          <div className="mt-3">
+            <button
+              onClick={() => navigate(`/provider/${app.provider_id}`)}
+              className="px-3 py-1.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
+            >
+              Re-Book
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <NetworkErrorBoundary>
       <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
@@ -478,7 +659,11 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full overflow-x-auto">
+                  <>
+                  <div className="sm:hidden">
+                    {upcoming.map((app) => renderUpcomingMobileCard(app))}
+                  </div>
+                  <div className="hidden sm:block w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
                         <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
@@ -619,6 +804,7 @@ export const AppointmentsPage = () => {
                       </tbody>
                     </table>
                   </div>
+                  </>
                 )}
               </div>
 
@@ -644,7 +830,11 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full overflow-x-auto">
+                  <>
+                  <div className="sm:hidden">
+                    {past.map((app) => renderPastMobileCard(app))}
+                  </div>
+                  <div className="hidden sm:block w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
                         <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
@@ -720,6 +910,7 @@ export const AppointmentsPage = () => {
                       </tbody>
                     </table>
                   </div>
+                  </>
                 )}
               </div>
             </div>

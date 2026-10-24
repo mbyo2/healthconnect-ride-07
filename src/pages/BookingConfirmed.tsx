@@ -147,9 +147,13 @@ const BookingConfirmed = () => {
         <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center">
           <CheckCircle className="h-10 w-10 text-emerald-500" />
         </div>
-        <h1 className="text-2xl font-bold text-foreground">Booking Confirmed!</h1>
+        <h1 className="text-2xl font-bold text-foreground">
+          {appointment.status === 'pending' ? "Request sent" : "Booking Confirmed!"}
+        </h1>
         <p className="text-muted-foreground">
-          Your appointment has been scheduled successfully.
+          {appointment.status === 'pending'
+            ? "Your provider still needs to confirm this time."
+            : "Your appointment has been scheduled successfully."}
         </p>
         <p className="text-xs text-muted-foreground font-mono">Booking ref: {String(appointment.id).slice(0, 8)}</p>
       </div>

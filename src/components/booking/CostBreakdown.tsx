@@ -107,6 +107,14 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
         )}
       </div>
 
+      {(feeMin != null || feeMax != null) && (
+        <p className="text-sm font-medium text-foreground">
+          {feeMin != null && feeMax != null && feeMin !== feeMax
+            ? `Your provider's fee: K${feeMin} – K${feeMax}`
+            : `Your provider's fee: K${feeMin ?? feeMax}`}
+        </p>
+      )}
+
       {!insurance && (
         <Link
           to="/insurance-cards"

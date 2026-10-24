@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { expandHoursToSlots } from "@/utils/availability";
-import { isExpiringSoon } from "@/utils/celebration";
 import { WaitlistSignup } from "./WaitlistSignup";
 import { CostBreakdown } from "./CostBreakdown";
 import { DayStripPicker } from "./DayStripPicker";
@@ -375,6 +374,15 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           {providerDisplayName(provider as any)}
         </h3>
         <p className="text-sm text-muted-foreground">{provider.specialty}</p>
+        {(provider.consultation_fee_min != null || provider.consultation_fee_max != null) && (
+          <p className="text-sm font-medium text-foreground mt-2">
+            {provider.consultation_fee_min != null &&
+            provider.consultation_fee_max != null &&
+            provider.consultation_fee_min !== provider.consultation_fee_max
+              ? `Your provider's fee: K${provider.consultation_fee_min} – K${provider.consultation_fee_max}`
+              : `Your provider's fee: K${provider.consultation_fee_min ?? provider.consultation_fee_max}`}
+          </p>
+        )}
       </div>
 
       <div>
@@ -566,31 +574,23 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
               const isPast = isSlotPast(selectedDate, time);
               const unavailable = isBooked || isPast;
               const isSelected = selectedTime === time;
-              // Uber-style urgency: slots starting within 2h pulse with an "Expiring soon" badge
-              const isExpiring = !unavailable && !isSelected && isExpiringSoon(time, selectedDate);
 
               return (
                 <button
                   key={time}
                   role="radio"
                   aria-checked={isSelected}
-                  aria-label={`${time}${isBooked ? ", already booked" : isPast ? ", time has passed" : isExpiring ? ", available, expiring soon" : ", available"}`}
+                  aria-label={`${time}${isBooked ? ", already booked" : isPast ? ", time has passed" : ", available"}`}
                   disabled={unavailable}
                   onClick={() => setSelectedTime(time)}
                   className={cn(
                     "relative p-3 rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                     unavailable && "bg-muted text-muted-foreground line-through cursor-not-allowed",
                     isSelected && "bg-primary text-primary-foreground",
-                    isExpiring && "doc-pulse-ring bg-orange-50 border border-orange-300 text-orange-900 hover:bg-orange-100 cursor-pointer",
-                    !unavailable && !isSelected && !isExpiring && "bg-muted hover:bg-primary/10 cursor-pointer"
+                    !unavailable && !isSelected && "bg-muted hover:bg-primary/10 cursor-pointer"
                   )}
                 >
                   {time}
-                  {isExpiring && (
-                    <span className="absolute -top-2 -right-1 text-xs font-bold text-white bg-orange-500 px-1.5 py-px rounded-full doc-urgency-blink whitespace-nowrap">
-                      Expiring soon
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -827,6 +827,9 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
                 </li>
               ))}
             </ol>
+            <p className="pt-2 text-xs font-medium text-muted-foreground">
+              Step {stepIndex + 1} of 3 — {STEPS[stepIndex].label}
+            </p>
           </DialogHeader>
 
           {step === 'type' && renderTypeSelection()}
