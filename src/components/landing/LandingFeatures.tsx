@@ -6,6 +6,7 @@ import {
   Sparkles, Building2, Activity, CheckCircle2, MapPin
 } from "lucide-react";
 import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
+import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 import { LandingImg } from "./LandingImg";
 
 export const HowItWorks = () => {
@@ -13,6 +14,9 @@ export const HowItWorks = () => {
   return (
     <section className="vf-section bg-white dark:bg-slate-950">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
+        <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-midnight text-center mb-12">
+          How Doc&apos; O Clock works
+        </h2>
         <div className="grid gap-10 md:grid-cols-3 md:gap-12">
           {[
             {
@@ -56,9 +60,9 @@ export const HowItWorks = () => {
                   height={500}
                 />
               </span>
-              <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-midnight">
+              <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-midnight">
                 {item.title}
-              </h2>
+              </h3>
               <p className="mt-4 max-w-sm text-base leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400">
                 {item.desc}
               </p>
@@ -73,7 +77,9 @@ export const HowItWorks = () => {
   );
 };
 
-export const PlatformScale = () => (
+export const PlatformScale = () => {
+  const stats = usePlatformStats();
+  return (
   <section className="vf-section relative overflow-hidden border-t border-canvas-silk">
     {/* Full-bleed photographic band — the "different colour" in the Apple-like rhythm. */}
     <div className="absolute inset-0" aria-hidden>
@@ -90,15 +96,15 @@ export const PlatformScale = () => (
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/40" />
     </div>
     <div className="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
-      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-white">
+      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl sm:text-4xl font-medium tracking-tight text-white">
         Built for everyday care. Ready for Zambia at scale.
       </h2>
       <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-10">
         {[
-          { value: "20+", unit: "specialties", label: "Clinical specialties covered" },
-          { value: "Video", unit: "visits", label: "Consult from anywhere" },
-          { value: "10", unit: "provinces", label: "Built for all of Zambia" },
-          { value: "24/7", unit: "access", label: "Emergency & bookings" },
+          { value: formatStat(stats.doctors), unit: "providers", label: "Verified practitioners on the platform" },
+          { value: formatStat(stats.hospitals), unit: "facilities", label: "Hospitals & clinics listed" },
+          { value: formatStat(stats.pharmacies), unit: "pharmacies", label: "Dispensaries & pharmacies listed" },
+          { value: formatStat(stats.appointments), unit: "appointments", label: "Booked through the platform" },
         ].map((stat) => (
           <div key={stat.label} className="text-center lg:text-left">
             <div className="font-display text-3xl font-medium tracking-tight text-white">
@@ -111,7 +117,8 @@ export const PlatformScale = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export const CareExperience = () => {
   const navigate = useNavigate();
@@ -124,7 +131,7 @@ export const CareExperience = () => {
               <HeartPulse className="h-3.5 w-3.5 text-primary-500" />
               Complete Healthcare Ecosystem
             </div>
-            <h2 className="font-display text-3xl font-medium text-midnight tracking-tight leading-[1.15]">
+            <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight leading-[1.15]">
               Care that fits into{" "}
               <span className="text-primary-500">your everyday life.</span>
             </h2>
@@ -310,7 +317,7 @@ export const Features = () => {
             <Sparkles className="h-3.5 w-3.5 text-primary-500" />
             Doc&apos; O Clock Core Features
           </div>
-          <h2 className="font-display text-3xl font-medium text-midnight tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight">
             Modern healthcare, designed around you.
           </h2>
         </div>
@@ -381,12 +388,12 @@ export const ForProviders = () => {
               <Building2 className="h-3.5 w-3.5 text-primary-500" />
               For Doctors, Clinics & Hospitals
             </div>
-            <h2 className="font-display text-3xl font-medium text-midnight tracking-tight leading-tight">
+            <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight leading-tight">
               Grow your medical practice{" "}
               <span className="text-primary-500">with Doc&apos; O Clock.</span>
             </h2>
             <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide">
-              Join hundreds of practitioners and institutions reaching thousands of patients daily across Zambia. Manage bookings, telehealth, e-prescriptions, and NHIMA billing in one place.
+              Join practitioners and institutions reaching patients across Zambia. Manage bookings, telehealth, e-prescriptions, and NHIMA billing in one place.
             </p>
             <div className="space-y-3 pt-1">
               {[

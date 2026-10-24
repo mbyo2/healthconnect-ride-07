@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, MapPin, Star, Calendar, Search, GraduationCap, DollarSign, Shield, Video, Home } from 'lucide-react';
+import { User, MapPin, Calendar, Search, GraduationCap, Shield, Video, Home } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RatingDisplay } from '@/components/RatingDisplay';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { providerDisplayName } from '@/utils/providerDisplay';
@@ -165,7 +167,7 @@ const HealthcareProfessionals = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
+    <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       <Helmet>
         <title>Verified Doctors & Specialists in Zambia | Doc' O Clock</title>
         <meta
@@ -175,27 +177,31 @@ const HealthcareProfessionals = () => {
         <link rel="canonical" href="https://doc0clock.online/healthcare-professionals" />
       </Helmet>
       {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-          <User className="h-8 w-8 text-primary" />
-          Healthcare Professionals
-        </h1>
-        <p className="text-muted-foreground">
-          Find and connect with verified healthcare professionals
-        </p>
+      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+        <div className="max-w-content mx-auto">
+          <h1 className="font-display text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-3">
+            <User className="h-8 w-8 text-primary-500" />
+            Healthcare Professionals
+          </h1>
+          <p className="text-sm text-graphite-500 font-medium tracking-wide mt-1">
+            Find and connect with verified healthcare professionals
+          </p>
+        </div>
       </div>
 
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+
       {/* Filters */}
-      <Card>
+      <Card className="border-canvas-silk bg-white dark:bg-slate-900 shadow-card">
         <CardContent className="pt-6 space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-graphite-400" />
               <Input
                 placeholder="Search name, specialty, medical school..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-canvas-silk bg-white dark:bg-slate-900 text-midnight focus-visible:ring-primary-500/30"
               />
             </div>
 
@@ -229,15 +235,28 @@ const HealthcareProfessionals = () => {
       {/* Results */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-full flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          <>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-5 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-2xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-10 w-full rounded-xl" />
+              </div>
+            ))}
+          </>
         ) : filteredProfessionals.length === 0 ? (
-          <Card className="col-span-full">
+          <Card className="col-span-full border-canvas-silk bg-white dark:bg-slate-900">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <User className="h-16 w-16 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No professionals found</p>
-              <p className="text-xs text-muted-foreground mt-1 mb-4">Try adjusting your search or clearing the filters.</p>
+              <User className="h-16 w-16 text-graphite-400 mb-4" />
+              <p className="text-graphite-500">No professionals found</p>
+              <p className="text-sm text-graphite-500 mt-1 mb-4">Try adjusting your search or clearing the filters.</p>
               <Button
                 variant="outline"
                 className="min-h-[44px]"
@@ -249,22 +268,30 @@ const HealthcareProfessionals = () => {
           </Card>
         ) : (
           filteredProfessionals.map((prof) => (
-            <Card key={prof.id} className="hover:shadow-lg transition-shadow">
+            <Card key={prof.id} className="border-canvas-silk bg-white dark:bg-slate-900 hover:shadow-card-hover transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <User className="h-6 w-6 text-primary" />
-                    </div>
+                    {prof.profile_image ? (
+                      <img
+                        src={prof.profile_image}
+                        alt=""
+                        className="h-12 w-12 rounded-2xl object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-2xl bg-primary-50 flex items-center justify-center shrink-0 text-sm font-semibold text-primary-600">
+                        {prof.first_name?.[0]}{prof.last_name?.[0]}
+                      </div>
+                    )}
                     <div>
-                      <CardTitle className="text-base leading-snug">
+                      <CardTitle className="text-base leading-snug text-midnight">
                         {providerDisplayName({ first_name: prof.first_name, last_name: prof.last_name, role: (prof as any)?.role })}
                       </CardTitle>
-                      <CardDescription>{prof.specialty || 'General Practice'}</CardDescription>
+                      <CardDescription className="text-graphite-500">{prof.specialty || 'General Practice'}</CardDescription>
                     </div>
                   </div>
                   {prof.accepting_patients && (
-                    <Badge variant="default" className="text-xs shrink-0">Accepting</Badge>
+                    <Badge className="text-xs shrink-0 bg-success-50 text-success-600 border border-success-100 hover:bg-success-50">Accepting</Badge>
                   )}
                 </div>
               </CardHeader>
@@ -272,8 +299,8 @@ const HealthcareProfessionals = () => {
               <CardContent className="space-y-2.5">
                 {/* Medical school */}
                 {prof.medical_school && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <GraduationCap className="h-4 w-4 text-primary shrink-0" />
+                  <div className="flex items-center gap-2 text-sm text-graphite-500">
+                    <GraduationCap className="h-4 w-4 text-primary-500 shrink-0" />
                     <span className="truncate">
                       {prof.medical_school}
                       {prof.graduation_year && ` '${prof.graduation_year.toString().slice(-2)}`}
@@ -283,7 +310,7 @@ const HealthcareProfessionals = () => {
 
                 {/* Practice location */}
                 {prof.primary_practice_location && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-graphite-500">
                     <MapPin className="h-4 w-4 shrink-0" />
                     <span className="truncate">{prof.primary_practice_location}</span>
                   </div>
@@ -291,24 +318,15 @@ const HealthcareProfessionals = () => {
 
                 {/* Rating & experience */}
                 <div className="flex items-center gap-4 text-sm">
-                  {!!prof.rating && (
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{prof.rating.toFixed(1)}</span>
-                      {!!prof.reviews_count && (
-                        <span className="text-muted-foreground">({prof.reviews_count})</span>
-                      )}
-                    </div>
-                  )}
+                  <RatingDisplay rating={prof.rating} reviewCount={prof.reviews_count} size="sm" />
                   {!!prof.years_experience && (
-                    <span className="text-muted-foreground">{prof.years_experience}+ yrs</span>
+                    <span className="text-graphite-500">{prof.years_experience}+ yrs</span>
                   )}
                 </div>
 
                 {/* Consultation fee */}
                 {feeLabel(prof) && (
-                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                    <DollarSign className="h-4 w-4" />
+                  <div className="text-sm font-semibold text-primary-600">
                     {feeLabel(prof)}
                   </div>
                 )}
@@ -316,20 +334,20 @@ const HealthcareProfessionals = () => {
                 {/* Subspecialties + capability badges */}
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
                   {(prof.subspecialties || []).slice(0, 2).map((sub, i) => (
-                    <Badge key={i} variant="outline" className="text-xs">{sub}</Badge>
+                    <Badge key={i} variant="outline" className="text-xs border-canvas-silk text-graphite-600">{sub}</Badge>
                   ))}
                   {prof.telemedicine_available && (
-                    <Badge variant="secondary" className="text-xs gap-1">
+                    <Badge variant="secondary" className="text-xs gap-1 bg-primary-50 text-primary-600 border border-primary-100 hover:bg-primary-50">
                       <Video className="h-3 w-3" /> Telemedicine
                     </Badge>
                   )}
                   {prof.home_visits_available && (
-                    <Badge variant="secondary" className="text-xs gap-1">
+                    <Badge variant="secondary" className="text-xs gap-1 bg-primary-50 text-primary-600 border border-primary-100 hover:bg-primary-50">
                       <Home className="h-3 w-3" /> Home Visits
                     </Badge>
                   )}
                   {prof.accepts_insurance && (
-                    <Badge variant="secondary" className="text-xs gap-1">
+                    <Badge variant="secondary" className="text-xs gap-1 bg-primary-50 text-primary-600 border border-primary-100 hover:bg-primary-50">
                       <Shield className="h-3 w-3" /> Insurance
                     </Badge>
                   )}
@@ -358,6 +376,7 @@ const HealthcareProfessionals = () => {
             </Card>
           ))
         )}
+      </div>
       </div>
     </div>
   );

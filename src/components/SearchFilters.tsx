@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSearch } from "@/context/SearchContext";
-import { HealthcareProviderType, SpecialtyType, InsuranceProvider } from "@/types/healthcare";
+import { HealthcareProviderType, InsuranceProvider } from "@/types/healthcare";
 import { Filter, MapPin, Video, Home, DollarSign, Languages } from "lucide-react";
 import { useState } from "react";
 
@@ -60,7 +60,7 @@ export const SearchFilters = () => {
           variant="outline"
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 lg:hidden"
         >
           <Filter className="h-4 w-4" />
           Filters
@@ -83,11 +83,12 @@ export const SearchFilters = () => {
         )}
       </div>
 
-      {showFilters && (
+      {/* On lg the filter content is always visible — the toggle governs mobile only. */}
+      <div className={showFilters ? undefined : "hidden lg:block"}>
         <Card>
           <CardContent className="p-4 space-y-5">
             {/* Row 1: Type / Specialty / Insurance */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Provider Type</Label>
                 <Select
@@ -103,34 +104,6 @@ export const SearchFilters = () => {
                     <SelectItem value="pharmacy">Pharmacy</SelectItem>
                     <SelectItem value="diagnostic_center">Diagnostic Center / Lab</SelectItem>
                     <SelectItem value="imaging_center">Radiology & Imaging</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Specialty</Label>
-                <Select
-                  value={selectedSpecialty || "all"}
-                  onValueChange={v => { setSelectedSpecialty(v as SpecialtyType); applyFilters(); }}
-                >
-                  <SelectTrigger><SelectValue placeholder="All specialties" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All specialties</SelectItem>
-                    <SelectItem value="General Practice">General Practice</SelectItem>
-                    <SelectItem value="Cardiology">Cardiology</SelectItem>
-                    <SelectItem value="Dermatology">Dermatology</SelectItem>
-                    <SelectItem value="Neurology">Neurology</SelectItem>
-                    <SelectItem value="Pediatrics">Pediatrics</SelectItem>
-                    <SelectItem value="Orthopedics">Orthopedics</SelectItem>
-                    <SelectItem value="Psychiatry">Psychiatry</SelectItem>
-                    <SelectItem value="Oncology">Oncology</SelectItem>
-                    <SelectItem value="Endocrinology">Endocrinology</SelectItem>
-                    <SelectItem value="Gastroenterology">Gastroenterology</SelectItem>
-                    <SelectItem value="General Dentistry">General Dentistry</SelectItem>
-                    <SelectItem value="Emergency Medicine">Emergency Medicine</SelectItem>
-                    <SelectItem value="Pathology & Diagnostics">Pathology & Diagnostics</SelectItem>
-                    <SelectItem value="Radiology & Imaging">Radiology & Imaging</SelectItem>
-                    <SelectItem value="Phlebotomy & Home Tests">Phlebotomy & Home Tests</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -249,7 +222,7 @@ export const SearchFilters = () => {
             </div>
           </CardContent>
         </Card>
-      )}
+      </div>
     </div>
   );
 };
