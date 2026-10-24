@@ -1,12 +1,14 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import React, { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { Building2, Loader2, Activity, ShieldCheck, RefreshCw } from "lucide-react";
+import { Building2, Activity, ShieldCheck, RefreshCw } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
+import { InstitutionPageHeader } from "@/components/institution/InstitutionPageHeader";
 import { HMSDashboard } from "@/components/hospital/HMSDashboard";
 import { OPDManagement } from "@/components/hospital/OPDManagement";
 import { IPDManagement } from "@/components/hospital/IPDManagement";
@@ -82,6 +84,7 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
 export const HospitalManagement = () => {
 
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { institution: hospital, institutionId: hospitalId, loading: loadingHospital } = useInstitutionContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
@@ -225,37 +228,56 @@ export const HospitalManagement = () => {
 
 
   if (loadingHospital) {
+    return <LoadingScreen message="Loading your hospital board…" />;
+  }
+
+  // No institution resolved for this account: the render below dereferences
+  // hospital.name / hospital.id / hospital.type unconditionally, so without
+  // this guard the page white-screens with a TypeError. Mirror
+  // InstitutionDashboard's graceful "Setting Up Your Dashboard" state.
+  if (!hospital) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-canvas dark:bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
+        <div className="max-w-md w-full vf-card text-center space-y-4">
+          <Building2 className="h-12 w-12 mx-auto text-primary-500" />
+          <h2 className="font-display text-xl font-medium text-midnight">Setting Up Your Dashboard</h2>
+          <p className="text-sm text-graphite-500">
+            We couldn't load an institution workspace for this account. If you just
+            registered a facility, refresh in a moment. If you're joining as staff,
+            ask your institution administrator to send you a staff invitation.
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button onClick={() => window.location.reload()} className="vf-btn-primary">
+              Refresh
+            </button>
+            <button onClick={() => navigate("/institution-dashboard")} className="vf-btn-secondary">
+              Go to Institution Dashboard
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-      {/* Monday Sticky Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold tracking-tight">{hospital.name}</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold text-white bg-success-500">
-                  Live HMS Board
-                </span>
-              </div>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                {facilityProfile.label}
-                {hospital.city ? ` • ${hospital.city}` : ""}
-              </p>
-
-            </div>
-          </div>
-
+      {/* Sticky Header */}
+      <InstitutionPageHeader
+        icon={<Building2 className="h-5 w-5" />}
+        title={hospital.name}
+        badges={
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold text-white bg-success-500">
+            Live HMS Board
+          </span>
+        }
+        subtitle={
+          <>
+            {facilityProfile.label}
+            {hospital.city ? ` • ${hospital.city}` : ""}
+          </>
+        }
+        subtitleClassName="text-xs text-graphite-500 dark:text-slate-400 font-medium"
+        actions={
           <button
             onClick={refreshAll}
             className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
@@ -263,14 +285,14 @@ export const HospitalManagement = () => {
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Sync Board Data</span>
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Main Tabs Navigation & Body */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk dark:border-slate-800">
-            <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
+            <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1.5 bg-transparent p-1">
               {MODULE_TABS.map((t) => {
                 const relevance = facilityProfile.modules[t.val];
                 return (
@@ -282,7 +304,7 @@ export const HospitalManagement = () => {
                         ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
                         : undefined
                     }
-                    className={`text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-graphite-500 dark:text-slate-400 shadow-none hover:bg-primary-100 hover:text-primary-500 data-[state=active]:bg-primary-500 data-[state=active]:text-white data-[state=active]:border-primary-500 data-[state=active]:shadow-xs ${
                       relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
                     }`}
                   >

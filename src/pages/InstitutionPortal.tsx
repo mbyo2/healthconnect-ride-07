@@ -10,6 +10,34 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LanguageSelector } from "@/i18n/LanguageSelector";
+
+/**
+ * ONE shared Supabase Auth appearance for both sign-in and sign-up,
+ * built from the design tokens: border radius from --radius (1.25rem),
+ * the Signal Blue primary (#397dff, via the --primary token) and the
+ * token surface/text colours (foreground / border / destructive vars),
+ * so dark mode is carried by the tokens.
+ */
+const authAppearance = {
+  theme: ThemeSupa,
+  style: {
+    button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', borderRadius: '1.25rem' },
+    anchor: { color: 'hsl(var(--primary))' },
+    container: { width: '100%' },
+    message: { color: 'hsl(var(--destructive))' },
+    input: {
+      borderRadius: '1.25rem',
+      backgroundColor: 'transparent',
+      color: 'hsl(var(--foreground))',
+      borderColor: 'hsl(var(--border))'
+    },
+    label: {
+      color: 'hsl(var(--foreground))',
+      fontSize: '0.875rem'
+    }
+  },
+};
 
 export const InstitutionPortal = () => {
   const navigate = useNavigate();
@@ -96,7 +124,11 @@ export const InstitutionPortal = () => {
   }
 
   return (
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+    <div className="min-h-screen bg-canvas text-midnight flex flex-col">
+      <div className="w-full flex items-center justify-end px-4 sm:px-6 py-4">
+        <LanguageSelector />
+      </div>
+      <div className="flex-1 flex items-center justify-center p-4 pt-0">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-3">
           <div className="flex justify-center">
@@ -134,25 +166,7 @@ export const InstitutionPortal = () => {
             <TabsContent value="signin">
               <Auth
                 supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
-                  style: {
-                    button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
-                    anchor: { color: 'hsl(var(--primary))' },
-                    container: { width: '100%' },
-                    message: { color: 'hsl(var(--destructive))' },
-                    input: {
-                      borderRadius: '0.375rem',
-                      backgroundColor: 'transparent',
-                      color: 'hsl(var(--foreground))',
-                      borderColor: 'hsl(var(--border))'
-                    },
-                    label: {
-                      color: 'hsl(var(--foreground))',
-                      fontSize: '0.875rem'
-                    }
-                  },
-                }}
+                appearance={authAppearance}
                 providers={[]}
                 view="sign_in"
                 redirectTo={`${window.location.origin}/institution-dashboard`}
@@ -162,25 +176,7 @@ export const InstitutionPortal = () => {
             <TabsContent value="signup">
               <Auth
                 supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
-                  style: {
-                    button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
-                    anchor: { color: 'hsl(var(--primary))' },
-                    container: { width: '100%' },
-                    message: { color: 'hsl(var(--destructive))' },
-                    input: {
-                      borderRadius: '0.375rem',
-                      backgroundColor: 'transparent',
-                      color: 'hsl(var(--foreground))',
-                      borderColor: 'hsl(var(--border))'
-                    },
-                    label: {
-                      color: 'hsl(var(--foreground))',
-                      fontSize: '0.875rem'
-                    }
-                  },
-                }}
+                appearance={authAppearance}
                 providers={[]}
                 view="sign_up"
                 redirectTo={`${window.location.origin}/institution-registration`}
@@ -200,6 +196,7 @@ export const InstitutionPortal = () => {
             <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

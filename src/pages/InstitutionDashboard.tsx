@@ -11,6 +11,8 @@ import {
   Siren, BedDouble, HeartPulse, Scissors, Ambulance
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { InstitutionPageHeader } from "@/components/institution/InstitutionPageHeader";
+import { archetypePalette } from "@/components/institution/archetypePalette";
 import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
@@ -64,7 +66,7 @@ interface ArchetypeConfig {
 
 const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
   solo_practice: {
-    label: "Solo Practice", color: "#0ea5e9", icon: <Stethoscope className="h-5 w-5" />,
+    label: "Solo Practice", color: archetypePalette.solo_practice, icon: <Stethoscope className="h-5 w-5" />,
     primaryAction: { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -76,7 +78,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   pharmacy: {
-    label: "Pharmacy", color: "#0073ea", icon: <Pill className="h-5 w-5" />,
+    label: "Pharmacy", color: archetypePalette.pharmacy, icon: <Pill className="h-5 w-5" />,
     primaryAction: { label: "Pharmacy Portal", path: "/pharmacy-portal", icon: <ShoppingCart className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "POS Billing", path: "/pharmacy-portal", icon: <ShoppingCart className="h-4 w-4" /> },
@@ -90,7 +92,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   wholesale_pharmacy: {
-    label: "Wholesale Distribution", color: "#7c3aed", icon: <Truck className="h-5 w-5" />,
+    label: "Wholesale Distribution", color: archetypePalette.wholesale_pharmacy, icon: <Truck className="h-5 w-5" />,
     primaryAction: { label: "Stock Control", path: "/pharmacy-inventory", icon: <Package className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Warehouse Stock", path: "/pharmacy-inventory", icon: <Package className="h-4 w-4" /> },
@@ -102,7 +104,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   diagnostics: {
-    label: "Laboratory & Diagnostics", color: "#a25ddc", icon: <FlaskConical className="h-5 w-5" />,
+    label: "Laboratory & Diagnostics", color: archetypePalette.diagnostics, icon: <FlaskConical className="h-5 w-5" />,
     primaryAction: { label: "Lab Management", path: "/lab-management", icon: <FlaskConical className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Test Requests", path: "/lab-management", icon: <ClipboardList className="h-4 w-4" /> },
@@ -115,7 +117,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   general_hospital: {
-    label: "Hospital", color: "#e44258", icon: <Heart className="h-5 w-5" />,
+    label: "Hospital", color: archetypePalette.general_hospital, icon: <Heart className="h-5 w-5" />,
     primaryAction: { label: "Full HMS", path: "/hospital-management", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "OPD Queue", path: "/hospital-management?tab=opd", icon: <Stethoscope className="h-4 w-4" /> },
@@ -134,7 +136,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   clinic: {
-    label: "Clinic", color: "#00c875", icon: <Stethoscope className="h-5 w-5" />,
+    label: "Clinic", color: archetypePalette.clinic, icon: <Stethoscope className="h-5 w-5" />,
     primaryAction: { label: "HMS Portal", path: "/hospital-management", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Appointments", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -149,7 +151,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   specialty_hospital: {
-    label: "Specialised Facility", color: "#0d9488", icon: <Stethoscope className="h-5 w-5" />,
+    label: "Specialised Facility", color: archetypePalette.specialty_hospital, icon: <Stethoscope className="h-5 w-5" />,
     primaryAction: { label: "HMS Portal", path: "/hospital-management", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Appointments", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -166,7 +168,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   long_term_care: {
-    label: "Long-Term Care", color: "#fdab3d", icon: <Heart className="h-5 w-5" />,
+    label: "Long-Term Care", color: archetypePalette.long_term_care, icon: <Heart className="h-5 w-5" />,
     primaryAction: { label: "Care Management", path: "/institution-dashboard?tab=care", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Residents", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
@@ -178,7 +180,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   dialysis_centre: {
-    label: "Dialysis Centre", color: "#0ea5e9", icon: <Activity className="h-5 w-5" />,
+    label: "Dialysis Centre", color: archetypePalette.dialysis_centre, icon: <Activity className="h-5 w-5" />,
     primaryAction: { label: "Dialysis Schedule", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Dialysis Schedule", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -191,7 +193,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   dental_clinic: {
-    label: "Dental Clinic", color: "#38bdf8", icon: <Stethoscope className="h-5 w-5" />,
+    label: "Dental Clinic", color: archetypePalette.dental_clinic, icon: <Stethoscope className="h-5 w-5" />,
     primaryAction: { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -204,7 +206,7 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
     ],
   },
   trauma_centre: {
-    label: "Trauma & Emergency", color: "#ef4444", icon: <Siren className="h-5 w-5" />,
+    label: "Trauma & Emergency", color: archetypePalette.trauma_centre, icon: <Siren className="h-5 w-5" />,
     primaryAction: { label: "Emergency Triage", path: "/institution-dashboard?tab=emergency", icon: <Siren className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Emergency Triage", path: "/institution-dashboard?tab=emergency", icon: <Siren className="h-4 w-4" /> },
@@ -240,6 +242,10 @@ export const InstitutionDashboard = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  // Dashboard fetch failure surface: without this, a failed fetch rendered
+  // a dashboard of zeros indistinguishable from a new facility (audit F6).
+  const [dataError, setDataError] = useState(false);
+  const [fetchRetryCount, setFetchRetryCount] = useState(0);
   // Precise facility identity + effective modules (DB-driven). The exact
   // type chosen at signup (type_code) drives the archetype, the header
   // label and the module set — not the coarse enum in `type`. The module
@@ -299,6 +305,7 @@ export const InstitutionDashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
+        setDataError(false);
         const instId = institution.id;
         const today = format(new Date(), "yyyy-MM-dd");
 
@@ -403,13 +410,14 @@ export const InstitutionDashboard = () => {
         setCounts({ personnel: personnelCount || providerIds.length, appointments: appointmentsCount, patients: uniquePatients, todayAppointments: todayCount, revenue: months.reduce((s, m) => s + m.revenue, 0) });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
+        setDataError(true);
       } finally {
         setDataLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, [institution]);
+  }, [institution, fetchRetryCount]);
 
   // Load the precise facility type + its effective modules from the DB.
   // Effective = tier charter overlaid with this institution's admin-granted
@@ -482,31 +490,31 @@ export const InstitutionDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
-        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl text-white flex items-center justify-center shadow-button" style={{ background: cfg.color }}>
-              {cfg.icon}
-            </div>
-            <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-                {institution.name}
-                <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
-                  {institution.is_verified ? "Verified" : "Pending"}
-                </span>
-                {isAdmin && (
-                  <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium bg-[#e5f0ff] text-[#0073ea] border border-[#bcd6ff]" title="You are the superadmin in charge of this institution">
-                    Super Admin
-                  </span>
-                )}
-              </h1>
-              <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
-                {headerLabel} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
+      <InstitutionPageHeader
+        className="py-5 shadow-sm"
+        icon={cfg.icon}
+        iconClassName="shadow-button"
+        iconStyle={{ background: cfg.color }}
+        title={institution.name}
+        badges={
+          <>
+            <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
+              {institution.is_verified ? "Verified" : "Pending"}
+            </span>
+            {isAdmin && (
+              <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium bg-primary-100 text-primary-600 border border-primary-200" title="You are the superadmin in charge of this institution">
+                Super Admin
+              </span>
+            )}
+          </>
+        }
+        subtitle={
+          <>
+            {headerLabel} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
+          </>
+        }
+        actions={
+          <>
             <button
               onClick={() => window.open("/kiosk", "_blank", "noopener")}
               className="vf-btn-secondary gap-1.5 text-sm"
@@ -526,20 +534,38 @@ export const InstitutionDashboard = () => {
                 <Settings className="h-3.5 w-3.5" /> Settings
               </button>
             )}
+          </>
+        }
+      />
+
+      {/* Dashboard data load failure — plain-language banner with retry
+          (previously a failed fetch silently rendered a dashboard of zeros). */}
+      {dataError && (
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
+          <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-error-200 bg-error-50 dark:bg-slate-900 px-4 py-3">
+            <p className="text-sm font-medium text-error-600 dark:text-slate-200">
+              We couldn't load your dashboard data. The numbers below may be incomplete — please try again.
+            </p>
+            <button
+              onClick={() => setFetchRetryCount((c) => c + 1)}
+              className="vf-btn-secondary gap-1.5 text-sm self-start sm:self-auto"
+            >
+              Retry
+            </button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Subscription renewal notice — only for effectively expired /
           past-due subscriptions; renders nothing otherwise. */}
       {subscriptionGate && (
-        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
           <SubscriptionExpiryBanner gate={subscriptionGate} isAdmin={isAdmin} />
         </div>
       )}
 
         {/* Main Suite Tab Navigation */}
-        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4 sticky top-[7.5rem] lg:top-[8.5rem] z-20 bg-canvas dark:bg-slate-950">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4 sticky top-[7.5rem] lg:top-[8.5rem] z-20 bg-canvas dark:bg-slate-950">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none" role="tablist" aria-label="Institution modules">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
