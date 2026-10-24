@@ -1,13 +1,19 @@
 import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, DollarSign, CheckCircle, Loader2, Receipt, TrendingUp, AlertCircle } from "lucide-react";
+import { Plus, DollarSign, CheckCircle, Loader2, Receipt, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
-import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
-import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { downloadReceiptPdf, downloadConsolidatedReceiptPdf } from "@/utils/receiptPdf";
+import {
+  buildHospitalBillLines,
+  matchServiceOrdered,
+  selectedChargesTotal,
+  unpricedCharges,
+  type AssembledCharge,
+  type PricedService,
+} from "@/lib/hospitalBilling";
 
 interface BillingProps {
   hospital: any;
@@ -24,127 +30,190 @@ const getPaymentPill = (status: string) => {
   }
 };
 
+interface PatientPolicy {
+  id: string;
+  provider_name: string;
+  policy_number: string;
+  active_today: boolean;
+  accepted_by_hospital: boolean;
+}
+
 export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: BillingProps) => {
-  const { formatPrice, currency } = useCurrency();
+  const { formatPrice } = useCurrency();
   const [showDialog, setShowDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState("");
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedVerification, setSelectedVerification] = useState<any>(null);
-  const [pendingPatientCharges, setPendingPatientCharges] = useState<any[]>([]);
+  const [pendingPatientCharges, setPendingPatientCharges] = useState<AssembledCharge[]>([]);
   const [isLoadingCharges, setIsLoadingCharges] = useState(false);
+  const [policies, setPolicies] = useState<PatientPolicy[]>([]);
+  const [selectedPolicyId, setSelectedPolicyId] = useState<string>("");
 
+  // E-14: charges are discovered from the encounter and matched to the
+  // hospital's service_pricing catalogue. Prices shown here are a
+  // preview read from those catalogue rows; the bill itself is priced
+  // and split by create_hospital_bill on the server. Charges with no
+  // price-list match are shown as "not on the price list" and can
+  // never be billed at a typed figure.
   const handlePatientSelect = async (patientId: string) => {
     setSelectedPatientId(patientId);
+    setPolicies([]);
+    setSelectedPolicyId("");
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes, tariffs, procRes, imagingRes, admissionsRes, ancRes, immRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, procRes, imagingRes, admissionsRes, ancRes, immRes, catalogueRes, policiesRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
-        supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
+        supabase.from("lab_tests").select("id, test_type").eq("patient_id", patientId).eq("payment_status", "pending"),
         supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
-        // Institution's own charge book first — hardcoded fallbacks only
-        // apply when a category has no tariff at all.
-        fetchInstitutionTariffs(hospital.id),
-        // Procedures / treatments executed for this patient at this facility.
         supabase.from("procedure_executions").select("id, procedure_id, execution_date, procedure:clinical_procedures(procedure_name)").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(100),
-        // Completed imaging orders (radiology) awaiting billing.
         supabase.from("imaging_orders" as any).select("id, modality, body_part, status, ordered_at").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(100),
-        // Active admissions with bed occupancy for per-day ward charges.
         supabase.from("hospital_admissions" as any).select("id, admission_date, bed_id, bed:hospital_beds(bed_number, bed_type)").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "admitted").limit(20),
-        // ANC visits (maternal & child health).
         supabase.from("anc_visits" as any).select("id, visit_number, visit_date").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(50),
-        // Administered immunizations.
         supabase.from("immunizations" as any).select("id, vaccine_name, dose_number, administered_date").eq("patient_id", patientId).eq("institution_id", hospital.id).not("administered_date", "is", null).limit(50),
+        supabase.from("service_pricing").select("id, service_code, service_label, base_price, category, institution_id")
+          .eq("is_active", true)
+          .or(`institution_id.eq.${hospital.id},institution_id.is.null`),
+        (supabase as any).rpc("list_patient_insurance", { p_hospital_id: hospital.id, p_patient_id: patientId }),
       ]);
-      // Institution procedure prices for the executions above.
-      const procIds = [...new Set(((procRes.data || []) as any[]).map((p: any) => p.procedure_id).filter(Boolean))];
-      let procPrices = new Map<string, number>();
-      if (procIds.length > 0) {
-        const { data: pricing } = await supabase.from("institution_procedure_pricing").select("procedure_id, price").eq("institution_id", hospital.id).in("procedure_id", procIds);
-        ((pricing || []) as any[]).forEach((p: any) => procPrices.set(p.procedure_id, Number(p.price) || 0));
-      }
-      const charges: any[] = [];
-      let calculatedTotal = 0;
+      const services = ((catalogueRes.data || []) as any[]).map((s) => ({
+        id: s.id,
+        service_code: s.service_code,
+        service_label: s.service_label,
+        base_price: Number(s.base_price) || 0,
+        category: s.category,
+        institution_id: s.institution_id,
+      })) as PricedService[];
+
+      const patientPolicies = ((policiesRes.data || []) as PatientPolicy[]);
+      setPolicies(patientPolicies);
+      const defaultPolicy = patientPolicies.find((p) => p.active_today && p.accepted_by_hospital);
+      setSelectedPolicyId(defaultPolicy?.id || "");
+
+      const charges: AssembledCharge[] = [];
       (apptsRes.data || []).forEach((a: any) => {
-        const fee = resolveTariffPrice(tariffs, 'opd', a.type, 150);
-        calculatedTotal += fee;
-        charges.push({ category: "Consultations", description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee, date: a.date, selected: true });
+        charges.push({
+          key: `appointment-${a.id}`,
+          category: "Consultations",
+          description: `Consultation (${a.type?.replace(/_/g, " ") || "General"}) - ${a.date}`,
+          date: a.date,
+          quantity: 1,
+          service: matchServiceOrdered(services, a.type || "", "consultation"),
+          source_kind: "appointment",
+          source_id: a.id,
+          selected: true,
+        });
       });
       (labsRes.data || []).forEach((l: any) => {
-        const fee = l.price || l.total_amount || resolveTariffPrice(tariffs, 'lab', l.test_type, 200);
-        calculatedTotal += fee;
-        charges.push({ category: "Laboratory", description: `Lab Test: ${l.test_type}`, amount: fee, date: (l as any).created_at || (l as any).test_date, selected: true });
+        charges.push({
+          key: `lab-${l.id}`,
+          category: "Laboratory",
+          description: `Lab Test: ${l.test_type}`,
+          date: (l as any).created_at || (l as any).test_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, l.test_type || ""),
+          source_kind: "lab_test",
+          source_id: l.id,
+          selected: true,
+        });
       });
       (rxsRes.data || []).forEach((r: any) => {
-        const unit = resolveTariffPrice(tariffs, 'pharmacy', r.medication_name, 50);
-        const fee = unit * (r.quantity || 1);
-        calculatedTotal += fee;
-        charges.push({ category: "Pharmacy", description: `Rx: ${r.medication_name}`, amount: fee, date: (r as any).created_at, selected: true });
+        charges.push({
+          key: `rx-${r.id}`,
+          category: "Pharmacy",
+          description: `Rx: ${r.medication_name}`,
+          date: (r as any).created_at,
+          quantity: Math.max(1, Number(r.quantity) || 1),
+          service: matchServiceOrdered(services, r.medication_name || ""),
+          source_kind: "prescription",
+          source_id: r.id,
+          selected: true,
+        });
       });
       ((procRes.data || []) as any[]).forEach((p: any) => {
-        const procName = p.procedure?.procedure_name || 'Procedure';
-        const fee = procPrices.get(p.procedure_id) || resolveTariffPrice(tariffs, 'surgery', procName, 0);
-        if (fee > 0) {
-          calculatedTotal += fee;
-          charges.push({ category: "Clinical Procedures", description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee, date: p.execution_date, selected: true });
-        }
+        const procName = p.procedure?.procedure_name || "Procedure";
+        charges.push({
+          key: `procedure-${p.id}`,
+          category: "Clinical Procedures",
+          description: `Procedure: ${procName} - ${p.execution_date || ""}`.trim(),
+          date: p.execution_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, procName),
+          source_kind: "procedure_execution",
+          source_id: p.id,
+          selected: true,
+        });
       });
-      // Radiology: completed imaging orders priced from the tariff book by
-      // modality + body part (e.g. "CT Head", "X-Ray Chest").
-      const modalityLabel: Record<string, string> = { xray: 'X-Ray', ct: 'CT Scan', mri: 'MRI', ultrasound: 'Ultrasound', mammography: 'Mammography' };
+      const modalityLabel: Record<string, string> = { xray: "X-Ray", ct: "CT Scan", mri: "MRI", ultrasound: "Ultrasound", mammography: "Mammography" };
       ((imagingRes.data || []) as any[]).forEach((o: any) => {
-        const label = `${modalityLabel[o.modality] || o.modality} ${o.body_part || ''}`.trim();
-        const fee = resolveTariffPrice(tariffs, 'radiology', label, resolveTariffPrice(tariffs, 'radiology', modalityLabel[o.modality] || o.modality, 0));
-        if (fee > 0) {
-          calculatedTotal += fee;
-          charges.push({ category: "Radiology & Imaging", description: `Imaging: ${label}`, amount: fee, date: o.ordered_at, selected: true });
-        }
+        const label = `${modalityLabel[o.modality] || o.modality} ${o.body_part || ""}`.trim();
+        charges.push({
+          key: `imaging-${o.id}`,
+          category: "Radiology & Imaging",
+          description: `Imaging: ${label}`,
+          date: o.ordered_at,
+          quantity: 1,
+          service: matchServiceOrdered(services, label, modalityLabel[o.modality] || o.modality || ""),
+          source_kind: "imaging_order",
+          source_id: o.id,
+          selected: true,
+        });
       });
-      // Ward & bed charges: per-day rate × days admitted for active admissions.
+      // Ward & bed charges: per-day service × days admitted (the day
+      // count is the quantity; the rate is the price-list row's price).
       ((admissionsRes.data || []) as any[]).forEach((a: any) => {
         if (!a.bed_id) return;
-        const bedType = (a.bed?.bed_type || 'general').toString();
+        const bedType = (a.bed?.bed_type || "general").toString();
         const admittedAt = new Date(a.admission_date).getTime();
         const days = Math.max(1, Math.ceil((Date.now() - admittedAt) / 86400000));
-        // Hint variants: "semi_private" -> "semi-private" to match tariff names like "Semi-Private Room".
-        const hint = bedType.replace(/_/g, '-');
-        const perDay = resolveTariffPrice(tariffs, 'ward', hint, resolveTariffPrice(tariffs, 'ward', bedType.replace(/_/g, ' '), 0));
-        if (perDay > 0 && days > 0) {
-          const fee = perDay * days;
-          calculatedTotal += fee;
-          const bedLabel = bedType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-          charges.push({ category: "Ward & Bed Charges", description: `Bed ${a.bed?.bed_number || ''} (${bedLabel}) × ${days} day${days > 1 ? 's' : ''}`.trim(), amount: fee, date: a.admission_date, selected: true });
-        }
+        const bedLabel = bedType.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+        charges.push({
+          key: `admission-${a.id}`,
+          category: "Ward & Bed Charges",
+          description: `Bed ${a.bed?.bed_number || ""} (${bedLabel}) × ${days} day${days > 1 ? "s" : ""}`.trim(),
+          date: a.admission_date,
+          quantity: days,
+          service: matchServiceOrdered(services, bedType.replace(/_/g, "-"), bedType, "ward", "bed"),
+          source_kind: "admission",
+          source_id: a.id,
+          selected: true,
+        });
       });
-      // ANC visits: each antenatal contact bills as a consultation.
       ((ancRes.data || []) as any[]).forEach((v: any) => {
-        const fee = resolveTariffPrice(tariffs, 'other', 'ANC', resolveTariffPrice(tariffs, 'opd', 'ANC', 200));
-        if (fee > 0) {
-          calculatedTotal += fee;
-          charges.push({ category: "Maternal & Child Health", description: `ANC Visit #${v.visit_number || '?'}`, amount: fee, date: v.visit_date, selected: true });
-        }
+        charges.push({
+          key: `anc-${v.id}`,
+          category: "Maternal & Child Health",
+          description: `ANC Visit #${v.visit_number || "?"}`,
+          date: v.visit_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, "ANC", "antenatal"),
+          source_kind: "anc_visit",
+          source_id: v.id,
+          selected: true,
+        });
       });
-      // Administered immunizations: specific vaccine price if set, else the
-      // standard vaccination administration fee.
       ((immRes.data || []) as any[]).forEach((im: any) => {
-        const label = `${im.vaccine_name || 'Vaccine'} (Dose ${im.dose_number ?? '?'})`;
-        const fee = resolveTariffPrice(tariffs, 'other', im.vaccine_name, resolveTariffPrice(tariffs, 'other', 'vaccination', 0));
-        if (fee > 0) {
-          calculatedTotal += fee;
-          charges.push({ category: "Maternal & Child Health", description: `Immunization: ${label}`, amount: fee, date: im.administered_date, selected: true });
-        }
+        charges.push({
+          key: `immunization-${im.id}`,
+          category: "Maternal & Child Health",
+          description: `Immunization: ${im.vaccine_name || "Vaccine"} (Dose ${im.dose_number ?? "?"})`,
+          date: im.administered_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, im.vaccine_name || "", "vaccination", "immunization"),
+          source_kind: "immunization",
+          source_id: im.id,
+          selected: true,
+        });
       });
+
+      setPendingPatientCharges(charges);
+      const matched = charges.filter((c) => c.service).length;
+      const unmatched = charges.length - matched;
       if (charges.length > 0) {
-        setPendingPatientCharges(charges);
-        setAmount(calculatedTotal.toString());
-        setDescription(charges.map((c) => c.description).join(", "));
-        toast.info(`Auto-populated ${charges.length} pending charges`);
-      } else {
-        setPendingPatientCharges([]);
-        setAmount("150");
-        setDescription("General Hospital Services");
+        toast.info(
+          unmatched > 0
+            ? `Found ${charges.length} charges — ${unmatched} are not on the price list and cannot be billed yet`
+            : `Auto-populated ${charges.length} pending charges`
+        );
       }
     } catch (e) {
       console.error("Error fetching patient charges:", e);
@@ -154,16 +223,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   };
 
   const toggleCharge = (index: number) => {
-    setPendingPatientCharges(prev => {
-      const next = prev.map((c, i) => i === index ? { ...c, selected: !c.selected } : c);
-      const total = next.filter(c => c.selected !== false).reduce((s, c) => s + (Number(c.amount) || 0), 0);
-      setAmount(total.toString());
-      setDescription(next.filter(c => c.selected !== false).map((c) => c.description).join(", "));
-      return next;
-    });
+    setPendingPatientCharges(prev => prev.map((c, i) => i === index && c.service ? { ...c, selected: !c.selected } : c));
   };
 
-  const selectedCharges = pendingPatientCharges.filter(c => c.selected !== false);
+  const selectedPricedCharges = pendingPatientCharges.filter(c => c.service && c.selected !== false);
+  const previewTotal = selectedChargesTotal(pendingPatientCharges);
+  const notOnPriceList = unpricedCharges(pendingPatientCharges);
 
   const totalRevenue = invoices?.reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const paidAmount = invoices?.filter((i: any) => i.payment_status === "paid").reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
@@ -187,79 +252,38 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   });
 
   const generateInvoice = async () => {
-    if (!selectedPatientId || !amount) return;
+    if (!selectedPatientId || selectedPricedCharges.length === 0) return;
     setIsSubmitting(true);
     try {
-      const total = Number(amount);
-      // Split payer allocation: insurer covers coverage%, patient covers the
-      // rest (copay / shortfall). Cash bills: patient owes 100%.
-      let paymentStatus: string = "pending";
-      let patientPortion = total;
-      let insurerPortion = 0;
-      let insuranceProvider: string | null = null;
-      let insurancePolicyNumber: string | null = null;
-      if (selectedVerification) {
-        const coverage = selectedVerification.coverage_percentage || 0;
-        insurerPortion = Math.round((total * coverage) / 100 * 100) / 100;
-        patientPortion = Math.round((total - insurerPortion) * 100) / 100;
-        insuranceProvider = selectedVerification.coverage_details?.provider || null;
-        if (coverage >= 100) paymentStatus = "paid";
-      }
-      const invoiceNumber = `INV-${Date.now().toString(36).toUpperCase()}`;
-      // NOTE: balance is a GENERATED column — do not insert it explicitly (error 428C9)
-      const { data: invData, error } = await supabase.from("hospital_billing" as any).insert({
-        hospital_id: hospital.id, patient_id: selectedPatientId, invoice_number: invoiceNumber,
-        total_amount: total, subtotal: total,
-        patient_portion: patientPortion, insurer_portion: insurerPortion,
-        insurance_provider: insuranceProvider, insurance_policy_number: insurancePolicyNumber,
-        items: selectedCharges.length > 0
-          ? selectedCharges.map((c: any) => ({ description: c.description, amount: c.amount, category: c.category }))
-          : [{ description: description || "Hospital services", amount: total }],
-        payment_status: paymentStatus,
-        due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
-      }).select("id").single();
+      // E-14: the server prices every line from the price list and
+      // computes the insurance split from the patient's policy — the
+      // payload carries ids, quantities and source references only.
+      const { data, error } = await (supabase as any).rpc("create_hospital_bill", {
+        p_hospital_id: hospital.id,
+        p_patient_id: selectedPatientId,
+        p_lines: buildHospitalBillLines(pendingPatientCharges),
+        p_insurance_info_id: selectedPolicyId || null,
+      });
       if (error) throw error;
-
-      // Auto-create the insurance claim so billing flows straight into the
-      // claims workbench — no manual re-entry. Best-effort: a claim failure
-      // must never block the invoice.
-      let insuranceClaimId: string | null = null;
-      if (selectedVerification && insurerPortion > 0 && invData) {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          const adm = (admissions || []).find((a: any) => a.patient_id === selectedPatientId);
-          const patientName = adm?.patient ? `${adm.patient.first_name || ""} ${adm.patient.last_name || ""}`.trim() : "Patient";
-          const { data: claimData, error: claimError } = await supabase.from("insurance_claims").insert({
-            institution_id: hospital.id,
-            hospital_billing_id: (invData as any).id,
-            patient_id: selectedPatientId,
-            patient_name: patientName,
-            insurance_provider: insuranceProvider || "Unknown",
-            policy_number: insurancePolicyNumber || "",
-            claim_amount: insurerPortion,
-            status: "submitted",
-            created_by: user?.id || selectedPatientId,
-          } as any).select("id").single();
-          if (!claimError && claimData) {
-            insuranceClaimId = (claimData as any).id;
-            await supabase.from("hospital_billing" as any).update({ insurance_claim_id: insuranceClaimId }).eq("id", (invData as any).id);
-          }
-        } catch (claimErr) {
-          console.error("Auto-claim creation failed (invoice kept):", claimErr);
-        }
+      const bill = (data as any)?.bill;
+      const unpriced = ((data as any)?.unpriced || []) as any[];
+      const claimId = (data as any)?.insurance_claim_id;
+      if (unpriced.length > 0) {
+        toast.warning(
+          `${unpriced.length} charge${unpriced.length > 1 ? "s were" : " was"} not billed — no price set yet: ${unpriced.map((u: any) => u.description).join(", ")}`
+        );
       }
-
       toast.success(
-        insuranceClaimId
-          ? `Invoice ${invoiceNumber} generated — claim filed for ${insuranceProvider}`
-          : `Invoice ${invoiceNumber} generated`
+        claimId
+          ? `Invoice ${bill?.invoice_number} generated — claim filed for ${bill?.insurance_provider}`
+          : `Invoice ${bill?.invoice_number} generated`
       );
       setShowDialog(false);
-      setSelectedPatientId(""); setAmount(""); setDescription(""); setSelectedVerification(null);
+      setSelectedPatientId(""); setPolicies([]); setSelectedPolicyId("");
       setPendingPatientCharges([]);
       onRefresh();
-    } catch (error) {
-      toast.error("Failed to generate invoice");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to generate invoice");
     } finally {
       setIsSubmitting(false);
     }
@@ -396,7 +420,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk max-w-md">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Generate Invoice</DialogTitle>
-            <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Create a billing record and auto-populate pending charges for a patient.</DialogDescription>
+            <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Charges are priced from the hospital price list and any insurance split is calculated on the server when the bill is generated.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2 text-xs">
             <div>
@@ -421,10 +445,11 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
               <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-1">
                 <p className="font-semibold text-slate-700 dark:text-slate-300 text-xs mb-2">Charges — untick to exclude from this bill</p>
                 {pendingPatientCharges.map((c, i) => (
-                  <label key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-2 py-2 transition-colors">
+                  <label key={c.key} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-2 py-2 transition-colors">
                     <input
                       type="checkbox"
-                      checked={c.selected !== false}
+                      checked={!!c.service && c.selected !== false}
+                      disabled={!c.service}
                       onChange={() => toggleCharge(i)}
                       className="h-5 w-5 accent-primary-500 shrink-0"
                     />
@@ -432,52 +457,74 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                       {c.description}
                       <span className="block text-xs text-slate-500 dark:text-slate-400">
                         {c.date ? `${new Date(c.date).toLocaleDateString()} · ` : ""}{c.category}
+                        {c.service ? ` · ${c.service.service_label}${c.quantity > 1 ? ` × ${c.quantity}` : ""}` : ""}
                       </span>
                     </span>
-                    <span className="font-mono font-semibold text-sm">{formatPrice(c.amount)}</span>
+                    {c.service ? (
+                      <span className="font-mono font-semibold text-sm">{formatPrice(c.service.base_price * c.quantity)}</span>
+                    ) : (
+                      <span className="text-xs font-bold text-warning-600 dark:text-warning-400 whitespace-nowrap">Not on the price list</span>
+                    )}
                   </label>
                 ))}
+                <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-700 flex items-center justify-between">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">Bill total (from price list)</span>
+                  <span className="font-mono font-bold text-sm">{formatPrice(previewTotal)}</span>
+                </div>
+                {notOnPriceList.length > 0 && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {notOnPriceList.length} charge{notOnPriceList.length > 1 ? "s are" : " is"} not on the price list and will not be billed. Add the service and its price to the price list first to bill {notOnPriceList.length > 1 ? "them" : "it"}.
+                  </p>
+                )}
               </div>
             )}
 
-            <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Amount ({currency === "USD" ? "$" : "K"})</label>
-              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
-            </div>
-            <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Description</label>
-              <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Consultation, Lab tests, etc." className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700" />
-            </div>
+            {selectedPatientId && !isLoadingCharges && pendingPatientCharges.length === 0 && (
+              <p className="text-xs text-slate-500 dark:text-slate-400">No pending charges were found for this patient.</p>
+            )}
 
             {selectedPatientId && (
-              <div className="space-y-3">
-                <InstitutionInsuranceVerification patientId={selectedPatientId} onVerified={(v) => setSelectedVerification(v)} />
-                {selectedVerification && (
-                  <div className="p-3 rounded-xl border border-success-500/30 bg-success-500/10 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-success-500" />
-                    <div>
-                      <p className="font-extrabold text-success-500 text-xs">Insurance: {selectedVerification.coverage_percentage}% covered</p>
-                      <p className="text-xs text-slate-600">Patient pays: {formatPrice((Number(amount) * (100 - selectedVerification.coverage_percentage)) / 100)}</p>
-                    </div>
-                  </div>
+              <div>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Insurance</label>
+                {policies.length > 0 ? (
+                  <Select value={selectedPolicyId || "none"} onValueChange={(v) => setSelectedPolicyId(v === "none" ? "" : v)}>
+                    <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Patient pays in full" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No insurance — patient pays in full</SelectItem>
+                      {policies.map((p) => (
+                        <SelectItem key={p.id} value={p.id} disabled={!p.active_today || !p.accepted_by_hospital}>
+                          {p.provider_name} · Policy {p.policy_number}
+                          {!p.active_today ? " (not active today)" : !p.accepted_by_hospital ? " (not billed by this hospital)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">No insurance on file — the patient pays in full.</p>
+                )}
+                {selectedPolicyId && (
+                  <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    The split between the insurer and the patient is calculated on the server from this policy's coverage terms when the bill is generated, and a claim is filed automatically.
+                  </p>
                 )}
               </div>
             )}
           </div>
           <DialogFooter>
             <button onClick={() => setShowDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-            {selectedCharges.length > 0 && (
+            {selectedPricedCharges.length > 0 && (
               <button
                 onClick={() => {
-                  // Group charges by category for the consolidated bill
+                  // Display-only consolidated bill from the same
+                  // price-list rows the server will bill from.
                   const byCat = new Map<string, any[]>();
-                  selectedCharges.forEach((c: any) => {
+                  selectedPricedCharges.forEach((c) => {
                     const cat = c.category || "Services";
                     if (!byCat.has(cat)) byCat.set(cat, []);
                     byCat.get(cat)!.push({
                       description: c.description,
-                      quantity: 1,
-                      unitPrice: c.amount,
+                      quantity: c.quantity,
+                      unitPrice: c.service!.base_price,
                     });
                   });
                   downloadConsolidatedReceiptPdf({
@@ -498,7 +545,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 <Receipt className="h-3.5 w-3.5" /> Consolidated Bill PDF
               </button>
             )}
-            <button onClick={generateInvoice} disabled={!selectedPatientId || !amount || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1">
+            <button onClick={generateInvoice} disabled={!selectedPatientId || selectedPricedCharges.length === 0 || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Generate Invoice
             </button>
           </DialogFooter>

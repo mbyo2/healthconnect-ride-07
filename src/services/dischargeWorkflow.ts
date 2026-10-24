@@ -8,6 +8,11 @@
  * Drafts carry a zero total with a "to be completed" line — billing staff
  * complete them in the Billing tab (bed days, procedures, pharmacy).
  * Zero-total pending drafts do not move revenue KPIs.
+ *
+ * E-14: drafts are opened by the ensure_hospital_billing_draft RPC.
+ * The previous direct insert silently failed on every call — it passed
+ * an explicit value for the GENERATED balance column (428C9) and the
+ * error was swallowed by the non-fatal catch below.
  */
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,31 +24,12 @@ export async function ensureBillingDraft(
     return { created: false, error: 'Missing hospital or admission' };
   }
   try {
-    const { data: existing } = await (supabase.from('hospital_billing' as any) as any)
-      .select('id')
-      .eq('admission_id', admission.id)
-      .limit(1);
-    if (existing && existing.length > 0) return { created: false };
-
-    const { error } = await (supabase.from('hospital_billing' as any) as any).insert({
-      hospital_id: hospitalId,
-      patient_id: admission.patient_id,
-      admission_id: admission.id,
-      invoice_number: `INV-${Date.now().toString(36).toUpperCase()}`,
-      total_amount: 0,
-      subtotal: 0,
-      balance: 0,
-      payment_status: 'pending',
-      items: [
-        {
-          description: `Bed & ward charges ${admission.admission_number ? `(${admission.admission_number})` : ''} — complete in Billing`,
-          amount: 0,
-        },
-      ],
-      due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
+    const { data, error } = await (supabase as any).rpc('ensure_hospital_billing_draft', {
+      p_hospital_id: hospitalId,
+      p_admission_id: admission.id,
     });
     if (error) throw error;
-    return { created: true };
+    return { created: !!(data as any)?.created };
   } catch (err: any) {
     // Never break discharge when billing hiccups — staff can raise the
     // invoice manually from the Billing tab.
