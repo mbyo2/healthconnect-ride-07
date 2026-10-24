@@ -32,6 +32,7 @@ interface AppointmentData {
   reason?: string;
   type: string;
   provider_id: string;
+  institution_id?: string | null;
   consultation_fee?: number | null;
   duration?: number | null;
 }
@@ -47,6 +48,56 @@ export const AppointmentDetails = () => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [videoConsultation, setVideoConsultation] = useState<{ id: string; meeting_url: string | null; status: string } | null>(null);
+  const [canComplete, setCanComplete] = useState(false);
+
+  // "Mark Complete" visibility mirrors the server rule
+  // (appointment_actor_has_clinical_role in
+  // 20261025_stagec3_appointment_status_pinning.sql): the caller must be
+  // THIS appointment's assigned provider, platform admin/super_admin
+  // (user_roles), staff/personnel of THIS appointment's institution,
+  // that institution's admin, or a staff member who shares an institution
+  // with the assigned provider. Holding any non-patient role somewhere
+  // else is NOT enough — the server refuses those transitions, so the
+  // button must not be offered.
+  useEffect(() => {
+    let cancelled = false;
+    const resolveCanComplete = async () => {
+      setCanComplete(false);
+      if (!user?.id || !appointment) return;
+      if (appointment.provider_id === user.id) {
+        if (!cancelled) setCanComplete(true);
+        return;
+      }
+      if (availableRoles.includes('admin' as any) || availableRoles.includes('super_admin' as any)) {
+        if (!cancelled) setCanComplete(true);
+        return;
+      }
+      try {
+        const [myPersonnel, myStaff, myAdminOf, providerPersonnel, providerStaff] = await Promise.all([
+          supabase.from('institution_personnel' as any).select('institution_id').eq('user_id', user.id),
+          supabase.from('institution_staff' as any).select('institution_id').eq('provider_id', user.id).eq('is_active', true),
+          supabase.from('healthcare_institutions' as any).select('id').eq('admin_id', user.id),
+          supabase.from('institution_personnel' as any).select('institution_id').eq('user_id', appointment.provider_id),
+          supabase.from('institution_staff' as any).select('institution_id').eq('provider_id', appointment.provider_id).eq('is_active', true),
+        ]);
+        const idsOf = (res: any) => new Set<string>((res?.data ?? []).map((r: any) => r.institution_id ?? r.id));
+        const mine = new Set<string>([...idsOf(myPersonnel), ...idsOf(myStaff), ...idsOf(myAdminOf)]);
+        if (appointment.institution_id && mine.has(appointment.institution_id)) {
+          if (!cancelled) setCanComplete(true);
+          return;
+        }
+        // shares_institution_with_provider: any institution we both serve
+        const providers = new Set<string>([...idsOf(providerPersonnel), ...idsOf(providerStaff)]);
+        if ([...mine].some((inst) => providers.has(inst))) {
+          if (!cancelled) setCanComplete(true);
+        }
+      } catch {
+        // Visibility check failed — stay hidden; the server remains the gate.
+      }
+    };
+    resolveCanComplete();
+    return () => { cancelled = true; };
+  }, [user?.id, appointment?.id, appointment?.provider_id, appointment?.institution_id]);
 
   useEffect(() => {
     fetchAppointment();
@@ -213,8 +264,9 @@ export const AppointmentDetails = () => {
             )}
             {appointment.status !== "cancelled" && appointment.status !== "completed" && (
               <>
-                {/* Only the assigned provider (or admin) can mark complete — patients cannot */}
-                {(availableRoles.some(r => r !== 'patient') || appointment.provider_id === user?.id) && (
+                {/* Server-aligned visibility (stagec3 pinning): assigned
+                    provider / this institution's staff / platform admin only */}
+                {canComplete && (
                 <button
                   onClick={async () => {
                     try {
