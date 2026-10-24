@@ -8,5 +8,11 @@ url = "https://tthzcijscedgxjfnfnky.supabase.co/functions/v1"
 name = "resend"
 url = "https://api.resend.com"
 
+# P3-19 (2026-10-24): resolved to verify_jwt = true, agreeing with
+# supabase/config.toml (the authoritative inventory). create-admin-user
+# must require an authenticated admin caller: it verifies the caller's
+# JWT and has_role('admin'/'super_admin') in-code, and its only call
+# sites (CreateAdmin, SuperAdminDashboard) invoke it with the signed-in
+# admin's session. The previous `false` here was the conflicting value.
 [functions.create-admin-user]
-verify_jwt = false
+verify_jwt = true

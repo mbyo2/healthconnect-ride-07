@@ -12,10 +12,21 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Validate cron secret for authentication
+  // Validate cron secret for authentication.
+  // P3-13: the secret is MANDATORY. If CRON_SECRET is not configured the
+  // function refuses every call (503, fail-closed — the same pattern the
+  // webhooks use) instead of comparing against an unset value.
   const cronSecret = req.headers.get("x-cron-secret");
   const expectedSecret = Deno.env.get("CRON_SECRET");
-  
+
+  if (!expectedSecret) {
+    console.error("CRON_SECRET is not configured — refusing all reminder runs");
+    return new Response(JSON.stringify({ error: "Reminder service not configured" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 503,
+    });
+  }
+
   if (!cronSecret || cronSecret !== expectedSecret) {
     console.log("Unauthorized request attempt - invalid or missing cron secret");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
