@@ -189,7 +189,13 @@ export function PrescriptionFulfillment() {
   };
 
   const handleCreateMultiRx = async () => {
-    if (!selectedPatient) {
+    // P0-7: never write a prescription without an authenticated prescriber.
+    // provider_id must be the session user — never fall back to the patient.
+    if (!user?.id) {
+      toast({ title: "You must be signed in to create a prescription.", variant: "destructive" });
+      return;
+    }
+    if (!selectedPatient?.id) {
       toast({ title: "Please select a patient", variant: "destructive" });
       return;
     }
@@ -229,7 +235,7 @@ export function PrescriptionFulfillment() {
       const prescribedDate = new Date().toISOString();
 
       const inserts = medicationItems.map((m) => ({
-        provider_id: user?.id || selectedPatient.id,
+        provider_id: user.id,
         patient_id: selectedPatient.id,
         pharmacy_id: institutionId || null,
         prescription_number: rxNo,
@@ -248,7 +254,13 @@ export function PrescriptionFulfillment() {
         .insert(inserts)
         .select("id");
 
-      if (error) throw error;
+      // P0-7: the server-side safety gate refuses allergy/interaction
+      // conflicts with HTTP 400 + a plain-language message — show that
+      // message verbatim so the pharmacist sees WHY, not a generic failure.
+      if (error) {
+        toast({ title: error.message || "Failed to dispense prescription", variant: "destructive" });
+        return;
+      }
 
       // FEFO-dispense the batch ledger, one atomic call per line, linked to
       // the prescription row it fulfills.
@@ -300,6 +312,27 @@ export function PrescriptionFulfillment() {
 
   const updateFulfillmentStatus = async (prescriptionId: string, newStatus: string) => {
     try {
+      // P1-27: never dispense from stale dropdown state. Re-fetch the
+      // prescription's current status from the server first; only the valid
+      // pre-dispense state ('pending' in this component's status vocabulary)
+      // may proceed. Anything else aborts with NOTHING changed — no stock
+      // movement, no local or server status write.
+      if (newStatus === "filled" && isOnline) {
+        const { data: fresh, error: freshError } = await (supabase as any)
+          .from("comprehensive_prescriptions")
+          .select("status, fulfillment_status")
+          .eq("id", prescriptionId)
+          .single();
+        const currentStatus = (fresh as any)?.status ?? (fresh as any)?.fulfillment_status;
+        if (freshError || currentStatus !== "pending") {
+          toast({
+            title: "This prescription is no longer awaiting dispensing — it may already have been filled or cancelled.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       // GAP-02/GAP-04: filling an Rx decrements the batch ledger via FEFO.
       // Dispense first; on any failure the status update is skipped so the
       // queue still shows the prescription as pending.

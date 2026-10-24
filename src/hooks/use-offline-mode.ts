@@ -9,6 +9,11 @@ export interface OfflineAction {
   table?: string;
   data?: any; // For update operations
   timestamp?: string;
+  // Set when sync attempted the action and it failed — the entry is RETAINED
+  // (never silently dropped) so the queue UI keeps showing it as pending
+  // with its failure reason.
+  status?: 'pending' | 'failed';
+  error?: string;
 }
 
 // Map of features and their availability in offline mode
@@ -137,6 +142,24 @@ export const useOfflineMode = () => {
     }
   }, []);
 
+  // Mark an action as failed WITHOUT removing it — a failed/offline change
+  // must stay visible in the queue (with its error) until it truly syncs.
+  // Persisted to IndexedDB so the failure state survives the reload below.
+  const markActionFailed = async (action: OfflineAction, error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error || 'Sync failed');
+    const failed: OfflineAction = { ...action, status: 'failed', error: message };
+    setPendingActions(prev => prev.map(a => (a.id === action.id ? failed : a)));
+    try {
+      const db = await openIndexedDB('offlineActionsDB', 1);
+      if (!db) return;
+      const tx = db.transaction('pendingActions', 'readwrite');
+      const store = tx.objectStore('pendingActions');
+      await store.put(failed);
+    } catch (e) {
+      console.error('Error marking offline action as failed:', e);
+    }
+  };
+
   // Process queued actions when back online
   const syncPendingActions = useCallback(async () => {
     if (!isOnline || pendingActions.length === 0) return;
@@ -146,29 +169,47 @@ export const useOfflineMode = () => {
         await processOfflineAction(action);
         await removeCompletedAction(action.id);
       } catch (error) {
+        // FAIL LOUDLY: retain the entry, stamp it with the error, and tell
+        // the user — never remove an action that did not actually sync.
         console.error(`Error processing action ${action.type}:`, error);
+        await markActionFailed(action, error);
+        toast({
+          title: "Offline change failed to sync",
+          description: error instanceof Error ? error.message : "A queued change could not be synced and was kept in the queue.",
+          variant: "destructive",
+        });
       }
     }
-    
+
     // Reload pending actions to update UI
     loadPendingActions();
   }, [isOnline, pendingActions]);
 
-  // Process a single offline action
+  // Process a single offline action.
+  // ENGINE RULE (P1-28): an action type with no real server implementation
+  // must THROW — syncPendingActions only removes an entry after this
+  // resolves, so throwing retains the entry and marks it failed. Previously
+  // UPDATE_PRESCRIPTION_STATUS fell through with `break`, so a status change
+  // queued offline was silently deleted as "completed" while the server
+  // still showed the old status (double-dispense risk).
   const processOfflineAction = async (action: OfflineAction) => {
     console.log('Processing offline action:', action);
-    
-    // Here you'd implement different strategies for each action type
-    // This is just an example and should be expanded based on your needs
+
     switch (action.type) {
       case 'UPDATE_PRESCRIPTION_STATUS':
-        // Handle prescription status update
-        break;
-        
-      // Add more cases for different action types
-        
+        // No server sync path exists for offline prescription status
+        // updates in this hook — fail loudly instead of vanishing.
+        throw new Error(
+          'Prescription status changes made offline cannot be synced — the server record was NOT updated. Re-check the prescription status while online before dispensing.'
+        );
+
+      // Add more cases for different action types — each case must either
+      // perform the real server write or throw.
+
       default:
-        console.warn('Unknown offline action type:', action.type);
+        throw new Error(
+          `Offline action "${action.type}" has no sync implementation — this change was NOT saved to the server.`
+        );
     }
   };
 

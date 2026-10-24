@@ -18,10 +18,10 @@ import { ListSkeleton } from '@/components/ui/list-skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { usePatientNames } from '@/hooks/usePatientNames';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { DrugInteractionAlert } from '@/components/clinical/DrugInteractionAlert';
-import { AllergyAlertSystem } from '@/components/clinical/AllergyAlertSystem';
 
 const DRUG_CATEGORIES = ['Analgesics', 'Antibiotics', 'Antivirals', 'Antihypertensives', 'Antidiabetics', 'Vitamins', 'Antipyretics', 'Antihistamines', 'IV Fluids', 'Controlled', 'Other'];
 
@@ -49,6 +49,9 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
     patient_name: '',
     notes: '',
   });
+  // P0-7: prescriptions must attach a real patient — selected from the
+  // facility's known patients (same source as OPD/IPD/lab modules).
+  const [selectedPatientId, setSelectedPatientId] = useState('');
   const [rxMedications, setRxMedications] = useState<Array<{ id: string; medication_name: string; dosage: string; quantity: number; instructions: string }>>([
     { id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }
   ]);
@@ -60,33 +63,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
     notes: ''
   });
 
-  // Dispense safety gate — allergy + interaction screening before release.
-  const [safetyRx, setSafetyRx] = useState<any>(null);
-  const [safetyOthers, setSafetyOthers] = useState<string[]>([]);
-
-  const openDispenseCheck = async (rx: any) => {
-    setSafetyRx(rx);
-    setSafetyOthers([]);
-    if (rx.patient_id) {
-      try {
-        const { data } = await (supabase.from('comprehensive_prescriptions' as any) as any)
-          .select('medication_name')
-          .eq('patient_id', rx.patient_id)
-          .eq('status', 'active')
-          .neq('id', rx.id)
-          .limit(20);
-        setSafetyOthers(((data || []) as any[]).map((r) => r.medication_name).filter(Boolean));
-      } catch {
-        setSafetyOthers([]);
-      }
-    }
-  };
-
-  const confirmDispense = async () => {
-    if (!safetyRx) return;
-    await dispense(safetyRx, 'completed');
-    setSafetyRx(null);
-  };
+  const { patients: hospitalPatients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
 
   const { data: inventory, loading, error, refresh } = useHospitalModule<any>(
     'pharmacy_inventory', 'pharmacy_id', hospital?.id, { orderBy: 'product_name', ascending: true }
@@ -158,12 +135,25 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       toast.error('Add at least one medication');
       return;
     }
+    // P0-7: never write anonymous prescription rows — a real patient and
+    // the signed-in prescriber are mandatory.
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      toast.error('You must be signed in to create a prescription.');
+      return;
+    }
+    if (!selectedPatientId) {
+      toast.error('Select a patient before creating a prescription.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const rxNumber = `RX-HOSP-${Date.now().toString(36).toUpperCase()}`;
       const prescribedDate = new Date().toISOString().split('T')[0];
 
       const inserts = valid.map(m => ({
+        patient_id: selectedPatientId,
+        provider_id: user.id,
         pharmacy_id: hospital.id,
         prescription_number: rxNumber,
         medication_name: m.medication_name.trim(),
@@ -172,15 +162,19 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         instructions: m.instructions || 'Take as directed',
         status: 'pending',
         prescribed_date: prescribedDate,
-        notes: rxForm.notes ? `[Patient: ${rxForm.patient_name}] ${rxForm.notes}` : (rxForm.patient_name ? `Patient: ${rxForm.patient_name}` : null)
+        notes: rxForm.notes || null
       }));
 
+      // The server-side safety gate refuses allergy/interaction conflicts
+      // (HTTP 400 + plain-language message); the catch below surfaces
+      // err.message verbatim so the prescriber sees WHY.
       const { error: err } = await (supabase.from('comprehensive_prescriptions' as any) as any).insert(inserts);
       if (err) throw err;
 
       toast.success(`Prescription with ${valid.length} medication(s) logged (Rx #${rxNumber})`);
       setShowAddRx(false);
       setRxForm({ patient_name: '', notes: '' });
+      setSelectedPatientId('');
       setRxMedications([{ id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }]);
       refreshRx();
     } catch (e: any) {
@@ -329,7 +323,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       <td className="py-3 px-3 font-extrabold">{rx.quantity ?? '1'}</td>
                       <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500 capitalize">{rx.status}</span></td>
                       <td className="py-3 px-3 text-center">
-                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center gap-1 mx-auto">
+                        <button onClick={() => dispense(rx, 'completed')} className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center gap-1 mx-auto">
                           <CheckCircle2 className="h-3 w-3" /> Dispense
                         </button>
                       </td>
@@ -626,15 +620,17 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Write Hospital Prescription (Multi-Drug)</DialogTitle></DialogHeader>
           <form onSubmit={handleCreateRx} className="space-y-3 py-2 text-xs">
-            <div>
-              <Label className="text-xs font-bold">Patient / Inpatient Name</Label>
-              <Input
-                value={rxForm.patient_name}
-                onChange={e => setRxForm({ ...rxForm, patient_name: e.target.value })}
-                placeholder="e.g. Inpatient Jane Doe - Bed #4"
-                className="h-8 text-xs"
-              />
-            </div>
+            <HospitalPatientSelect
+              patients={hospitalPatients}
+              loading={patientsLoading}
+              value={selectedPatientId}
+              onChange={(id) => {
+                setSelectedPatientId(id);
+                const p = hospitalPatients.find(pt => pt.id === id);
+                setRxForm({ ...rxForm, patient_name: p?.name || '' });
+              }}
+              label="Patient *"
+            />
 
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
@@ -784,40 +780,6 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Dispense safety gate — allergy + interaction screening */}
-      <Dialog open={!!safetyRx} onOpenChange={(v) => { if (!v) setSafetyRx(null); }}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-amber-500" /> Safety Check Before Dispensing
-            </DialogTitle>
-          </DialogHeader>
-          {safetyRx && (
-            <div className="space-y-3 py-2">
-              <p className="text-sm">
-                <strong>{safetyRx.medication_name}</strong> ({safetyRx.dosage || safetyRx.strength || 'as directed'})
-                {' '}→ {nameFor(safetyRx.patient_id) || 'walk-in patient'}
-              </p>
-              {safetyRx.patient_id ? (
-                <AllergyAlertSystem patientId={safetyRx.patient_id} compact />
-              ) : (
-                <p className="text-xs text-amber-600 font-medium">
-                  No linked patient record — confirm allergies verbally before handing over.
-                </p>
-              )}
-              <DrugInteractionAlert
-                prescribedDrugs={[safetyRx.medication_name, ...safetyOthers].filter(Boolean)}
-              />
-              <div className="flex gap-2 pt-1">
-                <Button variant="outline" className="flex-1" onClick={() => setSafetyRx(null)}>Cancel</Button>
-                <Button className="flex-1 bg-success-500 hover:bg-success-600 text-white" onClick={confirmDispense}>
-                  <CheckCircle2 className="h-4 w-4 mr-1" /> Confirm Dispense
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -39,8 +39,8 @@ interface FoundPatient {
  *  - Preselected: patientId/patientName given (e.g. from a records row) — goes
  *    straight to the reason step.
  *  - Search: no patient given — the clinician finds the patient by name via
- *    find_patient_for_emergency (identity only, every lookup audit-logged),
- *    then gives the reason.
+ *    emergency_patient_search (identity only; the server audit-logs every
+ *    lookup itself), then gives the reason.
  *
  * Clinical staff only; mandatory reason (10+ chars) + explicit confirmation;
  * the grant lasts 4 hours and is fully audited.
@@ -96,15 +96,9 @@ export function BreakGlassDialog({
       });
       if (error) throw error;
       const rows = (data || []) as FoundPatient[];
-      // Fail-closed accountability: the lookup is audit-logged before any
-      // identity is shown. If the audit write fails, show nothing.
-      if (rows.length > 0) {
-        const { error: logError } = await (supabase as any).rpc("log_emergency_lookup", {
-          p_term: term,
-          p_ids: rows.map((r) => r.pid),
-        });
-        if (logError) throw logError;
-      }
+      // The server-side emergency_patient_search writes the audit row
+      // itself — no client-side log_emergency_lookup call here (it would
+      // double-log every lookup).
       setResults(rows);
       setSearched(true);
     } catch (e: any) {
