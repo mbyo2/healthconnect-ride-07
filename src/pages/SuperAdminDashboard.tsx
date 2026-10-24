@@ -13,6 +13,7 @@ import { syncAdminLevel } from "@/lib/adminLevelSync";
 import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
 import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
 import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
+import { MarketplaceListingApprovals } from "@/components/admin/MarketplaceListingApprovals";
 import { Button } from "@/components/ui/button";
 
 type AdminUser = {
@@ -309,6 +310,9 @@ const SuperAdminDashboard = () => {
 
         {/* Payment Mode Approvals — institution mode-switch inbox */}
         <PaymentModeApprovals />
+
+        {/* Marketplace Listing Approvals — institution listing inbox */}
+        <MarketplaceListingApprovals />
 
       </div>
     </div>

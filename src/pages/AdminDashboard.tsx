@@ -29,6 +29,7 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { SupportWorkflow } from "@/components/workflows/SupportWorkflow";
 import { WithdrawalAdminQueue } from "@/components/admin/WithdrawalAdminQueue";
 import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
+import { MarketplaceListingApprovals } from "@/components/admin/MarketplaceListingApprovals";
 import { UserDeletionPanel } from "@/components/admin/UserDeletionPanel";
 import { format, subMonths, startOfMonth } from "date-fns";
 
@@ -431,7 +432,12 @@ export const AdminDashboard = () => {
             <TabsContent value="modules"><InstitutionModuleManager /></TabsContent>
             <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
             <TabsContent value="payouts"><WithdrawalAdminQueue /></TabsContent>
-            <TabsContent value="payment-modes"><PaymentModeApprovals /></TabsContent>
+            <TabsContent value="payment-modes">
+              <div className="space-y-6">
+                <PaymentModeApprovals />
+                <MarketplaceListingApprovals />
+              </div>
+            </TabsContent>
             {isSuperAdmin && <TabsContent value="commissions"><CommissionSettings /></TabsContent>}
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>
             <TabsContent value="security"><SecurityDashboard /></TabsContent>
