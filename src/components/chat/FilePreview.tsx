@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FileAttachment } from "@/types/communication";
 import { FileText, Image, Paperclip } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { safeHttpsUrl } from "@/utils/safeLink";
 
 interface FilePreviewProps {
   attachment: FileAttachment;
@@ -12,11 +13,16 @@ interface FilePreviewProps {
 const SIGNED_URL_TTL_SECONDS = 3600;
 
 export const FilePreview = ({ attachment }: FilePreviewProps) => {
-  // Legacy rows store a full public URL in file_url — render those
-  // exactly as before. New rows store a storage path inside the private
-  // chat-attachments bucket, which must be resolved to a signed URL
-  // (read access is enforced by the participant storage policy).
-  const isFullUrl = /^https?:\/\//i.test(attachment.file_url);
+  // Legacy rows store a full public URL in file_url. P2-33: file_url is
+  // stored data written by the other participant's client, so a legacy
+  // value may only render as a link when it passes the https allowlist
+  // (safeHttpsUrl) — javascript:/data:/http:/credentialed URLs fall
+  // through to the storage-path branch, fail signed-URL resolution, and
+  // render as plain text. New rows store a storage path inside the
+  // private chat-attachments bucket, resolved to a signed URL (read
+  // access is enforced by the participant storage policy).
+  const legacyUrl = safeHttpsUrl(attachment.file_url);
+  const isFullUrl = legacyUrl !== null;
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +50,7 @@ export const FilePreview = ({ attachment }: FilePreviewProps) => {
     return <Paperclip className="h-3 w-3" />;
   };
 
-  const href = isFullUrl ? attachment.file_url : signedUrl;
+  const href = isFullUrl ? legacyUrl : safeHttpsUrl(signedUrl);
 
   if (!href) {
     // Path-format attachment whose signed URL has not resolved (or was
