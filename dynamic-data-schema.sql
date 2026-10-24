@@ -1,4 +1,11 @@
 -- ============================================================================
+-- SUPERSEDED — DO NOT RUN. This is a historical one-off schema script kept
+-- for reference only. It is NOT part of the migration path (supabase/migrations/)
+-- and parts of it predate the 2026-10 security hardening — several policies in
+-- it use shapes (e.g. USING(true)) that were deliberately removed live.
+-- Running it against production would RE-OPEN closed audit findings (P3-23).
+-- ============================================================================
+-- ============================================================================
 -- DYNAMIC DATA TABLES - Replace Hardcoded Values
 -- Run this in Supabase SQL Editor
 -- ============================================================================

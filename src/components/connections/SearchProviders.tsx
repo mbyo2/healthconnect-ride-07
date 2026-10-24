@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { orIlikePattern } from '@/utils/postgrestFilter';
 import { useAuth } from '@/context/AuthContext';
 import { useConnections } from '@/hooks/useConnections';
 import { Search, UserPlus } from 'lucide-react';
@@ -33,7 +34,8 @@ export const SearchProviders = () => {
         .neq('id', user.id);
 
       if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+        const like = orIlikePattern(searchTerm);
+        query = query.or(`first_name.ilike.${like},last_name.ilike.${like},specialty.ilike.${like}`);
       }
 
       const { data, error } = await query.limit(20);

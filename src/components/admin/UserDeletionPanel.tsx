@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizeOrSearchTerm } from '@/utils/postgrestFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,7 +77,7 @@ export function UserDeletionPanel() {
   const searchUsers = async (term: string) => {
     setSearching(true);
     try {
-      const q = term.replace(/[%_,()]/g, '');
+      const q = sanitizeOrSearchTerm(term);
       const like = `%${q}%`;
       const { data, error } = await supabase
         .from('profiles')

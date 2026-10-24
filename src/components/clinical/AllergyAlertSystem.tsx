@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { orIlikePattern } from '@/utils/postgrestFilter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -220,7 +221,7 @@ export const checkDrugRiskLevel = async (drugName: string): Promise<{ risk_level
   const { data } = await supabase
     .from('drug_risk_levels' as any)
     .select('*')
-    .or(`drug_name.ilike.%${drugName}%,generic_name.ilike.%${drugName}%`)
+    .or(`drug_name.ilike.${orIlikePattern(drugName)},generic_name.ilike.${orIlikePattern(drugName)}`)
     .limit(1)
     .maybeSingle();
   return data as any;

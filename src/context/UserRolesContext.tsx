@@ -33,13 +33,23 @@ function sameRoleSet(a: UserRole[], b: UserRole[]): boolean {
 }
 
 /**
- * Expand raw role strings (user_roles DB rows + profiles.role only) into
- * the full capability set. Single implementation used by both the initial
- * fetch and refreshRoles so the two can never disagree.
+ * Expand raw role strings (user_roles DB rows only) into the full
+ * capability set. Single implementation used by both the initial fetch
+ * and refreshRoles so the two can never disagree.
  *
  * SECURITY (P1-25): auth user_metadata is user-writable and is NEVER a
  * role source. Roles come from the server: user_roles rows (admin-granted,
- * RLS-enforced) plus the profiles row the server maintains.
+ * RLS-enforced).
+ *
+ * P2-8 (Stage C2b): profiles.role / profiles.admin_level are NO LONGER
+ * role sources anywhere — client or server. Every RLS policy that gated
+ * on them was re-gated onto user_roles (has_role / has_admin_scope) in
+ * the stagec2b_a migrations; the profiles columns survive only as
+ * display/sync artefacts (kept in step by trg_sync_admin_level_from_roles).
+ * Merging profile.role here historically injected the signup-trigger
+ * default ('patient' for verified providers) into the available-role set
+ * and let a stale admin_level confer admin UI affordances the server no
+ * longer honours.
  *
  * Clinical cadres inherit the legacy 'health_personnel' catch-all so
  * provider dashboards, calendars and shared components keep working.
@@ -175,12 +185,11 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             rolesData.forEach(r => { if (r.role) rawRoles.push(r.role); });
           }
 
-          // 2. Add profile role (server-maintained row).
-          // NOTE: user_metadata is deliberately NOT read here — it is
-          // user-writable and must never confer a role (P1-25).
-          if (profile?.role) {
-            rawRoles.push(profile.role);
-          }
+          // 2. profiles.role is deliberately NOT merged (P2-8): it is a
+          // display/sync artefact, not an authority. user_metadata is
+          // likewise never read — it is user-writable and must never
+          // confer a role (P1-25). If user_roles returned nothing,
+          // expandRawRoles falls back to the 'patient' baseline.
 
           // 3. Role Expansion for related capabilities (shared helper)
           const roles = expandRawRoles(rawRoles);
@@ -196,9 +205,13 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           setUserRole(prev => (prev === primaryRole ? prev : primaryRole));
           setCurrentRole(prev => (prev === primaryRole ? prev : primaryRole));
 
-          const newAdminLevel = (roles.includes('admin') || roles.includes('super_admin'))
-            ? (roles.includes('super_admin') ? 'superadmin' : 'admin')
-            : (profile?.admin_level as AdminLevel);
+          // Admin level derives ONLY from user_roles (P2-8) — never from
+          // profiles.admin_level, which is a synced display artefact.
+          const newAdminLevel = roles.includes('super_admin')
+            ? 'superadmin'
+            : roles.includes('admin')
+              ? 'admin'
+              : null;
           setAdminLevel(prev => (prev === newAdminLevel ? prev : newAdminLevel));
 
           // Baseline only (P1-25): if the server has no role rows for this
@@ -215,7 +228,9 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (err) {
           console.error('Unexpected error in fetchRoles:', err);
-          const fallbackRole = (profile?.role || 'patient') as UserRole;
+          // Degraded-mode fallback is the baseline 'patient' role only —
+          // profiles.role must not confer roles even here (P2-8).
+          const fallbackRole = 'patient' as UserRole;
           setAvailableRoles(prev => (sameRoleSet(prev, [fallbackRole]) ? prev : [fallbackRole]));
           setUserRole(prev => (prev === fallbackRole ? prev : fallbackRole));
           setCurrentRole(prev => (prev === fallbackRole ? prev : fallbackRole));
@@ -278,11 +293,11 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id);
 
       if (rolesData && rolesData.length > 0) {
-        // Same sources (user_roles rows + profile role — never
-        // user_metadata), same expansion AND same primary-role selection
-        // as the initial fetch — the two can never disagree.
+        // Same single source (user_roles rows — never user_metadata,
+        // never profiles.role; P2-8), same expansion AND same
+        // primary-role selection as the initial fetch — the two can
+        // never disagree.
         const rawRoles = rolesData.map(r => String(r.role));
-        if (profile?.role) rawRoles.push(profile.role);
         const roles = expandRawRoles(rawRoles);
         setAvailableRoles(prev => (sameRoleSet(prev, roles) ? prev : roles));
         const primaryRole = ROLE_PRIORITY.find(r => roles.includes(r)) || roles[0];

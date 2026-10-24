@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { orIlikePattern } from '@/utils/postgrestFilter';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
@@ -28,7 +29,7 @@ export const PharmacyCustomers = () => {
     queryFn: async () => {
       let query = (supabase as any).from('pharmacy_customers').select('*')
         .eq('pharmacy_id', pharmacyId!).order('last_visit_at', { ascending: false, nullsFirst: false });
-      if (search) query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+      if (search) { const like = orIlikePattern(search); query = query.or(`name.ilike.${like},phone.ilike.${like}`); }
       const { data } = await query.limit(50);
       return data || [];
     },

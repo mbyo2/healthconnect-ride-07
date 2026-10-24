@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizeOrSearchTerm } from '@/utils/postgrestFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,7 +80,7 @@ export function UserManagement() {
     try {
       setIsLoading(true);
 
-      const q = term.trim().replace(/[%_,()]/g, '');
+      const q = sanitizeOrSearchTerm(term);
       let query = supabase
         .from('profiles')
         .select('id, email, first_name, last_name, created_at, is_profile_complete')

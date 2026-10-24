@@ -442,11 +442,14 @@ export const Prescriptions = () => {
       if (error) throw error;
 
       // Record any acknowledged safety override in the security audit log.
-      // security_audit_log's INSERT policy is WITH CHECK (true) ("System can
-      // insert security logs"), so a clinician insert is permitted; it uses
-      // the event_type/event_data columns from the table's migration. The
-      // same override text is already appended to the prescription notes
-      // above, so a failure here is logged but never blocks the prescription.
+      // NOTE (P3-26, verified live in Stage C2b): direct client INSERTs
+      // into security_audit_log are REFUSED by RLS — the binding live
+      // INSERT policies are the scoped marketplace flows and service-role
+      // only, so this best-effort insert fails and is only logged. The
+      // authoritative override record is written server-side by the
+      // medication-screening gate (same transaction as the prescription),
+      // and the override text is also appended to the prescription notes
+      // above — a failure here never blocks the prescription.
       if (overrideLines.length > 0) {
         try {
           const { error: auditError } = await (supabase as any)
