@@ -172,20 +172,21 @@ serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Decode JWT directly to get user ID (more reliable than auth.getUser() 
-    // which depends on Auth API availability and key configuration)
-    let patientId: string;
-    try {
-      const token = authHeader.replace('Bearer ', '');
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      patientId = payload.sub;
-      if (!patientId) throw new Error('No sub in token');
-    } catch (e) {
+    // Verify the JWT cryptographically via the Auth API using a user-scoped
+    // client. NEVER decode-and-trust the payload: an unsigned/forged token
+    // must be rejected here (audit P1-19).
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userErr } = await userClient.auth.getUser(token);
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const patientId: string = user.id;
 
     const body = await req.json();
     const parsed = RequestSchema.safeParse(body);

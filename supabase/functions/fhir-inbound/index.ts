@@ -10,7 +10,12 @@
  *   Observation        -> comprehensive_health_metrics
  *
  * Every inbound exchange is logged to fhir_exchanges (direction=inbound)
- * and to audit_logs. Requires a user JWT (the receiving clinician/admin).
+ * and to audit_logs. Authorization (audit P1-20): requires a verified user
+ * JWT AND a clinical/integration role (doctor, nurse, pharmacist, admin,
+ * super_admin, etc. — see CLINICAL_ROLES), AND, when the bundle targets an
+ * existing patient, an existing care relationship with that patient
+ * (has_care_relationship) unless the caller is admin/super_admin. A plain
+ * patient account can never write into another patient's chart.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -20,6 +25,19 @@ const corsHeaders = {
 };
 
 const SUPPORTED = ['Patient', 'Condition', 'MedicationRequest', 'Observation'];
+
+// Roles allowed to file inbound FHIR data (audit P1-20). Anything else
+// (notably a bare patient account) is rejected with 403.
+const CLINICAL_ROLES = new Set([
+  'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
+  'dentist', 'dental_therapist', 'radiologist', 'radiographer',
+  'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife',
+  'pharmacist', 'pharmacy_technologist', 'pathologist',
+  'physiotherapist', 'occupational_therapist', 'nutritionist',
+  'optometrist', 'optician', 'psychologist', 'community_health_worker',
+  'environmental_health_officer', 'ambulance_staff', 'ot_staff',
+  'triage_staff', 'traditional_practitioner', 'admin', 'super_admin',
+]);
 
 function bad(msg: string, status = 400) {
   return new Response(JSON.stringify({ ok: false, error: msg }), {
@@ -49,6 +67,18 @@ Deno.serve(async (req) => {
 
     // Service-role client for writes (bypasses RLS; we enforce auth above)
     const db = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Role gate (audit P1-20): holding any authenticated account is NOT
+    // enough — the caller must hold a clinical/integration role.
+    const { data: roleRows } = await db
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const callerRoles = (roleRows || []).map((r: any) => String(r.role));
+    const isPlatformAdmin = callerRoles.includes('admin') || callerRoles.includes('super_admin');
+    if (!callerRoles.some((r: string) => CLINICAL_ROLES.has(r))) {
+      return bad('Clinical or integration role required', 403);
+    }
 
     const body = await req.json();
     const { bundle, source_system } = body || {};
@@ -130,6 +160,34 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Care-relationship gate (audit P1-20): filing into an EXISTING
+    // patient's chart requires a care relationship with that patient,
+    // unless the caller is a platform admin/super_admin.
+    if (!isPlatformAdmin) {
+      const { data: hasRel, error: relErr } = await db.rpc('has_care_relationship', {
+        _provider: user.id,
+        _patient: patientId,
+      });
+      if (relErr || hasRel !== true) {
+        await db.from('fhir_exchanges').update({
+          status: 'rejected',
+          error_message: 'Caller has no care relationship with the target patient',
+          updated_at: new Date().toISOString(),
+        }).eq('id', exchange?.id);
+        await db.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'fhir_inbound_rejected',
+          resource: 'fhir_exchanges',
+          resource_id: exchange?.id,
+          details: { source_system, reason: 'no_care_relationship', patient_id: patientId },
+          severity: 'warning',
+          category: 'data_modification',
+          outcome: 'failure',
+        });
+        return bad('No care relationship with this patient', 403);
+      }
+    }
+
     await db.from('fhir_exchanges').update({ patient_id: patientId }).eq('id', exchange?.id);
 
     // 2. Conditions -> comprehensive_medical_records
@@ -163,7 +221,18 @@ Deno.serve(async (req) => {
         prescribed_date: (m.authoredOn || new Date().toISOString()).slice(0, 10),
         notes: `Imported via FHIR from ${source_system}`,
       }).select('id').single();
-      if (!error) results.push({ resourceType: 'MedicationRequest', action: 'imported', id: data.id });
+      if (error) {
+        // The live DB prescribing-safety gate (allergy/interaction triggers)
+        // refuses unsafe prescriptions at insert time. Surface that refusal
+        // as a clean 422 naming the conflict — never a silent drop or a 500.
+        await db.from('fhir_exchanges').update({
+          status: 'rejected',
+          error_message: `Prescription safety check failed: ${error.message}`,
+          updated_at: new Date().toISOString(),
+        }).eq('id', exchange?.id);
+        return bad(`Prescription safety check failed: ${error.message}`, 422);
+      }
+      results.push({ resourceType: 'MedicationRequest', action: 'imported', id: data.id });
     }
 
     // 4. Observations -> comprehensive_health_metrics

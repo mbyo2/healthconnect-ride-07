@@ -175,13 +175,55 @@ export async function verifyAndSettleLenco(
     .eq('lenco_reference', lencoReference)
     .maybeSingle();
 
+  // ── AMOUNT INTEGRITY (audit P1-21) ─────────────────────────────────
+  // The ledger row's amount originates from client-influenced init paths
+  // (e.g. lenco-widget-init persists the client-supplied amount), so it can
+  // NEVER be trusted on its own at settle time. Lenco's status response is
+  // authoritative for what was actually collected: if the collected amount
+  // or currency does not match the ledger row, settle NOTHING and flag the
+  // row instead of crediting the ledger amount. Tolerance mirrors the
+  // price-guard (0.01) — any larger drift in either direction fails closed.
+  let amountMismatch: {
+    collected_amount: number | null;
+    collected_currency: string | null;
+    ledger_amount: number;
+    ledger_currency: string;
+  } | null = null;
+  if (status === 'paid' && existing) {
+    const collectedAmount =
+      data.amount != null && String(data.amount).trim() !== '' ? Number(data.amount) : null;
+    const collectedCurrency = data.currency ? String(data.currency).toUpperCase() : null;
+    const ledgerAmount = Number((existing as any).amount);
+    const ledgerCurrency = String((existing as any).currency || 'ZMW').toUpperCase();
+    const amountOff =
+      collectedAmount == null ||
+      !Number.isFinite(collectedAmount) ||
+      Math.abs(collectedAmount - ledgerAmount) > 0.01;
+    const currencyOff = collectedCurrency != null && collectedCurrency !== ledgerCurrency;
+    if (amountOff || currencyOff) {
+      amountMismatch = {
+        collected_amount: collectedAmount,
+        collected_currency: collectedCurrency,
+        ledger_amount: ledgerAmount,
+        ledger_currency: ledgerCurrency,
+      };
+      console.error(
+        `verifyAndSettleLenco: AMOUNT MISMATCH for ${lencoReference} — collected ` +
+          `${collectedAmount} ${collectedCurrency} vs ledger ${ledgerAmount} ${ledgerCurrency}. Settlement refused.`,
+      );
+    }
+  }
+  const effectiveStatus: LencoSettledStatus = amountMismatch ? 'failed' : status;
+
   const { data: row } = await admin
     .from('lenco_payments')
     .update({
-      status,
+      status: effectiveStatus,
       lenco_collection_id: data.id || null,
       lenco_lenco_reference: data.lencoReference || null,
-      result_message: data.reasonForFailure || data.status || null,
+      result_message: amountMismatch
+        ? `amount_mismatch: collected ${amountMismatch.collected_amount} ${amountMismatch.collected_currency ?? ''} != ledger ${amountMismatch.ledger_amount} ${amountMismatch.ledger_currency} — settlement refused`
+        : data.reasonForFailure || data.status || null,
       metadata: {
         ...((existing?.metadata as any) ?? {}),
         last_status_check: new Date().toISOString(),
@@ -189,14 +231,17 @@ export async function verifyAndSettleLenco(
         fee: data.fee ?? null,
         operator_transaction_id: data.mobileMoneyDetails?.operatorTransactionId ?? null,
         account_name: data.mobileMoneyDetails?.accountName ?? null,
+        ...(amountMismatch ? { amount_mismatch: { ...amountMismatch, flagged_at: new Date().toISOString() } } : {}),
       },
     })
     .eq('lenco_reference', lencoReference)
     .select()
     .maybeSingle();
 
-  let settlement: unknown = null;
-  if (status === 'paid' && row) {
+  let settlement: unknown = amountMismatch
+    ? { settled: false, reason: 'amount_mismatch', ...amountMismatch }
+    : null;
+  if (effectiveStatus === 'paid' && row) {
     const alreadySettled = (row.metadata as any)?.settlement?.settled === true;
     if (!alreadySettled) {
       settlement = await settlePayment(admin as any, {
@@ -225,7 +270,7 @@ export async function verifyAndSettleLenco(
     }
   }
 
-  return { status, payment: row, settlement };
+  return { status: effectiveStatus, payment: row, settlement };
 }
 
 /**

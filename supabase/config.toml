@@ -95,6 +95,18 @@ verify_jwt = true
 [functions.create-admin-user]
 verify_jwt = true
 
+# Audit P1-19: triage-assess previously ran with verify_jwt = false and
+# trusted an unverified JWT payload. The function now verifies via
+# auth.getUser(); pin gateway verification on as defence in depth.
+[functions.triage-assess]
+verify_jwt = true
+
+[functions.fhir-inbound]
+verify_jwt = true
+
+[functions.send-email-campaign]
+verify_jwt = true
+
 
 [functions.dpo-create-token]
 verify_jwt = false
