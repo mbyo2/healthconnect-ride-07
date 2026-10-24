@@ -225,19 +225,17 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      // Capture the provider's configured consultation fee at booking time.
-      // Providers set consultation_fee_min/max on their profile; the booking
-      // persists the agreed fee so payments and earnings validate against it.
-      // Per CEO pricing model: the fee is the provider's listed price exactly —
-      // no new-visit markup. Virtual visits get a 0.7x telehealth adjustment.
-      const baseFee =
+      // Providers set consultation_fee_min/max on their profile; bookings
+      // persist the provider's listed price exactly. The server trigger
+      // enforce_appointment_fee re-derives it from the provider's profile at
+      // insert, so no client value can override it. When the provider has
+      // set no fee, NULL persists (fee confirmed at booking) — never an
+      // invented price.
+      const consultationFee =
         provider.consultation_fee_min ??
         provider.consultation_fee_max ??
         provider.consultation_fee ??
         null;
-      const consultationFee = baseFee !== null
-        ? Math.round(baseFee * (appointmentType === "virtual" ? 0.7 : 1))
-        : null;
 
       const selectedDependent =
         bookingFor !== 'self'
