@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useContext, useMemo, useCall
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
-import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import { cacheProfile, readCachedProfile, clearCachedProfile } from '@/utils/profileCache';
 import { clearApiCaches } from '@/utils/service-worker';
 import { withTimeout, TIMEOUTS } from '@/utils/async';
 import type { Profile } from '@/types/profile';
@@ -31,18 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load cached profile for instant UI (display only — role is re-fetched from server)
-    const cachedProfile = safeLocalGet('doc_oclock_profile');
+    // Load the minimal cached profile subset for instant UI (display
+    // only — P2-32: id/name/avatar in sessionStorage, never the full
+    // profile in localStorage; role is always re-fetched from server).
+    // readCachedProfile also purges any legacy full-profile localStorage
+    // copy left by older versions.
+    const cachedProfile = readCachedProfile();
     if (cachedProfile) {
-      try {
-        const cleanCache = cachedProfile.trim().replace(/^\uFEFF/, '');
-        const parsed = JSON.parse(cleanCache);
-        // Strip role from cache — always trust server for authorization
-        setProfile({ ...parsed, role: parsed.role }); // display only, overwritten by fetchProfile
-      } catch (e) {
-        console.error('Error parsing cached profile', e);
-        safeLocalRemove('doc_oclock_profile'); // Clear corrupted cache
-      }
+      setProfile(cachedProfile as any); // display only, overwritten by fetchProfile
     }
 
     // Set up auth state listener FIRST
@@ -61,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (event === 'SIGNED_OUT') {
           setProfile(null);
-          safeLocalRemove('doc_oclock_profile');
+          clearCachedProfile();
         }
       }
     );
@@ -83,9 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        // If we have a cached profile, we can stop loading immediately
-        // and let the fresh profile fetch happen in the background
-        if (safeLocalGet('doc_oclock_profile')) {
+        // If we have a cached profile subset, we can stop loading
+        // immediately and let the fresh profile fetch happen in the background
+        if (readCachedProfile()) {
           setIsLoading(false);
           clearTimeout(loadGuardTimer);
           fetchProfile(currentSession.user.id); // Fetch fresh data in background
@@ -171,8 +167,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: roleData || profileData.role || 'patient',
         };
         setProfile(fullProfile);
-        // Cache for display only — role is always re-validated on next fetchProfile
-        safeLocalSet('doc_oclock_profile', JSON.stringify(fullProfile));
+        // Cache the minimal display subset only (P2-32) — role and all
+        // PII/clinical fields stay in memory and are re-fetched fresh.
+        cacheProfile(fullProfile);
       } else {
         // If no profile exists, create a basic one
         console.log('No profile found, creating basic profile for:', userId);
@@ -224,10 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ...newProfile,
               role: roleData || profileRole
             });
-            safeLocalSet('doc_oclock_profile', JSON.stringify({
-              ...newProfile,
-              role: roleData || profileRole
-            }));
+            cacheProfile(newProfile);
           }
         }
       }
@@ -287,6 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_API_CACHE' });
     } catch { /* non-fatal */ }
     await clearApiCaches();
+    clearCachedProfile();
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error('Error signing out');
