@@ -11,23 +11,14 @@ interface CostBreakdownProps {
   appointmentType: "physical" | "virtual";
   visitType: "new" | "returning";
   specialty?: string;
-  /** Real published fees from the provider directory (ZMW). When present they
-      replace the generic specialty table below. */
+  /** Real published fees from the provider directory (ZMW). The displayed
+      total is the provider's actual listed fee — never an invented
+      specialty-table price, and never discounted by visit type. */
   feeMin?: number | null;
   feeMax?: number | null;
 }
 
-const BASE_COSTS: Record<string, number> = {
-  "Cardiology": 300,
-  "Dermatology": 200,
-  "Pediatrics": 180,
-  "General Practice": 150,
-  "Orthopedics": 350,
-  "Neurology": 400,
-  "Psychiatry": 250,
-};
-
-export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, feeMax }: CostBreakdownProps) => {
+export const CostBreakdown = ({ feeMin, feeMax }: CostBreakdownProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [insurance, setInsurance] = useState<any>(null);
@@ -61,22 +52,23 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
     })();
   }, [user]);
 
-  // Compute base cost in ZMW. Prefer the provider's real published fee range;
-  // the hardcoded specialty table is only a fallback when no fee is listed.
-  // Per CEO pricing model: bookings must reflect the provider's set price
-  // exactly — no new-visit markup. The listed fee is the price.
+  // The displayed total is the provider's actual listed fee, exactly —
+  // the same for virtual and in-person, new and returning visits. When
+  // the provider has published no fee there is nothing honest to
+  // estimate against, so no totals are shown at all.
   const listedFee = feeMin ?? feeMax ?? null;
-  const baseCost = (listedFee ?? BASE_COSTS[specialty || ""] ?? 150) *
-    (appointmentType === "virtual" ? 0.7 : 1);
-  const total = Math.round(baseCost);
 
-  const coveragePercent = verification?.coverage_percentage ?? (insurance ? 80 : 0);
-  const copay = verification?.copay_amount ?? (insurance ? 30 : 0);
-  const deductibleRemaining = verification?.deductible_remaining ?? (insurance ? 250 : 0);
+  // Insurance math comes ONLY from a real insurance_verifications row.
+  // An insurance_information record on its own proves nothing about
+  // coverage — no default percentages, copays or deductibles are shown.
+  const coveragePercent = verification?.coverage_percentage ?? 0;
+  const copay = verification?.copay_amount ?? 0;
+  const deductibleRemaining = verification?.deductible_remaining ?? 0;
 
-  const insuranceCovers = insurance ? Math.round(total * (coveragePercent / 100)) : 0;
-  const deductibleApplied = insurance ? Math.min(deductibleRemaining, Math.max(0, total - copay)) : 0;
-  const outOfPocket = insurance
+  const total = listedFee ?? 0;
+  const insuranceCovers = verification ? Math.round(total * (coveragePercent / 100)) : 0;
+  const deductibleApplied = verification ? Math.min(deductibleRemaining, Math.max(0, total - copay)) : 0;
+  const outOfPocket = verification
     ? Math.max(copay, Math.round(total - insuranceCovers + deductibleApplied))
     : total;
 
@@ -90,6 +82,44 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
     );
   }
 
+  if (listedFee === null) {
+    // Honest unset state: the provider hasn't published a fee, so there
+    // are no Service total / You pay figures and no insurance math.
+    return (
+      <Card className="p-4 space-y-3 border-primary/20 bg-primary/[0.02]">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-foreground flex items-center gap-2">
+            <Calculator className="h-4 w-4 text-primary" />
+            Estimated Cost
+          </h4>
+        </div>
+
+        <p className="text-sm font-medium text-foreground">
+          Your provider&apos;s fee: Fee confirmed at booking
+        </p>
+        <p className="text-sm text-muted-foreground">
+          This provider hasn&apos;t published a fee yet. The exact fee is
+          confirmed when they accept your booking.
+        </p>
+
+        {!insurance && (
+          <Link
+            to="/insurance-cards"
+            className="flex items-center gap-2 text-xs text-primary hover:underline p-2 bg-amber-500/5 border border-amber-500/20 rounded-lg"
+          >
+            <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
+            Add insurance to get coverage estimates
+          </Link>
+        )}
+
+        <p className="text-xs text-muted-foreground flex items-start gap-1">
+          <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+          Estimate only. Final cost depends on services rendered and verified coverage.
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 space-y-3 border-primary/20 bg-primary/[0.02]">
       <div className="flex items-center justify-between">
@@ -97,23 +127,26 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
           <Calculator className="h-4 w-4 text-primary" />
           Estimated Cost
         </h4>
-        {insurance ? (
+        {verification ? (
           <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20">
             <ShieldCheck className="h-3 w-3 mr-1" />
             Insured
+          </Badge>
+        ) : insurance ? (
+          <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20">
+            <ShieldCheck className="h-3 w-3 mr-1" />
+            Insured — coverage not verified
           </Badge>
         ) : (
           <Badge variant="outline">Self-pay</Badge>
         )}
       </div>
 
-      {(feeMin != null || feeMax != null) && (
-        <p className="text-sm font-medium text-foreground">
-          {feeMin != null && feeMax != null && feeMin !== feeMax
-            ? `Your provider's fee: K${feeMin} – K${feeMax}`
-            : `Your provider's fee: K${feeMin ?? feeMax}`}
-        </p>
-      )}
+      <p className="text-sm font-medium text-foreground">
+        {feeMin != null && feeMax != null && feeMin !== feeMax
+          ? `Your provider's fee: K${feeMin} – K${feeMax}`
+          : `Your provider's fee: K${feeMin ?? feeMax}`}
+      </p>
 
       {!insurance && (
         <Link
@@ -130,7 +163,7 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
           <span className="text-muted-foreground">Service total</span>
           <span className="font-medium text-foreground">K{total.toFixed(2)}</span>
         </div>
-        {insurance && (
+        {verification && (
           <>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
@@ -159,6 +192,9 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
       <p className="text-xs text-muted-foreground flex items-start gap-1">
         <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
         Estimate only. Final cost depends on services rendered and verified coverage.
+        {insurance && !verification && (
+          <> Coverage hasn&apos;t been verified yet — this estimate assumes you pay the full fee.</>
+        )}
       </p>
     </Card>
   );

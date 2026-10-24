@@ -19,6 +19,7 @@ import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import LocalisationTaxCard from "@/components/settings/LocalisationTaxCard";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
+import { requestMarketplaceListingChange, fetchPendingListingRequest } from "@/utils/marketplaceListingRequests";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -317,6 +318,62 @@ const InstitutionSettings = () => {
     }
   };
 
+  // ── Marketplace listing change requests ───────────────────────────
+  // list_in_marketplace is platform-governed too: the trust-column guard
+  // refuses direct changes by institution callers, so toggling the switch
+  // files a request (security_audit_log, event_type
+  // 'marketplace_listing_requested') that an admin approves in the
+  // Marketplace Listing Approvals inbox. The switch always reflects the
+  // APPLIED value; formData.list_in_marketplace is never mutated by it.
+  const [pendingListingRequest, setPendingListingRequest] = useState<{ to_listed: boolean; created_at: string } | null>(null);
+  const [requestingListing, setRequestingListing] = useState(false);
+
+  useEffect(() => {
+    if (!institution?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const pending = await fetchPendingListingRequest(institution.id);
+        if (!cancelled && pending) setPendingListingRequest(pending);
+      } catch {
+        /* non-fatal: the toggle still works without the banner */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [institution?.id]);
+
+  const appliedListed = !!(institution?.list_in_marketplace ?? formData.list_in_marketplace);
+
+  const requestListingChange = async (toListed: boolean) => {
+    if (!institution?.id || requestingListing) return;
+    if (pendingListingRequest) {
+      toast.info("A listing change request is already awaiting admin review.", {
+        description: "Your current visibility stays in effect until an admin approves it.",
+        duration: 5000,
+      });
+      return;
+    }
+    setRequestingListing(true);
+    try {
+      await requestMarketplaceListingChange({
+        institutionId: institution.id,
+        institutionName: formData.name || institution.name,
+        fromListed: appliedListed,
+        toListed,
+      });
+      setPendingListingRequest({ to_listed: toListed, created_at: new Date().toISOString() });
+      toast.success("Listing change request sent to platform admins.", {
+        description: "Your current visibility stays in effect until an admin approves the change.",
+        duration: 6000,
+      });
+    } catch (e: any) {
+      console.error("Failed to log listing change request:", e);
+      toast.error(e?.message || "Could not send the listing change request. Please try again.");
+    } finally {
+      setRequestingListing(false);
+    }
+  };
+
   const handleModuleToggle = async (moduleKey: string, moduleName: string, currentlyLive: boolean) => {
     if (!institution?.id) return;
     try {
@@ -374,7 +431,10 @@ const InstitutionSettings = () => {
           // payment_mode is deliberately NOT saved here: it is governed by
           // platform admins (see requestPaymentModeChange + the DB guard
           // trigger in 20261020_payment_mode_guard.sql).
-          list_in_marketplace: formData.list_in_marketplace,
+          // list_in_marketplace is likewise deliberately NOT saved here:
+          // the trust-column guard refuses direct changes (42501) and
+          // listing changes go through admin approval (see
+          // requestListingChange below).
           services_offered: formData.services_offered,
           equipment_available: formData.equipment_available,
           languages_spoken: formData.languages_spoken,
@@ -408,7 +468,6 @@ const InstitutionSettings = () => {
         country: formData.country,
         operating_hours: formData.operating_hours,
         accepted_insurance_providers: formData.accepted_insurance_providers,
-        list_in_marketplace: formData.list_in_marketplace,
         services_offered: formData.services_offered,
         equipment_available: formData.equipment_available,
         languages_spoken: formData.languages_spoken,
@@ -528,7 +587,7 @@ const InstitutionSettings = () => {
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   When enabled, patients searching for healthcare facilities will find your institution.
-                  Disable this to use the platform for internal HMS operations only.
+                  Listing changes are approved by platform admins, so toggling this switch sends them a request instead of changing your visibility right away.
                 </p>
                 {formData.payment_mode === 'own' && (
                   <p className="text-xs text-amber-600 font-medium mt-2">
@@ -538,7 +597,8 @@ const InstitutionSettings = () => {
               </div>
               <Switch
                 id="list_in_marketplace"
-                checked={formData.list_in_marketplace}
+                checked={appliedListed}
+                disabled={!!pendingListingRequest || requestingListing}
                 onCheckedChange={checked => {
                   if (checked && formData.payment_mode === 'own') {
                     // Block: own-mode institutions need admin approval to list
@@ -553,16 +613,22 @@ const InstitutionSettings = () => {
                     requestPaymentModeChange('platform');
                     return;
                   }
-                  setFormData(p => ({ ...p, list_in_marketplace: checked }));
-                  toast.info(
-                    checked
-                      ? "Institution will appear in public searches after saving."
-                      : "Institution will be hidden from public searches after saving.",
-                    { duration: 4000 }
-                  );
+                  if (pendingListingRequest) {
+                    toast.info("A listing change request is already awaiting admin review.", {
+                      description: "Your current visibility stays in effect until an admin approves it.",
+                      duration: 5000,
+                    });
+                    return;
+                  }
+                  requestListingChange(checked);
                 }}
               />
             </div>
+            {pendingListingRequest && (
+              <p className="text-xs font-medium text-amber-600 mt-3">
+                ⏳ Listing change requested{pendingListingRequest.created_at ? ` on ${new Date(pendingListingRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review. Your current visibility stays in effect until an admin approves.
+              </p>
+            )}
 
             {/* Payment Mode: platform vs own — READ-ONLY. Mode changes are
                 approved by platform admins; institutions request them. */}

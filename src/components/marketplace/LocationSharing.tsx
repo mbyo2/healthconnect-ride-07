@@ -10,6 +10,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapPin, Loader2 } from "lucide-react";
+import { requestMarketplaceListingChange, fetchPendingListingRequest } from "@/utils/marketplaceListingRequests";
 
 function LocationPicker({
   position,
@@ -49,6 +50,10 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [shareLocation, setShareLocation] = useState(false);
   const [listInMarketplace, setListInMarketplace] = useState(false);
+  const [institutionName, setInstitutionName] = useState<string | null>(null);
+  const [paymentMode, setPaymentMode] = useState<string | null>(null);
+  const [pendingListingRequest, setPendingListingRequest] = useState<{ to_listed: boolean; created_at: string } | null>(null);
+  const [requestingListing, setRequestingListing] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -56,14 +61,22 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
         if (institutionId) {
           const { data } = await (supabase as any)
             .from("healthcare_institutions")
-            .select("latitude, longitude, list_in_marketplace")
+            .select("latitude, longitude, list_in_marketplace, name, payment_mode")
             .eq("id", institutionId)
             .maybeSingle();
           if (data?.latitude && data?.longitude) {
             setPosition([Number(data.latitude), Number(data.longitude)]);
           }
           setListInMarketplace(!!data?.list_in_marketplace);
+          setInstitutionName(data?.name ?? null);
+          setPaymentMode(data?.payment_mode ?? null);
           setShareLocation(!!(data?.latitude && data?.longitude));
+          // Listing changes are request-based (the DB guard refuses
+          // direct changes) — surface a request already awaiting review.
+          try {
+            const pending = await fetchPendingListingRequest(institutionId);
+            if (pending) setPendingListingRequest(pending);
+          } catch { /* non-fatal: toggling still files a fresh request */ }
         } else if (userId) {
           const { data } = await (supabase as any)
             .from("profiles")
@@ -134,6 +147,33 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
     );
   };
 
+  // The listing switch shows the APPLIED value only. Toggling it files an
+  // admin-approval request (see marketplaceListingRequests) — it never
+  // mutates listInMarketplace locally.
+  const handleListingToggle = async (checked: boolean) => {
+    if (!institutionId || requestingListing) return;
+    if (paymentMode === 'own') return; // switch is disabled in this state
+    if (pendingListingRequest) {
+      toast.info("Listing change already requested — awaiting admin review.");
+      return;
+    }
+    setRequestingListing(true);
+    try {
+      await requestMarketplaceListingChange({
+        institutionId,
+        institutionName,
+        fromListed: listInMarketplace,
+        toListed: checked,
+      });
+      setPendingListingRequest({ to_listed: checked, created_at: new Date().toISOString() });
+      toast.success("Listing change request sent — awaiting admin review.");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not send the listing change request. Please try again.");
+    } finally {
+      setRequestingListing(false);
+    }
+  };
+
   const handleSave = async () => {
     if (shareLocation && !position) {
       toast.error("Please set a location on the map or use your current location");
@@ -142,12 +182,15 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
     setSaving(true);
     try {
       if (institutionId) {
+        // list_in_marketplace is deliberately NOT saved here: the
+        // trust-column guard refuses direct changes, so listing changes
+        // go through the admin-approval request below (latitude /
+        // longitude only in this update).
         const { error } = await (supabase as any)
           .from("healthcare_institutions")
           .update({
             latitude: shareLocation ? position![0] : null,
             longitude: shareLocation ? position![1] : null,
-            list_in_marketplace: listInMarketplace,
           })
           .eq("id", institutionId);
         if (error) throw error;
@@ -194,13 +237,26 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
         </div>
 
         {institutionId && (
-          <div className="flex items-center justify-between">
-            <Label htmlFor="list-market">List on marketplace</Label>
-            <Switch
-              id="list-market"
-              checked={listInMarketplace}
-              onCheckedChange={setListInMarketplace}
-            />
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="list-market">List on marketplace</Label>
+              <Switch
+                id="list-market"
+                checked={listInMarketplace}
+                disabled={paymentMode === 'own' || !!pendingListingRequest || requestingListing}
+                onCheckedChange={handleListingToggle}
+              />
+            </div>
+            {paymentMode === 'own' && (
+              <p className="text-xs text-muted-foreground">
+                Marketplace listing requires platform payment mode — request a switch in Institution Settings.
+              </p>
+            )}
+            {pendingListingRequest && (
+              <p className="text-xs text-amber-600 font-medium">
+                Listing change requested — awaiting admin review.
+              </p>
+            )}
           </div>
         )}
 

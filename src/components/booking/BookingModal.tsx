@@ -33,6 +33,23 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 
+/**
+ * Map a booking failure to a message a patient can act on. Raw
+ * PostgREST/DB errors must never reach the user — only our own trigger's
+ * plain-language working-hours message is passed through as-is.
+ */
+const friendlyBookingError = (error: any): string => {
+  const message = error?.message ? String(error.message) : "";
+  const code = error?.code ? String(error.code) : "";
+  if (code === "23505" || /already booked|duplicate key/i.test(message)) {
+    return "That time was just booked by another patient. Please go back and choose a different time.";
+  }
+  if (/outside this provider's working hours/i.test(message)) {
+    return message;
+  }
+  return "We couldn't create your appointment. Your details are safe — try again.";
+};
+
 interface BookingModalProps {
   provider: Provider;
   isOpen: boolean;
@@ -96,7 +113,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       const horizonStr = format(addDays(new Date(), 120), 'yyyy-MM-dd');
       const { data } = await (supabase as any).rpc('get_provider_booked_slots', {
-        p_provider_ids: [provider.id],
+        p_ids: [provider.id],
         p_from: todayStr,
         p_to: horizonStr,
       });
@@ -225,20 +242,12 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      // Capture the provider's configured consultation fee at booking time.
-      // Providers set consultation_fee_min/max on their profile; the booking
-      // persists the agreed fee so payments and earnings validate against it.
-      // Per CEO pricing model: the fee is the provider's listed price exactly —
-      // no new-visit markup. Virtual visits get a 0.7x telehealth adjustment.
-      const baseFee =
-        provider.consultation_fee_min ??
-        provider.consultation_fee_max ??
-        provider.consultation_fee ??
-        null;
-      const consultationFee = baseFee !== null
-        ? Math.round(baseFee * (appointmentType === "virtual" ? 0.7 : 1))
-        : null;
-
+      // The consultation fee is set server-side at insert (the
+      // enforce_appointment_fee trigger reads the provider's profiles
+      // record) from the provider's listed price; virtual and in-person
+      // bookings are charged identically. The client must not supply a
+      // fee — computing one here previously persisted virtual bookings at
+      // 70% and collapsed the provider's listed range to its minimum.
       const selectedDependent =
         bookingFor !== 'self'
           ? (myDependents || []).find((d) => d.id === bookingFor)
@@ -257,8 +266,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         status: 'pending',
         notes: reason || null,
         duration: visitType === 'new' ? 45 : 30,
-        patient_visit_type: visitType,
-        consultation_fee: consultationFee
+        patient_visit_type: visitType
       };
 
       // Offline: queue the booking on-device and replay it on reconnect
@@ -348,11 +356,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       }
     } catch (error) {
       console.error('Booking error:', error);
-      setSubmitError(
-        error instanceof Error && error.message
-          ? error.message
-          : "We couldn't create your appointment. Your details are safe — try again."
-      );
+      setSubmitError(friendlyBookingError(error));
     } finally {
       setIsSubmitting(false);
     }
