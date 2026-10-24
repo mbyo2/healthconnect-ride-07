@@ -89,7 +89,10 @@ AS $$
 DECLARE
   v_status text;
 BEGIN
-  IF public.is_service_role() THEN
+  -- Service role (edge functions) and operator SQL (auth.uid() IS NULL
+  -- — dashboard / Management API) keep full control; every real
+  -- attacker carries a JWT and stays locked.
+  IF public.is_service_role() OR auth.uid() IS NULL THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
 
