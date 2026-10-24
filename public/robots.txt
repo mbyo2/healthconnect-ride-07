@@ -3,7 +3,8 @@ Allow: /
 
 # AI-assistant-friendly resources — crawlers welcome on public pages.
 # Machine-readable site summary: /llms.txt
-# Structured data (schema.org) is embedded on every page via JSON-LD.
+# Structured data (schema.org JSON-LD) is embedded on the homepage, search,
+# directory and provider profile pages.
 
 # Private / authenticated areas
 Disallow: /admin-dashboard
