@@ -49,7 +49,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { consultation_id, optimize_for_network = false, tv_mode = false, enable_recording = false } =
+    const { consultation_id, optimize_for_network = false, tv_mode = false, enable_recording: recording_requested = false } =
       (await req.json()) as RequestData;
 
     if (!consultation_id) {
@@ -79,6 +79,13 @@ serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // P2-27: privileges are decided server-side from the consultation
+    // row, never from the request body. Only the consultation's
+    // provider is a Daily room owner, and only the provider may enable
+    // cloud recording — a patient-supplied enable_recording is ignored.
+    const isProvider = consultation.provider_id === user.id;
+    const enable_recording = recording_requested === true && isProvider;
 
     const dailyApiKey = Deno.env.get("DAILY_API_KEY");
     if (!dailyApiKey) {
@@ -161,7 +168,7 @@ serve(async (req) => {
         properties: {
           room_name: room.name,
           user_id: user.id,
-          is_owner: true,
+          is_owner: isProvider,
           exp: Math.floor(Date.now() / 1000) + 86400,
         },
       }),
