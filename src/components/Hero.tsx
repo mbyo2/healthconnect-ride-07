@@ -10,6 +10,13 @@ export const Hero = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const stats = usePlatformStats();
+  const doctorsBadge = formatStat(stats.doctors);
+  const heroStats = [
+    { value: formatStat(stats.doctors), label: "Doctors" },
+    { value: formatStat(stats.hospitals), label: "Hospitals" },
+    { value: formatStat(stats.pharmacies), label: "Pharmacies" },
+    { value: formatStat(stats.patients), label: "Patients" },
+  ].filter((stat) => stat.value !== null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,19 +77,16 @@ export const Hero = () => {
             </form>
 
             {/* Stats */}
+            {heroStats.length > 0 && (
             <div className="grid grid-cols-4 gap-3 mb-8 max-w-md mx-auto lg:mx-0 opacity-0 animate-hero-rise" style={{ animationDelay: "0.3s" }}>
-              {[
-                { value: formatStat(stats.doctors), label: "Doctors" },
-                { value: formatStat(stats.hospitals), label: "Hospitals" },
-                { value: formatStat(stats.pharmacies), label: "Pharmacies" },
-                { value: formatStat(stats.patients), label: "Patients" },
-              ].map((stat) => (
+              {heroStats.map((stat) => (
                 <div key={stat.label} className="text-center p-3 vf-card rounded-card">
                   <div className="text-lg font-display font-medium text-primary-500">{stat.value}</div>
                   <div className="text-xs text-graphite-500 tracking-wide">{stat.label}</div>
                 </div>
               ))}
             </div>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-3 opacity-0 animate-hero-rise" style={{ animationDelay: "0.35s" }}>
               <Button asChild size="lg" className="vf-btn-primary flex-1 sm:flex-none h-12">
@@ -138,9 +142,11 @@ export const Hero = () => {
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
+                {doctorsBadge && (
                 <div className="w-12 h-12 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-bold px-1 text-center leading-tight">
-                  {formatStat(stats.doctors)}
+                  {doctorsBadge}
                 </div>
+                )}
               </div>
             </div>
 
@@ -181,9 +187,11 @@ export const Hero = () => {
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
+                  {doctorsBadge && (
                   <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-medium px-0.5 text-center leading-tight">
-                    {formatStat(stats.doctors)}
+                    {doctorsBadge}
                   </div>
+                  )}
                 </div>
                 <p className="text-xs text-graphite-500">Providers across Zambia</p>
               </div>

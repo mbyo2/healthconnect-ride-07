@@ -17,17 +17,18 @@ const ECOSYSTEM = [
 export const Testimonials = () => {
   const stats = usePlatformStats();
 
-  // Live platform counts — unknown values render as "—", never faked.
+  // Live platform counts — unknown/zero values are filtered out, never faked.
   const metrics = [
     { value: formatStat(stats.doctors), label: "Verified Providers", detail: "Doctors, nurses & clinical cadres", icon: Award },
     { value: formatStat(stats.hospitals), label: "Care Facilities", detail: "Hospitals & clinics on platform", icon: HeartPulse },
     { value: formatStat(stats.appointments), label: "Appointments", detail: "Booked through the platform", icon: TrendingUp },
     { value: formatStat(stats.pharmacies), label: "Pharmacies", detail: "Dispensaries & drug stores", icon: ShieldCheck },
-  ];
+  ].filter((m) => m.value !== null);
 
   return (
     <section className="vf-section bg-white dark:bg-slate-900 border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
+        {metrics.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-16">
           {metrics.map((m) => (
             <div key={m.label} className="vf-card space-y-3">
@@ -42,6 +43,7 @@ export const Testimonials = () => {
             </div>
           ))}
         </div>
+        )}
 
         <div className="text-center mb-6">
           <p className="text-xs font-medium uppercase tracking-widest text-graphite-400">

@@ -192,8 +192,10 @@ export const ProviderDetail = () => {
     if (provider.consultation_fee_min && provider.consultation_fee_max)
       return `K${provider.consultation_fee_min} – K${provider.consultation_fee_max}`;
     if (provider.consultation_fee_min) return `From K${provider.consultation_fee_min}`;
+    if (provider.consultation_fee_max) return `Up to K${provider.consultation_fee_max}`;
     return null;
   })();
+  const feeDisplay = feeLabel ?? "Fee confirmed at booking";
 
   const subs: string[] = provider.subspecialties || [];
   const certs: string[] = provider.board_certifications || [];
@@ -365,12 +367,16 @@ export const ProviderDetail = () => {
                     Wait: {provider.typical_wait_time}
                   </span>
                 )}
-                {feeLabel && (
+                {feeLabel ? (
                   <span className="flex items-center gap-1 font-semibold text-primary-600">
                     {feeLabel}
                   </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-graphite-500 dark:text-slate-400">
+                    {feeDisplay}
+                  </span>
                 )}
-                {provider.years_experience && (
+                {(provider.years_experience ?? 0) > 0 && (
                   <span className="flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 shrink-0" />
                     {provider.years_experience}+ years experience
@@ -406,7 +412,7 @@ export const ProviderDetail = () => {
                       value={`${provider.medical_school || ""}${provider.graduation_year ? ` (${provider.graduation_year})` : ""}`}
                     />
                   )}
-                  {provider.years_experience && (
+                  {(provider.years_experience ?? 0) > 0 && (
                     <InfoRow label="Experience" value={`${provider.years_experience}+ years`} />
                   )}
                   {certs.length > 0 && (
@@ -519,9 +525,9 @@ export const ProviderDetail = () => {
             {/* ── Right sidebar (1/3) — first on mobile so fees + booking sit directly under the hero ── */}
             <div className="order-1 lg:order-2 space-y-5">
               {/* Fees & Insurance */}
-              {(feeLabel || insurances.length > 0) && (
+              {(feeDisplay || insurances.length > 0) && (
                 <Section icon={Wallet} title="Fees & Insurance">
-                  {feeLabel && <InfoRow label="Consultation fee" value={<span className="font-bold text-primary-500">{feeLabel}</span>} />}
+                  <InfoRow label="Consultation fee" value={feeLabel ? <span className="font-bold text-primary-500">{feeLabel}</span> : feeDisplay} />
                   {insurances.length > 0 && (
                     <div>
                       <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Accepted Insurance</p>
