@@ -5,8 +5,10 @@
 // POST — delivery status events for messages we sent: updates the
 //        message_queue row matched by provider_message_id
 //        (sent -> delivered / failed with Meta's error title).
-//        When WHATSAPP_APP_SECRET is set, the X-Hub-Signature-256 HMAC
-//        is verified before any update is applied.
+//        The X-Hub-Signature-256 HMAC is verified against
+//        WHATSAPP_APP_SECRET before any update is applied. FAIL CLOSED
+//        (P2-24): if WHATSAPP_APP_SECRET is not configured, POSTs are
+//        refused with 503 — an unverifiable webhook is never processed.
 //
 // Configure in the Meta app: callback URL = <project>/functions/v1/whatsapp-webhook,
 // verify token = WHATSAPP_VERIFY_TOKEN, subscribe to the `messages` field.
@@ -44,10 +46,15 @@ Deno.serve(async (req) => {
 
   const rawBody = await req.text();
   const appSecret = Deno.env.get('WHATSAPP_APP_SECRET');
-  if (appSecret) {
-    const ok = await verifySignature(rawBody, req.headers.get('x-hub-signature-256'), appSecret);
-    if (!ok) return new Response('Invalid signature', { status: 401 });
+  if (!appSecret) {
+    // Fail closed (P2-24): without the app secret a POST cannot be proven
+    // to come from Meta, so refuse it outright instead of processing
+    // unverified status events.
+    console.error('whatsapp-webhook: WHATSAPP_APP_SECRET not configured — refusing POST');
+    return new Response('Webhook not configured', { status: 503 });
   }
+  const ok = await verifySignature(rawBody, req.headers.get('x-hub-signature-256'), appSecret);
+  if (!ok) return new Response('Invalid signature', { status: 401 });
 
   let payload: any;
   try {

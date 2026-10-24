@@ -6,10 +6,21 @@
 // '/' HTML references pruned bundles and the app can never boot again until
 // the service worker updates. Navigation requests already use network-first
 // (handleNavigationRequest) — keep it that way.
-const CACHE_NAME = 'healthconnect-v1.2.0';
+const CACHE_NAME = 'healthconnect-v1.3.0';
 const STATIC_CACHE = 'healthconnect-static-v4';
 const DYNAMIC_CACHE = 'healthconnect-dynamic-v4';
-const API_CACHE = 'healthconnect-api-v5';
+// Per-user API caches (P2-31): every authenticated Supabase API response is
+// stored ONLY in a cache named after the user id decoded from the request's
+// Authorization Bearer JWT (`sub` claim, decode-only — a cache partition
+// key, never an auth decision): `healthconnect-api-<sub>`. There is no
+// shared API cache anymore: a response is only ever read back from the
+// cache of the same `sub`, so a shared clinic tablet can never serve one
+// user's cached patient data to a different user/session. Requests without
+// a decodable user token are never cached at all (network-only).
+const API_CACHE_PREFIX = 'healthconnect-api-';
+// Pre-P2-31 shared API caches: one cache served every user on the device.
+// Deleted unconditionally on activate so no cross-user data survives.
+const LEGACY_API_CACHES = ['healthconnect-api-v5'];
 const IMAGE_CACHE = 'healthconnect-images-v1';
 // Runtime-only caches (never precached at install):
 // - SHELL: the last successfully fetched '/' HTML, so an offline reload can
@@ -31,17 +42,10 @@ const STATIC_ASSETS = [
   '/logo512.png'
 ];
 
-// Supabase REST tables whose GET responses may be cached for offline use.
-// Directory-class, non-patient data ONLY (facility directory, help articles,
-// lab catalog, taxonomy). Patient data is never cached by the worker —
-// privacy rule. The app clears API_CACHE on sign-out (CLEAR_API_CACHE).
-const OFFLINE_CACHEABLE_TABLES = [
-  'healthcare_institutions',
-  'kb_articles',
-  'lab_test_catalog',
-  'institution_types',
-  'provider_types',
-];
+// (Removed: the pre-P2-31 OFFLINE_CACHEABLE_TABLES anonymous allowlist.
+// Anonymous/undifferentiated API responses are never cached now — see the
+// API_CACHE_PREFIX note above. Signed-in users still get offline reads of
+// every table they can access, from their own per-user cache partition.)
 
 // Install event - cache static assets
 // skipWaiting() runs unconditionally: a failed precache must never strand the
@@ -74,9 +78,19 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
+            // Legacy shared API caches go first — unconditionally.
+            if (LEGACY_API_CACHES.includes(cacheName)) {
+              console.log('[SW] Deleting legacy shared API cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+            // Per-user API caches survive activation: rural clinics stay
+            // offline for weeks and the SW may update in between. Isolation
+            // comes from the per-`sub` naming, not from wiping; sign-out
+            // (CLEAR_API_CACHE) is the wipe point.
+            const isPerUserApiCache = cacheName.startsWith(API_CACHE_PREFIX);
             if (cacheName !== STATIC_CACHE &&
                 cacheName !== DYNAMIC_CACHE &&
-                cacheName !== API_CACHE &&
+                !isPerUserApiCache &&
                 cacheName !== SHELL_CACHE &&
                 cacheName !== BUNDLE_CACHE) {
               console.log('[SW] Deleting old cache:', cacheName);
@@ -109,13 +123,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Supabase API traffic is routed before everything else.
+  if (isSupabaseRequest(request)) {
+    // /auth/v1/ is NEVER intercepted: tokens must not sit in Cache Storage
+    // and auth responses must never be synthesised or replayed by the
+    // worker. Leaving the request untouched = network-only.
+    if (isAuthRequest(request)) {
+      return;
+    }
+    // No decodable user token -> no caching of any kind (network-only).
+    // This covers signed-out traffic: the anon key JWT has no `sub`.
+    if (!userIdFromRequest(request)) {
+      return;
+    }
+    event.respondWith(handleAPIRequest(request));
+    return;
+  }
+
   // Handle different types of requests
   if (isNavigationRequest(request)) {
     event.respondWith(handleNavigationRequest(request));
   } else if (isStaticAsset(request)) {
     event.respondWith(handleStaticAsset(request));
-  } else if (isAPIRequest(request)) {
-    event.respondWith(handleAPIRequest(request));
   } else {
     event.respondWith(handleDynamicRequest(request));
   }
@@ -140,12 +169,22 @@ function isStaticAsset(request) {
          url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2)$/);
 }
 
-// Check if request is for API — Supabase REST only. Auth and storage
-// traffic is never intercepted: credentials and private files must not be
-// cached or synthesised by the worker.
-function isAPIRequest(request) {
+// Check if request targets the Supabase project host's API surface
+// (REST, auth, storage, edge functions).
+function isSupabaseRequest(request) {
   const url = new URL(request.url);
-  return url.hostname.includes('supabase.co') && url.pathname.startsWith('/rest/v1/');
+  const isProjectHost = url.hostname === 'supabase.co' || url.hostname.endsWith('.supabase.co');
+  if (!isProjectHost) return false;
+  return url.pathname.startsWith('/rest/v1/') ||
+         url.pathname.startsWith('/auth/v1/') ||
+         url.pathname.startsWith('/storage/v1/') ||
+         url.pathname.startsWith('/functions/v1/');
+}
+
+// Auth endpoints specifically: network-only, never cached (see fetch router).
+function isAuthRequest(request) {
+  const url = new URL(request.url);
+  return url.pathname.startsWith('/auth/v1/');
 }
 
 // Check if request is navigation
@@ -173,13 +212,22 @@ async function handleStaticAsset(request) {
   }
 }
 
-// Handle API requests with network-first strategy.
-// Offline reads: a signed-in user's GET responses are cached under a key
-// partitioned by their user id (decoded from the JWT `sub` claim), so a
-// shared clinic device never serves one user's data to another. Anonymous
-// requests are cached only for the public directory tables. The token
-// itself is never stored — only the id partition. Cache is wiped on
-// sign-out (CLEAR_API_CACHE) and on worker upgrade (cache version bump).
+// Handle Supabase API requests with a network-first strategy (P2-31).
+//
+// Isolation contract:
+// - The ONLY cache an API response is written to — or read back from — is
+//   `healthconnect-api-<sub>` for the `sub` decoded from THIS request's
+//   Authorization Bearer JWT. One user's data can therefore never be
+//   served to another user/session on a shared device.
+// - Requests with no token, an undecodable token, or a token without a
+//   `sub` (e.g. the anon key) never reach this handler: the fetch router
+//   leaves them untouched (network-only, nothing cached).
+// - /auth/v1/ never reaches this handler either (network-only — tokens
+//   must not sit in Cache Storage).
+// - Only GETs reach this handler (the router returns early for non-GET).
+// The token itself is never stored — only the decoded user id, as the
+// cache name. All per-user API caches are wiped on sign-out
+// (CLEAR_API_CACHE) and the legacy shared cache is deleted on activate.
 // Keep runtime caches bounded over long offline periods: oldest entries
 // are evicted first (Cache API keys() preserves insertion order).
 async function trimCache(cacheName, maxEntries) {
@@ -192,6 +240,10 @@ async function trimCache(cacheName, maxEntries) {
   } catch (e) { /* best-effort */ }
 }
 
+// Decode-only JWT `sub` extraction. NO signature verification: the value
+// is a cache partition key, never an auth decision — the server still
+// enforces auth/RLS on every network request, and a forged token can at
+// worst partition the forger's own (server-rejected) traffic.
 function userIdFromRequest(request) {
   const auth = request.headers.get('Authorization') || '';
   if (!auth.startsWith('Bearer ')) return null;
@@ -199,18 +251,24 @@ function userIdFromRequest(request) {
   if (parts.length !== 3) return null;
   try {
     const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-    return payload.sub || null;
+    const sub = payload.sub;
+    // Cache names must stay plain: Supabase user ids are UUIDs. Anything
+    // else is treated as "no user" (network-only) rather than trusted as
+    // a cache name.
+    if (typeof sub !== 'string' || !/^[A-Za-z0-9_-]+$/.test(sub)) return null;
+    return sub;
   } catch (e) {
     return null;
   }
 }
 
+function apiCacheNameFor(sub) {
+  return API_CACHE_PREFIX + sub;
+}
+
 function apiCacheKey(request) {
   const url = new URL(request.url);
-  const uid = userIdFromRequest(request);
-  if (uid) {
-    url.searchParams.set('__sb_user', uid);
-  }
+  // No user marker in the key: the cache itself is the per-user partition.
   // PostgREST returns an object vs an array for the same URL depending on
   // the Accept header (.single() vs list) — keep those entries separate.
   const accept = request.headers.get('Accept') || '';
@@ -220,66 +278,74 @@ function apiCacheKey(request) {
   return url.toString();
 }
 
-function isCacheableRequest(request) {
-  // Signed-in traffic: the user's own data, partitioned by user id.
-  // Anonymous traffic: public directory tables only.
-  return userIdFromRequest(request) !== null || isCacheableAPI(request);
+// Delete every per-user API cache (plus any legacy shared API cache).
+// Used on sign-out: cache names are dynamic, so wipe by prefix.
+async function clearApiCaches() {
+  const cacheNames = await caches.keys();
+  await Promise.all(
+    cacheNames
+      .filter((name) => name.startsWith(API_CACHE_PREFIX) || LEGACY_API_CACHES.includes(name))
+      .map((name) => caches.delete(name))
+  );
 }
 
 async function handleAPIRequest(request) {
-  const cache = await caches.open(API_CACHE);
+  const sub = userIdFromRequest(request);
+  // Defensive: the router already guarantees a decodable `sub`; if that
+  // ever fails here, fall back to plain network — never a shared cache.
+  if (!sub) {
+    return fetch(request);
+  }
+  const cacheName = apiCacheNameFor(sub);
+  const cache = await caches.open(cacheName);
   const cacheKey = apiCacheKey(request);
+
+  const serveFromCache = async () => {
+    const cachedResponse = await cache.match(cacheKey);
+    if (!cachedResponse) return null;
+    const body = await cachedResponse.clone().arrayBuffer();
+    const headers = new Headers(cachedResponse.headers);
+    headers.set('X-Served-From', 'cache');
+    return new Response(body, {
+      status: cachedResponse.status,
+      statusText: cachedResponse.statusText,
+      headers
+    });
+  };
+
   try {
     // Try network first
     const networkResponse = await fetch(request);
 
     if (networkResponse.ok) {
-      if (isCacheableRequest(request)) {
-        cache.put(cacheKey, networkResponse.clone()).then(() => trimCache(API_CACHE, 400));
-      }
+      cache.put(cacheKey, networkResponse.clone()).then(() => trimCache(cacheName, 400));
       return networkResponse;
     }
 
-    // Server error: fall back to the cached copy if we have one
-    const cachedResponse = await cache.match(cacheKey);
-    if (cachedResponse) {
-      const body = await cachedResponse.clone().arrayBuffer();
-      const headers = new Headers(cachedResponse.headers);
-      headers.set('X-Served-From', 'cache');
-      return new Response(body, {
-        status: cachedResponse.status,
-        statusText: cachedResponse.statusText,
-        headers
-      });
+    // The server actively rejected this session: never mask a 401/403 by
+    // serving cached data (the session may be revoked or expired).
+    if (networkResponse.status === 401 || networkResponse.status === 403) {
+      return networkResponse;
     }
+
+    // Other server errors: fall back to this user's cached copy if any.
+    const cachedResponse = await serveFromCache();
+    if (cachedResponse) return cachedResponse;
 
     return networkResponse;
   } catch (error) {
     // Offline: serve this user's cached copy
-    const cachedResponse = await cache.match(cacheKey);
-    if (cachedResponse) {
-      const body = await cachedResponse.clone().arrayBuffer();
-      const headers = new Headers(cachedResponse.headers);
-      headers.set('X-Served-From', 'cache');
-      return new Response(body, {
-        status: cachedResponse.status,
-        statusText: cachedResponse.statusText,
-        headers
-      });
-    }
+    const cachedResponse = await serveFromCache();
+    if (cachedResponse) return cachedResponse;
 
-    if (isCacheableRequest(request)) {
-      return new Response(JSON.stringify({
-        error: 'Service temporarily unavailable',
-        offline: true,
-        message: 'Please check your internet connection'
-      }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    return new Response('Service unavailable', { status: 503 });
+    return new Response(JSON.stringify({
+      error: 'Service temporarily unavailable',
+      offline: true,
+      message: 'Please check your internet connection'
+    }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
@@ -334,13 +400,6 @@ async function handleDynamicRequest(request) {
     console.error('[SW] Dynamic request failed:', error);
     return new Response('Resource not available offline', { status: 503 });
   }
-}
-
-// Check if a Supabase REST GET may be cached: directory-class tables only
-function isCacheableAPI(request) {
-  const url = new URL(request.url);
-  const table = url.pathname.replace('/rest/v1/', '').split('/')[0];
-  return OFFLINE_CACHEABLE_TABLES.includes(table);
 }
 
 // Offline write queueing lives in the app (useOfflineSync hook):
@@ -458,8 +517,11 @@ self.addEventListener('message', (event) => {
         });
         break;
       case 'CLEAR_API_CACHE':
-        // Sign-out hygiene: drop cached directory reads with the session.
-        caches.delete(API_CACHE).then(() => {
+        // Sign-out hygiene: drop ALL per-user API caches with the session.
+        // Cache names are dynamic (`healthconnect-api-<sub>`), so wipe by
+        // prefix — deleting one fixed name would leave other users' cached
+        // data on a shared device.
+        clearApiCaches().then(() => {
           if (event.ports[0]) event.ports[0].postMessage({ success: true });
         });
         break;

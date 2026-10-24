@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import { clearApiCaches } from '@/utils/service-worker';
 import { withTimeout, TIMEOUTS } from '@/utils/async';
 import type { Profile } from '@/types/profile';
 
@@ -276,11 +277,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    // Drop the service worker's offline API cache with the session, so
-    // cached directory data never outlives the signed-in user on a device.
+    // Drop the service worker's per-user offline API caches with the
+    // session (P2-31: caches are named `healthconnect-api-<user-id>`), so
+    // one user's cached patient data never outlives their session on a
+    // shared device. Ask the worker to wipe by prefix AND wipe directly
+    // from the page — the direct wipe also works when no SW controller
+    // exists yet (first load), where the message would be lost.
     try {
       navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_API_CACHE' });
     } catch { /* non-fatal */ }
+    await clearApiCaches();
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error('Error signing out');

@@ -288,8 +288,12 @@ export async function verifyAndSettleLenco(
  * Accepting multiple derivations cannot admit a forgery: an attacker still
  * needs the token/secret to produce any of them.
  *
- * Returns true when no secret/token is configured — callers must still
- * re-verify through the status API before settling.
+ * Returns true when no secret/token is configured. NOTE (P2-25): the
+ * lenco-webhook handler fails closed BEFORE calling this — it refuses
+ * every POST with 503 while neither LENCO_WEBHOOK_SECRET nor
+ * LENCO_SECRET_KEY is configured, so this permissive branch is not
+ * reachable from the live webhook. Callers must still re-verify through
+ * the status API before settling.
  */
 export async function verifyWebhookSignature(rawBody: string, signature: string | null): Promise<boolean> {
   const secret = Deno.env.get('LENCO_WEBHOOK_SECRET') || '';
