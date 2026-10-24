@@ -33,9 +33,13 @@ function sameRoleSet(a: UserRole[], b: UserRole[]): boolean {
 }
 
 /**
- * Expand raw role strings (DB rows, profile, auth metadata) into the full
- * capability set. Single implementation used by both the initial fetch and
- * refreshRoles so the two can never disagree.
+ * Expand raw role strings (user_roles DB rows + profiles.role only) into
+ * the full capability set. Single implementation used by both the initial
+ * fetch and refreshRoles so the two can never disagree.
+ *
+ * SECURITY (P1-25): auth user_metadata is user-writable and is NEVER a
+ * role source. Roles come from the server: user_roles rows (admin-granted,
+ * RLS-enforced) plus the profiles row the server maintains.
  *
  * Clinical cadres inherit the legacy 'health_personnel' catch-all so
  * provider dashboards, calendars and shared components keep working.
@@ -149,7 +153,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         try {
           // 1. Fetch roles from user_roles table — timed so a stalled
-          // request falls back to profile/metadata roles instead of
+          // request falls back to profile roles instead of
           // hanging the route gate forever.
           let rolesData: any[] | null = null;
           try {
@@ -162,7 +166,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
               rolesData = res.data;
             }
           } catch (rolesErr) {
-            console.warn('Roles fetch timed out, using profile/metadata roles:', rolesErr);
+            console.warn('Roles fetch timed out, using profile roles:', rolesErr);
           }
 
           const rawRoles: string[] = [];
@@ -171,26 +175,14 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             rolesData.forEach(r => { if (r.role) rawRoles.push(r.role); });
           }
 
-          // 2. Add profile role
+          // 2. Add profile role (server-maintained row).
+          // NOTE: user_metadata is deliberately NOT read here — it is
+          // user-writable and must never confer a role (P1-25).
           if (profile?.role) {
             rawRoles.push(profile.role);
           }
 
-          // 3. Add user_metadata roles
-          const metaRole = user.user_metadata?.role;
-          const metaBusinessType = user.user_metadata?.business_type;
-          const metaProviderType = user.user_metadata?.providerType;
-          if (metaRole) rawRoles.push(metaRole);
-          if (metaBusinessType) {
-            const bt = String(metaBusinessType).toLowerCase();
-            if (bt.includes('wholesale')) rawRoles.push('wholesale_pharmacy');
-            else if (bt.includes('pharm')) rawRoles.push('pharmacy', 'pharmacist');
-            else if (bt.includes('lab')) rawRoles.push('lab', 'lab_technician');
-            else rawRoles.push('institution_admin');
-          }
-          if (metaProviderType) rawRoles.push(metaProviderType);
-
-          // 4. Role Expansion for related capabilities (shared helper)
+          // 3. Role Expansion for related capabilities (shared helper)
           const roles = expandRawRoles(rawRoles);
           // Compare before setState: AuthContext creates a fresh profile
           // object on every fetchProfile (including TOKEN_REFRESHED), so
@@ -209,16 +201,21 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             : (profile?.admin_level as AdminLevel);
           setAdminLevel(prev => (prev === newAdminLevel ? prev : newAdminLevel));
 
-          // Ensure role is recorded in user_roles table in background if missing
+          // Baseline only (P1-25): if the server has no role rows for this
+          // user, the client may attempt to record the baseline 'patient'
+          // role — never a role derived from profile/metadata. Real role
+          // grants are admin-only (user_roles INSERT policies) and normally
+          // already exist via the signup trigger, so this is a no-op
+          // safety net, not a grant path.
           if (!rolesData || rolesData.length === 0) {
             supabase.from('user_roles').insert({
               user_id: user.id,
-              role: primaryRole as any,
+              role: 'patient' as any,
             }).then(() => {});
           }
         } catch (err) {
           console.error('Unexpected error in fetchRoles:', err);
-          const fallbackRole = (profile?.role || user.user_metadata?.role || 'patient') as UserRole;
+          const fallbackRole = (profile?.role || 'patient') as UserRole;
           setAvailableRoles(prev => (sameRoleSet(prev, [fallbackRole]) ? prev : [fallbackRole]));
           setUserRole(prev => (prev === fallbackRole ? prev : fallbackRole));
           setCurrentRole(prev => (prev === fallbackRole ? prev : fallbackRole));
@@ -281,9 +278,12 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id);
 
       if (rolesData && rolesData.length > 0) {
-        // Same expansion AND same primary-role selection as the initial
-        // fetch — the two can never disagree.
-        const roles = expandRawRoles(rolesData.map(r => String(r.role)));
+        // Same sources (user_roles rows + profile role — never
+        // user_metadata), same expansion AND same primary-role selection
+        // as the initial fetch — the two can never disagree.
+        const rawRoles = rolesData.map(r => String(r.role));
+        if (profile?.role) rawRoles.push(profile.role);
+        const roles = expandRawRoles(rawRoles);
         setAvailableRoles(prev => (sameRoleSet(prev, roles) ? prev : roles));
         const primaryRole = ROLE_PRIORITY.find(r => roles.includes(r)) || roles[0];
         setUserRole(prev => (prev === primaryRole ? prev : primaryRole));

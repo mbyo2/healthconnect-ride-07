@@ -29,13 +29,23 @@ const ALLOWED_SYNC_TABLES = new Set<string>([
 // Anything else is stripped before replay. Column names verified against
 // the live schema (types.ts) 2026-10-20 — vital_signs/health tables key
 // the patient as user_id; symptoms_diary uses patient_id.
+//
+// P1-32 (Stage B): authorship/timestamp fields are NEVER client-sent —
+// the server stamps them (BEFORE INSERT triggers force recorded_by =
+// auth.uid(), recorded_at = now(), and an honest is_patient_entered):
+//   - appointments: 'status' removed — a queued booking takes the DB
+//     default ('scheduled'); clients cannot mint a pre-confirmed status.
+//   - vital_signs: 'recorded_at' removed (metadata.recorded_by is also
+//     stripped in sanitizePayload below and re-stamped server-side).
+//   - comprehensive_health_metrics: 'recorded_at', 'recorded_by' and
+//     'is_patient_entered' removed.
 const ALLOWED_FIELDS: Record<string, Set<string>> = {
-  appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','status','notes','dependent_id','booked_for_name','duration','patient_visit_type','consultation_fee']),
+  appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','notes','dependent_id','booked_for_name','duration','patient_visit_type','consultation_fee']),
   symptoms_diary: new Set(['id','patient_id','symptoms','severity','notes','date']),
   health_reminders: new Set(['id','user_id','title','description','frequency','is_active','scheduled_time','next_trigger','type','priority']),
   medication_reminders: new Set(['id','user_id','medication_name','dosage','frequency','reminder_time','start_date','end_date','active']),
-  vital_signs: new Set(['id','user_id','heart_rate','blood_pressure_systolic','blood_pressure_diastolic','temperature','respiratory_rate','oxygen_saturation','blood_glucose','weight','recorded_at','metadata']),
-  comprehensive_health_metrics: new Set(['id','user_id','metric_name','metric_category','value','unit','recorded_at','notes','recorded_by','is_patient_entered','status']),
+  vital_signs: new Set(['id','user_id','heart_rate','blood_pressure_systolic','blood_pressure_diastolic','temperature','respiratory_rate','oxygen_saturation','blood_glucose','weight','metadata']),
+  comprehensive_health_metrics: new Set(['id','user_id','metric_name','metric_category','value','unit','notes','status']),
 };
 
 function sanitizePayload(table: string, data: any): Record<string, unknown> | null { if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
@@ -44,6 +54,14 @@ function sanitizePayload(table: string, data: any): Record<string, unknown> | nu
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(data)) {
     if (allowed.has(k)) out[k] = v;
+  }
+  // vital_signs keeps free-form metadata (device info, source, notes) but
+  // never a client-claimed recorded_by — the server trigger stamps the
+  // real caller into metadata.recorded_by on insert (P1-32).
+  if (table === 'vital_signs' && out.metadata && typeof out.metadata === 'object' && !Array.isArray(out.metadata)) {
+    const meta = { ...(out.metadata as Record<string, unknown>) };
+    delete meta.recorded_by;
+    out.metadata = meta;
   }
   return out;
 }
@@ -178,6 +196,25 @@ export function useOfflineSync() {
       // would reject most, but never rely on that for privacy).
       const { data: authData } = await supabase.auth.getUser();
       const currentUserId = authData?.user?.id ?? null;
+      // Role lookup for the identity-guard exception below, resolved at
+      // most once per sync run (never per queued item): true when the
+      // session user holds any non-patient role in user_roles (nurse,
+      // doctor, clinical_officer, pharmacist, …).
+      let staffRoleCache: boolean | null = null;
+      const sessionUserHasStaffRole = async (): Promise<boolean> => {
+        if (staffRoleCache !== null) return staffRoleCache;
+        staffRoleCache = false;
+        if (currentUserId) {
+          const { data: roleRows } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', currentUserId);
+          staffRoleCache = (roleRows ?? []).some(
+            (r: any) => typeof r?.role === 'string' && r.role !== 'patient'
+          );
+        }
+        return staffRoleCache;
+      };
       const db = await openDB();
       const tx = db.transaction(STORE_NAME, 'readonly');
       const store = tx.objectStore(STORE_NAME);
@@ -210,13 +247,27 @@ export function useOfflineSync() {
           currentUserId &&
           typeof (action.data?.patient_id ?? action.data?.user_id) === 'string' &&
           (action.data.patient_id ?? action.data.user_id) !== currentUserId &&
-          action.table !== 'vital_signs' &&
-          action.table !== 'comprehensive_health_metrics'
+          // Role-aware exception (Stage B finisher): for vital_signs /
+          // comprehensive_health_metrics only, a session holding a
+          // clinical/staff role may replay rows naming another patient —
+          // nurse vitals is a wired offline flow (nurse queues vitals
+          // offline with user_id = the patient). Authorship stays honest:
+          // the P1-32 BEFORE INSERT triggers stamp recorded_by =
+          // auth.uid() (the clinician) and is_patient_entered = false, so
+          // the row is attributed to its real author server-side.
+          !(
+            (action.table === 'vital_signs' ||
+              action.table === 'comprehensive_health_metrics') &&
+            (await sessionUserHasStaffRole())
+          )
         ) {
           // Patient-owned action queued by a different account — drop it.
-          // (vital_signs / metrics are excluded: a nurse queues them for a
-          // patient, so their user_id is the patient's, not the nurse's;
-          // RLS on the server remains the enforcement for those.)
+          // P1-32: this guard applies to vital_signs and
+          // comprehensive_health_metrics too — the old waiver let any
+          // signed-in account replay vitals/metrics rows naming a
+          // different patient. The only exception is the staff-role
+          // replay above; a patient session submitting for someone else
+          // is still dropped here, exactly as before.
           drop = true;
         } else if (action.operation === 'insert') {
           const clean = sanitizePayload(action.table, action.data);

@@ -7,7 +7,15 @@ import { validateFileUpload } from '@/utils/input-validation';
 import { logSecurityEvent, SecurityEvents, uploadRateLimiter } from '@/utils/security-service';
 
 interface FileUploaderProps {
-  onUploadComplete: (fileUrl: string, fileName: string) => void;
+  /**
+   * Called with the storage PATH of the uploaded object inside the
+   * private `chat-attachments` bucket (`<userId>/<random>.<ext>`) — not a
+   * URL. The chat-attachments bucket is private: there is no public URL.
+   * Display code resolves the path to a short-lived signed URL at render
+   * time (see FilePreview). Legacy rows whose file_url is already a full
+   * http(s) URL keep rendering as-is.
+   */
+  onUploadComplete: (filePath: string, fileName: string) => void;
 }
 
 export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
@@ -46,11 +54,25 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
         fileSize: file.size,
       });
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // Storage RLS on this bucket is folder-scoped: uploads are only
+      // allowed under a first path segment equal to the caller's uid.
+      // Uploading to the bucket root (the old behaviour) is refused, and
+      // getPublicUrl is meaningless on a private bucket — hand back the
+      // storage path; readers resolve a signed URL when rendering.
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('You must be signed in to upload a file');
+        return;
+      }
 
-      const { error: uploadError, data } = await supabase.storage
+      const rawExt = (file.name.split('.').pop() || '').toLowerCase();
+      const fileExt = /^[a-z0-9]{1,10}$/.test(rawExt) ? rawExt : 'bin';
+      const randomPart = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const filePath = `${user.id}/${randomPart}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
         .from('chat-attachments')
         .upload(filePath, file);
 
@@ -58,13 +80,9 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
         throw uploadError;
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('chat-attachments')
-        .getPublicUrl(filePath);
-
-      onUploadComplete(publicUrl, file.name);
+      onUploadComplete(filePath, file.name);
       toast.success('File uploaded successfully');
-      console.log('File uploaded:', { publicUrl, fileName: file.name });
+      console.log('File uploaded:', { filePath, fileName: file.name });
     } catch (error: any) {
       toast.error('Error uploading file');
       console.error('Error uploading file:', error.message);

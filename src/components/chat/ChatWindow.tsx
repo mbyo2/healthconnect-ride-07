@@ -88,13 +88,16 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
     }
   };
 
-  const handleFileUpload = async (fileUrl: string, fileName: string) => {
+  const handleFileUpload = async (filePath: string, fileName: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
       // messages has no attachments column — the file row goes first, then
       // the metadata lands in chat_attachments keyed by message_id.
+      // file_url stores the storage PATH inside the private
+      // chat-attachments bucket (legacy rows hold full URLs; FilePreview
+      // renders both).
       const { data: msg, error: msgError } = await supabase
         .from('messages')
         .insert({
@@ -111,7 +114,7 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
         .from('chat_attachments')
         .insert({
           message_id: msg.id,
-          file_url: fileUrl,
+          file_url: filePath,
           file_name: fileName,
         });
 

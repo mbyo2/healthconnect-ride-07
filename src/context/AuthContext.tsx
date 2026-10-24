@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Fetch user's primary role from user_roles table using secure function.
       // A timeout/failure here is non-fatal — fall through to the
-      // profile/metadata role below.
+      // server-maintained profile role below (never user_metadata).
       let roleData: any = null;
       if (roleRes.error) {
         console.warn('Role fetch failed, using fallback role:', roleRes.error);
@@ -178,19 +178,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         const userEmail = currentUser?.email;
-        const metaRole = currentUser?.user_metadata?.role || currentUser?.user_metadata?.business_type || 'patient';
-        const metaBusinessName = currentUser?.user_metadata?.business_name;
-        const metaProviderType = currentUser?.user_metadata?.providerType;
 
-        // Determine proper role
-        let profileRole = metaRole;
-        if (metaProviderType) profileRole = metaProviderType;
-        if (profileRole === 'business') profileRole = 'institution_admin';
-        // Wholesale distributors get their own business role (ZAMRA)
-        const metaBusinessType = currentUser?.user_metadata?.business_type;
-        if (typeof metaBusinessType === 'string' && metaBusinessType.toLowerCase().includes('wholesale')) {
-          profileRole = 'wholesale_pharmacy';
-        }
+        // SECURITY (P1-25): user_metadata is user-writable and must never
+        // decide a role. A missing profile is recreated with the baseline
+        // 'patient' role only; privileged roles are granted server-side
+        // (application-approval triggers / admin grants into user_roles)
+        // and surface here via the get_user_role RPC on the next fetch.
+        const profileRole = 'patient';
 
         const { error: createError } = await supabase
           .from('profiles')
@@ -208,13 +202,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setTimeout(() => fetchProfile(userId, retryCount + 1), 2000);
           }
         } else {
-          // Seed user_roles table with the resolved role
-          const rolesToInsert = [{ user_id: userId, role: profileRole as any }];
-          // Expand pharmacy → also add pharmacist; lab → also add lab_technician
-          if (profileRole === 'pharmacy') rolesToInsert.push({ user_id: userId, role: 'pharmacist' as any });
-          if (profileRole === 'laboratory' || profileRole === 'lab') rolesToInsert.push({ user_id: userId, role: 'lab_technician' as any });
-          
-          await supabase.from('user_roles').upsert(rolesToInsert, { onConflict: 'user_id,role' });
+          // Baseline 'patient' role row only — never a metadata-chosen
+          // role (P1-25). Admin-only INSERT policies on user_roles mean
+          // this normally no-ops because the signup trigger already
+          // granted the patient role.
+          await supabase.from('user_roles').upsert(
+            [{ user_id: userId, role: 'patient' as any }],
+            { onConflict: 'user_id,role' }
+          );
 
           // Fetch the newly created profile
           const { data: newProfile } = await supabase
