@@ -321,7 +321,14 @@ serve(async (req) => {
             p_transaction_type: 'credit',
             p_amount: settleAmount,
             p_description: `PayPal wallet top-up - ${payment.invoice_number}`,
-            p_payment_id: payment.id
+            p_payment_id: payment.id,
+            // F1b: the 5-arg call shape cannot resolve — two live overloads
+            // of process_wallet_transaction exist (5-arg legacy, 6-arg with
+            // p_gateway_ref + FOR UPDATE lock) and PostgREST answers the
+            // ambiguous shape with PGRST203, so the credit silently failed.
+            // Passing the PayPal capture id also engages the overload's
+            // unique gateway-ref idempotency behind the existingCredit check.
+            p_gateway_ref: capture.id
           });
 
           if (walletError) {
