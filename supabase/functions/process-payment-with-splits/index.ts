@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { resolveServicePrice, resolveReferenceAmount, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+import { deriveServerIdempotencyKey } from '../_shared/idempotency.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,9 +20,12 @@ const paymentSplitsSchema = z.object({
   paymentMethod: z.enum(['paypal', 'wallet']).optional().default('wallet'),
   paymentType: z.enum(['consultation', 'pharmacy']).optional().default('consultation'),
   redirectUrl: z.string().url().optional(),
-  // Idempotency key: client-generated UUID for this payment attempt.
-  // If provided and a payment already exists with this key, returns the
-  // existing payment instead of debiting again (replay safety).
+  // Idempotency key: client-generated UUID retry token for this payment
+  // attempt. It is never stored as-is (P3-17): the server derives the
+  // stored key from the authenticated user id + this token + a hash of
+  // the canonical payload, so the same token replayed by another user or
+  // for a different payload cannot collide with the first settlement.
+  // A genuine retry (same user, same token, same payload) still dedupes.
   idempotencyKey: z.string().uuid('Invalid idempotency key').optional()
 });
 
@@ -115,15 +119,49 @@ serve(async (req) => {
       );
     }
 
-    // IDEMPOTENCY: If client provided an idempotency key and we already
-    // processed it, return the existing payment (replay safety — no double debit).
+    // Resolve the authoritative price server-side FIRST — never trust the
+    // client amount, and the idempotency payload hash below must bind the
+    // trusted amount, not the client-supplied one.
+    let amount: number;
+    try {
+      const trusted = paymentType === 'pharmacy'
+        ? await resolveReferenceAmount(supabase as any, 'order', serviceId)
+        : await resolveServicePrice(supabase as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
+    // IDEMPOTENCY (P3-17): derive the stored key server-side from the
+    // authenticated user id + the client's retry token + the canonical
+    // payload (incl. the trusted amount). Same user + same token + same
+    // payload → same derived key → dedupe. Same token with a different
+    // user or any different payload field → different key → the payment
+    // settles independently instead of colliding with the first one.
     // The DB unique constraint on idempotency_key is the race-safe backstop.
-    if (idempotencyKey) {
+    const serverIdempotencyKey = await deriveServerIdempotencyKey(user.id, idempotencyKey, {
+      patientId,
+      providerId,
+      serviceId,
+      institutionId: institutionId || null,
+      paymentType: paymentType || 'consultation',
+      paymentMethod: paymentMethod || 'wallet',
+      currency: currency || 'ZMW',
+      amount,
+    });
+
+    if (serverIdempotencyKey) {
       const { data: existing } = await supabase
         .from('payments')
         .select('id, status, amount')
         .eq('patient_id', patientId)
-        .eq('idempotency_key', idempotencyKey)
+        .eq('idempotency_key', serverIdempotencyKey)
         .maybeSingle();
 
       if (existing) {
@@ -143,23 +181,6 @@ serve(async (req) => {
       }
     }
 
-    // Resolve the authoritative price server-side — never trust the client amount
-    let amount: number;
-    try {
-      const trusted = paymentType === 'pharmacy'
-        ? await resolveReferenceAmount(supabase as any, 'order', serviceId)
-        : await resolveServicePrice(supabase as any, serviceId);
-      amount = assertTrustedAmount(clientAmount, trusted);
-    } catch (e) {
-      if (e instanceof PriceMismatchError) {
-        return new Response(
-          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      throw e;
-    }
-
     console.log('Processing payment with splits:', { authenticatedUserId: user.id, amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType });
 
     // ATOMIC: Single RPC does debit + payment + splits + credits in ONE
@@ -174,7 +195,7 @@ serve(async (req) => {
       p_service_id: serviceId,
       p_payment_method: paymentMethod,
       p_currency: currency || 'ZMW',
-      p_idempotency_key: idempotencyKey || null,
+      p_idempotency_key: serverIdempotencyKey,
     });
 
     if (rpcError) {
