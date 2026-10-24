@@ -53,7 +53,7 @@ export function SpecialtyTiles() {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2.5" role="group" aria-label="Specialties">
+      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 lg:grid-cols-6" role="group" aria-label="Specialties">
         {TILES.map((tile) => {
           const Icon = tile.icon;
           const isActive =
@@ -67,7 +67,7 @@ export function SpecialtyTiles() {
               aria-pressed={isActive}
               aria-label={`Filter by ${tile.label}`}
               className={cn(
-                "flex flex-col items-center gap-2 rounded-2xl border-2 p-3 sm:p-4 min-h-[92px] transition-all",
+                "flex shrink-0 w-28 flex-col items-center gap-2 rounded-2xl border-2 p-3 sm:w-auto sm:p-4 min-h-[92px] transition-all",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 isActive
                   ? "border-primary-500 bg-primary-500/10 shadow-sm"

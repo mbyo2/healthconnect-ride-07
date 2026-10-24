@@ -4,6 +4,7 @@ import { ArrowRight, Search } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 
+import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 import { unsplash, unsplashSrcSet } from "./landingPhotos";
 import { LandingImg } from "./LandingImg";
 
@@ -16,8 +17,19 @@ const STORY_TABS = [
   { id: "emergency", name: "Emergency", quote: 2 },
 ];
 
+// Popular searches — every chip deep-links to a /search URL param that
+// SearchPage actually handles (q, category, specialty, mode). There is no
+// insurance param, so no NHIMA chip: it would land on an unfiltered list.
+const POPULAR_SEARCHES = [
+  { label: "Video visits", href: "/search?mode=online" },
+  { label: "Cardiology", href: "/search?specialty=Cardiology" },
+  { label: "Pediatrics", href: "/search?specialty=Pediatrics" },
+  { label: "General Practice", href: "/search?specialty=General+Practice" },
+];
+
 export const LandingHero = () => {
   const navigate = useNavigate();
+  const stats = usePlatformStats();
   const [query, setQuery] = useState("");
   const [activePartner, setActivePartner] = useState(0);
 
@@ -33,8 +45,7 @@ export const LandingHero = () => {
     <section className="relative overflow-hidden bg-hero-wash bg-canvas">
       <div className="relative z-10 mx-auto max-w-content px-4 pt-28 text-center sm:px-6 sm:pt-32 lg:px-8">
         <h1 className="mx-auto max-w-5xl font-display text-[2.75rem] font-medium leading-[1.05] tracking-tight text-midnight opacity-0 animate-hero-rise sm:text-6xl lg:text-[5rem]">
-          Healthcare patients love.
-          <br className="hidden sm:block" /> Book a doctor in seconds.
+          Book a verified doctor in Zambia — in person or by video.
         </h1>
 
         <p
@@ -68,8 +79,35 @@ export const LandingHero = () => {
         </form>
 
         <p
-          className="mt-4 opacity-0 animate-hero-rise"
+          className="mx-auto mt-5 max-w-xl text-sm font-medium text-graphite-600 dark:text-slate-300 opacity-0 animate-hero-rise"
           style={{ animationDelay: "0.24s" }}
+        >
+          {stats.doctors > 0 ? `${formatStat(stats.doctors)} verified practitioners` : "Verified HPCZ-registered practitioners"}
+          {" · "}
+          {stats.hospitals > 0 ? `${formatStat(stats.hospitals)} facilities` : "Clinics & hospitals nationwide"}
+          {" · NHIMA accepted"}
+        </p>
+
+        <div
+          className="mt-4 flex flex-wrap items-center justify-center gap-2 opacity-0 animate-hero-rise"
+          style={{ animationDelay: "0.28s" }}
+        >
+          <span className="text-xs font-medium text-graphite-400">Popular:</span>
+          {POPULAR_SEARCHES.map((chip) => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={() => navigate(chip.href)}
+              className="px-3.5 py-2 min-h-[44px] inline-flex items-center rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-medium text-graphite-600 dark:text-slate-300 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
+        <p
+          className="mt-4 opacity-0 animate-hero-rise"
+          style={{ animationDelay: "0.32s" }}
         >
           <button
             type="button"
@@ -107,7 +145,10 @@ export const LandingHero = () => {
               fetchpriority="high"
               decoding="async"
             />
-            <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 sm:left-auto sm:right-6 sm:mx-0">
+            <article className="relative z-20 mx-4 mt-4 max-w-sm rounded-card border border-canvas-silk bg-white/95 p-5 shadow-card-hover backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 sm:absolute sm:bottom-5 sm:left-auto sm:right-6 sm:mx-0 sm:mt-0 sm:border-white/70">
+              <span className="mb-3 inline-block px-2.5 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">
+                Illustrative story
+              </span>
               <p className="font-display text-base leading-snug text-midnight">
                 &ldquo;{featured.content}&rdquo;
               </p>

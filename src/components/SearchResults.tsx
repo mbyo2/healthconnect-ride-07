@@ -8,7 +8,7 @@ import { SearchPagination } from "@/components/SearchPagination";
 import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
 import { Volume2, MapPin, List } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const MemoizedProviderMap = memo(ProviderMap);
@@ -19,6 +19,24 @@ export const SearchResults = () => {
   const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm, setSearchTerm, setSearchQuery, setSelectedSpecialty, refreshProviders } = useSearch();
   const { speak } = useVoiceCommands();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [sortBy, setSortBy] = useState<'recommended' | 'rating' | 'fee-low' | 'fee-high'>('recommended');
+
+  // Client-side sort on a copy — default keeps the server order untouched.
+  // Result objects already carry rating + fee fields, so this is safe.
+  const feeOf = (p: any): number | null =>
+    p.consultation_fee_min ?? p.consultation_fee ?? p.consultation_fee_max ?? null;
+  const sortedProviders = useMemo(() => {
+    if (sortBy === 'recommended') return providers;
+    const copy = [...providers];
+    if (sortBy === 'rating') {
+      copy.sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
+    } else if (sortBy === 'fee-low') {
+      copy.sort((a, b) => (feeOf(a) ?? Number.POSITIVE_INFINITY) - (feeOf(b) ?? Number.POSITIVE_INFINITY));
+    } else if (sortBy === 'fee-high') {
+      copy.sort((a, b) => (feeOf(b) ?? Number.NEGATIVE_INFINITY) - (feeOf(a) ?? Number.NEGATIVE_INFINITY));
+    }
+    return copy;
+  }, [providers, sortBy]);
   
   useEffect(() => {
     if (!isLoading && speak && providers.length > 0) {
@@ -65,7 +83,7 @@ export const SearchResults = () => {
       {/* Header with simple controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-midnight">
+          <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-midnight">
             {providers.length > 0 
               ? `${totalCount} Healthcare Providers`
               : "No Providers Found"}
@@ -83,13 +101,13 @@ export const SearchResults = () => {
         
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex bg-muted rounded-lg p-1">
+          <div className="flex bg-canvas-bone border border-canvas-silk rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white dark:bg-slate-900 text-midnight shadow-sm'
+                  : 'text-graphite-500 hover:text-midnight'
               }`}
             >
               <List className="h-4 w-4" />
@@ -99,8 +117,8 @@ export const SearchResults = () => {
               onClick={() => setViewMode('map')}
               className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'map'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white dark:bg-slate-900 text-midnight shadow-sm'
+                  : 'text-graphite-500 hover:text-midnight'
               }`}
             >
               <MapPin className="h-4 w-4" />
@@ -108,6 +126,23 @@ export const SearchResults = () => {
             </button>
           </div>
           
+          {/* Sort */}
+          {providers.length > 0 && (
+            <label className="flex items-center gap-2 text-sm font-medium text-graphite-600">
+              <span className="sr-only">Sort results</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="h-11 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 px-3 text-sm font-medium text-midnight focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              >
+                <option value="recommended">Recommended</option>
+                <option value="rating">Highest rated</option>
+                <option value="fee-low">Lowest fee</option>
+                <option value="fee-high">Highest fee</option>
+              </select>
+            </label>
+          )}
+
           {/* Read Results Button */}
           {providers.length > 0 && (
             <Button 
@@ -122,45 +157,18 @@ export const SearchResults = () => {
         </div>
       </div>
       
-      {/* Empty state actions */}
-      {!isLoading && providers.length === 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 py-8 text-center">
-          <button
-            onClick={() => {
-              setSearchTerm("");
-              setSearchQuery("");
-              setSelectedSpecialty(null);
-              refreshProviders();
-            }}
-            className="vf-btn-primary min-h-[44px]"
-          >
-            Browse all doctors
-          </button>
-          <button
-            onClick={() => {
-              setSearchTerm("");
-              setSearchQuery("");
-              refreshProviders();
-            }}
-            className="vf-btn-secondary min-h-[44px]"
-          >
-            Clear search and try again
-          </button>
-        </div>
-      )}
-
       {/* Content */}
       {viewMode === 'map' ? (
         <div className="trust-card p-1 rounded-xl">
-          <MemoizedProviderMap 
-            providers={providers} 
+          <MemoizedProviderMap
+            providers={sortedProviders}
             userLocation={userLocation}
             maxDistance={maxDistance}
           />
         </div>
       ) : (
         <ProviderList
-          providers={providers}
+          providers={sortedProviders}
           onProviderSelect={(p) => {
             // Preserve the telehealth context (?mode=online) so the booking
             // modal preselects the virtual appointment type.

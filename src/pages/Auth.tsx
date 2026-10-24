@@ -163,6 +163,31 @@ const FALLBACK_SPECIALTIES: Array<{ value: string; label: string }> = [
 
 type SignupPath = null | "patient" | "provider" | "business";
 
+// One input treatment for the whole page (the sign-in token set).
+const inputCls =
+  "h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20";
+const selectCls =
+  "h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:ring-2 focus:ring-primary-500/20";
+
+// Password field with the same show/hide eye toggle as sign-in.
+const PasswordInput = (props: React.ComponentProps<typeof Input>) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <Input {...props} type={show ? "text" : "password"} className={`${inputCls} pr-10`} />
+      <button
+        type="button"
+        onClick={() => setShow(!show)}
+        aria-label={show ? "Hide password" : "Show password"}
+        aria-pressed={show}
+        className="absolute right-1 top-1/2 -translate-y-1/2 p-3 -m-1 rounded-md text-graphite-400 hover:text-midnight dark:text-slate-400 dark:hover:text-slate-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+};
+
 interface TermsAcceptanceProps {
   checked: boolean;
   error?: string;
@@ -398,14 +423,32 @@ export const Auth = () => {
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://doc0clock.online/auth" />
       </Helmet>
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 font-sans text-midnight">
+    <div className="min-h-screen bg-canvas font-sans text-midnight lg:grid lg:grid-cols-[1.05fr_1fr]">
+      {/* Brand panel — desktop only; layout only, form logic untouched */}
+      <div className="relative hidden overflow-hidden lg:block" aria-hidden>
+        <img
+          src="/images/landing/hero-1600.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-midnight/60" />
+        <div className="absolute inset-x-0 bottom-0 p-10">
+          <p className="font-display text-3xl font-medium text-white leading-snug">
+            Book a verified doctor in Zambia — in person or by video.
+          </p>
+          <p className="mt-3 text-sm font-medium text-white/80">
+            Verified HPCZ-registered providers · NHIMA accepted
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 py-8">
         <div className="text-center space-y-2">
           <Link to="/" className="mx-auto inline-flex flex-col items-center">
             <img src="/d0c-icon.svg" className="h-14 w-14 mb-1" alt="Doc' O Clock" />
             <h1 className="font-display text-3xl font-medium text-midnight tracking-tight">Doc' O Clock</h1>
           </Link>
-          <p className="text-sm text-graphite-500 font-medium tracking-wide">Enterprise Healthcare Platform</p>
+          <p className="text-sm text-graphite-500 font-medium tracking-wide">Book doctors, consult by video, manage your care</p>
         </div>
 
         <div className="vf-card !p-6 shadow-card">
@@ -426,7 +469,7 @@ export const Auth = () => {
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-graphite-600">Email Address</FormLabel>
-                      <FormControl><Input placeholder="you@example.online" {...field} type="email" autoComplete="email" className="h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
+                      <FormControl><Input placeholder="you@example.online" {...field} type="email" autoComplete="email" className={inputCls} /></FormControl>
                       <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
@@ -438,7 +481,7 @@ export const Auth = () => {
                       </div>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" {...field} className="h-11 text-sm font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" {...field} className={`${inputCls} pr-10`} />
                           <button type="button" onClick={() => setShowPassword(!showPassword)}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                             aria-pressed={showPassword}
@@ -472,38 +515,42 @@ export const Auth = () => {
               {signupPath === "patient" && (
                 <div className="space-y-4">
                   <p className="text-sm font-medium text-primary-500 tracking-wide">Patient Account Options</p>
-                  <Link to="/patient-registration" className="block w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all text-center">
-                    Full Registration with Onboarding
-                  </Link>
-                  <div className="text-center text-xs text-graphite-500 dark:text-slate-400 font-medium">or quick signup</div>
                   <Form {...patientForm}>
                     <form onSubmit={patientForm.handleSubmit(onPatientSignup)} className="space-y-3">
                       <div className="grid grid-cols-2 gap-2">
                         <FormField control={patientForm.control} name="firstName" render={({ field }) => (
-                          <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">First Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                          <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">First Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={patientForm.control} name="lastName" render={({ field }) => (
-                          <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Last Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                          <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Last Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                         )} />
                       </div>
                       <FormField control={patientForm.control} name="email" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Email</FormLabel><FormControl><Input {...field} type="email" className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Email</FormLabel><FormControl><Input {...field} type="email" className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="phone" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className={inputCls} /></FormControl></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="password" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                       )} />
+                      <p className="text-xs text-graphite-400 -mt-1">At least 6 characters</p>
                       <FormField control={patientForm.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
-                      <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all">
+                      <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
                         Quick Sign Up
                       </button>
                     </form>
                   </Form>
+                  <p className="text-center text-xs text-graphite-500 dark:text-slate-400">
+                    Prefer guided onboarding?{" "}
+                    <Link to="/patient-registration" className="font-medium text-primary-500 hover:underline">
+                      Full Registration with Onboarding
+                    </Link>{" "}
+                    — the quick signup above covers the basics; full registration adds your details step by step.
+                  </p>
                 </div>
               )}
 
@@ -514,17 +561,17 @@ export const Auth = () => {
                     <p className="text-sm font-medium text-primary-500 tracking-wide">Healthcare Professional Registration</p>
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={providerForm.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">First Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">First Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={providerForm.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Last Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Last Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={providerForm.control} name="providerType" render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Profession</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="h-11 border-graphite-300 dark:border-slate-700 text-base"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className={selectCls}><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {providerTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
@@ -536,7 +583,7 @@ export const Auth = () => {
                       <FormItem>
                         <FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Specialty</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="h-11 border-graphite-300 dark:border-slate-700 text-base"><SelectValue placeholder="Select specialty (optional)" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className={selectCls}><SelectValue placeholder="Select specialty (optional)" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {specialties.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                           </SelectContent>
@@ -551,7 +598,7 @@ export const Auth = () => {
                           <FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">
                             License / Reg. Number{prof?.requiresLicense ? " *" : ""}
                           </FormLabel>
-                          <FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl>
+                          <FormControl><Input {...field} className={inputCls} /></FormControl>
                           {prof?.requiresLicense && (
                             <p className="text-xs text-graphite-400">Required for {prof.label} — verified during application review.</p>
                           )}
@@ -560,16 +607,17 @@ export const Auth = () => {
                       );
                     }} />
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Email</FormLabel><FormControl><Input {...field} type="email" className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Email</FormLabel><FormControl><Input {...field} type="email" className={inputCls} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
+                      <p className="text-xs text-graphite-400 -mt-1">At least 6 characters</p>
                     <FormField control={providerForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={providerForm.watch("termsAccepted")} onChange={(checked) => providerForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={providerForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all">
+                    <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
                       Create Professional Account
                     </button>
                   </form>
@@ -585,7 +633,7 @@ export const Auth = () => {
                       <FormItem>
                         <FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Facility Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="h-11 border-graphite-300 dark:border-slate-700 text-base"><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className={selectCls}><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {businessTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
@@ -594,28 +642,28 @@ export const Auth = () => {
                       </FormItem>
                     )} />
                     <FormField control={businessForm.control} name="businessName" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Facility Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Healthcare" className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Facility Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Healthcare" className={inputCls} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="adminFirstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Admin First Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Admin First Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="adminLastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Admin Last Name</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Admin Last Name</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Facility Email</FormLabel><FormControl><Input {...field} type="email" className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Facility Email</FormLabel><FormControl><Input {...field} type="email" className={inputCls} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="city" render={({ field }) => (
-                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">City</FormLabel><FormControl><Input {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">City</FormLabel><FormControl><Input {...field} className={inputCls} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="country" render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Country</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl><SelectTrigger className="h-11 border-graphite-300 dark:border-slate-700 text-base"><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
+                            <FormControl><SelectTrigger className={selectCls}><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
                             <SelectContent>
                               {countries.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                             </SelectContent>
@@ -625,13 +673,14 @@ export const Auth = () => {
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
+                      <p className="text-xs text-graphite-400 -mt-1">At least 6 characters</p>
                     <FormField control={businessForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-11 text-base border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={businessForm.watch("termsAccepted")} onChange={(checked) => businessForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={businessForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all">
+                    <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
                       Register Business
                     </button>
                   </form>
@@ -640,6 +689,17 @@ export const Auth = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs font-medium text-graphite-500 dark:text-slate-400">
+          <span className="inline-flex items-center gap-1">
+            <ShieldCheck className="h-3.5 w-3.5 text-success-500" /> Verified HPCZ-registered providers
+          </span>
+          <span aria-hidden>·</span>
+          <span>Your data stays private</span>
+          <span aria-hidden>·</span>
+          <span>NHIMA accepted</span>
+        </p>
+      </div>
       </div>
     </div>
     </>
