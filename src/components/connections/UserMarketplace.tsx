@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { orIlikePattern } from '@/utils/postgrestFilter';
 import { useConnections } from '@/hooks/useConnections';
 import { useSession } from '@supabase/auth-helpers-react';
 import { Search } from 'lucide-react';
@@ -115,7 +116,8 @@ export const UserMarketplace = () => {
 
       // Apply search filter
       if (searchTerm) {
-        baseQuery = baseQuery.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%`);
+        const like = orIlikePattern(searchTerm);
+        baseQuery = baseQuery.or(`first_name.ilike.${like},last_name.ilike.${like},specialty.ilike.${like},city.ilike.${like}`);
       }
 
       const { data: profilesData, error } = await baseQuery.limit(50);

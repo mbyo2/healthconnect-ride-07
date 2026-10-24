@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { orIlikePattern } from "@/utils/postgrestFilter";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +52,7 @@ export function PatientInstitutionManager({ institutionId }: { institutionId: st
       const { data } = await supabase
         .from("profiles")
         .select("id, first_name, last_name, email")
-        .or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
+        .or(`first_name.ilike.${orIlikePattern(searchTerm)},last_name.ilike.${orIlikePattern(searchTerm)},email.ilike.${orIlikePattern(searchTerm)}`)
         .limit(10);
       return (data as any[]) || [];
     },

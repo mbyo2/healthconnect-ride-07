@@ -1,4 +1,16 @@
 // Server-side TOTP (RFC 6238) management. All secret material stays server-side.
+//
+// P3-15 (Stage C2b): secrets are ENCRYPTED AT REST. The TOTP secret is
+// stored AES-GCM-encrypted under the server-held TOTP_ENCRYPTION_KEY
+// (base64, 32 bytes) in the format `enc:v1:<base64(iv||ciphertext)>`,
+// and backup codes are stored only as SHA-256 hashes (`sha256:<hex>`).
+// user_two_factor_secrets already sits behind deny-all RLS reachable
+// only by this function's service role; encryption at rest removes the
+// plaintext exposure if the table is ever read out of band. If the key
+// is not configured, enrolment fails closed (503) rather than storing
+// plaintext. Values without the enc:v1: prefix are treated as legacy
+// plaintext (pre-fix rows) and still verify; backup-code arrays are
+// normalised to hashes on the next write.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -80,6 +92,92 @@ function randomBackupCode(): string {
   crypto.getRandomValues(buf);
   const hex = Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
   return hex.match(/.{1,4}/g)!.join('-');
+}
+
+// --- encryption at rest (P3-15) ---
+const ENC_PREFIX = 'enc:v1:';
+const HASH_PREFIX = 'sha256:';
+
+function b64(bytes: Uint8Array): string {
+  let s = '';
+  for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s);
+}
+function unb64(s: string): Uint8Array {
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function encryptionKey(): Promise<CryptoKey | null> {
+  const raw = Deno.env.get('TOTP_ENCRYPTION_KEY');
+  if (!raw) return null;
+  try {
+    const keyBytes = unb64(raw);
+    if (keyBytes.length !== 32) return null;
+    return await crypto.subtle.importKey('raw', keyBytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+  } catch {
+    return null;
+  }
+}
+
+async function encryptSecret(plain: string): Promise<string | null> {
+  const key = await encryptionKey();
+  if (!key) return null;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, key, new TextEncoder().encode(plain)
+  ));
+  const packed = new Uint8Array(iv.length + ct.length);
+  packed.set(iv); packed.set(ct, iv.length);
+  return ENC_PREFIX + b64(packed);
+}
+
+async function decryptSecret(stored: string): Promise<string> {
+  if (!stored.startsWith(ENC_PREFIX)) return stored; // legacy plaintext row
+  const key = await encryptionKey();
+  if (!key) throw new Error('TOTP_ENCRYPTION_KEY not configured');
+  const packed = unb64(stored.slice(ENC_PREFIX.length));
+  const pt = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: packed.slice(0, 12) }, key, packed.slice(12)
+  );
+  return new TextDecoder().decode(pt);
+}
+
+async function hashBackupCode(code: string): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code)));
+  return HASH_PREFIX + Array.from(digest).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function toStoredBackupCodes(codes: string[]): Promise<string[]> {
+  return Promise.all(codes.map((c) => (c.startsWith(HASH_PREFIX) ? c : hashBackupCode(c))));
+}
+
+/** A stored entry matches if it is the code's hash, or a legacy plaintext code. */
+async function backupCodeMatches(storedEntry: string, code: string): Promise<boolean> {
+  if (storedEntry.startsWith(HASH_PREFIX)) return storedEntry === (await hashBackupCode(code));
+  return storedEntry === code;
+}
+
+async function anyBackupCodeMatches(stored: unknown, code: string): Promise<boolean> {
+  if (!Array.isArray(stored)) return false;
+  for (const entry of stored) {
+    if (typeof entry === 'string' && (await backupCodeMatches(entry, code))) return true;
+  }
+  return false;
+}
+
+/** Stored array with the used code removed and every entry normalised to a hash. */
+async function remainingBackupCodes(stored: unknown, usedCode: string): Promise<string[]> {
+  if (!Array.isArray(stored)) return [];
+  const kept: string[] = [];
+  for (const entry of stored) {
+    if (typeof entry !== 'string') continue;
+    if (await backupCodeMatches(entry, usedCode)) continue;
+    kept.push(entry.startsWith(HASH_PREFIX) ? entry : await hashBackupCode(entry));
+  }
+  return kept;
 }
 
 // --- brute-force protection: 10 failed code attempts locks verification
@@ -164,8 +262,8 @@ Deno.serve(async (req) => {
           .eq('user_id', user.id)
           .maybeSingle();
         const valid = !!prior && (
-          (await verifyTotp(prior.secret, code)) ||
-          (Array.isArray(prior.backup_codes) && prior.backup_codes.includes(code))
+          (await verifyTotp(await decryptSecret(prior.secret), code)) ||
+          (await anyBackupCodeMatches(prior.backup_codes, code))
         );
         if (!valid) {
           await noteFailure(admin, user.id);
@@ -174,12 +272,18 @@ Deno.serve(async (req) => {
         await noteSuccess(admin, user.id);
       }
 
-      // Generate secret + backup codes; store server-side; return QR URL
+      // Generate secret + backup codes; store encrypted/hashed
+      // server-side; return QR URL + the plaintext codes ONCE.
       const secret = randomBase32(20);
       const codes = Array.from({ length: 10 }, () => randomBackupCode());
+      const storedSecret = await encryptSecret(secret);
+      if (!storedSecret) {
+        // Fail closed: never persist a plaintext TOTP secret (P3-15).
+        return json({ ok: false, error: 'Two-factor storage is not configured on the server' }, 503);
+      }
       const { error } = await admin
         .from('user_two_factor_secrets')
-        .upsert({ user_id: user.id, secret, backup_codes: codes, updated_at: new Date().toISOString() });
+        .upsert({ user_id: user.id, secret: storedSecret, backup_codes: await toStoredBackupCodes(codes), updated_at: new Date().toISOString() });
       if (error) return json({ error: 'Setup failed' }, 500);
       await admin
         .from('user_two_factor')
@@ -203,11 +307,11 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (!row) return json({ ok: false, error: '2FA not set up' }, 400);
 
-      let valid = await verifyTotp(row.secret, code);
+      let valid = await verifyTotp(await decryptSecret(row.secret), code);
       let backupUsed = false;
-      if (!valid && Array.isArray(row.backup_codes) && row.backup_codes.includes(code)) {
+      if (!valid && (await anyBackupCodeMatches(row.backup_codes, code))) {
         valid = true; backupUsed = true;
-        const remaining = row.backup_codes.filter((c: string) => c !== code);
+        const remaining = await remainingBackupCodes(row.backup_codes, code);
         await admin
           .from('user_two_factor_secrets')
           .update({ backup_codes: remaining, updated_at: new Date().toISOString() })
@@ -241,8 +345,8 @@ Deno.serve(async (req) => {
         .eq('user_id', user.id)
         .maybeSingle();
       if (!row) return json({ ok: true });
-      const valid = (await verifyTotp(row.secret, code)) ||
-        (Array.isArray(row.backup_codes) && row.backup_codes.includes(code));
+      const valid = (await verifyTotp(await decryptSecret(row.secret), code)) ||
+        (await anyBackupCodeMatches(row.backup_codes, code));
       if (!valid) {
         await noteFailure(admin, user.id);
         return json({ ok: false, error: 'Invalid code' }, 400);
@@ -261,8 +365,8 @@ Deno.serve(async (req) => {
         .eq('user_id', user.id)
         .maybeSingle();
       if (!existing) return json({ ok: false, error: '2FA not set up' }, 400);
-      const valid = (await verifyTotp(existing.secret, code)) ||
-        (Array.isArray(existing.backup_codes) && existing.backup_codes.includes(code));
+      const valid = (await verifyTotp(await decryptSecret(existing.secret), code)) ||
+        (await anyBackupCodeMatches(existing.backup_codes, code));
       if (!valid) {
         await noteFailure(admin, user.id);
         return json({ ok: false, error: 'Invalid code' }, 400);
@@ -271,7 +375,7 @@ Deno.serve(async (req) => {
       const codes = Array.from({ length: 10 }, () => randomBackupCode());
       const { error } = await admin
         .from('user_two_factor_secrets')
-        .update({ backup_codes: codes, updated_at: new Date().toISOString() })
+        .update({ backup_codes: await toStoredBackupCodes(codes), updated_at: new Date().toISOString() })
         .eq('user_id', user.id);
       if (error) return json({ error: 'Failed' }, 500);
       await admin.from('user_two_factor').update({ backup_codes_remaining: codes.length }).eq('user_id', user.id);

@@ -1,6 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import {
+  loadChatHistory,
+  saveChatHistory,
+  clearChatHistory as clearStoredChatHistory,
+  purgeLegacyChatHistory,
+} from '@/utils/chatHistoryStorage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,35 +61,67 @@ interface MedGemmaChatProps {
   roleOverride?: string;
 }
 
-const STORAGE_KEY = 'doc_oclock_ai_chat_history';
+const welcomeMessages = (): Message[] => [
+  {
+    role: 'assistant',
+    content: AI_WELCOME_MESSAGE,
+    timestamp: new Date()
+  }
+];
 
 export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps) => {
   const { currentRole, userRole } = useUserRoles();
   const activeRole = roleOverride || currentRole || userRole || 'patient';
-  // Load messages from localStorage on mount
-  const [messages, setMessages] = useState<Message[]>(() => {
+  // Chat history is health information: it is persisted per-user in
+  // sessionStorage only (see utils/chatHistoryStorage) — never in a
+  // global localStorage key shared by every account on the device.
+  const [chatUserId, setChatUserId] = useState<string | null>(null);
+  const loadedForRef = useRef<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>(welcomeMessages);
+
+  // Resolve the signed-in user and follow auth changes. On sign-out the
+  // stored history for that user is cleared and the view resets, so a
+  // shared device never shows the previous user's conversation.
+  useEffect(() => {
+    purgeLegacyChatHistory();
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setChatUserId(data.session?.user?.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        clearStoredChatHistory(loadedForRef.current);
+        loadedForRef.current = null;
+        setChatUserId(null);
+        setMessages(welcomeMessages());
+      } else if (session?.user) {
+        setChatUserId(session.user.id);
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Load this user's stored history once their id is known.
+  useEffect(() => {
+    if (!chatUserId || loadedForRef.current === chatUserId) return;
+    loadedForRef.current = chatUserId;
     try {
-      const saved = safeLocalGet(STORAGE_KEY);
+      const saved = loadChatHistory(chatUserId);
       if (saved) {
         const parsed = JSON.parse(saved);
         // Convert timestamp strings back to Date objects
-        return parsed.map((msg: any) => ({
+        setMessages(parsed.map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
-        }));
+        })));
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
     }
-    // Default welcome message
-    return [
-      {
-        role: 'assistant',
-        content: AI_WELCOME_MESSAGE,
-        timestamp: new Date()
-      }
-    ];
-  });
+  }, [chatUserId]);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -108,14 +145,17 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
     }
   }, [location.state]);
 
-  // Save messages to localStorage whenever they change
+  // Save messages to this user's session-scoped store whenever they
+  // change — but only after the stored history for that user has been
+  // loaded, so the welcome message never overwrites a real history.
   useEffect(() => {
+    if (!chatUserId || loadedForRef.current !== chatUserId) return;
     try {
-      safeLocalSet(STORAGE_KEY, JSON.stringify(messages));
+      saveChatHistory(chatUserId, JSON.stringify(messages));
     } catch (error) {
       console.error('Failed to save chat history:', error);
     }
-  }, [messages]);
+  }, [messages, chatUserId]);
 
   // Auto-scroll to bottom — the ref sits on the Radix ScrollArea *Root*
   // (overflow-hidden, never scrolls); the real scroller is the inner viewport.
@@ -322,14 +362,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   };
 
   const clearChatHistory = () => {
-    setMessages([
-      {
-        role: 'assistant',
-        content: AI_WELCOME_MESSAGE,
-        timestamp: new Date()
-      }
-    ]);
-    safeLocalRemove(STORAGE_KEY);
+    setMessages(welcomeMessages());
+    clearStoredChatHistory(chatUserId);
     toast.success('Chat history cleared');
   };
 
