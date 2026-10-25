@@ -297,21 +297,22 @@ const Settings = () => {
     }
   };
 
-  const handleAccessibilityToggle = async (checked: boolean) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await upsertUserSettings(user.id, { accessibility_mode: checked });
-      }
-      if (checked) {
-        enableEasyReading();
-        showSuccess({ message: "Accessibility mode enabled" });
-      } else {
-        disableEasyReading();
-        showSuccess({ message: "Accessibility mode disabled" });
-      }
-    } catch (error) {
-      toast.error("Failed to update accessibility settings");
+  // Easy Reading persists through the AccessibilityContext — the SAME
+  // single persistence function the floating Accessibility menu uses
+  // (enable/disableEasyReading -> localStorage `accessibility_easy_reading`).
+  // This handler previously awaited a divergent upsert into
+  // `user_settings.accessibility_mode` BEFORE touching the context; that
+  // table does not exist live (PostgREST PGRST205, proven 2026-10-25), so
+  // the write threw, the toast showed "Failed to update accessibility
+  // settings", and the context was never updated — the toggle always
+  // failed in Settings while the menu path worked. One write path only.
+  const handleAccessibilityToggle = (checked: boolean) => {
+    if (checked) {
+      enableEasyReading();
+      showSuccess({ message: "Accessibility mode enabled" });
+    } else {
+      disableEasyReading();
+      showSuccess({ message: "Accessibility mode disabled" });
     }
   };
 
