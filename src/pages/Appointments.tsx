@@ -101,7 +101,7 @@ export const AppointmentsPage = () => {
           const { data: providers } = await supabase
             .from("provider_directory")
             .select(
-              "id, first_name, last_name, specialty, avatar_url, phone, role, " +
+              "id, first_name, last_name, specialty, avatar_url, role, " +
               "consultation_fee_min, consultation_fee_max, telemedicine_available, " +
               "typical_wait_time, primary_practice_location, location"
             )

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Calendar, MapPin, Star, Clock, Award, User, Phone, Mail,
+  Calendar, MapPin, Star, Clock, Award, User,
   GraduationCap, DollarSign, Shield, Video, Home, Building2,
   Languages, Stethoscope, CheckCircle2,
 } from "lucide-react";
@@ -37,8 +37,6 @@ const ProviderProfile = () => {
           subspecialties,
           avatar_url,
           provider_type,
-          email,
-          phone,
           years_experience,
           rating,
           reviews_count,
@@ -153,20 +151,6 @@ const ProviderProfile = () => {
                 <div className="flex items-start gap-2.5">
                   <Clock className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                   <span>Avg. wait: {provider.typical_wait_time}</span>
-                </div>
-              )}
-
-              {provider.phone && (
-                <div className="flex items-start gap-2.5">
-                  <Phone className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                  <span>{provider.phone}</span>
-                </div>
-              )}
-
-              {provider.email && (
-                <div className="flex items-start gap-2.5">
-                  <Mail className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                  <span className="break-all">{provider.email}</span>
                 </div>
               )}
 

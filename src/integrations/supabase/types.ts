@@ -23557,7 +23557,6 @@ export type Database = {
           city: string | null
           consultation_fee_max: number | null
           consultation_fee_min: number | null
-          email: string | null
           first_name: string | null
           graduation_year: number | null
           home_visits_available: boolean | null
@@ -23568,7 +23567,6 @@ export type Database = {
           last_name: string | null
           location: string | null
           medical_school: string | null
-          phone: string | null
           primary_practice_location: string | null
           provider_type:
             | Database["public"]["Enums"]["healthcare_provider_type"]
@@ -23595,7 +23593,6 @@ export type Database = {
           city?: string | null
           consultation_fee_max?: number | null
           consultation_fee_min?: number | null
-          email?: string | null
           first_name?: string | null
           graduation_year?: number | null
           home_visits_available?: boolean | null
@@ -23606,7 +23603,6 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           medical_school?: string | null
-          phone?: string | null
           primary_practice_location?: string | null
           provider_type?:
             | Database["public"]["Enums"]["healthcare_provider_type"]
@@ -23633,7 +23629,6 @@ export type Database = {
           city?: string | null
           consultation_fee_max?: number | null
           consultation_fee_min?: number | null
-          email?: string | null
           first_name?: string | null
           graduation_year?: number | null
           home_visits_available?: boolean | null
@@ -23644,7 +23639,6 @@ export type Database = {
           last_name?: string | null
           location?: string | null
           medical_school?: string | null
-          phone?: string | null
           primary_practice_location?: string | null
           provider_type?:
             | Database["public"]["Enums"]["healthcare_provider_type"]

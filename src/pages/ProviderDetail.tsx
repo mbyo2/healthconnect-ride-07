@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import {
   MapPin, Clock, Star, CalendarPlus, Video, Shield,
   Award, GraduationCap, Languages, CheckCircle, Building2,
-  Wallet, Home, Phone, Mail, Stethoscope, Users,
+  Wallet, Home, Stethoscope,
 } from "lucide-react";
 import { RatingDisplay } from "@/components/RatingDisplay";
 import { useQuery } from "@tanstack/react-query";
@@ -74,8 +74,6 @@ export const ProviderDetail = () => {
           subspecialties,
           avatar_url,
           provider_type,
-          email,
-          phone,
           years_experience,
           rating,
           reviews_count,
@@ -574,22 +572,6 @@ export const ProviderDetail = () => {
                   <div className="flex flex-wrap gap-1.5">
                     {langs.map(l => <Badge key={l} variant="secondary" className="text-xs">{l}</Badge>)}
                   </div>
-                </Section>
-              )}
-
-              {/* Contact */}
-              {(provider.phone || provider.email) && (
-                <Section icon={Users} title="Contact">
-                  {provider.phone && (
-                    <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-sm text-primary-600 hover:underline">
-                      <Phone className="h-4 w-4" /> {provider.phone}
-                    </a>
-                  )}
-                  {provider.email && (
-                    <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-sm text-primary-600 hover:underline">
-                      <Mail className="h-4 w-4" /> {provider.email}
-                    </a>
-                  )}
                 </Section>
               )}
             </div>
