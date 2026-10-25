@@ -23,25 +23,31 @@ const AI_MODEL_CHAIN = [
 ];
 const AI_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-function getProvider() {
+function getProviders() {
+  // ALL configured providers, in spine order. The pre-fix code returned
+  // only the FIRST configured provider, so when the OpenRouter free
+  // models rotated (404) the scribe died with 'AI provider error 404'
+  // even though the Lovable gateway was healthy - the shared spine in
+  // _shared/ai.ts falls through providers, and so does this now.
+  const providers: any[] = [];
   const openRouterKey = Deno.env.get("OPENROUTER_API_KEY");
-  if (openRouterKey) return { endpoint: AI_ENDPOINT, models: AI_MODEL_CHAIN, headers: {
+  if (openRouterKey) providers.push({ endpoint: AI_ENDPOINT, models: AI_MODEL_CHAIN, headers: {
     "Authorization": `Bearer ${openRouterKey}`,
     "Content-Type": "application/json",
     "HTTP-Referer": "https://doc0clock.online",
     "X-Title": "Doc' O Clock",
-  }};
+  }});
   const hfToken = Deno.env.get("HF_TOKEN");
-  if (hfToken) return { endpoint: "https://api-inference.huggingface.co/v1/chat/completions", models: ["google/medgemma-1.5-4b-it"], headers: {
+  if (hfToken) providers.push({ endpoint: "https://api-inference.huggingface.co/v1/chat/completions", models: ["google/medgemma-1.5-4b-it"], headers: {
     "Authorization": `Bearer ${hfToken}`,
     "Content-Type": "application/json",
-  }};
+  }});
   const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-  if (lovableKey) return { endpoint: "https://ai.gateway.lovable.dev/v1/chat/completions", models: ["google/gemini-2.5-flash"], headers: {
+  if (lovableKey) providers.push({ endpoint: "https://ai.gateway.lovable.dev/v1/chat/completions", models: ["google/gemini-2.5-flash"], headers: {
     "Authorization": `Bearer ${lovableKey}`,
     "Content-Type": "application/json",
-  }};
-  return null;
+  }});
+  return providers;
 }
 
 function extractText(data: any): string {
@@ -58,23 +64,25 @@ function extractText(data: any): string {
 }
 
 async function chatComplete(messages: any[], maxTokens = 1500): Promise<{ text: string; model: string }> {
-  const provider = getProvider();
-  if (!provider) throw new Error("AI service not configured. Set OPENROUTER_API_KEY in edge function secrets.");
+  const providers = getProviders();
+  if (!providers.length) throw new Error("AI service not configured. Set OPENROUTER_API_KEY in edge function secrets.");
   let lastErr: any = null;
-  for (const model of provider.models) {
-    try {
-      const res = await fetch(provider.endpoint, {
-        method: "POST",
-        headers: provider.headers,
-        body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature: 0.2, stream: false }),
-      });
-      if (!res.ok) { lastErr = new Error(`AI provider error ${res.status}`); continue; }
-      const data = await res.json();
-      const text = extractText(data);
-      if (text) return { text, model };
-      lastErr = new Error("Empty AI response");
-    } catch (e) {
-      lastErr = e;
+  for (const provider of providers) {
+    for (const model of provider.models) {
+      try {
+        const res = await fetch(provider.endpoint, {
+          method: "POST",
+          headers: provider.headers,
+          body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature: 0.2, stream: false }),
+        });
+        if (!res.ok) { lastErr = new Error(`AI provider error ${res.status}`); continue; }
+        const data = await res.json();
+        const text = extractText(data);
+        if (text) return { text, model };
+        lastErr = new Error("Empty AI response");
+      } catch (e) {
+        lastErr = e;
+      }
     }
   }
   throw lastErr ?? new Error("AI request failed");

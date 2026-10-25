@@ -14,12 +14,13 @@ Deno.serve(async (req) => {
     if (!authHeader) throw new Error('No authorization header');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const callerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring('Bearer '.length).trim() : '';
+    const { data: { user } } = await supabase.auth.getUser(callerToken);
     if (!user) throw new Error('Unauthorized');
 
     const rateLimited = await aiRateLimitResponse(user.id, 'ocr-insurance-card', 10, corsHeaders);

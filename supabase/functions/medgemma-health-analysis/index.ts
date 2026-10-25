@@ -76,10 +76,14 @@ serve(async (req: Request) => {
     }
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
       { global: { headers: { Authorization: authHeader } } }
     );
-    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    // Explicit token (see doc-chat): a no-argument getUser() is
+    // unreliable in the edge runtime, and the apikey falls back to the
+    // service-role key when the legacy anon-key env var is unset.
+    const callerToken = authHeader.substring('Bearer '.length).trim();
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(callerToken);
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }

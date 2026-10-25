@@ -38,10 +38,14 @@ serve(async (req: Request) => {
     }
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
       { global: { headers: { Authorization: authHeader } } }
     );
-    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    // Pass the caller's JWT explicitly: edge functions have no session
+    // storage, so a no-argument getUser() always fails (this 401'd every
+    // legitimate clinician call until the 2026-10-25 completeness fix).
+    const token = authHeader.substring('Bearer '.length).trim();
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token);
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
