@@ -120,6 +120,40 @@ main {
   scroll-behavior: auto !important;
 }
 
+/* ─── Skeleton shimmer (YouTube-style) ───
+   THE one shimmer implementation for every loading placeholder in the app.
+   Token-driven: the base is --muted (flips with the theme — never a light
+   slab on a dark page) and the sweep is a low-alpha --foreground wash, so
+   it reads correctly on light and dark surfaces alike. Motion honours the
+   OS preference below and the per-account a11y reduced-motion setting
+   above (which globally freezes animations, leaving a static block). */
+.doc-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: hsl(var(--muted));
+}
+.doc-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--foreground) / 0.07) 50%,
+    transparent 100%
+  );
+  animation: doc-shimmer-sweep 1.6s ease-in-out infinite;
+}
+@keyframes doc-shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .doc-shimmer::after {
+    animation: none;
+  }
+}
+
 /* Dyslexia-friendly font: OpenDyslexic when loaded, gentle fallback stack */
 .a11y-dyslexia body,
 .a11y-dyslexia button,
