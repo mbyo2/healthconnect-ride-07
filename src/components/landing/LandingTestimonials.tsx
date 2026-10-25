@@ -86,15 +86,14 @@ export const Testimonials = () => {
           {ZAMBIAN_TESTIMONIALS.slice(0, 6).map((t, idx) => (
             <div key={idx} className="vf-card flex flex-col justify-between space-y-4 group">
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                {/* Honesty labelling lives once at section level (see the
+                    intro above) — not repeated as a pill on every card. */}
+                <div className="flex items-center">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">
-                    Illustrative story
-                  </span>
                 </div>
                 <div className="relative pt-1">
                   <Quote className="h-5 w-5 text-canvas-silk absolute -top-1 -left-1" />
