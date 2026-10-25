@@ -43,8 +43,8 @@ export function useMedicalRecords(userId: string | undefined) {
                     .eq('patient_id', userId)
                     .order('test_date', { ascending: false })
                     .limit(50),
-                (supabase.from('prescriptions' as any) as any)
-                    .select('id, medication_name, dosage, frequency, created_at')
+                (supabase.from('comprehensive_prescriptions' as any) as any)
+                    .select('id, medication_name, dosage, created_at')
                     .eq('patient_id', userId)
                     .order('created_at', { ascending: false })
                     .limit(50),
