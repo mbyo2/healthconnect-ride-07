@@ -9,6 +9,7 @@ import {
   FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2, Pencil, Trash2
 } from "lucide-react";
 import { LabRequest } from "@/types/lab";
+import { SkeletonLine, SkeletonTableRows } from "@/components/ui/skeleton-kit";
 import { toast } from "sonner";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -130,7 +131,7 @@ const LabManagement = () => {
     }
   };
 
-  const { data: requests } = useQuery({
+  const { data: requests, isLoading: requestsLoading } = useQuery({
     queryKey: ["lab-requests"],
     queryFn: async () => {
       try {
@@ -180,7 +181,7 @@ const LabManagement = () => {
     },
   });
 
-  const { data: testCatalog = [] } = useQuery({
+  const { data: testCatalog = [], isLoading: catalogLoading } = useQuery({
     queryKey: ["lab-test-catalog"],
     queryFn: async () => {
       const { data, error } = await supabase.from("lab_test_catalog" as any).select("*").order("name");
@@ -704,6 +705,7 @@ const LabManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-canvas-silk">
+                  {requestsLoading && <SkeletonTableRows rows={5} cells={7} />}
                   {requests
                     ?.filter(
                       (r) =>
@@ -901,6 +903,16 @@ const LabManagement = () => {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {catalogLoading &&
+                [0, 1, 2, 3].map((i) => (
+                  <div key={i} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2" aria-hidden>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <SkeletonLine className="h-3.5 w-1/2" />
+                      <SkeletonLine className="h-3 w-2/3" />
+                    </div>
+                    <SkeletonLine className="h-4 w-14 shrink-0" />
+                  </div>
+                ))}
               {testCatalog.map((test) => (
                 <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
                   <div className="min-w-0">
@@ -927,7 +939,7 @@ const LabManagement = () => {
                 </div>
               ))}
             </div>
-            {testCatalog.length === 0 && (
+            {testCatalog.length === 0 && !catalogLoading && (
               <p className="text-center text-xs text-slate-400 py-8">No tests in the catalog yet. Add your first test to start receiving orders.</p>
             )}
           </div>

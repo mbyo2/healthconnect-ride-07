@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 
 interface ChatContact {
   id: string;
@@ -136,7 +137,9 @@ export const ChatList = () => {
       return (
         <div className="grid gap-2 p-4" role="status" aria-label="Loading contacts">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" aria-hidden />
+            <div key={i} className="rounded-xl px-3" aria-hidden>
+              <SkeletonListRow />
+            </div>
           ))}
         </div>
       );

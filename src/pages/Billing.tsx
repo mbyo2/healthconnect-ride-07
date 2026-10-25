@@ -10,6 +10,8 @@ import { Plus, Receipt, CheckCircle, Clock, AlertCircle, Download, Loader2 } fro
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonLine, SkeletonTableRows } from "@/components/ui/skeleton-kit";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
@@ -319,7 +321,24 @@ export const Billing = () => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return (
+      <div className="container mx-auto p-6 max-w-6xl" role="status" aria-label="Loading billing and invoices">
+        <div className="flex justify-between items-center mb-6" aria-hidden>
+          <div className="space-y-2">
+            <SkeletonLine className="h-8 w-56" />
+            <SkeletonLine className="h-4 w-80 max-w-full" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-md" />
+        </div>
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden" aria-hidden>
+          <table className="w-full">
+            <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <SkeletonTableRows rows={6} cells={4} />
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -20,6 +20,8 @@ import { VitalsFlowsheet } from "@/components/clinical/VitalsFlowsheet";
 import { ProblemList } from "@/components/clinical/ProblemList";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { useAuth } from "@/context/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonCard, SkeletonLine, SkeletonListRow } from "@/components/ui/skeleton-kit";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
 import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
@@ -109,11 +111,22 @@ export default function MedicalRecords() {
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 font-sans">
-        <div className="max-w-content mx-auto space-y-4">
-          <div className="h-10 w-64 rounded-xl bg-white dark:bg-slate-900 animate-pulse" />
+        <div className="max-w-content mx-auto space-y-4" role="status" aria-label="Loading your health records">
+          <Skeleton className="h-10 w-64 rounded-xl" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 h-64 rounded-2xl bg-white dark:bg-slate-900 animate-pulse" />
-            <div className="h-64 rounded-2xl bg-white dark:bg-slate-900 animate-pulse" />
+            <div className="lg:col-span-2 rounded-2xl border border-canvas-silk bg-white px-5 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
+              {[0, 1, 2, 3].map((i) => (
+                <SkeletonListRow key={i} className="border-b border-canvas-silk py-4 last:border-0 dark:border-slate-800" />
+              ))}
+            </div>
+            <SkeletonCard className="h-64">
+              <div className="space-y-3">
+                <SkeletonLine className="h-5 w-1/2" />
+                <SkeletonLine className="w-full" />
+                <SkeletonLine className="w-5/6" />
+                <SkeletonLine className="w-4/6" />
+              </div>
+            </SkeletonCard>
           </div>
         </div>
       </div>

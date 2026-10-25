@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { SkeletonLine } from "@/components/ui/skeleton-kit";
 import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
@@ -178,9 +179,13 @@ export function PatientOverviewHero() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse" aria-hidden>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" aria-hidden>
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="rounded-2xl border bg-card p-4 h-32" />
+          <div key={i} className="rounded-2xl border bg-card p-4 h-32 space-y-3">
+            <SkeletonLine className="h-3 w-16" />
+            <SkeletonLine className="h-7 w-20" />
+            <SkeletonLine className="h-3 w-24" />
+          </div>
         ))}
       </div>
     );

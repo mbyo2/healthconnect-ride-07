@@ -1,6 +1,7 @@
 import { format, isToday as isTodayFn } from "date-fns";
 import { CalendarX2, ChevronLeft, ChevronRight, Video, MapPin, ChevronRight as GoIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SkeletonCircle, SkeletonLine } from "@/components/ui/skeleton-kit";
 
 export interface AgendaAppointment {
   id: string;
@@ -125,7 +126,18 @@ export function AgendaTimeline({
 
       {/* Timeline */}
       {loading ? (
-        <div className="p-8 text-center text-xs text-slate-500">Loading agenda…</div>
+        <div className="px-4 py-4 space-y-4" role="status" aria-label="Loading agenda">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-start gap-3" aria-hidden>
+              <SkeletonLine className="h-4 w-12 shrink-0" />
+              <SkeletonCircle className="h-3 w-3 mt-1" />
+              <div className="flex-1 space-y-2 rounded-2xl border border-canvas-silk dark:border-slate-800 p-3">
+                <SkeletonLine className="h-4 w-1/2" />
+                <SkeletonLine className="h-3 w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : appointments.length === 0 ? (
         <div className="p-8 text-center">
           <CalendarX2 className="h-8 w-8 mx-auto mb-3 text-slate-300 dark:text-slate-600" aria-hidden />

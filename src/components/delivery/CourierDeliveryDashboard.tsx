@@ -8,6 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import { updateDeliveryStatus } from '@/services/deliveryService';
 import { useCourierLocation } from '@/hooks/useCourierLocation';
 import { toast } from 'sonner';
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonBlock, SkeletonLine } from "@/components/ui/skeleton-kit";
 
 interface DeliveryOrder {
   id: string;
@@ -135,7 +137,21 @@ export function CourierDeliveryDashboard() {
   };
 
   if (loading) {
-    return <div className="p-4 text-center">Loading deliveries...</div>;
+    return (
+      <div className="space-y-4" role="status" aria-label="Loading deliveries">
+        <Skeleton className="h-9 w-full rounded-lg" />
+        {[0, 1].map((i) => (
+          <div key={i} className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-3" aria-hidden>
+            <div className="flex items-center justify-between">
+              <SkeletonLine className="h-5 w-36" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <SkeletonBlock className="h-14 rounded-lg" />
+            <SkeletonBlock className="h-14 rounded-lg" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (!courierId) {

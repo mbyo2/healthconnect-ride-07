@@ -14,7 +14,7 @@ import { WaitlistSignup } from "@/components/booking/WaitlistSignup";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { useState } from "react";
 import { Provider } from "@/types/provider";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonProviderProfile } from "@/components/ui/skeleton-kit";
 import { Badge } from "@/components/ui/badge";
 import { ProviderSlotsPreview } from "@/components/booking/ProviderSlotsPreview";
 
@@ -128,8 +128,8 @@ export const ProviderDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-canvas p-6 flex justify-center items-center">
-        <Skeleton className="h-64 w-full max-w-4xl rounded-2xl" />
+      <div className="min-h-screen bg-canvas p-6" role="status" aria-label="Loading provider profile">
+        <SkeletonProviderProfile />
       </div>
     );
   }

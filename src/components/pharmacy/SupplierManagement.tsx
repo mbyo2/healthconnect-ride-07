@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { SkeletonTableRows } from "@/components/ui/skeleton-kit";
 import { Switch } from '@/components/ui/switch';
 import {
   Table,
@@ -336,9 +337,21 @@ const SupplierManagement = () => {
       </CardHeader>
       <CardContent>
         {isLoading || institutionLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Contact Person</TableHead>
+                <TableHead className="hidden md:table-cell">Contact Info</TableHead>
+                <TableHead className="hidden lg:table-cell">Address</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <SkeletonTableRows rows={5} cells={6} rowClassName="border-b" />
+            </TableBody>
+          </Table>
         ) : (
           <Table>
             <TableHeader>

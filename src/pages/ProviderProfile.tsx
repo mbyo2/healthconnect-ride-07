@@ -13,7 +13,8 @@ import {
   GraduationCap, DollarSign, Shield, Video, Home, Building2,
   Languages, Stethoscope, CheckCircle2,
 } from "lucide-react";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonCard, SkeletonCircle, SkeletonLine } from "@/components/ui/skeleton-kit";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { ProviderReviews } from "@/components/provider/ProviderReviews";
 import { ProviderEducation } from "@/components/provider/ProviderEducation";
@@ -67,7 +68,34 @@ const ProviderProfile = () => {
     enabled: !!providerId,
   });
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 pt-20 pb-24" role="status" aria-label="Loading provider profile">
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div aria-hidden className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:col-span-1 space-y-5">
+              <div className="flex flex-col items-center text-center space-y-3">
+                <SkeletonCircle className="h-28 w-28" />
+                <SkeletonLine className="h-5 w-40" />
+                <SkeletonLine className="h-4 w-28" />
+              </div>
+              <div className="space-y-2.5">
+                <SkeletonLine className="h-4 w-full" />
+                <SkeletonLine className="h-4 w-5/6" />
+                <SkeletonLine className="h-4 w-4/6" />
+              </div>
+              <Skeleton className="h-11 w-full rounded-pill" />
+            </div>
+            <div aria-hidden className="lg:col-span-2 space-y-5">
+              <SkeletonCard className="h-48" />
+              <SkeletonCard className="h-64" />
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (!provider) {
     return (

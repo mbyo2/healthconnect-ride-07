@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, Package, Truck, CheckCircle, Clock, MapPin, ArrowRight, ClipboardCheck } from "lucide-react";
+import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { format } from "date-fns";
 import { markDelivered, isValidOrderTransition } from "@/utils/marketplace-workflows";
 import { ensureDeliveryOrderForOrder } from "@/services/deliveryService";
@@ -185,8 +186,12 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="flex justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <CardContent className="py-6" role="status" aria-label="Loading deliveries">
+          <div className="divide-y divide-canvas-silk dark:divide-slate-800" aria-hidden>
+            {[0, 1, 2].map((i) => (
+              <SkeletonListRow key={i} avatar={false} action />
+            ))}
+          </div>
         </CardContent>
       </Card>
     );

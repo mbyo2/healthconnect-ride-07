@@ -2,7 +2,8 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useStaffMetrics, StaffMetricKey } from "@/hooks/useStaffMetrics";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonDashboardBody, SkeletonLine } from "@/components/ui/skeleton-kit";
 import {
   Users, Calendar, Clock, Phone, Ticket, CreditCard, FileText,
   BarChart3, Settings, Wrench, Package, Truck, Siren, Heart,
@@ -253,7 +254,24 @@ export default function StaffDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  if (rolesLoading) return <LoadingScreen />;
+  if (rolesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="px-6 py-8">
+          <div className="max-w-7xl mx-auto flex items-center gap-4" aria-hidden>
+            <Skeleton className="h-12 w-12 rounded-lg" />
+            <div className="flex-1 space-y-2">
+              <SkeletonLine className="h-6 w-56 max-w-full" />
+              <SkeletonLine className="h-4 w-80 max-w-full" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 pb-10" role="status" aria-label="Loading staff dashboard">
+          <SkeletonDashboardBody />
+        </div>
+      </div>
+    );
+  }
 
   // Find the staff role from available roles, fallback to profile
   const staffRole = availableRoles.find(r => STAFF_ROLES.includes(r.toLowerCase()))
@@ -345,7 +363,7 @@ export default function StaffDashboard() {
                   <div className="min-w-0">
                     <p className="text-sm text-gray-500">{metric.label}</p>
                     {metricsBusy ? (
-                      <div className="h-8 w-20 mt-1 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" aria-label="Loading metric" />
+                      <SkeletonLine className="h-8 w-20 mt-1" />
                     ) : (
                       <>
                         <p

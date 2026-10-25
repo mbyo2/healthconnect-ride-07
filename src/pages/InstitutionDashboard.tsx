@@ -10,7 +10,7 @@ import {
   BookOpen, FileText, Calculator, CheckCircle2, Hourglass, Droplet,
   Siren, BedDouble, HeartPulse, Scissors, Ambulance
 } from "lucide-react";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { SkeletonDashboardBody } from "@/components/ui/skeleton-kit";
 import { InstitutionPageHeader } from "@/components/institution/InstitutionPageHeader";
 import { archetypePalette } from "@/components/institution/archetypePalette";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -449,7 +449,15 @@ export const InstitutionDashboard = () => {
     return () => { cancelled = true; };
   }, [institution]);
 
-  if (instLoading || dataLoading) return <LoadingScreen />;
+  if (instLoading || dataLoading) {
+    return (
+      <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
+        <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6" role="status" aria-label="Loading institution dashboard">
+          <SkeletonDashboardBody />
+        </div>
+      </div>
+    );
+  }
 
   if (!institution) {
     return (

@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useRoleDashboard } from "@/hooks/useRoleDashboard";
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { SkeletonDashboardBody } from "@/components/ui/skeleton-kit";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -20,9 +20,15 @@ const Home = () => {
     skip: isPatient || loading
   });
 
-  // Show loading while determining role redirect
+  // Show a dashboard-shaped skeleton while determining role redirect
   if (isAuthenticated && (isLoading || shouldRedirect || loading)) {
-    return <LoadingScreen message="Loading your dashboard..." />;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6" role="status" aria-label="Loading your dashboard">
+          <SkeletonDashboardBody />
+        </div>
+      </div>
+    );
   }
 
   // Render authenticated patient view

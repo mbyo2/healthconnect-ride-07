@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Shield, User, Loader2, Globe, Clock, Type, Palette, Settings as SettingsIcon } from "lucide-react";
+import { Bell, Shield, User, Globe, Clock, Type, Palette, Settings as SettingsIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonForm, SkeletonLine } from "@/components/ui/skeleton-kit";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -318,8 +320,21 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
+        <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+          <div className="max-w-content mx-auto flex items-center gap-3" aria-hidden>
+            <Skeleton className="h-10 w-10 rounded-xl" />
+            <div className="space-y-2">
+              <SkeletonLine className="h-6 w-32" />
+              <SkeletonLine className="h-4 w-56 max-w-full" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-content mx-auto px-4 sm:px-6 pt-6" role="status" aria-label="Loading settings">
+          <div className="vf-card" aria-hidden>
+            <SkeletonForm rows={4} />
+          </div>
+        </div>
       </div>
     );
   }

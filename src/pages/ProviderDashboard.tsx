@@ -44,7 +44,8 @@ import GrowthChart from "@/components/clinical/GrowthChart";
 import VaccinationSchedule from "@/components/clinical/VaccinationSchedule";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LoadingSkeleton, DashboardSkeleton } from "@/components/shared/LoadingSkeleton";
+import { DashboardSkeleton } from "@/components/shared/LoadingSkeleton";
+import { SkeletonForm, SkeletonListRow } from "@/components/ui/skeleton-kit";
 
 // ── constants (match Profile.tsx) ────────────────────────────────────────────
 
@@ -181,8 +182,7 @@ const MyPracticeEditor = () => {
     return (
       <div className="space-y-4 py-6">
         <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading your practice details…</p>
-        <LoadingSkeleton type="text" />
-        <LoadingSkeleton type="card" count={2} />
+        <SkeletonForm rows={3} />
       </div>
     );
   }
@@ -429,8 +429,11 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
     return (
       <div className="space-y-4 py-6">
         <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading patient records…</p>
-        <LoadingSkeleton type="text" />
-        <LoadingSkeleton type="card" count={2} />
+        <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <SkeletonListRow key={i} action />
+          ))}
+        </div>
       </div>
     );
   }

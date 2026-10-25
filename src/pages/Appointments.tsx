@@ -8,7 +8,9 @@ import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
-import { EmptyState, LoadingSkeleton } from "@/components/shared";
+import { EmptyState } from "@/components/shared";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { createNotification } from "@/services/notifications";
@@ -626,8 +628,17 @@ export const AppointmentsPage = () => {
         {/* Main Board Body */}
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
           {isLoading ? (
-            <div className="space-y-4">
-              <LoadingSkeleton variant="card" count={3} />
+            <div
+              className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden"
+              role="status"
+              aria-label="Loading appointments"
+            >
+              <Skeleton className="h-[52px] w-full rounded-none" />
+              <div className="divide-y divide-canvas-silk dark:divide-slate-800 px-5" aria-hidden>
+                {[0, 1, 2].map((i) => (
+                  <SkeletonListRow key={i} action />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
