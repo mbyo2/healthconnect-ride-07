@@ -67,6 +67,12 @@ verify_jwt = true
 [functions.create-daily-room]
 verify_jwt = true
 
+# CSP violation report collector (P3-22 follow-up): browsers deliver
+# CSP reports unauthenticated by design; the function stores them in
+# public.csp_reports via the service role and caps body size in-code.
+[functions.csp-report]
+verify_jwt = false
+
 # Device bridge ingest: on-site bridges hold no Supabase JWT; the function
 # self-verifies a per-institution HMAC token (DEVICE_BRIDGE_SECRET) and
 # fails closed (503) when the secret is unset.
