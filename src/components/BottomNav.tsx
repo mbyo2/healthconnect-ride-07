@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones, Scissors, Droplets, DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList, Navigation, HeartPulse } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones, Scissors, Droplets, DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList, Navigation, HeartPulse, TrendingUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useAuth } from "@/context/AuthContext";
@@ -171,16 +171,6 @@ export function BottomNav() {
       ];
     }
 
-    // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
-      return [
-        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Provider dashboard" },
-        { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Patient appointments" },
-        { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Patient messages" },
-        { to: "/ai-diagnostics", label: "AI", icon: <Brain className="h-5 w-5" />, active: location.pathname === "/ai-diagnostics", description: "AI clinical assistant" },
-      ];
-    }
-
     // Pharmacy (retail, wholesale, professionals)
     if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       if (availableRoles.includes('wholesale_pharmacy')) {
@@ -198,6 +188,25 @@ export function BottomNav() {
         { to: "/marketplace", label: "Market", icon: <ShoppingCart className="h-5 w-5" />, active: location.pathname === "/marketplace", description: "Marketplace" },
       ];
     }
+    // Lab (facility, technicians, pathologists, phlebotomists)
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
+      return [
+        { to: "/lab-management", label: "Lab", icon: <Activity className="h-5 w-5" />, active: location.pathname === "/lab-management", description: "Lab management" },
+        { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Medical records" },
+        { to: "/search", label: "Search", icon: <Search className="h-5 w-5" />, active: location.pathname === "/search", description: "Search" },
+        { to: "/profile", label: "Profile", icon: <User className="h-5 w-5" />, active: location.pathname === "/profile", description: "Profile" },
+      ];
+    }
+    // Doctor / Health Personnel / Radiologist
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Provider dashboard" },
+        { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Patient appointments" },
+        { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Patient messages" },
+        { to: "/ai-diagnostics", label: "AI", icon: <Brain className="h-5 w-5" />, active: location.pathname === "/ai-diagnostics", description: "AI clinical assistant" },
+      ];
+    }
+
 
     // Admin
     if (isAdmin) {
@@ -219,13 +228,24 @@ export function BottomNav() {
       ];
     }
 
-    // Lab (facility, technicians, pathologists, phlebotomists)
-    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
+
+    // Finance Manager (facility operations)
+    if (availableRoles.includes('finance_manager')) {
       return [
-        { to: "/lab-management", label: "Lab", icon: <Activity className="h-5 w-5" />, active: location.pathname === "/lab-management", description: "Lab management" },
-        { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Medical records" },
-        { to: "/search", label: "Search", icon: <Search className="h-5 w-5" />, active: location.pathname === "/search", description: "Search" },
-        { to: "/profile", label: "Profile", icon: <User className="h-5 w-5" />, active: location.pathname === "/profile", description: "Profile" },
+        { to: "/staff-dashboard", label: "Dashboard", icon: <BarChart3 className="h-5 w-5" />, active: location.pathname === "/staff-dashboard", description: "Finance dashboard" },
+        { to: "/enterprise-accounting", label: "Accounting", icon: <DollarSign className="h-5 w-5" />, active: location.pathname === "/enterprise-accounting", description: "Enterprise accounting" },
+        { to: "/institution/reports", label: "Reports", icon: <TrendingUp className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "Financial reports" },
+        { to: "/wallet", label: "Wallet", icon: <Wallet className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Finances & payouts" },
+      ];
+    }
+
+    // Courier
+    if (availableRoles.includes('courier')) {
+      return [
+        { to: "/courier-deliveries", label: "Deliveries", icon: <Package className="h-5 w-5" />, active: location.pathname === "/courier-deliveries", description: "My deliveries" },
+        { to: "/map", label: "Map", icon: <Search className="h-5 w-5" />, active: location.pathname === "/map", description: "Delivery map" },
+        { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Messages" },
+        { to: "/wallet", label: "Wallet", icon: <Wallet className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Earnings & payouts" },
       ];
     }
 
@@ -278,6 +298,24 @@ export function BottomNav() {
       ];
     }
 
+    // Pharmacy (retail, wholesale, professionals)
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
+      return [
+        { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
+        { to: "/institution/personnel", label: "Staff", description: "Invite and manage staff", icon: <Users className="h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Track sales and revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
+        { to: "/profile", label: "Pharmacy Profile", description: "Business information", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Pharmacy preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+    // Lab (facility, technicians, pathologists, phlebotomists)
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
+      return [
+        { to: "/connections", label: "Patients", description: "Patient lookup", icon: <Users className="h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Lab revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
+        { to: "/settings", label: "Settings", description: "Lab settings", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
     // Doctor / Health Personnel / Radiologist
     if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
@@ -292,16 +330,6 @@ export function BottomNav() {
       ];
     }
 
-    // Pharmacy (retail, wholesale, professionals)
-    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
-      return [
-        { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
-        { to: "/institution/personnel", label: "Staff", description: "Invite and manage staff", icon: <Users className="h-5 w-5" /> },
-        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Track sales and revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
-        { to: "/profile", label: "Pharmacy Profile", description: "Business information", icon: <User className="h-5 w-5" /> },
-        { to: "/settings", label: "Settings", description: "Pharmacy preferences", icon: <Settings className="h-5 w-5" /> },
-      ];
-    }
 
     // Admin
     if (isAdmin) {
@@ -334,12 +362,26 @@ export function BottomNav() {
       ];
     }
 
-    // Lab (facility, technicians, pathologists, phlebotomists)
-    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
+
+    // Finance Manager
+    if (availableRoles.includes('finance_manager')) {
       return [
-        { to: "/connections", label: "Patients", description: "Patient lookup", icon: <Users className="h-5 w-5" /> },
-        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Lab revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
-        { to: "/settings", label: "Settings", description: "Lab settings", icon: <Settings className="h-5 w-5" /> },
+        { to: "/enterprise-accounting", label: "Accounting", description: "Enterprise accounts & ledgers", icon: <DollarSign className="h-5 w-5" /> },
+        { to: "/institution/reports", label: "Financial Reports", description: "Revenue & financial analytics", icon: <TrendingUp className="h-5 w-5" /> },
+        { to: "/wallet", label: "Finances", description: "Institution finances", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/profile", label: "Profile", description: "Finance profile", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+
+    // Courier
+    if (availableRoles.includes('courier')) {
+      return [
+        { to: "/courier-deliveries", label: "My Deliveries", description: "Assigned delivery orders", icon: <Package className="h-5 w-5" /> },
+        { to: "/map", label: "Delivery Map", description: "Pickup & drop-off locations", icon: <Search className="h-5 w-5" /> },
+        { to: "/wallet", label: "Earnings", description: "Delivery earnings", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/profile", label: "Profile", description: "Courier profile", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Preferences", icon: <Settings className="h-5 w-5" /> },
       ];
     }
 

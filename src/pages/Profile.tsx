@@ -13,6 +13,7 @@ import {
   Plus, X, Building2, Languages,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { toast } from "sonner";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,9 +49,14 @@ const INSURANCE_OPTIONS = [
 
 const Profile = () => {
   const { user, profile, refreshProfile } = useAuth();
+  const { availableRoles } = useUserRoles();
   const { showSuccess } = useSuccessFeedback();
 
-  const isProvider = PROVIDER_ROLES.includes(profile?.role || "");
+  // Badge authority is user_roles; profiles.role (signup default 'patient')
+  // is only an OR fallback (P2-8).
+  const isProvider =
+    availableRoles.some((r) => PROVIDER_ROLES.includes(r)) ||
+    PROVIDER_ROLES.includes(profile?.role || "");
   // Only claim verification when the profile is actually verified.
   const verifiedBadge = profile?.is_verified
     ? (isProvider ? "Verified Practitioner" : "Verified Patient")

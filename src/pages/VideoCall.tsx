@@ -4,6 +4,7 @@ import { VideoRoom } from '@/components/video/VideoRoom';
 import { PreVisitChecklist } from '@/components/video/PreVisitChecklist';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/context/UserRolesContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { supabase } from '@/integrations/supabase/client';
 import { logAnalyticsEvent } from '@/utils/analytics-service';
@@ -38,6 +39,7 @@ const VideoCall = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
+  const { availableRoles } = useUserRoles();
   const [loading, setLoading] = useState(true);
   const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
   const [meetingToken, setMeetingToken] = useState<string | null>(null);
@@ -258,8 +260,13 @@ const VideoCall = () => {
     logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
     // Only consultable clinicians close the visit on leave; patients can
     // rejoin while live, and non-consultable staff never own a visit.
+    // Authority is user_roles (via UserRolesContext) — profiles.role is a
+    // display artefact that defaults to 'patient' and must never decide
+    // who owns a visit (P2-8); it is kept only as an OR fallback.
     const role = (profile?.role || '').toLowerCase();
-    const isProvider = (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role);
+    const isProvider =
+      availableRoles.some((r) => (CONSULTABLE_PROVIDER_ROLES as string[]).includes(r)) ||
+      (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role);
     try {
       if (consultationId && isProvider) {
         await supabase
@@ -277,7 +284,7 @@ const VideoCall = () => {
     } else {
       navigate('/video-consultations', { replace: true });
     }
-  }, [consultationId, profile, navigate]);
+  }, [consultationId, profile, navigate, availableRoles]);
 
   // Derived display values for the pre-visit screen.
 

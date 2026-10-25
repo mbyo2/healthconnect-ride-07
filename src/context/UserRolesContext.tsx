@@ -69,9 +69,13 @@ function expandRawRoles(rawRoles: string[]): UserRole[] {
   rawRoles.forEach(r => {
     const roleStr = r.toLowerCase();
     if (roleStr === 'pharmacy') {
+      // NOTE (completeness pass 2026-10-25): 'institution_admin' is no
+      // longer injected here. It outranks pharmacy in ROLE_PRIORITY, so a
+      // pure pharmacy business account landed on /institution-dashboard —
+      // a hospital surface its own permission set never granted — instead
+      // of its portal. Genuine institution admins hold the raw role.
       expandedRoles.add('pharmacy');
       expandedRoles.add('pharmacist');
-      expandedRoles.add('institution_admin');
     } else if (roleStr === 'pharmacist') {
       expandedRoles.add('pharmacist');
       expandedRoles.add('pharmacy');
@@ -79,9 +83,10 @@ function expandRawRoles(rawRoles: string[]): UserRole[] {
     } else if (roleStr === 'wholesale_pharmacy' || roleStr === 'wholesale') {
       expandedRoles.add('wholesale_pharmacy');
     } else if (roleStr === 'lab' || roleStr === 'laboratory') {
+      // Same fix as 'pharmacy' above: no injected 'institution_admin',
+      // so lab business accounts land on /lab-management, their own home.
       expandedRoles.add('lab');
       expandedRoles.add('lab_technician');
-      expandedRoles.add('institution_admin');
     } else if (roleStr === 'lab_technician') {
       expandedRoles.add('lab_technician');
       expandedRoles.add('lab');

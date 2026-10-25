@@ -41,9 +41,21 @@ export const ProviderPortal = () => {
             return;
           }
 
+          // Provider access is decided by user_roles — the server-granted
+          // authority (P2-8). profiles.role defaults to 'patient' from the
+          // signup trigger and wrongly denied verified clinicians whose
+          // mirror was stale; it survives only as an OR fallback.
+          const { data: roleRows } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id);
+          const grantedRoles = (roleRows || []).map((r: { role: string }) => r.role);
+
           setIsRedirecting(true);
 
           if (
+            grantedRoles.some((r) => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r)) ||
+            grantedRoles.includes('health_personnel') ||
             (profile?.role && (ALL_CLINICIAN_ROLES as readonly string[]).includes(profile.role)) ||
             profile?.role === 'health_personnel'
           ) {

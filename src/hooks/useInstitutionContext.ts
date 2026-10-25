@@ -288,9 +288,18 @@ export function useInstitutionContext() {
       // healthcare facility). Auto-provisioned rows are NOT verified —
       // accreditation is granted only through the institution application
       // review workflow.
-      const userRole = (profile?.role || user.user_metadata?.role || '') as string;
+      // Role authority is user_roles ONLY (P2-8/P1-25): profiles.role is
+      // a display artefact and user_metadata is user-writable — a patient
+      // could previously set metadata role='pharmacy' and trigger
+      // institution auto-provisioning. business_type stays: it is a
+      // declared business kind from the business signup flow, not a role.
+      const { data: grantedRoleRows } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      const grantedRoles = (grantedRoleRows || []).map((r: any) => String(r.role));
       const businessType = (user.user_metadata?.business_type || '') as string;
-      const isInstitutionalRole = [
+      const isInstitutionalRole = grantedRoles.some((userRole) => [
         'pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist',
         'hospital', 'clinic', 'specialized_clinic',
         'laboratory', 'lab', 'lab_technician', 'nursing_home', 'institution_admin',
@@ -301,10 +310,10 @@ export function useInstitutionContext() {
         'occupational_therapist', 'nutritionist', 'optometrist', 'optician', 'psychologist',
         'environmental_health_officer', 'community_health_worker',
         'traditional_practitioner', 'phlebotomist', 'cxo',
-        'receptionist', 'hr_manager', 'billing_staff',
+        'receptionist', 'hr_manager', 'billing_staff', 'finance_manager',
         'inventory_manager', 'maintenance_manager', 'ambulance_staff', 'pathologist',
         'ot_staff', 'triage_staff',
-      ].includes(userRole) || businessType.length > 0;
+      ].includes(userRole)) || businessType.length > 0;
 
       // Skip auto-provisioning if we found staff links but couldn't fetch
       // institution details (RLS issue). The user is staff somewhere —

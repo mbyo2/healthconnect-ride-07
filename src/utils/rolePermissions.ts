@@ -57,8 +57,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-profile/:id',
     '/booking-confirmed',
     '/iot-monitoring',
-    '/mental-health',
-    '/ar-anatomy',
     '/triage',              // AI triage intake — the booking front door
     '/doc-o-clock',
   ]),
@@ -146,7 +144,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/telemedicine',
     '/health-analytics',
     '/medications',
-    '/compliance-audit',
     // NOTE: removed pharmacy-portal, pharmacy-inventory, pharmacy-management,
     //       hospital-management, lab-management — those belong to their own roles
   ]),
@@ -490,8 +487,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     '/admin-dashboard',
     '/wallet',
-    '/admin-wallet',
-    '/compliance-audit',
     '/healthcare-application',
     '/hospital-management',
     '/pharmacy-management',
@@ -755,11 +750,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/health-analytics',
     '/telemedicine',
     '/blockchain-records',
-    '/ar-anatomy',
-    '/mental-health',
-    '/genomic-analysis',
-    '/smart-contracts',
-    '/quantum-encryption',
     '/map',
     '/search',
     '/medical-records',
@@ -771,7 +761,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-portal',
     '/pharmacy-portal',
     '/pharmacy-inventory',
-    '/compliance-audit',
     '/healthcare-application',
     '/lab-management',
     '/institution-portal',
@@ -779,7 +768,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-management',
     '/admin-dashboard',
     '/super-admin-dashboard',
-    '/admin-wallet',
     '/create-admin',
     '/advanced-dashboard',
     '/emergency-response',
@@ -791,9 +779,15 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ])
 };
 
-// New role permissions (INSTITUTION_OPERATIONAL_ROUTES imported from config)
+// Role permission EXTENSIONS (INSTITUTION_OPERATIONAL_ROUTES imported from
+// config). These UNION with the literal sets above — they must never
+// silently replace them. The pre-fix overwrite form demoted `specialist`
+// to a subset of `doctor` (losing lab-orders/imaging/icu/theatre) and
+// stripped core routes from several facility roles; every assignment
+// below therefore spreads the existing set first.
 
 ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/appointments',
@@ -801,6 +795,7 @@ ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/institution/personnel',
@@ -811,6 +806,7 @@ ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.CXO] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
@@ -820,13 +816,12 @@ ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
   '/institution/devices',
   '/hospital-management',
   '/wallet',
-  '/admin-wallet',
   '/health-analytics',
   '/advanced-dashboard',
-  '/compliance-audit',
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] || []),
   '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
@@ -840,6 +835,7 @@ ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] || []),
   ...COMMON_ROUTES,
   '/lab-management',
   '/medical-records',
@@ -850,6 +846,7 @@ ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes billing staff
@@ -859,6 +856,7 @@ ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/wallet',
@@ -870,6 +868,7 @@ ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes inventory managers
@@ -879,9 +878,12 @@ ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] || []),
   '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
+  '/triage',
+  '/opd',
   '/appointments',
   '/appointments/:id',
   '/medical-records',
@@ -891,6 +893,7 @@ ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] || []),
   '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/institution/devices',
@@ -899,6 +902,7 @@ ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] || []),
   ...COMMON_ROUTES,
   ...PROVIDER_CORE_ROUTES,
   '/prescriptions',
@@ -909,6 +913,7 @@ ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] || []),
   '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
@@ -920,6 +925,7 @@ ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.COURIER] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.COURIER] || []),
   ...COMMON_ROUTES,
   '/courier-deliveries',
   '/wallet',
@@ -928,6 +934,7 @@ ROLE_PERMISSIONS[USER_ROLES.COURIER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.PATHOLOGIST] = dedupeRoutes([
+  ...(ROLE_PERMISSIONS[USER_ROLES.PATHOLOGIST] || []),
   ...COMMON_ROUTES,
   '/lab-management',
   '/medical-records',
@@ -942,57 +949,11 @@ Object.keys(ROLE_PERMISSIONS).forEach(role => {
   ROLE_PERMISSIONS[role] = dedupeRoutes(ROLE_PERMISSIONS[role] || []);
 });
 
-// Default landing pages for each role
-export const ROLE_LANDING_PAGES: Record<string, string> = {
-  [USER_ROLES.PATIENT]: '/home',
-  [USER_ROLES.HEALTH_PERSONNEL]: '/provider-dashboard',
-  [USER_ROLES.ADMIN]: '/admin-dashboard',
-  [USER_ROLES.LAB]: '/lab-management',
-  [USER_ROLES.PHARMACY]: '/pharmacy-portal',
-  [USER_ROLES.INSTITUTION_ADMIN]: '/institution-dashboard',
-  [USER_ROLES.INSTITUTION_STAFF]: '/institution-dashboard',
-  [USER_ROLES.SUPER_ADMIN]: '/super-admin-dashboard',
-  [USER_ROLES.SUPPORT]: '/staff-dashboard',
-  [USER_ROLES.DOCTOR]: '/provider-dashboard',
-  [USER_ROLES.SPECIALIST]: '/provider-dashboard',
-  [USER_ROLES.MEDICAL_LICENTIATE]: '/provider-dashboard',
-  [USER_ROLES.CLINICAL_OFFICER]: '/provider-dashboard',
-  [USER_ROLES.DENTIST]: '/provider-dashboard',
-  [USER_ROLES.DENTAL_THERAPIST]: '/provider-dashboard',
-  [USER_ROLES.NURSE]: '/provider-dashboard',
-  [USER_ROLES.REGISTERED_NURSE]: '/provider-dashboard',
-  [USER_ROLES.ENROLLED_NURSE]: '/provider-dashboard',
-  [USER_ROLES.MIDWIFE]: '/provider-dashboard',
-  [USER_ROLES.RADIOLOGIST]: '/provider-dashboard',
-  [USER_ROLES.RADIOGRAPHER]: '/provider-dashboard',
-  [USER_ROLES.PHYSIOTHERAPIST]: '/provider-dashboard',
-  [USER_ROLES.OCCUPATIONAL_THERAPIST]: '/provider-dashboard',
-  [USER_ROLES.NUTRITIONIST]: '/provider-dashboard',
-  [USER_ROLES.OPTOMETRIST]: '/provider-dashboard',
-  [USER_ROLES.OPTICIAN]: '/provider-dashboard',
-  [USER_ROLES.PSYCHOLOGIST]: '/provider-dashboard',
-  [USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER]: '/provider-dashboard',
-  [USER_ROLES.COMMUNITY_HEALTH_WORKER]: '/provider-dashboard',
-  [USER_ROLES.TRADITIONAL_PRACTITIONER]: '/provider-dashboard',
-  [USER_ROLES.PHARMACIST]: '/pharmacy-portal',
-  [USER_ROLES.PHARMACY_TECHNOLOGIST]: '/pharmacy-portal',
-  [USER_ROLES.WHOLESALE_PHARMACY]: '/pharmacy-portal',
-  [USER_ROLES.LAB_TECHNICIAN]: '/lab-management',
-  [USER_ROLES.MEDICAL_RECORDS_OFFICER]: '/institution-dashboard',
-  [USER_ROLES.RECEPTIONIST]: '/institution-dashboard',
-  [USER_ROLES.HR_MANAGER]: '/institution-dashboard',
-  [USER_ROLES.CXO]: '/institution-dashboard',
-  [USER_ROLES.OT_STAFF]: '/institution-dashboard',
-  [USER_ROLES.PHLEBOTOMIST]: '/lab-management',
-  [USER_ROLES.BILLING_STAFF]: '/institution-dashboard',
-  [USER_ROLES.FINANCE_MANAGER]: '/institution-dashboard',
-  [USER_ROLES.INVENTORY_MANAGER]: '/institution-dashboard',
-  [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
-  [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
-  [USER_ROLES.AMBULANCE_STAFF]: '/institution-dashboard',
-  [USER_ROLES.COURIER]: '/courier-deliveries',
-  [USER_ROLES.PATHOLOGIST]: '/lab-management',
-};
+// (ROLE_LANDING_PAGES was deleted in the 2026-10-25 completeness pass:
+// it was a second, contradictory landing map — it sent every facility-ops
+// role to /institution-dashboard while ROLE_META sends them to
+// /staff-dashboard — and nothing imported it. Landing pages have exactly
+// one source: ROLE_PRIORITY + ROLE_META via getRoleLandingPage below.)
 
 // PUBLIC_ROUTES imported from config
 
@@ -1125,8 +1086,6 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'support', 'super_admin'] },
     { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['super_admin'] },
     { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['super_admin'] },
-    { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin', 'super_admin'] },
-    { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel', 'super_admin'] },
     { path: '/pharmacy-management', label: 'Pharmacy Management', icon: 'Pill', roles: ['admin', 'pharmacy', 'pharmacist', 'super_admin'] },
 
     ...baseNavigation

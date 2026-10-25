@@ -117,7 +117,7 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Avg Response", icon: <Clock className="h-5 w-5" />, metricKey: "avg_response" },
     ],
     quickActions: [
-      { label: "View Tickets", path: "/support", icon: <Ticket className="h-5 w-5" />, description: "Manage support requests" },
+      { label: "Help Centre", path: "/help", icon: <Ticket className="h-5 w-5" />, description: "Support resources & requests" },
       { label: "Patient Search", path: "/institution/patients", icon: <Users className="h-5 w-5" />, description: "Find patient records" },
       { label: "Messages", path: "/chat", icon: <Phone className="h-5 w-5" />, description: "Support conversations" },
     ],
@@ -136,8 +136,8 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Completed Today", icon: <UserCheck className="h-5 w-5" />, metricKey: "dispatches_completed_today" },
     ],
     quickActions: [
-      { label: "Dispatch", path: "/ambulance", icon: <Siren className="h-5 w-5" />, description: "New emergency dispatch" },
-      { label: "Fleet Status", path: "/ambulance", icon: <Truck className="h-5 w-5" />, description: "View all units" },
+      { label: "Dispatch", path: "/emergency-response", icon: <Siren className="h-5 w-5" />, description: "New emergency dispatch" },
+      { label: "Fleet Status", path: "/emergency-response", icon: <Truck className="h-5 w-5" />, description: "View all units" },
     ],
     tabs: [
       { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },
@@ -190,8 +190,8 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Completed", icon: <UserCheck className="h-5 w-5" />, metricKey: "maintenance_completed" },
     ],
     quickActions: [
-      { label: "Work Orders", path: "/maintenance", icon: <Wrench className="h-5 w-5" />, description: "Manage maintenance requests" },
-      { label: "New Request", path: "/maintenance", icon: <FileText className="h-5 w-5" />, description: "Log maintenance issue" },
+      { label: "Work Orders", path: "/hospital-management?tab=maintenance", icon: <Wrench className="h-5 w-5" />, description: "Manage maintenance requests" },
+      { label: "New Request", path: "/hospital-management?tab=maintenance", icon: <FileText className="h-5 w-5" />, description: "Log maintenance issue" },
     ],
     tabs: [
       { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },
@@ -208,12 +208,31 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
       { label: "Out of Stock", icon: <Siren className="h-5 w-5" />, metricKey: "inventory_out_of_stock" },
     ],
     quickActions: [
-      { label: "Inventory", path: "/inventory", icon: <Package className="h-5 w-5" />, description: "View stock levels" },
-      { label: "Stock In", path: "/inventory", icon: <TrendingUp className="h-5 w-5" />, description: "Receive new stock" },
+      { label: "Inventory", path: "/enhanced-inventory", icon: <Package className="h-5 w-5" />, description: "View stock levels" },
+      { label: "Stock In", path: "/enhanced-inventory", icon: <TrendingUp className="h-5 w-5" />, description: "Receive new stock" },
     ],
     tabs: [
       { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },
       { id: "stock", label: "Stock", icon: <Package className="h-4 w-4" /> },
+    ],
+  },
+  finance_manager: {
+    title: "Finance Office",
+    subtitle: "Revenue, accounting & financial oversight",
+    icon: <DollarSign className="h-6 w-6" />,
+    metrics: [
+      { label: "Total Revenue", icon: <DollarSign className="h-5 w-5" />, metricKey: "revenue_total", format: "currency" },
+      { label: "Today's Revenue", icon: <TrendingUp className="h-5 w-5" />, metricKey: "revenue_today", format: "currency" },
+      { label: "Overdue Invoices", icon: <Clock className="h-5 w-5" />, metricKey: "invoices_overdue" },
+    ],
+    quickActions: [
+      { label: "Billing & Invoices", path: "/hospital-management?tab=billing", icon: <FileText className="h-5 w-5" />, description: "Invoices, payments & collections" },
+      { label: "Accounting", path: "/enterprise-accounting", icon: <BarChart3 className="h-5 w-5" />, description: "Enterprise accounts & ledgers" },
+      { label: "Financial Reports", path: "/institution/reports", icon: <TrendingUp className="h-5 w-5" />, description: "Revenue & financial analytics" },
+    ],
+    tabs: [
+      { id: "overview", label: "Overview", icon: <BarChart3 className="h-4 w-4" /> },
+      { id: "reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
     ],
   },
 };

@@ -92,7 +92,7 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 export interface RoleMeta {
   label: string;
   icon: string;            // lucide icon name
-  category: 'clinical' | 'nursing' | 'allied' | 'institution' | 'admin' | 'patient' | 'lab' | 'pharmacy' | 'community';
+  category: 'clinical' | 'nursing' | 'allied' | 'institution' | 'admin' | 'patient' | 'lab' | 'pharmacy' | 'community' | 'logistics';
   landingPage: string;
 }
 
@@ -143,6 +143,7 @@ export const ROLE_META: Record<UserRole, RoleMeta> = {
   [USER_ROLES.CXO]:                 { label: 'CXO',                 icon: 'Crown',           category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.OT_STAFF]:            { label: 'OT Staff',            icon: 'Scissors',        category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.BILLING_STAFF]:       { label: 'Billing Staff',       icon: 'Receipt',         category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.FINANCE_MANAGER]:     { label: 'Finance Manager',     icon: 'Landmark',        category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.INVENTORY_MANAGER]:   { label: 'Inventory Manager',   icon: 'Package',         category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.TRIAGE_STAFF]:        { label: 'Triage Staff',        icon: 'AlertTriangle',   category: 'institution', landingPage: '/staff-dashboard' },
   [USER_ROLES.MAINTENANCE_MANAGER]: { label: 'Maintenance Manager', icon: 'Wrench',          category: 'institution', landingPage: '/staff-dashboard' },
@@ -166,11 +167,13 @@ export const ROLE_PRIORITY: UserRole[] = [
   USER_ROLES.RECEPTIONIST,
   USER_ROLES.HR_MANAGER,
   USER_ROLES.BILLING_STAFF,
+  USER_ROLES.FINANCE_MANAGER,
   USER_ROLES.TRIAGE_STAFF,
   USER_ROLES.OT_STAFF,
   USER_ROLES.MAINTENANCE_MANAGER,
   USER_ROLES.INVENTORY_MANAGER,
   USER_ROLES.AMBULANCE_STAFF,
+  USER_ROLES.COURIER,
   USER_ROLES.MEDICAL_RECORDS_OFFICER,
   USER_ROLES.DOCTOR,
   USER_ROLES.SPECIALIST,
@@ -311,7 +314,9 @@ export const COMMON_ROUTES = [
   '/privacy-security',
   '/payment-success',
   '/payment-cancel',
-  '/courier-deliveries',
+  // NOTE: '/courier-deliveries' is deliberately NOT a common route — it is
+  // the courier role's own surface (granted in ROLE_PERMISSIONS.courier).
+  // As a common route it passed the route guard for every signed-in role.
 ];
 
 export const PROVIDER_CORE_ROUTES = [
