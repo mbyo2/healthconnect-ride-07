@@ -79,3 +79,23 @@ describe('provider-types sweep · dental charting persists', () => {
     expect(src).toContain("'dental_therapist'");
   });
 });
+
+describe('provider-types sweep · late code-map findings', () => {
+  it('NutritionistWorkflow saves diet plans in the live table shape', () => {
+    const src = readSrc('src/components/workflows/NutritionistWorkflow.tsx');
+    // Live diet_plans: diet_type is a lowercase CHECK domain and there are
+    // no calories_per_day / meal_frequency / instructions / status
+    // columns — the old payload ('Regular' + those columns) failed for
+    // every nutritionist.
+    expect(src).not.toContain("diet_type: 'Regular'");
+    expect(src).toContain("diet_type: 'regular'");
+    expect(src).toContain('notes: instructions');
+    expect(src).not.toContain('calories_per_day:');
+    expect(src).not.toContain("toast.error(e?.message");
+  });
+
+  it('HealthcareProfessionals mapper keeps role so Book can render', () => {
+    const src = readSrc('src/pages/HealthcareProfessionals.tsx');
+    expect(src).toContain('role: item.role');
+  });
+});

@@ -35,6 +35,7 @@ interface Professional {
   reviews_count?: number;
   accepting_patients: boolean;
   profile_image?: string;
+  role?: string;
 }
 
 const HealthcareProfessionals = () => {
@@ -128,6 +129,10 @@ const HealthcareProfessionals = () => {
         telemedicine_available: item.telemedicine_available ?? false,
         home_visits_available: item.home_visits_available ?? false,
         accepting_patients: item.accepting_patients ?? false,
+        // The card's Book/View-Profile label reads prof.role — the select
+        // fetched it but the mapper dropped it, so `consultable` was
+        // always false and "Book" never rendered (2026-10-25 sweep).
+        role: item.role,
       }));
 
       setProfessionals(mappedData);

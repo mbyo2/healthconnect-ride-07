@@ -35,25 +35,29 @@ export const NutritionistWorkflow = () => {
 
   const saveDietPlan = async () => {
     if (!planPatientId) { toast.error('Select a patient for this diet plan'); return; }
+    if (!institutionId) { toast.error('Diet plans are recorded under your facility. Link your account to a facility first.'); return; }
     if (!user) { toast.error('You must be signed in'); return; }
     setSavingPlan(true);
     try {
       const instructions = [
+        plan.calories ? `Calorie target: ${plan.calories} kcal/day` : null,
         plan.breakfast ? `Breakfast: ${plan.breakfast}` : null,
         plan.lunch ? `Lunch: ${plan.lunch}` : null,
         plan.dinner ? `Dinner: ${plan.dinner}` : null,
         plan.snacks ? `Snacks: ${plan.snacks}` : null,
         plan.notes ? `Notes: ${plan.notes}` : null,
       ].filter(Boolean).join('\n');
+      // Live diet_plans shape (2026-10-25 sweep): diet_type is a lowercase
+      // CHECK domain ('regular', 'diabetic', …) and the plan detail lives
+      // in `notes` — there are no calories_per_day / meal_frequency /
+      // instructions / status columns. The previous payload violated all
+      // of that, so this save failed for every nutritionist.
       const { error } = await supabase.from('diet_plans').insert({
-        hospital_id: institutionId || null,
+        hospital_id: institutionId,
         patient_id: planPatientId,
         prescribed_by: user.id,
-        diet_type: 'Regular',
-        calories_per_day: plan.calories ? parseInt(plan.calories, 10) : null,
-        meal_frequency: 3,
-        instructions: instructions || null,
-        status: 'active',
+        diet_type: 'regular',
+        notes: instructions || null,
         start_date: new Date().toISOString().split('T')[0],
       });
       if (error) throw error;
@@ -61,8 +65,8 @@ export const NutritionistWorkflow = () => {
       setShowPlan(false);
       setPlanPatientId('');
       setPlan({ bmi: '', calories: '', breakfast: '', lunch: '', dinner: '', snacks: '', notes: '' });
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to save diet plan');
+    } catch {
+      toast.error('Failed to save diet plan. Please try again.');
     } finally {
       setSavingPlan(false);
     }
