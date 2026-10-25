@@ -35,6 +35,7 @@ import { PsychologistWorkflow } from "@/components/workflows/PsychologistWorkflo
 import { NurseWorkflow } from "@/components/workflows/NurseWorkflow";
 import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, NURSING_ROLES, type UserRole } from "@/config/roleConfig";
 import { hasRoutePermission } from "@/utils/rolePermissions";
+import { hasProviderDashboardAccess } from "@/utils/providerAccess";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
 import { ProblemList } from "@/components/clinical/ProblemList";
@@ -491,6 +492,13 @@ export const ProviderDashboard = () => {
 
   // ── Approval gate: unverified providers see a pending screen, not the dashboard ──
   // (Security: prevents "under review" accounts from accessing clinical tools.)
+  // Access is decided by hasProviderDashboardAccess (src/utils/providerAccess.ts):
+  // independent approval (is_verified / approved application) OR an active
+  // staff post at a verified institution. Facility staff never pass through
+  // the independent application flow — accept_staff_invitation and the
+  // facility "Add staff" screen grant only the staff row + app role — so
+  // gating on profiles.is_verified alone locked out every facility-employed
+  // clinician whose landing page is this dashboard (defect, 2026-10-25).
   const [verificationChecked, setVerificationChecked] = useState(false);
   const [isVerifiedProvider, setIsVerifiedProvider] = useState(false);
 
@@ -501,12 +509,53 @@ export const ProviderDashboard = () => {
         setVerificationChecked(true);
         return;
       }
-      const { data } = await supabase
-        .from("profiles")
-        .select("is_verified")
-        .eq("id", user.id)
-        .maybeSingle();
-      setIsVerifiedProvider((data as any)?.is_verified === true);
+      const [profileRes, applicationRes, staffRes, personnelRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("is_verified")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("health_personnel_applications")
+          .select("status")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("institution_staff")
+          .select("institution_id")
+          .eq("provider_id", user.id)
+          .eq("is_active", true),
+        supabase
+          .from("institution_personnel")
+          .select("institution_id")
+          .eq("user_id", user.id)
+          .eq("status", "active"),
+      ]);
+
+      // Facility-employment path: an active post only counts when the
+      // employing institution is itself verified by the platform.
+      const staffInstitutionIds = [
+        ...((staffRes.data as any[]) || []).map((r) => r.institution_id),
+        ...((personnelRes.data as any[]) || []).map((r) => r.institution_id),
+      ].filter(Boolean);
+      let hasActiveVerifiedStaffPost = false;
+      if (staffInstitutionIds.length > 0) {
+        const { data: institutions } = await supabase
+          .from("healthcare_institutions")
+          .select("id, is_verified")
+          .in("id", staffInstitutionIds);
+        hasActiveVerifiedStaffPost = ((institutions as any[]) || []).some(
+          (i) => i?.is_verified === true
+        );
+      }
+
+      setIsVerifiedProvider(
+        hasProviderDashboardAccess({
+          profileIsVerified: (profileRes.data as any)?.is_verified === true,
+          applicationStatus: (applicationRes.data as any)?.status ?? null,
+          hasActiveVerifiedStaffPost,
+        })
+      );
       setVerificationChecked(true);
     };
     checkVerification();
