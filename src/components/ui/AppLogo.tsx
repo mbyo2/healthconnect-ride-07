@@ -43,9 +43,12 @@ export const AppLogo = ({
           }
         : {})}
     >
-      <img 
-        src="/d0c-icon.svg" 
-        alt="Doc' O Clock" 
+      {/* When the wordmark text is rendered next to the icon, the img is
+          decorative (alt="") so a wrapping link's accessible name is the
+          brand exactly once, not alt-text + wordmark concatenated. */}
+      <img
+        src="/d0c-icon.svg"
+        alt={showText ? "" : "Doc' O Clock"}
         className={cn("object-contain", sizeClasses[size])}
       />
       {showText && (
