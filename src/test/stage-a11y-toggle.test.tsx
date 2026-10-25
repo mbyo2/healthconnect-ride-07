@@ -5,14 +5,17 @@
  *
  * Root cause: the Settings handler awaited a divergent Supabase upsert into
  * `user_settings.accessibility_mode` before updating the context. The
- * `user_settings` table does not exist live — PostgREST answers PGRST205
- * ("Could not find the table 'public.user_settings' in the schema cache",
- * proven at API level as a QA patient) — so the write threw, the toast
- * showed, and enableEasyReading() never ran.
+ * `user_settings` table did not exist live (PGRST205, proven 2026-10-25),
+ * so the write threw, the toast showed, and enableEasyReading() never ran.
  *
- * Fix: BOTH surfaces write through the single persistence function —
- * AccessibilityContext enable/disableEasyReading (localStorage
- * `accessibility_easy_reading`). These tests pin that behaviour and wiring.
+ * Fix then: BOTH surfaces write through the single context path.
+ * Fix now (completeness pass, 2026-10-25): that context path itself was
+ * reworked — persistence is a PER-ACCOUNT record (`a11y.v2.<scope>`),
+ * never the old browser-global `accessibility_*` keys, which leaked one
+ * person's modes to the next user of the same browser and were never
+ * cleared on sign-out (the CEO's "it turns itself on" bug). These tests
+ * pin the wiring AND the new storage contract; per-account isolation is
+ * pinned in stage-accessibility-accounts.test.tsx.
  */
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
@@ -20,7 +23,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import "@testing-library/jest-dom/vitest";
-import { AccessibilityProvider, useAccessibility } from "@/context/AccessibilityContext";
+import {
+  AccessibilityProvider,
+  useAccessibility,
+  a11yStorageKey,
+  parseA11yRecord,
+} from "@/context/AccessibilityContext";
 
 const readSrc = (p: string) => readFileSync(resolve(__dirname, "../../", p), "utf8");
 
@@ -33,10 +41,11 @@ const Probe = () => {
 describe("A11y toggle · single persistence function", () => {
   beforeEach(() => {
     localStorage.clear();
-    document.documentElement.classList.remove("easy-reading");
+    document.documentElement.className = "";
+    document.documentElement.style.fontSize = "";
   });
 
-  it("enableEasyReading persists to localStorage and applies the class", () => {
+  it("enableEasyReading persists to the per-scope record and applies the class", () => {
     render(
       <AccessibilityProvider>
         <Probe />
@@ -47,7 +56,10 @@ describe("A11y toggle · single persistence function", () => {
     act(() => api.enableEasyReading());
 
     expect(screen.getByTestId("easy-reading")).toHaveTextContent("true");
-    expect(localStorage.getItem("accessibility_easy_reading")).toBe("true");
+    const stored = parseA11yRecord(localStorage.getItem(a11yStorageKey("guest")));
+    expect(stored?.easyReading).toBe(true);
+    // The leaky global key is never written again.
+    expect(localStorage.getItem("accessibility_easy_reading")).toBeNull();
     expect(document.documentElement.classList.contains("easy-reading")).toBe(true);
   });
 
@@ -68,19 +80,34 @@ describe("A11y toggle · single persistence function", () => {
     expect(screen.getByTestId("easy-reading")).toHaveTextContent("true");
   });
 
-  it("disableEasyReading persists the off state too", () => {
+  it("legacy global keys are ignored and deleted — never adopted as a choice", () => {
     localStorage.setItem("accessibility_easy_reading", "true");
+    localStorage.setItem("accessibility_high_contrast", "true");
     render(
       <AccessibilityProvider>
         <Probe />
       </AccessibilityProvider>
     );
+    expect(screen.getByTestId("easy-reading")).toHaveTextContent("false");
+    expect(api.preferences.highContrast).toBe(false);
+    expect(localStorage.getItem("accessibility_easy_reading")).toBeNull();
+    expect(localStorage.getItem("accessibility_high_contrast")).toBeNull();
+  });
+
+  it("disableEasyReading persists the off state too", () => {
+    render(
+      <AccessibilityProvider>
+        <Probe />
+      </AccessibilityProvider>
+    );
+    act(() => api.enableEasyReading());
     expect(screen.getByTestId("easy-reading")).toHaveTextContent("true");
 
     act(() => api.disableEasyReading());
 
     expect(screen.getByTestId("easy-reading")).toHaveTextContent("false");
-    expect(localStorage.getItem("accessibility_easy_reading")).toBe("false");
+    const stored = parseA11yRecord(localStorage.getItem(a11yStorageKey("guest")));
+    expect(stored?.easyReading).toBe(false);
     expect(document.documentElement.classList.contains("easy-reading")).toBe(false);
   });
 
@@ -91,7 +118,9 @@ describe("A11y toggle · single persistence function", () => {
       </AccessibilityProvider>
     );
     act(() => api.updatePreferences({ dyslexiaFont: true }));
-    expect(localStorage.getItem("accessibility_dyslexiafont")).toBe("true");
+    const stored = parseA11yRecord(localStorage.getItem(a11yStorageKey("guest")));
+    expect(stored?.preferences.dyslexiaFont).toBe(true);
+    expect(localStorage.getItem("accessibility_dyslexiafont")).toBeNull();
   });
 });
 

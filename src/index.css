@@ -98,6 +98,18 @@ main {
   filter: contrast(1.08);
 }
 
+/* Large text: roomier base copy and line height */
+.a11y-large-text body {
+  font-size: 1.125em;
+  line-height: 1.65;
+}
+.a11y-large-text p,
+.a11y-large-text li,
+.a11y-large-text label {
+  font-size: 1.06em;
+  line-height: 1.65;
+}
+
 /* Reduced motion: calm everything down, same as OS-level preference */
 .a11y-reduced-motion *,
 .a11y-reduced-motion *::before,

@@ -298,14 +298,14 @@ const Settings = () => {
   };
 
   // Easy Reading persists through the AccessibilityContext — the SAME
-  // single persistence function the floating Accessibility menu uses
-  // (enable/disableEasyReading -> localStorage `accessibility_easy_reading`).
-  // This handler previously awaited a divergent upsert into
-  // `user_settings.accessibility_mode` BEFORE touching the context; that
-  // table does not exist live (PostgREST PGRST205, proven 2026-10-25), so
-  // the write threw, the toast showed "Failed to update accessibility
-  // settings", and the context was never updated — the toggle always
-  // failed in Settings while the menu path worked. One write path only.
+  // single persistence path the floating Accessibility menu uses
+  // (enable/disableEasyReading -> per-account record `a11y.v2.<user-id>`,
+  // mirrored to the user's `user_settings` row). One write path only:
+  // this handler previously awaited a divergent upsert into
+  // `user_settings.accessibility_mode` BEFORE touching the context, and
+  // when that write threw (the table was phantom, PGRST205, proven
+  // 2026-10-25), the toggle always failed in Settings while the menu
+  // path worked.
   const handleAccessibilityToggle = (checked: boolean) => {
     if (checked) {
       enableEasyReading();
@@ -382,7 +382,7 @@ const Settings = () => {
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Accessibility Easy Reading</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">High-contrast text and enlarged touch targets</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Wider spacing and enlarged touch targets, saved to your account</p>
                 </div>
                 <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} aria-label="Accessibility easy reading"  className="scale-125" />
               </div>

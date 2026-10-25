@@ -41,6 +41,8 @@ export const AccessibilityMenu = () => {
     setScreenReaderEnabled,
     preferences,
     updatePreferences,
+    resetAllAccessibility,
+    systemPreferences,
   } = useAccessibility();
   
   const { theme, setTheme } = useTheme();
@@ -219,6 +221,19 @@ export const AccessibilityMenu = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
+                  <Label htmlFor="a11y-large-text">Large text</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Bigger body text with roomier line spacing
+                  </p>
+                </div>
+                <Switch
+                  id="a11y-large-text"
+                  checked={preferences.largeText}
+                  onCheckedChange={(checked) => updatePreferences({ largeText: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
                   <Label htmlFor="a11y-motion">Reduce motion</Label>
                   <p className="text-xs text-muted-foreground">
                     Calm animations and transitions
@@ -298,15 +313,34 @@ export const AccessibilityMenu = () => {
                 <code className="bg-muted px-2 py-1 rounded text-xs">Alt + 2</code>
               </div>
               <div className="flex justify-between">
-                <span>Toggle voice:</span>
-                <code className="bg-muted px-2 py-1 rounded text-xs">Alt + 3</code>
-              </div>
-              <div className="flex justify-between">
                 <span>Text size +/-:</span>
                 <code className="bg-muted px-2 py-1 rounded text-xs">Alt + / -</code>
               </div>
+              <p className="text-xs text-muted-foreground pt-1">
+                Accessibility modes themselves only change here or in Settings — never by keyboard shortcut.
+              </p>
             </CardContent>
           </Card>
+
+          {/* Device preferences are detected, never auto-applied */}
+          {(systemPreferences.reducedMotion || systemPreferences.highContrast) &&
+            !(preferences.reducedMotion && preferences.highContrast) && (
+            <p className="text-xs text-muted-foreground px-1">
+              Your device asks for
+              {systemPreferences.reducedMotion && !preferences.reducedMotion ? ' reduced motion' : ''}
+              {systemPreferences.reducedMotion && !preferences.reducedMotion && systemPreferences.highContrast && !preferences.highContrast ? ' and' : ''}
+              {systemPreferences.highContrast && !preferences.highContrast ? ' higher contrast' : ''}
+              . We don't turn anything on for you — use the switches above if you'd like them here too.
+            </p>
+          )}
+
+          <Button variant="outline" size="touch" onClick={resetAllAccessibility} className="w-full">
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset all accessibility settings
+          </Button>
+          <p className="text-xs text-muted-foreground px-1">
+            Settings are saved to your account only — they never carry over to another person using this device.
+          </p>
         </div>
       </SheetContent>
     </Sheet>
