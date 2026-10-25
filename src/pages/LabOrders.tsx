@@ -131,6 +131,8 @@ const LabOrders = () => {
       const { error } = await supabase.from("lab_tests").insert({
         patient_id: patientId,
         ordered_by: user.id,
+        entered_by: user.id,
+        order_source: "electronic",
         lab_id: labId,
         test_type: testType,
         test_category: testCategory || catalogEntry?.category || null,
@@ -330,6 +332,8 @@ const LabOrders = () => {
                     const { error } = await supabase.from("lab_tests").insert({
                       patient_id: patientId,
                       ordered_by: user.id,
+                      entered_by: user.id,
+                      order_source: "electronic",
                       lab_id: labId,
                       test_type: item.item_name,
                       test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,

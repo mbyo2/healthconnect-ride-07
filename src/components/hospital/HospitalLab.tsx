@@ -49,12 +49,19 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
     test_category: "Hematology",
     priority: "routine",
     sample_type: "Blood",
+    order_source: "electronic",
+    external_referrer_name: "",
+    external_referrer_facility: "",
   });
 
   const { data: labOrders, loading, error, refresh } = useHospitalModule<any>(
     "lab_tests", "lab_id", hospital?.id, { orderBy: "created_at", ascending: false }
   );
-  const { nameFor } = usePatientNames(labOrders.map((o) => o.patient_id));
+  const { names, nameFor } = usePatientNames([
+    ...labOrders.map((o) => o.patient_id),
+    ...labOrders.map((o) => o.entered_by),
+    ...labOrders.map((o) => o.ordered_by),
+  ]);
   const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
 
   const filtered = filter === "all" ? labOrders : labOrders.filter((o) => o.status === filter);
@@ -73,6 +80,10 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       toast.error("Please select a patient for this lab order");
       return;
     }
+    if (orderForm.order_source === "external_referral" && !orderForm.external_referrer_name.trim()) {
+      toast.error("Enter the referring clinician's name for an external referral");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const testNum = `LAB-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
@@ -83,10 +94,21 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         const tariffs = await fetchInstitutionTariffs(hospital.id);
         price = resolveTariffPrice(tariffs, 'lab', orderForm.test_type, 200);
       } catch { /* tariff lookup is best-effort */ }
+      const isExternal = orderForm.order_source === "external_referral";
       const { error: err } = await (supabase.from("lab_tests" as any) as any).insert({
         lab_id: hospital.id,
+        institution_id: hospital.id,
         patient_id: orderForm.patient_id,
-        ordered_by: user?.id,
+        // Attribution is split: ordered_by is the ordering clinician (NULL
+        // for an outside referral, whose name is recorded as text instead);
+        // entered_by is the person typing — also forced server-side.
+        ordered_by: isExternal ? null : user?.id,
+        entered_by: user?.id,
+        order_source: orderForm.order_source,
+        external_referrer_name: orderForm.order_source !== "electronic"
+          ? (orderForm.external_referrer_name.trim() || null) : null,
+        external_referrer_facility: orderForm.order_source !== "electronic"
+          ? (orderForm.external_referrer_facility.trim() || null) : null,
         test_number: testNum,
         test_type: orderForm.test_type,
         test_category: orderForm.test_category,
@@ -293,6 +315,15 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                   <td className="py-3 px-4">
                     <div className="font-mono font-bold text-slate-900 dark:text-slate-100">{order.test_number}</div>
                     <div className="text-xs text-graphite-500 dark:text-slate-400">{order.test_type}</div>
+                    {(order.order_source === "external_referral" || (order.entered_by && order.ordered_by && order.entered_by !== order.ordered_by) || (order.order_source && order.order_source !== "electronic")) && (
+                      <div className="text-xs text-graphite-400">
+                        {order.order_source === "external_referral" ? (
+                          <>External referral{order.external_referrer_name ? ` — ${order.external_referrer_name}` : ""}{order.entered_by && names[order.entered_by] ? ` · entered by ${names[order.entered_by]}` : ""}</>
+                        ) : (
+                          <>{order.ordered_by && names[order.ordered_by] ? `Ordered by ${names[order.ordered_by]} · ` : ""}entered by {order.entered_by && names[order.entered_by] ? names[order.entered_by] : "staff"}{order.order_source && order.order_source !== "electronic" ? ` (${order.order_source.replace("_", " ")})` : ""}</>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td className="py-3 px-3 font-bold text-primary-500">{nameFor(order.patient_id) || "Inpatient"}</td>
                   <td className="py-3 px-3 text-center">{getStatusPill(order.status, order)}</td>
@@ -404,6 +435,43 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                 <option value="stat">STAT (Immediate)</option>
               </select>
             </div>
+            <div>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">How did this order arrive?</label>
+              <select
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
+                value={orderForm.order_source}
+                onChange={(e) => setOrderForm({ ...orderForm, order_source: e.target.value })}
+              >
+                <option value="electronic">Electronic — I am ordering it</option>
+                <option value="paper_form">Paper request form</option>
+                <option value="verbal">Verbal / phone order</option>
+                <option value="external_referral">External referral (outside clinician)</option>
+              </select>
+            </div>
+            {orderForm.order_source !== "electronic" && (
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">
+                    Referring clinician{orderForm.order_source === "external_referral" ? " *" : ""}
+                  </label>
+                  <input
+                    value={orderForm.external_referrer_name}
+                    onChange={(e) => setOrderForm({ ...orderForm, external_referrer_name: e.target.value })}
+                    placeholder="Name on the form"
+                    className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Referring facility</label>
+                  <input
+                    value={orderForm.external_referrer_facility}
+                    onChange={(e) => setOrderForm({ ...orderForm, external_referrer_facility: e.target.value })}
+                    placeholder="e.g. Outside clinic"
+                    className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
+                  />
+                </div>
+              </div>
+            )}
             <DialogFooter className="pt-2">
               <button type="button" onClick={() => setShowOrderDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">

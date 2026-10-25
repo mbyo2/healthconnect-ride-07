@@ -8607,6 +8607,9 @@ export type Database = {
           patient_id: string
           radiologist_id: string | null
           reported_at: string
+          status: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           created_at?: string
@@ -8618,6 +8621,9 @@ export type Database = {
           patient_id: string
           radiologist_id?: string | null
           reported_at?: string
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           created_at?: string
@@ -8629,6 +8635,9 @@ export type Database = {
           patient_id?: string
           radiologist_id?: string | null
           reported_at?: string
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
           {
@@ -11586,11 +11595,16 @@ export type Database = {
           admission_id: string | null
           balance: number | null
           created_at: string | null
+          entered_by: string | null
+          external_referrer_facility: string | null
+          external_referrer_name: string | null
           id: string
+          institution_id: string | null
           insurance_claim_id: string | null
           lab_id: string
           notes: string | null
-          ordered_by: string
+          order_source: string
+          ordered_by: string | null
           patient_id: string
           payment_status: string | null
           performed_by: string | null
@@ -11614,11 +11628,16 @@ export type Database = {
           admission_id?: string | null
           balance?: number | null
           created_at?: string | null
+          entered_by?: string | null
+          external_referrer_facility?: string | null
+          external_referrer_name?: string | null
           id?: string
+          institution_id?: string | null
           insurance_claim_id?: string | null
           lab_id: string
           notes?: string | null
-          ordered_by: string
+          order_source?: string
+          ordered_by?: string | null
           patient_id: string
           payment_status?: string | null
           performed_by?: string | null
@@ -11642,11 +11661,16 @@ export type Database = {
           admission_id?: string | null
           balance?: number | null
           created_at?: string | null
+          entered_by?: string | null
+          external_referrer_facility?: string | null
+          external_referrer_name?: string | null
           id?: string
+          institution_id?: string | null
           insurance_claim_id?: string | null
           lab_id?: string
           notes?: string | null
-          ordered_by?: string
+          order_source?: string
+          ordered_by?: string | null
           patient_id?: string
           payment_status?: string | null
           performed_by?: string | null

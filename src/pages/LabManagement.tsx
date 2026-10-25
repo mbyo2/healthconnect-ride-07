@@ -433,6 +433,9 @@ const LabManagement = () => {
       const { error } = await supabase.from("lab_tests").insert({
         patient_id: selectedPatientId,
         ordered_by: user.id,
+        entered_by: user.id,
+        order_source: "electronic",
+        institution_id: labInstitutionId,
         lab_id: labInstitutionId,
         test_type: selectedTestType,
         test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,

@@ -31,6 +31,14 @@ const getStatusPill = (status: string) => {
   }
 };
 
+const getResultStatusPill = (status?: string | null) => {
+  switch (status) {
+    case "final": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Final report</span>;
+    case "preliminary": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Preliminary</span>;
+    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">Draft</span>;
+  }
+};
+
 const getPriorityPill = (priority: string) => {
   if (priority === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Emergency</span>;
   if (priority === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Urgent</span>;
@@ -44,7 +52,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
   const [reportingOrder, setReportingOrder] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderForm, setOrderForm] = useState({ patient_id: "", modality: "xray", body_part: "", clinical_indication: "", priority: "routine" });
-  const [resultForm, setResultForm] = useState({ findings: "", impression: "", image_url: "" });
+  const [resultForm, setResultForm] = useState({ findings: "", impression: "", image_url: "", status: "draft" });
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: orders, loading, error, refresh } = useHospitalModule<any>("imaging_orders", "institution_id", hospital?.id, { orderBy: "ordered_at", ascending: false });
@@ -115,7 +123,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
   const openReport = (order: any) => {
     setReportingOrder(order);
     const existing = resultFor(order.id);
-    setResultForm({ findings: existing?.findings || "", impression: existing?.impression || "", image_url: existing?.image_url || "" });
+    setResultForm({ findings: existing?.findings || "", impression: existing?.impression || "", image_url: existing?.image_url || "", status: existing?.status || "draft" });
     setShowReport(true);
   };
 
@@ -124,10 +132,14 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
     if (!reportingOrder) return;
     if (!resultForm.findings.trim()) { toast.error("Enter the findings"); return; }
     if (!resultForm.impression.trim()) { toast.error("Enter the impression"); return; }
+    const existing = resultFor(reportingOrder.id);
+    if (existing?.status === "final") {
+      toast.error("This report is final and cannot be edited — file an addendum report instead.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const user = (await supabase.auth.getUser()).data.user;
-      const existing = resultFor(reportingOrder.id);
       const payload = {
         order_id: reportingOrder.id,
         patient_id: reportingOrder.patient_id,
@@ -136,6 +148,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
         impression: resultForm.impression.trim(),
         image_url: resultForm.image_url.trim() || null,
         reported_at: new Date().toISOString(),
+        status: resultForm.status,
       };
       if (existing) {
         const { error: err } = await (supabase.from("imaging_results" as any) as any).update(payload).eq("id", existing.id);
@@ -144,9 +157,11 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
         const { error: err } = await (supabase.from("imaging_results" as any) as any).insert(payload);
         if (err) throw err;
       }
-      // Mark order completed once a report exists
-      await (supabase.from("imaging_orders" as any) as any).update({ status: "completed" }).eq("id", reportingOrder.id);
-      toast.success("Radiology report saved");
+      // A filed (preliminary or final) report completes the order; a draft does not.
+      if (resultForm.status !== "draft") {
+        await (supabase.from("imaging_orders" as any) as any).update({ status: "completed" }).eq("id", reportingOrder.id);
+      }
+      toast.success(resultForm.status === "final" ? "Final report issued" : resultForm.status === "preliminary" ? "Preliminary evaluation saved" : "Draft report saved");
       setShowReport(false);
       setReportingOrder(null);
       loadResults();
@@ -235,7 +250,10 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
                         <button onClick={() => openReport(o)} className="btn-primary text-xs px-3 py-1.5 rounded-lg">Enter Report</button>
                       )}
                       {res && (
-                        <button onClick={() => openReport(o)} className="btn-outline text-xs px-3 py-1.5 rounded-lg">View Report</button>
+                        <>
+                          {getResultStatusPill(res.status)}
+                          <button onClick={() => openReport(o)} className="btn-outline text-xs px-3 py-1.5 rounded-lg">View Report</button>
+                        </>
                       )}
                       {!["completed", "cancelled"].includes(o.status) && (
                         <button onClick={() => updateOrderStatus(o, "cancelled")} className="btn-ghost text-xs px-3 py-1.5 rounded-lg text-error-500">Cancel</button>
@@ -260,10 +278,14 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
                   <div className="flex items-center gap-2 flex-wrap">
                     <FileText className="h-4 w-4 text-primary-500" />
                     <span className="font-bold">Patient: {nameFor(r.patient_id)}</span>
+                    {getResultStatusPill(r.status)}
                     <span className="text-xs text-muted-foreground">
                       reported {r.reported_at ? new Date(r.reported_at).toLocaleDateString() : "—"}
                     </span>
                   </div>
+                  {r.status === "preliminary" && (
+                    <p className="text-xs text-warning-600 mt-1">Preliminary evaluation — a radiologist's final report is still to follow. Patients see final reports only.</p>
+                  )}
                   <div className="mt-2 text-sm">
                     <p className="font-semibold">Findings</p>
                     <p className="text-muted-foreground whitespace-pre-wrap">{r.findings}</p>
@@ -336,26 +358,50 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
               Radiology Report {reportingOrder ? `— ${MODALITY_LABELS[reportingOrder.modality] || reportingOrder.modality} (${reportingOrder.body_part})` : ""}
             </DialogTitle>
           </DialogHeader>
+          {(() => {
+            const existingResult = reportingOrder ? resultFor(reportingOrder.id) : null;
+            const isFinal = existingResult?.status === "final";
+            return (
           <form onSubmit={handleSaveReport} className="space-y-3">
+            {isFinal && (
+              <p className="text-sm rounded-lg bg-success-50 text-success-700 px-3 py-2">
+                This report has been issued as <strong>final</strong> and can no longer be edited. Corrections are filed as an addendum report.
+              </p>
+            )}
             <div>
               <label className="text-sm font-semibold">Findings</label>
-              <textarea className="input w-full" rows={4} value={resultForm.findings} onChange={(e) => setResultForm({ ...resultForm, findings: e.target.value })} placeholder="Describe what the images show…" />
+              <textarea className="input w-full" rows={4} disabled={isFinal} value={resultForm.findings} onChange={(e) => setResultForm({ ...resultForm, findings: e.target.value })} placeholder="Describe what the images show…" />
             </div>
             <div>
               <label className="text-sm font-semibold">Impression</label>
-              <textarea className="input w-full" rows={3} value={resultForm.impression} onChange={(e) => setResultForm({ ...resultForm, impression: e.target.value })} placeholder="Clinical impression / diagnosis…" />
+              <textarea className="input w-full" rows={3} disabled={isFinal} value={resultForm.impression} onChange={(e) => setResultForm({ ...resultForm, impression: e.target.value })} placeholder="Clinical impression / diagnosis…" />
             </div>
             <div>
               <label className="text-sm font-semibold">Image URL (optional)</label>
-              <input className="input w-full" value={resultForm.image_url} onChange={(e) => setResultForm({ ...resultForm, image_url: e.target.value })} placeholder="https://…" />
+              <input className="input w-full" disabled={isFinal} value={resultForm.image_url} onChange={(e) => setResultForm({ ...resultForm, image_url: e.target.value })} placeholder="https://…" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold">Report status</label>
+              <select className="input w-full" disabled={isFinal} value={resultForm.status} onChange={(e) => setResultForm({ ...resultForm, status: e.target.value })}>
+                <option value="draft">Draft — still being written</option>
+                <option value="preliminary">Preliminary — radiographer's evaluation, final report to follow</option>
+                <option value="final">Final — radiologist's signed report</option>
+              </select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Only a radiologist of this institution can issue a final report; the report is signed under your name. Patients see final reports only.
+              </p>
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowReport(false)} className="btn-outline px-4 py-2 rounded-lg">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="btn-primary px-4 py-2 rounded-lg flex items-center gap-1">
-                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} Save Report
-              </button>
+              {!isFinal && (
+                <button type="submit" disabled={isSubmitting} className="btn-primary px-4 py-2 rounded-lg flex items-center gap-1">
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} Save Report
+                </button>
+              )}
             </DialogFooter>
           </form>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
