@@ -13,13 +13,17 @@ export interface PlatformStats {
 }
 
 /**
- * Format a count as "1,200+" style. Returns null for unknown/zero counts:
- * consumers must filter nulls out so a stat with no real value renders
- * nothing at all — never a dash or placeholder. Never fake social proof.
+ * Format a count for display. Small counts (< 100) are shown exactly —
+ * "16", never "16+", which reads as placeholder text. At 100+ the count
+ * is rounded down to one significant figure with a "+" ("1,200+") so the
+ * figure reads as honest scale rather than a precise census. Returns null
+ * for unknown/zero counts: consumers must filter nulls out so a stat with
+ * no real value renders nothing at all — never a dash or placeholder.
+ * Never fake social proof.
  */
 export const formatStat = (n: number): string | null => {
   if (!Number.isFinite(n) || n <= 0) return null;
-  if (n < 100) return `${n}+`;
+  if (n < 100) return `${n}`;
   const magnitude = Math.pow(10, Math.floor(Math.log10(n)));
   const rounded = Math.floor(n / magnitude) * magnitude;
   return `${rounded.toLocaleString()}+`;
