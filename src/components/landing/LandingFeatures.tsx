@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Pill, ShieldCheck, HeartPulse,
   CheckCircle, ArrowRight, ChevronRight, Stethoscope,
-  Sparkles, Building2, Activity, CheckCircle2, MapPin
+  Building2, Activity, CheckCircle2, MapPin
 } from "lucide-react";
 import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
@@ -21,7 +21,7 @@ export const HowItWorks = () => {
           {[
             {
               title: "Book.",
-              desc: "Find verified doctors by specialty, hospital, NHIMA cover, or city — and lock a slot in seconds.",
+              desc: "Find verified doctors by specialty, hospital, NHIMA cover, or city, and book a time that suits you.",
               route: "/search",
               photo: LANDING_PHOTOS.bookStep,
               alt: "Illustrative photo: an African doctor booking an appointment on a phone — Doc' O Clock",
@@ -131,14 +131,14 @@ export const CareExperience = () => {
           <div className="space-y-6">
             <div className="vf-eyebrow">
               <HeartPulse className="h-3.5 w-3.5 text-primary-500" />
-              Complete Healthcare Ecosystem
+              For patients
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight leading-[1.15]">
               Care that fits into{" "}
               <span className="text-primary-500">your everyday life.</span>
             </h2>
             <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide">
-              Doc&apos; O Clock brings doctors, pharmacies, labs, and hospitals together in one intuitive experience. Get care in minutes, anywhere in Zambia.
+              Doctors, pharmacies, labs and hospitals in one account. Book a visit, order medicines and keep your records together — from anywhere in Zambia.
             </p>
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
               {[
@@ -180,7 +180,7 @@ export const CareExperience = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="font-medium text-base text-white">Video consultations</div>
-                    <div className="text-xs text-white/70">Connect with a certified doctor in minutes</div>
+                    <div className="text-xs text-white/70">Video visit with a verified doctor</div>
                   </div>
                   <button
                     onClick={() => navigate("/video-dashboard")}
@@ -207,9 +207,9 @@ export const Features = () => {
       tab: "Doctor Consultations",
       icon: Stethoscope,
       title: "Book verified doctors & specialists",
-      desc: "Browse certified practitioners across 20+ specialties. View hospital credentials, available slots and book in seconds.",
-      metrics: ["Verified Doctors", "Clear Fee Pricing", "Instant Confirmations"],
-      badge: "Top Rated",
+      desc: "Browse verified practitioners across 20+ specialties. See each doctor's fees and available times, then choose a slot.",
+      metrics: ["Verified Doctors", "Fees shown upfront", "Provider confirms your time"],
+      badge: "Booking",
       preview: (
         <div className="space-y-2.5">
           {[
@@ -235,9 +235,9 @@ export const Features = () => {
       tab: "E-Prescriptions",
       icon: Pill,
       title: "Digital prescriptions & pharmacy delivery",
-      desc: "Doctors generate secure e-prescriptions sent instantly to your Doc' O Clock app. Fulfill medications from licensed pharmacies with doorstep delivery.",
-      metrics: ["Direct Pharmacy Routing", "100% Genuine Medicines", "Doorstep Delivery"],
-      badge: "Fast Dispense",
+      desc: "Your doctor sends the prescription to your phone after the visit. Choose a licensed pharmacy for pickup, or have it delivered.",
+      metrics: ["Sent to your pharmacy", "Licensed pharmacies only", "Pickup or delivery"],
+      badge: "Pharmacy",
       preview: (
         <div className="space-y-2.5">
           {[
@@ -258,10 +258,10 @@ export const Features = () => {
     {
       tab: "NHIMA Insurance",
       icon: ShieldCheck,
-      title: "Seamless NHIMA & private insurance coverage",
-      desc: "Doc' O Clock integrates directly with NHIMA and private insurers. Access covered consultations, lab tests and hospital care without out-of-pocket stress.",
-      metrics: ["Instant Eligibility Check", "Zero Paper Claims", "NHIMA Network"],
-      badge: "Insurance Ready",
+      title: "NHIMA and private insurance",
+      desc: "Check whether your NHIMA or private cover applies to a consultation, lab test or hospital visit before you pay. Your insurer confirms the final coverage.",
+      metrics: ["Cover shown at booking", "Claims filed digitally", "NHIMA accepted"],
+      badge: "Insurance",
       preview: (
         <div className="p-4 rounded-2xl bg-canvas-bone border border-canvas-silk space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-canvas-silk">
@@ -286,8 +286,8 @@ export const Features = () => {
       icon: HeartPulse,
       title: "24/7 emergency ambulance & bed finder",
       desc: "In emergencies every second counts. Find the nearest open ICU hospital, track ambulance ETA, and alert physicians before you arrive.",
-      metrics: ["116 Emergency Dispatch", "Real-Time Bed Occupancy", "Trauma Ready"],
-      badge: "24/7 Emergency",
+      metrics: ["Call 116 dispatch", "Nearest open facility", "Ambulance tracking"],
+      badge: "Emergency",
       preview: (
         <div className="space-y-2.5">
           {[
@@ -316,11 +316,10 @@ export const Features = () => {
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
-            <Sparkles className="h-3.5 w-3.5 text-primary-500" />
-            Doc&apos; O Clock Core Features
+Core features
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight">
-            Modern healthcare, designed around you.
+            Book, consult, and get your medicines.
           </h2>
         </div>
 
@@ -336,7 +335,6 @@ export const Features = () => {
             >
               <f.icon className="mb-3 h-5 w-5 text-primary-500" />
               <div className="text-base font-medium text-midnight">{f.tab}</div>
-              <p className="mt-1 text-xs leading-relaxed text-graphite-500 dark:text-slate-400">{f.badge}</p>
             </button>
           ))}
         </div>
@@ -367,9 +365,6 @@ export const Features = () => {
                 <active.icon className="h-4 w-4 text-primary-500" />
                 <span className="text-xs font-medium text-graphite-700">{active.tab} Preview</span>
               </div>
-              <span className="px-2.5 py-0.5 rounded-pill text-xs font-medium bg-primary-50 text-primary-600">
-                {active.badge}
-              </span>
             </div>
             {active.preview}
           </div>
@@ -391,7 +386,7 @@ export const ForProviders = () => {
               For Doctors, Clinics & Hospitals
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight leading-tight">
-              Grow your medical practice{" "}
+              Take bookings from patients{" "}
               <span className="text-primary-500">with Doc&apos; O Clock.</span>
             </h2>
             <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide">
@@ -399,9 +394,9 @@ export const ForProviders = () => {
             </p>
             <div className="space-y-3 pt-1">
               {[
-                { title: "Zero Setup Cost", desc: "Create your verified doctor profile and start accepting bookings today." },
-                { title: "HD Video Telehealth Suite", desc: "Consult patients remotely with encrypted video and automated notes." },
-                { title: "Digital Prescription & EMR", desc: "Send digital scripts straight to pharmacies and manage patient records securely." },
+                { title: "A profile patients can find", desc: "Your verified profile appears in search with your fees and available times." },
+                { title: "Video consultations", desc: "Encrypted video visits, with notes kept in the patient record." },
+                { title: "Prescriptions and records", desc: "Send prescriptions to pharmacies and keep patient records in one place." },
               ].map((item) => (
                 <div key={item.title} className="flex items-start gap-4 p-4 rounded-card bg-white dark:bg-slate-900 border border-canvas-silk">
                   <CheckCircle2 className="h-5 w-5 text-primary-500 mt-0.5 shrink-0" />

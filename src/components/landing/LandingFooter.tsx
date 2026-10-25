@@ -72,7 +72,6 @@ export const CTASection = () => {
             <div className="absolute inset-0 bg-midnight/80" />
           </div>
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/20 blur-[100px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/15 blur-[80px] rounded-full pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
             <div className="space-y-4 text-center lg:text-left max-w-2xl">
