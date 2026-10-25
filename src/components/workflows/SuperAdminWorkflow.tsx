@@ -46,7 +46,7 @@ export const SuperAdminWorkflow = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-canvas-silk pb-4">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
             <Crown className="h-5 w-5 text-amber-500" />
             SuperAdmin Platform Console
           </h1>
@@ -124,7 +124,7 @@ function OverviewTab({ formatPrice }: { formatPrice: (n: number) => string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Platform Revenue (All Institutions)" description="Gross billed across the platform">
           <div className="py-6 text-center">
-            <p className="text-3xl font-extrabold text-primary-500">{formatPrice(revenue || 0)}</p>
+            <p className="text-3xl font-semibold text-primary-500">{formatPrice(revenue || 0)}</p>
             <p className="text-xs text-muted-foreground mt-1">Lifetime gross billing volume</p>
           </div>
         </ChartCard>

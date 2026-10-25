@@ -15,18 +15,18 @@ const NotFound = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-canvas px-4 font-sans text-midnight">
-      <div className="text-center space-y-6 max-w-md bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-sm">
+      <div className="text-center space-y-6 max-w-md bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-2xl p-8 sm:p-10 shadow-sm">
         <div className="flex justify-center">
-          <div className="bg-primary-50 dark:bg-blue-950 p-5 rounded-3xl ring-8 ring-primary-100/50 dark:ring-blue-950/50">
+          <div className="bg-primary-50 dark:bg-blue-950 p-5 rounded-2xl ring-8 ring-primary-100/50 dark:ring-blue-950/50">
             <AlertCircle className="h-12 w-12 text-primary-500" />
           </div>
         </div>
         
         <div className="space-y-2">
-          <span className="text-xs font-black uppercase tracking-wider text-primary-500 bg-primary-50 dark:bg-blue-950 px-3 py-1 rounded-full">
+          <span className="text-xs font-bold uppercase tracking-wider text-primary-500 bg-primary-50 dark:bg-blue-950 px-3 py-1 rounded-full">
             404 Error
           </span>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight pt-1">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight pt-1">
             Page Not Found
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -38,14 +38,14 @@ const NotFound = () => {
           <Button
             onClick={() => navigate(-1)}
             variant="outline"
-            className="rounded-full h-11 border border-slate-200 dark:border-slate-800 text-xs font-extrabold"
+            className="rounded-full h-11 border border-slate-200 dark:border-slate-800 text-xs font-semibold"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
           </Button>
           <Button
             onClick={handleReturnHome}
-            className="rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-sm"
+            className="rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold shadow-sm"
           >
             <Home className="h-4 w-4 mr-2" />
             Return to Workspace

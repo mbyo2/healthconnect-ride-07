@@ -210,15 +210,15 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <Activity className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">Physiotherapy &amp; Rehabilitation Center</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-400 text-slate-950">
+              <h2 className="text-xl font-bold tracking-tight">Physiotherapy &amp; Rehabilitation Center</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-400 text-slate-950">
                 Biomechanics &amp; ROM
               </span>
             </div>
@@ -248,10 +248,10 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
         <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="rom" className="text-xs font-extrabold shrink-0"><Activity className="h-4 w-4" />Range of Motion (ROM Goniometry)</TabsTrigger>
-          <TabsTrigger value="pain" className="text-xs font-extrabold shrink-0"><Flame className="h-4 w-4" />Pain Assessment (VAS 0-10)</TabsTrigger>
-          <TabsTrigger value="exercises" className="text-xs font-extrabold shrink-0"><Dumbbell className="h-4 w-4" />Rehabilitation Exercise Rx</TabsTrigger>
-          <TabsTrigger value="sessions" className="text-xs font-extrabold shrink-0"><ClipboardList className="h-4 w-4" />Therapy Session Records</TabsTrigger>
+          <TabsTrigger value="rom" className="text-xs font-semibold shrink-0"><Activity className="h-4 w-4" />Range of Motion (ROM Goniometry)</TabsTrigger>
+          <TabsTrigger value="pain" className="text-xs font-semibold shrink-0"><Flame className="h-4 w-4" />Pain Assessment (VAS 0-10)</TabsTrigger>
+          <TabsTrigger value="exercises" className="text-xs font-semibold shrink-0"><Dumbbell className="h-4 w-4" />Rehabilitation Exercise Rx</TabsTrigger>
+          <TabsTrigger value="sessions" className="text-xs font-semibold shrink-0"><ClipboardList className="h-4 w-4" />Therapy Session Records</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -260,7 +260,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                 Joint Range of Motion (Goniometry Measurements)
               </h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -270,13 +270,13 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
 
             <Dialog open={showAddROM} onOpenChange={setShowAddROM}>
               <DialogTrigger asChild>
-                <Button size="sm" className="text-xs font-extrabold">
+                <Button size="sm" className="text-xs font-semibold">
                   <Plus className="h-4 w-4" /> Add Joint Measurement
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
+              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
                 <DialogHeader>
-                  <DialogTitle className="font-black text-lg">Log Joint Goniometry (ROM)</DialogTitle>
+                  <DialogTitle className="font-bold text-lg">Log Joint Goniometry (ROM)</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div className="grid grid-cols-2 gap-2">
@@ -354,7 +354,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Joint &amp; Movement</th>
                   <th className="py-3 px-3">Left Side (Degrees)</th>
                   <th className="py-3 px-3">Right Side (Degrees)</th>
@@ -368,24 +368,24 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   return (
                     <tr key={r.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                       <td className="py-3 px-4">
-                        <div className="font-extrabold text-slate-900 dark:text-slate-100">{r.joint}</div>
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{r.joint}</div>
                         <div className="text-xs text-slate-400 font-medium">{r.movement}</div>
                       </td>
-                      <td className="py-3 px-3 font-mono font-black text-slate-900 dark:text-slate-100">
+                      <td className="py-3 px-3 font-mono font-bold text-slate-900 dark:text-slate-100">
                         {r.leftDegrees}°
                       </td>
-                      <td className="py-3 px-3 font-mono font-black text-slate-900 dark:text-slate-100">
+                      <td className="py-3 px-3 font-mono font-bold text-slate-900 dark:text-slate-100">
                         {r.rightDegrees}°
                       </td>
                       <td className="py-3 px-3 font-semibold text-slate-500">{r.normalRange}</td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-2">
                           {hasDeficit ? (
-                            <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-black text-xs">
+                            <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-bold text-xs">
                               Asymmetric Deficit
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-xs">
+                            <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-xs">
                               Symmetric
                             </span>
                           )}
@@ -406,7 +406,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
       {activeTab === "pain" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
               Visual Analog Pain Scale &amp; Functional Restrictions
             </h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -415,12 +415,12 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
+            <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <Label className="font-black text-sm">Visual Analog Scale (VAS): {painScore} / 10</Label>
+                  <Label className="font-bold text-sm">Visual Analog Scale (VAS): {painScore} / 10</Label>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-black text-white ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
                       painScore <= 3 ? "bg-emerald-500" : painScore <= 6 ? "bg-amber-500" : "bg-rose-500"
                     }`}
                   >
@@ -480,22 +480,22 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </div>
 
               {/* Pain Trend Summary — derived from filed sessions for this patient */}
-            <div className="p-6 rounded-3xl bg-slate-900 text-white shadow-md flex flex-col justify-between space-y-4">
+            <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-400 text-slate-950 uppercase">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-400 text-slate-950 uppercase">
                   Filed Chart
                 </span>
                 <div className="mt-4">
                   {persistedSessions.length === 0 ? (
                     <>
-                      <div className="text-3xl font-black text-slate-300">No sessions yet</div>
+                      <div className="text-3xl font-bold text-slate-300">No sessions yet</div>
                       <p className="text-xs text-slate-300 mt-1">
                         File sessions below to track pre/post pain on this patient&apos;s chart.
                       </p>
                     </>
                   ) : (
                     <>
-                      <div className="text-3xl font-black text-emerald-400">
+                      <div className="text-3xl font-bold text-emerald-400">
                         {persistedSessions.length} session{persistedSessions.length === 1 ? "" : "s"} filed
                       </div>
                       <p className="text-xs text-slate-300 mt-1">
@@ -549,7 +549,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   printWin.document.close();
                   toast.success("Summary sent to printer");
                 }}
-                className="w-full bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20"
+                className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20"
               >
                 Print Session Summary
               </Button>
@@ -563,7 +563,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                 Prescribed Home &amp; Clinic Exercise Protocol
               </h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -584,7 +584,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   toast.error("Copy failed — your browser blocked clipboard access");
                 }
               }}
-              className="font-extrabold text-xs"
+              className="font-semibold text-xs"
             >
               Copy Plan to Share
             </Button>
@@ -597,13 +597,13 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-black text-xs">
+                  <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-bold text-xs">
                     {ex.targetArea}
                   </span>
                   <span className="text-xs font-bold text-slate-400">{ex.frequency}</span>
                 </div>
 
-                <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                   <Dumbbell className="h-4 w-4 text-primary-500" />
                   <span>{ex.name}</span>
                 </h4>
@@ -632,7 +632,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
       {activeTab === "sessions" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
               Clinical Session Logs &amp; Modality Applications
             </h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -676,7 +676,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 onClick={handleLogSession}
                 disabled={savingSession}
                 size="sm"
-                className="font-extrabold text-xs"
+                className="font-semibold text-xs"
               >
                 <Plus className="h-4 w-4" /> {savingSession ? "Filing…" : "File Session to Chart"}
               </Button>
@@ -686,7 +686,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Session #</th>
                   <th className="py-3 px-3">Date</th>
                   <th className="py-3 px-3 text-center">Pre-VAS</th>
@@ -706,7 +706,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 )}
                 {persistedSessions.map((s: any) => (
                   <tr key={s.sessionNo} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-black text-primary-500">Session #{s.sessionNo}</td>
+                    <td className="py-3 px-4 font-bold text-primary-500">Session #{s.sessionNo}</td>
                     <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">{s.date}</td>
                     <td className="py-3 px-3 text-center font-bold text-rose-600">{s.painPre ?? "—"}{s.painPre !== null ? "/10" : ""}</td>
                     <td className="py-3 px-3 text-center font-bold text-emerald-600">{s.painPost ?? "—"}{s.painPost !== null ? "/10" : ""}</td>

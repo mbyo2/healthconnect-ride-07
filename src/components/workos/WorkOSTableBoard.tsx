@@ -81,7 +81,7 @@ export const WORKOS_STATUS_CONFIG: Record<PatientStatus, { bg: string; text: str
 };
 
 export const WORKOS_PRIORITY_CONFIG: Record<PriorityLevel, { bg: string; text: string }> = {
-  "Urgent !!!": { bg: "bg-red-600/90", text: "text-white font-extrabold" },
+  "Urgent !!!": { bg: "bg-red-600/90", text: "text-white font-semibold" },
   "High": { bg: "bg-amber-500/90", text: "text-white font-bold" },
   "Medium": { bg: "bg-blue-500/90", text: "text-white font-bold" },
   "Routine": { bg: "bg-slate-400/80", text: "text-white font-medium" },
@@ -144,7 +144,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                   <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                     {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                   </button>
-                  <h2 className="text-base sm:text-lg font-black tracking-tight" style={{ color: groupColor }}>
+                  <h2 className="text-base sm:text-lg font-bold tracking-tight" style={{ color: groupColor }}>
                     {groupName}
                   </h2>
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${isDarkMode ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
@@ -171,7 +171,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                 <div className="w-full">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className={`text-xs font-extrabold uppercase tracking-wider border-b ${isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-500"}`}>
+                      <tr className={`text-xs font-semibold uppercase tracking-wider border-b ${isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-500"}`}>
                         <th className="py-2.5 px-4 w-[260px]">Patient & Clinical Profile</th>
                         <th className="py-2.5 px-3 w-[160px] text-center">Status</th>
                         <th className="py-2.5 px-3 w-[130px] text-center">Priority</th>
@@ -204,7 +204,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                             {/* Patient Info with Comment Bubble */}
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-2.5">
-                                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-sm flex-shrink-0">
+                                <div className="h-8 w-8 rounded-lg bg-primary-600 text-white flex items-center justify-center font-bold text-xs shadow-sm flex-shrink-0">
                                   {patient.name.charAt(0)}
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -338,7 +338,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                 </div>
                                 <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                                   <div
-                                    className="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                                    className="bg-primary-500 h-full rounded-full transition-all duration-500"
                                     style={{ width: `${patient.timelineDays}%` }}
                                   />
                                 </div>

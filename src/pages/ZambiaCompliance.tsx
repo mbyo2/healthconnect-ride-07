@@ -234,7 +234,7 @@ export const ZambiaCompliance = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access Zambia compliance.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -257,7 +257,7 @@ export const ZambiaCompliance = () => {
               <Flag className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold">Zambia Compliance</h1>
+              <h1 className="text-xl font-semibold">Zambia Compliance</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Regulatory Compliance Management</p>
             </div>
           </div>
@@ -273,7 +273,7 @@ export const ZambiaCompliance = () => {
         {/* Compliance Overview */}
         <Card className="border-canvas-silk dark:border-slate-800 shadow-xs mb-6">
           <CardHeader>
-            <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary-500" /> Overall Compliance Status
             </CardTitle>
           </CardHeader>
@@ -335,7 +335,7 @@ export const ZambiaCompliance = () => {
           {/* NHIMA Configuration Tab */}
           <TabsContent value="nhima" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">National Health Insurance Scheme Configuration</h3>
+              <h3 className="text-sm font-semibold">National Health Insurance Scheme Configuration</h3>
               <Dialog open={showNhimaDialog} onOpenChange={setShowNhimaDialog}>
                 <DialogTrigger asChild>
                   <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
@@ -344,7 +344,7 @@ export const ZambiaCompliance = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle className="text-lg font-extrabold">Configure NHIMA</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold">Configure NHIMA</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
@@ -438,7 +438,7 @@ export const ZambiaCompliance = () => {
             {nhimaConfig ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold">Current NHIMA Configuration</CardTitle>
+                  <CardTitle className="text-sm font-semibold">Current NHIMA Configuration</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
@@ -470,7 +470,7 @@ export const ZambiaCompliance = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Globe className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">NHIMA Not Configured</h3>
+                  <h3 className="text-sm font-semibold mb-2">NHIMA Not Configured</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your NHIMA settings to enable insurance claims</p>
                   <Button onClick={() => setShowNhimaDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure NHIMA
@@ -483,7 +483,7 @@ export const ZambiaCompliance = () => {
           {/* Medical Council Tab */}
           <TabsContent value="council" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Medical Council Compliance</h3>
+              <h3 className="text-sm font-semibold">Medical Council Compliance</h3>
               <Dialog open={showCouncilDialog} onOpenChange={setShowCouncilDialog}>
                 <DialogTrigger asChild>
                   <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
@@ -492,7 +492,7 @@ export const ZambiaCompliance = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle className="text-lg font-extrabold">Configure Medical Council</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold">Configure Medical Council</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
@@ -542,7 +542,7 @@ export const ZambiaCompliance = () => {
             {medicalCouncilConfig ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold">Council Compliance Status</CardTitle>
+                  <CardTitle className="text-sm font-semibold">Council Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
@@ -575,7 +575,7 @@ export const ZambiaCompliance = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">Medical Council Not Configured</h3>
+                  <h3 className="text-sm font-semibold mb-2">Medical Council Not Configured</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your medical council compliance settings</p>
                   <Button onClick={() => setShowCouncilDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Council
@@ -588,7 +588,7 @@ export const ZambiaCompliance = () => {
           {/* ZRA Tax Tab */}
           <TabsContent value="tax" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Zambia Revenue Authority Tax Configuration</h3>
+              <h3 className="text-sm font-semibold">Zambia Revenue Authority Tax Configuration</h3>
               <Dialog open={showTaxDialog} onOpenChange={setShowTaxDialog}>
                 <DialogTrigger asChild>
                   <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
@@ -597,7 +597,7 @@ export const ZambiaCompliance = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle className="text-lg font-extrabold">Configure ZRA Tax</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold">Configure ZRA Tax</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -685,7 +685,7 @@ export const ZambiaCompliance = () => {
             {taxConfig ? (
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold">Tax Compliance Status</CardTitle>
+                  <CardTitle className="text-sm font-semibold">Tax Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
@@ -712,7 +712,7 @@ export const ZambiaCompliance = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <BarChart3 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">ZRA Tax Not Configured</h3>
+                  <h3 className="text-sm font-semibold mb-2">ZRA Tax Not Configured</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your tax compliance settings</p>
                   <Button onClick={() => setShowTaxDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Tax
@@ -725,7 +725,7 @@ export const ZambiaCompliance = () => {
           {/* Health Regulations Tab */}
           <TabsContent value="regulations" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Zambia Health Regulations</h3>
+              <h3 className="text-sm font-semibold">Zambia Health Regulations</h3>
               <Button variant="outline" size="sm" className="text-xs">
                 <Download className="h-4 w-4 mr-1" /> Export Regulations
               </Button>
@@ -737,7 +737,7 @@ export const ZambiaCompliance = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{regulation.regulation_name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{regulation.regulation_name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">{regulation.regulation_code}</div>
                       </div>
                       <Badge variant="outline" className="text-xs">{regulation.regulation_category}</Badge>

@@ -189,7 +189,7 @@ const MyPracticeEditor = () => {
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="space-y-3">
-      <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 border-b border-canvas-mist dark:border-slate-800 pb-2">
+      <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 border-b border-canvas-mist dark:border-slate-800 pb-2">
         <Icon className="h-4 w-4" /> {title}
       </h3>
       {children}
@@ -228,7 +228,7 @@ const MyPracticeEditor = () => {
       <Section icon={GraduationCap} title="Education">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
             <Input
               value={data.medical_school}
               onChange={e => setData(p => ({ ...p, medical_school: e.target.value }))}
@@ -237,7 +237,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
             <Input
               type="number" min="1960" max="2030"
               value={data.graduation_year}
@@ -263,7 +263,7 @@ const MyPracticeEditor = () => {
       <Section icon={MapPin} title="Practice Details">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
             <Input
               value={data.primary_practice_location}
               onChange={e => setData(p => ({ ...p, primary_practice_location: e.target.value }))}
@@ -272,7 +272,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
             <Input
               value={data.typical_wait_time}
               onChange={e => setData(p => ({ ...p, typical_wait_time: e.target.value }))}
@@ -316,7 +316,7 @@ const MyPracticeEditor = () => {
       <Section icon={DollarSign} title="Consultation Fees (ZMW)">
         <div className="flex items-center gap-3 max-w-xs">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_min}
@@ -327,7 +327,7 @@ const MyPracticeEditor = () => {
           </div>
           <span className="mt-6 text-graphite-500 dark:text-slate-400 font-bold text-sm">–</span>
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
+            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_max}
@@ -378,7 +378,7 @@ const MyPracticeEditor = () => {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-xl h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs"
+          className="rounded-xl h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs"
         >
           {saving
             ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
@@ -446,7 +446,7 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 shrink-0">
+        <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 shrink-0">
           Patient
         </Label>
         <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
@@ -789,7 +789,7 @@ export const ProviderDashboard = () => {
           <div className="mx-auto h-16 w-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-6">
             <Hourglass className="h-8 w-8 text-amber-600 dark:text-amber-400" />
           </div>
-          <h1 className="text-2xl font-black mb-3">Application Under Review</h1>
+          <h1 className="text-2xl font-bold mb-3">Application Under Review</h1>
           <p className="text-sm text-graphite-500 mb-6">
             Your healthcare provider application is being reviewed by our team.
             You'll get full access to the dashboard once approved. This usually
@@ -846,7 +846,7 @@ export const ProviderDashboard = () => {
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Weekly Patient Volume</div>
-            <div className="text-3xl font-display font-medium text-accent-500">{weekStats?.total || 0}</div>
+            <div className="text-3xl font-display font-medium text-midnight">{weekStats?.total || 0}</div>
             <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed this week</div>
           </div>
           <div className="vf-card space-y-3">
@@ -883,7 +883,7 @@ export const ProviderDashboard = () => {
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
-              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <div className="p-2 rounded-lg bg-primary-50 dark:bg-blue-950 text-primary-500">
                 <act.icon className="h-4 w-4" />
@@ -897,7 +897,7 @@ export const ProviderDashboard = () => {
             Live modules open; planned modules are chartered but not built yet. */}
         {charter.length > 0 && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-            <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
+            <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-1">
               My Practice Modules
             </p>
             <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
@@ -918,7 +918,7 @@ export const ProviderDashboard = () => {
                       )}
                       <span className="truncate">{m.module_name}</span>
                     </span>
-                    <span className={`text-xs font-extrabold uppercase tracking-wide ${m.status === "live" ? "text-success-500" : "text-graphite-400"}`}>
+                    <span className={`text-xs font-semibold uppercase tracking-wide ${m.status === "live" ? "text-success-500" : "text-graphite-400"}`}>
                       {m.status === "live" ? "Live" : "Coming soon"}
                     </span>
                   </>
@@ -970,7 +970,7 @@ export const ProviderDashboard = () => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="text-xs font-extrabold px-4 py-1.5 min-h-[44px] rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
+                  className="text-xs font-semibold px-4 py-1.5 min-h-[44px] rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -994,7 +994,7 @@ export const ProviderDashboard = () => {
             {hasSpecialtyTools && <TabsContent value="specialty"><SpecialtyTools /></TabsContent>}
             <TabsContent value="my_practice">
               <div className="mb-4">
-                <h2 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h2 className="font-semibold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice Profile
                 </h2>

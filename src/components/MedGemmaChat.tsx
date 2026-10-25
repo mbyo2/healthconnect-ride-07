@@ -376,7 +376,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
   return (
     <Card className="w-full h-[calc(100dvh-16rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border">
-      <CardHeader className="border-b py-2 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
+      <CardHeader className="border-b py-2 sm:py-4 bg-card">
         <CardTitle className="flex items-center justify-between text-sm sm:text-lg">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -402,7 +402,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         {/* Messages Area - WhatsApp style */}
-        <ScrollArea className="flex-1 p-3 sm:p-6 bg-gradient-to-b from-muted/30 to-background overflow-x-hidden" ref={scrollRef}>
+        <ScrollArea className="flex-1 p-3 sm:p-6 bg-muted/30 overflow-x-hidden" ref={scrollRef}>
           <div className="space-y-4 sm:space-y-5">
             {messages.map((message, index) => (
               <div
@@ -603,7 +603,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 aria-label="Type your health question"
                 placeholder={selectedImages.length > 0 ? "Describe what you want to know about these images..." : "Ask me about your health..."}
                 disabled={isLoading}
-                className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border focus-visible:ring-2 focus-visible:ring-primary"
+                className="resize-none min-h-[48px] max-h-[120px] rounded-2xl px-4 py-3 pr-12 text-base bg-muted/50 border focus-visible:ring-2 focus-visible:ring-primary"
                 rows={1}
               />
               <Button

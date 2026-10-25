@@ -27,7 +27,7 @@ const About = () => (
         <img
           src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=85"
           alt="African healthcare professional and patient reviewing care together - Doc' O Clock platform"
-          className="h-64 w-full rounded-3xl object-cover shadow-xl shadow-primary/10"
+          className="h-64 w-full rounded-2xl object-cover shadow-xl shadow-primary/10"
           loading="lazy"
         />
       </div>
@@ -46,7 +46,7 @@ const About = () => (
         ))}
       </section>
 
-      <section className="mt-16 rounded-3xl border border-primary/15 bg-primary/5 p-8 sm:p-10">
+      <section className="mt-16 rounded-2xl border border-primary/15 bg-primary/5 p-8 sm:p-10">
         <div className="flex gap-4">
           <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-primary" />
           <div>

@@ -153,7 +153,7 @@ export const InstitutionModuleManager = () => {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-extrabold text-sm flex items-center gap-2">
+        <h2 className="font-semibold text-sm flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary-500" /> Institution Module Manager
         </h2>
         <p className="text-xs text-graphite-500 mt-1">
@@ -191,7 +191,7 @@ export const InstitutionModuleManager = () => {
       {selectedId && (
         <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <h3 className="font-extrabold text-sm">{selected?.name}</h3>
+            <h3 className="font-semibold text-sm">{selected?.name}</h3>
             <span className="text-xs font-bold text-graphite-500">
               Tier: <span className="text-midnight">{tier || "unknown"}</span>
               {tierLabel && <span className="text-graphite-400"> · {tierLabel}</span>}
@@ -226,17 +226,17 @@ export const InstitutionModuleManager = () => {
                         : <Ban className="h-4 w-4 text-error-500" />}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-extrabold truncate" title={m.module_name}>{m.module_name}</p>
+                        <p className="text-xs font-semibold truncate" title={m.module_name}>{m.module_name}</p>
                         <p className="text-xs text-graphite-500">
                           {m.source === "charter" ? (isLive ? "Tier default" : "Tier default · planned")
                           : m.source === "admin_grant" ? "Added by admin" : "Suspended by admin"}
-                          {priceLabel && <span className="ml-1 font-extrabold text-primary-600">{priceLabel}</span>}
+                          {priceLabel && <span className="ml-1 font-semibold text-primary-600">{priceLabel}</span>}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <button
                             onClick={() => toggleModule(m)}
                             disabled={saving === m.module_key}
-                            className={`text-xs font-extrabold px-3 py-1 rounded-full transition-colors ${
+                            className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors ${
                               isLive ? "bg-error-100 text-error-600 hover:bg-error-200" : "bg-success-100 text-success-700 hover:bg-success-200"
                             }`}
                           >
@@ -261,7 +261,7 @@ export const InstitutionModuleManager = () => {
 
               {/* Grant an off-plan module */}
               <div className="mt-4 pt-4 border-t border-canvas-silk">
-                <p className="text-xs font-extrabold mb-2 flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> Grant a module outside this tier</p>
+                <p className="text-xs font-semibold mb-2 flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> Grant a module outside this tier</p>
                 <div className="flex gap-2 max-w-xl">
                   <select
                     value={grantKey}

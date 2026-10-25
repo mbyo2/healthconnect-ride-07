@@ -82,7 +82,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       {/* Top Action Header */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
-          <h3 className="text-base font-extrabold flex items-center gap-2">
+          <h3 className="text-base font-semibold flex items-center gap-2">
             <Package className="h-5 w-5 text-primary-500" />
             Hospital Inventory & Stock Purchase Board
           </h3>
@@ -100,7 +100,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
           </button>
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
             Add Stock Item
@@ -112,19 +112,19 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       <div className="grid grid-cols-3 gap-3">
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-primary-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-primary-500">{supplies.length}</div>
+          <div className="text-2xl font-bold font-mono text-primary-500">{supplies.length}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Stock Items</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-warning-500">{lowStock.length}</div>
+          <div className="text-2xl font-bold font-mono text-warning-500">{lowStock.length}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Need Reorder</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-error-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-error-500">{expiringSoon.length}</div>
+          <div className="text-2xl font-bold font-mono text-error-500">{expiringSoon.length}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Expiring ≤ 90d</div>
         </div>
       </div>
@@ -133,7 +133,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl">
         <button
           onClick={() => setActiveTab("stock")}
-          className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all ${
+          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
             activeTab === "stock" ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
           }`}
         >
@@ -141,7 +141,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
         </button>
         <button
           onClick={() => setActiveTab("reorder")}
-          className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all ${
+          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
             activeTab === "reorder" ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
           }`}
         >
@@ -165,7 +165,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
           <div className="overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Item Name</th>
                   <th className="py-2.5 px-3">Category</th>
                   <th className="py-2.5 px-3">Qty</th>
@@ -199,11 +199,11 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base">Add Hospital Inventory Item</DialogTitle>
+            <DialogTitle className="font-semibold text-base">Add Hospital Inventory Item</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddItem} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Name *</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Item Name *</label>
               <input
                 value={newItem.item_name}
                 onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
@@ -214,7 +214,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Quantity</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Quantity</label>
                 <input
                   type="number"
                   value={newItem.quantity_available}
@@ -223,7 +223,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
                 />
               </div>
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reorder Level</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Reorder Level</label>
                 <input
                   type="number"
                   value={newItem.reorder_level}

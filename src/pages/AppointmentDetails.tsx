@@ -214,7 +214,7 @@ export const AppointmentDetails = () => {
       <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 flex items-center justify-center">
         <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk text-center space-y-3">
           <Calendar className="h-12 w-12 mx-auto text-primary-500" />
-          <h3 className="text-lg font-extrabold">Appointment Record Not Found</h3>
+          <h3 className="text-lg font-semibold">Appointment Record Not Found</h3>
           <button
             onClick={() => navigate("/appointments")}
             className="px-4 py-2 rounded-md bg-primary-500 text-white font-bold text-xs"
@@ -240,7 +240,7 @@ export const AppointmentDetails = () => {
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
             </button>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold tracking-tight truncate">Appointment Record #{appointment.id.slice(0, 8)}</h1>
+              <h1 className="text-xl font-semibold tracking-tight truncate">Appointment Record #{appointment.id.slice(0, 8)}</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
                 {appointment.patient
                   ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}`
@@ -306,7 +306,7 @@ export const AppointmentDetails = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Appointment Information Card */}
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
               <Calendar className="h-5 w-5 text-primary-500" />
               Appointment Information
             </h2>
@@ -316,7 +316,7 @@ export const AppointmentDetails = () => {
                 <Calendar className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
                   <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Date</div>
-                  <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                  <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                     {format(new Date(`${appointment.date}T00:00:00`), "EEEE, MMMM d, yyyy")}
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export const AppointmentDetails = () => {
 
           {/* Participant Info */}
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
               <User className="h-5 w-5 text-primary-500" />
               Participant Details
             </h2>
@@ -390,7 +390,7 @@ export const AppointmentDetails = () => {
             <div className="space-y-3 text-xs">
               <div>
                 <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Full Name</div>
-                <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                   {appointment.patient
                     ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
                     : appointment.provider
@@ -411,7 +411,7 @@ export const AppointmentDetails = () => {
 
         {/* Clinical Notes Section */}
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
-          <h2 className="font-extrabold text-base flex items-center gap-2">
+          <h2 className="font-semibold text-base flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-500" />
             Clinical Notes & Observations
           </h2>
@@ -424,7 +424,7 @@ export const AppointmentDetails = () => {
           />
           <button
             onClick={updateNotes}
-            className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
+            className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all"
           >
             Save Clinical Notes
           </button>
@@ -451,7 +451,7 @@ export const AppointmentDetails = () => {
             <button
               onClick={cancelAppointment}
               disabled={cancelling}
-              className="px-4 py-2 rounded-md bg-error-500 hover:bg-error-600 text-white font-extrabold text-xs disabled:opacity-50"
+              className="px-4 py-2 rounded-md bg-error-500 hover:bg-error-600 text-white font-semibold text-xs disabled:opacity-50"
             >
               {cancelling ? "Cancelling…" : "Yes, cancel"}
             </button>

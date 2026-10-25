@@ -211,7 +211,7 @@ export const FinancialControls = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access financial controls.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -236,7 +236,7 @@ export const FinancialControls = () => {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Financial Controls</h1>
+              <h1 className="text-xl font-semibold truncate">Financial Controls</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Revenue Leak Prevention & Audit Management</p>
             </div>
           </div>
@@ -249,7 +249,7 @@ export const FinancialControls = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Financial Control Settings</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Financial Control Settings</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4 max-h-[500px] overflow-y-auto">
                   <div className="grid grid-cols-2 gap-4">
@@ -341,40 +341,40 @@ export const FinancialControls = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Flagged Transactions</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Flagged Transactions</span>
                 <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{flaggedCount}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{flaggedCount}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Requires review</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Audits</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Audits</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{pendingCount}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{pendingCount}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting approval</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Price Discrepancies</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Price Discrepancies</span>
                 <DollarSign className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-error-500">{discrepancies.length}</div>
+              <div className="text-2xl font-bold font-mono text-error-500">{discrepancies.length}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Unresolved</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
                 <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-error-500">
+              <div className="text-2xl font-bold font-mono text-error-500">
                 {institution.currency || "ZMW"} {totalDiscrepancyAmount.toFixed(2)}
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">At risk amount</div>
@@ -421,7 +421,7 @@ export const FinancialControls = () => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle className="text-lg font-extrabold">Create Manual Audit Entry</DialogTitle>
+                      <DialogTitle className="text-lg font-semibold">Create Manual Audit Entry</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
@@ -486,13 +486,13 @@ export const FinancialControls = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Transaction</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Amount</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Risk Score</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Created</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Transaction</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Amount</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Risk Score</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Created</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -599,7 +599,7 @@ export const FinancialControls = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <CardTitle className="text-sm font-semibold flex items-center gap-2">
                           <AlertTriangle className="h-4 w-4 text-error-500" />
                           {discrepancy.transaction_type} Discrepancy
                         </CardTitle>
@@ -653,7 +653,7 @@ export const FinancialControls = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Revenue Leak Trends
                   </CardTitle>
                 </CardHeader>
@@ -665,7 +665,7 @@ export const FinancialControls = () => {
               </Card>
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-primary-500" /> Control Effectiveness
                   </CardTitle>
                 </CardHeader>

@@ -40,7 +40,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black font-mono text-rose-500">{stats.icuOccupancyPercent}%</span>
+            <span className="text-3xl font-bold font-mono text-rose-500">{stats.icuOccupancyPercent}%</span>
             <span className="text-xs font-semibold text-rose-400">Full (18/20 Beds)</span>
           </div>
           <div className="mt-3 w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -59,7 +59,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black font-mono text-amber-500">{stats.avgTriageMinutes}m</span>
+            <span className="text-3xl font-bold font-mono text-amber-500">{stats.avgTriageMinutes}m</span>
             <span className="text-xs font-semibold text-emerald-500">↓ 14% faster today</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Target: &lt; 15 mins per patient intake</p>
@@ -76,7 +76,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black font-mono text-blue-500">{stats.totalPatients}</span>
+            <span className="text-3xl font-bold font-mono text-blue-500">{stats.totalPatients}</span>
             <span className="text-xs font-semibold text-slate-400">Patients in Board</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">4 Group Sections • Live updates</p>
@@ -93,7 +93,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-black font-mono text-emerald-500">K48,250</span>
+            <span className="text-2xl font-bold font-mono text-emerald-500">K48,250</span>
             <span className="text-xs font-semibold text-emerald-400">+22% vs yesterday</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Medications & Consultations</p>
@@ -109,7 +109,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
           <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-500" />
-              <h3 className="font-extrabold text-base tracking-tight">Clinical Stage Throughput Breakdown</h3>
+              <h3 className="font-semibold text-base tracking-tight">Clinical Stage Throughput Breakdown</h3>
             </div>
             <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">
               Real-time Workflows
@@ -166,7 +166,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
           <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-emerald-500" />
-              <h3 className="font-extrabold text-base tracking-tight">On-Call Specialists</h3>
+              <h3 className="font-semibold text-base tracking-tight">On-Call Specialists</h3>
             </div>
             <span className="text-xs font-mono font-bold text-slate-400">Sample roster</span>
           </div>

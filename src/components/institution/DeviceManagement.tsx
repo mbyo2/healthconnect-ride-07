@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Plus, Loader2, Wifi, WifiOff, Activity, Heart,
   Thermometer, Microscope, MonitorSpeaker, Pill, AlertTriangle,
-  RefreshCw, Settings, Zap, Radio
+  RefreshCw, Settings, Zap, Radio, MapPin, BatteryMedium
 } from "lucide-react";
 
 interface InstitutionDevice {
@@ -366,10 +366,10 @@ export const DeviceManagement = ({ institutionId }: { institutionId: string }) =
 
                     <div className="space-y-1 text-xs text-muted-foreground">
                       {device.manufacturer && <div>{device.manufacturer} {device.model_number}</div>}
-                      {device.location_description && <div>📍 {device.location_description}</div>}
+                      {device.location_description && <div className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden /> {device.location_description}</div>}
                       {device.connection_protocol && <div>Protocol: <span className="uppercase font-medium">{device.connection_protocol}</span></div>}
                       {device.battery_level != null && (
-                        <div>🔋 {device.battery_level}%</div>
+                        <div className="flex items-center gap-1.5"><BatteryMedium className="h-3.5 w-3.5 shrink-0" aria-hidden /> {device.battery_level}%</div>
                       )}
                       {timeSinceHeartbeat != null && (
                         <div>Last signal: {timeSinceHeartbeat < 60 ? `${timeSinceHeartbeat}m ago` : `${Math.round(timeSinceHeartbeat / 60)}h ago`}</div>

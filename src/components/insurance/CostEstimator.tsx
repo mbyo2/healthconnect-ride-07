@@ -161,11 +161,11 @@ export const CostEstimator = () => {
   return (
     <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-6 shadow-xs space-y-5">
       <div className="flex items-center gap-3 pb-3 border-b border-canvas-silk dark:border-slate-800">
-        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm">
+        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm">
           <Calculator className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-base font-extrabold tracking-tight">Healthcare Out-of-Pocket Estimator</h2>
+          <h2 className="text-base font-semibold tracking-tight">Healthcare Out-of-Pocket Estimator</h2>
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             Calculate accurate consultation and procedure copays based on active insurance policies
           </p>
@@ -177,7 +177,7 @@ export const CostEstimator = () => {
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="h-5 w-5 text-primary-500" />
             <div>
-              <div className="text-xs font-extrabold text-slate-900 dark:text-slate-100">{insuranceInfo.provider_name}</div>
+              <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">{insuranceInfo.provider_name}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400">Policy: {insuranceInfo.policy_number}</div>
             </div>
           </div>
@@ -207,7 +207,7 @@ export const CostEstimator = () => {
       )}
 
       <div>
-        <label htmlFor="cost-estimator-service" className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 block mb-1">
+        <label htmlFor="cost-estimator-service" className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 block mb-1">
           Select Clinical Procedure or Consultation Type
         </label>
         <Select value={serviceType} onValueChange={setServiceType}>
@@ -230,14 +230,14 @@ export const CostEstimator = () => {
       <button
         onClick={calculateEstimate}
         disabled={!serviceType || estimating}
-        className="w-full py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-40"
+        className="w-full py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-40"
       >
         {estimating ? "Working out your cost..." : "Calculate What You'll Pay"}
       </button>
 
       {estimate && (
         <div className="p-4 rounded-xl bg-canvas border border-canvas-silk space-y-3">
-          <div className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Financial Breakdown Summary</div>
+          <div className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Financial Breakdown Summary</div>
           <div className="space-y-1.5 text-xs font-medium">
             <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>K{estimate.total.toFixed(2)}</span></div>
             <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-K{estimate.coverage.toFixed(2)}</span></div>

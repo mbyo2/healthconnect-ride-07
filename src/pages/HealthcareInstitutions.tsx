@@ -171,15 +171,15 @@ export const HealthcareInstitutions = () => {
       {/* ── Hero Banner ── */}
       <div className="bg-slate-900 text-white border-b border-slate-800 px-4 sm:px-6 py-10 sm:py-14">
         <div className="max-w-7xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/40 text-primary-500 text-xs font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/40 text-primary-500 text-xs font-bold uppercase tracking-wider">
             <Building2 className="h-3.5 w-3.5" />
             Verified Healthcare Facilities
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
             Healthcare Institutions &amp; Clinics
           </h1>
           <p className="text-slate-400 dark:text-slate-300 text-sm sm:text-base max-w-2xl font-medium">
-            Explore accredited hospitals, pharmacies, laboratories, and specialised medical clinics. Book appointments and manage care seamlessly.
+            Explore accredited hospitals, pharmacies, laboratories, and specialised medical clinics. Book appointments and manage your care.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 max-w-2xl">
@@ -210,7 +210,7 @@ export const HealthcareInstitutions = () => {
             <button
               key={tab.key}
               onClick={() => setTypeFilter(tab.key)}
-              className={`px-4 py-2 rounded-xl font-extrabold text-xs whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all ${
                 typeFilter === tab.key
                   ? 'bg-primary-500 text-white shadow-xs'
                   : 'bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500'
@@ -239,7 +239,7 @@ export const HealthcareInstitutions = () => {
           ) : filtered.length === 0 ? (
             <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 space-y-3">
               <Building2 className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600" />
-              <h3 className="font-extrabold text-base">No institutions found</h3>
+              <h3 className="font-semibold text-base">No institutions found</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">Try clearing your search filters or choose another category.</p>
               <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); setTypeFilter('all'); }}>
                 Reset Filters
@@ -275,14 +275,14 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
               {TYPE_ICONS[inst.institution_type] || <Building2 className="h-5 w-5 text-primary-500" />}
             </div>
             <div className="min-w-0">
-              <h3 className="font-black text-sm text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">{inst.name}</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">{inst.name}</h3>
               <p className="text-xs font-bold text-graphite-500 dark:text-slate-400 capitalize mt-0.5">
                 {inst.institution_type?.replace(/_/g, ' ')}
               </p>
             </div>
           </div>
           {inst.is_verified && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-success-500/10 text-success-500 shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-success-500/10 text-success-500 shrink-0">
               <CheckCircle2 className="h-3 w-3" /> Verified
             </span>
           )}
@@ -307,32 +307,32 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
         {/* ── Capability badge strip ── */}
         <div className="flex flex-wrap gap-1.5 pt-0.5">
           {inst.is_24_7 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-error-500/10 text-error-500">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-error-500/10 text-error-500">
               <Clock className="h-3 w-3" /> 24 / 7
             </span>
           )}
           {inst.emergency_services && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-warning-500/15 text-warning-600">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-warning-500/15 text-warning-600">
               <Zap className="h-3 w-3" /> Emergency
             </span>
           )}
           {inst.ambulance_services && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-primary-500/10 text-primary-500">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-primary-500/10 text-primary-500">
               <Siren className="h-3 w-3" /> Ambulance
             </span>
           )}
           {inst.telemedicine_available && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-purple-500/10 text-purple-500">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-purple-500/10 text-purple-500">
               <Wifi className="h-3 w-3" /> Telemedicine
             </span>
           )}
           {inst.number_of_beds && inst.number_of_beds > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
               <BedDouble className="h-3 w-3" /> {inst.number_of_beds} beds
             </span>
           )}
           {inst.accreditation_body && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-success-500/10 text-success-500">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-success-500/10 text-success-500">
               <ShieldCheck className="h-3 w-3" /> {inst.accreditation_body}
             </span>
           )}

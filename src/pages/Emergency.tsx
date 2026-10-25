@@ -267,7 +267,7 @@ const Emergency = () => {
                     <p className="text-sm font-bold text-red-700 dark:text-red-300">
                       Sending emergency alert in
                     </p>
-                    <p className="text-5xl font-black tabular-nums text-red-600" aria-hidden="true">
+                    <p className="text-5xl font-bold tabular-nums text-red-600" aria-hidden="true">
                       {sendCountdown}
                     </p>
                     <p className="sr-only" aria-live="assertive">

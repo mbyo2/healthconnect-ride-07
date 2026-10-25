@@ -409,7 +409,7 @@ export const BespokeWorkOSShowcase = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-amber-500">
                   <Zap className="h-5 w-5" />
-                  <h3 className="font-extrabold text-lg">Clinical Automations Center</h3>
+                  <h3 className="font-semibold text-lg">Clinical Automations Center</h3>
                 </div>
                 <button
                   onClick={() => setIsAutomationsModalOpen(false)}
@@ -472,7 +472,7 @@ export const BespokeWorkOSShowcase = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-indigo-400">
                   <Layers className="h-5 w-5" />
-                  <h3 className="font-extrabold text-lg">Clinical Integrations Hub</h3>
+                  <h3 className="font-semibold text-lg">Clinical Integrations Hub</h3>
                 </div>
                 <button
                   onClick={() => setIsIntegrationsModalOpen(false)}
@@ -514,7 +514,7 @@ export const BespokeWorkOSShowcase = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-blue-500" />
-                  <h3 className="font-extrabold text-lg">New Patient Intake ({targetAddGroup})</h3>
+                  <h3 className="font-semibold text-lg">New Patient Intake ({targetAddGroup})</h3>
                 </div>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
@@ -614,7 +614,7 @@ export const BespokeWorkOSShowcase = () => {
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-500">
                     {selectedPatient.id}
                   </span>
-                  <h3 className="font-extrabold text-xl">{selectedPatient.name}</h3>
+                  <h3 className="font-semibold text-xl">{selectedPatient.name}</h3>
                 </div>
                 <button
                   onClick={() => setSelectedPatient(null)}
@@ -656,7 +656,7 @@ export const BespokeWorkOSShowcase = () => {
                     className="h-12 w-12 rounded-full object-cover border-2 border-blue-500"
                   />
                   <div>
-                    <div className="font-extrabold text-base">{selectedPatient.doctor.name}</div>
+                    <div className="font-semibold text-base">{selectedPatient.doctor.name}</div>
                     <div className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{selectedPatient.doctor.specialty}</div>
                   </div>
                 </div>

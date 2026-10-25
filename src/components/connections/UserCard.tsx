@@ -74,12 +74,12 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         <div className="flex items-center space-x-3">
           <Avatar className="h-11 w-11 border border-canvas-silk dark:border-slate-800">
             <AvatarImage src={user.avatar_url} />
-            <AvatarFallback className="bg-primary-50 text-primary-500 font-extrabold text-xs">
+            <AvatarFallback className="bg-primary-50 text-primary-500 font-semibold text-xs">
               {user.first_name?.[0]}{user.last_name?.[0]}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               {user.first_name} {user.last_name}
             </h3>
             {user.specialty && (
@@ -108,7 +108,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Institution Info */}
       {user.institution && (
         <div className="p-3 bg-primary-50 border border-primary-200 rounded-xl text-xs">
-          <div className="flex items-center gap-1.5 font-extrabold text-primary-500">
+          <div className="flex items-center gap-1.5 font-semibold text-primary-500">
             <Building className="h-3.5 w-3.5" />
             <span>{user.institution.name}</span>
           </div>
@@ -119,7 +119,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Services */}
       {user.services && user.services.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
+          <h4 className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
             <Stethoscope className="h-3 w-3 text-primary-500" /> Services Offered
           </h4>
           <div className="space-y-1">
@@ -127,7 +127,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
               <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
                 <span className="font-bold text-slate-900 dark:text-slate-100">{service.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-success-500 font-black">K{service.price}</span>
+                  <span className="text-success-500 font-bold">K{service.price}</span>
                   {service.duration && (
                     <span className="text-graphite-500 dark:text-slate-400 text-xs flex items-center gap-0.5">
                       <Clock className="h-3 w-3" /> {service.duration}m
@@ -143,14 +143,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Products */}
       {user.products && user.products.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
+          <h4 className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
             <Pill className="h-3 w-3 text-purple-500" /> Available Products
           </h4>
           <div className="space-y-1">
             {user.products.slice(0, 3).map((product) => (
               <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
                 <span className="font-bold text-slate-900 dark:text-slate-100">{product.medication_name}</span>
-                <span className="text-success-500 font-black">K{product.price}</span>
+                <span className="text-success-500 font-bold">K{product.price}</span>
               </div>
             ))}
           </div>
@@ -176,7 +176,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         <button
           onClick={() => onConnect(user.id, user.role)}
           disabled={isConnecting}
-          className="flex-1 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
+          className="flex-1 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all"
         >
           Connect
         </button>

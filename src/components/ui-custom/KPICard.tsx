@@ -18,10 +18,10 @@ export const KPICard = ({ title, value, subtitle, icon: Icon, color = "text-prim
     <Card className="rounded-card border-canvas-silk shadow-card">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{title}</span>
+          <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{title}</span>
           <Icon className={`h-4 w-4 ${color}`} />
         </div>
-        <div className={`text-2xl font-black font-mono ${color}`}>{value}</div>
+        <div className={`text-2xl font-bold font-mono ${color}`}>{value}</div>
         <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{subtitle}</div>
         {trend && (
           <div className={`text-xs font-bold mt-1 ${trend.isPositive ? "text-success-500" : "text-error-500"}`}>

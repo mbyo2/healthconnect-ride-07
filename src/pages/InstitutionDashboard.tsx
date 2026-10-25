@@ -612,7 +612,7 @@ export const InstitutionDashboard = () => {
                       { description: `Required module: ${rule?.requiredModules.join(" or ") || "—"}. Contact your administrator to enable it.` }
                     );
                   }}
-                  className="px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
                 >
                   <Lock className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -626,7 +626,7 @@ export const InstitutionDashboard = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 title={atypicalNote || undefined}
-                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all ${
                   isActive
                     ? "bg-primary-500 text-white shadow-xs"
                     : isAtypical
@@ -699,7 +699,7 @@ export const InstitutionDashboard = () => {
 
             {/* Type-specific Quick Navigation */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-3">{cfg.label} Quick Access Modules</p>
+              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-3">{cfg.label} Quick Access Modules</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {cfg.quickLinks.map((action) => (
                   <button
@@ -723,7 +723,7 @@ export const InstitutionDashboard = () => {
                 modules show a "New" badge; suspended modules are hidden. */}
             {charter.length > 0 && (
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-                <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
+                <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-1">
                   {headerLabel} Modules
                 </p>
                 <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
@@ -750,7 +750,7 @@ export const InstitutionDashboard = () => {
                           )}
                           <span className="truncate">{m.module_name}</span>
                         </span>
-                        <span className={`text-xs font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
+                        <span className={`text-xs font-semibold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
                           {badge}
                         </span>
                       </>

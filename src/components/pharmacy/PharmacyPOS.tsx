@@ -159,13 +159,13 @@ export const PharmacyPOS = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 shadow-md text-center font-sans">
           <Package className="h-12 w-12 text-primary-500 mx-auto mb-3" />
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Open Cash Register</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Open Cash Register</h2>
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1 mb-4">Start your cashier shift by entering the opening float</p>
           <div className="text-left mb-4">
-            <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Opening Cash Balance ({getSymbol()})</label>
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Opening Cash Balance ({getSymbol()})</label>
             <input type="number" value={openingBalanceInput} onChange={(e) => setOpeningBalanceInput(e.target.value)} className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 text-sm font-bold" />
           </div>
-          <button onClick={() => openRegister.mutate(parseFloat(openingBalanceInput) || 0)} className="w-full py-2.5 rounded-md bg-primary-500 text-white font-extrabold text-sm">
+          <button onClick={() => openRegister.mutate(parseFloat(openingBalanceInput) || 0)} className="w-full py-2.5 rounded-md bg-primary-500 text-white font-semibold text-sm">
             Open Register
           </button>
         </div>
@@ -188,14 +188,14 @@ export const PharmacyPOS = () => {
               className="w-full pl-8 pr-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium"
             />
           </div>
-          <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-500 text-white text-xs font-extrabold">
+          <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-500 text-white text-xs font-semibold">
             Close Register
           </button>
         </div>
 
         {/* Session Info Bar */}
         {activeSession && (
-          <div className="flex items-center gap-4 px-4 py-2 bg-primary-50 border-b border-primary-200 text-xs font-extrabold text-primary-500">
+          <div className="flex items-center gap-4 px-4 py-2 bg-primary-50 border-b border-primary-200 text-xs font-semibold text-primary-500">
             <span>Session Sales: {formatPrice(activeSession.total_sales || 0)}</span>
             <span className="text-primary-200">|</span>
             <span>Transactions: {activeSession.transaction_count || 0}</span>
@@ -213,10 +213,10 @@ export const PharmacyPOS = () => {
                 onClick={() => addToCart(item)}
                 className="p-3 rounded-xl border border-canvas-silk cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
               >
-                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate">{item.medication_name}</p>
+                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">{item.medication_name}</p>
                 <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{item.dosage} · {item.medication_type}</p>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm font-black text-primary-500">{formatPrice(item.unit_price || 0)}</span>
+                  <span className="text-sm font-bold text-primary-500">{formatPrice(item.unit_price || 0)}</span>
                   <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${item.quantity_available <= 5 ? "bg-error-500" : "bg-success-500"}`}>
                     {item.quantity_available}
                   </span>
@@ -238,7 +238,7 @@ export const PharmacyPOS = () => {
         {/* Cart Header */}
         <div className="p-3 border-b border-canvas-silk bg-canvas flex items-center gap-2">
           <ShoppingCart className="h-4 w-4 text-primary-500" />
-          <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Cart</span>
+          <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">Cart</span>
           {cart.length > 0 && <span className="ml-auto inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{cart.length}</span>}
         </div>
 
@@ -263,12 +263,12 @@ export const PharmacyPOS = () => {
                   <button aria-label={`Decrease quantity of ${item.item_name}`} onClick={() => updateQuantity(index, -1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Minus className="h-3 w-3" />
                   </button>
-                  <span className="w-7 text-center font-extrabold">{item.quantity}</span>
+                  <span className="w-7 text-center font-semibold">{item.quantity}</span>
                   <button aria-label={`Increase quantity of ${item.item_name}`} onClick={() => updateQuantity(index, 1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
-                <span className="font-extrabold w-16 text-right text-primary-500">{formatPrice(item.total)}</span>
+                <span className="font-semibold w-16 text-right text-primary-500">{formatPrice(item.total)}</span>
                 <button aria-label={`Remove ${item.item_name} from cart`} onClick={() => removeItem(index)} className="h-6 w-6 rounded flex items-center justify-center text-error-500 hover:bg-error-50">
                   <X className="h-3 w-3" />
                 </button>
@@ -290,7 +290,7 @@ export const PharmacyPOS = () => {
             {discountPercent > 0 && (
               <div className="flex justify-between font-medium text-success-500"><span>Discount ({discountPercent}%)</span><span>-{formatPrice(discountAmount)}</span></div>
             )}
-            <div className="flex justify-between font-black text-base pt-1 border-t border-canvas-silk dark:border-slate-800">
+            <div className="flex justify-between font-bold text-base pt-1 border-t border-canvas-silk dark:border-slate-800">
               <span>Total</span><span className="text-primary-500">{formatPrice(totalAmount)}</span>
             </div>
           </div>
@@ -298,7 +298,7 @@ export const PharmacyPOS = () => {
           {/* Discount Selector */}
           <div className="flex gap-1">
             {POS_DISCOUNT_BANDS.map((d) => (
-              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
+              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-semibold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
                 {d === 0 ? "No Disc" : `${d}%`}
               </button>
             ))}
@@ -312,7 +312,7 @@ export const PharmacyPOS = () => {
               { value: "card", icon: <CreditCard className="h-3.5 w-3.5" />, label: "Card" },
               { value: "insurance", icon: <Shield className="h-3.5 w-3.5" />, label: "Insurance" },
             ].map((pm) => (
-              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-xs font-extrabold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
+              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
                 {pm.icon}{pm.label}
               </button>
             ))}
@@ -325,7 +325,7 @@ export const PharmacyPOS = () => {
           <button
             onClick={() => saleMutation.mutate()}
             disabled={cart.length === 0 || saleMutation.isPending}
-            className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
+            className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
           >
             <Receipt className="h-4 w-4" />
             {saleMutation.isPending ? "Processing..." : `Complete Sale — ${formatPrice(totalAmount)}`}
@@ -336,18 +336,18 @@ export const PharmacyPOS = () => {
       {/* Close Register Dialog */}
       <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>
         <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <DialogHeader><DialogTitle className="font-extrabold text-base">Close Register</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="font-semibold text-base">Close Register</DialogTitle></DialogHeader>
           <div className="space-y-3 text-xs py-2">
             {activeSession && (
               <div className="p-3 rounded-xl bg-canvas space-y-1">
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Opening Balance:</span><span className="font-extrabold">{formatPrice(activeSession.opening_balance)}</span></div>
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Total Sales:</span><span className="font-extrabold text-success-500">{formatPrice(activeSession.total_sales)}</span></div>
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Transactions:</span><span className="font-extrabold">{activeSession.transaction_count}</span></div>
-                <div className="flex justify-between border-t border-canvas-silk pt-1"><span className="font-extrabold">Expected Cash:</span><span className="font-black text-primary-500">{formatPrice(Number(activeSession.opening_balance || 0) + Number(activeSession.cash_sales || 0))}</span></div>
+                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Opening Balance:</span><span className="font-semibold">{formatPrice(activeSession.opening_balance)}</span></div>
+                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Total Sales:</span><span className="font-semibold text-success-500">{formatPrice(activeSession.total_sales)}</span></div>
+                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Transactions:</span><span className="font-semibold">{activeSession.transaction_count}</span></div>
+                <div className="flex justify-between border-t border-canvas-silk pt-1"><span className="font-semibold">Expected Cash:</span><span className="font-bold text-primary-500">{formatPrice(Number(activeSession.opening_balance || 0) + Number(activeSession.cash_sales || 0))}</span></div>
               </div>
             )}
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Actual Closing Balance ({getSymbol()})</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Actual Closing Balance ({getSymbol()})</label>
               <input type="number" value={closingBalanceInput} onChange={(e) => setClosingBalanceInput(e.target.value)} className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
             </div>
           </div>
@@ -362,14 +362,14 @@ export const PharmacyPOS = () => {
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
         <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base flex items-center gap-2">
+            <DialogTitle className="font-semibold text-base flex items-center gap-2">
               <Receipt className="h-5 w-5 text-success-500" /> Sale Receipt
             </DialogTitle>
           </DialogHeader>
           {lastSale && (
             <div className="space-y-2 text-xs font-mono py-2">
               <div className="text-center pb-2 border-b border-dashed border-graphite-300 dark:border-slate-700">
-                <p className="font-extrabold text-sm">Doc'O Clock Pharmacy</p>
+                <p className="font-semibold text-sm">Doc'O Clock Pharmacy</p>
                 <p className="text-graphite-500 dark:text-slate-400">{lastSale.receipt_number}</p>
                 <p className="text-graphite-500 dark:text-slate-400">{new Date(lastSale.created_at).toLocaleString()}</p>
               </div>
@@ -384,7 +384,7 @@ export const PharmacyPOS = () => {
               </div>
               <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400">Subtotal:</span><span>{formatPrice(lastSale.subtotal)}</span></div>
               {lastSale.discount_amount > 0 && <div className="flex justify-between text-success-500"><span>Discount:</span><span>-{formatPrice(lastSale.discount_amount)}</span></div>}
-              <div className="flex justify-between font-black text-sm border-t border-canvas-silk pt-1"><span>TOTAL:</span><span className="text-primary-500">{formatPrice(lastSale.total_amount)}</span></div>
+              <div className="flex justify-between font-bold text-sm border-t border-canvas-silk pt-1"><span>TOTAL:</span><span className="text-primary-500">{formatPrice(lastSale.total_amount)}</span></div>
               <p className="capitalize text-graphite-500 dark:text-slate-400">Paid by: {lastSale.payment_method?.replace("_", " ")}</p>
               <p className="text-center text-graphite-500 dark:text-slate-400 pt-1 border-t border-dashed border-graphite-300 dark:border-slate-700">Thank you for your purchase!</p>
             </div>

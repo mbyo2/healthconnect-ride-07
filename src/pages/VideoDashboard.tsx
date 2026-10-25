@@ -68,11 +68,11 @@ const VideoDashboard: React.FC = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Video className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 Video Visits
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
@@ -85,7 +85,7 @@ const VideoDashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
-              className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Phone className="h-4 w-4" />
               <span>Create Room Link</span>
@@ -109,7 +109,7 @@ const VideoDashboard: React.FC = () => {
             </p>
             <button
               onClick={loadStats}
-              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shrink-0"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold shrink-0"
             >
               Try again
             </button>
@@ -119,10 +119,10 @@ const VideoDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Upcoming Sessions (7d)</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Upcoming Sessions (7d)</span>
               <Video className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-3xl font-black font-mono text-primary-500">{stats.loading ? "—" : stats.upcoming}</div>
+            <div className="text-3xl font-bold font-mono text-primary-500">{stats.loading ? "—" : stats.upcoming}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.upcoming === 0 ? "No sessions scheduled" : `${stats.upcoming} sessions scheduled`}
             </div>
@@ -130,10 +130,10 @@ const VideoDashboard: React.FC = () => {
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Appointments</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Today's Appointments</span>
               <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-3xl font-black font-mono text-warning-500">{stats.loading ? "—" : stats.today}</div>
+            <div className="text-3xl font-bold font-mono text-warning-500">{stats.loading ? "—" : stats.today}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.today === 0 ? "No sessions scheduled today" : `${stats.today} consultation(s) today`}
             </div>
@@ -141,10 +141,10 @@ const VideoDashboard: React.FC = () => {
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Live Calls</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Live Calls</span>
               <Radio className="h-5 w-5 text-success-500 animate-pulse" />
             </div>
-            <div className="text-3xl font-black font-mono text-success-500">{stats.loading ? "—" : stats.active}</div>
+            <div className="text-3xl font-bold font-mono text-success-500">{stats.loading ? "—" : stats.active}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.active === 0 ? "No active consultations" : `${stats.active} session(s) live`}
             </div>
@@ -158,14 +158,14 @@ const VideoDashboard: React.FC = () => {
               <Phone className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Create a Shareable Call Room</h3>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Create a Shareable Call Room</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{isHealthPersonnel ? "Create a room link to share with your patient — no patient is assigned automatically; share the link after the booking." : "Create a room link to share with your provider — no provider is assigned automatically; share the link after your booking."}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+              className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
             >
               <Phone className="h-4 w-4" /> Create Room Link
             </button>
@@ -184,13 +184,13 @@ const VideoDashboard: React.FC = () => {
             <div className="mx-auto h-12 w-12 rounded-xl bg-primary-500/10 text-primary-500 flex items-center justify-center mb-3">
               <Video className="h-6 w-6" />
             </div>
-            <h3 className="font-extrabold text-sm mb-1">No upcoming video sessions</h3>
+            <h3 className="font-semibold text-sm mb-1">No upcoming video sessions</h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mb-4">
               Schedule a video consultation and it will appear here.
             </p>
             <button
               onClick={() => navigate("/appointments")}
-              className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all inline-flex items-center justify-center gap-2"
+              className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all inline-flex items-center justify-center gap-2"
             >
               <Calendar className="h-4 w-4" /> Schedule Session
             </button>

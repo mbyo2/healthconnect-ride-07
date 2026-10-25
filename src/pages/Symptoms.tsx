@@ -110,11 +110,11 @@ const Symptoms = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs shrink-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2 min-w-0">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2 min-w-0">
                 <span className="truncate">Check your symptoms</span>
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping shrink-0" />
               </h1>
@@ -135,7 +135,7 @@ const Symptoms = () => {
               <Bot className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-primary-500 flex items-center gap-1.5">
+              <h3 className="font-semibold text-sm text-primary-500 flex items-center gap-1.5">
                 Doc' O Clock Clinical AI Triage <Sparkles className="h-4 w-4" />
               </h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
@@ -145,7 +145,7 @@ const Symptoms = () => {
           </div>
           <button
             onClick={() => navigate("/ai-diagnostics")}
-            className="px-4 py-2 min-h-[44px] rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-blue-950/30 font-extrabold text-xs flex items-center gap-1.5 transition-all"
+            className="px-4 py-2 min-h-[44px] rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-blue-950/30 font-semibold text-xs flex items-center gap-1.5 transition-all"
           >
             <span>Analyze with AI</span>
             <ArrowRight className="h-4 w-4" />
@@ -156,7 +156,7 @@ const Symptoms = () => {
           {/* Category Symptom Selector */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <div className="border-b border-canvas-silk pb-3">
-              <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Select your symptoms</h2>
+              <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Select your symptoms</h2>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">Tap a symptom to add it to your list.</p>
             </div>
 
@@ -177,7 +177,7 @@ const Symptoms = () => {
               ) : (
                 symptomCategories.map((category) => (
                 <div key={category.title} className="space-y-2">
-                  <h4 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase flex items-center gap-1.5">
+                  <h4 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase flex items-center gap-1.5">
                     {getIconForCategory(category.title)}
                     {category.title}
                   </h4>
@@ -211,12 +211,12 @@ const Symptoms = () => {
           <div className="space-y-6">
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <div className="border-b border-canvas-silk dark:border-slate-800 pb-3">
-                <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Severity & details</h2>
+                <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Severity & details</h2>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label htmlFor="symptom-severity" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Discomfort Severity (1 - 10)</label>
+                  <label htmlFor="symptom-severity" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Discomfort Severity (1 - 10)</label>
                   <input
                     id="symptom-severity"
                     type="number"
@@ -232,7 +232,7 @@ const Symptoms = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="symptom-description" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Describe your symptoms</label>
+                  <label htmlFor="symptom-description" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Describe your symptoms</label>
                   <textarea
                     id="symptom-description"
                     value={description}
@@ -247,14 +247,14 @@ const Symptoms = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={saving}
-                    className="py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-60"
+                    className="py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-60"
                   >
                     {saving ? "Saving…" : "Save to Medical Log"}
                   </button>
                   <button
                     onClick={handleAIAnalysis}
                     disabled={selectedSymptoms.length === 0}
-                    className="py-3 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
+                    className="py-3 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
                   >
                     <Bot className="h-4 w-4" /> AI Differential
                   </button>
@@ -264,7 +264,7 @@ const Symptoms = () => {
 
             {selectedSymptoms.length > 0 && (
               <div className="rounded-2xl border border-primary-500/30 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
-                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Your selected symptoms ({selectedSymptoms.length})</p>
+                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">Your selected symptoms ({selectedSymptoms.length})</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedSymptoms.map((symptom) => (
                     <button

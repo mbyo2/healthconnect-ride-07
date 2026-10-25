@@ -74,14 +74,14 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
       <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Title & Brand Icon */}
         <div className="flex items-start gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary-500 via-purple-500 to-success-500 p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
+          <div className="h-11 w-11 rounded-2xl bg-primary p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
             <div className="w-full h-full bg-slate-950/20 backdrop-blur-sm rounded-[14px] flex items-center justify-center">
               <Activity className="h-6 w-6 text-white animate-pulse" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight font-sans flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight font-sans flex items-center gap-2">
                 <span>{boardTitle}</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-primary-500 font-mono font-bold border border-blue-500/20">
                   CRM Board
@@ -107,7 +107,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           >
             <Zap className="h-4 w-4" />
             <span>Automate</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-xs font-extrabold">
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-xs font-semibold">
               3
             </span>
           </button>
@@ -119,7 +119,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           >
             <Layers className="h-4 w-4" />
             <span>Integrate</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-mono text-xs font-extrabold">
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-mono text-xs font-semibold">
               5
             </span>
           </button>
@@ -212,7 +212,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("ai")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "ai"
-                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm font-bold"
+                ? "bg-primary-600 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-purple-400 hover:text-purple-300 hover:bg-purple-950/30" : "text-purple-700 hover:text-purple-900 hover:bg-purple-50"
             }`}
           >

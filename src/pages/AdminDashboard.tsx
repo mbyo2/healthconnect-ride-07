@@ -205,7 +205,7 @@ export const AdminDashboard = () => {
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="text-xs font-extrabold px-3.5 py-1.5 min-h-[44px] rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
+                  className="text-xs font-semibold px-3.5 py-1.5 min-h-[44px] rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{label}</span>

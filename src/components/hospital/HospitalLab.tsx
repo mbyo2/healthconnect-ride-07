@@ -199,7 +199,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
-          <h3 className="text-base font-extrabold flex items-center gap-2">
+          <h3 className="text-base font-semibold flex items-center gap-2">
             <TestTube className="h-5 w-5 text-primary-500" />
             Laboratory Information Management System (LIMS)
           </h3>
@@ -216,7 +216,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           </button>
           <button
             onClick={() => setShowOrderDialog(true)}
-            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs flex items-center gap-1"
           >
             <Plus className="h-4 w-4" /> Order Lab Test
           </button>
@@ -233,7 +233,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         ].map((card) => (
           <div key={card.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
             <div style={{ color: card.color }} className="flex justify-center mb-1">{card.icon}</div>
-            <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
+            <div className="text-2xl font-bold font-mono" style={{ color: card.color }}>{card.value}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">{card.label}</div>
           </div>
         ))}
@@ -277,7 +277,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Test # / Type</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
@@ -352,7 +352,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
         <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base">Order Laboratory Test</DialogTitle>
+            <DialogTitle className="font-semibold text-base">Order Laboratory Test</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleOrderLab} className="space-y-3 py-2 text-xs">
             <HospitalPatientSelect
@@ -363,7 +363,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
               label="Patient *"
             />
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Test Name *</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Test Name *</label>
               <input
                 value={orderForm.test_type}
                 onChange={(e) => setOrderForm({ ...orderForm, test_type: e.target.value })}
@@ -374,7 +374,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
                 <input
                   value={orderForm.test_category}
                   onChange={(e) => setOrderForm({ ...orderForm, test_category: e.target.value })}
@@ -383,7 +383,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                 />
               </div>
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Sample Type</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Sample Type</label>
                 <input
                   value={orderForm.sample_type}
                   onChange={(e) => setOrderForm({ ...orderForm, sample_type: e.target.value })}
@@ -393,7 +393,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
               </div>
             </div>
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Priority</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Priority</label>
               <select
                 className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 value={orderForm.priority}
@@ -418,10 +418,10 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       <Dialog open={!!showResultDialog} onOpenChange={(o) => !o && setShowResultDialog(null)}>
         <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base">Enter Result — {showResultDialog?.test_type}</DialogTitle>
+            <DialogTitle className="font-semibold text-base">Enter Result — {showResultDialog?.test_type}</DialogTitle>
           </DialogHeader>
           <div className="py-2 text-xs">
-            <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Summary *</label>
+            <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result Summary *</label>
             <textarea
               className="w-full mt-1 h-24 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium"
               placeholder="e.g. Haemoglobin 14.2 g/dL — Within Normal Range"

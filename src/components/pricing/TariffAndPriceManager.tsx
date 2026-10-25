@@ -504,7 +504,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-canvas-silk pb-3">
         <div>
-          <h2 className="text-base font-extrabold flex items-center gap-2">
+          <h2 className="text-base font-semibold flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-primary-500" />
             Universal Hospital Service Tariff & Pricing Matrix
           </h2>
@@ -517,7 +517,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             <button
               onClick={loadStarterTariffs}
               disabled={seeding || !institutionId}
-              className="px-3.5 py-1.5 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-100 font-extrabold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-100 font-semibold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
             >
               <Tag className="h-4 w-4" />
               <span>{seeding ? 'Loading…' : 'Load Starter Tariffs'}</span>
@@ -525,7 +525,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
           )}
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
             <span>Add Service Tariff</span>
@@ -538,7 +538,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       ) : tariffs.length === 0 ? (
         <div className="rounded-xl border border-dashed border-graphite-300 dark:border-slate-700 p-8 text-center space-y-2">
           <Tag className="h-8 w-8 mx-auto text-slate-300" />
-          <p className="text-sm font-extrabold">No tariffs yet</p>
+          <p className="text-sm font-semibold">No tariffs yet</p>
           <p className="text-xs text-graphite-500 dark:text-slate-400">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
         </div>
       ) : null}
@@ -600,7 +600,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               return (
                 <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">{t.code}</td>
-                  <td className="py-3 px-3 font-extrabold text-slate-900 dark:text-slate-100">{t.name}</td>
+                  <td className="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">{t.name}</td>
                   <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{t.department}</td>
                   <td className="py-3 px-3 text-right font-mono">
                     {isEditing ? (
@@ -671,11 +671,11 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base">Add Service Price</DialogTitle>
+            <DialogTitle className="font-semibold text-base">Add Service Price</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddService} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Service Name *</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Service Name *</label>
               <input
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
@@ -686,7 +686,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Selling Price ({currency}) *</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Selling Price ({currency}) *</label>
                 <input
                   type="number"
                   value={newService.basePrice}
@@ -696,7 +696,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                 />
               </div>
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Cost Price ({currency})</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Cost Price ({currency})</label>
                 <input
                   type="number"
                   value={newService.costPrice}

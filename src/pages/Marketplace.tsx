@@ -72,11 +72,11 @@ const Marketplace = () => {
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
                 <Pill className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                   Pharmacy Marketplace & Prescription Fulfillment
                   <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
@@ -89,7 +89,7 @@ const Marketplace = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab("cart")}
-                className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-2"
+                className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Cart ({cart?.items?.length ?? 0})</span>
@@ -109,7 +109,7 @@ const Marketplace = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
                     : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -139,7 +139,7 @@ const Marketplace = () => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-2 border border-graphite-300 dark:border-slate-700 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                  className="px-4 py-2 border border-graphite-300 dark:border-slate-700 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((category) => (
@@ -159,7 +159,7 @@ const Marketplace = () => {
                   <button
                     onClick={() => refetchProducts()}
                     aria-label="Retry loading medications"
-                    className="px-6 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
+                    className="px-6 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold transition-all"
                   >
                     Try again
                   </button>
@@ -202,7 +202,7 @@ const Marketplace = () => {
 
           {activeTab === "orders" && (
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm mb-4">Medication Fulfillment & Order History</h2>
+              <h2 className="font-semibold text-sm mb-4">Medication Fulfillment & Order History</h2>
               <div className="space-y-3" aria-label={ordersLoading ? "Loading orders" : "Order history"}>
                 {ordersLoading ? (
                   [0, 1, 2].map((i) => (
@@ -218,7 +218,7 @@ const Marketplace = () => {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
+                          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                             order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
                           }`}>
@@ -234,7 +234,7 @@ const Marketplace = () => {
                         {order.status === "pending" && (
                           <Button
                             onClick={() => setPendingPaymentOrder(order)}
-                            className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-extrabold"
+                            className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold"
                           >
                             Pay now
                           </Button>

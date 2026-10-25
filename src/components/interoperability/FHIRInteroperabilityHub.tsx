@@ -151,15 +151,15 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <Share2 className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">HL7 FHIR Interoperability &amp; Data Exchange Engine</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
+              <h2 className="text-xl font-bold tracking-tight">HL7 FHIR Interoperability &amp; Data Exchange Engine</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400 text-slate-950">
                 HL7 FHIR R4 / R5
               </span>
             </div>
@@ -174,7 +174,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
             onClick={handleCopy}
             variant="secondary"
             size="sm"
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-extrabold text-xs"
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs"
           >
             {copied ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
             <span>{copied ? "Copied" : "Copy JSON"}</span>
@@ -183,7 +183,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
             onClick={handleDownload}
             disabled={!profile}
             size="sm"
-            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-extrabold text-xs"
+            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs"
           >
             <Download className="h-4 w-4" /> Download FHIR Bundle
           </Button>
@@ -192,7 +192,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
 
       {/* Real patient selector */}
       <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <Label className="flex items-center gap-2 text-xs font-extrabold text-slate-600 dark:text-slate-300">
+        <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
           <Users className="h-4 w-4 text-primary-500" /> Source patient (admitted to this facility)
         </Label>
         {loading ? (
@@ -223,14 +223,14 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
       {/* Resource Selector */}
       <Tabs value={selectedResourceType} onValueChange={setSelectedResourceType}>
         <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="Patient" className="text-xs font-extrabold shrink-0">Patient Resource</TabsTrigger>
-          <TabsTrigger value="Observation" className="text-xs font-extrabold shrink-0">Observation (Vitals & Labs)</TabsTrigger>
-          <TabsTrigger value="Bundle" className="text-xs font-extrabold shrink-0">Full FHIR Collection Bundle</TabsTrigger>
+          <TabsTrigger value="Patient" className="text-xs font-semibold shrink-0">Patient Resource</TabsTrigger>
+          <TabsTrigger value="Observation" className="text-xs font-semibold shrink-0">Observation (Vitals & Labs)</TabsTrigger>
+          <TabsTrigger value="Bundle" className="text-xs font-semibold shrink-0">Full FHIR Collection Bundle</TabsTrigger>
         </TabsList>
       </Tabs>
 
       {/* Live FHIR JSON Display */}
-      <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
+      <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 text-slate-400">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />

@@ -249,15 +249,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 to-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <Baby className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">Pediatric Care &amp; Child Health Center</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
+              <h2 className="text-xl font-bold tracking-tight">Pediatric Care &amp; Child Health Center</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400 text-slate-950">
                 WHO Standardized
               </span>
             </div>
@@ -287,10 +287,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       {/* Sub Tabs */}
       <Tabs value={activeSubTab} onValueChange={(v) => setActiveSubTab(v as any)}>
         <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="growth" className="text-xs font-extrabold shrink-0"><TrendingUp className="h-4 w-4" />WHO Growth Curves & Vitals</TabsTrigger>
-          <TabsTrigger value="immunization" className="text-xs font-extrabold shrink-0"><ShieldCheck className="h-4 w-4" />Vaccine & Immunization Registry</TabsTrigger>
-          <TabsTrigger value="milestones" className="text-xs font-extrabold shrink-0"><Activity className="h-4 w-4" />Developmental Milestones</TabsTrigger>
-          <TabsTrigger value="calculator" className="text-xs font-extrabold shrink-0"><Calculator className="h-4 w-4" />Pediatric Dosage Calculator</TabsTrigger>
+          <TabsTrigger value="growth" className="text-xs font-semibold shrink-0"><TrendingUp className="h-4 w-4" />WHO Growth Curves & Vitals</TabsTrigger>
+          <TabsTrigger value="immunization" className="text-xs font-semibold shrink-0"><ShieldCheck className="h-4 w-4" />Vaccine & Immunization Registry</TabsTrigger>
+          <TabsTrigger value="milestones" className="text-xs font-semibold shrink-0"><Activity className="h-4 w-4" />Developmental Milestones</TabsTrigger>
+          <TabsTrigger value="calculator" className="text-xs font-semibold shrink-0"><Calculator className="h-4 w-4" />Pediatric Dosage Calculator</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -299,7 +299,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                 Child Anthropometry &amp; Growth Trajectory
               </h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -309,13 +309,13 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
             <Dialog open={showGrowthModal} onOpenChange={setShowGrowthModal}>
               <DialogTrigger asChild>
-                <Button size="sm" className="text-xs font-extrabold">
+                <Button size="sm" className="text-xs font-semibold">
                   <Plus className="h-4 w-4" /> Log Measurement
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
+              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
                 <DialogHeader>
-                  <DialogTitle className="font-black text-lg">Log Pediatric Growth Vitals</DialogTitle>
+                  <DialogTitle className="font-bold text-lg">Log Pediatric Growth Vitals</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div className="space-y-1">
@@ -380,24 +380,24 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Latest Weight (charted)</span>
-              <div className="text-2xl font-black text-primary-500 mt-1">
+              <span className="text-xs font-semibold uppercase text-slate-400">Latest Weight (charted)</span>
+              <div className="text-2xl font-bold text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
               </div>
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Latest Length / Height</span>
-              <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
+              <span className="text-xs font-semibold uppercase text-slate-400">Latest Length / Height</span>
+              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
               </div>
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Head Circumference</span>
-              <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
+              <span className="text-xs font-semibold uppercase text-slate-400">Head Circumference</span>
+              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.head || "—"}{growthHistory[growthHistory.length - 1]?.head ? " cm" : ""}
               </div>
               <span className="text-xs font-bold text-slate-500">Clinical screening still required</span>
@@ -409,7 +409,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Visit Date</th>
                   <th className="py-3 px-3">Age (Months)</th>
                   <th className="py-3 px-3">Weight</th>
@@ -422,7 +422,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   <tr key={i} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4 font-bold text-primary-500">{row.date}</td>
                     <td className="py-3 px-3 font-semibold">{row.ageMonths} mo</td>
-                    <td className="py-3 px-3 font-black text-slate-900 dark:text-slate-100">{row.weight} kg</td>
+                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{row.weight} kg</td>
                     <td className="py-3 px-3 font-semibold">{row.height} cm</td>
                     <td className="py-3 px-3 font-semibold">{row.head ? `${row.head} cm` : "—"}</td>
                   </tr>
@@ -438,7 +438,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">National Immunization Schedule (EPI)</h3>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">National Immunization Schedule (EPI)</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
                 Tracking completed doses, upcoming shots, and batch serial numbers
               </p>
@@ -466,7 +466,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   printWin.document.close();
                   toast.success("Registry record sent to printer");
                 }}
-                className="font-extrabold text-xs"
+                className="font-semibold text-xs"
               >
                 Print Registry Record
               </Button>
@@ -487,7 +487,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-9 w-9 rounded-xl flex items-center justify-center font-black ${
+                    className={`h-9 w-9 rounded-xl flex items-center justify-center font-bold ${
                       shown === "completed"
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
                         : shown === "due"
@@ -498,14 +498,14 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     <ShieldCheck className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{v.name}</h4>
+                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{v.name}</h4>
                     <p className="text-xs text-slate-400 font-medium">Recommended Age: {v.due}</p>
                   </div>
                 </div>
 
                 <div>
                   {shown === "completed" ? (
-                    <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
                       ✓ Filed in registry
                     </span>
                   ) : (
@@ -513,7 +513,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       size="sm"
                       onClick={() => handleRecordDose(v.name)}
                       disabled={recordingDose === v.name}
-                      className="rounded-full text-xs font-black"
+                      className="rounded-full text-xs font-bold"
                     >
                       {recordingDose === v.name ? "Filing…" : "Record Dose"}
                     </Button>
@@ -530,7 +530,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       {activeSubTab === "milestones" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Pediatric Developmental Milestones (Ages 0 - 24 Months)</h3>
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Pediatric Developmental Milestones (Ages 0 - 24 Months)</h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Screening motor, speech, and social progression</p>
           </div>
 
@@ -542,7 +542,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-black text-xs">
+                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-bold text-xs">
                       {m.age}
                     </span>
                     <span className="text-xs font-bold text-slate-400 uppercase">{m.category}</span>
@@ -560,7 +560,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                         prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
                       );
                     }}
-                    className={`rounded-xl font-extrabold text-xs ${
+                    className={`rounded-xl font-semibold text-xs ${
                       achievedMilestones.includes(idx)
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                         : "text-emerald-700 dark:text-emerald-400 border-emerald-300"
@@ -587,15 +587,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       {activeSubTab === "calculator" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Weight-Based Pediatric Dosage Calculator</h3>
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Weight-Based Pediatric Dosage Calculator</h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400">
               Calculate exact single and daily doses (mg and mL) from child weight and liquid concentration
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
-              <h4 className="font-black text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Calculator className="h-4 w-4 text-primary-500" /> Dosage Input Parameters
               </h4>
 
@@ -637,7 +637,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     step="0.5"
                     value={calcWeight}
                     onChange={(e) => setCalcWeight(parseFloat(e.target.value) || 1)}
-                    className="font-black"
+                    className="font-bold"
                   />
                 </div>
                 <div className="space-y-1">
@@ -647,7 +647,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     step="1"
                     value={calcMgPerKg}
                     onChange={(e) => setCalcMgPerKg(parseFloat(e.target.value) || 1)}
-                    className="font-black"
+                    className="font-bold"
                   />
                 </div>
               </div>
@@ -666,17 +666,17 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </div>
 
             {/* Calculated Result Card */}
-            <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md flex flex-col justify-between space-y-4">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-primary-500 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-500 text-white uppercase tracking-wider">
                   Precise Calculated Dosage
                 </span>
                 <div className="mt-4">
-                  <div className="text-4xl font-black text-emerald-400 tracking-tight">
+                  <div className="text-4xl font-bold text-emerald-400 tracking-tight">
                     {singleDoseMl} mL
                   </div>
                   <p className="text-xs text-slate-300 font-semibold mt-1">
-                    Equates to <span className="text-white font-black">{singleDoseMg} mg</span> per individual dose
+                    Equates to <span className="text-white font-bold">{singleDoseMg} mg</span> per individual dose
                   </p>
                 </div>
               </div>
@@ -706,7 +706,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     toast.error("Copy failed — your browser blocked clipboard access");
                   }
                 }}
-                className="w-full text-xs font-extrabold"
+                className="w-full text-xs font-semibold"
               >
                 Copy Dosage for Prescription
               </Button>

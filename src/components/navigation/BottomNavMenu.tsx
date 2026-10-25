@@ -45,7 +45,7 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
           <div className="p-2 rounded-full transition-all duration-200 flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
             <Menu className="h-5 w-5" />
           </div>
-          <span className="hidden min-[400px]:block text-xs font-black leading-none tracking-tight mt-0.5">More</span>
+          <span className="hidden min-[400px]:block text-xs font-bold leading-none tracking-tight mt-0.5">More</span>
         </button>
       </SheetTrigger>
 
@@ -54,17 +54,17 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
         className="w-[82vw] max-w-sm max-h-[100dvh] bg-white dark:bg-slate-900 border-l border-canvas-silk dark:border-slate-800 flex flex-col h-full p-0"
       >
         <SheetHeader className="pb-0 flex-shrink-0 px-5 pt-6">
-          <SheetTitle className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Menu</SheetTitle>
+          <SheetTitle className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Menu</SheetTitle>
           {user && (
-            <div className="flex items-center gap-3 mt-4 py-3.5 px-4 bg-canvas-bone dark:bg-slate-800 rounded-3xl border border-canvas-silk dark:border-slate-700">
+            <div className="flex items-center gap-3 mt-4 py-3.5 px-4 bg-canvas-bone dark:bg-slate-800 rounded-2xl border border-canvas-silk dark:border-slate-700">
               <Avatar className="h-11 w-11 ring-2 ring-primary-500/30 ring-offset-1 ring-offset-canvas-bone dark:ring-offset-slate-800">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary-50 dark:bg-blue-950 text-primary-500 dark:text-blue-400 font-extrabold text-sm">
+                <AvatarFallback className="bg-primary-50 dark:bg-blue-950 text-primary-500 dark:text-blue-400 font-semibold text-sm">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100 truncate">
+                <span className="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">
                   {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
                 </span>
                 <span className="text-xs text-slate-400 dark:text-slate-500 truncate font-medium">{user.email}</span>
@@ -93,7 +93,7 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
                     {item.icon}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">{item.label}</span>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">{item.label}</span>
                     <span className="text-xs text-slate-400 dark:text-slate-500 truncate font-medium">{item.description}</span>
                   </div>
                 </Link>

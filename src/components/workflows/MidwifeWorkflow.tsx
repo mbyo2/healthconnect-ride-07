@@ -94,17 +94,17 @@ export const MidwifeWorkflow = () => {
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
 
-      <div className="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm">
+      <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-black shadow-md">
+          <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-bold shadow-md">
             <Baby className="h-7 w-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-xs font-black uppercase tracking-wider text-slate-300">Midwife Clinical Workspace</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Midwife Clinical Workspace</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Maternal Health Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-0.5">Maternal Health Dashboard</h1>
             <p className="text-xs text-slate-400 font-medium">Antenatal care, deliveries, postnatal care & maternal health</p>
           </div>
         </div>
@@ -165,13 +165,13 @@ export const MidwifeWorkflow = () => {
                 {step.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
+                <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
                 <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
               </div>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-black transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-bold transition-all"
             >
               Open Module
             </button>

@@ -83,11 +83,11 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Top TV Header */}
       <div className="flex items-center justify-between border-b border-slate-800/80 pb-6">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-primary-500 flex items-center justify-center font-black text-2xl shadow-lg shadow-primary-500/30">
+          <div className="h-14 w-14 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-2xl shadow-lg shadow-primary-500/30">
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
               DOC' O CLOCK HEALTHCARE NETWORK
               <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
             </h1>
@@ -98,7 +98,7 @@ export const PublicQueueDisplay: React.FC = () => {
         </div>
 
         <div className="text-right">
-          <div className="text-3xl font-black font-mono text-emerald-400 tracking-wider">
+          <div className="text-3xl font-bold font-mono text-emerald-400 tracking-wider">
             {currentTime}
           </div>
           <div className="text-xs font-semibold text-slate-400 mt-0.5">
@@ -110,27 +110,27 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Main Focus: Big Screen Now Calling Hero */}
       <div className="my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left 7 cols: Current Active Called Token */}
-        <div className="lg:col-span-7 p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-primary-500/40 border-2 border-primary-500 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-7 p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-primary-500/40 border-2 border-primary-500 shadow-2xl flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-10">
             <Bell className="h-48 w-48 text-primary-500" />
           </div>
 
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500 text-white text-xs font-black uppercase tracking-widest animate-pulse">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500 text-white text-xs font-bold uppercase tracking-widest animate-pulse">
               <Volume2 className="h-4 w-4" /> Now Calling / Token Called
             </div>
 
             <div className="mt-8">
               {loading ? (
-                <div className="text-4xl sm:text-5xl font-black tracking-tight text-slate-400" role="status" aria-label="Loading queue">
+                <div className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-400" role="status" aria-label="Loading queue">
                   Loading queue…
                 </div>
               ) : currentlyCalled ? (
-                <div className="text-7xl sm:text-9xl font-black font-mono tracking-tight text-white drop-shadow-md">
+                <div className="text-7xl sm:text-9xl font-bold font-mono tracking-tight text-white drop-shadow-md">
                   {currentlyCalled.tokenNumber}
                 </div>
               ) : (
-                <div className="text-3xl sm:text-5xl font-black tracking-tight text-slate-300">
+                <div className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-300">
                   {!institutionId
                     ? "Display not connected"
                     : feedError
@@ -154,7 +154,7 @@ export const PublicQueueDisplay: React.FC = () => {
             <div className="mt-8 pt-6 border-t border-slate-700/80 grid grid-cols-2 gap-4">
               <div>
                 <span className="text-xs font-bold uppercase text-slate-400">Department:</span>
-                <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-1">
+                <div className="text-3xl sm:text-4xl font-bold text-emerald-400 mt-1">
                   {currentlyCalled.department}
                 </div>
                 <span className="text-sm font-semibold text-slate-300">Please proceed as directed by reception</span>
@@ -162,7 +162,7 @@ export const PublicQueueDisplay: React.FC = () => {
 
               <div>
                 <span className="text-xs font-bold uppercase text-slate-400">Status:</span>
-                <div className="text-2xl sm:text-3xl font-black text-white mt-1 capitalize">
+                <div className="text-2xl sm:text-3xl font-bold text-white mt-1 capitalize">
                   {currentlyCalled.status === "serving" ? "Now serving" : "Next in queue"}
                 </div>
                 <span className="text-xs text-blue-300 font-bold">Token numbers only — names stay private</span>
@@ -173,7 +173,7 @@ export const PublicQueueDisplay: React.FC = () => {
 
         {/* Right 5 cols: Department Status Grid */}
         <div className="lg:col-span-5 flex flex-col justify-between gap-3">
-          <div className="px-2 font-extrabold text-sm uppercase text-slate-400 tracking-wider">
+          <div className="px-2 font-semibold text-sm uppercase text-slate-400 tracking-wider">
             Up Next in Queue
           </div>
 
@@ -184,17 +184,17 @@ export const PublicQueueDisplay: React.FC = () => {
                 className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-primary-500/20 text-primary-500 font-mono font-black text-sm flex items-center justify-center border border-primary-500/40">
+                  <div className="h-10 w-10 rounded-xl bg-primary-500/20 text-primary-500 font-mono font-bold text-sm flex items-center justify-center border border-primary-500/40">
                     {tok.tokenNumber}
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-white">{tok.department}</h4>
+                    <h4 className="font-semibold text-sm text-white">{tok.department}</h4>
                     <p className="text-xs text-slate-400">Waiting</p>
                   </div>
                 </div>
 
                 <div>
-                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-blue-950 text-blue-300 border border-blue-800">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-blue-950 text-blue-300 border border-blue-800">
                     Next
                   </span>
                 </div>
@@ -212,7 +212,7 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Bottom News Ticker / Waiting Room Advice */}
       <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs font-medium text-slate-300 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-black text-xs uppercase">
+          <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-bold text-xs uppercase">
             Notice
           </span>
           <span>

@@ -221,7 +221,7 @@ export const ProcedureManagement = () => {
               <Activity className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Procedure Management</h1>
+              <h1 className="text-xl font-semibold truncate">Procedure Management</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Clinical Procedures & Pricing Configuration</p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export const ProcedureManagement = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create Clinical Procedure</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create Clinical Procedure</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -334,7 +334,7 @@ export const ProcedureManagement = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle className="text-lg font-extrabold">Set Institution Pricing</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold">Set Institution Pricing</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
@@ -419,40 +419,40 @@ export const ProcedureManagement = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Procedures</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Procedures</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{totalProcedures}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{totalProcedures}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In catalog</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Pricing</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Pricing</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{activePricing}</div>
+              <div className="text-2xl font-bold font-mono text-success-500">{activePricing}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured prices</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{recentExecutions}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{recentExecutions}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Past 7 days</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Price</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Avg Price</span>
                 <TrendingUp className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">
+              <div className="text-2xl font-bold font-mono text-warning-500">
                 {institution?.currency || "ZMW"} {avgProcedurePrice.toFixed(0)}
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per procedure</div>
@@ -522,7 +522,7 @@ export const ProcedureManagement = () => {
                           <Activity className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{procedure.procedure_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{procedure.procedure_name}</CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">{procedure.procedure_code}</div>
                         </div>
                       </div>
@@ -574,7 +574,7 @@ export const ProcedureManagement = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">Institution Required</h3>
+                  <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Select an institution to manage pricing</p>
                   <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
                     Go to Institution Portal
@@ -605,12 +605,12 @@ export const ProcedureManagement = () => {
                   <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                     <thead className="bg-canvas-mist dark:bg-slate-800">
                       <tr>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Procedure</th>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Price</th>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Currency</th>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Effective From</th>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                        <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Procedure</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Price</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Currency</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Effective From</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                        <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -655,7 +655,7 @@ export const ProcedureManagement = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">Institution Required</h3>
+                  <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Select an institution to view executions</p>
                   <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
                     Go to Institution Portal
@@ -703,7 +703,7 @@ export const ProcedureManagement = () => {
                               <Activity className="h-5 w-5" />
                             </div>
                             <div>
-                              <CardTitle className="text-sm font-extrabold">{execution.procedure?.procedure_name}</CardTitle>
+                              <CardTitle className="text-sm font-semibold">{execution.procedure?.procedure_name}</CardTitle>
                               <div className="text-xs text-graphite-500 dark:text-slate-400">
                                 {execution.patient?.first_name} {execution.patient?.last_name}
                               </div>
@@ -751,7 +751,7 @@ export const ProcedureManagement = () => {
           <TabsContent value="inventory" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Package className="h-4 w-4 text-primary-500" /> Procedure-Inventory Mapping
                 </CardTitle>
               </CardHeader>

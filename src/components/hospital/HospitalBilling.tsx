@@ -299,7 +299,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         </h3>
         <button
           onClick={() => setShowDialog(true)}
-          className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
+          className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center gap-1 shadow-xs"
         >
           <Plus className="h-4 w-4" /> Generate Invoice
         </button>
@@ -419,12 +419,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-extrabold text-base">Generate Invoice</DialogTitle>
+            <DialogTitle className="font-semibold text-base">Generate Invoice</DialogTitle>
             <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Charges are priced from the hospital price list and any insurance split is calculated on the server when the bill is generated.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
               <Select value={selectedPatientId} onValueChange={handlePatientSelect}>
                 <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select admitted patient" /></SelectTrigger>
                 <SelectContent>
@@ -485,7 +485,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
 
             {selectedPatientId && (
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Insurance</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Insurance</label>
                 {policies.length > 0 ? (
                   <Select value={selectedPolicyId || "none"} onValueChange={(v) => setSelectedPolicyId(v === "none" ? "" : v)}>
                     <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Patient pays in full" /></SelectTrigger>

@@ -27,7 +27,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-blue-500" />
-            <h3 className="font-extrabold text-base tracking-tight">Today's Clinical Shift & Treatment Timeline</h3>
+            <h3 className="font-semibold text-base tracking-tight">Today's Clinical Shift & Treatment Timeline</h3>
             <span className="text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
               Live Horizon • Aug 23, 2026
             </span>

@@ -232,7 +232,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
 
   if (!institutionId) {
     return (
-      <div className="p-8 rounded-3xl border border-dashed text-center text-sm text-muted-foreground">
+      <div className="p-8 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
         Dispensary needs an institution context — open this from a facility dashboard.
       </div>
     );
@@ -241,15 +241,15 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <Pill className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">Community Dispensary &amp; First-Aid POS</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-white text-emerald-900">
+              <h2 className="text-xl font-bold tracking-tight">Community Dispensary &amp; First-Aid POS</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white text-emerald-900">
                 Live Stock
               </span>
             </div>
@@ -325,15 +325,15 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-black uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      <span className="text-xs font-bold uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                         {item.category}
                       </span>
-                      <span className={`text-xs font-extrabold ${item.stock <= 10 ? "text-amber-600" : "text-emerald-600"}`}>
+                      <span className={`text-xs font-semibold ${item.stock <= 10 ? "text-amber-600" : "text-emerald-600"}`}>
                         {item.stock} left
                       </span>
                     </div>
 
-                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{item.name}</h4>
+                    <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{item.name}</h4>
                     <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                       <span className="flex items-center gap-1"><Barcode className="h-3 w-3" aria-hidden />Batch: {item.batchNo}</span>
                       <span>•</span>
@@ -343,7 +343,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
 
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-canvas-silk dark:border-slate-800">
                     <div>
-                      <span className="text-xs font-black text-slate-900 dark:text-slate-100">{formatPrice(item.unitPrice)}</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatPrice(item.unitPrice)}</span>
                       <span className="text-xs text-slate-400 block">{item.stock} in stock</span>
                     </div>
 
@@ -351,7 +351,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                       onClick={() => addToCart(item)}
                       aria-label={`Dispense ${item.name}`}
                       size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 font-extrabold text-xs active:scale-95"
+                      className="bg-emerald-600 hover:bg-emerald-700 font-semibold text-xs active:scale-95"
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden /> Dispense
                     </Button>
@@ -363,12 +363,12 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         </div>
 
         {/* Right Column: POS Dispensing Cart */}
-        <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs h-fit sticky top-24">
+        <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs h-fit sticky top-24">
           <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3">
-            <h3 className="font-black text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-emerald-600" aria-hidden /> Dispensing Order Cart
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">
               {cart.reduce((s, c) => s + c.qty, 0)} Items
             </span>
           </div>
@@ -431,23 +431,23 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                       aria-label={`Decrease quantity of ${c.item.name}`}
                       variant="outline"
                       size="icon"
-                      className="h-6 w-6 font-black text-xs"
+                      className="h-6 w-6 font-bold text-xs"
                     >
                       <Minus className="h-3 w-3" aria-hidden />
                     </Button>
-                    <span className="font-black px-1">{c.qty}</span>
+                    <span className="font-bold px-1">{c.qty}</span>
                     <Button
                       onClick={() => updateCartQty(c.item.id, c.qty + 1)}
                       aria-label={`Increase quantity of ${c.item.name}`}
                       variant="outline"
                       size="icon"
-                      className="h-6 w-6 font-black text-xs"
+                      className="h-6 w-6 font-bold text-xs"
                     >
                       <Plus className="h-3 w-3" aria-hidden />
                     </Button>
                   </div>
 
-                  <div className="text-right font-black text-primary-500">
+                  <div className="text-right font-bold text-primary-500">
                     {formatPrice(c.item.unitPrice * c.qty)}
                   </div>
                 </div>
@@ -457,15 +457,15 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
 
           {/* Subtotal & Checkout button */}
           <div className="pt-3 border-t border-canvas-silk dark:border-slate-800 space-y-3">
-            <div className="flex justify-between text-sm font-black">
+            <div className="flex justify-between text-sm font-bold">
               <span>Total Payable:</span>
-              <span className="text-emerald-600 text-base font-black tabular-nums">{formatPrice(subtotal)}</span>
+              <span className="text-emerald-600 text-base font-bold tabular-nums">{formatPrice(subtotal)}</span>
             </div>
 
             <Button
               onClick={handleCompleteDispensing}
               disabled={cart.length === 0 || processing}
-              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-extrabold text-xs active:scale-95"
+              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-semibold text-xs active:scale-95"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden />
               {processing ? "Recording Sale…" : "Complete Dispense & Print Slip"}

@@ -138,7 +138,7 @@ export function HealthMetricCards() {
                 <p className="text-xs font-bold uppercase tracking-wide text-graphite-500 dark:text-slate-400">
                   {m.label}
                 </p>
-                <p className="text-2xl font-extrabold text-midnight dark:text-white leading-tight">
+                <p className="text-2xl font-semibold text-midnight dark:text-white leading-tight">
                   {m.value}
                   <span className="text-xs font-bold text-graphite-500 ml-1">{m.unit}</span>
                 </p>

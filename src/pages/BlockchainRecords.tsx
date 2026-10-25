@@ -101,11 +101,11 @@ const BlockchainRecords = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-purple-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Database className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 Blockchain Medical Ledger & Verification Board
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
@@ -118,21 +118,21 @@ const BlockchainRecords = () => {
           <div className="flex items-center gap-2">
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
                   <Plus className="w-4 h-4" />
                   <span>Add Record</span>
                 </button>
               </DialogTrigger>
               <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 sm:max-w-[450px]">
                 <DialogHeader>
-                  <DialogTitle className="font-extrabold text-base">Add New Medical Record</DialogTitle>
+                  <DialogTitle className="font-semibold text-base">Add New Medical Record</DialogTitle>
                   <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">
                     This record will be encrypted and committed to the immutable blockchain ledger.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div>
-                    <label htmlFor="title" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Title</label>
+                    <label htmlFor="title" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Title</label>
                     <input
                       id="title"
                       value={newRecord.title}
@@ -142,7 +142,7 @@ const BlockchainRecords = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="provider" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Provider</label>
+                    <label htmlFor="provider" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Provider</label>
                     <input
                       id="provider"
                       value={newRecord.provider}
@@ -153,7 +153,7 @@ const BlockchainRecords = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label htmlFor="date" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Date</label>
+                      <label htmlFor="date" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date</label>
                       <input
                         id="date"
                         type="date"
@@ -163,7 +163,7 @@ const BlockchainRecords = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="category" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
+                      <label htmlFor="category" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
                       <Select
                         value={newRecord.category}
                         onValueChange={(val) => setNewRecord({ ...newRecord, category: val })}
@@ -182,7 +182,7 @@ const BlockchainRecords = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <button onClick={handleAddRecord} className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs">
+                  <button onClick={handleAddRecord} className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs">
                     Commit to Blockchain
                   </button>
                 </DialogFooter>
@@ -204,7 +204,7 @@ const BlockchainRecords = () => {
             <Lock className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <h3 className="font-extrabold text-sm text-purple-500">End-to-End Cryptographic Ledger Security</h3>
+            <h3 className="font-semibold text-sm text-purple-500">End-to-End Cryptographic Ledger Security</h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
               All health records are encrypted via AES-256 and committed to a distributed cryptographic ledger. Access grants are fully auditable.
             </p>
@@ -229,7 +229,7 @@ const BlockchainRecords = () => {
           {/* Records List */}
           <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-primary-500" />
                 Blockchain-Verified Health Records
               </h2>
@@ -254,7 +254,7 @@ const BlockchainRecords = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <FileText className="w-4 h-4 text-purple-500 shrink-0" />
-                          <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate">{record.title}</h4>
+                          <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">{record.title}</h4>
                           {record.verified && (
                             <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Verified
@@ -289,7 +289,7 @@ const BlockchainRecords = () => {
           {/* Audit Trail */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Eye className="w-4 h-4 text-success-500" />
                 Cryptographic Audit Log
               </h2>
@@ -320,7 +320,7 @@ const BlockchainRecords = () => {
         {/* Record Details Panel */}
         {selectedRecord && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-4">Selected Record Ledger Telemetry</h2>
+            <h2 className="font-semibold text-sm mb-4">Selected Record Ledger Telemetry</h2>
 
             <div className="flex items-center gap-2 mb-4 border-b border-canvas-silk pb-3">
               {[
@@ -331,7 +331,7 @@ const BlockchainRecords = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveDetailsTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
+                  className={`px-3.5 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                     activeDetailsTab === tab.id
                       ? "bg-primary-500 text-white shadow-xs"
                       : "bg-canvas dark:bg-slate-800 text-graphite-500 dark:text-slate-400"
@@ -350,7 +350,7 @@ const BlockchainRecords = () => {
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setShowPayload((v) => !v)}
-                    className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs"
+                    className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs"
                     aria-expanded={showPayload}
                   >
                     {showPayload ? 'Hide Record Payload' : 'View Full Record Payload'}
@@ -388,7 +388,7 @@ const BlockchainRecords = () => {
                 <p className="text-graphite-500 dark:text-slate-400">
                   Manage patient access grants. Every permission change emits a signed transaction to the audit trail.
                 </p>
-                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-extrabold text-xs flex items-center gap-1">
+                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs flex items-center gap-1">
                   <Share2 className="w-4 h-4" /> Grant Provider Access
                 </button>
               </div>

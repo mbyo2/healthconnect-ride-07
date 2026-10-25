@@ -121,10 +121,10 @@ export const SupplierRatingCard = ({
           <div
             className={`h-full transition-all duration-700 ease-out ${
               Number(percentage) >= 85
-                ? "bg-gradient-to-r from-green-400 to-green-500"
+                ? "bg-success-500"
                 : Number(percentage) >= 70
-                  ? "bg-gradient-to-r from-amber-400 to-amber-500"
-                  : "bg-gradient-to-r from-red-400 to-red-500"
+                  ? "bg-amber-500"
+                  : "bg-danger-500"
             }`}
             style={{ width: mounted ? `${percentage}%` : '0%' }}
           />
@@ -136,7 +136,7 @@ export const SupplierRatingCard = ({
   return (
     <Card className="border border-gray-200 dark:border-slate-800 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group transform-gpu hover:-translate-y-0.5">
       {/* Header with Rating */}
-      <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/50 border-b border-gray-200 dark:border-slate-700">
+      <CardHeader className="pb-4 bg-muted/50 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <CardTitle className="text-sm font-bold text-gray-900 dark:text-white mb-1">
@@ -149,7 +149,7 @@ export const SupplierRatingCard = ({
             )}
           </div>
           <div className="text-right">
-            <div className="text-3xl font-black text-blue-600 dark:text-blue-400">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
               {rating.toFixed(1)}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold">

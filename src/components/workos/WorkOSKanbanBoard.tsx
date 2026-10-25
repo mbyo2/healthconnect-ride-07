@@ -51,7 +51,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
               }`}>
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${statusConfig.bg}`} />
-                  <h3 className="font-extrabold text-sm tracking-tight">{status}</h3>
+                  <h3 className="font-semibold text-sm tracking-tight">{status}</h3>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-mono font-bold ${
                     isDarkMode ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-700"
                   }`}>
@@ -101,7 +101,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                               <span className="text-slate-300 dark:text-slate-700">•</span>
                               <span className="text-blue-400 font-bold">{patient.id}</span>
                             </div>
-                            <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-500 transition-colors">
+                            <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-500 transition-colors">
                               {patient.name}
                             </h4>
                           </div>

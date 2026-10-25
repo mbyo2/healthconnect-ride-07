@@ -75,7 +75,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
 
       if (error) throw error;
       
-      toast.success('Welcome back!');
+      toast.success('Signed in');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
     } finally {

@@ -238,7 +238,7 @@ export const CareTeamManagement = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access care team management.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -267,7 +267,7 @@ export const CareTeamManagement = () => {
               <Users className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Care Team Management</h1>
+              <h1 className="text-xl font-semibold truncate">Care Team Management</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Interdisciplinary Team Coordination</p>
             </div>
           </div>
@@ -280,7 +280,7 @@ export const CareTeamManagement = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Assign Care Team Member</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Assign Care Team Member</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -378,7 +378,7 @@ export const CareTeamManagement = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create Clinical Task</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create Clinical Task</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -487,40 +487,40 @@ export const CareTeamManagement = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Assignments</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Assignments</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{activeAssignments}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{activeAssignments}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current team members</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
                 <Clock className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-2xl font-bold font-mono text-purple-500">{pendingTasks}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Available Roles</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Available Roles</span>
                 <Shield className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{totalRoles}</div>
+              <div className="text-2xl font-bold font-mono text-success-500">{totalRoles}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured roles</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Overdue Tasks</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Overdue Tasks</span>
                 <AlertTriangle className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-error-500">{overdueTasks}</div>
+              <div className="text-2xl font-bold font-mono text-error-500">{overdueTasks}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require attention</div>
             </CardContent>
           </Card>
@@ -567,12 +567,12 @@ export const CareTeamManagement = () => {
               <table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Patient</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Staff Member</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Assigned</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Patient</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Staff Member</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Role</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Assigned</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -620,7 +620,7 @@ export const CareTeamManagement = () => {
           {/* Role Definitions Tab */}
           <TabsContent value="roles" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Care Team Roles</h3>
+              <h3 className="text-sm font-semibold">Care Team Roles</h3>
               <Button variant="outline" size="sm" className="text-xs">
                 <Settings className="h-4 w-4 mr-1" /> Configure Roles
               </Button>
@@ -636,7 +636,7 @@ export const CareTeamManagement = () => {
                           {getRoleTypeIcon(role.role_type)}
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{role.role_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{role.role_name}</CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">{role.role_type}</div>
                         </div>
                       </div>
@@ -703,7 +703,7 @@ export const CareTeamManagement = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{task.task_name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{task.task_name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -762,7 +762,7 @@ export const CareTeamManagement = () => {
           <TabsContent value="workflows" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary-500" /> Clinical Workflow Templates
                 </CardTitle>
               </CardHeader>

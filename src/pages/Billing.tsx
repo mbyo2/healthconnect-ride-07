@@ -470,7 +470,7 @@ export const Billing = () => {
           {showReceipt && (
             <div className="bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
               {/* Header with Doc'O Clock branding */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+              <div className="bg-primary-600 text-white p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold flex items-center gap-2">

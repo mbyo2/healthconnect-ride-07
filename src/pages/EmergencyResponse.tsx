@@ -96,7 +96,7 @@ const EmergencyResponse = () => {
       patient_id: user.id,
       latitude,
       longitude,
-      message: "Emergency call initiated from HealthConnect Ride.",
+      message: "Emergency call initiated from Doc' O Clock.",
       status: "active",
     });
     if (error) {
@@ -143,11 +143,11 @@ const EmergencyResponse = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 24/7 Emergency Dispatch & Triage Board
                 <span className="w-2 h-2 rounded-full bg-error-500 animate-ping" />
               </h1>
@@ -172,14 +172,14 @@ const EmergencyResponse = () => {
             <Phone className="w-8 h-8 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Need Immediate Emergency Assistance?</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Need Immediate Emergency Assistance?</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">
               Click below to dispatch emergency response and share live GPS telemetry with medical teams.
             </p>
           </div>
           <button
             onClick={handleEmergencyCall}
-            className="px-10 py-4 rounded-xl bg-error-500 hover:bg-error-500 text-white font-black text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
+            className="px-10 py-4 rounded-xl bg-error-500 hover:bg-error-500 text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
           >
             <Phone className="w-6 h-6" />
             <span>CALL EMERGENCY SERVICES</span>
@@ -194,7 +194,7 @@ const EmergencyResponse = () => {
           {/* Emergency Contacts */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <User className="w-4 h-4 text-primary-500" />
                 Primary Emergency Contacts
               </h2>
@@ -207,13 +207,13 @@ const EmergencyResponse = () => {
               {emergencyContacts.map((contact) => (
                 <div key={contact.id} className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                   <div>
-                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{contact.name}</h4>
+                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{contact.name}</h4>
                     <p className="text-xs text-graphite-500 dark:text-slate-400">{contact.relationship || contact.relation}</p>
                     <p className="text-xs font-mono font-bold text-primary-500 mt-0.5">{contact.phone}</p>
                   </div>
                   <button
                     onClick={() => callNumber(contact.phone)}
-                    className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-success-500 text-white text-xs font-extrabold flex items-center justify-center gap-1"
+                    className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-success-500 text-white text-xs font-semibold flex items-center justify-center gap-1"
                   >
                     <Phone className="w-3.5 h-3.5" /> Call
                   </button>
@@ -230,7 +230,7 @@ const EmergencyResponse = () => {
           {/* Critical Medical Info */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-error-500" />
                 Critical Telemetry & Medical Profile
               </h2>
@@ -242,18 +242,18 @@ const EmergencyResponse = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-error-50 dark:bg-red-950/40 border border-error-500/30">
-                  <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
-                  <p className="text-2xl font-black font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
+                  <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
+                  <p className="text-2xl font-bold font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
                 <div className="p-3 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
-                  <p className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
+                  <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
                   <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
                 </div>
               </div>
 
               <div className="space-y-2 text-xs">
                 <div>
-                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Medical Conditions</p>
+                  <p className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Medical Conditions</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.conditions.map((condition, index) => (
                       <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{condition}</span>
@@ -263,7 +263,7 @@ const EmergencyResponse = () => {
                 </div>
 
                 <div>
-                  <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Current Medications</p>
+                  <p className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Current Medications</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.medications.map((med, index) => (
                       <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{med}</span>
@@ -279,7 +279,7 @@ const EmergencyResponse = () => {
         {/* Nearby Hospitals Board */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-            <h2 className="font-extrabold text-sm flex items-center gap-2">
+            <h2 className="font-semibold text-sm flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary-500" />
               Nearest Trauma Centers & Hospitals
             </h2>
@@ -290,7 +290,7 @@ const EmergencyResponse = () => {
               <div key={h.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{h.name}</h4>
+                    <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{h.name}</h4>
                     <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">24/7 Emergency</span>
                   </div>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{h.address || "Lusaka Medical District"}</p>
@@ -315,13 +315,13 @@ const EmergencyResponse = () => {
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-primary-500">Live GPS Location Telemetry</h3>
+              <h3 className="font-semibold text-sm text-primary-500">Live GPS Location Telemetry</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Broadcast precise GPS positioning to responding dispatchers and emergency contacts.</p>
             </div>
           </div>
           <button
             onClick={handleShareLocation}
-            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-extrabold text-xs text-white shadow-xs transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
+            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs text-white shadow-xs transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
           >
             {locationSharing ? "Stop Location Telemetry" : "Activate GPS Telemetry Broadcast"}
           </button>

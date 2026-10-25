@@ -240,7 +240,7 @@ function FacilityAuditTrail() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-blue-500 to-indigo-600 shrink-0" />
+                    <div className="w-1.5 h-8 rounded-full bg-primary-500 shrink-0" />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className={`text-xs font-semibold font-mono ${ACTION_COLORS[entry.action] || "text-slate-300"}`}>
@@ -358,7 +358,7 @@ export default function MultiCenterAuditSuite({ institutionId }: { institutionId
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg shadow-indigo-900/30">
+        <div className="p-3 bg-primary-600 rounded-xl">
           <Network className="h-6 w-6 text-white" />
         </div>
         <div>

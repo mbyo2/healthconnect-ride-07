@@ -515,11 +515,11 @@ const LabManagement = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Microscope className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 {labTitle}
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
@@ -532,18 +532,18 @@ const LabManagement = () => {
           <div className="flex items-center gap-2">
             <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
               <DialogTrigger asChild>
-                <button className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
                   <Plus className="h-4 w-4" />
                   <span>New Test Request</span>
                 </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
                 <DialogHeader>
-                  <DialogTitle className="font-extrabold text-base">Create New Lab Request</DialogTitle>
+                  <DialogTitle className="font-semibold text-base">Create New Lab Request</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4 text-xs">
                   <div>
-                    <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
+                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
                     <input
                       placeholder="Search patient name..."
                       value={patientSearchTerm}
@@ -571,7 +571,7 @@ const LabManagement = () => {
                   </div>
 
                   <div>
-                    <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Test Type</label>
+                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Test Type</label>
                     <Select value={selectedTestType} onValueChange={setSelectedTestType}>
                       <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 font-bold text-xs">
                         <SelectValue placeholder="Select test type" />
@@ -623,7 +623,7 @@ const LabManagement = () => {
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
+              className={`px-4 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
                   : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -640,28 +640,28 @@ const LabManagement = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
               <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-warning-500">{pendingRequests.length}</div>
+            <div className="text-2xl font-bold font-mono text-warning-500">{pendingRequests.length}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting sample processing</div>
           </div>
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
               <FlaskConical className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-primary-500">{inProgressRequests.length}</div>
+            <div className="text-2xl font-bold font-mono text-primary-500">{inProgressRequests.length}</div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently on bench</div>
           </div>
 
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
               <CheckCircle2 className="h-5 w-5 text-success-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-success-500">
+            <div className="text-2xl font-bold font-mono text-success-500">
               {completedRequests.filter((r) => new Date(r.updated_at).toDateString() === new Date().toDateString()).length}
             </div>
             <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Signed off & released</div>
@@ -672,7 +672,7 @@ const LabManagement = () => {
         {activeTab === "requests" && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk dark:border-slate-800 pb-3">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FlaskConical className="h-4 w-4 text-primary-500" /> Active Pathology Orders
               </h2>
               <div className="relative w-full sm:w-64">
@@ -690,7 +690,7 @@ const LabManagement = () => {
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Test Number</th>
                     <th className="py-2.5 px-3">Patient</th>
                     <th className="py-2.5 px-3">Test Requested</th>
@@ -731,7 +731,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => collectSample(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 min-h-[44px] min-w-[44px]"
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 min-h-[44px] min-w-[44px]"
                             >
                               Collect Sample
                             </button>
@@ -740,7 +740,7 @@ const LabManagement = () => {
                             <button
                               onClick={() => startAnalysis(request)}
                               disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 min-h-[44px] min-w-[44px]"
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 min-h-[44px] min-w-[44px]"
                             >
                               Start Analysis
                             </button>
@@ -748,7 +748,7 @@ const LabManagement = () => {
                           {request.status === "in_progress" && (
                             <button
                               onClick={() => { setSelectedRequest(request); setActiveTab("results"); }}
-                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-extrabold min-h-[44px] min-w-[44px]"
+                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-semibold min-h-[44px] min-w-[44px]"
                             >
                               Enter Result
                             </button>
@@ -794,7 +794,7 @@ const LabManagement = () => {
         {/* Results Entry Tab */}
         {activeTab === "results" && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+            <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary-500" />
               {selectedRequest?.status === "completed" ? "Lab Results — Review & Verification" : "Pathologist Results Verification Entry"}
             </h2>
@@ -802,7 +802,7 @@ const LabManagement = () => {
               <div className="space-y-4 text-xs">
                 <div className="p-4 rounded-xl bg-primary-50 border border-primary-500/20 flex justify-between items-center">
                   <div>
-                    <p className="font-extrabold text-sm text-primary-500">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
+                    <p className="font-semibold text-sm text-primary-500">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
                     <p className="text-xs text-graphite-500 dark:text-slate-400">
                       Patient: <strong>{selectedRequest.patient?.first_name} {selectedRequest.patient?.last_name}</strong>
                     </p>
@@ -813,7 +813,7 @@ const LabManagement = () => {
                 {selectedRequest.status === "completed" ? (
                   <>
                     <div>
-                      <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Findings</label>
+                      <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result Findings</label>
                       <div className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 bg-canvas-silk dark:bg-slate-800 font-medium whitespace-pre-wrap">
                         {resultSummary || (selectedRequest as any).result_summary || "No findings recorded."}
                       </div>
@@ -830,7 +830,7 @@ const LabManagement = () => {
                       <button
                         onClick={verifyResult}
                         disabled={isSubmitting || (selectedRequest as any).verified_by || !canVerify}
-                        className="px-5 py-2 rounded-md bg-success-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs disabled:opacity-50"
+                        className="px-5 py-2 rounded-md bg-success-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs disabled:opacity-50"
                       >
                         {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                         {(selectedRequest as any).verified_by ? "Verified ✓" : "Verify & Sign Off"}
@@ -845,7 +845,7 @@ const LabManagement = () => {
                 ) : (
                   <>
                 <div>
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Findings Summary</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result Findings Summary</label>
                   <textarea
                     className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter quantitative values, microscopic findings, and clinical impressions..."
@@ -866,7 +866,7 @@ const LabManagement = () => {
                   <button
                     onClick={submitResult}
                     disabled={!resultSummary || isSubmitting}
-                    className="px-5 py-2 rounded-md bg-success-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs"
+                    className="px-5 py-2 rounded-md bg-success-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Submit & Release Results
                   </button>
@@ -887,7 +887,7 @@ const LabManagement = () => {
         {activeTab === "catalog" && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Microscope className="h-4 w-4 text-primary-500" /> Diagnostic Test Catalog
               </h2>
               <button
@@ -901,11 +901,11 @@ const LabManagement = () => {
               {testCatalog.map((test) => (
                 <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
                   <div className="min-w-0">
-                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{test.name}</h4>
+                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{test.name}</h4>
                     <p className="text-xs text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="font-black text-sm font-mono text-primary-500 mr-1">{formatPrice(test.price)}</span>
+                    <span className="font-bold text-sm font-mono text-primary-500 mr-1">{formatPrice(test.price)}</span>
                     <button
                       onClick={() => openEditTestDialog(test)}
                       title="Edit test"
@@ -934,7 +934,7 @@ const LabManagement = () => {
         <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
           <DialogContent className="sm:max-w-[440px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="font-extrabold text-base">{editingTest ? "Edit Test" : "Add Test to Catalog"}</DialogTitle>
+              <DialogTitle className="font-semibold text-base">{editingTest ? "Edit Test" : "Add Test to Catalog"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 py-2">
               <div>
@@ -1005,7 +1005,7 @@ const LabManagement = () => {
         <Dialog open={!!testToDelete} onOpenChange={(open) => { if (!open) setTestToDelete(null); }}>
           <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="text-sm font-black">Remove test from catalog?</DialogTitle>
+              <DialogTitle className="text-sm font-bold">Remove test from catalog?</DialogTitle>
               <DialogDescription className="text-xs">
                 “{testToDelete?.name}” will be removed from your lab catalog. This cannot be undone.
               </DialogDescription>

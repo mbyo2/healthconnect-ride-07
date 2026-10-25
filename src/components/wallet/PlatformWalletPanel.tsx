@@ -47,7 +47,7 @@ export const PlatformWalletPanel = () => {
           <div className="h-12 rounded-xl bg-muted animate-pulse" role="status" aria-label="Loading platform wallet" />
         ) : (
           <>
-            <p className="text-3xl font-black tabular-nums">{formatPrice(balance ?? 0)}</p>
+            <p className="text-3xl font-bold tabular-nums">{formatPrice(balance ?? 0)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Collected platform fees across all payment rails.
             </p>

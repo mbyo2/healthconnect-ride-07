@@ -252,7 +252,7 @@ export const EnterpriseAccounting = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enterprise accounting.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -278,7 +278,7 @@ export const EnterpriseAccounting = () => {
               <BookOpen className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Enterprise Accounting</h1>
+              <h1 className="text-xl font-semibold truncate">Enterprise Accounting</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">General Ledger, Asset Management & Bank Reconciliation</p>
             </div>
           </div>
@@ -291,7 +291,7 @@ export const EnterpriseAccounting = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create General Ledger Entry</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create General Ledger Entry</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -412,10 +412,10 @@ export const EnterpriseAccounting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
                 <BookOpen className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">
+              <div className="text-2xl font-bold font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalAssets / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Gross asset value</div>
@@ -424,10 +424,10 @@ export const EnterpriseAccounting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
                 <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-error-500">
+              <div className="text-2xl font-bold font-mono text-error-500">
                 {institution.currency || "ZMW"} {(totalDepreciation / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Total depreciation</div>
@@ -436,10 +436,10 @@ export const EnterpriseAccounting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">
+              <div className="text-2xl font-bold font-mono text-success-500">
                 {institution.currency || "ZMW"} {(netBookValue / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current asset value</div>
@@ -448,10 +448,10 @@ export const EnterpriseAccounting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
                 <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{pendingReconciliations}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{pendingReconciliations}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting reconciliation</div>
             </CardContent>
           </Card>
@@ -504,15 +504,15 @@ export const EnterpriseAccounting = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Entry #</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Account</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Debit</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Credit</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Currency</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Entry #</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Account</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Debit</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Credit</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Currency</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -606,7 +606,7 @@ export const EnterpriseAccounting = () => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle className="text-lg font-extrabold">Add Fixed Asset</DialogTitle>
+                      <DialogTitle className="text-lg font-semibold">Add Fixed Asset</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div className="grid grid-cols-2 gap-4">
@@ -733,7 +733,7 @@ export const EnterpriseAccounting = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{asset.asset_name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{asset.asset_name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">{asset.asset_code}</div>
                       </div>
                       <Badge variant="outline" className="text-xs">{asset.asset_category}</Badge>
@@ -798,7 +798,7 @@ export const EnterpriseAccounting = () => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle className="text-lg font-extrabold">Start Bank Reconciliation</DialogTitle>
+                      <DialogTitle className="text-lg font-semibold">Start Bank Reconciliation</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
@@ -894,7 +894,7 @@ export const EnterpriseAccounting = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{reconciliation.bank_name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{reconciliation.bank_name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">{reconciliation.account_number}</div>
                       </div>
                       <Badge className={getReconciliationStatusColor(reconciliation.reconciliation_status) + " text-xs"}>
@@ -937,7 +937,7 @@ export const EnterpriseAccounting = () => {
           <TabsContent value="integration" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <ArrowUpRight className="h-4 w-4 text-primary-500" /> External ERP Integration
                 </CardTitle>
               </CardHeader>

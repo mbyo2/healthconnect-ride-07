@@ -133,7 +133,7 @@ const AdvancedDashboard = () => {
             } else {
                 // Fallback to default activities if no events
                 setRecentActivity([
-                    { id: 1, action: 'Welcome to HealthConnect', time: 'Just now', icon: Activity },
+                    { id: 1, action: 'Welcome to Doc\' O Clock', time: 'Just now', icon: Activity },
                 ]);
             }
 
@@ -222,7 +222,7 @@ const AdvancedDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                            Welcome back, {profile?.first_name || 'User'}!
+                            Welcome back, {profile?.first_name || 'User'}
                         </h1>
                         <p className="text-muted-foreground mt-1">Here's your health overview for today</p>
                     </div>

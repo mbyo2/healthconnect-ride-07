@@ -125,11 +125,11 @@ export default function MedicalRecords() {
       <ProtectedRoute>
         <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
           <div className="max-w-md w-full rounded-2xl border border-destructive/30 bg-white dark:bg-slate-900 p-8 text-center space-y-3">
-            <p className="font-extrabold text-sm">We couldn&apos;t load your health records</p>
+            <p className="font-semibold text-sm">We couldn&apos;t load your health records</p>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Check your connection and try again.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold"
             >
               Try again
             </button>
@@ -177,7 +177,7 @@ export default function MedicalRecords() {
               </button>
               <button
                 onClick={exportAllRecords}
-                className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+                className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-all">
                 <Download className="h-4 w-4" />
                 <span>Export EHR Data</span>
               </button>
@@ -222,7 +222,7 @@ export default function MedicalRecords() {
             {/* Recent Records */}
             <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
               <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-                <h2 className="font-extrabold text-sm flex items-center gap-2">
+                <h2 className="font-semibold text-sm flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-primary-500" />
                   Recent Diagnostic & Consultation Records
                 </h2>
@@ -241,7 +241,7 @@ export default function MedicalRecords() {
                           {getTypeIcon(record.type)}
                         </div>
                         <div>
-                          <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
+                          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
                           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
                             {record.provider} • {new Date(record.date).toLocaleDateString()}
                           </p>
@@ -267,7 +267,7 @@ export default function MedicalRecords() {
                     </p>
                     <button
                       onClick={() => navigate('/ai-diagnostics')}
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
                     >
                       Scan your first document
                     </button>
@@ -316,7 +316,7 @@ export default function MedicalRecords() {
 
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                 <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-                  <h2 className="font-extrabold text-sm flex items-center gap-2">
+                  <h2 className="font-semibold text-sm flex items-center gap-2">
                     <Activity className="h-4 w-4 text-success-500" />
                     Vital Sign Metrics
                   </h2>
@@ -328,7 +328,7 @@ export default function MedicalRecords() {
                       <div key={index} className="p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 flex justify-between items-center">
                         <div>
                           <p className="font-bold text-xs text-slate-700 dark:text-slate-300">{metric.label}</p>
-                          <p className="text-xl font-black font-mono text-primary-500">{metric.value}</p>
+                          <p className="text-xl font-bold font-mono text-primary-500">{metric.value}</p>
                           <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{metric.date}</p>
                         </div>
                         <div>
@@ -343,7 +343,7 @@ export default function MedicalRecords() {
                       </p>
                       <button
                         onClick={() => navigate('/iot-monitoring')}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
                       >
                         Record vitals
                       </button>
@@ -374,24 +374,24 @@ export default function MedicalRecords() {
 
           {/* Quick Actions */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-3">Quick EHR Actions</h2>
+            <h2 className="font-semibold text-sm mb-3">Quick EHR Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <button
                 onClick={() => navigate('/appointments')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
               >
                 <Calendar className="h-4 w-4 text-primary-500" />
                 <span>Schedule Checkup</span>
               </button>
               <button
                 onClick={() => toast.info("Records from your providers appear here automatically after each visit.")}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
                 <FileText className="h-4 w-4 text-purple-500" />
                 <span>Request Records</span>
               </button>
               <button
                 onClick={() => navigate('/health-dashboard')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
               >
                 <Heart className="h-4 w-4 text-error-500" />
                 <span>Health Summary</span>

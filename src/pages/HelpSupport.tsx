@@ -63,7 +63,7 @@ export default function HelpSupport() {
             </p>
             <Link
               to="/contact"
-              className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
             >
               Contact Us
             </Link>

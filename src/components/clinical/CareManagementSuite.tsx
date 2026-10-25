@@ -178,7 +178,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
 
   if (!institutionId) {
     return (
-      <div className="p-8 rounded-3xl border border-dashed text-center text-sm text-muted-foreground">
+      <div className="p-8 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
         Care management needs an institution context — open this from a facility dashboard.
       </div>
     );
@@ -187,15 +187,15 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <BedDouble className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">Outpatient (OPD) &amp; Inpatient (IPD) Care Management</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-950">
+              <h2 className="text-xl font-bold tracking-tight">Outpatient (OPD) &amp; Inpatient (IPD) Care Management</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400 text-slate-950">
                 Live ADT Data
               </span>
             </div>
@@ -227,7 +227,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
+              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
                   : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -245,7 +245,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Live Hospital Ward &amp; Bed Occupancy</h3>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Live Hospital Ward &amp; Bed Occupancy</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">Real-time bed tracking across wards</p>
             </div>
             <div className="relative w-full sm:w-64">
@@ -264,11 +264,11 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="status" aria-label="Loading beds">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-36 rounded-3xl bg-muted animate-pulse" aria-hidden />
+                <div key={i} className="h-36 rounded-2xl bg-muted animate-pulse" aria-hidden />
               ))}
             </div>
           ) : filteredBeds.length === 0 ? (
-            <div className="p-10 rounded-3xl border border-dashed text-center">
+            <div className="p-10 rounded-2xl border border-dashed text-center">
               <BedDouble className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />
               <p className="font-bold text-sm">
                 {beds.length === 0 ? "No beds registered yet." : "No beds match your search."}
@@ -286,7 +286,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                 return (
                   <div
                     key={b.id}
-                    className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-3 ${
+                    className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
                       isOccupied
                         ? "bg-white dark:bg-slate-900 border-primary-500/40 shadow-xs"
                         : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-graphite-300 dark:border-slate-700"
@@ -294,9 +294,9 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-mono font-black text-xs text-primary-500">{b.bedNumber}</span>
+                        <span className="font-mono font-bold text-xs text-primary-500">{b.bedNumber}</span>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-black uppercase ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase ${
                             isOccupied
                               ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
                               : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
@@ -310,7 +310,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
 
                       {isOccupied && (
                         <div className="mt-3 p-2.5 rounded-xl bg-primary-500/5 border border-primary-500/20 text-xs">
-                          <div className="font-black text-slate-900 dark:text-slate-100">{b.patientName || "Occupant"}</div>
+                          <div className="font-bold text-slate-900 dark:text-slate-100">{b.patientName || "Occupant"}</div>
                           {b.admissionDate && (
                             <div className="text-xs text-slate-500">Admitted: {b.admissionDate}</div>
                           )}
@@ -330,7 +330,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
 
       {/* 2. Bed Movements & Transfers */}
       {activeTab === "transfers" && (
-        <div className="p-10 rounded-3xl border border-dashed text-center">
+        <div className="p-10 rounded-2xl border border-dashed text-center">
           <ArrowRightLeft className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />
           <p className="font-bold text-sm">No transfer ledger yet</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
@@ -344,7 +344,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       {activeTab === "discharge" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Admitted Patients Ready for Discharge</h3>
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Admitted Patients Ready for Discharge</h3>
             <p className="text-xs text-graphite-500 dark:text-slate-400">
               Discharging frees the bed immediately and opens the billing draft.
             </p>
@@ -356,7 +356,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
               ))}
             </div>
           ) : admitted.length === 0 ? (
-            <div className="p-10 rounded-3xl border border-dashed text-center">
+            <div className="p-10 rounded-2xl border border-dashed text-center">
               <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" aria-hidden />
               <p className="font-bold text-sm">No admitted patients</p>
               <p className="text-xs text-muted-foreground mt-1">Admit patients from OPD or Emergency to see them here.</p>
@@ -379,7 +379,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   <button
                     onClick={() => handleDischarge(a)}
                     disabled={dischargingId === a.id}
-                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-extrabold text-xs flex items-center gap-1.5 transition-all"
+                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-1.5 transition-all"
                   >
                     {dischargingId === a.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

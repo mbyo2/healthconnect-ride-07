@@ -66,11 +66,11 @@ const IoTMonitoring = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Cpu className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 IoT Medical Device & Telemetry Board
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
@@ -90,7 +90,7 @@ const IoTMonitoring = () => {
               <DropdownMenuTrigger asChild>
                 <button
                   disabled={isScanning}
-                  className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
                 >
                   {isScanning ? (
                     <>
@@ -127,7 +127,7 @@ const IoTMonitoring = () => {
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Connected Devices Grid */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+          <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Watch className="h-4 w-4 text-primary-500" />
             Active Connected Devices ({devices.length})
           </h2>
@@ -160,7 +160,7 @@ const IoTMonitoring = () => {
                       <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">Offline</span>
                     )}
                   </div>
-                  <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{device.device_name}</h3>
+                  <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{device.device_name}</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 capitalize mb-3 font-medium">{device.device_type.replace("_", " ")}</p>
                   <div className="space-y-1.5 text-xs">
                     <div className="flex items-center justify-between font-bold text-graphite-500 dark:text-slate-400">
@@ -184,7 +184,7 @@ const IoTMonitoring = () => {
                 <button
                   onClick={() => scanAndConnectDevice("bluetooth")}
                   disabled={isScanning}
-                  className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-extrabold transition-colors"
+                  className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-semibold transition-colors"
                 >
                   {isScanning ? "Scanning…" : "Connect a device"}
                 </button>
@@ -195,7 +195,7 @@ const IoTMonitoring = () => {
 
         {/* Current Vital Signs Bento Grid */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+          <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Heart className="w-4 h-4 text-error-500" />
             Real-Time Vital Telemetry
           </h2>
@@ -206,8 +206,8 @@ const IoTMonitoring = () => {
                 <Heart className="w-5 h-5 text-error-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
-              <p className="text-3xl font-black text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
+              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
+              <p className="text-3xl font-bold text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">bpm</p>
             </div>
 
@@ -216,8 +216,8 @@ const IoTMonitoring = () => {
                 <Activity className="w-5 h-5 text-primary-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
-              <p className="text-3xl font-black text-primary-500 mt-1">
+              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
+              <p className="text-3xl font-bold text-primary-500 mt-1">
                 {vitalSigns?.blood_pressure
                   ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                   : "--/--"}
@@ -230,8 +230,8 @@ const IoTMonitoring = () => {
                 <Thermometer className="w-5 h-5 text-warning-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
-              <p className="text-3xl font-black text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
+              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
+              <p className="text-3xl font-bold text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">°C</p>
             </div>
 
@@ -240,8 +240,8 @@ const IoTMonitoring = () => {
                 <Droplet className="w-5 h-5 text-primary-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
-              <p className="text-3xl font-black text-primary-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
+              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
+              <p className="text-3xl font-bold text-primary-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">% SpO2</p>
             </div>
           </div>
@@ -250,7 +250,7 @@ const IoTMonitoring = () => {
         {/* Charts & Alerts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+            <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary-500" />
               24-Hour Continuous Heart Rate Telemetry
             </h2>
@@ -275,7 +275,7 @@ const IoTMonitoring = () => {
           </div>
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+            <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-warning-500" />
               Device Alerts ({alerts.length})
             </h2>
@@ -320,11 +320,11 @@ const IoTMonitoring = () => {
               <Smartphone className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-primary-500">Pair Additional Medical Devices</h3>
+              <h3 className="font-semibold text-sm text-primary-500">Pair Additional Medical Devices</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Stream continuous EKG, pulse oximetry, and blood glucose directly to your medical team.</p>
             </div>
           </div>
-          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs">
+          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1 shadow-xs">
             <Bot className="w-4 h-4" /> AI Diagnostics
           </button>
         </div>

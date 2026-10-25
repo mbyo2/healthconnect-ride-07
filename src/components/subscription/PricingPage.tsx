@@ -200,7 +200,7 @@ const PatientCTA = () => {
 /* ─── Patient Section ─── */
 const PatientFreeSection = () => (
   <div className="max-w-3xl mx-auto space-y-6">
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+    <Card className="border-primary/20 bg-primary/5">
       <CardHeader className="text-center pb-4">
         <div className="flex justify-center mb-3">
           <div className="p-3 rounded-full bg-primary/10">
@@ -283,7 +283,7 @@ const ProviderPayPerBookingSection = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+      <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
             <div className="p-3 rounded-full bg-primary/10">
@@ -402,7 +402,7 @@ const PharmacySection = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+      <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
             <div className="p-3 rounded-full bg-primary/10">
@@ -570,7 +570,7 @@ const InstitutionSection = () => {
         referenceId={lencoSub?.referenceId || null}
         onActivated={() => navigate('/institution-dashboard')}
       />
-      <Card className="max-w-4xl mx-auto border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+      <Card className="max-w-4xl mx-auto border-primary/20 bg-primary/5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
             <div className="p-3 rounded-full bg-primary/10"><Building2 className="h-8 w-8 text-primary" /></div>

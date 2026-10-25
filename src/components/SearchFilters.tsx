@@ -65,7 +65,7 @@ export const SearchFilters = () => {
           <Filter className="h-4 w-4" />
           Filters
           {activeCount > 0 && (
-            <span className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-primary-500 text-white text-xs font-black">
+            <span className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-primary-500 text-white text-xs font-bold">
               {activeCount}
             </span>
           )}

@@ -326,7 +326,7 @@ const Profile = () => {
 
             <Button
               onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-              className={`rounded-full px-6 h-11 text-xs font-extrabold shadow-sm transition-all ${
+              className={`rounded-full px-6 h-11 text-xs font-semibold shadow-sm transition-all ${
                 isEditing
                   ? "bg-slate-900 hover:bg-black text-white"
                   : "bg-primary-500 hover:bg-primary-600 text-white"
@@ -339,9 +339,9 @@ const Profile = () => {
         </div>
 
         {/* ── Personal Info Form ── */}
-        <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
           <div className="border-b border-canvas-silk dark:border-slate-800 pb-4">
-            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <User className="h-5 w-5 text-primary-500" />
               Personal &amp; Clinical Information
             </h2>
@@ -357,7 +357,7 @@ const Profile = () => {
                 { id: "lastName", label: "Last Name" },
               ].map(f => (
                 <div key={f.id} className="space-y-1.5">
-                  <Label htmlFor={f.id} className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">{f.label}</Label>
+                  <Label htmlFor={f.id} className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">{f.label}</Label>
                   <Input
                     id={f.id}
                     value={(formData as any)[f.id]}
@@ -368,11 +368,11 @@ const Profile = () => {
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label htmlFor="profile-email" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
+                <Label htmlFor="profile-email" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
                 <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>
+                <Label htmlFor="phone" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -385,7 +385,7 @@ const Profile = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="location" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Address / Location</Label>
+              <Label htmlFor="location" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Address / Location</Label>
               <Input
                 id="location"
                 value={formData.location}
@@ -396,7 +396,7 @@ const Profile = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="bio" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Bio / Clinical Background</Label>
+              <Label htmlFor="bio" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Bio / Clinical Background</Label>
               <Textarea
                 id="bio"
                 value={formData.bio}
@@ -409,10 +409,10 @@ const Profile = () => {
 
             {isEditing && (
               <div className="flex gap-3 pt-4">
-                <Button onClick={handleSave} className="flex-1 rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs">
+                <Button onClick={handleSave} className="flex-1 rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                   <Save className="h-4 w-4 mr-2" /> Save Changes
                 </Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 rounded-full h-11 border font-extrabold text-xs">
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 rounded-full h-11 border font-semibold text-xs">
                   Cancel
                 </Button>
               </div>
@@ -422,10 +422,10 @@ const Profile = () => {
 
         {/* ── Provider Professional Details (health_personnel only) ── */}
         {isProvider && (
-          <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
             <div className="flex items-start justify-between border-b border-canvas-silk dark:border-slate-800 pb-4">
               <div>
-                <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice &amp; Professional Details
                 </h2>
@@ -435,7 +435,7 @@ const Profile = () => {
                 size="sm"
                 onClick={() => provEditing ? handleProvSave() : setProvEditing(true)}
                 disabled={provSaving}
-                className={`rounded-full px-5 min-h-[44px] text-xs font-extrabold ${
+                className={`rounded-full px-5 min-h-[44px] text-xs font-semibold ${
                   provEditing ? "bg-slate-900 hover:bg-black text-white" : "bg-primary-500 hover:bg-primary-600 text-white"
                 }`}
               >
@@ -450,7 +450,7 @@ const Profile = () => {
 
               {/* Education */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <GraduationCap className="h-4 w-4" /> Education
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -482,7 +482,7 @@ const Profile = () => {
 
               {/* Board Certifications */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <Award className="h-4 w-4" /> Board Certifications
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -506,7 +506,7 @@ const Profile = () => {
 
               {/* Subspecialties */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <Shield className="h-4 w-4" /> Subspecialties
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -530,7 +530,7 @@ const Profile = () => {
 
               {/* Practice */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> Practice Details
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -559,7 +559,7 @@ const Profile = () => {
 
               {/* Affiliated Hospitals */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <Building2 className="h-4 w-4" /> Affiliated Hospitals
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -595,7 +595,7 @@ const Profile = () => {
 
               {/* Fees */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <DollarSign className="h-4 w-4" /> Consultation Fees (ZMW)
                 </h3>
                 <div className="grid grid-cols-2 gap-4 max-w-xs">
@@ -628,7 +628,7 @@ const Profile = () => {
 
               {/* Service toggles */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3">Service Delivery</h3>
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3">Service Delivery</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {([
                     { key: "telemedicine_available", icon: Video, label: "Telemedicine Available" },
@@ -653,7 +653,7 @@ const Profile = () => {
               {/* Insurance */}
               {provData.accepts_insurance && (
                 <section>
-                  <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                     <Shield className="h-4 w-4" /> Accepted Insurance Providers
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -678,7 +678,7 @@ const Profile = () => {
 
               {/* Languages */}
               <section>
-                <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <Languages className="h-4 w-4" /> Languages Spoken
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -702,10 +702,10 @@ const Profile = () => {
 
               {provEditing && (
                 <div className="flex gap-3 pt-2">
-                  <Button onClick={handleProvSave} disabled={provSaving} className="rounded-full h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs">
+                  <Button onClick={handleProvSave} disabled={provSaving} className="rounded-full h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                     <Save className="h-4 w-4 mr-2" />{provSaving ? "Saving…" : "Save Practice Details"}
                   </Button>
-                  <Button variant="outline" onClick={() => setProvEditing(false)} className="rounded-full h-11 px-6 font-extrabold text-xs">
+                  <Button variant="outline" onClick={() => setProvEditing(false)} className="rounded-full h-11 px-6 font-semibold text-xs">
                     Cancel
                   </Button>
                 </div>
@@ -715,7 +715,7 @@ const Profile = () => {
         )}
 
         {/* ── Stats Widget ── */}
-        <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ProfileStats userId={user?.id} />
         </div>
       </div>

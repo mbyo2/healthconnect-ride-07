@@ -299,7 +299,7 @@ export const WalletTopUp = () => {
                     </div>
 
                     <div className="relative mt-4">
-                        <span aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-black text-gray-400">
+                        <span aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-400">
                             {getSymbol()}
                         </span>
                         <Input

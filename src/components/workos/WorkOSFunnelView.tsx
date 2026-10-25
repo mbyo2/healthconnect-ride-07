@@ -38,36 +38,36 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
           totalPatients) *
           100
       ),
-      color: "from-indigo-600 to-purple-600",
-      textColor: "text-purple-500",
-      borderColor: "border-purple-500/30",
+      color: "from-primary-500 to-primary-400",
+      textColor: "text-primary-500",
+      borderColor: "border-primary-500/30",
       description: "Diagnostic workup, labs, radiology & specialist consults",
     },
     {
       stage: "3. ICU & High Dependency",
       count: icuCount,
       percent: Math.round((icuCount / totalPatients) * 100),
-      color: "from-rose-600 to-pink-600",
-      textColor: "text-rose-500",
-      borderColor: "border-rose-500/30",
+      color: "from-primary-700 to-primary-600",
+      textColor: "text-primary-600",
+      borderColor: "border-primary-500/30",
       description: "Intensive care monitoring & critical life-support",
     },
     {
       stage: "4. Outpatient Telehealth & Recovery",
       count: outpatientCount,
       percent: Math.round((outpatientCount / totalPatients) * 100),
-      color: "from-emerald-600 to-success-500",
-      textColor: "text-emerald-500",
-      borderColor: "border-emerald-500/30",
+      color: "from-primary-400 to-primary-300",
+      textColor: "text-primary-500",
+      borderColor: "border-primary-500/30",
       description: "Remote monitoring, chronic disease management & therapy",
     },
     {
       stage: "5. Discharge & Clearance",
       count: dischargeCount,
       percent: Math.round((dischargeCount / totalPatients) * 100),
-      color: "from-success-500 to-teal-500",
-      textColor: "text-teal-500",
-      borderColor: "border-teal-500/30",
+      color: "from-graphite-500 to-graphite-400",
+      textColor: "text-graphite-500",
+      borderColor: "border-graphite-500/30",
       description: "Final billing settlement, medication release & discharge",
     },
   ];
@@ -87,7 +87,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <span>Total Intake Pipeline</span>
             <Users className="h-4 w-4 text-blue-500" />
           </div>
-          <div className="mt-2 text-2xl font-black font-mono">{patients.length} Patients</div>
+          <div className="mt-2 text-2xl font-bold font-mono">{patients.length} Patients</div>
           <div className="mt-1 text-xs text-emerald-500 flex items-center gap-1 font-semibold">
             <TrendingUp className="h-3 w-3" />
             <span>+14.2% intake velocity vs last week</span>
@@ -101,7 +101,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <span>Stage Conversion Rate</span>
             <Filter className="h-4 w-4 text-purple-500" />
           </div>
-          <div className="mt-2 text-2xl font-black font-mono">82.4%</div>
+          <div className="mt-2 text-2xl font-bold font-mono">82.4%</div>
           <div className="mt-1 text-xs text-purple-400 font-semibold">
             Average 18 hrs per stage completion
           </div>
@@ -114,7 +114,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <span>Discharge Success Rate</span>
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </div>
-          <div className="mt-2 text-2xl font-black font-mono text-emerald-500">94.8%</div>
+          <div className="mt-2 text-2xl font-bold font-mono text-emerald-500">94.8%</div>
           <div className="mt-1 text-xs text-slate-400">Zero unplanned readmissions</div>
         </div>
 
@@ -125,7 +125,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
             <span>Total Pipeline Billing</span>
             <DollarSign className="h-4 w-4 text-emerald-500" />
           </div>
-          <div className="mt-2 text-2xl font-black font-mono text-emerald-500">
+          <div className="mt-2 text-2xl font-bold font-mono text-emerald-500">
             ZMW K{totalBillingSum.toLocaleString()}
           </div>
           <div className="mt-1 text-xs text-slate-400">Est. gross operational revenue</div>
@@ -138,7 +138,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       }`}>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+            <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-500" />
               <span>Clinical CRM Pipeline Funnel</span>
             </h2>
@@ -167,13 +167,13 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
 
                   <div className="flex items-center gap-3 font-mono">
                     <span className="text-slate-400">{stage.description}</span>
-                    <span className="text-slate-200 font-extrabold">{stage.count} Patients ({stage.percent}%)</span>
+                    <span className="text-slate-200 font-semibold">{stage.count} Patients ({stage.percent}%)</span>
                   </div>
                 </div>
 
                 <div className="w-full bg-slate-200 dark:bg-slate-800/80 h-9 rounded-xl overflow-hidden p-1 flex items-center">
                   <div
-                    className={`h-full rounded-lg bg-gradient-to-r ${stage.color} flex items-center justify-end px-3 text-white text-xs font-black transition-all duration-700 shadow-sm`}
+                    className={`h-full rounded-lg bg-gradient-to-r ${stage.color} flex items-center justify-end px-3 text-white text-xs font-bold transition-all duration-700 shadow-sm`}
                     style={{ width: `${Math.max(8, stage.percent)}%` }}
                   >
                     <span>{stage.percent}%</span>

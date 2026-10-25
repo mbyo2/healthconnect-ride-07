@@ -136,7 +136,7 @@ export const AIInsightsWidget = ({ context, data, compact = false }: AIInsightsW
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-3 border rounded-lg bg-gradient-to-r from-primary/5 to-primary/10">
+      <div className="flex items-center gap-3 p-3 border rounded-lg bg-primary/10">
         <div className="p-2 rounded-full bg-primary/20">
           <Bot className="h-4 w-4 text-primary" />
         </div>
@@ -153,7 +153,7 @@ export const AIInsightsWidget = ({ context, data, compact = false }: AIInsightsW
   }
 
   return (
-    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-background to-primary/5">
+    <Card className="border-primary/30 bg-card">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">

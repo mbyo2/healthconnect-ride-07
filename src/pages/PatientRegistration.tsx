@@ -327,7 +327,7 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <User className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Personal Information</h3>
+              <h3 className="text-sm font-semibold">Personal Information</h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FormField
@@ -335,7 +335,7 @@ export const PatientRegistration = () => {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">First Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold">First Name</FormLabel>
                     <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -346,7 +346,7 @@ export const PatientRegistration = () => {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">Last Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold">Last Name</FormLabel>
                     <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -358,7 +358,7 @@ export const PatientRegistration = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Email Address</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Email Address</FormLabel>
                   <FormControl><Input {...field} type="email" className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -369,7 +369,7 @@ export const PatientRegistration = () => {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Phone Number</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Phone Number</FormLabel>
                   <FormControl><Input {...field} type="tel" placeholder="+260..." className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -380,7 +380,7 @@ export const PatientRegistration = () => {
               name="dateOfBirth"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Date of Birth</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Date of Birth</FormLabel>
                   <FormControl><Input {...field} type="date" className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -391,7 +391,7 @@ export const PatientRegistration = () => {
               name="gender"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Gender</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Gender</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -407,7 +407,7 @@ export const PatientRegistration = () => {
               name="bloodType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Blood Type (Optional)</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Blood Type (Optional)</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Select blood type" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -427,14 +427,14 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Contact Information</h3>
+              <h3 className="text-sm font-semibold">Contact Information</h3>
             </div>
             <FormField
               control={contactInfoForm.control}
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Street Address</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Street Address</FormLabel>
                   <FormControl><Input {...field} placeholder="123 Main Street" className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -446,7 +446,7 @@ export const PatientRegistration = () => {
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">City</FormLabel>
+                    <FormLabel className="text-xs font-semibold">City</FormLabel>
                     <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -457,7 +457,7 @@ export const PatientRegistration = () => {
                 name="zipCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">Postal Code</FormLabel>
+                    <FormLabel className="text-xs font-semibold">Postal Code</FormLabel>
                     <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -469,7 +469,7 @@ export const PatientRegistration = () => {
               name="country"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Country</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Country</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -492,7 +492,7 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Phone className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Emergency Contact</h3>
+              <h3 className="text-sm font-semibold">Emergency Contact</h3>
             </div>
             <p className="text-xs text-graphite-500 dark:text-slate-400">In case of emergency, who should we contact?</p>
             <FormField
@@ -500,7 +500,7 @@ export const PatientRegistration = () => {
               name="emergencyName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Contact Name</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Contact Name</FormLabel>
                   <FormControl><Input {...field} placeholder="Full name" className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -511,7 +511,7 @@ export const PatientRegistration = () => {
               name="emergencyPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Phone Number</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Phone Number</FormLabel>
                   <FormControl><Input {...field} type="tel" autoComplete="off" placeholder="+260..." className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -522,7 +522,7 @@ export const PatientRegistration = () => {
               name="emergencyRelationship"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Relationship</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Relationship</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Select relationship" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -538,7 +538,7 @@ export const PatientRegistration = () => {
               name="emergencyEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Email (Optional)</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Email (Optional)</FormLabel>
                   <FormControl><Input {...field} type="email" className="h-11 text-base" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -552,7 +552,7 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Insurance Information</h3>
+              <h3 className="text-sm font-semibold">Insurance Information</h3>
             </div>
             <FormField
               control={insuranceForm.control}
@@ -578,7 +578,7 @@ export const PatientRegistration = () => {
                   name="insuranceProvider"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-extrabold">Insurance Provider</FormLabel>
+                      <FormLabel className="text-xs font-semibold">Insurance Provider</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Select provider" /></SelectTrigger></FormControl>
                         <SelectContent>
@@ -594,7 +594,7 @@ export const PatientRegistration = () => {
                   name="policyNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-extrabold">Policy Number</FormLabel>
+                      <FormLabel className="text-xs font-semibold">Policy Number</FormLabel>
                       <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -605,7 +605,7 @@ export const PatientRegistration = () => {
                   name="groupNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-extrabold">Group Number (Optional)</FormLabel>
+                      <FormLabel className="text-xs font-semibold">Group Number (Optional)</FormLabel>
                       <FormControl><Input {...field} className="h-11 text-base" /></FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -616,7 +616,7 @@ export const PatientRegistration = () => {
                   name="coverageStartDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-extrabold">Coverage Start Date</FormLabel>
+                      <FormLabel className="text-xs font-semibold">Coverage Start Date</FormLabel>
                       <FormControl><Input {...field} type="date" className="h-11 text-base" /></FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -632,7 +632,7 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Heart className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Medical History</h3>
+              <h3 className="text-sm font-semibold">Medical History</h3>
             </div>
             <p className="text-xs text-graphite-500 dark:text-slate-400">This information helps your healthcare provider give you better care.</p>
 
@@ -656,7 +656,7 @@ export const PatientRegistration = () => {
                 name="allergies"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">Please describe your allergies</FormLabel>
+                    <FormLabel className="text-xs font-semibold">Please describe your allergies</FormLabel>
                     <FormControl><Textarea {...field} placeholder="e.g., Penicillin, peanuts, latex..." className="text-base min-h-[80px]" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -684,7 +684,7 @@ export const PatientRegistration = () => {
                 name="chronicConditions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">Please describe your conditions</FormLabel>
+                    <FormLabel className="text-xs font-semibold">Please describe your conditions</FormLabel>
                     <FormControl><Textarea {...field} placeholder="e.g., Diabetes, hypertension, asthma..." className="text-base min-h-[80px]" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -712,7 +712,7 @@ export const PatientRegistration = () => {
                 name="surgeries"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-extrabold">Please describe your surgeries</FormLabel>
+                    <FormLabel className="text-xs font-semibold">Please describe your surgeries</FormLabel>
                     <FormControl><Textarea {...field} placeholder="e.g., Appendectomy 2015, knee surgery 2020..." className="text-base min-h-[80px]" /></FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -725,7 +725,7 @@ export const PatientRegistration = () => {
               name="medications"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Current Medications (Optional)</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Current Medications (Optional)</FormLabel>
                   <FormControl><Textarea {...field} placeholder="List any medications you're currently taking..." className="text-base min-h-[80px]" /></FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -739,14 +739,14 @@ export const PatientRegistration = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-primary-500" />
-              <h3 className="text-sm font-extrabold">Create Your Account</h3>
+              <h3 className="text-sm font-semibold">Create Your Account</h3>
             </div>
             <FormField
               control={passwordForm.control}
               name="password"
               render={() => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Password</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Password</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -769,7 +769,7 @@ export const PatientRegistration = () => {
               name="confirmPassword"
               render={() => (
                 <FormItem>
-                  <FormLabel className="text-xs font-extrabold">Confirm Password</FormLabel>
+                  <FormLabel className="text-xs font-semibold">Confirm Password</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -829,7 +829,7 @@ export const PatientRegistration = () => {
               Step {currentStep} of {totalSteps}
             </div>
           </div>
-          <CardTitle className="text-lg font-extrabold">Patient Registration</CardTitle>
+          <CardTitle className="text-lg font-semibold">Patient Registration</CardTitle>
           <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
         </CardHeader>
         <CardContent className="pt-4">

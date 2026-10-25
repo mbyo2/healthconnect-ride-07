@@ -196,7 +196,7 @@ export function PatientOverviewHero() {
   return (
     <div className="space-y-5">
       {/* Greeting hero with next appointment spotlight */}
-      <Card className="overflow-hidden border-0 bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground shadow-lg">
+      <Card className="overflow-hidden border-0 bg-primary-600 text-primary-foreground shadow-lg">
         <CardContent className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between">
             <div>

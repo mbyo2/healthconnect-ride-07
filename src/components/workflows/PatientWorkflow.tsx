@@ -214,13 +214,13 @@ export const PatientWorkflow = React.memo(() => {
     return (
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold text-primary-500 bg-primary-50 dark:bg-blue-950/50 border border-primary-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-primary-500 bg-primary-50 dark:bg-blue-950/50 border border-primary-500/20">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Patient Onboarding</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Your Health Journey</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Your Health Journey</h2>
           <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-            Complete your profile setup to unlock instant booking, digital prescriptions, and virtual consultations.
+            Complete your profile to book appointments, receive digital prescriptions, and join video consultations.
           </p>
 
           <div className="max-w-md mx-auto space-y-2 pt-2">
@@ -243,7 +243,7 @@ export const PatientWorkflow = React.memo(() => {
             return (
               <div
                 key={step.id}
-                className={`p-5 rounded-3xl bg-white dark:bg-slate-900 border transition-all ${
+                className={`p-5 rounded-2xl bg-white dark:bg-slate-900 border transition-all ${
                   step.completed
                     ? 'border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/20'
                     : isHighlighted
@@ -262,12 +262,12 @@ export const PatientWorkflow = React.memo(() => {
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
                   {step.completed ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-700">Done</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Done</span>
                   ) : step.required ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-600">Required</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Required</span>
                   ) : null}
                 </div>
-                <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 mb-1">{step.title}</h3>
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 mb-1">{step.title}</h3>
                 <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.description}</p>
                 <button
                   onClick={() => handleNavigation(step.route, step.title)}
@@ -304,14 +304,14 @@ export const PatientWorkflow = React.memo(() => {
       <ProfileCompleteBanner />
 
       {/* ─── Top Header Bar (Date & Notification Bell) ─── */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 shadow-xs">
+      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-2xl bg-primary-50 dark:bg-blue-950/60 border border-primary-500/20 text-primary-500">
             <Calendar className="h-5 w-5" />
           </div>
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Today</span>
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100">
+            <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
               {format(new Date(), 'MMMM d, yyyy')}
             </span>
           </div>
@@ -337,7 +337,7 @@ export const PatientWorkflow = React.memo(() => {
           <button
             onClick={() => setCareMode('online')}
             aria-pressed={careMode === 'online'}
-            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'online'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -349,7 +349,7 @@ export const PatientWorkflow = React.memo(() => {
           <button
             onClick={() => setCareMode('offline')}
             aria-pressed={careMode === 'offline'}
-            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'offline'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -364,16 +364,16 @@ export const PatientWorkflow = React.memo(() => {
       {/* ─── High-Contrast Dark Next Appointment Banner (Black/Navy) ─── */}
       <div
         onClick={() => upcomingError ? refetchUpcoming() : handleNavigation('/appointments', 'Appointments')}
-        className="group p-5 sm:p-6 rounded-3xl bg-slate-900 text-white shadow-xl shadow-slate-900/10 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-900 transition-all active:scale-[0.99]"
+        className="group p-5 sm:p-6 rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-900/10 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-900 transition-all active:scale-[0.99]"
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               {upcomingError ? 'Appointments unavailable' : upcomingAppointment ? 'Your next appointment' : 'Quick Consultation'}
             </span>
             <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
           </div>
-          <div className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+          <div className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
             {upcomingError ? (
               <span>Couldn&apos;t load your appointments — tap to retry</span>
             ) : upcomingAppointment ? (
@@ -402,7 +402,7 @@ export const PatientWorkflow = React.memo(() => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="px-5 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-primary-50 dark:hover:bg-slate-700 hover:text-primary-500 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
+          <button className="px-5 py-2.5 rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-primary-50 dark:hover:bg-slate-700 hover:text-primary-500 font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
             <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -411,14 +411,14 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── Digital Prescription Alert Card (if active) ─── */}
       {activePrescriptionsCount > 0 && (
-        <div className="p-4 sm:p-5 rounded-3xl bg-slate-900 text-white border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 text-white border border-slate-800 flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-primary-500/20 text-sky-400">
               <Pill className="h-5 w-5" />
             </div>
             <div>
               <span className="text-xs text-slate-400 font-bold block">Medical Records</span>
-              <span className="text-sm sm:text-base font-black text-white">
+              <span className="text-sm sm:text-base font-bold text-white">
                 You have {activePrescriptionsCount} active {activePrescriptionsCount === 1 ? 'prescription' : 'prescriptions'}
               </span>
             </div>
@@ -439,12 +439,12 @@ export const PatientWorkflow = React.memo(() => {
       <div>
         <div className="flex items-center justify-between mb-3.5 px-1">
           <div>
-            <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Specialties</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Specialties</h2>
             <p className="text-xs text-slate-400 font-medium">Browse verified medical specialists</p>
           </div>
           <button
             onClick={() => handleNavigation(`/search?mode=${careMode}`, 'All Specialties')}
-            className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1"
           >
             <span>View all</span>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -463,7 +463,7 @@ export const PatientWorkflow = React.memo(() => {
                   setSelectedSpecialty(spec.id);
                   handleNavigation(spec.route, spec.name);
                 }}
-                className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all text-center flex flex-col items-center justify-center gap-2 group hover:shadow-md hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all text-center flex flex-col items-center justify-center gap-2 group hover:shadow-md hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-primary-500/50 bg-primary-50/40 dark:bg-blue-950/40 ring-2 ring-primary-500/20'
                     : 'border-canvas-silk dark:border-slate-800 hover:border-primary-500/40'
@@ -473,7 +473,7 @@ export const PatientWorkflow = React.memo(() => {
                   <spec.icon className="h-6 w-6 text-primary-500" aria-hidden />
                 </div>
                 <div>
-                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 block group-hover:text-primary-500 transition-colors">
+                  <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 block group-hover:text-primary-500 transition-colors">
                     {spec.name}
                   </span>
                   <span className="text-xs text-slate-400 font-medium block">
@@ -489,7 +489,7 @@ export const PatientWorkflow = React.memo(() => {
       {/* ─── Reference-style Doctor Cards ─── */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Available Doctors</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Available Doctors</h2>
           <button
             onClick={() => handleNavigation(`/search?mode=${careMode}`, 'Find Doctors')}
             className="text-xs font-bold text-blue-600 hover:text-blue-700"
@@ -526,53 +526,53 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── Quick Access Services Hub (Clean Blue, Black & White) ─── */}
       <div>
-        <h2 className="text-lg sm:text-xl font-black mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Quick Access</h2>
+        <h2 className="text-lg sm:text-xl font-bold mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Quick Access</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <button
             type="button"
             onClick={() => handleNavigation('/emergency', 'Emergency')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <AlertTriangle className="h-5 w-5" />
             </div>
-            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Emergency Help</h3>
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">Emergency Help</h3>
             <p className="text-xs text-slate-400 font-medium">24/7 hotline & dispatch</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/marketplace', 'Buy Medicine')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Pill className="h-5 w-5" />
             </div>
-            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Buy Medicine</h3>
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">Buy Medicine</h3>
             <p className="text-xs text-slate-400 font-medium">Online pharmacy & refill</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/search', 'Find Doctor')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Users className="h-5 w-5" />
             </div>
-            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Find Doctor</h3>
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">Find Doctor</h3>
             <p className="text-xs text-slate-400 font-medium">Book clinic & video visits</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/healthcare-institutions', 'Hospitals')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-purple-50 dark:bg-purple-950/40 text-purple-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Building2 className="h-5 w-5" />
             </div>
-            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Hospitals & Labs</h3>
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">Hospitals & Labs</h3>
             <p className="text-xs text-slate-400 font-medium">Find nearby facilities</p>
           </button>
         </div>
@@ -580,53 +580,53 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── Insurance, Cost Estimator & Waitlists ─── */}
       <div>
-        <h2 className="text-lg sm:text-xl font-black mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Insurance & Scheduling</h2>
+        <h2 className="text-lg sm:text-xl font-bold mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Insurance & Scheduling</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <button
             type="button"
             onClick={() => handleNavigation('/insurance-cards', 'Insurance Cards')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-teal-50 dark:bg-teal-950/40 text-teal-600 rounded-xl w-fit mb-2">
               <CreditCard className="h-4 w-4" />
             </div>
-            <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Insurance Card</h4>
+            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Insurance Card</h4>
             <p className="text-xs text-slate-400">Upload & verify</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/cost-estimator', 'Cost Estimator')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-orange-50 dark:bg-orange-950/40 text-orange-600 rounded-xl w-fit mb-2">
               <Shield className="h-4 w-4" />
             </div>
-            <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Cost Estimator</h4>
+            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Cost Estimator</h4>
             <p className="text-xs text-slate-400">Clear pricing</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/waitlist', 'Waitlist')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 rounded-xl w-fit mb-2">
               <Calendar className="h-4 w-4" />
             </div>
-            <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Early Slots</h4>
+            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Early Slots</h4>
             <p className="text-xs text-slate-400">Priority waitlist</p>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/appointment-reminders', 'Reminders')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-pink-50 dark:bg-pink-950/40 text-pink-600 rounded-xl w-fit mb-2">
               <Activity className="h-4 w-4" />
             </div>
-            <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Reminders</h4>
+            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Reminders</h4>
             <p className="text-xs text-slate-400">Calendar alerts</p>
           </button>
         </div>
@@ -637,15 +637,15 @@ export const PatientWorkflow = React.memo(() => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
-          <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm space-y-3">
-            <h3 className="font-black text-base text-slate-900 dark:text-slate-100">Health Support & Emergency Services</h3>
+          <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm space-y-3">
+            <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">Health Support & Emergency Services</h3>
             <p className="text-xs text-slate-500 leading-relaxed font-medium">
               Need immediate triage, symptom checks, or emergency ambulance dispatch? Our clinical emergency team is available 24/7.
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
               <Button
                 onClick={() => handleNavigation('/emergency', 'Emergency')}
-                className="rounded-full bg-rose-600 hover:bg-rose-700 font-extrabold text-xs"
+                className="rounded-full bg-rose-600 hover:bg-rose-700 font-semibold text-xs"
               >
                 <Phone className="h-3.5 w-3.5" />
                 <span>Call Emergency (116)</span>
@@ -653,7 +653,7 @@ export const PatientWorkflow = React.memo(() => {
               <Button
                 variant="secondary"
                 onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}
-                className="rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-extrabold text-xs"
+                className="rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-semibold text-xs"
               >
                 <Heart className="h-3.5 w-3.5" />
                 <span>Check Symptoms</span>

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Plus, Pill, Clock, AlertTriangle, CheckCircle, Building, RefreshCw } from 'lucide-react';
+import { CalendarIcon, Plus, Pill, Clock, AlertTriangle, CheckCircle, Building, RefreshCw, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { providerDisplayName } from '@/utils/providerDisplay';
@@ -368,7 +368,7 @@ export const ComprehensivePrescriptions = () => {
                         <p>{(prescription as any).healthcare_institutions.address}</p>
                       )}
                       {(prescription as any).healthcare_institutions.phone && (
-                        <p>📞 {(prescription as any).healthcare_institutions.phone}</p>
+                        <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 shrink-0" aria-hidden /> {(prescription as any).healthcare_institutions.phone}</p>
                       )}
                     </div>
                   </div>

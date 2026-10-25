@@ -49,13 +49,13 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
       }`}>
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md">
+          <div className="p-2 rounded-xl bg-primary-600 text-white shadow-md">
             <Bot className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+            <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
               Doc' O Clock Clinical AI Assistant
-              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-mono font-bold border border-purple-500/20">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 font-mono font-bold border border-primary-500/20">
                 Doc'O Clock AI
               </span>
             </h2>
@@ -75,12 +75,12 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
                 onClick={() => handleRun(wf.prompt)}
                 className={`p-3.5 rounded-xl border text-left transition-all hover:scale-[1.02] flex flex-col justify-between group ${
                   isDarkMode
-                    ? "bg-slate-950/60 border-slate-800 hover:border-purple-500/50 hover:bg-slate-900"
-                    : "bg-slate-50 border-slate-200 hover:border-purple-300 hover:bg-purple-50/50"
+                    ? "bg-slate-950/60 border-slate-800 hover:border-primary-500/50 hover:bg-slate-900"
+                    : "bg-slate-50 border-slate-200 hover:border-primary-300 hover:bg-primary-50/50"
                 }`}
               >
                 <div>
-                  <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold text-xs">
+                  <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold text-xs">
                     <Icon className="h-4 w-4" />
                     <span>{wf.title}</span>
                   </div>
@@ -88,7 +88,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
                     {wf.prompt}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center text-xs font-bold text-purple-500 group-hover:translate-x-1 transition-transform">
+                <div className="mt-3 flex items-center text-xs font-bold text-primary-500 group-hover:translate-x-1 transition-transform">
                   <span>Run Automation</span>
                   <ArrowRight className="h-3 w-3 ml-1" />
                 </div>
@@ -105,7 +105,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && customPrompt && handleRun(customPrompt)}
-            className={`w-full pl-4 pr-12 py-3 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+            className={`w-full pl-4 pr-12 py-3 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all ${
               isDarkMode
                 ? "bg-slate-950/80 border-slate-800 text-slate-100 placeholder-slate-500"
                 : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400"
@@ -114,7 +114,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
           <button
             onClick={() => customPrompt && handleRun(customPrompt)}
             disabled={isAnalyzing}
-            className="absolute right-2 top-2 p-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-all disabled:opacity-50"
+            className="absolute right-2 top-2 p-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-all disabled:opacity-50"
           >
             <Send className="h-4 w-4" />
           </button>
@@ -122,7 +122,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
 
         {/* AI Processing Status & Result */}
         {isAnalyzing && (
-          <div className="mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-300 flex items-center gap-3 text-xs font-semibold animate-pulse">
+          <div className="mt-4 p-4 rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-600 dark:text-primary-300 flex items-center gap-3 text-xs font-semibold animate-pulse">
             <Sparkles className="h-5 w-5 animate-spin" />
             <span>Analyzing board telemetry and processing MedGemma neural inference...</span>
           </div>
@@ -130,9 +130,9 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
 
         {aiOutput && !isAnalyzing && (
           <div className={`mt-4 p-4 rounded-xl border font-mono text-xs whitespace-pre-line leading-relaxed ${
-            isDarkMode ? "bg-slate-950 border-purple-500/30 text-purple-200" : "bg-purple-50 border-purple-200 text-purple-900"
+            isDarkMode ? "bg-slate-950 border-primary-500/30 text-primary-200" : "bg-primary-50 border-primary-200 text-primary-900"
           }`}>
-            <div className="flex items-center gap-2 font-bold mb-1 text-purple-600 dark:text-purple-400">
+            <div className="flex items-center gap-2 font-bold mb-1 text-primary-600 dark:text-primary-400">
               <CheckCircle2 className="h-4 w-4" />
               <span>AI Command Output</span>
             </div>

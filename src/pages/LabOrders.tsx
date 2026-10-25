@@ -175,7 +175,7 @@ const LabOrders = () => {
             <FlaskConical className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Order Lab Tests</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Order Lab Tests</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">Place test orders for your patients at verified laboratories</p>
           </div>
         </div>

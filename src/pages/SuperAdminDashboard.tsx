@@ -190,7 +190,7 @@ const SuperAdminDashboard = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="border border-canvas-silk dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900">
-              <DropdownMenuLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Actions</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-bold">
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}
               </DropdownMenuItem>
@@ -216,7 +216,7 @@ const SuperAdminDashboard = () => {
       <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-accent-500 text-white flex items-center justify-center shadow-button">
+            <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-button">
               <Shield className="h-5 w-5" />
             </div>
             <div>
@@ -281,10 +281,10 @@ const SuperAdminDashboard = () => {
           ].map((card) => (
             <div key={card.label} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{card.label}</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{card.label}</span>
                 <span style={{ color: card.color }}>{card.icon}</span>
               </div>
-              <div className="text-2xl font-black" style={{ color: card.color }}>{card.value}</div>
+              <div className="text-2xl font-bold" style={{ color: card.color }}>{card.value}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
             </div>
           ))}
@@ -292,7 +292,7 @@ const SuperAdminDashboard = () => {
 
         {/* Admin Management Table */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
+          <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary-500" /> Admin & Superadmin Management
           </h2>
           <DataTable columns={adminColumns} data={admins} searchColumn="email" />

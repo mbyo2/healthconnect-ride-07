@@ -222,7 +222,7 @@ export const PrescriptionWriter = () => {
     <Card className="p-6 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs font-sans">
       <div className="flex items-center justify-between mb-6 pb-3 border-b border-canvas-silk dark:border-slate-800">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <Pill className="h-5 w-5 text-primary-500" />
             Write E-Prescription (Multi-Medication)
           </h2>
@@ -292,7 +292,7 @@ export const PrescriptionWriter = () => {
           {medications.map((m, idx) => (
             <div key={m.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 space-y-3 relative">
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
+                <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                   Medication #{idx + 1}
                 </span>
                 {medications.length > 1 && (
@@ -435,7 +435,7 @@ export const PrescriptionWriter = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-extrabold rounded-xl"
+          className="w-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl"
         >
           <CheckCircle2 className="h-4 w-4 mr-2" />
           {isSubmitting ? "Issuing Prescription..." : `Issue Multi-Medication E-Prescription (${medications.length} Meds)`}

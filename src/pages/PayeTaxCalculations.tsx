@@ -243,7 +243,7 @@ export const PayeTaxCalculations = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access PAYE calculations.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -269,7 +269,7 @@ export const PayeTaxCalculations = () => {
               <Calculator className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">PAYE Tax Calculations</h1>
+              <h1 className="text-xl font-semibold truncate">PAYE Tax Calculations</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Zambian Pay-As-You-Earn Tax Slabs & Payroll</p>
             </div>
           </div>
@@ -282,7 +282,7 @@ export const PayeTaxCalculations = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Add PAYE Tax Slab</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Add PAYE Tax Slab</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -367,7 +367,7 @@ export const PayeTaxCalculations = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Calculate PAYE Tax</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Calculate PAYE Tax</DialogTitle>
                   <p className="text-xs text-muted-foreground">
                     {taxSlabs.length === 0
                       ? "No custom slabs configured — the verified ZRA 2024/25 statutory bands apply."
@@ -432,20 +432,20 @@ export const PayeTaxCalculations = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Tax Slabs</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Tax Slabs</span>
                 <BarChart3 className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{activeSlabs}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{activeSlabs}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured bands</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total PAYE Collected</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total PAYE Collected</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">
+              <div className="text-2xl font-bold font-mono text-success-500">
                 {institution.currency || "ZMW"} {(totalPayeCollected / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">This period</div>
@@ -454,20 +454,20 @@ export const PayeTaxCalculations = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
                 <CheckCircle className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{processedPayroll}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{processedPayroll}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Completed runs</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Payroll</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Payroll</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{pendingPayroll}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{pendingPayroll}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
@@ -492,7 +492,7 @@ export const PayeTaxCalculations = () => {
           {/* Tax Slabs Tab */}
           <TabsContent value="slabs" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">PAYE Tax Slabs</h3>
+              <h3 className="text-sm font-semibold">PAYE Tax Slabs</h3>
               <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
@@ -516,7 +516,7 @@ export const PayeTaxCalculations = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{slab.slab_name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{slab.slab_name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">
                           {new Date(slab.effective_from).toLocaleDateString()}
                         </div>
@@ -584,14 +584,14 @@ export const PayeTaxCalculations = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Employee</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Month</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Gross Income</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Taxable Income</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">PAYE Tax</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Engine</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Calculated</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Employee</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Month</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Gross Income</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Taxable Income</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">PAYE Tax</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Engine</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Calculated</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -694,7 +694,7 @@ export const PayeTaxCalculations = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">
+                        <CardTitle className="text-sm font-semibold">
                           {pay.employee?.first_name} {pay.employee?.last_name}
                         </CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">
@@ -757,7 +757,7 @@ export const PayeTaxCalculations = () => {
           <TabsContent value="statutory" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary-500" /> NAPSA & NHIMA Statutory Deductions
                 </CardTitle>
               </CardHeader>

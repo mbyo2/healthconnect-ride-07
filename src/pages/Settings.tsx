@@ -360,7 +360,7 @@ const Settings = () => {
                 </div>
                 <button
                   onClick={handleTwoFactorToggle}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
                 >
                   Manage · {twoFactor ? 'On' : 'Off'}
                 </button>
@@ -370,7 +370,7 @@ const Settings = () => {
             {/* Appearance Settings */}
             <div className="vf-card space-y-4">
               <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
-                <Palette className="h-4 w-4 text-accent-500" /> Theme & Accessibility
+                <Palette className="h-4 w-4 text-graphite-500" /> Theme & Accessibility
               </h2>
               <div className="flex items-center justify-between">
                 <div>
@@ -390,7 +390,7 @@ const Settings = () => {
 
             {/* Privacy & Data */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
                 <Shield className="h-4 w-4 text-success-500" /> Privacy & Data Rights
               </h2>
               <button
@@ -413,7 +413,7 @@ const Settings = () => {
           <div className="space-y-6">
             {/* Notification Controls */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
                 <Bell className="h-4 w-4 text-warning-500" /> Notifications
               </h2>
               <div className="flex items-center justify-between">
@@ -475,11 +475,11 @@ const Settings = () => {
 
             {/* Regional Localization */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
                 <Globe className="h-4 w-4 text-primary-500" /> Language & Region
               </h2>
               <div className="space-y-1.5">
-                <label htmlFor="settings-language" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>
+                <label htmlFor="settings-language" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>
                 <Select value={i18nLang} onValueChange={(val) => {
                   setI18nLang(val as any);
                   setLanguage(val);
@@ -495,7 +495,7 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-timezone" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">System Timezone</label>
+                <label htmlFor="settings-timezone" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
                   <SelectTrigger id="settings-timezone" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -508,7 +508,7 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-date-format" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Date Display Format</label>
+                <label htmlFor="settings-date-format" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
                   <SelectTrigger id="settings-date-format" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>

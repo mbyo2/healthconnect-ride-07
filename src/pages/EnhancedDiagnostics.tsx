@@ -223,7 +223,7 @@ export const EnhancedDiagnostics = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced diagnostics.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -251,7 +251,7 @@ export const EnhancedDiagnostics = () => {
               <FlaskConical className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Enhanced Diagnostics</h1>
+              <h1 className="text-xl font-semibold truncate">Enhanced Diagnostics</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Lab & Radiology Order Management</p>
             </div>
           </div>
@@ -264,7 +264,7 @@ export const EnhancedDiagnostics = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create Diagnostic Order</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create Diagnostic Order</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -354,7 +354,7 @@ export const EnhancedDiagnostics = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Schedule Staff</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Schedule Staff</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -468,40 +468,40 @@ export const EnhancedDiagnostics = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{pendingOrders}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{pendingOrders}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{inProgressOrders}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{inProgressOrders}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently processing</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{completedToday}</div>
+              <div className="text-2xl font-bold font-mono text-success-500">{completedToday}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Results delivered</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
                 <Users className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{scheduledStaff}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{scheduledStaff}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Upcoming shifts</div>
             </CardContent>
           </Card>
@@ -565,14 +565,14 @@ export const EnhancedDiagnostics = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Order #</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Patient</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Priority</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Tests</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Ordered</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Order #</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Patient</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Priority</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Tests</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Ordered</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -626,7 +626,7 @@ export const EnhancedDiagnostics = () => {
           <TabsContent value="results" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary-500" /> Results Management
                 </CardTitle>
               </CardHeader>
@@ -669,7 +669,7 @@ export const EnhancedDiagnostics = () => {
                           <UserRound className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">
+                          <CardTitle className="text-sm font-semibold">
                             {schedule.staff?.first_name} {schedule.staff?.last_name}
                           </CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">{schedule.staff?.specialty}</div>
@@ -711,7 +711,7 @@ export const EnhancedDiagnostics = () => {
           <TabsContent value="integration" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Video className="h-4 w-4 text-primary-500" /> Telemedicine-Diagnostic Integration
                 </CardTitle>
               </CardHeader>

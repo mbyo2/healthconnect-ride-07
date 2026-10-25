@@ -96,7 +96,7 @@ export function AgendaTimeline({
           <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2 min-w-0">
-          <h2 className="font-extrabold text-sm text-primary-600 dark:text-primary-400 truncate">
+          <h2 className="font-semibold text-sm text-primary-600 dark:text-primary-400 truncate">
             {dateLabel}
           </h2>
           <span
@@ -179,11 +179,11 @@ export function AgendaTimeline({
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100 truncate">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                         {patientName(app)}
                       </p>
                       {isUpNext && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-primary-500 text-white">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-500 text-white">
                           Up next
                         </span>
                       )}

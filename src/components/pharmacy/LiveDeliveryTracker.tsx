@@ -17,7 +17,7 @@ const riderIcon = L.divIcon({
     background: #2563eb; border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;">🛵</div>`,
+    "><svg width="18" height="18" viewBox="0 0 24 24" fill="white" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>`,
   iconSize: [36, 36],
   iconAnchor: [18, 18],
 });
@@ -29,7 +29,7 @@ const pharmacyIcon = L.divIcon({
     background: #059669; border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;">💊</div>`,
+    "><svg width="18" height="18" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg></div>`,
   iconSize: [36, 36],
   iconAnchor: [18, 18],
 });

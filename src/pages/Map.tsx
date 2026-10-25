@@ -311,17 +311,17 @@ const MapPage = () => {
                   <p className="text-sm text-muted-foreground">{selectedProvider.specialty}</p>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {selectedProvider.telemedicine_available && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-primary/10 text-primary">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary">
                         <Video className="h-3 w-3" aria-hidden /> Telemedicine
                       </span>
                     )}
                     {selectedProvider.consultation_fee_min && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                         <Wallet className="h-3 w-3" aria-hidden /> From K{selectedProvider.consultation_fee_min}
                       </span>
                     )}
                     {selectedProvider.typical_wait_time && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300">
                         <Clock className="h-3 w-3" aria-hidden /> {selectedProvider.typical_wait_time}
                       </span>
                     )}

@@ -179,16 +179,16 @@ export const RoleBasedWorkflow = () => {
     return (
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Welcome to Doc' O Clock</CardTitle>
+          <CardTitle>Complete your profile setup</CardTitle>
           <CardDescription>
-            Please complete your profile setup to access your personalized workflow.
+            Your role is assigned when your profile is complete. Finish setup to open your workspace.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <InfoIcon className="h-4 w-4" />
             <AlertDescription>
-              Your user role is being determined. Please refresh the page or complete your profile setup.
+              If you already finished setup, refresh the page.
             </AlertDescription>
           </Alert>
           <button

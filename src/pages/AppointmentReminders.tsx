@@ -117,11 +117,11 @@ const AppointmentRemindersPage = () => {
         {/* Sticky Monday Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-[1500px] mx-auto flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Bell className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 Appointment Reminders & Calendar Sync
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
@@ -135,7 +135,7 @@ const AppointmentRemindersPage = () => {
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
           {/* Reminder Channel Preferences */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
               <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
               {prefsLoading && <span className="text-xs font-medium text-graphite-400">Loading…</span>}
             </h2>
@@ -146,7 +146,7 @@ const AppointmentRemindersPage = () => {
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-xs">Email Notifications</p>
+                  <p className="font-semibold text-xs">Email Notifications</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
                 </div>
               </div>
@@ -159,7 +159,7 @@ const AppointmentRemindersPage = () => {
                   <MessageSquare className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-xs flex items-center gap-2">
+                  <p className="font-semibold text-xs flex items-center gap-2">
                     SMS Text Reminders
                     <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-xs font-bold">Coming soon</span>
                   </p>
@@ -175,7 +175,7 @@ const AppointmentRemindersPage = () => {
                   <Smartphone className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-xs">Push Notifications</p>
+                  <p className="font-semibold text-xs">Push Notifications</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ const AppointmentRemindersPage = () => {
             <Button
               onClick={savePreferences}
               disabled={saving}
-              className="w-full py-3 rounded-xl font-extrabold text-xs"
+              className="w-full py-3 rounded-xl font-semibold text-xs"
             >
               {saving ? "Saving..." : "Save Reminder Preferences"}
             </Button>
@@ -193,7 +193,7 @@ const AppointmentRemindersPage = () => {
 
           {/* Upcoming Visits & Calendar Sync */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
               <Calendar className="h-4 w-4 text-success-500" /> Upcoming Visits & iCal Export
             </h2>
 
@@ -208,7 +208,7 @@ const AppointmentRemindersPage = () => {
                 <p className="text-xs font-medium text-destructive">We couldn&apos;t load your upcoming visits.</p>
                 <Button
                   onClick={() => refetchUpcoming()}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-extrabold"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold"
                 >
                   Try again
                 </Button>
@@ -237,7 +237,7 @@ const AppointmentRemindersPage = () => {
                         <Clock className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{apt.type || "Medical Consultation"}</p>
+                        <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{apt.type || "Medical Consultation"}</p>
                         <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                           {new Date(apt.date).toLocaleDateString()} at {apt.time}
                         </p>
@@ -246,7 +246,7 @@ const AppointmentRemindersPage = () => {
                     <Button
                       variant="outline"
                       onClick={() => downloadIcs(apt)}
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl text-primary-500 font-extrabold text-xs"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl text-primary-500 font-semibold text-xs"
                     >
                       <Calendar className="h-3.5 w-3.5" />
                       <span>Sync to Calendar (.ics)</span>

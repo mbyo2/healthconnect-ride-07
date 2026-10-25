@@ -152,7 +152,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Pill className="h-5 w-5 text-primary-500" />
-          <h2 className="text-lg font-extrabold">Drug Stock Management</h2>
+          <h2 className="text-lg font-semibold">Drug Stock Management</h2>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => { refresh(); refreshMovements(); }} className="p-2 rounded-xl border border-canvas-silk hover:bg-canvas-mist" title="Refresh">

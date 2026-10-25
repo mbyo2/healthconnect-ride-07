@@ -196,7 +196,7 @@ export const CheckoutModal = ({
 
           {pickupOnly ? (
             <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 p-3 text-xs">
-              <p className="font-extrabold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
+              <p className="font-semibold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
                 Pharmacy pickup required
               </p>
               <p className="text-muted-foreground mt-1">

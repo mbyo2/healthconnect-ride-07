@@ -196,8 +196,8 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 1: Account */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 text-white text-xs font-black">1</span>
-          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Account Information</h3>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 text-white text-xs font-bold">1</span>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Account Information</h3>
         </div>
 
         {[
@@ -206,7 +206,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "phone_number", label: "Phone Number", type: "tel", placeholder: "+260 97 123 4567", field: "phone_number" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{f.label} {f.field !== "phone_number" && <span className="text-error-500">*</span>}</label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} {f.field !== "phone_number" && <span className="text-error-500">*</span>}</label>
             <input
               id={f.id} type={f.type} placeholder={f.placeholder}
               value={String(formData[f.field])}
@@ -224,7 +224,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "confirmPassword", label: "Confirm Password", show: showConfirmPassword, toggle: () => setShowConfirmPassword(v => !v), field: "confirmPassword" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
             <div className="relative mt-1">
               <input
                 id={f.id} type={f.show ? "text" : "password"}
@@ -246,13 +246,13 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 2: Professional */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white text-xs font-black">2</span>
-          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Professional Information</h3>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white text-xs font-bold">2</span>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Professional Information</h3>
         </div>
 
         {/* Profession — the exact provider role the applicant is applying for */}
         <div>
-          <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Profession <span className="text-error-500">*</span></label>
+          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Profession <span className="text-error-500">*</span></label>
           <div className="mt-1">
             <Select value={formData.profession} onValueChange={handleProfessionChange} disabled={isSubmitting}>
               <SelectTrigger className={`border ${errors.profession ? "border-error-500" : "border-graphite-300 dark:border-slate-700"} text-xs font-bold`}>
@@ -269,7 +269,7 @@ export const HealthPersonnelApplicationForm = () => {
         </div>
 
         <div>
-          <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Country of Practice <span className="text-error-500">*</span></label>
+          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Country of Practice <span className="text-error-500">*</span></label>
           <div className="mt-1">
             <Select value={selectedCountry} onValueChange={(v) => { setSelectedCountry(v); setUploadedDocuments({}); }} disabled={isSubmitting}>
               <SelectTrigger className="border border-graphite-300 dark:border-slate-700 text-xs font-bold">
@@ -287,7 +287,7 @@ export const HealthPersonnelApplicationForm = () => {
         {/* Licence — required only for regulated professions */}
         {selectedProfession?.requiresLicense !== false && (
           <div>
-            <label htmlFor="license_number" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">License Number <span className="text-error-500">*</span></label>
+            <label htmlFor="license_number" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">License Number <span className="text-error-500">*</span></label>
             <input
               id="license_number" type="text" placeholder="e.g. MD123456"
               value={formData.license_number || ""}
@@ -306,7 +306,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "specialty", label: "Specialty", placeholder: "e.g. Cardiology, General Practice", field: "specialty" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
             <input
               id={f.id} type="text" placeholder={f.placeholder}
               value={String(formData[f.field])}
@@ -319,7 +319,7 @@ export const HealthPersonnelApplicationForm = () => {
         ))}
 
         <div>
-          <label htmlFor="years_of_experience" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Years of Experience <span className="text-error-500">*</span></label>
+          <label htmlFor="years_of_experience" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Years of Experience <span className="text-error-500">*</span></label>
           <input
             id="years_of_experience" type="number" placeholder="e.g. 5" min="0"
             value={formData.years_of_experience}
@@ -334,8 +334,8 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 3: Documents */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-success-500 text-white text-xs font-black">3</span>
-          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Regulatory Documents</h3>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-success-500 text-white text-xs font-bold">3</span>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Regulatory Documents</h3>
         </div>
         <p className="text-xs text-graphite-500 dark:text-slate-400">
           Upload required documents for <strong>{REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}</strong>. All required docs must be uploaded before submission.
@@ -346,7 +346,7 @@ export const HealthPersonnelApplicationForm = () => {
             <div key={requirement.id} className="p-3 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
-                  <p className="font-extrabold text-xs flex items-center gap-1">
+                  <p className="font-semibold text-xs flex items-center gap-1">
                     {requirement.name}
                     {requirement.required && <span className="text-error-500">*</span>}
                   </p>
@@ -388,7 +388,7 @@ export const HealthPersonnelApplicationForm = () => {
 
         {!documentValidation.valid && documentValidation.missing.length > 0 && (
           <div className="p-3 rounded-xl border border-error-500/30 bg-error-500/5">
-            <p className="text-xs font-extrabold text-error-500 mb-1">Missing Required Documents:</p>
+            <p className="text-xs font-semibold text-error-500 mb-1">Missing Required Documents:</p>
             <ul className="text-xs text-error-500 list-disc list-inside space-y-0.5">
               {documentValidation.missing.map((doc) => <li key={doc}>{doc}</li>)}
             </ul>
@@ -399,14 +399,14 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 4: Practice Details (optional but recommended) */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-500 text-white text-xs font-black">4</span>
-          <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-500 text-white text-xs font-bold">4</span>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
         </div>
 
         {/* Medical School & Graduation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Medical School</label>
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Medical School</label>
             <input
               type="text"
               placeholder="e.g. UNZA School of Medicine"
@@ -417,7 +417,7 @@ export const HealthPersonnelApplicationForm = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Graduation Year</label>
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Graduation Year</label>
             <input
               type="number"
               min="1960"
@@ -433,7 +433,7 @@ export const HealthPersonnelApplicationForm = () => {
 
         {/* Practice Location */}
         <div>
-          <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Primary Practice Location</label>
+          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Primary Practice Location</label>
           <input
             type="text"
             placeholder="e.g. Woodlands Clinic, Lusaka"
@@ -447,7 +447,7 @@ export const HealthPersonnelApplicationForm = () => {
         {/* Consultation Fees */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Min Consultation Fee (ZMW)</label>
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Min Consultation Fee (ZMW)</label>
             <input
               type="number"
               min="0"
@@ -459,7 +459,7 @@ export const HealthPersonnelApplicationForm = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Max Consultation Fee (ZMW)</label>
+            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Max Consultation Fee (ZMW)</label>
             <input
               type="number"
               min="0"
@@ -474,7 +474,7 @@ export const HealthPersonnelApplicationForm = () => {
 
         {/* Typical Wait Time */}
         <div>
-          <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Typical Wait Time</label>
+          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Typical Wait Time</label>
           <Select
             value={(formData as any).typical_wait_time || ""}
             onValueChange={v => setFormData(prev => ({ ...prev, typical_wait_time: v }))}
@@ -521,7 +521,7 @@ export const HealthPersonnelApplicationForm = () => {
       <button
         type="submit"
         disabled={isSubmitting || !isFormValid()}
-        className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-40 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
+        className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-40 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
       >
         {isSubmitting ? (
           <><Loader2 className="h-4 w-4 animate-spin" />{registrationStage || "Creating Account..."}</>

@@ -215,7 +215,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
 
   if (!institutionId) {
     return (
-      <div className="p-8 rounded-3xl border border-dashed text-center text-sm text-muted-foreground">
+      <div className="p-8 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
         Administration needs an institution context — open this from a facility dashboard.
       </div>
     );
@@ -224,15 +224,15 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
             <Building className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black tracking-tight">ERP Administration &amp; Operations Suite</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-400 text-slate-950">
+              <h2 className="text-xl font-bold tracking-tight">ERP Administration &amp; Operations Suite</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-400 text-slate-950">
                 Live Data
               </span>
             </div>
@@ -243,7 +243,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-500 text-white">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white">
             Collected: {formatPrice(totalCollected)}
           </span>
         </div>
@@ -263,7 +263,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
+              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
                   : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -281,14 +281,14 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Personnel Directory &amp; Shifts</h3>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Personnel Directory &amp; Shifts</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
                 {staff.length} staff member{staff.length === 1 ? "" : "s"} · manage roles on the Personnel page
               </p>
             </div>
             <button
               onClick={() => navigate("/institution/personnel")}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs"
             >
               <Users className="h-4 w-4" /> Manage Personnel
             </button>
@@ -297,7 +297,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Employee Name</th>
                   <th className="py-3 px-3">Designation &amp; Department</th>
                   <th className="py-3 px-3">Contact</th>
@@ -328,7 +328,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                       </td>
                       <td className="py-3 px-3 font-semibold">{emp.shift}</td>
                       <td className="py-3 px-3 text-center">
-                        <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
                           {emp.status}
                         </span>
                       </td>
@@ -336,7 +336,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                         <button
                           onClick={() => printPayslip(emp)}
                           aria-label={`Print advisory pay slip for ${emp.name}`}
-                          className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs transition-colors"
+                          className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-semibold text-xs transition-colors"
                         >
                           Payslip
                         </button>
@@ -355,33 +355,33 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Total Invoiced</span>
-              <div className="text-2xl font-black text-emerald-600 mt-1 tabular-nums">{formatPrice(totalInvoiced)}</div>
+              <span className="text-xs font-semibold uppercase text-slate-400">Total Invoiced</span>
+              <div className="text-2xl font-bold text-emerald-600 mt-1 tabular-nums">{formatPrice(totalInvoiced)}</div>
               <span className="text-xs font-bold text-slate-500">All billing invoices</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Outstanding</span>
-              <div className="text-2xl font-black text-rose-600 mt-1 tabular-nums">{formatPrice(totalOutstanding)}</div>
+              <span className="text-xs font-semibold uppercase text-slate-400">Outstanding</span>
+              <div className="text-2xl font-bold text-rose-600 mt-1 tabular-nums">{formatPrice(totalOutstanding)}</div>
               <span className="text-xs font-bold text-slate-500">Awaiting collection</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-xs font-extrabold uppercase text-slate-400">Collected</span>
-              <div className="text-2xl font-black text-primary-500 mt-1 tabular-nums">{formatPrice(totalCollected)}</div>
+              <span className="text-xs font-semibold uppercase text-slate-400">Collected</span>
+              <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">{formatPrice(totalCollected)}</div>
               <span className="text-xs font-bold text-slate-500">Invoiced minus outstanding</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Invoice Journal</h3>
+            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Invoice Journal</h3>
             <p className="text-xs text-muted-foreground">New invoices are raised in Hospital Management → Billing.</p>
           </div>
 
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-3 text-right">Total</th>
                   <th className="py-3 px-3 text-right">Balance</th>
@@ -421,19 +421,19 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Medical Asset Register</h3>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Medical Asset Register</h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">{assets.length} asset{assets.length === 1 ? "" : "s"} tracked</p>
             </div>
 
             <Dialog open={showAssetModal} onOpenChange={setShowAssetModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Log Asset
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
+              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
                 <DialogHeader>
-                  <DialogTitle className="font-black text-lg">Log Medical Asset</DialogTitle>
+                  <DialogTitle className="font-bold text-lg">Log Medical Asset</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div>
@@ -480,7 +480,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowAssetModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddAsset} disabled={savingAsset} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">
+                  <button onClick={handleAddAsset} disabled={savingAsset} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-semibold disabled:opacity-50">
                     {savingAsset ? "Logging…" : "Save Asset"}
                   </button>
                 </DialogFooter>
@@ -491,7 +491,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Asset</th>
                   <th className="py-3 px-3">Department</th>
                   <th className="py-3 px-3">Serial #</th>

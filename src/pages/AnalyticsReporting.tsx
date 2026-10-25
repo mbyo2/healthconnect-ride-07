@@ -457,7 +457,7 @@ export const AnalyticsReporting = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access analytics and reporting.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -550,7 +550,7 @@ export const AnalyticsReporting = () => {
               <BarChart3 className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Analytics & Reporting</h1>
+              <h1 className="text-xl font-semibold truncate">Analytics & Reporting</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Business Intelligence & Custom Reports</p>
             </div>
           </div>
@@ -563,7 +563,7 @@ export const AnalyticsReporting = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Generate Analytics Report</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Generate Analytics Report</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -678,40 +678,40 @@ export const AnalyticsReporting = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Appointments</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Appointments</span>
                 <Calendar className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black text-primary-500">{live.appointments.length}</div>
+              <div className="text-2xl font-bold text-primary-500">{live.appointments.length}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Booked at this institution</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Revenue Collected</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Revenue Collected</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black text-success-500">{currency} {totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-success-500">{currency} {totalRevenue.toLocaleString()}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{collectedPayments.length} collected payments</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Registered Patients</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Registered Patients</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black text-primary-500">{live.patientCount}</div>
+              <div className="text-2xl font-bold text-primary-500">{live.patientCount}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In this institution's registry</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reports Generated</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Reports Generated</span>
                 <FileText className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black text-warning-500">{reports.length}</div>
+              <div className="text-2xl font-bold text-warning-500">{reports.length}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{scheduledReports} scheduled</div>
             </CardContent>
           </Card>
@@ -739,7 +739,7 @@ export const AnalyticsReporting = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <BarChart3 className="h-8 w-8 mx-auto text-primary-500" />
-                  <p className="text-sm font-extrabold">No analytics yet</p>
+                  <p className="text-sm font-semibold">No analytics yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Appointments, payments and clinical activity for this institution will appear here as they happen.
                   </p>
@@ -750,7 +750,7 @@ export const AnalyticsReporting = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary-500" /> Appointments Over Time
                       </CardTitle>
                     </CardHeader>
@@ -770,7 +770,7 @@ export const AnalyticsReporting = () => {
                   </Card>
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Users className="h-4 w-4 text-success-500" /> Appointments by Status
                       </CardTitle>
                     </CardHeader>
@@ -790,7 +790,7 @@ export const AnalyticsReporting = () => {
                   </Card>
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Activity className="h-4 w-4 text-primary-500" /> Activity by Category
                       </CardTitle>
                     </CardHeader>
@@ -816,7 +816,7 @@ export const AnalyticsReporting = () => {
 
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
-                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <PieChart className="h-4 w-4 text-primary-500" /> Category Breakdown
                     </CardTitle>
                   </CardHeader>
@@ -875,7 +875,7 @@ export const AnalyticsReporting = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <FileText className="h-8 w-8 mx-auto text-primary-500" />
-                  <p className="text-sm font-extrabold">No reports found</p>
+                  <p className="text-sm font-semibold">No reports found</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Generate your first analytics report to see it listed here.
                   </p>
@@ -898,7 +898,7 @@ export const AnalyticsReporting = () => {
                           {getReportTypeIcon(report.report_type)}
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{report.report_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{report.report_name}</CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">
                             {new Date(report.generated_at).toLocaleString()}
                           </div>
@@ -966,7 +966,7 @@ export const AnalyticsReporting = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <DollarSign className="h-8 w-8 mx-auto text-success-500" />
-                  <p className="text-sm font-extrabold">No payments yet</p>
+                  <p className="text-sm font-semibold">No payments yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Financial analytics appear here once payments are recorded for this institution's providers.
                   </p>
@@ -977,7 +977,7 @@ export const AnalyticsReporting = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <DollarSign className="h-4 w-4 text-primary-500" /> Collected Revenue by Payment Method
                       </CardTitle>
                     </CardHeader>
@@ -997,7 +997,7 @@ export const AnalyticsReporting = () => {
                   </Card>
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary-500" /> Payments by Status
                       </CardTitle>
                     </CardHeader>
@@ -1019,7 +1019,7 @@ export const AnalyticsReporting = () => {
 
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
-                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <LineChart className="h-4 w-4 text-primary-500" /> Revenue Trend (last 12 weeks)
                     </CardTitle>
                   </CardHeader>
@@ -1047,7 +1047,7 @@ export const AnalyticsReporting = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
                   <Activity className="h-8 w-8 mx-auto text-primary-500" />
-                  <p className="text-sm font-extrabold">No operational data yet</p>
+                  <p className="text-sm font-semibold">No operational data yet</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Operational analytics appear here once appointments, lab tests or prescriptions are recorded for this institution.
                   </p>
@@ -1058,7 +1058,7 @@ export const AnalyticsReporting = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Activity className="h-4 w-4 text-primary-500" /> Appointment Cadence
                       </CardTitle>
                     </CardHeader>
@@ -1078,7 +1078,7 @@ export const AnalyticsReporting = () => {
                   </Card>
                   <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
-                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary-500" /> Appointments by Status
                       </CardTitle>
                     </CardHeader>
@@ -1100,22 +1100,22 @@ export const AnalyticsReporting = () => {
 
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
-                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Clock className="h-4 w-4 text-primary-500" /> Clinical Activity
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-black text-primary-500">{live.labTests.length}</div>
+                        <div className="text-2xl font-bold text-primary-500">{live.labTests.length}</div>
                         <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Lab tests ordered</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-black text-success-500">{live.prescriptions.length}</div>
+                        <div className="text-2xl font-bold text-success-500">{live.prescriptions.length}</div>
                         <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Prescriptions written</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-black text-warning-500">{live.staffCount}</div>
+                        <div className="text-2xl font-bold text-warning-500">{live.staffCount}</div>
                         <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Providers & staff in scope</div>
                       </div>
                     </div>
@@ -1131,7 +1131,7 @@ export const AnalyticsReporting = () => {
       <Dialog open={!!viewedReport} onOpenChange={(open) => { if (!open) setViewedReport(null); }}>
         <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
-            <DialogTitle className="text-lg font-extrabold">{viewedReport?.report_name}</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">{viewedReport?.report_name}</DialogTitle>
           </DialogHeader>
           {viewedReport && (
             <div className="space-y-3 py-2">

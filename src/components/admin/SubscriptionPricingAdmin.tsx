@@ -118,7 +118,7 @@ export function SubscriptionPricingAdmin() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 className="font-extrabold text-sm flex items-center gap-2">
+        <h2 className="font-semibold text-sm flex items-center gap-2">
           <Tag className="h-4 w-4 text-emerald-500" /> Subscription Pricing
           <Badge variant="secondary" className="text-xs">Superadmin only</Badge>
         </h2>
@@ -157,7 +157,7 @@ export function SubscriptionPricingAdmin() {
 
                   <div className="grid grid-cols-2 gap-3 flex-1">
                     <div>
-                      <label className="text-xs font-extrabold uppercase text-graphite-500">
+                      <label className="text-xs font-semibold uppercase text-graphite-500">
                         Monthly (K)
                       </label>
                       <Input
@@ -170,7 +170,7 @@ export function SubscriptionPricingAdmin() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-extrabold uppercase text-graphite-500">
+                      <label className="text-xs font-semibold uppercase text-graphite-500">
                         Annual (K)
                       </label>
                       <div className="flex gap-1.5 mt-1">

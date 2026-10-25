@@ -256,7 +256,7 @@ export const MedicalShiftHR = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access shift HR.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -282,7 +282,7 @@ export const MedicalShiftHR = () => {
               <Clock className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Medical Shift HR & Attendance</h1>
+              <h1 className="text-xl font-semibold truncate">Medical Shift HR & Attendance</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Shift Management & Biometric Attendance Tracking</p>
             </div>
           </div>
@@ -295,7 +295,7 @@ export const MedicalShiftHR = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create Medical Shift</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create Medical Shift</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -411,40 +411,40 @@ export const MedicalShiftHR = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{activeShifts}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{activeShifts}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured shifts</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
                 <Users className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-purple-500">{todayAssignments}</div>
+              <div className="text-2xl font-bold font-mono text-purple-500">{todayAssignments}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Staff scheduled</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{presentToday}</div>
+              <div className="text-2xl font-bold font-mono text-success-500">{presentToday}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Clock-in recorded</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
                 <Fingerprint className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{onlineDevices}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{onlineDevices}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Biometric devices</div>
             </CardContent>
           </Card>
@@ -469,7 +469,7 @@ export const MedicalShiftHR = () => {
           {/* Shifts Tab */}
           <TabsContent value="shifts" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Medical Shifts</h3>
+              <h3 className="text-sm font-semibold">Medical Shifts</h3>
               <Button variant="outline" size="sm" className="text-xs">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
@@ -485,7 +485,7 @@ export const MedicalShiftHR = () => {
                           <Clock className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{shift.shift_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{shift.shift_name}</CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">{shift.shift_type}</div>
                         </div>
                       </div>
@@ -555,7 +555,7 @@ export const MedicalShiftHR = () => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle className="text-lg font-extrabold">Assign Staff to Shift</DialogTitle>
+                      <DialogTitle className="text-lg font-semibold">Assign Staff to Shift</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
@@ -624,13 +624,13 @@ export const MedicalShiftHR = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Shift</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Hours</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Assigned</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Staff</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Shift</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Hours</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Assigned</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -707,14 +707,14 @@ export const MedicalShiftHR = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Clock In</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Clock Out</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Hours</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Overtime</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Biometric</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Staff</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Clock In</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Clock Out</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Hours</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Overtime</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Biometric</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -776,7 +776,7 @@ export const MedicalShiftHR = () => {
           {/* Biometric Devices Tab */}
           <TabsContent value="devices" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">Biometric Devices</h3>
+              <h3 className="text-sm font-semibold">Biometric Devices</h3>
               <Button variant="outline" size="sm" className="text-xs">
                 <Plus className="h-4 w-4 mr-1" /> Add Device
               </Button>
@@ -792,7 +792,7 @@ export const MedicalShiftHR = () => {
                           <Fingerprint className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{device.device_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{device.device_name}</CardTitle>
                           <div className="text-xs text-graphite-500 dark:text-slate-400">{device.device_type}</div>
                         </div>
                       </div>

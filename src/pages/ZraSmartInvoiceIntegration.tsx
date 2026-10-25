@@ -341,7 +341,7 @@ export const ZraSmartInvoiceIntegration = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-            <h2 className="text-xl font-extrabold">Institution Required</h2>
+            <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access ZRA Smart Invoice integration.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
@@ -367,7 +367,7 @@ export const ZraSmartInvoiceIntegration = () => {
               <FileText className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">ZRA Smart Invoice Integration</h1>
+              <h1 className="text-xl font-semibold truncate">ZRA Smart Invoice Integration</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">VSDC Fiscalization & Compliance</p>
             </div>
           </div>
@@ -380,7 +380,7 @@ export const ZraSmartInvoiceIntegration = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Configure ZRA Smart Invoice</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Configure ZRA Smart Invoice</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="p-3 rounded-lg bg-canvas-mist dark:bg-slate-800 text-xs">
@@ -490,7 +490,7 @@ export const ZraSmartInvoiceIntegration = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Connection Status</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Connection Status</span>
                 <ShieldCheck className="h-4 w-4 text-primary-500" />
               </div>
               <Badge className={getStatusColor(settings?.status || "not_connected") + " text-xs"}>
@@ -504,30 +504,30 @@ export const ZraSmartInvoiceIntegration = () => {
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accepted Invoices</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Accepted Invoices</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-success-500">{activeSubmissions}</div>
+              <div className="text-2xl font-bold font-mono text-success-500">{activeSubmissions}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Successfully fiscalized</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending/Retrying</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending/Retrying</span>
                 <Clock className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-warning-500">{pendingSubmissions}</div>
+              <div className="text-2xl font-bold font-mono text-warning-500">{pendingSubmissions}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting submission</div>
             </CardContent>
           </Card>
           <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Mappings</span>
+                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Item Mappings</span>
                 <Database className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-primary-500">{totalMappings}</div>
+              <div className="text-2xl font-bold font-mono text-primary-500">{totalMappings}</div>
               <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Catalog synced</div>
             </CardContent>
           </Card>
@@ -555,7 +555,7 @@ export const ZraSmartInvoiceIntegration = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
-                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Zap className="h-4 w-4 text-primary-500" /> VSDC Actions
                     </CardTitle>
                   </CardHeader>
@@ -582,7 +582,7 @@ export const ZraSmartInvoiceIntegration = () => {
                 </Card>
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
-                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <ShieldCheck className="h-4 w-4 text-primary-500" /> Configuration Status
                     </CardTitle>
                   </CardHeader>
@@ -614,7 +614,7 @@ export const ZraSmartInvoiceIntegration = () => {
               <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
                   <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
-                  <h3 className="text-sm font-extrabold mb-2">Smart Invoice Not Configured</h3>
+                  <h3 className="text-sm font-semibold mb-2">Smart Invoice Not Configured</h3>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">
                     Configure ZRA Smart Invoice to enable automatic fiscalization of invoices with the Zambia Revenue Authority.
                   </p>
@@ -653,13 +653,13 @@ export const ZraSmartInvoiceIntegration = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Invoice #</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Amount</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Attempts</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">ZRA Invoice #</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Submitted</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Invoice #</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Amount</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Attempts</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">ZRA Invoice #</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Submitted</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -722,7 +722,7 @@ export const ZraSmartInvoiceIntegration = () => {
           {/* Item Mappings Tab */}
           <TabsContent value="mappings" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">ZRA Item Mappings</h3>
+              <h3 className="text-sm font-semibold">ZRA Item Mappings</h3>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                   <RefreshCw className="h-4 w-4 mr-1" /> Sync from ZRA
@@ -751,7 +751,7 @@ export const ZraSmartInvoiceIntegration = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{mapping.zra_item_code}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{mapping.zra_item_code}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">Item ID: {mapping.catalog_item_id}</div>
                       </div>
                       {mapping.is_active ? (
@@ -791,7 +791,7 @@ export const ZraSmartInvoiceIntegration = () => {
           {/* VSDC Logs Tab */}
           <TabsContent value="logs" className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-extrabold">VSDC Operation Logs</h3>
+              <h3 className="text-sm font-semibold">VSDC Operation Logs</h3>
               <Button variant="outline" size="sm" className="text-xs min-h-[44px]">
                 <Download className="h-4 w-4 mr-1" /> Export
               </Button>
@@ -801,11 +801,11 @@ export const ZraSmartInvoiceIntegration = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Operation</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Duration</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Started</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Operation</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Duration</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Started</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -67,7 +67,7 @@ export const RadiologistWorkflow = () => {
                   <h3 className="text-sm font-semibold text-foreground truncate flex items-center gap-1.5">
                     {step.title}
                     {step.comingSoon && (
-                      <span className="text-xs font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">Soon</span>
+                      <span className="text-xs font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">Soon</span>
                     )}
                   </h3>
                   <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>

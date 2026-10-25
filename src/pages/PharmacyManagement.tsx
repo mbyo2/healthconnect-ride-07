@@ -138,7 +138,7 @@ export const PharmacyManagement = () => {
       <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 flex items-center justify-center">
         <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk text-center space-y-3">
           <Package className="h-12 w-12 mx-auto text-primary-500" />
-          <h3 className="text-lg font-extrabold">Pharmacy POS Board</h3>
+          <h3 className="text-lg font-semibold">Pharmacy POS Board</h3>
           <p className="text-xs text-graphite-500 dark:text-slate-400">
             Link your pharmacy account to activate the Doc' O Clock inventory & POS system.
           </p>
@@ -155,11 +155,11 @@ export const PharmacyManagement = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
         <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <ShoppingCart className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 {pharmacy.name} — Pharmacy Management & POS
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
@@ -185,13 +185,13 @@ export const PharmacyManagement = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Stock Retail Value</div>
-          <div className="text-2xl font-black font-mono text-primary-500 mt-1">{formatPrice(totalRetailValue)}</div>
+          <div className="text-2xl font-bold font-mono text-primary-500 mt-1">{formatPrice(totalRetailValue)}</div>
           <div className="text-xs text-slate-400 mt-0.5">{inventory.length} total items</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Today's Sales Revenue</div>
-          <div className="text-2xl font-black font-mono text-success-500 mt-1">
+          <div className="text-2xl font-bold font-mono text-success-500 mt-1">
             {formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0))}
           </div>
           <div className="text-xs text-emerald-500 font-bold mt-0.5">{todaySales.length} transactions</div>
@@ -199,13 +199,13 @@ export const PharmacyManagement = () => {
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Low Stock Warnings</div>
-          <div className="text-2xl font-black font-mono text-warning-500 mt-1">{lowStockItems.length}</div>
+          <div className="text-2xl font-bold font-mono text-warning-500 mt-1">{lowStockItems.length}</div>
           <div className="text-xs text-amber-500 font-bold mt-0.5">Reorder required</div>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Active Cart Items</div>
-          <div className="text-2xl font-black font-mono text-purple-600 mt-1">{cart.length}</div>
+          <div className="text-2xl font-bold font-mono text-purple-600 mt-1">{cart.length}</div>
           <div className="text-xs text-slate-400 mt-0.5">Subtotal: {formatPrice(cartSubtotal)}</div>
         </div>
       </div>
@@ -225,7 +225,7 @@ export const PharmacyManagement = () => {
         {/* Left: Inventory Product Grid */}
         <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs p-4 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-canvas-silk dark:border-slate-800">
-            <h2 className="font-extrabold text-base flex items-center gap-2">
+            <h2 className="font-semibold text-base flex items-center gap-2">
               <Package className="h-5 w-5 text-primary-500" />
               Pharmacy Inventory Catalog
             </h2>
@@ -252,13 +252,13 @@ export const PharmacyManagement = () => {
                   className="p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors cursor-pointer flex justify-between items-center group"
                 >
                   <div>
-                    <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">
+                    <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">
                       {item.product_name}
                     </div>
                     <div className="text-xs text-graphite-500 dark:text-slate-400">
                       Code: {item.product_code || "—"} • Stock: <strong className="text-slate-900 dark:text-slate-100">{item.quantity}</strong>
                     </div>
-                    <div className="font-mono font-extrabold text-sm text-primary-500 mt-1">
+                    <div className="font-mono font-semibold text-sm text-primary-500 mt-1">
                       {formatPrice(item.unit_price)}
                     </div>
                   </div>
@@ -279,7 +279,7 @@ export const PharmacyManagement = () => {
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-canvas-silk dark:border-slate-800">
-              <h2 className="font-extrabold text-base flex items-center gap-2">
+              <h2 className="font-semibold text-base flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5 text-primary-500" />
                 Active Cart ({cart.length})
               </h2>
@@ -317,7 +317,7 @@ export const PharmacyManagement = () => {
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
               <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Tax (16%)</span><span>{formatPrice(cartTax)}</span></div>
-              <div className="flex justify-between text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1 border-t">
+              <div className="flex justify-between text-base font-semibold text-slate-900 dark:text-slate-100 pt-1 border-t">
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
               <p className="text-graphite-400 dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
@@ -326,7 +326,7 @@ export const PharmacyManagement = () => {
             <button
               onClick={completeSale}
               disabled={cart.length === 0 || isProcessing}
-              className="w-full py-3 rounded-md bg-success-500 hover:bg-success-500 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-40 flex items-center justify-center gap-1.5"
+              className="w-full py-3 rounded-md bg-success-500 hover:bg-success-500 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-40 flex items-center justify-center gap-1.5"
             >
               <CheckCircle className="h-4 w-4" />
               <span>Complete Sale ({formatPrice(cartTotal)})</span>

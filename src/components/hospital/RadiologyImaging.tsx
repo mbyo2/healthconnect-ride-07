@@ -78,7 +78,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
-          <h3 className="text-base font-extrabold flex items-center gap-2">
+          <h3 className="text-base font-semibold flex items-center gap-2">
             <Image className="h-5 w-5 text-primary-500" />
             Radiology & Medical Imaging WorkOS
           </h3>
@@ -88,7 +88,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
           <button onClick={refresh} className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setShowNewOrder(true)} className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1">
+          <button onClick={() => setShowNewOrder(true)} className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> New Imaging Order
           </button>
         </div>
@@ -98,17 +98,17 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       <div className="grid grid-cols-3 gap-3">
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Image className="h-5 w-5 mx-auto text-primary-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-primary-500">{orders.length}</div>
+          <div className="text-2xl font-bold font-mono text-primary-500">{orders.length}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Studies</div>
         </div>
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <Clock className="h-5 w-5 mx-auto text-warning-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-warning-500">{pending}</div>
+          <div className="text-2xl font-bold font-mono text-warning-500">{pending}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">In Queue</div>
         </div>
         <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
-          <div className="text-2xl font-black font-mono text-success-500">{reported}</div>
+          <div className="text-2xl font-bold font-mono text-success-500">{reported}</div>
           <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Reports Signed</div>
         </div>
       </div>
@@ -135,7 +135,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
         <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Order # / Modality</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3">Exam / Body Part</th>
@@ -189,17 +189,17 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       {/* New Order Dialog */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <DialogHeader><DialogTitle className="font-extrabold text-base">New Radiology Imaging Order</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="font-semibold text-base">New Radiology Imaging Order</DialogTitle></DialogHeader>
           <form onSubmit={handleNewOrder} className="space-y-3 py-2 text-xs">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Modality *</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Modality *</label>
                 <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={form.exam_type} onChange={(e) => setForm({ ...form, exam_type: e.target.value })}>
                   {["X-Ray", "CT Scan", "MRI", "Ultrasound", "Mammography", "DEXA Scan", "PET Scan", "Fluoroscopy", "Echocardiogram", "ECG"].map((m) => <option key={m}>{m}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Priority</label>
+                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Priority</label>
                 <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })}>
                   <option value="routine">Routine</option>
                   <option value="urgent">Urgent</option>
@@ -208,11 +208,11 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
               </div>
             </div>
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Part / Region</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Body Part / Region</label>
               <input value={form.body_part} onChange={(e) => setForm({ ...form, body_part: e.target.value })} placeholder="e.g. Chest, Abdomen, Right Knee" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700" />
             </div>
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Clinical Notes</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Clinical Notes</label>
               <input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Clinical indication or history" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700" />
             </div>
             <DialogFooter>

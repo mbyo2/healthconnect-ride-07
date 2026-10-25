@@ -486,7 +486,7 @@ export function PrescriptionFulfillment() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk pb-3">
         <div className="flex items-center gap-2">
           <Pill className="h-5 w-5 text-primary-500" />
-          <h2 className="text-base font-extrabold">Pharmacy Prescription &amp; Dispensing Queue</h2>
+          <h2 className="text-base font-semibold">Pharmacy Prescription &amp; Dispensing Queue</h2>
           {!isOnline && (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
               <AlertTriangle className="h-3.5 w-3.5" /> Offline
@@ -496,14 +496,14 @@ export function PrescriptionFulfillment() {
 
         <Dialog open={showNewRxDialog} onOpenChange={setShowNewRxDialog}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 self-start">
+            <button className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 self-start">
               <Plus className="h-4 w-4" />
               <span>Prescribe &amp; Dispense (Multi-Drug)</span>
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-3xl p-6">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-2xl p-6">
             <DialogHeader>
-              <DialogTitle className="font-black text-xl flex items-center gap-2">
+              <DialogTitle className="font-bold text-xl flex items-center gap-2">
                 <Pill className="h-6 w-6 text-primary-500" />
                 Pharmacy Direct Dispensing (Multi-Medication)
               </DialogTitle>
@@ -560,7 +560,7 @@ export function PrescriptionFulfillment() {
                   <button
                     type="button"
                     onClick={handleAddMedication}
-                    className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs flex items-center gap-1"
+                    className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-semibold text-xs flex items-center gap-1"
                   >
                     <Plus className="h-3 w-3" /> Add Another Medication
                   </button>
@@ -569,7 +569,7 @@ export function PrescriptionFulfillment() {
                 {medicationItems.map((item, idx) => (
                   <div key={item.id} className="p-3.5 rounded-2xl border border-canvas-silk bg-canvas-bone dark:bg-slate-950 space-y-2 relative">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
+                      <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                         Item #{idx + 1}
                       </span>
                       {medicationItems.length > 1 && (
@@ -664,7 +664,7 @@ export function PrescriptionFulfillment() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleCreateMultiRx}
-                className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {isSubmitting ? "Dispensing..." : `Dispense (${medicationItems.length} Meds)`}
@@ -677,7 +677,7 @@ export function PrescriptionFulfillment() {
       <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Medication Name</th>
               <th className="py-2.5 px-3">Patient</th>
               <th className="py-2.5 px-3 text-center">Fulfillment Status</th>
@@ -689,7 +689,7 @@ export function PrescriptionFulfillment() {
           <tbody className="divide-y divide-canvas-silk">
             {prescriptions.map((p) => (
               <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-100">
+                <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">
                   <div className="flex items-center gap-1.5">
                     <Pill className="h-3.5 w-3.5 text-primary-500" />
                     <span>{p.medication_name}</span>

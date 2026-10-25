@@ -227,7 +227,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       <div key={indent.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
-            <p className="text-[15px] font-extrabold">{indent.indent_number} <span className="font-medium text-graphite-500 dark:text-slate-400">• {indent.department}</span></p>
+            <p className="text-[15px] font-semibold">{indent.indent_number} <span className="font-medium text-graphite-500 dark:text-slate-400">• {indent.department}</span></p>
             <p className="text-xs text-graphite-500 dark:text-slate-400">Raised {fmtDate(indent.created_at)}{indent.notes ? ` • ${indent.notes}` : ""}</p>
           </div>
           <div className="flex gap-1.5 items-center flex-wrap">{getPriorityPill(indent.priority)}{getStatusPill(indent.status)}</div>
@@ -270,7 +270,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
-          <h3 className="text-base font-extrabold flex items-center gap-2">
+          <h3 className="text-base font-semibold flex items-center gap-2">
             <ClipboardList className="h-5 w-5 text-primary-500" />
             Indent Management
           </h3>
@@ -280,7 +280,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setActiveTab("raise")} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1">
+          <button onClick={() => setActiveTab("raise")} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> Raise indent
           </button>
         </div>
@@ -291,7 +291,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
         {glance.map((g) => (
           <div key={g.label} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
-            <p className="text-[28px] leading-8 font-extrabold tabular-nums">{g.value}</p>
+            <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">{g.label}</p>
           </div>
         ))}
@@ -307,7 +307,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-extrabold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
           >
             {tab.label}
           </button>
@@ -360,7 +360,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
             <label className="text-xs font-bold">Notes (optional)</label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Why is this needed?" className="mt-1 w-full px-3 py-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
           </div>
-          <button type="submit" disabled={isSubmitting} className="px-5 py-3 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-extrabold disabled:opacity-50 flex items-center gap-2">
+          <button type="submit" disabled={isSubmitting} className="px-5 py-3 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold disabled:opacity-50 flex items-center gap-2">
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} Submit indent request
           </button>
         </form>
@@ -391,7 +391,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <DialogFooter>
             <button onClick={() => setShowApprove(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
-            <button onClick={handleApprove} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+            <button onClick={handleApprove} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Approve indent
             </button>
           </DialogFooter>
@@ -408,7 +408,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <DialogFooter>
             <button onClick={() => setShowReject(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep</button>
-            <button onClick={handleReject} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+            <button onClick={handleReject} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} <XCircle className="h-3.5 w-3.5" /> Reject indent
             </button>
           </DialogFooter>
@@ -436,7 +436,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <DialogFooter>
             <button onClick={() => setShowFulfill(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
-            <button onClick={handleFulfill} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+            <button onClick={handleFulfill} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} <Truck className="h-3.5 w-3.5" /> Record issue
             </button>
           </DialogFooter>
@@ -450,7 +450,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <p className="text-sm text-graphite-500 dark:text-slate-400"><strong className="text-slate-900 dark:text-slate-100">{selected?.indent_number}</strong> will be withdrawn. This cannot be undone.</p>
           <DialogFooter>
             <button onClick={() => setShowCancelConfirm(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep</button>
-            <button onClick={handleCancel} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-extrabold">Yes, cancel</button>
+            <button onClick={handleCancel} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -318,15 +318,15 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
 
   const inputCls =
     "w-full min-h-[44px] p-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 text-sm font-semibold bg-white dark:bg-slate-800 dark:text-slate-100";
-  const labelCls = "block text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5";
+  const labelCls = "block text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5";
   const btnPrimary =
-    "min-h-[44px] px-4 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50";
+    "min-h-[44px] px-4 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50";
 
   if (!institutionId) {
     return (
       <div className="p-10 text-center rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900">
         <Wallet className="h-10 w-10 mx-auto text-graphite-400 mb-3" />
-        <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">No institution selected</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">No institution selected</p>
         <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1">
           The financial ledger belongs to an institution. Join or select one to continue.
         </p>
@@ -342,7 +342,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     return (
       <div className="p-10 text-center rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900">
         <TriangleAlert className="h-10 w-10 mx-auto text-warning-500 mb-3" />
-        <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">Ledger unavailable</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Ledger unavailable</p>
         <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1">{loadError}</p>
         <button onClick={load} className={`${btnPrimary} mt-4`}>Try again</button>
       </div>
@@ -354,7 +354,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-canvas-silk dark:border-slate-800 pb-4">
         <div>
-          <h2 className="text-lg font-extrabold flex items-center gap-2">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
             <BookOpenCheck className="h-5 w-5 text-primary-500" />
             Healthcare Financial Ledger
           </h2>
@@ -392,7 +392,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       {accounts.length === 0 ? (
         <div className="p-10 text-center rounded-2xl border border-dashed border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900">
           <Landmark className="h-10 w-10 mx-auto text-graphite-400 mb-3" />
-          <p className="text-sm font-extrabold">No chart of accounts yet</p>
+          <p className="text-sm font-semibold">No chart of accounts yet</p>
           <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
             This institution has no ledger accounts. Pick a country template to load a standard healthcare chart of accounts — every account starts at zero, and you can add, rename, or remove accounts afterwards.
           </p>
@@ -421,7 +421,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           {!hasTransactions ? (
             <div className="p-8 text-center rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900">
               <ReceiptText className="h-10 w-10 mx-auto text-graphite-400 mb-3" />
-              <p className="text-sm font-extrabold">No transactions yet</p>
+              <p className="text-sm font-semibold">No transactions yet</p>
               <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
                 The chart of accounts is set up, but no journal entries have been posted. Figures will appear here once you post your first entry — nothing is shown until then.
               </p>
@@ -432,29 +432,29 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Gross Revenue</div>
-                <div className="text-2xl font-black text-primary-500 mt-1 tabular-nums">
+                <div className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Gross Revenue</div>
+                <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.revenue)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Operating Expenses</div>
-                <div className="text-2xl font-black text-error-500 mt-1 tabular-nums">
+                <div className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Operating Expenses</div>
+                <div className="text-2xl font-bold text-error-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.expenses)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Income</div>
-                <div className="text-2xl font-black text-success-500 mt-1 tabular-nums">
+                <div className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Net Income</div>
+                <div className="text-2xl font-bold text-success-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.netIncome)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">Revenue − expenses</div>
               </div>
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Est. VAT ({country.vatRate}%)</div>
-                <div className="text-2xl font-black text-warning-500 mt-1 tabular-nums">
+                <div className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Est. VAT ({country.vatRate}%)</div>
+                <div className="text-2xl font-bold text-warning-500 mt-1 tabular-nums">
                   {country.currency} {fmt(estimatedVat)}
                 </div>
                 <div className="text-xs text-amber-500 font-bold mt-0.5">Estimate, not a filing figure</div>
@@ -476,7 +476,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Globe className="h-5 w-5 text-primary-500" />
-              <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Tax Jurisdiction:</span>
+              <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Tax Jurisdiction:</span>
               <select
                 value={country.countryCode}
                 onChange={(e) => handleCountryChange(e.target.value)}
@@ -497,17 +497,17 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           {/* Chart of accounts */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-extrabold flex items-center gap-2">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Scale className="h-4 w-4 text-primary-500" /> Chart of Accounts
               </h3>
-              <button onClick={() => setShowAccountModal(true)} className="min-h-[44px] px-3 rounded-xl text-xs font-extrabold text-primary-600 dark:text-primary-400 flex items-center gap-1">
+              <button onClick={() => setShowAccountModal(true)} className="min-h-[44px] px-3 rounded-xl text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1">
                 <Plus className="h-4 w-4" /> Add Account
               </button>
             </div>
             <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/50 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/50 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Code</th>
                     <th className="py-2.5 px-3">Account Title</th>
                     <th className="py-2.5 px-3">Category</th>
@@ -532,7 +532,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
 
           {/* Journal entries */}
           <div>
-            <h3 className="text-sm font-extrabold flex items-center gap-2 mb-2">
+            <h3 className="text-sm font-semibold flex items-center gap-2 mb-2">
               <ReceiptText className="h-4 w-4 text-primary-500" /> Journal Entries
               <span className="text-xs font-bold text-graphite-400">({journals.length})</span>
             </h3>
@@ -544,7 +544,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
               <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/50 text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                    <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/50 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                       <th className="py-2.5 px-4">Entry</th>
                       <th className="py-2.5 px-3">Date</th>
                       <th className="py-2.5 px-3">Description</th>

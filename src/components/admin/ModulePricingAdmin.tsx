@@ -83,10 +83,10 @@ export function ModulePricingAdmin() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-        <h2 className="font-extrabold text-sm flex items-center gap-2">
+        <h2 className="font-semibold text-sm flex items-center gap-2">
           <Puzzle className="h-4 w-4 text-primary-500" /> Module Add-on Pricing
         </h2>
-        <Badge variant="secondary" className="text-xs font-extrabold">
+        <Badge variant="secondary" className="text-xs font-semibold">
           {pricedCount} of {rows.length} priced
         </Badge>
       </div>
@@ -115,7 +115,7 @@ export function ModulePricingAdmin() {
                 className="flex flex-wrap items-center gap-3 p-3 rounded-xl border border-canvas-silk bg-canvas-mist/30"
               >
                 <div className="min-w-0 flex-1 basis-48">
-                  <p className="text-xs font-extrabold truncate" title={row.module_name}>{row.module_name}</p>
+                  <p className="text-xs font-semibold truncate" title={row.module_name}>{row.module_name}</p>
                   <p className="text-xs text-graphite-400 font-mono">{row.module_key}</p>
                 </div>
                 <div className="flex items-center gap-1.5">

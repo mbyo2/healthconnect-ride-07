@@ -38,7 +38,7 @@ export default function OPD() {
           <Stethoscope className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold">Outpatient Department</h1>
+          <h1 className="text-2xl font-semibold">Outpatient Department</h1>
           <p className="text-sm text-graphite-500">
             Queue management, triage & check-in · {hospital?.name || "Doc'O Clock"}
           </p>

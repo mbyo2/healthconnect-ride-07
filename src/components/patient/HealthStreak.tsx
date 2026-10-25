@@ -1,4 +1,4 @@
-import { Shield, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
+import { Shield, ShieldCheck, CheckCircle2, Circle, Flame } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface HealthMilestone {
@@ -31,31 +31,32 @@ export const HealthStreak = ({ milestones, streakDays = 0 }: HealthStreakProps) 
           <div className="relative shrink-0">
             <div
               className={`h-16 w-16 rounded-full flex items-center justify-center ${
-                isFull ? "bg-blue-600 doc-shield-glow" : "bg-blue-100"
+                isFull ? "bg-primary" : "bg-primary-100"
               }`}
             >
               {isFull ? (
                 <ShieldCheck className="h-8 w-8 text-white" />
               ) : (
-                <Shield className={`h-8 w-8 ${pct > 50 ? "text-blue-600" : "text-blue-300"}`} />
+                <Shield className={`h-8 w-8 ${pct > 50 ? "text-primary-600" : "text-primary-300"}`} />
               )}
             </div>
             {streakDays > 0 && (
-              <span className="absolute -bottom-1 -right-1 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                {streakDays}🔥
+              <span className="absolute -bottom-1 -right-1 inline-flex items-center gap-0.5 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {streakDays}
+                <Flame className="h-3 w-3" aria-hidden />
               </span>
             )}
           </div>
 
           <div className="flex-1">
-            <p className="font-bold text-sm text-gray-900">Health Shield</p>
+            <p className="font-bold text-sm text-foreground">Health Shield</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {completed}/{total} checkups complete
             </p>
             {/* Progress bar */}
-            <div className="h-2 bg-gray-100 rounded-full mt-2 overflow-hidden">
+            <div className="h-2 bg-muted rounded-full mt-2 overflow-hidden">
               <div
-                className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                className="h-full bg-primary rounded-full transition-all duration-500"
                 style={{ width: `${pct}%` }}
               />
             </div>

@@ -212,7 +212,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
-          <h3 className="text-base font-extrabold flex items-center gap-2">
+          <h3 className="text-base font-semibold flex items-center gap-2">
             <Tent className="h-5 w-5 text-primary-500" />
             Health Camp Outreach
           </h3>
@@ -225,7 +225,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <button onClick={() => setShowRegister(true)} className="px-3 py-1.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
             <UserPlus className="h-3.5 w-3.5" /> Quick Register
           </button>
-          <button onClick={() => setShowNewCamp(true)} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1">
+          <button onClick={() => setShowNewCamp(true)} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> New Camp
           </button>
         </div>
@@ -236,7 +236,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
         {glance.map((g) => (
           <div key={g.label} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
-            <p className="text-[28px] leading-8 font-extrabold tabular-nums">{g.value}</p>
+            <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">{g.label}</p>
           </div>
         ))}
@@ -259,7 +259,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-extrabold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
           >
             {tab.label}
           </button>
@@ -278,7 +278,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                 <div key={c.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-[15px] font-extrabold">{c.name}</p>
+                      <p className="text-[15px] font-semibold">{c.name}</p>
                       <p className="text-xs text-graphite-500 dark:text-slate-400">{c.location} • {fmtDate(c.camp_date)} • {campTypeLabel(c.camp_type)}</p>
                     </div>
                     {getStatusPill(c.status)}
@@ -324,7 +324,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Name</th>
                     <th className="py-2.5 px-3">Phone</th>
                     <th className="py-2.5 px-3 text-center">Age</th>
@@ -376,7 +376,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             {followupsDue.map((r) => (
               <div key={r.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs flex items-center justify-between gap-3 flex-wrap">
                 <div>
-                  <p className="text-[15px] font-extrabold">{r.full_name}</p>
+                  <p className="text-[15px] font-semibold">{r.full_name}</p>
                   <p className="text-xs text-graphite-500 dark:text-slate-400">
                     {r.phone || "No phone"} • Due {fmtDate(r.follow_up_date)} • {campById(r.camp_id)?.name}
                     {r.referral_needed && r.referred_to ? ` • Referred to ${r.referred_to}` : ""}
@@ -395,7 +395,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Camp</th>
                   <th className="py-2.5 px-3">Date</th>
                   <th className="py-2.5 px-3 text-right">Registered</th>
@@ -460,7 +460,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowNewCamp(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Create camp
               </button>
             </DialogFooter>
@@ -505,7 +505,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowRegister(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Register
               </button>
             </DialogFooter>
@@ -567,7 +567,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             )}
             <DialogFooter>
               <button type="button" onClick={() => setShowScreening(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-extrabold disabled:opacity-50 flex items-center gap-1">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Save screening
               </button>
             </DialogFooter>
@@ -584,7 +584,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           </p>
           <DialogFooter>
             <button onClick={() => setCancelTarget(null)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep camp</button>
-            <button onClick={() => updateCampStatus(cancelTarget, "cancelled")} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-extrabold">Yes, cancel</button>
+            <button onClick={() => updateCampStatus(cancelTarget, "cancelled")} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

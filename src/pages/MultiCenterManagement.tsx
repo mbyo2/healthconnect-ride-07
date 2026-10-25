@@ -174,7 +174,7 @@ export const MultiCenterManagement = () => {
               <Network className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold truncate">Multi-Center Management</h1>
+              <h1 className="text-xl font-semibold truncate">Multi-Center Management</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Network Administration & Cross-Institution Operations</p>
             </div>
           </div>
@@ -187,7 +187,7 @@ export const MultiCenterManagement = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-lg font-extrabold">Create New Network</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Create New Network</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -274,7 +274,7 @@ export const MultiCenterManagement = () => {
                           <Building2 className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-sm font-extrabold">{network.network_name}</CardTitle>
+                          <CardTitle className="text-sm font-semibold">{network.network_name}</CardTitle>
                           <Badge variant="outline" className="text-xs mt-1">
                             {networkTypeLabels[network.network_type] || network.network_type}
                           </Badge>
@@ -333,13 +333,13 @@ export const MultiCenterManagement = () => {
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Institution</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Network</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Commission</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Joined</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Institution</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Network</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Role</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Commission</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Joined</th>
+                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -406,7 +406,7 @@ export const MultiCenterManagement = () => {
                         <Globe className="h-5 w-5" />
                       </div>
                       <div>
-                        <CardTitle className="text-sm font-extrabold">{country.name}</CardTitle>
+                        <CardTitle className="text-sm font-semibold">{country.name}</CardTitle>
                         <div className="text-xs text-graphite-500 dark:text-slate-400">{country.code}</div>
                       </div>
                     </div>
@@ -444,13 +444,13 @@ export const MultiCenterManagement = () => {
           <TabsContent value="billing" className="space-y-4">
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary-500" /> Cross-Institution Billing
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
-                  <h4 className="text-xs font-extrabold mb-3">Active Cross-Billing Networks</h4>
+                  <h4 className="text-xs font-semibold mb-3">Active Cross-Billing Networks</h4>
                   <div className="space-y-2">
                     {networks.filter((n) => n.cross_billing_enabled).map((network) => (
                       <div key={network.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg">
@@ -472,7 +472,7 @@ export const MultiCenterManagement = () => {
                 </div>
 
                 <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
-                  <h4 className="text-xs font-extrabold mb-3">Billing Rules</h4>
+                  <h4 className="text-xs font-semibold mb-3">Billing Rules</h4>
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
                       <ArrowRight className="h-3 w-3" />
@@ -498,7 +498,7 @@ export const MultiCenterManagement = () => {
       <Dialog open={showMemberDialog} onOpenChange={setShowMemberDialog}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-lg font-extrabold">Add Institution to Network</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">Add Institution to Network</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>

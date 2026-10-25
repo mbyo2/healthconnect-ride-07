@@ -527,17 +527,17 @@ export const Prescriptions = () => {
     switch (status) {
       case "active":
       case "filled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">✓ Active / Filled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">✓ Active / Filled</span>;
       case "expired":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Expired</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Expired</span>;
       case "pending":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● Pending Rx</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● Pending Rx</span>;
       case "partially_filled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-900/40">◐ Partially Filled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-900/40">◐ Partially Filled</span>;
       case "cancelled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">✕ Cancelled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">✕ Cancelled</span>;
       default:
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-primary-50 dark:bg-blue-950/50 text-primary-500 dark:text-blue-400 border border-primary-500/20">{status || "Dispatched"}</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-primary-50 dark:bg-blue-950/50 text-primary-500 dark:text-blue-400 border border-primary-500/20">{status || "Dispatched"}</span>;
     }
   };
 
@@ -743,7 +743,7 @@ export const Prescriptions = () => {
                         <button
                           type="button"
                           onClick={handleAddMedication}
-                          className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-xs transition-all flex items-center gap-1"
+                          className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-semibold text-xs transition-all flex items-center gap-1"
                         >
                           <Plus className="h-3 w-3" /> Add Another Medication
                         </button>
@@ -752,7 +752,7 @@ export const Prescriptions = () => {
                       {medicationItems.map((item, idx) => (
                         <div key={item.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950/60 space-y-3 relative">
                           <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-xs">
+                            <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                               Medication #{idx + 1}
                             </span>
                             {medicationItems.length > 1 && (
@@ -968,7 +968,7 @@ export const Prescriptions = () => {
                       type="button"
                       disabled={isSubmitting}
                       onClick={handleCreatePrescription}
-                      className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       {isSubmitting ? "Processing..." : `Issue E-Prescription (${medicationItems.length} Meds)`}
@@ -998,7 +998,7 @@ export const Prescriptions = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             aria-label="Filter by prescription status"
-            className="px-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
+            className="px-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
           >
             <option value="all">All Prescriptions</option>
             <option value="active">Active / Filled</option>
@@ -1021,7 +1021,7 @@ export const Prescriptions = () => {
             <p className="text-sm font-medium text-destructive">We couldn&apos;t load your prescriptions.</p>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-extrabold"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-semibold"
             >
               Try again
             </button>
@@ -1080,7 +1080,7 @@ export const Prescriptions = () => {
               />
             )}
 
-            <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
             {/* Refill requests queue for prescribers */}
             {isPrescriber && (
               <div className="p-4 border-b border-canvas-silk dark:border-slate-800">
@@ -1091,9 +1091,9 @@ export const Prescriptions = () => {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-                  <h2 className="font-extrabold text-sm text-white">Active E-Prescriptions &amp; Refills</h2>
+                  <h2 className="font-semibold text-sm text-white">Active E-Prescriptions &amp; Refills</h2>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-primary-500 text-white">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-500 text-white">
                   {filteredPrescriptions.length} Records ({groupedOrders.length} Orders)
                 </span>
               </div>
@@ -1123,7 +1123,7 @@ export const Prescriptions = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[950px]">
                   <thead>
-                    <tr className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                    <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                       <th className="py-2.5 px-4 w-[240px]">Medication Profile</th>
                       <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                       <th className="py-2.5 px-3 w-[180px]">Dosage &amp; Frequency</th>
@@ -1138,7 +1138,7 @@ export const Prescriptions = () => {
                       <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
                         {/* Medication */}
                         <td className="py-3 px-4">
-                          <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                             <Pill className="h-4 w-4 text-primary-500 flex-shrink-0" />
                             <span>{p.medication_name}</span>
                           </div>
@@ -1211,7 +1211,7 @@ export const Prescriptions = () => {
                                     toast.error(e.message || "Failed to claim prescription.");
                                   }
                                 }}
-                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-xs font-black transition-all active:scale-95 flex items-center gap-1"
+                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1"
                                 title="Claim this prescription for your pharmacy"
                               >
                                 <CheckCircle className="h-3.5 w-3.5" />
@@ -1226,7 +1226,7 @@ export const Prescriptions = () => {
                                   : [p];
                                 handlePrintSlip(batchItems);
                               }}
-                              className="px-3 py-2.5 min-h-[44px] rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-xs font-black transition-all active:scale-95 flex items-center gap-1"
+                              className="px-3 py-2.5 min-h-[44px] rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-xs font-bold transition-all active:scale-95 flex items-center gap-1"
                               title="Print full official multi-drug prescription"
                             >
                               <Printer className="h-3.5 w-3.5" />

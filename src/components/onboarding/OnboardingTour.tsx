@@ -34,7 +34,7 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
   
   const tourSteps: TourStep[] = [
     {
-      title: "Welcome to HealthConnect",
+      title: "Welcome to Doc' O Clock",
       description: "Let's take a quick tour to help you get started with the app. We'll show you the main features so you can make the most of your healthcare experience.",
       image: "placeholder.svg",
       icon: <Home className="h-12 w-12 text-primary mb-4" />,
@@ -65,7 +65,7 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
     },
     {
       title: "You're All Set!",
-      description: "Thanks for exploring HealthConnect! You can always find this tour again in your profile settings.",
+      description: "Thanks for exploring Doc' O Clock. You can always find this tour again in your profile settings.",
       icon: <Home className="h-12 w-12 text-primary mb-4" />,
     },
   ];

@@ -114,7 +114,7 @@ export function ProviderSlotsPreview({
 
   return (
     <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
-      <h3 className="font-extrabold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
+      <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
         <CalendarClock className="h-4 w-4 text-primary-500" aria-hidden />
         Nearest available slots
       </h3>

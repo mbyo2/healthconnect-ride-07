@@ -54,11 +54,11 @@ const HealthAnalytics = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight">
+              <h1 className="text-xl font-semibold tracking-tight">
                 Biometric Health Analytics
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
@@ -83,7 +83,7 @@ const HealthAnalytics = () => {
             <button
               onClick={exportReport}
               disabled={!hasAnyData || loading}
-              className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Download className="h-4 w-4" />
               <span>Export Report</span>
@@ -115,14 +115,14 @@ const HealthAnalytics = () => {
             <div className="h-16 w-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center mx-auto mb-4">
               <HeartPulse className="h-8 w-8" />
             </div>
-            <h2 className="text-lg font-extrabold mb-2">No health data yet</h2>
+            <h2 className="text-lg font-semibold mb-2">No health data yet</h2>
             <p className="text-sm text-graphite-500 dark:text-slate-400 mb-6">
               Record your first vitals — blood pressure, heart rate, weight or oxygen saturation —
               and your trends will appear here. We only show measurements you have actually logged.
             </p>
             <button
               onClick={() => navigate("/iot-monitoring")}
-              className="px-6 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-xs transition-all min-h-[44px]"
+              className="px-6 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-xs transition-all min-h-[44px]"
             >
               Record vitals
             </button>
@@ -177,7 +177,7 @@ const HealthAnalytics = () => {
             {/* Detailed Analytics Board */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
               <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
-                <h2 className="font-extrabold text-sm flex items-center gap-2">
+                <h2 className="font-semibold text-sm flex items-center gap-2">
                   <LineChartIcon className="h-4 w-4 text-primary-500" />
                   Biometric Data Visualizations
                 </h2>
@@ -193,7 +193,7 @@ const HealthAnalytics = () => {
                       role="tab"
                       aria-selected={activeTab === tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`px-3 py-1 rounded-md text-xs font-extrabold transition-all ${
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                         activeTab === tab.id
                           ? "bg-primary-500 text-white shadow-xs"
                           : "text-graphite-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800"
@@ -211,7 +211,7 @@ const HealthAnalytics = () => {
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Heart Rate (bpm) — from your recorded vitals</h3>
+                      <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Heart Rate (bpm) — from your recorded vitals</h3>
                     </div>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -236,7 +236,7 @@ const HealthAnalytics = () => {
                   <ChartEmptyState message="No activity data in this period. Sync a device or log activity to see your trend." />
                 ) : (
                   <div className="space-y-4">
-                    <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Daily Step Count & Active Caloric Burn</h3>
+                    <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Daily Step Count & Active Caloric Burn</h3>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={activityData}>
@@ -259,7 +259,7 @@ const HealthAnalytics = () => {
                   <ChartEmptyState message="No sleep logged in this period. Log your sleep hours to see your trend." />
                 ) : (
                   <div className="space-y-4">
-                    <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Duration (recorded hours per night)</h3>
+                    <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Duration (recorded hours per night)</h3>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={sleepData}>
@@ -302,10 +302,10 @@ function KpiCard({ label, icon, value, caption, accent }: {
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{label}</span>
+        <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{label}</span>
         {icon}
       </div>
-      <div className={`text-2xl font-black font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+      <div className={`text-2xl font-bold font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
         {value ?? "—"}
       </div>
       <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
@@ -323,8 +323,8 @@ function VitalsTile({ title, value, accent, caption }: {
 }) {
   return (
     <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
-      <p className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">{title}</p>
-      <p className={`text-3xl font-black font-mono mt-2 ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+      <p className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">{title}</p>
+      <p className={`text-3xl font-bold font-mono mt-2 ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
         {value ?? "—"}
       </p>
       <p className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-1">

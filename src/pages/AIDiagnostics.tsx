@@ -31,11 +31,11 @@ const AIDiagnostics = () => {
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
                 <Brain className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                   Multimodal Medical AI Diagnostic Workspace
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
@@ -66,7 +66,7 @@ const AIDiagnostics = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
+                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
                     : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -104,7 +104,7 @@ const AIDiagnostics = () => {
                 }`}
               >
                 <div style={{ color: card.color }} className="mb-2">{card.icon}</div>
-                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{card.title}</p>
+                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{card.title}</p>
                 <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">{card.sub}</p>
               </div>
             ))}
@@ -132,7 +132,7 @@ const AIDiagnostics = () => {
           {activeTab === "symptoms" && (
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <div className="border-b border-canvas-silk pb-3">
-                <h2 className="font-extrabold text-sm flex items-center gap-2">
+                <h2 className="font-semibold text-sm flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-warning-500" />
                   Guided Clinical Symptom Analysis
                 </h2>
@@ -154,7 +154,7 @@ const AIDiagnostics = () => {
           <div className="rounded-2xl border border-warning-500/30 bg-canvas-bone p-4 flex items-start gap-3 text-xs">
             <AlertCircle className="h-5 w-5 text-warning-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+              <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                 <TriangleAlert className="h-4 w-4 text-warning-500" aria-hidden /> Important safety note
               </p>
               <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">

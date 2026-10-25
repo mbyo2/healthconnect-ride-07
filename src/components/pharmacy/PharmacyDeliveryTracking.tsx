@@ -237,7 +237,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                         <button
                           onClick={() => handleHandToCourier(d)}
                           disabled={handingId === d.id}
-                          className="mr-auto px-4 py-2 rounded-xl border border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 disabled:opacity-50 text-xs font-extrabold flex items-center gap-1.5"
+                          className="mr-auto px-4 py-2 rounded-xl border border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 disabled:opacity-50 text-xs font-semibold flex items-center gap-1.5"
                         >
                           {handingId === d.id ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -252,7 +252,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                       <button
                         onClick={() => handleFulfill(d)}
                         disabled={fulfillingId === d.id}
-                        className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
+                        className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs"
                       >
                         {fulfillingId === d.id ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -255,13 +255,13 @@ export const BillingStaffWorkflow = () => {
               <Printer className="h-3 w-3" /> PDF
             </button>
             {invoice.balance > 0 && (
-              <button onClick={() => openPaymentDialog(invoice)} className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1">
+              <button onClick={() => openPaymentDialog(invoice)} className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center gap-1">
                 <CreditCard className="h-3 w-3" /> Pay
               </button>
             )}
           </div>
         </div>
-        <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{invoice.patient_name}</p>
+        <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{invoice.patient_name}</p>
         <div className="flex items-center gap-4 text-xs font-bold text-graphite-500 dark:text-slate-400">
           <span>Total: K{invoice.total_amount?.toLocaleString()}</span>
           <span>Paid: K{invoice.paid_amount?.toLocaleString()}</span>
@@ -280,22 +280,22 @@ export const BillingStaffWorkflow = () => {
     <div className="space-y-6 font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight">Billing & Accounts Dashboard</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Billing & Accounts Dashboard</h1>
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Invoicing, payments, insurance claims & financial reconciliation</p>
         </div>
         <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
               <Plus className="h-4 w-4" /> New Invoice
             </button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-            <DialogHeader><DialogTitle className="font-extrabold text-base">Create Hospital Invoice</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle className="font-semibold text-base">Create Hospital Invoice</DialogTitle></DialogHeader>
             <div className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient Name *</label>
+                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient Name *</label>
                     {invoiceForm.patient_name.trim().length >= 2 && (
                       <button
                         type="button"
@@ -316,7 +316,7 @@ export const BillingStaffWorkflow = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Insurance Provider</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Insurance Provider</label>
                   <input
                     value={invoiceForm.insurance_provider}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, insurance_provider: e.target.value }))}
@@ -328,7 +328,7 @@ export const BillingStaffWorkflow = () => {
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items (priced services)</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items (priced services)</label>
                 </div>
                 <ServiceLineEditor
                   lines={invoiceForm.items}
@@ -340,7 +340,7 @@ export const BillingStaffWorkflow = () => {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Tax Amount</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Tax Amount</label>
                   <input
                     type="number"
                     value={invoiceForm.tax}
@@ -349,7 +349,7 @@ export const BillingStaffWorkflow = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Discount</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Discount</label>
                   <input
                     type="number"
                     value={invoiceForm.discount}
@@ -358,7 +358,7 @@ export const BillingStaffWorkflow = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Due Date</label>
+                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Due Date</label>
                   <input
                     type="date"
                     value={invoiceForm.due_date}
@@ -372,13 +372,13 @@ export const BillingStaffWorkflow = () => {
                 <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>K{subtotal.toLocaleString()}</span></div>
                 {invoiceForm.tax > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Tax</span><span>K{invoiceForm.tax.toLocaleString()}</span></div>}
                 {invoiceForm.discount > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Discount</span><span>-K{invoiceForm.discount.toLocaleString()}</span></div>}
-                <div className="flex justify-between font-black text-sm text-primary-500 pt-1 border-t border-canvas-silk dark:border-slate-800"><span>Grand Total</span><span>K{totalAmount.toLocaleString()}</span></div>
+                <div className="flex justify-between font-bold text-sm text-primary-500 pt-1 border-t border-canvas-silk dark:border-slate-800"><span>Grand Total</span><span>K{totalAmount.toLocaleString()}</span></div>
               </div>
 
               <button
                 onClick={handleCreateInvoice}
                 disabled={creating || !invoiceForm.patient_name.trim()}
-                className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-xs shadow-xs"
               >
                 {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Official Invoice"}
               </button>
@@ -390,10 +390,10 @@ export const BillingStaffWorkflow = () => {
       {/* Payment Dialog */}
       <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
         <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <DialogHeader><DialogTitle className="font-extrabold text-base">Record Payment — {selectedInvoice?.invoice_number}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="font-semibold text-base">Record Payment — {selectedInvoice?.invoice_number}</DialogTitle></DialogHeader>
           <div className="space-y-4 text-xs">
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Payment Amount (Balance: K{selectedInvoice?.balance?.toLocaleString()})</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Payment Amount (Balance: K{selectedInvoice?.balance?.toLocaleString()})</label>
               <input
                 type="number"
                 value={paymentForm.amount}
@@ -402,7 +402,7 @@ export const BillingStaffWorkflow = () => {
               />
             </div>
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Payment Mode</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Payment Mode</label>
               <Select value={paymentForm.payment_mode} onValueChange={(v) => setPaymentForm((prev) => ({ ...prev, payment_mode: v as any }))}>
                 <SelectTrigger className="mt-1 border-graphite-300 dark:border-slate-700 font-bold text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -416,7 +416,7 @@ export const BillingStaffWorkflow = () => {
               </Select>
             </div>
             <div>
-              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reference Number</label>
+              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Reference Number</label>
               <input
                 value={paymentForm.reference_number}
                 onChange={(e) => setPaymentForm((prev) => ({ ...prev, reference_number: e.target.value }))}
@@ -427,7 +427,7 @@ export const BillingStaffWorkflow = () => {
             <button
               onClick={handleRecordPayment}
               disabled={creating || paymentForm.amount <= 0}
-              className="w-full py-2.5 rounded-xl bg-success-500 text-white font-extrabold text-xs shadow-xs"
+              className="w-full py-2.5 rounded-xl bg-success-500 text-white font-semibold text-xs shadow-xs"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Record & Post Payment"}
             </button>
@@ -439,19 +439,19 @@ export const BillingStaffWorkflow = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
-          <p className="text-2xl font-black font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
+          <p className="text-2xl font-bold font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
           <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Today's Total Collections</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
-          <p className="text-2xl font-black font-mono text-primary-500">{pendingInvoices.length}</p>
+          <p className="text-2xl font-bold font-mono text-primary-500">{pendingInvoices.length}</p>
           <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Invoices</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
-          <p className="text-2xl font-black font-mono text-error-500">{pendingClaims.length}</p>
+          <p className="text-2xl font-bold font-mono text-error-500">{pendingClaims.length}</p>
           <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Insurance Claims</p>
         </div>
       </div>
@@ -459,19 +459,19 @@ export const BillingStaffWorkflow = () => {
       {/* Module Tabs */}
       <Tabs defaultValue="invoices">
         <TabsList className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl">
-          <TabsTrigger value="invoices" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="invoices" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Invoices ({invoices.length})
           </TabsTrigger>
-          <TabsTrigger value="accounting" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="accounting" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Multi-Country Accounting
           </TabsTrigger>
-          <TabsTrigger value="claims" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="claims" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Insurance Claims ({claims.length})
           </TabsTrigger>
-          <TabsTrigger value="tpa" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="tpa" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             TPA Workflow
           </TabsTrigger>
-          <TabsTrigger value="denials" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="denials" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Denials
           </TabsTrigger>
         </TabsList>
@@ -503,7 +503,7 @@ export const BillingStaffWorkflow = () => {
             claims.map((claim) => (
               <div key={claim.id} className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-900 dark:text-slate-100">{claim.patient_name}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{claim.patient_name}</span>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                     claim.status === "approved" ? "bg-success-500" : claim.status === "rejected" ? "bg-error-500" : "bg-warning-500"
                   }`}>

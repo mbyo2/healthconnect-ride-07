@@ -203,7 +203,7 @@ function AdjudicationSimulator() {
         </div>
       </div>
 
-      <Button onClick={runAdjudication} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3">
+      <Button onClick={runAdjudication} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3">
         <Calculator className="h-4 w-4 mr-2" /> Run Dynamic Adjudication
       </Button>
 
@@ -523,7 +523,7 @@ export default function AdvancedRevenueCycle({ institutionId }: { institutionId?
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg shadow-blue-900/30">
+        <div className="p-3 bg-primary-600 rounded-xl">
           <CreditCard className="h-6 w-6 text-white" />
         </div>
         <div>

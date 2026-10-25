@@ -810,7 +810,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
                   <span
                     aria-current={i === stepIndex ? "step" : undefined}
                     className={cn(
-                      "flex h-6 flex-1 items-center justify-center rounded-full text-xs font-black sm:text-xs",
+                      "flex h-6 flex-1 items-center justify-center rounded-full text-xs font-bold sm:text-xs",
                       i < stepIndex && "bg-primary/15 text-primary",
                       i === stepIndex && "bg-primary text-primary-foreground",
                       i > stepIndex && "bg-muted text-muted-foreground"

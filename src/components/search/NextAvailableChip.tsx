@@ -103,7 +103,7 @@ export function NextAvailableChip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold",
         "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
       )}
       aria-label={`Next available: ${format(next.date, "EEEE, MMMM d")} at ${next.time}`}

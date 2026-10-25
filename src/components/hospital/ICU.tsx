@@ -174,7 +174,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-extrabold text-graphite-800 dark:text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-graphite-800 dark:text-white flex items-center gap-2">
             <BedDouble className="h-5 w-5 text-primary-500" /> ICU Management
           </h2>
           <p className="text-xs text-graphite-500 dark:text-slate-400">
@@ -212,7 +212,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
           >
             {tab.label}
           </button>
@@ -231,7 +231,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`h-3 w-3 rounded-full ${STATUS_COLORS[bed.status] || "bg-slate-400"}`} />
-                      <span className="font-extrabold text-sm text-graphite-800 dark:text-white">{bed.bed_number}</span>
+                      <span className="font-semibold text-sm text-graphite-800 dark:text-white">{bed.bed_number}</span>
                     </div>
                     {getStatusPill(bed.status)}
                   </div>
@@ -328,7 +328,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                 <thead className="bg-canvas-mist dark:bg-slate-800 text-left">
                   <tr>
                     {["Time", "HR", "BP", "SpO₂", "Temp °C", "GCS", "Notes"].map((h) => (
-                      <th key={h} className="px-3 py-2 font-extrabold">{h}</th>
+                      <th key={h} className="px-3 py-2 font-semibold">{h}</th>
                     ))}
                   </tr>
                 </thead>

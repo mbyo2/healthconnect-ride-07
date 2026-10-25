@@ -1,7 +1,7 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { ShoppingCart, Truck, Plus, Loader2, RefreshCw, Trash2, Pencil } from "lucide-react";
+import { ShoppingCart, Truck, Plus, Loader2, RefreshCw, Trash2, Pencil, Phone, Mail, MapPin, CreditCard } from "lucide-react";
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
@@ -228,7 +228,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
             <ShoppingCart className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-extrabold">Procurement</h2>
+            <h2 className="text-lg font-semibold">Procurement</h2>
             <p className="text-xs text-graphite-500">
               {orders.length} purchase orders · {suppliers.filter((s) => s.is_active).length} active suppliers
             </p>
@@ -265,7 +265,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
           <button
             key={t}
             onClick={() => setActiveTab(t)}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wide transition-colors ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide transition-colors ${
               activeTab === t
                 ? "bg-primary-500 text-white"
                 : "bg-canvas-mist text-graphite-500 hover:bg-canvas-silk"
@@ -381,7 +381,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="font-extrabold text-sm">{s.supplier_name}</p>
+                      <p className="font-semibold text-sm">{s.supplier_name}</p>
                       {s.contact_person && <p className="text-xs text-graphite-500">{s.contact_person}</p>}
                     </div>
                     <span
@@ -393,10 +393,10 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                     </span>
                   </div>
                   <div className="mt-2 space-y-1 text-xs text-graphite-500">
-                    {s.phone && <p>📞 {s.phone}</p>}
-                    {s.email && <p>✉️ {s.email}</p>}
-                    {s.address && <p>📍 {s.address}</p>}
-                    {s.payment_terms && <p>💳 Terms: {s.payment_terms}</p>}
+                    {s.phone && <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 shrink-0" aria-hidden /> {s.phone}</p>}
+                    {s.email && <p className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5 shrink-0" aria-hidden /> {s.email}</p>}
+                    {s.address && <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden /> {s.address}</p>}
+                    {s.payment_terms && <p className="flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5 shrink-0" aria-hidden /> Terms: {s.payment_terms}</p>}
                   </div>
                   <div className="mt-3 flex gap-2">
                     <button
@@ -539,7 +539,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-right text-sm font-extrabold">Total: {fmtMoney(poTotal)}</p>
+              <p className="mt-2 text-right text-sm font-semibold">Total: {fmtMoney(poTotal)}</p>
             </div>
 
             <DialogFooter>
@@ -702,7 +702,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                     </table>
                   </div>
                 )}
-                <p className="mt-2 text-right font-extrabold">Total: {fmtMoney(viewingPO.total_amount)}</p>
+                <p className="mt-2 text-right font-semibold">Total: {fmtMoney(viewingPO.total_amount)}</p>
               </div>
               {NEXT_STATUS[viewingPO.status]?.length > 0 && (
                 <div className="flex gap-2 flex-wrap pt-1">

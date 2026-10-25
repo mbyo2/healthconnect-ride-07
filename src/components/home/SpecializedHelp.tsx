@@ -69,7 +69,7 @@ export const SpecializedHelp = () => {
                             <div className="p-2.5 bg-muted border border-border rounded-2xl shadow-sm group-hover:shadow-md group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 group-hover:scale-110">
                                 {iconMap[category.icon_name] || <Activity className="h-6 w-6" />}
                             </div>
-                            <span className="text-xs sm:text-xs font-extrabold text-foreground group-hover:text-primary text-center px-2 leading-tight tracking-tight transition-colors duration-300">
+                            <span className="text-xs sm:text-xs font-semibold text-foreground group-hover:text-primary text-center px-2 leading-tight tracking-tight transition-colors duration-300">
                                 {category.name}
                             </span>
                         </CardContent>

@@ -82,7 +82,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
       <div className="p-3.5 border-b border-slate-700/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
           {/* Status Icon */}
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary-500 via-purple-500 to-success-500 p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
+          <div className="h-8 w-8 rounded-xl bg-primary p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
             <div className="w-full h-full bg-slate-950/30 rounded-[10px] flex items-center justify-center gap-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-error-500" />
               <span className="w-1.5 h-1.5 rounded-full bg-warning-500" />
@@ -93,7 +93,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
           {!isCollapsed && (
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <span className="font-extrabold text-sm tracking-tight truncate">Clinical Dashboard</span>
+                <span className="font-semibold text-sm tracking-tight truncate">Clinical Dashboard</span>
                 <span className="text-xs font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-400 rounded font-bold uppercase">
                   CRM
                 </span>

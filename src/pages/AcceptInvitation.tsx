@@ -87,7 +87,7 @@ const AcceptInvitation = () => {
       return;
     }
     setAccepted(true);
-    toast.success("Welcome to the team!");
+    toast.success("You have joined the team");
     // Land the invitee inside the inviting institution's workspace: without
     // this, staff who also own an auto-provisioned institution would keep
     // resolving to their own empty workspace and never see the inviter's.

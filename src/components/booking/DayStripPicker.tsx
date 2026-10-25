@@ -112,7 +112,7 @@ export function DayStripPicker({
               <span className={cn("text-xs font-bold uppercase tracking-wide", selected ? "text-primary-foreground/80" : "text-muted-foreground")}>
                 {todayCell ? "Today" : format(day, "EEE")}
               </span>
-              <span className="text-xl font-extrabold leading-none">{format(day, "d")}</span>
+              <span className="text-xl font-semibold leading-none">{format(day, "d")}</span>
               <span className={cn("h-1.5 w-1.5 rounded-full mt-1", available ? "bg-emerald-500" : "bg-transparent")} aria-hidden />
             </button>
           );

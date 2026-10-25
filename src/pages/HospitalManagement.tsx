@@ -266,7 +266,7 @@ export const HospitalManagement = () => {
         icon={<Building2 className="h-5 w-5" />}
         title={hospital.name}
         badges={
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold text-white bg-success-500">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">
             Live HMS Board
           </span>
         }
@@ -304,7 +304,7 @@ export const HospitalManagement = () => {
                         ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
                         : undefined
                     }
-                    className={`px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-graphite-500 dark:text-slate-400 shadow-none hover:bg-primary-100 hover:text-primary-500 data-[state=active]:bg-primary-500 data-[state=active]:text-white data-[state=active]:border-primary-500 data-[state=active]:shadow-xs ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-graphite-500 dark:text-slate-400 shadow-none hover:bg-primary-100 hover:text-primary-500 data-[state=active]:bg-primary-500 data-[state=active]:text-white data-[state=active]:border-primary-500 data-[state=active]:shadow-xs ${
                       relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
                     }`}
                   >
@@ -322,13 +322,13 @@ export const HospitalManagement = () => {
                 <Card>
                   <CardContent className="p-8 text-center space-y-3">
                     <Building2 className="h-10 w-10 mx-auto text-primary-500" />
-                    <p className="text-sm font-extrabold">No departments set up yet</p>
+                    <p className="text-sm font-semibold">No departments set up yet</p>
                     <p className="text-xs text-graphite-500 dark:text-slate-400 max-w-md mx-auto">
                       Departments organize your wards, beds, and staff. Add your first department to populate the live HMS board.
                     </p>
                     <button
                       onClick={() => setActiveTab("departments")}
-                      className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-colors"
+                      className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold transition-colors"
                     >
                       Set up departments
                     </button>
