@@ -207,7 +207,7 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         pill: "999px",
-        card: "20px",
+        card: "16px",
         nav: "100px",
       },
       keyframes: {
@@ -249,15 +249,13 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "fadeIn": "fadeIn 0.6s ease-out forwards",
         "slideIn": "slideIn 0.4s ease-out",
-        "bounceIn": "bounceIn 1s ease-out",
-        "float": "float 3s ease-in-out infinite",
         "hero-rise": "heroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "soft-pulse": "softPulse 3.5s ease-in-out infinite",
       },
       backgroundImage: {
         'grid-pattern': "linear-gradient(to right, #f3f4f6 1px, transparent 1px), linear-gradient(to bottom, #f3f4f6 1px, transparent 1px)",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.08), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 20%, rgba(245,92,21,0.06), transparent 50%)',
+        'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.07), transparent 60%)',
       },
       boxShadow: {
         // v3 has no xs/2xs scale — define them so the hundreds of

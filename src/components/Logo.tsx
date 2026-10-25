@@ -14,7 +14,7 @@ export const Logo = ({ onClick, className = "" }: LogoProps) => {
         alt="Doc' O Clock" 
         className="w-8 h-8 object-contain"
       />
-      <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent no-underline">
+      <span className="text-xl font-bold text-midnight no-underline">
         Doc' O Clock
       </span>
     </div>
