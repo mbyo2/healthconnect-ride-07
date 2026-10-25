@@ -34,6 +34,19 @@ import {
   Wallet
 } from "lucide-react";
 
+// An appointment is a telemedicine visit only when the appointment itself
+// was booked as one (BookingModal writes 'video_consultation'; 'telemedicine'
+// / 'telehealth' are legacy type values for the same thing). A provider's
+// directory capability (telemedicine_available) must never label an
+// in-person appointment row as telemedicine.
+const isVideoAppointment = (app: any): boolean =>
+  app?.type === "video_consultation" || app?.type === "telemedicine" || app?.type === "telehealth";
+
+// The booking reference patients quote from their confirmation page
+// (BookingConfirmed renders String(appointment.id).slice(0, 8)). The
+// provider list shows the same value so both sides can match a booking.
+const bookingRef = (app: any): string => String(app?.id ?? "").slice(0, 8);
+
 export const AppointmentsPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -364,7 +377,7 @@ export const AppointmentsPage = () => {
   // the desktop tables below; markup follows the AgendaTimeline card idiom.
   const renderUpcomingMobileCard = (app: any) => {
     const person = isProvider ? app.patient : app.provider;
-    const isVideo = app.type === "video_consultation";
+    const isVideo = isVideoAppointment(app);
     const apptDate = parseISO(app.date);
     return (
       <div
@@ -381,6 +394,9 @@ export const AppointmentsPage = () => {
                 ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
+            {isProvider && (
+              <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+            )}
             {!isProvider && person?.specialty && (
               <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
             )}
@@ -393,7 +409,7 @@ export const AppointmentsPage = () => {
                       : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                   </span>
                 )}
-                {person?.telemedicine_available && (
+                {isVideo && (
                   <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-emerald-50 text-emerald-700">
                     <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                   </span>
@@ -494,17 +510,20 @@ export const AppointmentsPage = () => {
                 ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
+            {isProvider && (
+              <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+            )}
             {!isProvider && person?.specialty && (
               <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
             )}
-            {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
+            {!isProvider && (person?.consultation_fee_min || isVideoAppointment(app)) && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {person?.consultation_fee_min && (
                   <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
                     <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                   </span>
                 )}
-                {person?.telemedicine_available && (
+                {isVideoAppointment(app) && (
                   <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
                     <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                   </span>
@@ -520,7 +539,7 @@ export const AppointmentsPage = () => {
             {format(apptDate, "MMM d, yyyy")} • {app.time}
           </span>
           <span className="text-slate-500">
-            {app.type === "video_consultation" ? "Video Visit" : "In-Person"}
+            {isVideoAppointment(app) ? "Video Visit" : "In-Person"}
           </span>
           <span className="text-slate-500">
             {person?.address || "To be confirmed"}
@@ -684,7 +703,7 @@ export const AppointmentsPage = () => {
                       <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
                         {upcoming.map((app) => {
                           const person = isProvider ? app.patient : app.provider;
-                          const isVideo = app.type === "video_consultation";
+                          const isVideo = isVideoAppointment(app);
                           const apptDate = parseISO(app.date);
 
                           return (
@@ -700,6 +719,9 @@ export const AppointmentsPage = () => {
                                         ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                                         : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
                                     </div>
+                                    {isProvider && (
+                                      <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+                                    )}
                                     {!isProvider && person?.specialty && (
                                       <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
                                     )}
@@ -713,7 +735,7 @@ export const AppointmentsPage = () => {
                                               : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                                           </span>
                                         )}
-                                        {person?.telemedicine_available && (
+                                        {isVideo && (
                                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black bg-emerald-50 text-emerald-700">
                                             <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                           </span>
@@ -864,17 +886,20 @@ export const AppointmentsPage = () => {
                                   <div>{isProvider
                                     ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                                     : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}</div>
+                                  {isProvider && (
+                                    <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+                                  )}
                                   {!isProvider && person?.specialty && (
                                     <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
                                   )}
-                                  {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
+                                  {!isProvider && (person?.consultation_fee_min || isVideoAppointment(app)) && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {person?.consultation_fee_min && (
                                         <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
                                           <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                                         </span>
                                       )}
-                                      {person?.telemedicine_available && (
+                                      {isVideoAppointment(app) && (
                                         <span className="inline-flex items-center gap-0.5 text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
                                           <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                         </span>
@@ -893,7 +918,7 @@ export const AppointmentsPage = () => {
                               </td>
 
                               <td className="py-3 px-3 text-slate-500">
-                                {app.type === "video_consultation" ? "Video Visit" : "In-Person"}
+                                {isVideoAppointment(app) ? "Video Visit" : "In-Person"}
                               </td>
 
                               <td className="py-3 px-3 text-slate-500 truncate max-w-[180px]">

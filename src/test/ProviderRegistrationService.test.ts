@@ -3,11 +3,16 @@ import { describe, it, expect, vi } from 'vitest';
 import * as fc from 'fast-check';
 
 // Mock Supabase client before importing the service
+// NOTE: since the workforce-hardening redesign (91649b6) the service first
+// calls supabase.auth.getUser() to reuse an existing session (Step 0). The
+// mock must provide it — default: no session, i.e. the new-account path.
+// (vi.clearAllMocks clears call history only, so this default survives.)
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
       signUp: vi.fn(),
       signInWithPassword: vi.fn(),
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
     },
     from: vi.fn(() => ({
       upsert: vi.fn(),
@@ -53,6 +58,14 @@ describe('ProviderRegistrationService Property Tests', () => {
             fc.constant('   '), // whitespace only
             fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0) // valid name
           ),
+          // Current contract (91649b6): a profession must be selected, and
+          // the licence number is mandatory only for regulated professions.
+          profession: fc.oneof(
+            fc.constant(''), // empty
+            fc.constant('   '), // whitespace only
+            fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0) // valid profession
+          ),
+          requires_license: fc.boolean(),
           phone_number: fc.oneof(
             fc.constant(''), // empty (optional)
             fc.string().filter(s => /^\+?[\d\s\-\(\)]+$/.test(s)), // valid phone
@@ -91,8 +104,9 @@ describe('ProviderRegistrationService Property Tests', () => {
             testData.password.length >= 6 &&
             testData.confirmPassword === testData.password &&
             testData.full_name.trim() !== '' &&
+            testData.profession.trim() !== '' &&
             (testData.phone_number === '' || /^\+?[\d\s\-\(\)]+$/.test(testData.phone_number)) &&
-            testData.license_number.trim() !== '' &&
+            (!testData.requires_license || testData.license_number.trim() !== '') &&
             testData.specialty.trim() !== '' &&
             testData.years_of_experience >= 0;
 
@@ -130,6 +144,11 @@ describe('ProviderRegistrationService Property Tests', () => {
             fc.constant(''), // empty
             fc.constant('   ') // whitespace only
           ),
+          profession: fc.oneof(
+            fc.constant(''), // empty
+            fc.constant('   ') // whitespace only
+          ),
+          requires_license: fc.boolean(),
           phone_number: fc.string().filter(s => s.length > 0 && !/^\+?[\d\s\-\(\)]+$/.test(s)), // invalid phone
           license_number: fc.oneof(
             fc.constant(''), // empty
@@ -176,13 +195,21 @@ describe('ProviderRegistrationService Property Tests', () => {
             expect(errors.full_name!.length).toBeGreaterThan(0);
           }
 
+          if (testData.profession.trim() === '') {
+            expect(errors.profession).toBeDefined();
+            expect(typeof errors.profession).toBe('string');
+            expect(errors.profession!.length).toBeGreaterThan(0);
+          }
+
           if (testData.phone_number && !/^\+?[\d\s\-\(\)]+$/.test(testData.phone_number)) {
             expect(errors.phone_number).toBeDefined();
             expect(typeof errors.phone_number).toBe('string');
             expect(errors.phone_number!.length).toBeGreaterThan(0);
           }
 
-          if (testData.license_number.trim() === '') {
+          // Licence is only mandatory for regulated professions
+          // (requires_license from provider_types) — current contract.
+          if (testData.requires_license && testData.license_number.trim() === '') {
             expect(errors.license_number).toBeDefined();
             expect(typeof errors.license_number).toBe('string');
             expect(errors.license_number!.length).toBeGreaterThan(0);
@@ -236,6 +263,8 @@ describe('ProviderRegistrationService Property Tests', () => {
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test User',
+      profession: 'doctor',
+      requires_license: true,
       phone_number: '+1234567890',
       license_number: 'LIC123',
       specialty: 'General Practice',
@@ -285,6 +314,8 @@ describe('ProviderRegistrationService Property Tests', () => {
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test User',
+      profession: 'doctor',
+      requires_license: true,
       phone_number: '+1234567890',
       license_number: 'LIC123',
       specialty: 'General Practice',
@@ -352,6 +383,8 @@ describe('ProviderRegistrationService Property Tests', () => {
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test Provider',
+      profession: 'doctor',
+      requires_license: true,
       phone_number: '+1234567890',
       license_number: 'LIC123456',
       specialty: 'Cardiology',
@@ -385,13 +418,20 @@ describe('ProviderRegistrationService Property Tests', () => {
     expect(result.success).toBe(true);
     expect(result.error).toBeUndefined();
     
-    // Verify user account creation (Requirement 1.1)
+    // Verify user account creation (Requirement 1.1). Current contract:
+    // the exact profession and professional details travel in the signup
+    // metadata so the DB triggers (handle_new_user / assign_default_role /
+    // auto_create_provider_application) build the account skeleton.
     expect(supabase.auth.signUp).toHaveBeenCalledWith({
       email: registrationData.email,
       password: registrationData.password,
       options: {
         data: {
           full_name: registrationData.full_name,
+          role: registrationData.profession,
+          license_number: registrationData.license_number,
+          specialty: registrationData.specialty,
+          years_experience: registrationData.years_of_experience,
         }
       }
     });
@@ -408,21 +448,24 @@ describe('ProviderRegistrationService Property Tests', () => {
       specialty: registrationData.specialty
     });
     
-    // Verify role assignment (Requirement 1.2)
-    expect(mockFromChain.insert).toHaveBeenCalledWith({
-      user_id: mockUser.id,
-      role: 'health_personnel'
-    });
-    
-    // Verify application creation with provider data
-    expect(mockFromChain.insert).toHaveBeenCalledWith({
+    // Verify role assignment (Requirement 1.2). Current contract: the
+    // client NEVER writes roles — the assign_default_role trigger grants
+    // the pending role from the signup metadata, and the exact provider
+    // role is granted only on admin approval. The service must not insert
+    // into any table (in particular not user_roles).
+    expect(mockFromChain.insert).not.toHaveBeenCalled();
+    expect(result.transaction?.roleAssigned).toBe(true);
+
+    // Verify application creation with provider data: the trigger seeds a
+    // skeleton row at signup, so the service UPSERTs the full details.
+    expect(mockFromChain.upsert).toHaveBeenCalledWith({
       user_id: mockUser.id,
       license_number: registrationData.license_number,
       specialty: registrationData.specialty,
       years_of_experience: registrationData.years_of_experience,
       documents_url: registrationData.documents_url,
       status: 'pending'
-    });
+    }, { onConflict: 'user_id' });
     
     // Verify automatic authentication (Requirement 1.3)
     expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
@@ -453,6 +496,8 @@ describe('ProviderRegistrationService Property Tests', () => {
           password: fc.string({ minLength: 6, maxLength: 20 }),
           confirmPassword: fc.string({ minLength: 6, maxLength: 20 }),
           full_name: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
+          profession: fc.constant('doctor'),
+          requires_license: fc.boolean(),
           phone_number: fc.option(fc.string().filter(s => /^\+?[\d\s\-\(\)]+$/.test(s)), { nil: undefined }),
           license_number: fc.string({ minLength: 1, maxLength: 20 }).filter(s => s.trim().length > 0),
           specialty: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
@@ -462,11 +507,14 @@ describe('ProviderRegistrationService Property Tests', () => {
           ...data,
           confirmPassword: data.password // Ensure passwords match for valid data
         })),
-        // Generator for failure scenarios
+        // Generator for failure scenarios — one per step of the CURRENT
+        // flow (auth → profile upsert → application upsert → sign-in).
+        // The old 'role_failure' scenario is gone: role assignment is
+        // owned by the assign_default_role DB trigger, so there is no
+        // client-side role step left to fail.
         fc.constantFrom(
           'auth_failure',
-          'profile_failure', 
-          'role_failure',
+          'profile_failure',
           'application_failure',
           'signin_failure'
         ),
@@ -479,8 +527,16 @@ describe('ProviderRegistrationService Property Tests', () => {
           const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
           
           const mockUser = { id: 'test-user-id', email: registrationData.email };
-          const mockDeleteChain = { delete: vi.fn().mockResolvedValue({ error: null }) };
-          
+
+          // Chain shaped like the real PostgREST builder for the calls the
+          // service makes: upsert(...) and, during rollback, delete().eq(...).
+          const makeFromChain = (upsert: any) => ({
+            upsert,
+            insert: vi.fn().mockResolvedValue({ error: null }),
+            delete: vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) })),
+            eq: vi.fn(() => ({ delete: vi.fn().mockResolvedValue({ error: null }) }))
+          });
+
           // Set up mocks based on failure type
           switch (failureType) {
             case 'auth_failure':
@@ -489,61 +545,37 @@ describe('ProviderRegistrationService Property Tests', () => {
                 error: { message: 'Email already registered' }
               });
               break;
-              
+
             case 'profile_failure':
               (supabase.auth.signUp as any).mockResolvedValue({
                 data: { user: mockUser },
                 error: null
               });
-              (supabase.from as any).mockReturnValue({
-                upsert: vi.fn().mockResolvedValue({ error: { message: 'Profile creation failed' } }),
-                insert: vi.fn().mockResolvedValue({ error: null }),
-                delete: vi.fn().mockResolvedValue({ error: null }),
-                eq: vi.fn(() => mockDeleteChain)
-              });
+              (supabase.from as any).mockReturnValue(makeFromChain(
+                vi.fn().mockResolvedValue({ error: { message: 'Profile creation failed' } })
+              ));
               break;
-              
-            case 'role_failure':
-              (supabase.auth.signUp as any).mockResolvedValue({
-                data: { user: mockUser },
-                error: null
-              });
-              (supabase.from as any).mockReturnValue({
-                upsert: vi.fn().mockResolvedValue({ error: null }),
-                insert: vi.fn()
-                  .mockResolvedValueOnce({ error: { message: 'Role assignment failed' } })
-                  .mockResolvedValue({ error: null }),
-                delete: vi.fn().mockResolvedValue({ error: null }),
-                eq: vi.fn(() => mockDeleteChain)
-              });
-              break;
-              
+
             case 'application_failure':
               (supabase.auth.signUp as any).mockResolvedValue({
                 data: { user: mockUser },
                 error: null
               });
-              (supabase.from as any).mockReturnValue({
-                upsert: vi.fn().mockResolvedValue({ error: null }),
-                insert: vi.fn()
-                  .mockResolvedValueOnce({ error: null }) // role success
-                  .mockResolvedValueOnce({ error: { message: 'Application creation failed' } }), // application failure
-                delete: vi.fn().mockResolvedValue({ error: null }),
-                eq: vi.fn(() => mockDeleteChain)
-              });
+              (supabase.from as any).mockReturnValue(makeFromChain(
+                vi.fn()
+                  .mockResolvedValueOnce({ error: null }) // profile upsert succeeds
+                  .mockResolvedValue({ error: { message: 'Application creation failed' } }) // application upsert fails
+              ));
               break;
-              
+
             case 'signin_failure':
               (supabase.auth.signUp as any).mockResolvedValue({
                 data: { user: mockUser },
                 error: null
               });
-              (supabase.from as any).mockReturnValue({
-                upsert: vi.fn().mockResolvedValue({ error: null }),
-                insert: vi.fn().mockResolvedValue({ error: null }),
-                delete: vi.fn().mockResolvedValue({ error: null }),
-                eq: vi.fn(() => mockDeleteChain)
-              });
+              (supabase.from as any).mockReturnValue(makeFromChain(
+                vi.fn().mockResolvedValue({ error: null })
+              ));
               (supabase.auth.signInWithPassword as any).mockResolvedValue({
                 error: { message: 'Authentication failed' }
               });
@@ -624,6 +656,8 @@ describe('ProviderRegistrationService Property Tests', () => {
           email: fc.emailAddress(),
           password: fc.string({ minLength: 6, maxLength: 20 }),
           full_name: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
+          profession: fc.constant('doctor'),
+          requires_license: fc.boolean(),
           phone_number: fc.option(fc.string().filter(s => /^\+?[\d\s\-\(\)]+$/.test(s)), { nil: undefined }),
           license_number: fc.string({ minLength: 1, maxLength: 20 }).filter(s => s.trim().length > 0),
           specialty: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),

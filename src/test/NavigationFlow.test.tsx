@@ -61,6 +61,13 @@ describe('Navigation Flow Tests', () => {
   /**
    * Test that health_personnel has access to required routes
    * Requirements: 1.4
+   *
+   * '/prescriptions' is deliberately NOT in this list: since the
+   * provider-workforce hardening (rolePermissions.ts, HEALTH_PERSONNEL
+   * entry), the generic health_personnel catch-all no longer inherits
+   * the prescription board — only the legal prescribing professions
+   * (PRESCRIBING_ROLES) and pharmacy dispense roles may open it. The
+   * denial is asserted explicitly in the next test.
    */
   it('should allow health_personnel access to all required routes', () => {
     const requiredRoutes = [
@@ -68,7 +75,6 @@ describe('Navigation Flow Tests', () => {
       '/provider-portal',
       '/appointments',
       '/chat',
-      '/prescriptions',
       '/profile',
       '/settings',
     ];
@@ -77,6 +83,15 @@ describe('Navigation Flow Tests', () => {
       const hasAccess = hasRoutePermission(['health_personnel'], route);
       expect(hasAccess).toBe(true);
     });
+  });
+
+  /**
+   * The generic health_personnel catch-all must NOT inherit prescription
+   * access; prescribing professions (e.g. doctor) keep it.
+   */
+  it('should deny health_personnel the prescription board but allow prescribing roles', () => {
+    expect(hasRoutePermission(['health_personnel'], '/prescriptions')).toBe(false);
+    expect(hasRoutePermission([USER_ROLES.DOCTOR], '/prescriptions')).toBe(true);
   });
 
   /**
