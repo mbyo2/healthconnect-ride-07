@@ -176,7 +176,6 @@ export const LandingFooter = () => {
           <div className="col-span-2 space-y-4">
             <div className="flex items-center gap-2">
               <AppLogo size="sm" linkTo="/" />
-              <span className="font-display text-lg text-midnight">Doc&apos; O Clock</span>
             </div>
             <p className="text-sm text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide max-w-sm">
               Zambia&apos;s premier digital healthcare and telemedicine platform connecting patients with certified doctors, pharmacies, and hospitals.
