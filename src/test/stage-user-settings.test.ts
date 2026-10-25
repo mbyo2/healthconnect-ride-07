@@ -82,6 +82,18 @@ describe('user_settings · recreated table serves every current caller', () => {
     }
   });
 
+  it('notification_settings carries the UNIQUE(user_id) arbiter its upsert needs', () => {
+    // Adjacent proven defect (same 2024 migration, partial apply): the
+    // live table lacked UNIQUE(user_id), so upsertNotificationSettings
+    // failed 42P10 on every Settings email/push preference write.
+    const fix = readSrc('supabase/migrations/20261025_stageusettings_notification_settings_unique_user.sql');
+    expect(fix).toContain('CREATE UNIQUE INDEX IF NOT EXISTS notification_settings_user_id_key');
+    expect(fix).toContain('ON public.notification_settings (user_id)');
+    const page = readSrc('src/pages/Settings.tsx');
+    expect(page).toContain('.from("notification_settings")');
+    expect(page).toContain('const upsertNotificationSettings');
+  });
+
   it('the accessibility toggle stays off this table (a11y fix boundary)', () => {
     const page = readSrc('src/pages/Settings.tsx');
     const handler = page.slice(page.indexOf('const handleAccessibilityToggle'), page.indexOf('if (loading)'));
