@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -18,12 +17,13 @@ import {
 } from "lucide-react";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { InventoryControlTabs } from "@/components/pharmacy/InventoryControlTabs";
-import { precheckDispenseLines, dispenseLinesFEFO } from "@/components/pharmacy/pharmacyStockService";
+import { buildPharmacySaleItemsPayload, PHARMACY_SALE_TAX_RATE } from "@/lib/pharmacySale";
 
-const TAX_RATE = 0.16;
+// Cart-preview only: the charged tax is computed server-side by
+// create_pharmacy_sale at the same 16% rate (a server constant there).
+const TAX_RATE = PHARMACY_SALE_TAX_RATE;
 
 export const PharmacyManagement = () => {
-  const { user } = useAuth();
   const { institution: pharmacy, institutionId: pharmacyId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
@@ -99,57 +99,33 @@ export const PharmacyManagement = () => {
     if (cart.length === 0 || !pharmacy) return;
     setIsProcessing(true);
     try {
-      const transactionId = `TXN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
-      const total = cartTotal;
-
-      // GAP-20 + GAP-03: one pre-check for the whole cart, then a single sale
-      // row, then FEFO dispenses against the batch ledger (the transactional
-      // path). No per-item pharmacy_inventory.quantity update loop — the batch
-      // ledger is the stock truth. Shortfalls abort before anything is
-      // written; a mid-dispense failure rolls the sale row back.
-      const lines = cart.map((item) => ({
-        inventoryTable: "pharmacy_inventory" as const,
-        inventoryItemId: item.id as string,
-        quantity: Math.max(1, Math.round(item.cartQuantity)),
-        productName: item.product_name,
-      }));
-      await precheckDispenseLines(pharmacy.id, lines);
-
-      const { data: saleRow, error: saleError } = await supabase
-        .from("pharmacy_sales" as any)
-        .insert({
-          pharmacy_id: pharmacy.id,
-          transaction_id: transactionId,
-          customer_id: selectedPatientId || null,
-          items: cart,
-          subtotal: cartSubtotal,
-          tax: cartTax,
-          total_amount: total,
-          payment_method: paymentMethod,
-          payment_status: "completed",
-          served_by: user?.id || null,
-          created_at: new Date().toISOString(),
-        })
-        .select("id")
-        .single();
+      // Server-priced sale: create_pharmacy_sale prices every line from
+      // this pharmacy's pharmacy_inventory catalogue, computes subtotal,
+      // the 16% tax and the total server-side, writes the pharmacy_sales
+      // row born 'completed' and FEFO-dispenses against the batch ledger
+      // — all in one transaction. The client sends item ids + quantities
+      // only; the cart figures above are a preview, never the charge, and
+      // there is no client rollback: a failure aborts the RPC's
+      // transaction before anything is written.
+      const { data, error: saleError } = await (supabase as any).rpc("create_pharmacy_sale", {
+        p_pharmacy_id: pharmacy.id,
+        p_items: buildPharmacySaleItemsPayload(
+          cart.map((item) => ({ pharmacy_inventory_id: item.id, quantity: item.cartQuantity }))
+        ),
+        p_payment_method: paymentMethod,
+        p_customer_id: selectedPatientId || null,
+      });
 
       if (saleError) throw saleError;
 
-      try {
-        await dispenseLinesFEFO(pharmacy.id, lines, {
-          referenceType: "pos_sale",
-          referenceId: (saleRow as any)?.id,
-          notes: `Pharmacy sale ${transactionId}`,
-        });
-      } catch (fefoError: any) {
-        await supabase.from("pharmacy_sales" as any).delete().eq("id", (saleRow as any)?.id);
-        throw new Error(`Sale rolled back: ${fefoError?.message || "FEFO dispense failed"}`);
-      }
-
-      toast.success(`Sale completed! Receipt ${transactionId}`);
+      const sale = (data as any)?.sale;
+      toast.success(
+        `Sale completed! Receipt ${sale?.transaction_id} — ${formatPrice(Number(sale?.total_amount || 0))}`
+      );
       setCart([]);
       setSelectedPatientId("");
       refetchInventory();
+      queryClient.invalidateQueries({ queryKey: ["pharmacy-sales-today", pharmacy?.id] });
     } catch (error: any) {
       toast.error(error?.message || "Failed to complete sale");
     } finally {
@@ -344,6 +320,7 @@ export const PharmacyManagement = () => {
               <div className="flex justify-between text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1 border-t">
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
+              <p className="text-graphite-400 dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
             </div>
 
             <button

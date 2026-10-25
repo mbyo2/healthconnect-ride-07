@@ -23,8 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/hooks/use-currency";
+import { buildPosSaleItemsPayload } from "@/lib/posSale";
 
 interface DispensaryItem {
   id: string;
@@ -38,11 +38,15 @@ interface DispensaryItem {
 
 /**
  * Community dispensary POS backed by live medication_inventory. Completing
- * a dispense records a pharmacy_sales row, decrements stock, and prints a
- * receipt from the recorded sale — never local-only.
+ * a dispense goes through the create_pos_sale RPC (P1-26): the server
+ * prices every line from this institution's catalogue, deducts stock and
+ * FEFO-dispenses atomically, and the receipt prints from the RPC-returned
+ * sale — never local-only, never client-priced. Semantic unification:
+ * till sales are born 'completed' for every payment method in the
+ * canonical POS, so this surface no longer splits cash-paid vs
+ * digital-pending — the RPC's sale is the receipt.
  */
 export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
-  const { user } = useAuth();
   const { formatPrice } = useCurrency();
   const [stock, setStock] = useState<DispensaryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,63 +155,36 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
     if (!institutionId) return;
     setProcessing(true);
     try {
-      const receiptNo = `DSP-${Date.now().toString(36).toUpperCase()}`;
-      const items = cart.map((c) => ({
-        medication_inventory_id: c.item.id,
-        item_name: c.item.name,
-        quantity: c.qty,
-        unit_price: c.item.unitPrice,
-        total: Math.round(c.item.unitPrice * c.qty * 100) / 100,
-      }));
-
-      // Cash collected at the till counts as paid. Mobile-money/card sales stay
-      // pending until the payment is confirmed — never mark unverified
-      // digital money as received.
-      const cashCollected = paymentMethod === "cash";
-      const { data: sale, error: saleError } = await (supabase.from("pharmacy_sales" as any) as any)
-        .insert({
-          pharmacy_id: institutionId,
-          customer_name: customerName.trim() || "Walk-in Patient",
-          customer_phone: customerPhone.trim() || null,
-          items,
-          subtotal,
-          total_amount: subtotal,
-          paid_amount: cashCollected ? subtotal : 0,
-          balance: cashCollected ? 0 : subtotal,
-          payment_method: paymentMethod,
-          payment_status: cashCollected ? "paid" : "pending",
-          cashier_id: user?.id || null,
-          served_by: user?.id || null,
-          transaction_id: receiptNo,
-        })
-        .select("id")
-        .single();
+      // P1-26 canonical till: create_pos_sale prices every line from this
+      // institution's medication_inventory catalogue, computes the total,
+      // deducts stock and FEFO-dispenses atomically. The client sends
+      // item ids + quantities only — the prices shown in the cart are a
+      // display preview, never the charge.
+      const { data, error: saleError } = await (supabase as any).rpc("create_pos_sale", {
+        p_pharmacy_id: institutionId,
+        p_items: buildPosSaleItemsPayload(
+          cart.map((c) => ({ medication_inventory_id: c.item.id, quantity: c.qty }))
+        ),
+        p_customer_name: customerName.trim() || "Walk-in Patient",
+        p_customer_phone: customerPhone.trim() || null,
+        p_payment_method: paymentMethod,
+      });
       if (saleError) throw saleError;
 
-      // Decrement live stock per line item
-      for (const c of cart) {
-        const { error: stockError } = await (supabase.from("medication_inventory" as any) as any)
-          .update({ quantity_available: Math.max(0, c.item.stock - c.qty) })
-          .eq("id", c.item.id);
-        if (stockError) throw stockError;
-        await (supabase.from("inventory_transactions" as any) as any).insert({
-          medication_inventory_id: c.item.id,
-          transaction_type: "dispense",
-          quantity: -c.qty,
-          unit_price: c.item.unitPrice,
-          transaction_date: new Date().toISOString(),
-          notes: `Dispensary sale ${(sale as any)?.id || receiptNo}`,
-        }).then(() => {});
-      }
+      const sale = (data as any)?.sale;
+      const soldItems: Array<{ item_name: string; quantity: number; unit_price: number; total: number }> =
+        ((data as any)?.items as any[]) || [];
+      const receiptNo: string = sale?.receipt_number || "";
+      const totalAmount = Number(sale?.total_amount || 0);
 
-      // Print receipt from the recorded sale (escape everything user/DB-sourced).
+      // Print receipt from the RPC-returned sale (escape everything user/DB-sourced).
       const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       const printWin = window.open("", "_blank");
       if (printWin) {
-        const rows = cart
+        const rows = soldItems
           .map(
-            (c) =>
-              `<tr><td style="padding:4px 0;">${esc(c.item.name)} (x${c.qty})</td><td style="text-align:right;">K${(c.item.unitPrice * c.qty).toFixed(2)}</td></tr>`
+            (line) =>
+              `<tr><td style="padding:4px 0;">${esc(line.item_name)} (x${line.quantity})</td><td style="text-align:right;">K${Number(line.total).toFixed(2)}</td></tr>`
           )
           .join("");
 
@@ -218,8 +195,8 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <div style="text-align:center; font-size:11px;">Primary Essential Medical Dispense</div>
               <hr style="border-top:1px dashed #000; margin:10px 0;"/>
               <div><strong>Receipt:</strong> ${esc(receiptNo)}</div>
-              <div><strong>Customer:</strong> ${esc(customerName || "Walk-in Patient")}</div>
-              <div><strong>Payment:</strong> ${esc(paymentMethod.toUpperCase())} — ${cashCollected ? "PAID" : "PENDING CONFIRMATION"}</div>
+              <div><strong>Customer:</strong> ${esc(sale?.customer_name || customerName || "Walk-in Patient")}</div>
+              <div><strong>Payment:</strong> ${esc(paymentMethod.toUpperCase())} — PAID</div>
               <div><strong>Date:</strong> ${new Date().toLocaleString()}</div>
               <hr style="border-top:1px dashed #000; margin:10px 0;"/>
               <table style="width:100%;">
@@ -228,7 +205,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <hr style="border-top:1px dashed #000; margin:10px 0;"/>
               <div style="display:flex; justify-content:space-between; font-weight:bold;">
                 <span>TOTAL AMOUNT:</span>
-                <span>K${subtotal.toFixed(2)}</span>
+                <span>K${totalAmount.toFixed(2)}</span>
               </div>
               <div style="text-align:center; margin-top:15px; font-size:10px;">
                 Thank you for trusting Doc' O Clock Community Dispensary!
@@ -240,11 +217,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         printWin.document.close();
       }
 
-      toast.success(
-        cashCollected
-          ? `Dispensing completed! Receipt #${receiptNo} recorded.`
-          : `Sale recorded as pending — receipt #${receiptNo}. Confirm the ${paymentMethod} payment to settle it.`
-      );
+      toast.success(`Dispensing completed! Receipt #${receiptNo} recorded.`);
       setCart([]);
       setCustomerName("");
       setCustomerPhone("");
