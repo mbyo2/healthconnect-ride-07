@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
@@ -40,17 +40,20 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
             : "border-white/70 bg-white dark:bg-slate-900/80"
         }`}
       >
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="flex shrink-0 items-center gap-2 rounded-pill px-2 py-1"
+        {/* Single interactive element for the logo home action: AppLogo is
+            rendered link-less (linkTo="") and this Link is the one anchor.
+            Its accessible name comes from aria-label alone — the img alt
+            ("Doc' O Clock") is not concatenated, so the name is stated once. */}
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-2 rounded-pill px-2 py-1 hover:opacity-80 transition-opacity"
           aria-label="Doc' O Clock home"
         >
-          <AppLogo size="sm" linkTo="/" showText={false} className="shrink-0" />
+          <AppLogo size="sm" linkTo="" showText={false} className="shrink-0" />
           <span className="hidden font-display text-[15px] tracking-tight text-midnight sm:inline">
             Doc&apos; O Clock
           </span>
-        </button>
+        </Link>
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => (
