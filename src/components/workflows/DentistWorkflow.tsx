@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { PRESCRIBING_ROLES } from '@/config/roleConfig';
 import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
@@ -29,11 +33,86 @@ const TOOTH_CONDITIONS = [
 
 export const DentistWorkflow = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { showSuccess } = useSuccessFeedback();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const [toothChart, setToothChart] = useState<Record<string, string>>({});
   const [selectedTooth, setSelectedTooth] = useState<string | null>(null);
   const [showChart, setShowChart] = useState(false);
+  // Chart persistence (dental_charts): one saved chart per patient this
+  // provider treats. Before this, charting lived only in component state
+  // and was lost on navigation.
+  const [chartPatients, setChartPatients] = useState<{ id: string; name: string }[]>([]);
+  const [chartPatientId, setChartPatientId] = useState<string>('');
+  const [chartNotes, setChartNotes] = useState('');
+  const [chartSaving, setChartSaving] = useState(false);
+  const [canPrescribe, setCanPrescribe] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const [{ data: roleRows }, { data: appts }] = await Promise.all([
+        supabase.from('user_roles').select('role').eq('user_id', user.id),
+        supabase.from('appointments').select('patient_id').eq('provider_id', user.id),
+      ]);
+      if (cancelled) return;
+      const roles = (roleRows || []).map((r: any) => r.role as string);
+      setCanPrescribe(roles.some(r => (PRESCRIBING_ROLES as readonly string[]).includes(r)));
+      const patientIds = [...new Set((appts || []).map((a: any) => a.patient_id))];
+      if (patientIds.length) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', patientIds);
+        if (!cancelled) {
+          setChartPatients((profs || []).map((p: any) => ({
+            id: p.id,
+            name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Patient',
+          })));
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !chartPatientId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase.from('dental_charts' as any) as any)
+        .select('chart, notes')
+        .eq('patient_id', chartPatientId)
+        .eq('provider_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      setToothChart((data?.chart as Record<string, string>) || {});
+      setChartNotes(data?.notes || '');
+      setSelectedTooth(null);
+    })();
+    return () => { cancelled = true; };
+  }, [user, chartPatientId]);
+
+  const saveChart = async () => {
+    if (!user || !chartPatientId) {
+      toast.error('Choose the patient this chart belongs to first.');
+      return;
+    }
+    setChartSaving(true);
+    try {
+      const { error } = await (supabase.from('dental_charts' as any) as any)
+        .upsert(
+          { patient_id: chartPatientId, provider_id: user.id, chart: toothChart, notes: chartNotes || null, updated_at: new Date().toISOString() },
+          { onConflict: 'patient_id,provider_id' },
+        );
+      if (error) throw error;
+      showSuccess({ message: 'Dental chart saved to the patient record.' });
+    } catch {
+      toast.error('Could not save the dental chart. Please try again.');
+    } finally {
+      setChartSaving(false);
+    }
+  };
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -74,7 +153,9 @@ export const DentistWorkflow = () => {
     { title: "My Schedule", description: "Availability, appointments & calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Queue", description: "Today's consultations & upcoming visits", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
     { title: "Patient Records (EMR)", description: "Access case sheets, vitals & history", icon: <Stethoscope className="h-5 w-5" />, route: '/institution/patients' },
-    { title: "Write Prescriptions", description: "Digital Rx with allergy & interaction alerts", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' },
+    // Prescribing is charter-bound (dentists yes, dental therapists no) —
+    // the tile follows the same role list as the database policy.
+    ...(canPrescribe ? [{ title: "Write Prescriptions", description: "Digital Rx with allergy & interaction alerts", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' }] : []),
     { title: "AI Clinical Assistant", description: "AI-powered CDSS & diagnostic support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
     { title: "Video Consultations", description: "Telemedicine & remote patient care", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
     { title: "My Patients", description: "Connected patient network", icon: <Users className="h-5 w-5" />, route: '/connections' },
@@ -118,6 +199,34 @@ export const DentistWorkflow = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center mb-4">
+              <select
+                aria-label="Patient for this chart"
+                value={chartPatientId}
+                onChange={(e) => setChartPatientId(e.target.value)}
+                className="flex-1 min-h-[44px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-medium text-slate-900 dark:text-slate-100"
+              >
+                <option value="">Select a patient to chart…</option>
+                {chartPatients.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <input
+                aria-label="Chart notes"
+                value={chartNotes}
+                onChange={(e) => setChartNotes(e.target.value)}
+                placeholder="Chart notes (optional)"
+                className="flex-1 min-h-[44px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-medium text-slate-900 dark:text-slate-100"
+              />
+              <Button onClick={saveChart} disabled={chartSaving || !chartPatientId} className="min-h-[44px]">
+                {chartSaving ? 'Saving…' : 'Save Chart'}
+              </Button>
+            </div>
+            {chartPatients.length === 0 && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                Charts are saved against a patient from your bookings — once a patient books with you, they appear here and their saved chart loads automatically.
+              </p>
+            )}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 {renderToothRow(TEETH_UPPER_RIGHT, 'Upper Right')}
