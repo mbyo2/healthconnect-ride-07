@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BreakGlassDialog } from "@/components/clinical/BreakGlassDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { checkProviderAccess } from "@/utils/provider-patient-access";
+import { isPatientRecordAccessible } from "@/utils/patientRecordAccess";
 
 interface PatientRecord {
   id: string;
@@ -68,6 +68,7 @@ export const PatientRecords = () => {
         .select(`
           id,
           patient_id,
+          provider_id,
           record_type,
           description,
           visit_date
@@ -79,17 +80,45 @@ export const PatientRecords = () => {
 
       const rows = (data as any[]) || [];
       const patientIds = [...new Set(rows.map((r) => r.patient_id).filter(Boolean))];
-      
-      // 3-layer access control: filter to only patients the provider can access
-      // Layer 1: has appointment relationship, Layer 2: shared institution, Layer 3: role scope
+
+      // Display gate over the RLS-visible rows (RLS is the security
+      // boundary — this filter only narrows, never widens). A patient is
+      // shown when the provider is linked to them in a way the platform
+      // itself recognises: a care relationship (has_patient_relationship
+      // RPC), an active break-the-glass grant, or authorship of one of
+      // the visible records. See src/utils/patientRecordAccess.ts for why
+      // the previous checkProviderAccess filter (a non-existent
+      // `.allowed` property over an institution-links check with zero
+      // rows platform-wide) emptied this tab for every provider.
+      const grantPatientIds = new Set<string>();
+      if (patientIds.length > 0) {
+        const { data: grants } = await (supabase as any)
+          .from('emergency_access_grants')
+          .select('patient_id')
+          .eq('clinician_id', user.id)
+          .is('revoked_at', null)
+          .gt('expires_at', new Date().toISOString())
+          .in('patient_id', patientIds);
+        (grants || []).forEach((g: any) => grantPatientIds.add(g.patient_id));
+      }
+
       const accessiblePatientIds: string[] = [];
-      for (const pid of patientIds) {
-        const access = await checkProviderAccess(user.id, pid);
-        if (access.allowed) {
+      await Promise.all(patientIds.map(async (pid) => {
+        const hasOwnRecord = rows.some((r) => r.patient_id === pid && (r as any).provider_id === user.id);
+        let hasRelationship = false;
+        if (!hasOwnRecord && !grantPatientIds.has(pid)) {
+          const { data } = await supabase.rpc('has_patient_relationship', { p_patient_id: pid });
+          hasRelationship = data === true;
+        }
+        if (isPatientRecordAccessible({
+          hasRelationship,
+          hasActiveGrant: grantPatientIds.has(pid),
+          hasOwnRecord,
+        })) {
           accessiblePatientIds.push(pid);
         }
-      }
-      
+      }));
+
       const filteredRows = rows.filter(r => accessiblePatientIds.includes(r.patient_id));
       
       let patientMap: Record<string, any> = {};

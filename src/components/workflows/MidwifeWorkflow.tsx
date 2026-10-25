@@ -129,7 +129,7 @@ export const MidwifeWorkflow = () => {
               >
                 <option value="">Select patient…</option>
                 {ancPatients.map(p => (
-                  <option key={p.id} value={p.id}>{p.full_name || p.email || p.id}</option>
+                  <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
             </div>
