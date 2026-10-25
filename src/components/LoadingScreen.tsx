@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { SkeletonAppFrame } from "@/components/ui/skeleton-kit";
 import { safeLocalRemove, safeLocalClear, safeSessionRemove, safeSessionClear } from '@/utils/storage';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -9,6 +9,13 @@ interface LoadingScreenProps {
   timeout?: number;
 }
 
+/**
+ * Full-screen loading state for route chunks and auth/session gates.
+ * YouTube-style: an app-frame skeleton (header bar + page body shapes)
+ * instead of a centred spinner on a blank page, so the layout the user
+ * is about to see is already on screen. The message is announced to
+ * assistive tech via role="status"; the slow-load retry is unchanged.
+ */
 export const LoadingScreen = React.memo<LoadingScreenProps>(({
   message = "Loading...",
   timeout = 2500
@@ -27,21 +34,17 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50">
-      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-6 animate-fade-in">
-        <img src="/d0c-icon.svg" alt="Doc' O Clock" className="w-16 h-16 object-contain" />
-        <div className="space-y-2">
-          <h1 className="text-xl font-bold text-foreground">Doc' O Clock</h1>
-          <p className="text-sm text-muted-foreground">{message}</p>
-        </div>
-        <LoadingSpinner size="lg" className="text-primary" />
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <span role="status" className="sr-only">{message}</span>
+      <SkeletonAppFrame />
 
-        {showRetry && (
-          <Button onClick={handleRefresh} variant="outline" size="sm" className="mt-4 animate-slide-up">
+      {showRetry && (
+        <div className="fixed inset-x-0 bottom-8 flex justify-center animate-fade-in">
+          <Button onClick={handleRefresh} variant="outline" size="sm" className="shadow-lg">
             Taking too long? Retry
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 });
