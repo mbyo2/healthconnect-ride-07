@@ -70,7 +70,9 @@ export const HealthStreak = ({ milestones, streakDays = 0 }: HealthStreakProps) 
               <div
                 key={m.id}
                 className={`flex items-center gap-2 p-2 rounded-xl text-xs ${
-                  m.completed ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-500 dark:text-gray-400"
+                  m.completed
+                    ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {m.completed ? (
