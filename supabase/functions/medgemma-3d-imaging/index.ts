@@ -1,4 +1,4 @@
-import { resolveAIProvider, chatComplete, AIError, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { AI_MODEL_LABEL, extractAIText, LOVABLE_ENDPOINT, LOVABLE_TEXT_MODEL } from '../_shared/ai.ts';
 import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -80,59 +80,72 @@ serve(async (req: Request) => {
 
     console.log(`MedGemma 1.5 4B 3D imaging analysis: ${imagingType.toUpperCase()} ${bodyPart}, ${slices.length} slices`);
     
-    const aiProvider = resolveAIProvider();
-    const HF_TOKEN = aiProvider ? 'configured' : '';
-    if (!HF_TOKEN) {
-      console.error('No AI provider configured (OPENROUTER_API_KEY / HF_TOKEN missing)');
+    // Honest scope (completeness pass 2026-10-25): this function reviews
+    // individual 2D slices with a vision model. It is NOT a volumetric/3D
+    // reconstruction - the pre-fix code discarded the slice bytes, sent a
+    // text placeholder to a text model, and still claimed 'native 3D
+    // imaging' in its response. Without the vision gateway we decline
+    // plainly instead of fabricating a reading.
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('Vision gateway not configured (LOVABLE_API_KEY missing)');
       return new Response(
-        JSON.stringify({ error: 'AI service not configured', fallback: true }),
+        JSON.stringify({ error: 'Scan review is not available - the vision service is not configured.', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    // Review a representative sample: first, last and evenly spaced
+    // slices between, at most 6 images per request.
+    const MAX_REVIEW = 6;
+    const pickedIdx: number[] = [];
+    if (slices.length <= MAX_REVIEW) {
+      slices.forEach((_: string, i: number) => pickedIdx.push(i));
+    } else {
+      for (let k = 0; k < MAX_REVIEW; k++) pickedIdx.push(Math.round((k * (slices.length - 1)) / (MAX_REVIEW - 1)));
+    }
+    const reviewedSlices = pickedIdx.map((i) => slices[i]);
 
-    const systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B with native 3D medical imaging capabilities.
+    const systemPrompt = `You are Doc' O Clock AI, assisting with a PRELIMINARY review of individual scan slices. You are shown ${reviewedSlices.length} of ${slices.length} ${sliceOrientation || 'cross-sectional'} slices from a ${imagingType.toUpperCase()} scan of the ${bodyPart}, in order.
 
-3D VOLUMETRIC IMAGING ANALYSIS MODE:
-- You are analyzing ${slices.length} ${sliceOrientation || 'cross-sectional'} slices from a ${imagingType.toUpperCase()} scan of the ${bodyPart}
-- Understand the 3D context across all slices
-- Identify anatomical structures and their relationships
-- Detect and characterize any abnormalities
-- Consider volumetric extent of findings
-- Provide systematic analysis
+HARD LIMITS - follow exactly:
+- Describe only what is visible in the slices you were given.
+- This is NOT a volumetric or 3D reconstruction. Do not invent measurements, volumes, or findings on slices you were not shown.
+- Always state that this is a preliminary AI slice review, not a radiologist's report.
 
 ${contrastUsed ? 'Contrast enhancement is present - assess enhancement patterns.' : 'This is a non-contrast study.'}
 
-${userRole === 'health_personnel' ? 'Provide detailed radiological interpretation with differential diagnosis.' : 'Explain findings in clear, understandable terms.'}`;
+${userRole === 'health_personnel' ? 'Provide a structured radiology-style review (per-slice findings, impression, recommendations).' : 'Explain findings in clear, understandable terms.'}`;
 
-    // Build text description of slices for text-based analysis
-    const sliceDescriptions = slices.map((_: string, i: number) => `Slice ${i + 1}/${slices.length}`).join(', ');
-
-    const messages = [
-      {
-        role: 'system',
-        content: systemPrompt
-      },
-      {
-        role: 'user',
-        content: `[${imagingType.toUpperCase()} scan of ${bodyPart} - ${slices.length} ${sliceOrientation || 'cross-sectional'} slices attached: ${sliceDescriptions}]
-
-Clinical Question: ${clinicalQuestion}
-
-Provide a comprehensive analysis including:
-1. Technical Quality Assessment
-2. Systematic Anatomical Review
-3. Abnormality Detection and Characterization
-4. Volumetric/3D Relationships
-5. Impression and Recommendations`
-      }
-    ];
-
-    const { text: analysis } = await chatComplete({
-      messages,
-      maxTokens: 2500,
-      temperature: 0.3,
-      topP: 0.95,
+    const visionRes = await fetch(LOVABLE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: LOVABLE_TEXT_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: `Clinical Question: ${clinicalQuestion}\n\nReview the attached slices (they are slices ${pickedIdx.map((i) => i + 1).join(', ')} of ${slices.length}) and provide:\n1. Technical Quality Assessment\n2. Per-Slice Findings\n3. Overall Impression and Recommendations` },
+              ...reviewedSlices.map((sl: string) => ({
+                type: 'image_url',
+                image_url: { url: sl.startsWith('data:') || sl.startsWith('http') ? sl : `data:image/jpeg;base64,${sl}` },
+              })),
+            ],
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2500,
+      }),
     });
+    if (!visionRes.ok) {
+      console.error('Vision gateway error:', visionRes.status);
+      return new Response(
+        JSON.stringify({ error: 'Scan review is temporarily unavailable. Please try again.', fallback: true }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const analysis = extractAIText(await visionRes.json()) || '';
 
 
     console.log('3D imaging analysis completed');
@@ -146,10 +159,14 @@ Provide a comprehensive analysis including:
         timestamp: new Date().toISOString(),
         model: AI_MODEL_LABEL,
         capabilities: {
-          native_3d_imaging: true,
-          volumetric_analysis: true,
-          multi_slice_context: true
-        }
+          native_3d_imaging: false,
+          volumetric_analysis: false,
+          multi_slice_context: true,
+          slice_review: true,
+          slices_reviewed: reviewedSlices.length,
+          slices_received: slices.length
+        },
+        method: 'Preliminary AI review of individual 2D slices - not a volumetric reconstruction and not a radiologist report.'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

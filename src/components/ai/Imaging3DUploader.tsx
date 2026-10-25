@@ -95,7 +95,7 @@ export const Imaging3DUploader = () => {
       }
 
       setAnalysis(data.analysis);
-      toast.success('3D imaging analyzed successfully');
+      toast.success('Scan slices reviewed');
     } catch (error) {
       console.error('3D imaging analysis error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to analyze imaging');
@@ -119,10 +119,10 @@ export const Imaging3DUploader = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Layers className="h-5 w-5" />
-            3D Volumetric Analysis
+            Scan Slice Review
           </CardTitle>
           <CardDescription>
-            Upload CT, MRI, or PET-CT slices for AI-powered volumetric analysis
+            Upload CT, MRI, or PET-CT slices for a preliminary AI review of the slices
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -273,21 +273,21 @@ export const Imaging3DUploader = () => {
             {isAnalyzing ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Analyzing Volumetric Data...
+                Reviewing slices...
               </>
             ) : (
               <>
                 <Layers className="h-4 w-4 mr-2" />
-                Analyze 3D Imaging
+                Review scan slices
               </>
             )}
           </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
-            <p className="flex items-center gap-1.5"><Lightbulb className="h-4 w-4 text-amber-500" aria-hidden /> <strong>Doc' O Clock AI Volumetric Analysis</strong></p>
-            <p>• Native 3D understanding across slices</p>
-            <p>• Cross-sectional anatomical correlation</p>
-            <p>• Pathology detection and measurement</p>
+            <p className="flex items-center gap-1.5"><Lightbulb className="h-4 w-4 text-amber-500" aria-hidden /> <strong>Doc' O Clock AI Slice Review</strong></p>
+            <p>• Reviews a sample of your slices (up to 6) — a preliminary AI reading, not a radiologist report</p>
+            <p>• Per-slice findings in order</p>
+            <p>• Anything unusual is flagged for a clinician to confirm</p>
           </div>
         </CardContent>
       </Card>
@@ -295,9 +295,9 @@ export const Imaging3DUploader = () => {
       {/* Results Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Volumetric Analysis</CardTitle>
+          <CardTitle>Slice Review</CardTitle>
           <CardDescription>
-            AI-generated analysis of your 3D imaging study
+            AI-generated preliminary review of your scan slices
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -308,7 +308,7 @@ export const Imaging3DUploader = () => {
                 Analyzing {slices.length} slices with Doc' O Clock AI...
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                This may take a moment for volumetric processing
+                This may take a moment while the slices are reviewed
               </p>
             </div>
           ) : analysis ? (

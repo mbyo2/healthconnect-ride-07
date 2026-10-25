@@ -121,7 +121,7 @@ serve(async (req) => {
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
-      { auth: { persistSession: false } }
+      { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } }
     );
     const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token);
     if (authErr || !user) {
@@ -130,6 +130,23 @@ serve(async (req) => {
 
     const rateLimited = await aiRateLimitResponse(user.id, 'ambient-scribe', 10, corsHeaders);
     if (rateLimited) return rateLimited;
+
+    // Role gate (completeness pass 2026-10-25): the scribe drafts clinical
+    // consultation notes, so it is clinicians-only. The role is verified
+    // from user_roles under the caller's own JWT — never from the client.
+    const { data: scribeRoles } = await supabaseAuth
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const SCRIBE_ROLES = ['doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
+      'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse',
+      'midwife', 'health_personnel'];
+    if (!(scribeRoles || []).some((r: any) => SCRIBE_ROLES.includes(r.role))) {
+      return new Response(
+        JSON.stringify({ error: 'The consultation scribe is available to clinicians only. Your account does not have a clinical role.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const body = await req.json();
     const parsed = requestSchema.safeParse(body);

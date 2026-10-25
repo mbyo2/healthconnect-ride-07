@@ -92,13 +92,13 @@ function ruleBasedTriage(userPayload: string): TriageOutput {
   };
 }
 
-async function callGateway(userPayload: string): Promise<TriageOutput> {
+async function callGateway(userPayload: string): Promise<{ ai: TriageOutput; model: string }> {
   const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) {
     // Graceful degradation: rule-based triage when AI key is not configured.
     // This ensures the function responds instead of crashing (bug 2026-10-10).
     console.warn("LOVABLE_API_KEY not configured, using rule-based fallback");
-    return ruleBasedTriage(userPayload);
+    return { ai: ruleBasedTriage(userPayload), model: "rule-based-fallback" };
   }
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -136,7 +136,7 @@ async function callGateway(userPayload: string): Promise<TriageOutput> {
     ? parsed.urgency
     : "routine";
 
-  return {
+  const aiOut: TriageOutput = {
     urgency,
     recommended_specialty:
       typeof parsed.recommended_specialty === "string" &&
@@ -153,6 +153,7 @@ async function callGateway(userPayload: string): Promise<TriageOutput> {
     reasoning:
       typeof parsed.reasoning === "string" ? parsed.reasoning : "",
   };
+  return { ai: aiOut, model: "google/gemini-3-flash-preview" };
 }
 
 serve(async (req) => {
@@ -210,7 +211,7 @@ serve(async (req) => {
       extra_notes: input.extraNotes ?? null,
     });
 
-    const ai = await callGateway(userPayload);
+    const { ai, model: triageModel } = await callGateway(userPayload);
 
     // Service-role client to write across tables regardless of RLS surface.
     const admin = createClient(supabaseUrl, serviceKey);
@@ -246,7 +247,10 @@ serve(async (req) => {
         red_flags: ai.red_flags,
         recommended_action: ai.recommended_action,
         reasoning: ai.reasoning,
-        model: "google/gemini-3-flash-preview",
+        // Provenance is recorded honestly: the gateway model name only
+        // when the gateway actually answered, 'rule-based-fallback'
+        // otherwise (the pre-fix code always recorded the model name).
+        model: triageModel,
         emergency_event_id: emergencyEventId,
       })
       .select("id")

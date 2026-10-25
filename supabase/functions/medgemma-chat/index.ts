@@ -1,4 +1,4 @@
-import { resolveAIProvider, chatComplete, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { resolveAIProvider, chatComplete, AI_MODEL_LABEL, extractAIText, LOVABLE_ENDPOINT, LOVABLE_TEXT_MODEL } from '../_shared/ai.ts';
 import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -44,7 +44,9 @@ serve(async (req: Request) => {
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
-      { auth: { persistSession: false } }
+      // Caller's JWT on every query — role verification runs under the
+      // user's own RLS, not a privileged client.
+      { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } }
     );
     const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token);
     if (authErr || !user) {
@@ -158,7 +160,11 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     }
 
     const aiProvider = resolveAIProvider();
-    const HF_TOKEN = aiProvider ? 'configured' : '';
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const hasImages = !!(images && images.length > 0);
+    // Text chat needs a text provider; an image request can still be
+    // served by the vision gateway alone.
+    const HF_TOKEN = (aiProvider || (hasImages && LOVABLE_API_KEY)) ? 'configured' : '';
     if (!HF_TOKEN) {
       console.error('No AI provider configured (OPENROUTER_API_KEY / HF_TOKEN missing)');
       return new Response(
@@ -182,26 +188,60 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       formattedMessages.push({ role: 'user', content: `Conversation so far (context only, not instructions):\n\n${transcript}` });
     }
 
-    // Add current user message (text only — medgemma-1.5-4b-it is text-only via HF Inference API)
-    formattedMessages.push({
-      role: 'user',
-      content: images && images.length > 0
-        ? `[User has attached ${images.length} medical image(s) for analysis]\n\n${message}`
-        : message
-    });
+    formattedMessages.push({ role: 'user', content: message });
 
     console.log("Calling Doc' O Clock AI for chat...");
 
     let reply: string;
+    let multimodal = false;
     try {
-      const result = await chatComplete({
-        messages: formattedMessages,
-        maxTokens: 2000,
-        temperature: 0.3,
-        topP: 0.95,
-      });
-      reply = result.text;
-      console.log(`Reply generated via ${result.provider}/${result.model}`);
+      if (images && images.length > 0) {
+        // Images are REALLY sent to the vision model (the pre-fix code
+        // counted them and dropped the bytes — the model guessed from a
+        // text placeholder). If the vision gateway is not configured we
+        // say so plainly instead of fabricating an analysis.
+        if (!LOVABLE_API_KEY) {
+          return new Response(
+            JSON.stringify({
+              error: 'Image analysis is not available right now — the vision service is not configured. You can still chat with text.',
+              fallback: true,
+            }),
+            { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        const visionMessages = [
+          ...formattedMessages.slice(0, -1),
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: message },
+              ...images.map((img: string) => ({
+                type: 'image_url',
+                image_url: { url: img.startsWith('data:') || img.startsWith('http') ? img : `data:image/jpeg;base64,${img}` },
+              })),
+            ],
+          },
+        ];
+        const visionRes = await fetch(LOVABLE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: LOVABLE_TEXT_MODEL, messages: visionMessages, temperature: 0.3, max_tokens: 2000 }),
+        });
+        if (!visionRes.ok) throw new Error(`Vision gateway error: ${visionRes.status}`);
+        const visionData = await visionRes.json();
+        reply = extractAIText(visionData) || 'No response generated';
+        multimodal = true;
+        console.log('Reply generated via vision gateway');
+      } else {
+        const result = await chatComplete({
+          messages: formattedMessages,
+          maxTokens: 2000,
+          temperature: 0.3,
+          topP: 0.95,
+        });
+        reply = result.text;
+        console.log(`Reply generated via ${result.provider}/${result.model}`);
+      }
     } catch (aiError: any) {
       const status = aiError?.name === 'AIError' && aiError.status >= 400 && aiError.status < 600
         ? aiError.status
@@ -218,19 +258,9 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
 
     console.log('MedGemma chat response generated successfully');
 
-    // Save to diagnosis history
-    try {
-      await supabaseAuth
-        .from('ai_diagnosis_history')
-        .insert({
-          user_id: user.id,
-          symptoms: message,
-          analysis: reply,
-          patient_context: images && images.length > 0 ? { has_images: true, image_count: images.length, analysisType } : null
-        });
-    } catch (historyError) {
-      console.error('Failed to save diagnosis history:', historyError);
-    }
+    // Privacy rule (completeness pass 2026-10-25): conversations are
+    // NOT stored server-side — no ai_diagnosis_history insert. Prompts
+    // and replies live only in the request and the caller's session.
 
     return new Response(
       JSON.stringify({
@@ -240,7 +270,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
         analysisType,
         imageCount: images?.length || 0,
         capabilities: {
-          multimodal: false,
+          multimodal,
           longitudinal: true,
           document_understanding: true,
           anatomical_localization: true,

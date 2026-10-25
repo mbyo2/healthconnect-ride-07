@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 import React, { useState } from "react";
 import { Sparkles, Send, Bot, Zap, CheckCircle2, ShieldAlert, Cpu, ArrowRight } from "lucide-react";
 
@@ -18,17 +19,27 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
     { title: "Predict 24h Admissions", prompt: "Run predictive analytics on Lusaka emergency arrival trends for tonight.", icon: Sparkles },
   ];
 
-  const handleRun = (promptText: string) => {
+  const handleRun = async (promptText: string) => {
     setIsAnalyzing(true);
     setAiOutput(null);
     onExecutePrompt(promptText);
-
-    setTimeout(() => {
+    try {
+      // Real assistant call (completeness pass 2026-10-25): doc-chat answers
+      // under the signed-in user's own role and permissions, verified from
+      // user_roles under the caller's JWT; conversations are not stored
+      // server-side. The previous implementation fabricated a canned
+      // "telemetry" response after a timer - removed.
+      const { data, error } = await supabase.functions.invoke('doc-chat', {
+        body: { message: promptText },
+      });
+      if (error) throw error;
+      const reply = (data as any)?.reply || '';
+      setAiOutput(reply || 'The assistant did not return an answer. Please try rephrasing.');
+    } catch {
+      setAiOutput('The assistant is unavailable right now. Please try again in a moment.');
+    } finally {
       setIsAnalyzing(false);
-      setAiOutput(
-        `AI Telemetry Execution Complete:\n• Prompt: "${promptText}"\n• Action: Re-indexed 12 patient records across 4 group sections.\n• Recommendation: Reallocated 2 beds in Ward 4B for Dr. Mutale's cardiac admissions.\n• Risk Score: Low (Confidence 98.4%).`
-      );
-    }, 1200);
+    }
   };
 
   return (

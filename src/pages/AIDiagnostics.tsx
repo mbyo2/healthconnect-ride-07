@@ -40,7 +40,7 @@ const AIDiagnostics = () => {
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
                 <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                  Evidence-based clinical decision support powered by MedGemma 27B & 3D Volumetric Imaging
+                  Evidence-based clinical decision support from Doc' O Clock AI, with preliminary scan-slice review
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { resolveAIProvider, chatComplete, AIError, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { AI_MODEL_LABEL, extractAIText, LOVABLE_ENDPOINT, LOVABLE_TEXT_MODEL } from '../_shared/ai.ts';
 import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -77,12 +77,16 @@ serve(async (req: Request) => {
 
     console.log('MedGemma 1.5 4B document analysis request received');
     
-    const aiProvider = resolveAIProvider();
-    const HF_TOKEN = aiProvider ? 'configured' : '';
-    if (!HF_TOKEN) {
-      console.error('No AI provider configured (OPENROUTER_API_KEY / HF_TOKEN missing)');
+    // Document extraction is a VISION task: the document image itself is
+    // sent to the vision model below. (The pre-fix code dropped the image
+    // and asked a text model to 'analyze' a placeholder string - every
+    // extracted value was invented.) Without the vision gateway we say so
+    // plainly instead of fabricating an extraction.
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('Vision gateway not configured (LOVABLE_API_KEY missing)');
       return new Response(
-        JSON.stringify({ error: 'AI service not configured', fallback: true }),
+        JSON.stringify({ error: 'Document analysis is not available - the vision service is not configured.', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -152,7 +156,7 @@ For each medication:
         break;
     }
 
-    const systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B with advanced document understanding capabilities.
+    const systemPrompt = `You are Doc' O Clock AI, a medical document assistant. You are looking at an actual image of the document - extract only what is visibly written; if a field is not visible or is unclear, report it as not visible rather than guessing.
 
 DOCUMENT UNDERSTANDING MODE:
 - Extract structured data accurately from medical documents
@@ -163,28 +167,36 @@ DOCUMENT UNDERSTANDING MODE:
 
 ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable for EHR integration.' : 'Present findings in clear, patient-friendly language while maintaining accuracy.'}`;
 
-    // Use HuggingFace OpenAI-compatible chat completions endpoint
-    const messages = [
-      {
-        role: 'system',
-        content: systemPrompt
-      },
-      {
-        role: 'user',
-        content: `[Document image attached for analysis - ${documentType}]
-
-${extractionPrompt}
-
-Note: Please analyze this medical document and extract the requested information systematically.`
-      }
-    ];
-
-    const { text: extractedData } = await chatComplete({
-      messages,
-      maxTokens: 2000,
-      temperature: 0.2,
-      topP: 0.9,
+    const documentUrl = document.startsWith('data:') || document.startsWith('http')
+      ? document
+      : `data:image/jpeg;base64,${document}`;
+    const visionRes = await fetch(LOVABLE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: LOVABLE_TEXT_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: extractionPrompt },
+              { type: 'image_url', image_url: { url: documentUrl } },
+            ],
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 2000,
+      }),
     });
+    if (!visionRes.ok) {
+      console.error('Vision gateway error:', visionRes.status);
+      return new Response(
+        JSON.stringify({ error: 'Document analysis is temporarily unavailable. Please try again.', fallback: true }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const extractedData = extractAIText(await visionRes.json()) || '';
 
 
     console.log('Document analysis completed');

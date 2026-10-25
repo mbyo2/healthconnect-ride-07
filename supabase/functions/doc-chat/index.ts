@@ -492,7 +492,9 @@ serve(async (req: Request) => {
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
-      { auth: { persistSession: false } }
+      // The caller's JWT rides every query: role reads and any data access
+      // run under the user's own RLS, never a privileged client.
+      { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } }
     );
     const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
     if (authError || !user) {
@@ -636,19 +638,11 @@ serve(async (req: Request) => {
 
     console.log('Doc 0 Clock response generated');
 
-    // Save diagnosis history to database (auth already verified above)
-    try {
-      await supabaseAuth
-        .from('ai_diagnosis_history')
-        .insert({
-          user_id: user.id,
-          symptoms: message,
-          analysis: reply,
-          patient_context: image ? { has_image: true } : null
-        });
-    } catch (historyError) {
-      console.error('Failed to save diagnosis history:', historyError);
-    }
+    // Privacy rule (completeness pass 2026-10-25): AI conversations are
+    // NOT stored server-side. The prompt and reply exist in this request
+    // and in the caller's own session only — no ai_diagnosis_history
+    // insert, no transcript retention, nothing harvested for training
+    // or analytics. The insert that used to live here was removed.
 
     return new Response(
       JSON.stringify({

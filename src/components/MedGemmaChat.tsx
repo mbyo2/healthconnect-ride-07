@@ -54,7 +54,7 @@ const LinkifiedText = ({ text }: { text: string }) => {
   );
 };
 
-const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI Assistant, your advanced multimodal medical assistant. I can:\n\n• Analyze single or multiple medical images\n• Compare scans over time (longitudinal analysis)\n• Extract data from lab reports and documents\n• Identify anatomical features with localization\n• Answer medical questions\n\nHow can I assist you today?";
+const AI_WELCOME_MESSAGE = "Hello! I'm the Doc' O Clock AI Assistant. I can:\n\n• Answer medical questions in plain language\n• Look at a medical image you attach and describe what it shows\n• Help you understand lab results and documents\n\nYour conversations stay in this session — they are not saved on our servers. How can I help you today?";
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
@@ -242,14 +242,14 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
     setIsLoading(true);
 
     try {
-      console.log('Attempting MedGemma 1.5 4B multimodal chat...');
+      console.log('Attempting AI chat...');
 
       let data, error;
       let functionUsed = '';
 
-      // Try medgemma-chat first (now supports multimodal with MedGemma 1.5 4B)
+      // Try medgemma-chat first (supports text and attached images)
       try {
-        console.log('Calling medgemma-chat (MedGemma 1.5 4B - multimodal)...');
+        console.log('Calling medgemma-chat...');
         const response = await supabase.functions.invoke('medgemma-chat', {
           body: {
             message: userMessage.content,
@@ -264,7 +264,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
         });
         data = response.data;
         error = response.error;
-        functionUsed = 'medgemma-chat (MedGemma 1.5 4B)';
+        functionUsed = 'medgemma-chat';
 
         if (error || !data?.reply) throw new Error('medgemma-chat failed');
       } catch (medgemmaError) {
@@ -305,7 +305,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
             });
             data = medAiResponse.data;
             error = medAiResponse.error;
-            functionUsed = 'med-ai (GPT-3.5 fallback - text only)';
+            functionUsed = 'med-ai (text only)';
             
             if (imagesToSend.length > 0) {
               toast.warning('Note: Final fallback AI cannot analyze images');
@@ -317,7 +317,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
         }
       }
 
-      console.log(`${functionUsed} response:`, { data, error });
+      // Privacy: never log AI replies or prompts to the console.
 
       if (error) {
         console.error('AI function error:', error);
