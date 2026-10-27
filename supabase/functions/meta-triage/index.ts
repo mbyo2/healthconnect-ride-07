@@ -53,20 +53,33 @@ function json(status: number, data: unknown): Response {
 }
 
 // Symptom/context fields ONLY — there is deliberately no identifier field.
-const RequestSchema = z.object({
-  chiefComplaint: z.string().min(1).max(500),
-  symptoms: z.array(z.string().max(120)).max(30).default([]),
-  dangerSigns: z.array(z.string().max(60)).max(8).default([]),
-  bodyArea: z.string().max(40).nullable().default(null),
-  duration: z.string().max(40).nullable().default(null),
-  severity: z.number().int().min(0).max(10),
-  ageBand: z.string().max(40).nullable().default(null),
-  pregnant: z.enum(["yes", "no", "not-applicable"]).nullable().default(null),
-  answers: z
-    .array(z.object({ question: z.string().max(200), answer: z.string().max(500) }))
-    .max(8)
-    .default([]),
-});
+// .strict() rejects any extra key (e.g. an email or user id) outright, and
+// the handler rebuilds the Meta payload field-by-field regardless.
+const RequestSchema = z
+  .object({
+    // May be empty: a patient who only tapped symptom chips has no free
+    // text. The refine below still requires at least one symptom signal.
+    chiefComplaint: z.string().max(500),
+    symptoms: z.array(z.string().max(120)).max(30).default([]),
+    dangerSigns: z.array(z.string().max(60)).max(8).default([]),
+    bodyArea: z.string().max(40).nullable().default(null),
+    duration: z.string().max(40).nullable().default(null),
+    severity: z.number().int().min(0).max(10),
+    ageBand: z.string().max(40).nullable().default(null),
+    pregnant: z.enum(["yes", "no", "not-applicable"]).nullable().default(null),
+    answers: z
+      .array(z.object({ question: z.string().max(200), answer: z.string().max(500) }))
+      .max(8)
+      .default([]),
+  })
+  .strict()
+  .refine(
+    (v) =>
+      v.chiefComplaint.trim().length > 0 ||
+      v.symptoms.length > 0 ||
+      v.dangerSigns.length > 0,
+    { message: "at least one symptom signal is required" },
+  );
 
 // The platform's 27 provider professions (mirrors ALL_CLINICIAN_ROLES in
 // src/config/roleConfig.ts). The model may only recommend from this list.
