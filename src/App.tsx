@@ -49,6 +49,7 @@ const SharedEquipment = lazyWithRetry(() => import('@/pages/SharedEquipment'));
 const Prescriptions = lazyWithRetry(() => import('@/pages/Prescriptions'));
 const Symptoms = lazyWithRetry(() => import('@/pages/Symptoms'));
 const TriageIntake = lazyWithRetry(() => import('@/pages/TriageIntake'));
+const TriageAssistant = lazyWithRetry(() => import('@/pages/TriageAssistant'));
 const HealthcareProfessionals = lazyWithRetry(() => import('@/pages/HealthcareProfessionals'));
 const HealthcareInstitutions = lazyWithRetry(() => import('@/pages/HealthcareInstitutions'));
 const VideoDashboard = lazyWithRetry(() => import('@/pages/VideoDashboard'));
@@ -293,7 +294,7 @@ const AppContent = () => {
             {/* Legacy path: old bookmarks/links to the pharmacy Rx view land here */}
             <Route path="/pharmacy-rx" element={<Navigate to="/prescriptions" replace />} />
             <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
-            <Route path="/triage" element={<RouteGuard><TriageIntake /></RouteGuard>} />
+            <Route path="/triage" element={<RouteGuard><TriageAssistant /></RouteGuard>} />
             <Route path="/doc-o-clock" element={<RouteGuard><TriageIntake /></RouteGuard>} />
             <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
             {/* Legacy alias — role permissions reference /telemedicine; the suite lives at /video-consultations */}

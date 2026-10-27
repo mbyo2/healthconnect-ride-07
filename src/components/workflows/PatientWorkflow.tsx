@@ -313,6 +313,24 @@ export const PatientWorkflow = React.memo(() => {
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
 
+      {/* ─── AI Symptom Triage Entry ─── */}
+      <button
+        type="button"
+        onClick={() => navigate('/triage')}
+        className="w-full text-left bg-primary-500 hover:bg-primary-600 text-white p-4 sm:p-5 rounded-2xl shadow-xs transition-all active:scale-[0.99] flex items-center gap-4"
+      >
+        <div className="p-2.5 rounded-2xl bg-white/15 shrink-0">
+          <Sparkles className="h-6 w-6" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-base sm:text-lg font-bold block">Not feeling well?</span>
+          <span className="text-xs sm:text-sm text-white/85 font-medium block">
+            Check your symptoms in about a minute — we&apos;ll point you to the right care and help you book. Nothing you enter is saved.
+          </span>
+        </div>
+        <ChevronRight className="h-5 w-5 shrink-0" />
+      </button>
+
       {/* ─── Top Header Bar (Date & Notification Bell) ─── */}
       <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-3">

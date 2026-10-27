@@ -193,6 +193,13 @@ verify_jwt = false
 [functions.triage-assess]
 verify_jwt = true
 
+# Meta AI triage step (hackathon build, 2026-10-27): authenticated
+# patients only; the function verifies the caller in-code and uses the
+# identity ONLY for an in-memory rate limit — it stores nothing, and the
+# payload it forwards to the Meta Model API is anonymised (symptoms only).
+[functions.meta-triage]
+verify_jwt = true
+
 # WhatsApp webhook: Meta calls it without a Supabase JWT; the function
 # self-verifies (GET handshake token + POST HMAC, fail-closed — P2-24).
 [functions.whatsapp-webhook]

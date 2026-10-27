@@ -1,6 +1,8 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { CareExperience, HowItWorks, Features, ForProviders, PlatformScale } from "@/components/landing/LandingFeatures";
@@ -95,6 +97,48 @@ const Landing = () => {
         <LandingHeader scrolled={scrolled} />
         <main id="main-content">
           <LandingHero />
+          {/* Symptom entry — routes into the AI Triage & Care Assistant.
+              Chips only preselect a body area / symptom on /triage; no
+              symptom text is collected or sent anywhere on this page. */}
+          <section className="px-4 sm:px-6 py-10 bg-white dark:bg-slate-900 border-y border-canvas-silk dark:border-slate-800">
+            <div className="max-w-3xl mx-auto text-center space-y-4">
+              <h2 className="text-2xl font-bold tracking-tight flex items-center justify-center gap-2">
+                <Sparkles className="h-6 w-6 text-primary-500" /> Not sure who to see?
+              </h2>
+              <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium">
+                Answer a few symptom questions and Doc&apos;O Clock will point you to the
+                right professional — a dentist for a toothache, a midwife for antenatal
+                care, a doctor for the rest. It takes about a minute, and nothing you
+                enter is saved.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  { label: "Fever", area: "general", s: "Fever" },
+                  { label: "Toothache", area: "teeth-mouth", s: "Tooth pain" },
+                  { label: "Skin rash", area: "skin", s: "Rash" },
+                  { label: "Back pain", area: "back-joints", s: "Back pain" },
+                  { label: "Stomach pain", area: "stomach-digestion", s: "Stomach pain" },
+                  { label: "Anxiety & stress", area: "mind-mood", s: "" },
+                  { label: "Child health", area: "child-health", s: "" },
+                  { label: "Eye problem", area: "eyes-vision", s: "" },
+                ].map((chip) => (
+                  <Link
+                    key={chip.label}
+                    to={`/triage?area=${chip.area}${chip.s ? `&s=${encodeURIComponent(chip.s)}` : ""}`}
+                    className="px-3.5 py-2 rounded-full border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-300 transition-all"
+                  >
+                    {chip.label}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                to="/triage"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-all active:scale-[0.99]"
+              >
+                Check my symptoms <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </section>
           <HowItWorks />
           <PlatformScale />
           <CareExperience />
