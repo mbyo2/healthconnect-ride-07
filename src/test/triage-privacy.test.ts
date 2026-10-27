@@ -75,3 +75,41 @@ describe("triage intake + page — privacy contract in source", () => {
     expect(pageSource).not.toMatch(/localStorage\.setItem|sessionStorage\.setItem/);
   });
 });
+
+describe("role-wise triage — least-privilege pins (CEO order, 2026-10-27)", () => {
+  const payloadSource = readFileSync(
+    resolve(__dirname, "../lib/triage/payload.ts"),
+    "utf8",
+  );
+  const roleModeSource = readFileSync(
+    resolve(__dirname, "../lib/triage/roleMode.ts"),
+    "utf8",
+  );
+
+  it("the page performs no database access at all — no .from() of any kind", () => {
+    expect(pageSource).not.toMatch(/\.from\(/);
+  });
+
+  it("the page touches no web storage at all", () => {
+    expect(pageSource).not.toMatch(/localStorage|sessionStorage/);
+  });
+
+  it("the page's only supabase call is the single meta-triage invoke", () => {
+    const invokes = pageSource.match(/functions\.invoke/g) ?? [];
+    expect(invokes).toHaveLength(1);
+    expect(pageSource).toContain('"meta-triage"');
+    expect(pageSource).not.toMatch(/\.rpc\(/);
+  });
+
+  it("role/mode is NEVER sent upstream: the payload builder carries no role or mode", () => {
+    expect(payloadSource).not.toMatch(/\bcurrentRole\b|\bactingRole\b|\btriageMode\b/);
+    expect(payloadSource).not.toMatch(/role\s*:/);
+    expect(payloadSource).not.toMatch(/mode\s*:/);
+  });
+
+  it("the role-mode resolver is pure: no supabase, no fetch, no storage, no DB", () => {
+    expect(roleModeSource).not.toContain("supabase");
+    expect(roleModeSource).not.toMatch(/\.from\(|functions\.invoke|fetch\(/);
+    expect(roleModeSource).not.toMatch(/localStorage|sessionStorage/);
+  });
+});

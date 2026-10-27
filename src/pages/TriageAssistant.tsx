@@ -2,6 +2,14 @@ import React, { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { ROLE_PERMISSIONS } from "@/utils/rolePermissions";
+import {
+  TRIAGE_MODE_INTRO,
+  getTriageMode,
+  resolveActingRole,
+  resolveTriageNextSteps,
+} from "@/lib/triage/roleMode";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
@@ -51,6 +59,12 @@ import {
  * Safety order of operations: the deterministic red-flag screen runs
  * FIRST, locally and synchronously. A hit shows the emergency screen
  * immediately — no network call is made on that path at all.
+ *
+ * Role-wise (CEO order, 2026-10-27): usable by every role, acting on
+ * the CURRENT acting role via src/lib/triage/roleMode.ts — patients
+ * may book; clinical roles guide without booking or touching any
+ * patient record; every other role gets own-symptoms guidance only.
+ * The role/mode is never sent upstream and unlocks no data access.
  */
 
 const BODY_AREAS: Array<{ id: BodyArea; label: string }> = [
@@ -129,6 +143,12 @@ function Chip({
 
 export default function TriageAssistant() {
   const { user, loading: authLoading } = useAuth();
+  const {
+    currentRole,
+    primaryRole,
+    availableRoles,
+    loading: rolesLoading,
+  } = useUserRoles();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -157,11 +177,27 @@ export default function TriageAssistant() {
     [intake],
   );
 
+  // Role-wise, least-privilege behaviour (CEO order, 2026-10-27): the
+  // mode follows the role the user is CURRENTLY acting as. The mode and
+  // the role are presentation-only — they are never sent to the
+  // meta-triage function (the anonymised payload is unchanged) and they
+  // unlock no data access of any kind for any role.
+  const actingRole = resolveActingRole({ currentRole, primaryRole, availableRoles });
+  const triageMode = getTriageMode(actingRole);
+  const actingPermissions = actingRole ? (ROLE_PERMISSIONS[actingRole] ?? []) : [];
+  const nextSteps = assessment
+    ? resolveTriageNextSteps({
+        mode: triageMode,
+        permissions: actingPermissions,
+        assessment,
+      })
+    : [];
+
   React.useEffect(() => {
     if (!authLoading && !user) navigate("/auth", { replace: true });
   }, [authLoading, user, navigate]);
 
-  if (authLoading) return <LoadingScreen />;
+  if (authLoading || rolesLoading) return <LoadingScreen />;
   if (!user) return null;
 
   const patch = (partial: Partial<TriageIntake>) =>
@@ -293,12 +329,8 @@ export default function TriageAssistant() {
     setStep("intro");
   };
 
-  const bookWithProfession = () => {
-    if (!assessment) return;
-    const { specialty, q } = assessment.profession.search;
-    if (specialty) navigate(`/search?specialty=${encodeURIComponent(specialty)}`);
-    else if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
-    else navigate("/search");
+  const goToNextStep = (route?: string) => {
+    if (route) navigate(route);
   };
 
   const stepNumber = step === "intro" ? 1 : step === "intake" ? 2 : 3;
@@ -314,7 +346,9 @@ export default function TriageAssistant() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">AI Symptom Triage</h1>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-              Tell us how you feel — we&apos;ll point you to the right care and help you book
+              {triageMode === "patient"
+                ? "Tell us how you feel — we'll point you to the right care and help you book"
+                : "Tell us how you feel — we'll point you to the right care"}
             </p>
           </div>
         </div>
@@ -353,6 +387,9 @@ export default function TriageAssistant() {
                 anonymous symptom summary used by the AI step.
               </p>
             </div>
+            <p className="text-sm font-medium text-graphite-700 dark:text-slate-200">
+              {TRIAGE_MODE_INTRO[triageMode]}
+            </p>
             <button
               type="button"
               onClick={() => setStep("intake")}
@@ -668,13 +705,26 @@ export default function TriageAssistant() {
                 </p>
               )}
 
-              <button
-                type="button"
-                onClick={bookWithProfession}
-                className="w-full py-3.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-              >
-                Find &amp; book a {assessment.profession.label} <ArrowRight className="h-4 w-4" />
-              </button>
+              {nextSteps.map((stepDef, idx) =>
+                stepDef.kind === "link" ? (
+                  <button
+                    key={`${stepDef.route ?? stepDef.label}-${idx}`}
+                    type="button"
+                    onClick={() => goToNextStep(stepDef.route)}
+                    className="w-full py-3.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                  >
+                    {stepDef.label} <ArrowRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <p
+                    key={`${stepDef.label}-${idx}`}
+                    className="text-sm font-medium text-graphite-600 dark:text-slate-300"
+                  >
+                    {stepDef.label}
+                    {stepDef.description ? <> {stepDef.description}</> : null}
+                  </p>
+                ),
+              )}
               <p className="text-xs text-graphite-400 font-medium">
                 This is guidance, not a diagnosis. If your symptoms get worse at any
                 point — especially any of the danger signs — call 116 or go to the

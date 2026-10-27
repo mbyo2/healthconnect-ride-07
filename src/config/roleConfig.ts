@@ -314,6 +314,14 @@ export const COMMON_ROUTES = [
   '/privacy-security',
   '/payment-success',
   '/payment-cancel',
+  // '/triage' IS a common route (CEO order, 2026-10-27): the AI symptom
+  // triage is a personal symptom check — it collects no patient data,
+  // reads or writes no records, stores nothing, and its role-wise,
+  // least-privilege behaviour lives in the page itself (see
+  // src/lib/triage/roleMode.ts). Same safety class as /settings and /help:
+  // every signed-in role may open it, and no role gains any extra power
+  // from it — not even super_admin.
+  '/triage',
   // NOTE: '/courier-deliveries' is deliberately NOT a common route — it is
   // the courier role's own surface (granted in ROLE_PERMISSIONS.courier).
   // As a common route it passed the route guard for every signed-in role.
