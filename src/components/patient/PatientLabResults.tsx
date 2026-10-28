@@ -33,18 +33,16 @@ export default function PatientLabResults() {
     queryKey: ['patient-lab-results', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      // Live lab_results carries test_name + notes directly; verified_at
-      // exists after the 20260930 drift catch-up. Join lab_tests (source of
-      // truth) via test_id to get verifier info.
-      const { data, error } = await supabase
-        .from('lab_results')
+      // W3b (2026-10-28): patients read the masking view, not the base
+      // table. Base-table patient SELECT is verified-only at RLS, so the
+      // pending shell (test exists, name, "Pending verification") comes
+      // from lab_results_patient_view, which returns all of the patient's
+      // own rows with value-bearing columns (result_value, notes,
+      // document_url, is_abnormal) NULL until the result is verified.
+      const { data, error } = await (supabase.from('lab_results_patient_view' as any) as any)
         .select(`
           id, test_name, result_value, unit, reference_range, notes,
-          verified_at, test_id, created_at,
-          lab_test:lab_tests!lab_results_test_id_fkey(
-            verified_by,
-            verifier:profiles!lab_tests_verified_by_fkey(first_name, last_name)
-          )
+          verified_at, test_id, created_at
         `)
         .eq('patient_id', user!.id)
         .order('created_at', { ascending: false })
@@ -53,7 +51,28 @@ export default function PatientLabResults() {
         console.error('lab_results fetch error', error);
         return [] as LabResultRow[];
       }
-      return (data || []) as unknown as LabResultRow[];
+      const rows = (data || []) as unknown as LabResultRow[];
+      // Verifier info for verified rows: lab_tests (source of truth for
+      // verification) is patient-readable exactly for verified rows, so
+      // look the verifier up there, keyed by the lab_results.test_id.
+      const verifiedTestIds = [...new Set(
+        rows.filter(r => r.verified_at && r.test_id).map(r => r.test_id as string)
+      )];
+      if (verifiedTestIds.length > 0) {
+        const { data: tests } = await supabase
+          .from('lab_tests')
+          .select(`
+            id, verified_by,
+            verifier:profiles!lab_tests_verified_by_fkey(first_name, last_name)
+          `)
+          .in('id', verifiedTestIds);
+        const byId = new Map((tests || []).map((t: any) => [t.id, t]));
+        for (const r of rows) {
+          const t = r.test_id ? byId.get(r.test_id) : undefined;
+          if (t) r.lab_test = { verified_by: t.verified_by, verifier: t.verifier };
+        }
+      }
+      return rows;
     },
   });
 

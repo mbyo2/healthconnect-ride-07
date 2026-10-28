@@ -116,8 +116,11 @@ export function PatientOverviewHero() {
             .select("id", { count: "exact", head: true })
             .eq("patient_id", user.id)
             .in("status", ["pending", "partially_filled"]),
+          // W3b (2026-10-28): count via the patient masking view — base
+          // lab_tests patient SELECT is verified-only, so counting pending
+          // orders on the base table would always read 0.
           (supabase as any)
-            .from("lab_tests")
+            .from("lab_tests_patient_view")
             .select("id", { count: "exact", head: true })
             .eq("patient_id", user.id)
             .not("status", "in", "(completed,cancelled)"),

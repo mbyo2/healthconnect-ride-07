@@ -78,15 +78,31 @@ const CLASS_TERMS: Record<string, string> = {
   nsaids: 'nsaids',
 };
 
+const tokeniseDrugName = (s: string): string[] =>
+  s.split(/[\s/\-(),;]+/).filter(Boolean);
+
 export function drugClassesFor(name: string): string[] {
   const v = normalizeDrugName(name);
   if (!v) return [];
   if (CLASS_TERMS[v]) return [CLASS_TERMS[v]];
+  // W3b (2026-10-28): word-boundary (token-sequence) matching, mirroring
+  // the SQL public.drug_classes_for — a member matches when its token
+  // sequence appears contiguously in the candidate's tokens, so prefixed
+  // names ("SW28W2 Amoxicillin") and combination forms
+  // ("Sulfamethoxazole-Trimethoprim") match, while look-alike tokens
+  // ("Penicillamine", "Sulfate") stay clean.
+  const vTokens = tokeniseDrugName(v);
   const classes: string[] = [];
   for (const [cls, members] of Object.entries(DRUG_CLASSES)) {
-    if (members.some((m) => v === m || v.startsWith(`${m} `) || v.startsWith(`${m}/`) || v.endsWith(`/${m}`))) {
-      classes.push(cls);
-    }
+    const hit = members.some((m) => {
+      const mt = tokeniseDrugName(m);
+      if (mt.length === 0 || mt.length > vTokens.length) return false;
+      for (let i = 0; i + mt.length <= vTokens.length; i++) {
+        if (mt.every((t, j) => vTokens[i + j] === t)) return true;
+      }
+      return false;
+    });
+    if (hit) classes.push(cls);
   }
   return classes;
 }
