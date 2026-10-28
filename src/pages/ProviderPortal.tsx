@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const ProviderPortal = () => {
   const navigate = useNavigate();
@@ -110,7 +111,7 @@ export const ProviderPortal = () => {
 
       toast.success("Check your email to confirm your registration");
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 

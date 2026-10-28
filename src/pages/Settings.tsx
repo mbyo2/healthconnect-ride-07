@@ -13,6 +13,7 @@ import { useAccessibility } from "@/context/AccessibilityContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/i18n/LanguageContext";
 import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Real push state of THIS device/browser — deliberately not the saved
@@ -79,7 +80,7 @@ const Settings = () => {
       }
       toast.success('Data export requested — you will be notified when it is ready.');
     } catch (error: any) {
-      toast.error(error.message || 'Unable to submit your request. Please try again.');
+      toast.error(friendlyErrorMessage(error, 'Unable to submit your request. Please try again.'));
     } finally {
       setExporting(false);
     }

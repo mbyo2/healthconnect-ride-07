@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
 import { logSecurityEvent, SecurityEvents, authRateLimiter } from '@/utils/security-service';
 import { clearApiCaches } from '@/utils/service-worker';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,7 +78,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
       
       toast.success('Signed in');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in');
+      toast.error(friendlyErrorMessage(error, 'Failed to sign in'));
     } finally {
       setLoading(false);
     }
@@ -116,7 +117,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
     } catch (error: any) {
       // eslint-disable-next-line no-console
       console.error('AuthForm register error:', error);
-      toast.error(error.message || 'Failed to create account');
+      toast.error(friendlyErrorMessage(error, 'Failed to create account'));
     } finally {
       setLoading(false);
     }

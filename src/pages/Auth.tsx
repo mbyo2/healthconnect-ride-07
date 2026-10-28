@@ -15,6 +15,7 @@ import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { safeRedirectTarget } from "@/utils/pendingAction";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -291,7 +292,7 @@ export const Auth = () => {
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
-    if (error) showError(error.message);
+    if (error) showError(friendlyErrorMessage(error));
     else navigate(redirectTo, { replace: true });
     setLocalLoading(false);
   };
@@ -315,7 +316,7 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(error.message);
+    if (error) showError(friendlyErrorMessage(error));
     else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
@@ -346,7 +347,7 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(error.message);
+    if (error) showError(friendlyErrorMessage(error));
     else { showSuccess("Account created! Your application is under review."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
@@ -379,7 +380,7 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(error.message);
+    if (error) showError(friendlyErrorMessage(error));
     else { showSuccess("Business registered! Account under review."); setActiveTab("signin"); }
     setLocalLoading(false);
   };

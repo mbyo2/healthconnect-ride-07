@@ -15,6 +15,7 @@ import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
 import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
 import { MarketplaceListingApprovals } from "@/components/admin/MarketplaceListingApprovals";
 import { Button } from "@/components/ui/button";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type AdminUser = {
   id: string;
@@ -92,7 +93,7 @@ const SuperAdminDashboard = () => {
       setNewAdminEmail(""); setNewAdminPassword(""); setNewAdminFirstName(""); setNewAdminLastName("");
       fetchAdmins();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create admin");
+      toast.error(friendlyErrorMessage(error, "Failed to create admin"));
     } finally {
       setIsSubmitting(false);
     }
@@ -125,7 +126,7 @@ const SuperAdminDashboard = () => {
       toast.success(`Admin ${isCurrentlySuper ? "changed to Admin" : "promoted to Superadmin"}`);
       fetchAdmins();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update admin level");
+      toast.error(friendlyErrorMessage(error, "Failed to update admin level"));
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +153,7 @@ const SuperAdminDashboard = () => {
       toast.success("Admin access removed");
       fetchAdmins();
     } catch (error: any) {
-      toast.error(error.message || "Failed to remove admin access");
+      toast.error(friendlyErrorMessage(error, "Failed to remove admin access"));
     } finally {
       setIsSubmitting(false);
     }

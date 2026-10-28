@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TwoFactorMethod } from "@/types/settings";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
@@ -107,7 +108,7 @@ const PrivacySecurityPage = () => {
       });
 
       if (error) {
-        toast.error(error.message);
+        toast.error(friendlyErrorMessage(error));
       } else {
         toast.success("Password updated successfully");
         setCurrentPassword("");
@@ -156,7 +157,7 @@ const PrivacySecurityPage = () => {
       }
     } catch (error: any) {
       console.error('Error toggling 2FA:', error);
-      toast.error(error?.message || 'Error updating two-factor authentication');
+      toast.error(friendlyErrorMessage(error, 'Error updating two-factor authentication'));
     } finally {
       setIsLoading(false);
     }
@@ -175,7 +176,7 @@ const PrivacySecurityPage = () => {
       toast.success('Two-factor authentication enabled');
       logSecurityAction('2fa_enabled', 'auth', '');
     } catch (error: any) {
-      toast.error(error?.message || 'Invalid verification code');
+      toast.error(friendlyErrorMessage(error, 'Invalid verification code'));
     } finally {
       setIsLoading(false);
     }
@@ -244,7 +245,7 @@ const PrivacySecurityPage = () => {
       );
     } catch (error: any) {
       console.error(`Error submitting ${requestType} request:`, error);
-      toast.error(error.message || 'Unable to submit your request. Please try again.');
+      toast.error(friendlyErrorMessage(error, 'Unable to submit your request. Please try again.'));
     } finally {
       setIsLoading(false);
     }

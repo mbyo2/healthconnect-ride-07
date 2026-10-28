@@ -19,6 +19,7 @@ import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import LocalisationTaxCard from "@/components/settings/LocalisationTaxCard";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -500,7 +501,7 @@ const InstitutionSettings = () => {
       toast.success("Settings saved successfully");
     } catch (error: any) {
       console.error("Error saving settings:", error);
-      toast.error(error.message || "Failed to save settings");
+      toast.error(friendlyErrorMessage(error, "Failed to save settings"));
     } finally {
       setSaving(false);
     }

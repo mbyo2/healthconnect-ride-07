@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, ArrowLeft, Wallet as WalletIcon, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PaymentDetails {
   amount: number | null;
@@ -108,7 +109,7 @@ const PaymentSuccess = () => {
         }
       } catch (error) {
         console.error('Payment completion error:', error);
-        toast.error(error instanceof Error ? error.message : "Failed to complete payment");
+        toast.error(friendlyErrorMessage(error, "Failed to complete payment"));
       } finally {
         setIsLoading(false);
       }
