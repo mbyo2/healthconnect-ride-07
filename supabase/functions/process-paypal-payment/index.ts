@@ -80,7 +80,7 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     );
-    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(authHeader.replace('Bearer ', '')); // Explicit JWT: no-arg getUser() ignores the global Authorization header on supabase-js 2.7.1 and 401s every valid user (same F1 defect class fixed in process-wallet-payment/doc-chat)
     if (authErr || !user) {
       return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
