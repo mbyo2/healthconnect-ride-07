@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', '')); // Explicit JWT: no-arg getUser() ignores the global Authorization header on supabase-js 2.7.1 and 401s every valid user (same F1 defect class fixed in process-wallet-payment/doc-chat)
     if (authError || !user) throw new Error('Unauthorized');
 
     const { patientId, resourceTypes } = await req.json();
