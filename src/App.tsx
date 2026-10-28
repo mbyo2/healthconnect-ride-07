@@ -15,6 +15,7 @@ import { TwoFactorGate } from '@/components/auth/TwoFactorGate';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 import { PageTitleManager } from '@/components/PageTitleManager';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 // Bounded retry wrapper for lazy imports to handle stale chunk errors without hanging indefinitely
 const lazyWithRetry = (importFn: () => Promise<any>) =>
@@ -433,6 +434,7 @@ const App: React.FC = () => {
             <Router>
               <div className="App">
                 <PageTitleManager />
+                <ScrollToTop />
                 <TwoFactorGate>
                   <AppContentWithPreload />
                 </TwoFactorGate>
