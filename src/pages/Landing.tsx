@@ -98,8 +98,11 @@ const Landing = () => {
         <main id="main-content">
           <LandingHero />
           {/* Symptom entry — routes into the AI Triage & Care Assistant.
-              Chips only preselect a body area / symptom on /triage; no
-              symptom text is collected or sent anywhere on this page. */}
+              Chips only preselect a body area on /triage; no symptom text
+              is collected or sent anywhere on this page. (W1-F1: the chips
+              previously also carried a pre-typed symptom in a ?s= param,
+              which let a landing-page click silently create triage data —
+              removed; the user picks/types their own symptoms on /triage.) */}
           <section className="px-4 sm:px-6 py-10 bg-white dark:bg-slate-900 border-y border-canvas-silk dark:border-slate-800">
             <div className="max-w-3xl mx-auto text-center space-y-4">
               <h2 className="text-2xl font-bold tracking-tight flex items-center justify-center gap-2">
@@ -113,18 +116,18 @@ const Landing = () => {
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 {[
-                  { label: "Fever", area: "general", s: "Fever" },
-                  { label: "Toothache", area: "teeth-mouth", s: "Tooth pain" },
-                  { label: "Skin rash", area: "skin", s: "Rash" },
-                  { label: "Back pain", area: "back-joints", s: "Back pain" },
-                  { label: "Stomach pain", area: "stomach-digestion", s: "Stomach pain" },
-                  { label: "Anxiety & stress", area: "mind-mood", s: "" },
-                  { label: "Child health", area: "child-health", s: "" },
-                  { label: "Eye problem", area: "eyes-vision", s: "" },
+                  { label: "Fever", area: "general" },
+                  { label: "Toothache", area: "teeth-mouth" },
+                  { label: "Skin rash", area: "skin" },
+                  { label: "Back pain", area: "back-joints" },
+                  { label: "Stomach pain", area: "stomach-digestion" },
+                  { label: "Anxiety & stress", area: "mind-mood" },
+                  { label: "Child health", area: "child-health" },
+                  { label: "Eye problem", area: "eyes-vision" },
                 ].map((chip) => (
                   <Link
                     key={chip.label}
-                    to={`/triage?area=${chip.area}${chip.s ? `&s=${encodeURIComponent(chip.s)}` : ""}`}
+                    to={`/triage?area=${chip.area}`}
                     className="px-3.5 py-2 rounded-full border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-300 transition-all"
                   >
                     {chip.label}
