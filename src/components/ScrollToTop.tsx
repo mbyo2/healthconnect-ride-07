@@ -28,7 +28,7 @@ import { useLocation, useNavigationType } from "react-router-dom";
  *   native scroll restoration so users return to where they were.
  */
 export function ScrollToTop() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, key } = useLocation();
   const navigationType = useNavigationType();
 
   useLayoutEffect(() => {
@@ -71,7 +71,10 @@ export function ScrollToTop() {
     resetScroll();
     const raf = requestAnimationFrame(resetScroll);
     return () => cancelAnimationFrame(raf);
-  }, [pathname, hash, navigationType]);
+    // `key` is in the deps on purpose: it changes on EVERY navigation,
+    // including a nav-link click for the page you are already on
+    // (same pathname) — those clicks must also land at the top.
+  }, [pathname, hash, key, navigationType]);
 
   return null;
 }

@@ -33,6 +33,7 @@ function NavButtons() {
   return (
     <>
       <button onClick={() => navigate("/b")}>go-b</button>
+      <button onClick={() => navigate("/a")}>go-a-self</button>
       <button onClick={() => navigate("/b#anchor-x")}>go-hash</button>
       <button onClick={() => navigate(-1)}>go-back</button>
     </>
@@ -92,6 +93,26 @@ describe("ScrollToTop", () => {
     expect(document.body.scrollTop).toBe(0);
     expect(main.scrollTop).toBe(0);
     expect(screen.getByText("page b")).toBeInTheDocument();
+  });
+
+  it("resets scroll when navigating to the SAME pathname (nav-link re-click)", () => {
+    render(
+      <MemoryRouter initialEntries={["/a"]}>
+        <Harness />
+      </MemoryRouter>,
+    );
+    const main = document.querySelector("main")!;
+    setScroll(document.body, 500);
+    setScroll(main, 500);
+    scrollToSpy.mockClear();
+
+    fireEvent.click(screen.getByText("go-a-self"));
+
+    expect(scrollToSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ top: 0, behavior: "instant" }),
+    );
+    expect(document.body.scrollTop).toBe(0);
+    expect(main.scrollTop).toBe(0);
   });
 
   it("scrolls to the hash anchor instead of the top when the target exists", () => {
