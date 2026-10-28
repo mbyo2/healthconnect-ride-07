@@ -96,7 +96,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       const horizonStr = format(addDays(new Date(), 120), 'yyyy-MM-dd');
       const { data } = await (supabase as any).rpc('get_provider_booked_slots', {
-        p_provider_ids: [provider.id],
+        p_ids: [provider.id],
         p_from: todayStr,
         p_to: horizonStr,
       });

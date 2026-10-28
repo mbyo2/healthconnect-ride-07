@@ -63,7 +63,7 @@ export function ProviderSlotsPreview({
         // which made every slot look free. The rpc returns only date/time
         // occupancy — no patient identities.
         const { data } = await (supabase as any).rpc("get_provider_booked_slots", {
-          p_provider_ids: [providerId],
+          p_ids: [providerId],
           p_from: from,
           p_to: to,
         });

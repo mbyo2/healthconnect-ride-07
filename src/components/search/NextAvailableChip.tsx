@@ -38,7 +38,7 @@ export function useBookedSlots(providerIds: string[]) {
         // direct appointments SELECTs are RLS-blind to other patients'
         // bookings, so occupancy must come from the rpc.
         const { data } = await (supabase as any).rpc("get_provider_booked_slots", {
-          p_provider_ids: providerIds,
+          p_ids: providerIds,
           p_from: from,
           p_to: to,
         });
