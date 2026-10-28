@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 
 /**
@@ -11,10 +11,17 @@ import { useLocation, useNavigationType } from "react-router-dom";
  * /terms scrolled → footer /privacy landed at body scrollTop 1866).
  *
  * Details that matter for this app:
- * - The document scroller is <body>, not the window (html/body height CSS
- *   makes body the scroll container; window.scrollY stays 0), and the app
- *   shell (MobileLayout) scrolls inside <main id="main-content">. All of
- *   them are reset; resetting a non-scroller is a no-op.
+ * - The document scroller is <body>, not the window (index.css sets
+ *   html,body { height: 100% }, which makes body the scroll container;
+ *   window.scrollY stays 0), and the app shell (MobileLayout) also
+ *   scrolls inside <main id="main-content">. All of them are reset;
+ *   resetting a non-scroller is a no-op.
+ * - index.css sets `scroll-behavior: smooth` on html/body, so a plain
+ *   scrollTop assignment ANIMATES — and a route change immediately
+ *   followed by lazy-chunk/data renders can strand that animation
+ *   mid-flight (proven live: /providers → /search stayed at 1416 with a
+ *   naive reset). Resets therefore use behavior:"instant" and run again
+ *   on the next animation frame.
  * - Hash anchors keep working: when the URL carries a #fragment and the
  *   target element exists, we scroll to it instead of the top.
  * - POP navigations (browser Back/Forward) are left to the browser's
@@ -24,7 +31,7 @@ export function ScrollToTop() {
   const { pathname, hash } = useLocation();
   const navigationType = useNavigationType();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (navigationType === "POP") return;
 
     if (hash) {
@@ -41,11 +48,29 @@ export function ScrollToTop() {
       }
     }
 
-    window.scrollTo(0, 0);
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
-    const main = document.querySelector("main");
-    if (main) main.scrollTop = 0;
+    const resetScroll = () => {
+      const opts: ScrollToOptions = { top: 0, left: 0, behavior: "instant" };
+      window.scrollTo(opts);
+      if (document.documentElement) {
+        document.documentElement.scrollTo(opts);
+        if (document.documentElement.scrollTop !== 0) {
+          document.documentElement.scrollTop = 0;
+        }
+      }
+      if (document.body) {
+        document.body.scrollTo(opts);
+        if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
+      }
+      const main = document.querySelector("main");
+      if (main) {
+        main.scrollTo(opts);
+        if (main.scrollTop !== 0) main.scrollTop = 0;
+      }
+    };
+
+    resetScroll();
+    const raf = requestAnimationFrame(resetScroll);
+    return () => cancelAnimationFrame(raf);
   }, [pathname, hash, navigationType]);
 
   return null;

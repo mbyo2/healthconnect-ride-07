@@ -17,6 +17,15 @@ function setScroll(el: Element, value: number) {
     writable: true,
     configurable: true,
   });
+  // jsdom's Element.scrollTo is a not-implemented stub; give the element a
+  // faithful one that honours the options object the component passes.
+  Object.defineProperty(el, "scrollTo", {
+    value: (opts: { top?: number }) => {
+      (el as HTMLElement).scrollTop = opts?.top ?? 0;
+    },
+    writable: true,
+    configurable: true,
+  });
 }
 
 function NavButtons() {
@@ -71,12 +80,15 @@ describe("ScrollToTop", () => {
       </MemoryRouter>,
     );
     const main = document.querySelector("main")!;
+    setScroll(document.documentElement, 300);
     setScroll(document.body, 640);
     setScroll(main, 880);
 
     fireEvent.click(screen.getByText("go-b"));
 
-    expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
+    expect(scrollToSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ top: 0, behavior: "instant" }),
+    );
     expect(document.body.scrollTop).toBe(0);
     expect(main.scrollTop).toBe(0);
     expect(screen.getByText("page b")).toBeInTheDocument();
