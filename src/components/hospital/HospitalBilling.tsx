@@ -102,7 +102,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes, procRes, imagingRes, bedSegRes, ancRes, immRes, catalogueRes, policiesRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, procRes, imagingRes, bedSegRes, ancRes, immRes, otRes, emergencyRes, deliveryRes, bloodRes, dayCareRes, specialistRes, eyeRes, ambulanceRes, catalogueRes, policiesRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type").eq("patient_id", patientId).eq("payment_status", "pending"),
         // Prescription statuses are pending/filled/partially_filled —
@@ -114,6 +114,20 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         supabase.from("admission_bed_segments" as any).select("id, admission_id, bed_id, bed_type, segment_start, segment_end, bed:hospital_beds(bed_number)").eq("patient_id", patientId).eq("hospital_id", hospital.id).limit(50),
         supabase.from("anc_visits" as any).select("id, visit_number, visit_date").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(50),
         supabase.from("immunizations" as any).select("id, vaccine_name, dose_number, administered_date").eq("patient_id", patientId).eq("institution_id", hospital.id).not("administered_date", "is", null).limit(50),
+        // Billing completeness (2026-10-30): chargeable events the
+        // dedicated modules record must reach this bill too — theatre
+        // surgeries, emergency cases, deliveries, issued blood, day
+        // care, specialist sessions, eye examinations and ambulance
+        // trips. Each is validated server-side by create_hospital_bill
+        // under its own source_kind.
+        supabase.from("ot_surgeries" as any).select("id, procedure_name, scheduled_date").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(50),
+        supabase.from("emergency_cases" as any).select("id, chief_complaint, arrival_time").eq("patient_id", patientId).eq("hospital_id", hospital.id).in("status", ["discharged", "admitted"]).limit(50),
+        supabase.from("deliveries" as any).select("id, delivery_type, delivery_date").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(20),
+        supabase.from("blood_bank_requests" as any).select("id, component_type, units_required").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "issued").limit(50),
+        supabase.from("day_care_procedures" as any).select("id, procedure_name, scheduled_date").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "completed").limit(50),
+        supabase.from("specialist_sessions" as any).select("id, specialty_type, session_number, session_date").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(50),
+        supabase.from("eye_examinations" as any).select("id").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(50),
+        supabase.from("ambulance_dispatches" as any).select("id, pickup_location, destination").eq("patient_id", patientId).eq("institution_id", hospital.id).in("status", ["delivered", "completed"]).limit(50),
         supabase.from("service_pricing").select("id, service_code, service_label, base_price, category, institution_id")
           .eq("is_active", true)
           .or(`institution_id.eq.${hospital.id},institution_id.is.null`),
@@ -259,6 +273,117 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           service: matchServiceOrdered(services, im.vaccine_name || "", "vaccination", "immunization"),
           source_kind: "immunization",
           source_id: im.id,
+          selected: true,
+        });
+      });
+      // ── Billing completeness sources (2026-10-30) ──────────────
+      // Unmatched events still land in this list with service=null —
+      // they show as "Not on the price list" with the add-to-price-
+      // list action, never silently dropped.
+      ((otRes.data || []) as any[]).forEach((s: any) => {
+        charges.push({
+          key: `ot-${s.id}`,
+          category: "Theatre & Surgery",
+          description: `Surgery: ${s.procedure_name || "Surgical procedure"}`,
+          date: s.scheduled_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, s.procedure_name || "", "surgery"),
+          source_kind: "ot_surgery",
+          source_id: s.id,
+          selected: true,
+        });
+      });
+      ((emergencyRes.data || []) as any[]).forEach((c: any) => {
+        charges.push({
+          key: `emergency-${c.id}`,
+          category: "Emergency",
+          description: `Emergency attendance${c.chief_complaint ? `: ${String(c.chief_complaint).slice(0, 60)}` : ""}`,
+          date: c.arrival_time,
+          quantity: 1,
+          service: matchServiceOrdered(services, "casualty", "emergency"),
+          source_kind: "emergency_case",
+          source_id: c.id,
+          selected: true,
+        });
+      });
+      ((deliveryRes.data || []) as any[]).forEach((d: any) => {
+        const caesarean = String(d.delivery_type || "").toLowerCase().includes("caesar") || String(d.delivery_type || "").toLowerCase().includes("c-section");
+        charges.push({
+          key: `delivery-${d.id}`,
+          category: "Maternal & Child Health",
+          description: caesarean ? "Delivery: Caesarean section" : "Delivery: Normal vaginal delivery",
+          date: d.delivery_date,
+          quantity: 1,
+          service: caesarean
+            ? matchServiceOrdered(services, "caesarean", "c-section")
+            : matchServiceOrdered(services, "vaginal delivery", "normal delivery", "delivery"),
+          source_kind: "delivery",
+          source_id: d.id,
+          selected: true,
+        });
+      });
+      ((bloodRes.data || []) as any[]).forEach((b: any) => {
+        charges.push({
+          key: `blood-${b.id}`,
+          category: "Blood Bank",
+          description: `Blood transfusion: ${b.component_type || "blood"} × ${b.units_required ?? 1} unit(s)`,
+          date: undefined,
+          quantity: Math.max(1, Number(b.units_required) || 1),
+          service: matchServiceOrdered(services, "transfusion", "blood"),
+          source_kind: "blood_request",
+          source_id: b.id,
+          selected: true,
+        });
+      });
+      ((dayCareRes.data || []) as any[]).forEach((p: any) => {
+        charges.push({
+          key: `daycare-${p.id}`,
+          category: "Day Care",
+          description: `Day care: ${p.procedure_name || "Procedure"}`,
+          date: p.scheduled_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, p.procedure_name || ""),
+          source_kind: "day_care_procedure",
+          source_id: p.id,
+          selected: true,
+        });
+      });
+      ((specialistRes.data || []) as any[]).forEach((s: any) => {
+        charges.push({
+          key: `specialist-${s.id}`,
+          category: "Specialist Sessions",
+          description: `${s.specialty_type || "Specialist"} session${s.session_number ? ` #${s.session_number}` : ""}`,
+          date: s.session_date,
+          quantity: 1,
+          service: matchServiceOrdered(services, s.specialty_type || "", "physiotherapy"),
+          source_kind: "specialist_session",
+          source_id: s.id,
+          selected: true,
+        });
+      });
+      ((eyeRes.data || []) as any[]).forEach((e: any) => {
+        charges.push({
+          key: `eye-${e.id}`,
+          category: "Eye Care",
+          description: "Eye examination",
+          date: undefined,
+          quantity: 1,
+          service: matchServiceOrdered(services, "eye examination", "ophthalmology", "eye"),
+          source_kind: "eye_examination",
+          source_id: e.id,
+          selected: true,
+        });
+      });
+      ((ambulanceRes.data || []) as any[]).forEach((a: any) => {
+        charges.push({
+          key: `ambulance-${a.id}`,
+          category: "Ambulance",
+          description: `Ambulance trip: ${a.pickup_location || "Pickup"} → ${a.destination || "Hospital"}`,
+          date: undefined,
+          quantity: 1,
+          service: matchServiceOrdered(services, "ambulance"),
+          source_kind: "ambulance_dispatch",
+          source_id: a.id,
           selected: true,
         });
       });

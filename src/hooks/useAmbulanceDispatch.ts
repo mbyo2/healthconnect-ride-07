@@ -7,6 +7,11 @@ import { toast } from 'sonner';
 export interface AmbulanceDispatch {
   id: string;
   institution_id: string | null;
+  /** The patient master record this trip belongs to, when linked from
+   *  the roster picker at dispatch time. A completed trip with a
+   *  patient link is billable to that patient (Billing Completeness,
+   *  2026-10-30); an unlinked trip is never attributed to anyone. */
+  patient_id: string | null;
   patient_name: string;
   contact_phone: string | null;
   pickup_location: string;

@@ -12,6 +12,9 @@ import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone, 
 import { useAmbulanceDispatch } from '@/hooks/useAmbulanceDispatch';
 import { useAmbulancePositionPublisher, useLatestAmbulancePositions, positionAgeLabel } from '@/hooks/useAmbulancePosition';
 import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMap';
+import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import type { InstitutionPatient } from '@/lib/patients';
 
 const MOVING_STATUSES = ['en_route', 'on_scene', 'transporting'];
 
@@ -38,6 +41,12 @@ export const AmbulanceStaffWorkflow = () => {
   // Latest live position per active dispatch for the board.
   const latestPositions = useLatestAmbulancePositions(active.map(d => d.id));
   const [form, setForm] = useState({ patient_name: '', pickup_location: '', destination: '', priority: 'urgent', ambulance_unit: 'AMB-01', contact_phone: '', notes: '' });
+  // Billing completeness: linking the trip to the patient's master
+  // record makes the completed trip billable to that patient. The
+  // free-text caller name stays for unregistered call-outs; editing it
+  // clears the link so an id never rides under a wrong name.
+  const { institutionId } = useInstitutionAffiliation();
+  const [pickedPatient, setPickedPatient] = useState<InstitutionPatient | null>(null);
 
   const statusFlow: Record<string, string> = {
     dispatched: 'en_route', en_route: 'on_scene', on_scene: 'transporting', transporting: 'delivered', delivered: 'completed',
@@ -59,7 +68,20 @@ export const AmbulanceStaffWorkflow = () => {
           <DialogContent>
             <DialogHeader><DialogTitle>Emergency Dispatch</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <div className="space-y-1"><Label>Patient / Caller</Label><Input value={form.patient_name} onChange={e => setForm({...form, patient_name: e.target.value})} /></div>
+              {institutionId && (
+                <div className="space-y-1">
+                  <Label>Link to patient record (so the trip can be billed)</Label>
+                  <InstitutionPatientPicker
+                    institutionId={institutionId}
+                    value={pickedPatient}
+                    onChange={(p) => {
+                      setPickedPatient(p);
+                      if (p) setForm(f => ({ ...f, patient_name: p.name, contact_phone: p.phone || f.contact_phone }));
+                    }}
+                    />
+                </div>
+              )}
+              <div className="space-y-1"><Label>Patient / Caller</Label><Input value={form.patient_name} onChange={e => { setPickedPatient(null); setForm({...form, patient_name: e.target.value}); }} /></div>
               <div className="space-y-1"><Label>Pickup Location</Label><Input value={form.pickup_location} onChange={e => setForm({...form, pickup_location: e.target.value})} placeholder="Address or landmark" /></div>
               <div className="space-y-1"><Label>Destination</Label><Input value={form.destination} onChange={e => setForm({...form, destination: e.target.value})} /></div>
               <div className="grid grid-cols-2 gap-2">
@@ -78,7 +100,7 @@ export const AmbulanceStaffWorkflow = () => {
               </div>
               <div className="space-y-1"><Label>Contact Phone</Label><Input type="tel" value={form.contact_phone} onChange={e => setForm({...form, contact_phone: e.target.value})} /></div>
               <div className="space-y-1"><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={2} /></div>
-              <Button className="w-full bg-destructive hover:bg-destructive/90" onClick={async () => { await createDispatch(form as any); setShowAdd(false); }}>Dispatch Now</Button>
+              <Button className="w-full bg-destructive hover:bg-destructive/90" onClick={async () => { await createDispatch({ ...form, patient_id: pickedPatient?.id ?? null } as any); setPickedPatient(null); setShowAdd(false); }}>Dispatch Now</Button>
             </div>
           </DialogContent>
         </Dialog>

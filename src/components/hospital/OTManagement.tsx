@@ -12,6 +12,8 @@ import { Plus, Scissors, Clock, Calendar, AlertTriangle, Timer, FileSignature } 
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
+import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
+import type { InstitutionPatient } from '@/lib/patients';
 
 interface OTProps {
   hospital?: any;
@@ -63,6 +65,11 @@ export const OTManagement = ({ hospital }: OTProps) => {
     date: '', time: '', duration: '60', anesthetist: '', preOpNotes: '',
     isMinor: false, guardianName: ''
   });
+  // Billing completeness: a completed surgery can only reach the
+  // patient's bill when the booking carries the patient's master id —
+  // the roster picker sets it (typing a name instead clears it, so an
+  // id never rides under a wrong name).
+  const [pickedPatient, setPickedPatient] = useState<InstitutionPatient | null>(null);
 
   const [anaesthesiaForm, setAnaesthesiaForm] = useState({
     anaesthesiaType: 'general', drugsAdministered: '', intraopMonitoring: '',
@@ -100,6 +107,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       const { error } = await (supabase.from('ot_surgeries' as any) as any).insert({
         institution_id: hospital.id,
         patient_name: form.patientName,
+        patient_id: pickedPatient?.id ?? null,
         procedure_name: form.surgeryType,
         surgeon_name: form.surgeon || 'TBD',
         ot_room: form.otRoom,
@@ -120,6 +128,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       });
       if (error) throw error;
       setForm({ patientName: '', surgeryType: '', surgeon: '', otRoom: 'OT-1', date: '', time: '', duration: '60', anesthetist: '', preOpNotes: '', isMinor: false, guardianName: '' });
+      setPickedPatient(null);
       setShowDialog(false);
       toast.success('Surgery scheduled successfully');
       refresh();
@@ -333,8 +342,21 @@ export const OTManagement = ({ hospital }: OTProps) => {
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Schedule Surgery</DialogTitle></DialogHeader>
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            {hospital?.id && (
+              <div className="space-y-2">
+                <Label>Link to patient record (so the surgery can be billed)</Label>
+                <InstitutionPatientPicker
+                  institutionId={hospital.id}
+                  value={pickedPatient}
+                  onChange={(p) => {
+                    setPickedPatient(p);
+                    if (p) setForm(f => ({ ...f, patientName: p.name }));
+                  }}
+                />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Patient Name *</Label><Input value={form.patientName} onChange={e => setForm(p => ({ ...p, patientName: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>Patient Name *</Label><Input value={form.patientName} onChange={e => { setPickedPatient(null); setForm(p => ({ ...p, patientName: e.target.value })); }} /></div>
               <div className="space-y-2"><Label>Surgery Type *</Label><Input value={form.surgeryType} onChange={e => setForm(p => ({ ...p, surgeryType: e.target.value }))} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
