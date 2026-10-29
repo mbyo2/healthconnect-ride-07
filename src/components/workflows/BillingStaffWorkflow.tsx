@@ -125,10 +125,42 @@ export const BillingStaffWorkflow = () => {
           const label = `Lab Test: ${l.test_type}`;
           pushCharge(label, 1, l.test_type || "", "lab");
         });
+        // Till/bill guard: a medicine already paid for at the
+        // dispensary till is never charged again — fully paid ones
+        // are left off the invoice, partly paid ones are billed for
+        // the unpaid remainder only. (The consolidated hospital bill
+        // enforces the same rule server-side in create_hospital_bill;
+        // this keeps the manual-invoice surface honest too.)
+        const tillPaidByRx = new Map<string, number>();
+        if (institutionId) {
+          await Promise.all(
+            ((rxsRes.data || []) as any[]).map(async (r: any) => {
+              try {
+                const { data } = await (supabase as any).rpc("prescription_till_paid", {
+                  p_prescription_id: r.id,
+                  p_hospital_id: institutionId,
+                });
+                const paid = Number((data as any)?.paid_quantity || 0);
+                if (paid > 0) tillPaidByRx.set(r.id, paid);
+              } catch {
+                // No figure, no skip — the consolidated bill's
+                // server-side guard remains the backstop.
+              }
+            })
+          );
+        }
+        const tillSkipped: string[] = [];
+        const tillPartial: string[] = [];
         (rxsRes.data || []).forEach((r: any) => {
           const qty = r.quantity || 1;
           const label = `Rx: ${r.medication_name}`;
-          pushCharge(label, qty, r.medication_name || "");
+          const paid = tillPaidByRx.get(r.id) || 0;
+          if (paid >= qty) {
+            tillSkipped.push(label);
+            return;
+          }
+          if (paid > 0) tillPartial.push(label);
+          pushCharge(label, qty - paid, r.medication_name || "");
         });
 
         if (fetchedItems.length > 0) {
@@ -154,6 +186,16 @@ export const BillingStaffWorkflow = () => {
           );
         } else {
           toast.info("No pending system charges found for this patient");
+        }
+        if (tillSkipped.length > 0) {
+          toast.warning(
+            `${tillSkipped.length} medicine charge${tillSkipped.length === 1 ? " was" : "s were"} already paid at the dispensary till and ${tillSkipped.length === 1 ? "was" : "were"} not charged again: ${tillSkipped.slice(0, 3).join(", ")}${tillSkipped.length > 3 ? "…" : ""}`
+          );
+        }
+        if (tillPartial.length > 0) {
+          toast.warning(
+            `${tillPartial.length} medicine charge${tillPartial.length === 1 ? " was" : "s were"} partly paid at the dispensary till — only the unpaid remainder was billed: ${tillPartial.slice(0, 3).join(", ")}${tillPartial.length > 3 ? "…" : ""}`
+          );
         }
       }
     } catch (e) {

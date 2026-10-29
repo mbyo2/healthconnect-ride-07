@@ -54,6 +54,8 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
   const [cart, setCart] = useState<Array<{ item: DispensaryItem; qty: number }>>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [prescriptions, setPrescriptions] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "mobile_money" | "card">("mobile_money");
   const [processing, setProcessing] = useState(false);
 
@@ -90,9 +92,42 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
     }
   }, [institutionId]);
 
+  // Till/bill guard: a dispense can be recorded against the
+  // prescription it fulfils. The link is what stops the same medicine
+  // being charged again on the patient's hospital bill (and the RPC
+  // refuses the sale if that prescription is already billed or
+  // already fully paid at the till).
+  const fetchPrescriptions = useCallback(async () => {
+    if (!institutionId) return;
+    try {
+      const { data } = await (supabase as any)
+        .from("comprehensive_prescriptions")
+        .select("id, patient_id, medication_name, dosage, quantity, prescription_number")
+        .eq("pharmacy_id", institutionId)
+        .in("status", ["pending", "partially_filled"])
+        .order("prescribed_date", { ascending: false })
+        .limit(50);
+      const rows = ((data as any[]) || []).map((r: any) => ({ ...r, patient_name: "Patient" }));
+      const ids = [...new Set(rows.map((r: any) => r.patient_id).filter(Boolean))];
+      if (ids.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, first_name, last_name").in("id", ids as string[]);
+        const names = new Map(((profs || []) as any[]).map((p: any) => [p.id, `${p.first_name || ""} ${p.last_name || ""}`.trim()]));
+        rows.forEach((r: any) => { r.patient_name = names.get(r.patient_id) || "Patient"; });
+      }
+      setPrescriptions(rows.map((r: any) => ({
+        id: r.id,
+        label: `${r.prescription_number || "Rx"} — ${r.patient_name} — ${r.medication_name} ${r.dosage || ""} ×${r.quantity}`,
+      })));
+    } catch {
+      // The link is optional — a failed lookup never blocks a dispense.
+      setPrescriptions([]);
+    }
+  }, [institutionId]);
+
   useEffect(() => {
     fetchStock();
-  }, [fetchStock]);
+    fetchPrescriptions();
+  }, [fetchStock, fetchPrescriptions]);
 
   const [stockFilter, setStockFilter] = useState<string>('all');
   const filteredStock = stock.filter((s) => {
@@ -168,6 +203,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         p_customer_name: customerName.trim() || "Walk-in Patient",
         p_customer_phone: customerPhone.trim() || null,
         p_payment_method: paymentMethod,
+        p_prescription_id: selectedPrescriptionId || null,
       });
       if (saleError) throw saleError;
 
@@ -221,6 +257,8 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
       setCart([]);
       setCustomerName("");
       setCustomerPhone("");
+      setSelectedPrescriptionId("");
+      fetchPrescriptions();
       fetchStock();
     } catch (error: any) {
       console.error("Error completing dispense:", error);
@@ -395,6 +433,25 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
               />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="dsp-prescription" className="font-bold text-slate-700 dark:text-slate-300">Prescription (optional)</Label>
+              <select
+                id="dsp-prescription"
+                value={selectedPrescriptionId}
+                onChange={(e) => setSelectedPrescriptionId(e.target.value)}
+                className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-900"
+              >
+                <option value="">Walk-in sale — no prescription</option>
+                {prescriptions.map((rx) => (
+                  <option key={rx.id} value={rx.id}>{rx.label}</option>
+                ))}
+              </select>
+              {selectedPrescriptionId && (
+                <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+                  This payment is recorded against the prescription, so the same medicine is not charged again on the patient's hospital bill.
+                </p>
+              )}
             </div>
             <div className="space-y-1">
               <Label htmlFor="dsp-pay-method" className="font-bold text-slate-700 dark:text-slate-300">Payment Method</Label>

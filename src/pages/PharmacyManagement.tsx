@@ -34,6 +34,7 @@ export const PharmacyManagement = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "mobile_money" | "insurance">("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState("");
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
 
@@ -64,6 +65,24 @@ export const PharmacyManagement = () => {
         .gte("created_at", today)
         .order("created_at", { ascending: false })
         .limit(500);
+      return (data as any[]) || [];
+    },
+    enabled: !!pharmacy,
+  });
+
+  // Till guard (pharmacy universe): a sale can be recorded against
+  // the pharmacy_prescriptions record it fulfils; the RPC refuses a
+  // second completed sale for the same prescription at this pharmacy.
+  const { data: pendingPharmacyPrescriptions } = useQuery({
+    queryKey: ["pharmacy-prescriptions-pending", pharmacy?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("pharmacy_prescriptions")
+        .select("id, prescription_number, medications")
+        .eq("pharmacy_id", pharmacy!.id)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(50);
       return (data as any[]) || [];
     },
     enabled: !!pharmacy,
@@ -114,6 +133,7 @@ export const PharmacyManagement = () => {
         ),
         p_payment_method: paymentMethod,
         p_customer_id: selectedPatientId || null,
+        p_prescription_id: selectedPrescriptionId || null,
       });
 
       if (saleError) throw saleError;
@@ -124,6 +144,7 @@ export const PharmacyManagement = () => {
       );
       setCart([]);
       setSelectedPatientId("");
+      setSelectedPrescriptionId("");
       refetchInventory();
       queryClient.invalidateQueries({ queryKey: ["pharmacy-sales-today", pharmacy?.id] });
     } catch (error: any) {
@@ -321,6 +342,28 @@ export const PharmacyManagement = () => {
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
               <p className="text-graphite-400 dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="pm-prescription" className="text-xs font-bold">Prescription (optional)</Label>
+              <select
+                id="pm-prescription"
+                value={selectedPrescriptionId}
+                onChange={(e) => setSelectedPrescriptionId(e.target.value)}
+                className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-900"
+              >
+                <option value="">Walk-in sale — no prescription</option>
+                {(pendingPharmacyPrescriptions || []).map((rx: any) => (
+                  <option key={rx.id} value={rx.id}>
+                    {rx.prescription_number || "Rx"} — {Array.isArray(rx.medications) ? rx.medications.map((m: any) => m?.name).filter(Boolean).join(", ") : "prescription"}
+                  </option>
+                ))}
+              </select>
+              {selectedPrescriptionId && (
+                <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+                  This payment is recorded against the prescription, so it cannot be charged for twice.
+                </p>
+              )}
             </div>
 
             <button

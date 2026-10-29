@@ -311,6 +311,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       const bill = (data as any)?.bill;
       const unpriced = ((data as any)?.unpriced || []) as any[];
       const alreadyBilled = ((data as any)?.already_billed || []) as any[];
+      const alreadyPaidAtTill = ((data as any)?.already_paid_at_till || []) as any[];
       const appended = (data as any)?.appended === true;
       const claimId = (data as any)?.insurance_claim_id;
       if (unpriced.length > 0) {
@@ -323,6 +324,24 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         toast.warning(
           `${alreadyBilled.length} charge${alreadyBilled.length > 1 ? "s were" : " was"} already on ${holders.length === 1 ? `bill ${holders[0]}` : "an earlier bill"} and ${alreadyBilled.length > 1 ? "were" : "was"} not charged again`
         );
+      }
+      if (alreadyPaidAtTill.length > 0) {
+        // Till/bill guard: medicines the patient already paid for at
+        // the dispensary till are never charged again — fully paid
+        // ones are skipped, partly paid ones billed for the remainder.
+        const receipts = [...new Set(alreadyPaidAtTill.flatMap((a: any) => a.receipt_numbers || []))];
+        const fullyPaid = alreadyPaidAtTill.filter((a: any) => Number(a.billed_quantity || 0) === 0);
+        const partlyPaid = alreadyPaidAtTill.filter((a: any) => Number(a.billed_quantity || 0) > 0);
+        if (fullyPaid.length > 0) {
+          toast.warning(
+            `${fullyPaid.length} medicine charge${fullyPaid.length > 1 ? "s were" : " was"} already paid at the dispensary till${receipts.length > 0 ? ` (receipt ${receipts.join(", ")})` : ""} and ${fullyPaid.length > 1 ? "were" : "was"} not charged again`
+          );
+        }
+        if (partlyPaid.length > 0) {
+          toast.warning(
+            `${partlyPaid.length} medicine charge${partlyPaid.length > 1 ? "s were" : " was"} partly paid at the dispensary till — only the unpaid remainder was billed`
+          );
+        }
       }
       toast.success(
         claimId

@@ -46,6 +46,7 @@ export const PharmacyPOS = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [prescriptionId, setPrescriptionId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>("cash");
   const [paymentRef, setPaymentRef] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
@@ -62,6 +63,32 @@ export const PharmacyPOS = () => {
       if (searchQuery.length >= 2) query = query.or(`medication_name.ilike.%${searchQuery}%,generic_name.ilike.%${searchQuery}%`);
       const { data } = await query.limit(20);
       return (data || []) as InventoryItem[];
+    },
+    enabled: !!pharmacyId,
+  });
+
+  // Till/bill guard: a sale can be recorded against the prescription
+  // it fulfils. The link is what stops the same medicine being charged
+  // again on the patient's hospital bill (and the RPC refuses the sale
+  // if that prescription is already billed or already fully paid).
+  const { data: pendingPrescriptions } = useQuery({
+    queryKey: ["pos-prescriptions", pharmacyId],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("comprehensive_prescriptions")
+        .select("id, patient_id, medication_name, dosage, quantity, prescription_number")
+        .eq("pharmacy_id", pharmacyId!)
+        .in("status", ["pending", "partially_filled"])
+        .order("prescribed_date", { ascending: false })
+        .limit(50);
+      const rows = ((data || []) as any[]).map((r) => ({ ...r, patient_name: "Patient" }));
+      const ids = [...new Set(rows.map((r) => r.patient_id).filter(Boolean))];
+      if (ids.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, first_name, last_name").in("id", ids as string[]);
+        const names = new Map(((profs || []) as any[]).map((p) => [p.id, `${p.first_name || ""} ${p.last_name || ""}`.trim()]));
+        rows.forEach((r) => { r.patient_name = names.get(r.patient_id) || "Patient"; });
+      }
+      return rows;
     },
     enabled: !!pharmacyId,
   });
@@ -118,6 +145,7 @@ export const PharmacyPOS = () => {
         p_payment_method: paymentMethod,
         p_payment_reference: paymentRef || null,
         p_discount_percent: discountPercent,
+        p_prescription_id: prescriptionId || null,
       });
       if (error) throw error;
       const sale = (data as any)?.sale;
@@ -126,7 +154,7 @@ export const PharmacyPOS = () => {
       return { ...sale, items: soldItems };
     },
     onSuccess: (data) => {
-      setLastSale(data); setShowReceipt(true); setCart([]); setCustomerName(""); setCustomerPhone(""); setPaymentRef(""); setDiscountPercent(0);
+      setLastSale(data); setShowReceipt(true); setCart([]); setCustomerName(""); setCustomerPhone(""); setPaymentRef(""); setDiscountPercent(0); setPrescriptionId("");
       queryClient.invalidateQueries({ queryKey: ["pos-inventory"] }); queryClient.invalidateQueries({ queryKey: ["pos-session"] });
       toast.success("Sale completed!");
     },
@@ -248,6 +276,24 @@ export const PharmacyPOS = () => {
             <input placeholder="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="flex-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium" />
             <input placeholder="Phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-28 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs" />
           </div>
+          <select
+            value={prescriptionId}
+            onChange={(e) => setPrescriptionId(e.target.value)}
+            className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-900"
+            aria-label="Prescription this sale fulfils (optional)"
+          >
+            <option value="">Prescription (optional) — walk-in sale</option>
+            {(pendingPrescriptions || []).map((rx: any) => (
+              <option key={rx.id} value={rx.id}>
+                {rx.prescription_number || "Rx"} — {rx.patient_name} — {rx.medication_name} {rx.dosage || ""} ×{rx.quantity}
+              </option>
+            ))}
+          </select>
+          {prescriptionId && (
+            <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+              This payment is recorded against the prescription, so the same medicine is not charged again on the patient's hospital bill.
+            </p>
+          )}
         </div>
 
         {/* Cart Items */}
