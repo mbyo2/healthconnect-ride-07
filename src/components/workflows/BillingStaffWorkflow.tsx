@@ -91,7 +91,10 @@ export const BillingStaffWorkflow = () => {
         const [apptsRes, labsRes, rxsRes, insRes] = await Promise.all([
           supabase.from("appointments").select("id, type, date").eq("patient_id", patientId).eq("status", "completed"),
           supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
-          supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
+          // Prescription statuses are pending/filled/partially_filled —
+          // 'active' is not a legal status value; filtering on it
+          // silently dropped every medicine charge from the invoice.
+          supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).in("status", ["pending", "filled", "partially_filled"]),
           // Auto-fill insurance from the patient's latest verification — never re-typed.
           supabase.from("insurance_verifications" as any).select("provider_name, verified_at").eq("patient_id", patientId).order("verified_at", { ascending: false }).limit(1),
         ]);

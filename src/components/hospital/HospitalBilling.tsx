@@ -104,7 +104,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       const [apptsRes, labsRes, rxsRes, procRes, imagingRes, admissionsRes, ancRes, immRes, catalogueRes, policiesRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type").eq("patient_id", patientId).eq("payment_status", "pending"),
-        supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
+        // Prescription statuses are pending/filled/partially_filled —
+        // 'active' is not a legal status value, so filtering on it
+        // silently dropped every medicine charge from the bill.
+        supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).in("status", ["pending", "filled", "partially_filled"]),
         supabase.from("procedure_executions").select("id, procedure_id, execution_date, procedure:clinical_procedures(procedure_name)").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(100),
         supabase.from("imaging_orders" as any).select("id, modality, body_part, status, ordered_at").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(100),
         supabase.from("hospital_admissions" as any).select("id, admission_date, bed_id, bed:hospital_beds(bed_number, bed_type)").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "admitted").limit(20),
@@ -307,16 +310,26 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       if (error) throw error;
       const bill = (data as any)?.bill;
       const unpriced = ((data as any)?.unpriced || []) as any[];
+      const alreadyBilled = ((data as any)?.already_billed || []) as any[];
+      const appended = (data as any)?.appended === true;
       const claimId = (data as any)?.insurance_claim_id;
       if (unpriced.length > 0) {
         toast.warning(
           `${unpriced.length} charge${unpriced.length > 1 ? "s were" : " was"} not billed — no price set yet: ${unpriced.map((u: any) => u.description).join(", ")}`
         );
       }
+      if (alreadyBilled.length > 0) {
+        const holders = [...new Set(alreadyBilled.map((a: any) => a.invoice_number).filter(Boolean))];
+        toast.warning(
+          `${alreadyBilled.length} charge${alreadyBilled.length > 1 ? "s were" : " was"} already on ${holders.length === 1 ? `bill ${holders[0]}` : "an earlier bill"} and ${alreadyBilled.length > 1 ? "were" : "was"} not charged again`
+        );
+      }
       toast.success(
         claimId
           ? `Invoice ${bill?.invoice_number} generated — claim filed for ${bill?.insurance_provider}`
-          : `Invoice ${bill?.invoice_number} generated`
+          : appended
+            ? `Charges added to invoice ${bill?.invoice_number} — the patient's bill now totals ${formatPrice(Number(bill?.total_amount || 0))}`
+            : `Invoice ${bill?.invoice_number} generated`
       );
       setShowDialog(false);
       setSelectedPatientId(""); setSelectedPatient(null); setPolicies([]); setSelectedPolicyId("");
