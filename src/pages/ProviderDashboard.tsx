@@ -44,8 +44,7 @@ import GrowthChart from "@/components/clinical/GrowthChart";
 import VaccinationSchedule from "@/components/clinical/VaccinationSchedule";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DashboardSkeleton } from "@/components/shared/LoadingSkeleton";
-import { SkeletonForm, SkeletonListRow } from "@/components/ui/skeleton-kit";
+import { SkeletonForm, SkeletonListRow, SkeletonProviderDashboard } from "@/components/ui/skeleton-kit";
 
 // ── constants (match Profile.tsx) ────────────────────────────────────────────
 
@@ -776,7 +775,7 @@ export const ProviderDashboard = () => {
     return (
       <div className="min-h-screen bg-canvas p-6">
         <div className="mx-auto space-y-6 pt-8" style={{ maxWidth: "var(--max-content, 1280px)" }}>
-          <DashboardSkeleton />
+          <SkeletonProviderDashboard />
           <p className="text-sm font-medium text-center text-graphite-500 dark:text-slate-400">
             Checking your provider access…
           </p>

@@ -3,8 +3,7 @@ import React, { useEffect, useCallback, memo } from "react";
 import { ProviderList } from "@/components/ProviderList";
 import ProviderMap from "@/components/ProviderMap";
 import { useSearch } from "@/context/SearchContext";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SkeletonProviderCard } from "@/components/ui/skeleton-kit";
+import { SkeletonProviderCard, SkeletonSearchHeader } from "@/components/ui/skeleton-kit";
 import { SearchPagination } from "@/components/SearchPagination";
 import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
@@ -69,7 +68,7 @@ export const SearchResults = () => {
   if (isLoading && providers.length === 0) {
     return (
       <div className="space-y-6" role="status" aria-label="Loading providers">
-        <Skeleton className="h-12 w-full rounded-lg" />
+        <SkeletonSearchHeader />
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <SkeletonProviderCard key={i} />

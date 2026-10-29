@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { PatientOrderTracking } from "@/components/marketplace/PatientOrderTracking";
 import { useMarketplace } from "@/hooks/useMarketplace";
+import { SkeletonProductCard, SkeletonOrderCard } from "@/components/ui/skeleton-kit";
 import { Search, ShoppingCart, Package, Pill } from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "@/types/marketplace";
@@ -165,9 +166,9 @@ const Marketplace = () => {
                   </button>
                 </div>
               ) : productsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Loading products">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="status" aria-label="Loading products">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-60 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 animate-pulse rounded-2xl" />
+                    <SkeletonProductCard key={i} />
                   ))}
                 </div>
               ) : (
@@ -206,11 +207,7 @@ const Marketplace = () => {
               <div className="space-y-3" aria-label={ordersLoading ? "Loading orders" : "Order history"}>
                 {ordersLoading ? (
                   [0, 1, 2].map((i) => (
-                    <div key={i} className="border border-canvas-silk bg-canvas rounded-xl p-4 animate-pulse" aria-hidden="true">
-                      <div className="h-4 w-40 rounded bg-canvas-silk dark:bg-slate-800 mb-2" />
-                      <div className="h-3 w-56 rounded bg-canvas-silk dark:bg-slate-800 mb-1" />
-                      <div className="h-3 w-48 rounded bg-canvas-silk dark:bg-slate-800" />
-                    </div>
+                    <SkeletonOrderCard key={i} />
                   ))
                 ) : (
                   orders?.map((order) => (

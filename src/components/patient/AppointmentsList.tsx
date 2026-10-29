@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListSkeleton } from "@/components/ui/list-skeleton";
+import { SkeletonAppointmentCard } from "@/components/ui/skeleton-kit";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Calendar, Clock, MapPin, CalendarX, RefreshCw, FileCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +83,13 @@ export const AppointmentsList = () => {
   };
 
   if (isLoading) {
-    return <ListSkeleton count={3} showAvatar />;
+    return (
+      <div className="space-y-4" role="status" aria-label="Loading appointments">
+        {[0, 1, 2].map((i) => (
+          <SkeletonAppointmentCard key={i} />
+        ))}
+      </div>
+    );
   }
 
   if (appointments.length === 0) {

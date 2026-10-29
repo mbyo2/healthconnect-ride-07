@@ -153,6 +153,22 @@ main {
     animation: none;
   }
 }
+/* Shimmer variant for elements sitting ON dark surfaces (e.g. the
+   slate-900 next-appointment banner, dark table group headers): the
+   default muted block is nearly invisible there, so use a light
+   translucent block with a brighter sweep. Declared after .doc-shimmer
+   so it wins at equal specificity when both classes are present. */
+.doc-shimmer-on-dark {
+  background-color: rgb(255 255 255 / 0.13);
+}
+.doc-shimmer-on-dark::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 0.14) 50%,
+    transparent 100%
+  );
+}
 
 /* Dyslexia-friendly font: OpenDyslexic when loaded, gentle fallback stack */
 .a11y-dyslexia body,

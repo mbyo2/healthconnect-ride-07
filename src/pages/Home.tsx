@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useRoleDashboard } from "@/hooks/useRoleDashboard";
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
-import { SkeletonDashboardBody } from "@/components/ui/skeleton-kit";
+import { SkeletonPatientHome } from "@/components/ui/skeleton-kit";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -20,12 +20,14 @@ const Home = () => {
     skip: isPatient || loading
   });
 
-  // Show a dashboard-shaped skeleton while determining role redirect
+  // Show the patient-home skeleton while determining role redirect —
+  // patients (the audience that stays on /home) see the exact layout
+  // they are about to get; other roles redirect away from it.
   if (isAuthenticated && (isLoading || shouldRedirect || loading)) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6" role="status" aria-label="Loading your dashboard">
-          <SkeletonDashboardBody />
+        <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6" role="status" aria-label="Loading your dashboard">
+          <SkeletonPatientHome />
         </div>
       </div>
     );

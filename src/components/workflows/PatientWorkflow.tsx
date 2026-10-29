@@ -42,11 +42,7 @@ import {
   ArrowRight,
   FileText
 } from 'lucide-react';
-import {
-  SkeletonCard,
-  SkeletonListRow,
-  SkeletonStatGrid,
-} from "@/components/ui/skeleton-kit";
+import { SkeletonPatientHome } from "@/components/ui/skeleton-kit";
 import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
@@ -202,19 +198,12 @@ export const PatientWorkflow = React.memo(() => {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto py-12" role="status" aria-label="Loading your health dashboard">
+      <div className="max-w-6xl mx-auto pb-12" role="status" aria-label="Loading your health dashboard">
         <p className="sr-only">Loading your health dashboard...</p>
-        {/* Greeting hero + health metric cards + wallet/appointments shapes */}
-        <SkeletonCard className="h-40" />
-        <SkeletonStatGrid />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900 lg:col-span-2" aria-hidden>
-            {[0, 1, 2].map((i) => (
-              <SkeletonListRow key={i} action />
-            ))}
-          </div>
-          <SkeletonCard className="h-44" />
-        </div>
+        {/* Structural twin of the loaded dashboard below (same max-w-6xl
+            frame): triage banner, header bar, care toggle, dark
+            appointment banner, metric cards, specialties, doctors. */}
+        <SkeletonPatientHome />
       </div>
     );
   }

@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { HeartPulse, Activity, Thermometer, Scale, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonMetricCard } from "@/components/ui/skeleton-kit";
 import { cn } from "@/lib/utils";
 import { ManualVitalsEntry } from "@/components/patient/ManualVitalsEntry";
 
@@ -94,7 +94,7 @@ export function HealthMetricCards() {
         <h2 className="text-lg font-bold text-midnight">Your health</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-2xl" />
+            <SkeletonMetricCard key={i} />
           ))}
         </div>
       </section>
