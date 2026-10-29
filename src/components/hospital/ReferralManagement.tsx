@@ -14,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { usePatientNames } from '@/hooks/usePatientNames';
-import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { ListSkeleton } from '@/components/ui/list-skeleton';
 import { USER_ROLES } from '@/config/roleConfig';
@@ -40,6 +39,36 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   );
   const referrals = [...outgoing, ...incoming];
 
+  // Patient names for referral rows, resolved from the master profiles
+  // of the rows on screen (the roster picker replaced the old derived
+  // patient list; row rendering still needs names by id).
+  const [patientNames, setPatientNames] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const ids = Array.from(
+      new Set(referrals.map((r: any) => r.patient_id).filter(Boolean))
+    ).filter((id) => !patientNames[id as string]);
+    if (!ids.length) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', ids as string[]);
+      if (cancelled || !data?.length) return;
+      setPatientNames((prev) => {
+        const next = { ...prev };
+        (data as any[]).forEach((p) => {
+          next[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+        });
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [referrals]);
+
   // Incoming network referrals must arrive the moment they're sent.
   useEffect(() => {
     if (!hospital?.id) return;
@@ -60,8 +89,6 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       supabase.removeChannel(channel);
     };
   }, [hospital?.id, refresh, refreshIncoming]);
-  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
-
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [facilities, setFacilities] = useState<any[]>([]);
@@ -233,14 +260,15 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   };
 
   const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => {
-    // Patient name lookup: facility list → search results → selected name → fallback to raw id
+    // Patient name lookup: master-profile map → search results →
+    // selected name → plain fallback (never a raw UUID).
     const nameFor = (patientId: string) => {
-      const p = (patients || []).find((x: any) => x.id === patientId)
-        || searchResults.find((x: any) => x.id === patientId);
-      if (p) return `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || patientId;
+      if (patientNames[patientId]) return patientNames[patientId];
+      const p = searchResults.find((x: any) => x.id === patientId);
+      if (p) return `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || "Patient";
       // For the just-created referral, use the name captured at selection time
       if (form.patient_id === patientId && selectedPatientName) return selectedPatientName;
-      return patientId || "Patient";
+      return "Patient";
     };
     return (
     <Card key={r.id}>
@@ -308,15 +336,14 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
           <DialogHeader><DialogTitle>Create Referral</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <HospitalPatientSelect
-              patients={patients}
-              loading={patientsLoading}
+              institutionId={hospital?.id}
               value={form.patient_id}
               onChange={(id) => setForm({ ...form, patient_id: id })}
-              emptyHint="No patients registered at this facility yet. Register a patient in OPD Management or admit one in IPD before creating a referral."
+              createSource="referral"
             />
-            {(!patients || patients.length === 0) && (
+            {!hospital?.id && (
               <div className="space-y-1.5">
-                <Label>Or search your patients</Label>
+                <Label>Search your patients</Label>
                 <Input
                   value={patientSearch}
                   onChange={(e) => searchPatients(e.target.value)}

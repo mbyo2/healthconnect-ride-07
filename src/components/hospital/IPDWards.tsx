@@ -13,7 +13,6 @@ import { Bed, Plus, ArrowRightLeft, FileOutput, Loader2, RefreshCw } from "lucid
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
-import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { HospitalPatientSelect } from "./HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +43,6 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
 
   const { data: beds, loading, error, refresh } = useHospitalModule<any>("ward_beds", "institution_id", hospital?.id, { orderBy: "ward_name", ascending: true });
   const { data: transfers, loading: transfersLoading, refresh: refreshTransfers } = useHospitalModule<any>("ward_transfers", "institution_id", hospital?.id, { orderBy: "transfer_date", ascending: false });
-  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
   const { nameFor } = usePatientNames(beds.map((b) => b.patient_id).concat(transfers.map((t) => t.patient_id)));
 
   const wards = beds.reduce<Record<string, any[]>>((acc, bed) => {
@@ -326,7 +324,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
             <DialogDescription>Admit a patient to bed {selectedBed?.bed_number} ({selectedBed?.ward_name}).</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAdmit} className="space-y-3">
-            <HospitalPatientSelect patients={patients} loading={patientsLoading} value={admitForm.patient_id} onChange={(id) => setAdmitForm({ patient_id: id })} />
+            <HospitalPatientSelect institutionId={hospital?.id} value={admitForm.patient_id} onChange={(id) => setAdmitForm({ patient_id: id })} createSource="admission" />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowAdmitDialog(false)}>Cancel</Button>
               <Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Admit"}</Button>

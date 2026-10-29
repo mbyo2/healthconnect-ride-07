@@ -17,6 +17,9 @@ import { useCurrency } from "@/hooks/use-currency";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 import { ServiceLineEditor, useInstitutionServices } from "@/components/billing/InvoiceServiceLines";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
+import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
+import type { InstitutionPatient } from "@/lib/patients";
 import {
   type InvoiceServiceLine,
   emptyServiceLine,
@@ -58,12 +61,17 @@ export const Billing = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [showReceipt, setShowReceipt] = useState<Invoice | null>(null);
   const [markPaidInvoice, setMarkPaidInvoice] = useState<Invoice | null>(null);
-  const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
 
   // Form state — P1-26: invoice lines are priced services chosen from
   // the institution's service_pricing list, never free-typed prices.
-  const { services } = useInstitutionServices(institutionId);
-  const [patientId, setPatientId] = useState("");
+  // Patient Unity W3: the patient comes from the ONE roster picker
+  // (search_institution_patients + create-on-missing) — the old
+  // appointments-∪-registry derivation (which produced null ids for
+  // registry patients) is gone.
+  const { services, refresh: refreshServices } = useInstitutionServices(institutionId);
+  const { isAdmin: canCreateService } = useInstitutionTeam(institutionId);
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
+  const patientId = selectedPatient?.id ?? "";
   const [items, setItems] = useState<InvoiceServiceLine[]>([emptyServiceLine()]);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -73,7 +81,6 @@ export const Billing = () => {
 
   useEffect(() => {
     fetchInvoices();
-    fetchPatients();
   }, [institutionId]);
 
   const fetchInvoices = async () => {
@@ -94,52 +101,6 @@ export const Billing = () => {
     }
   };
 
-  const fetchPatients = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get patients from appointments (provider has relationship via appointment)
-      const { data: appointments } = await supabase
-        .from("appointments")
-        .select("patient_id")
-        .eq("provider_id", user.id);
-
-      const patientIds = [...new Set((appointments || []).map((a: any) => a.patient_id).filter(Boolean))];
-
-      // Get patients from registry
-      const { data: registry } = await supabase
-        .from("institution_patient_registry")
-        .select("linked_patient_id, first_name, last_name")
-        .eq("institution_id", institutionId || "");
-
-      const registryPatients = (registry || []).map((p: any) => ({
-        id: p.linked_patient_id,
-        name: `${p.first_name} ${p.last_name}`.trim()
-      }));
-
-      // Get patient profiles for appointment patients not in registry
-      const registryIds = new Set(registryPatients.map(p => p.id));
-      const missingIds = patientIds.filter(id => !registryIds.has(id));
-
-      let appointmentPatients: any[] = [];
-      if (missingIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", missingIds);
-        appointmentPatients = (profiles || []).map((p: any) => ({
-          id: p.id,
-          name: `${p.first_name} ${p.last_name}`.trim()
-        }));
-      }
-
-      setPatients([...registryPatients, ...appointmentPatients]);
-    } catch (err) {
-      console.error("Failed to fetch patients:", err);
-    }
-  };
-
   const calculateTotals = () => {
     // Display preview from the same catalogue the server prices from;
     // create_manual_invoice re-derives every figure at write time.
@@ -154,18 +115,16 @@ export const Billing = () => {
       return;
     }
     if (items.some(i => !i.service_pricing_id)) {
-      toast.error("Choose a priced service for every line");
+      toast.error("Every line needs a priced service — pick one from the price list, or create it right in the line");
       return;
     }
 
     setSubmitting(true);
     try {
-      const patient = patients.find(p => p.id === patientId);
-
       const { data, error } = await (supabase as any).rpc("create_manual_invoice", {
         p_institution_id: institutionId,
         p_patient_id: patientId,
-        p_patient_name: patient?.name || "Unknown",
+        p_patient_name: selectedPatient?.name || "Unknown",
         p_lines: buildInvoiceLinesPayload(items),
         p_tax: tax,
         p_discount: discount,
@@ -301,7 +260,7 @@ export const Billing = () => {
   };
 
   const resetForm = () => {
-    setPatientId("");
+    setSelectedPatient(null);
     setItems([emptyServiceLine()]);
     setTax(0);
     setDiscount(0);
@@ -417,19 +376,12 @@ export const Billing = () => {
             <DialogTitle>Create Invoice</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Patient</Label>
-              <Select value={patientId} onValueChange={setPatientId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select patient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {patients.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <InstitutionPatientPicker
+              institutionId={institutionId}
+              value={selectedPatient}
+              onChange={setSelectedPatient}
+              label="Patient"
+            />
 
             <div>
               <Label>Services (priced from the price list)</Label>
@@ -438,6 +390,9 @@ export const Billing = () => {
                 services={services}
                 onChange={setItems}
                 formatPrice={formatPrice}
+                institutionId={institutionId}
+                canCreateService={canCreateService}
+                onServiceCreated={() => void refreshServices()}
               />
             </div>
 

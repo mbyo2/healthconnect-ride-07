@@ -20,10 +20,11 @@ import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { usePatientNames } from '@/hooks/usePatientNames';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
+import { MedicineQuickCreateDialog, DRUG_CATEGORIES, toProductCode } from './MedicineQuickCreateDialog';
+import { EntitySelect, type EntityOption } from '@/components/ui/EntitySelect';
+import { useInstitutionTeam } from '@/hooks/useInstitutionTeam';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-const DRUG_CATEGORIES = ['Analgesics', 'Antibiotics', 'Antivirals', 'Antihypertensives', 'Antidiabetics', 'Vitamins', 'Antipyretics', 'Antihistamines', 'IV Fluids', 'Controlled', 'Other'];
 
 export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +37,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
   const [drugForm, setDrugForm] = useState({
     product_name: '',
-    category: 'Analgesics',
+    category: 'medication',
     quantity: 100,
     unit_price: 10,
     cost_price: 6,
@@ -52,9 +53,13 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   // P0-7: prescriptions must attach a real patient — selected from the
   // facility's known patients (same source as OPD/IPD/lab modules).
   const [selectedPatientId, setSelectedPatientId] = useState('');
-  const [rxMedications, setRxMedications] = useState<Array<{ id: string; medication_name: string; dosage: string; quantity: number; instructions: string }>>([
+  const [rxMedications, setRxMedications] = useState<Array<{ id: string; medication_name: string; stock_id?: string; dosage: string; quantity: number; instructions: string }>>([
     { id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }
   ]);
+  // Create-on-missing for medicines (W4): dispensary team members may add
+  // stock inline (pharmacy_inventory RLS: institution admin or staff).
+  const { isMember: canCreateMedicine } = useInstitutionTeam(hospital?.id);
+  const [posQuickCreateTerm, setPosQuickCreateTerm] = useState<string | null>(null);
 
   const [writeOffForm, setWriteOffForm] = useState({
     item_id: '',
@@ -111,6 +116,8 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       const { error: err } = await (supabase.from('pharmacy_inventory' as any) as any).insert({
         pharmacy_id: hospital.id,
         ...drugForm,
+        // product_code is NOT NULL with no default — always generate one.
+        product_code: toProductCode(drugForm.product_name),
         quantity: Number(drugForm.quantity),
         unit_price: Number(drugForm.unit_price),
         cost_price: Number(drugForm.cost_price),
@@ -119,10 +126,11 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success('Drug added to pharmacy inventory');
       setShowAddDrug(false);
-      setDrugForm({ product_name: '', category: 'Analgesics', quantity: 100, unit_price: 10, cost_price: 6, batch_number: '', expiry_date: '', reorder_level: 20 });
+      setDrugForm({ product_name: '', category: 'medication', quantity: 100, unit_price: 10, cost_price: 6, batch_number: '', expiry_date: '', reorder_level: 20 });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to add drug');
+      console.error('Add drug failed', e);
+      toast.error('That medicine could not be added. Only this facility\u2019s pharmacy team can change stock — check the details and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -236,6 +244,30 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   const filteredInventory = inventory.filter(i =>
     (i.product_name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Medicine picker for prescription lines (W4): stocked medicines are
+  // searchable; a medicine that is not stocked offers inline creation
+  // (dispensary team only) instead of a free-text dead-end.
+  const searchMedicines = async (term: string): Promise<EntityOption[]> => {
+    const t = term.trim().toLowerCase();
+    return inventory
+      .filter(i => !t || (i.product_name || '').toLowerCase().includes(t))
+      .slice(0, 25)
+      .map(i => ({
+        id: i.id,
+        label: i.product_name,
+        sublabel: `Stock: ${i.quantity ?? 0} · K${Number(i.unit_price || 0)}`,
+      }));
+  };
+  const medicineValue = (item: { medication_name: string; stock_id?: string }): EntityOption | null => {
+    if (!item.medication_name) return null;
+    const inv = item.stock_id ? inventory.find(i => i.id === item.stock_id) : undefined;
+    return {
+      id: item.stock_id ?? item.medication_name,
+      label: item.medication_name,
+      sublabel: inv ? `Stock: ${inv.quantity ?? 0} · K${Number(inv.unit_price || 0)}` : undefined,
+    };
+  };
 
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
@@ -374,6 +406,22 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       </div>
                     );
                   })}
+                  {searchQuery.trim() && filteredInventory.filter(i => i.quantity > 0).length === 0 && (
+                    <div className="col-span-full p-4 border border-dashed rounded-lg text-center space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        No stocked medicine matches “{searchQuery.trim()}”.
+                      </p>
+                      {canCreateMedicine ? (
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => setPosQuickCreateTerm(searchQuery.trim())}>
+                          <Plus className="h-3.5 w-3.5 mr-1" /> Add “{searchQuery.trim()}” to stock
+                        </Button>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          Only this facility's pharmacy team can add new medicines to stock.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -568,7 +616,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <Label className="text-xs">Category</Label>
                 <Select value={drugForm.category} onValueChange={v => setDrugForm({ ...drugForm, category: v })}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{DRUG_CATEGORIES.map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+                  <SelectContent>{DRUG_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value} className="text-xs">{c.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
@@ -621,6 +669,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           <DialogHeader><DialogTitle>Write Hospital Prescription (Multi-Drug)</DialogTitle></DialogHeader>
           <form onSubmit={handleCreateRx} className="space-y-3 py-2 text-xs">
             <HospitalPatientSelect
+              institutionId={hospital?.id}
               patients={hospitalPatients}
               loading={patientsLoading}
               value={selectedPatientId}
@@ -666,13 +715,36 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                   </div>
 
                   <div>
-                    <Label className="text-xs">Medication Name *</Label>
-                    <Input
-                      value={item.medication_name}
-                      onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, medication_name: e.target.value } : m))}
-                      placeholder="e.g. Paracetamol 500mg"
-                      required
-                      className="h-8 text-xs bg-white dark:bg-slate-950"
+                    <EntitySelect
+                      entityName="medicine"
+                      label="Medication Name *"
+                      placeholder="Search stocked medicines…"
+                      value={medicineValue(item)}
+                      onChange={(opt) => setRxMedications(prev => prev.map(m => m.id === item.id ? {
+                        ...m,
+                        medication_name: opt?.label ?? '',
+                        stock_id: opt && inventory.some(i => i.id === opt.id) ? opt.id : undefined,
+                      } : m))}
+                      search={searchMedicines}
+                      renderCreateDialog={canCreateMedicine ? (ctx) => (
+                        <MedicineQuickCreateDialog
+                          pharmacyId={hospital.id}
+                          open={ctx.open}
+                          onOpenChange={ctx.onOpenChange}
+                          initialName={ctx.initialTerm}
+                          onCreated={(med) => {
+                            refresh();
+                            ctx.onCreated({
+                              id: med.id,
+                              label: med.product_name,
+                              sublabel: `Stock: ${med.quantity} · K${Number(med.unit_price || 0)}`,
+                            });
+                          }}
+                        />
+                      ) : undefined}
+                      createUnavailableNote={!canCreateMedicine
+                        ? "Only this facility's pharmacy team can add new medicines to stock — ask a pharmacist or admin to add it."
+                        : undefined}
                     />
                   </div>
 
@@ -779,6 +851,20 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* POS create-on-missing: add an unstocked medicine without leaving dispensing */}
+      {posQuickCreateTerm !== null && (
+        <MedicineQuickCreateDialog
+          pharmacyId={hospital.id}
+          open={posQuickCreateTerm !== null}
+          onOpenChange={(o) => { if (!o) setPosQuickCreateTerm(null); }}
+          initialName={posQuickCreateTerm}
+          onCreated={() => {
+            setPosQuickCreateTerm(null);
+            refresh();
+          }}
+        />
+      )}
 
     </div>
   );

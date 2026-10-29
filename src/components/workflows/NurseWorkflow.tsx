@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import DeteriorationScores from '@/components/clinical/DeteriorationScores';
 import { useAuth } from '@/context/AuthContext';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
@@ -365,19 +366,13 @@ export const NurseWorkflow = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-[13px] font-medium">Patient *</Label>
-              <select
+              <HospitalPatientSelect
+                institutionId={institutionId}
+                patients={vitalsPatients}
                 value={vitalsPatientId}
-                onChange={e => setVitalsPatientId(e.target.value)}
-                className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900"
-              >
-                <option value="">Select patient…</option>
-                {vitalsPatients.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {(p as any).name || [p.first_name, p.last_name].filter(Boolean).join(' ') || p.id.slice(0, 8)}
-                  </option>
-                ))}
-              </select>
+                onChange={setVitalsPatientId}
+                label="Patient *"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div>

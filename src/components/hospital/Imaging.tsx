@@ -6,7 +6,7 @@ import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
-import { useHospitalPatients } from "@/hooks/useHospitalPatients";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -57,8 +57,6 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
 
   const { data: orders, loading, error, refresh } = useHospitalModule<any>("imaging_orders", "institution_id", hospital?.id, { orderBy: "ordered_at", ascending: false });
   const { nameFor } = usePatientNames(orders.map((o) => o.patient_id));
-  const { patients: hospitalPatients } = useHospitalPatients(hospital?.id);
-
   // Results are scoped to this institution's orders
   const [resultsAll, setResultsAll] = useState<any[]>([]);
   const [loadingResults, setLoadingResults] = useState(false);
@@ -309,15 +307,12 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>New Imaging Order</DialogTitle></DialogHeader>
           <form onSubmit={handleNewOrder} className="space-y-3">
-            <div>
-              <label className="text-sm font-semibold">Patient</label>
-              <select className="input w-full" value={orderForm.patient_id} onChange={(e) => setOrderForm({ ...orderForm, patient_id: e.target.value })}>
-                <option value="">Select patient…</option>
-                {hospitalPatients.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </div>
+            <HospitalPatientSelect
+              institutionId={hospital?.id}
+              value={orderForm.patient_id}
+              onChange={(id) => setOrderForm({ ...orderForm, patient_id: id })}
+              label="Patient"
+            />
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm font-semibold">Modality</label>

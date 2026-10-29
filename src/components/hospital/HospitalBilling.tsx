@@ -14,6 +14,42 @@ import {
   type AssembledCharge,
   type PricedService,
 } from "@/lib/hospitalBilling";
+import { InstitutionPatientPicker } from "./InstitutionPatientPicker";
+import { PricedServiceQuickCreateDialog, PRICED_SERVICE_CATEGORIES } from "@/components/billing/PricedServiceQuickCreateDialog";
+import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
+import type { InstitutionPatient } from "@/lib/patients";
+
+/**
+ * A human label for the price-list service a charge needs, derived from
+ * the charge itself — used to prefill the create-on-missing dialog so
+ * the new service re-matches this charge (the matcher keys off the
+ * clinical name: test type, medication, modality, procedure…).
+ */
+function suggestedServiceLabel(c: AssembledCharge): string {
+  const d = c.description || "";
+  switch (c.source_kind) {
+    case "lab_test":
+      return d.replace(/^Lab Test:\s*/, "");
+    case "prescription":
+      return d.replace(/^Rx:\s*/, "");
+    case "procedure_execution":
+      return d.replace(/^Procedure:\s*/, "").replace(/\s+-\s+.*$/, "");
+    case "imaging_order":
+      return d.replace(/^Imaging:\s*/, "");
+    case "immunization":
+      return d.replace(/^Immunization:\s*/, "").replace(/\s*\(Dose.*$/, "");
+    case "anc_visit":
+      return "ANC Visit";
+    case "admission": {
+      const m = d.match(/\(([^)]+)\)/);
+      return `${m ? `${m[1]} ` : ""}Ward Bed (per day)`;
+    }
+    case "appointment":
+      return "Consultation";
+    default:
+      return d;
+  }
+}
 
 interface BillingProps {
   hospital: any;
@@ -43,6 +79,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   const [showDialog, setShowDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
+  // Create-on-missing for charges with no price-list match (W4).
+  const { isAdmin: canCreatePricing } = useInstitutionTeam(hospital?.id);
+  const [pricingCharge, setPricingCharge] = useState<AssembledCharge | null>(null);
   const [pendingPatientCharges, setPendingPatientCharges] = useState<AssembledCharge[]>([]);
   const [isLoadingCharges, setIsLoadingCharges] = useState(false);
   const [policies, setPolicies] = useState<PatientPolicy[]>([]);
@@ -279,7 +319,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           : `Invoice ${bill?.invoice_number} generated`
       );
       setShowDialog(false);
-      setSelectedPatientId(""); setPolicies([]); setSelectedPolicyId("");
+      setSelectedPatientId(""); setSelectedPatient(null); setPolicies([]); setSelectedPolicyId("");
       setPendingPatientCharges([]);
       onRefresh();
     } catch (error: any) {
@@ -423,17 +463,15 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Charges are priced from the hospital price list and any insurance split is calculated on the server when the bill is generated.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2 text-xs">
-            <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
-              <Select value={selectedPatientId} onValueChange={handlePatientSelect}>
-                <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select admitted patient" /></SelectTrigger>
-                <SelectContent>
-                  {admissions?.map((a: any) => (
-                    <SelectItem key={a.patient_id} value={a.patient_id}>{a.patient?.first_name} {a.patient?.last_name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <InstitutionPatientPicker
+              institutionId={hospital?.id}
+              value={selectedPatient}
+              onChange={(p) => {
+                setSelectedPatient(p);
+                void handlePatientSelect(p?.id ?? "");
+              }}
+              label="Patient"
+            />
 
             {isLoadingCharges && (
               <div className="flex items-center gap-2 p-2 bg-primary-50 rounded-lg text-primary-500 text-xs font-bold">
@@ -463,7 +501,18 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     {c.service ? (
                       <span className="font-mono font-semibold text-sm">{formatPrice(c.service.base_price * c.quantity)}</span>
                     ) : (
-                      <span className="text-xs font-bold text-warning-600 dark:text-warning-400 whitespace-nowrap">Not on the price list</span>
+                      <span className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="text-xs font-bold text-warning-600 dark:text-warning-400">Not on the price list</span>
+                        {canCreatePricing && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); setPricingCharge(c); }}
+                            className="text-xs font-bold text-primary-500 hover:underline"
+                          >
+                            Add to price list
+                          </button>
+                        )}
+                      </span>
                     )}
                   </label>
                 ))}
@@ -473,7 +522,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 </div>
                 {notOnPriceList.length > 0 && (
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {notOnPriceList.length} charge{notOnPriceList.length > 1 ? "s are" : " is"} not on the price list and will not be billed. Add the service and its price to the price list first to bill {notOnPriceList.length > 1 ? "them" : "it"}.
+                    {notOnPriceList.length} charge{notOnPriceList.length > 1 ? "s are" : " is"} not on the price list and will not be billed.
+                    {canCreatePricing
+                      ? " Use “Add to price list” next to a charge to price it now, without leaving this bill."
+                      : " Only an institution admin can add services to the price list — ask your admin to price them."}
                   </p>
                 )}
               </div>
@@ -533,6 +585,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     date: new Date(),
                     issuerName: hospital?.name || "Doc'O Clock",
                     customerName: (() => {
+                      if (selectedPatient?.name) return selectedPatient.name;
                       const adm = (admissions || []).find((a: any) => a.patient_id === selectedPatientId);
                       return adm?.patient ? `${adm.patient.first_name || ""} ${adm.patient.last_name || ""}`.trim() : "Patient";
                     })(),
@@ -551,6 +604,24 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Create-on-missing: price an unpriced charge without leaving the bill.
+          On save the charges are re-assembled so the new service re-matches. */}
+      {pricingCharge && (
+        <PricedServiceQuickCreateDialog
+          institutionId={hospital.id}
+          open={!!pricingCharge}
+          onOpenChange={(o) => { if (!o) setPricingCharge(null); }}
+          initialLabel={suggestedServiceLabel(pricingCharge)}
+          initialCategory={
+            PRICED_SERVICE_CATEGORIES.includes(pricingCharge.category) ? pricingCharge.category : "Other"
+          }
+          onCreated={() => {
+            setPricingCharge(null);
+            if (selectedPatientId) void handlePatientSelect(selectedPatientId);
+          }}
+        />
+      )}
     </div>
   );
 };

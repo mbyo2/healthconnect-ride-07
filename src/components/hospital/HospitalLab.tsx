@@ -5,7 +5,6 @@ import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
-import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,8 +61,6 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
     ...labOrders.map((o) => o.entered_by),
     ...labOrders.map((o) => o.ordered_by),
   ]);
-  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
-
   const filtered = filter === "all" ? labOrders : labOrders.filter((o) => o.status === filter);
 
   const stats = {
@@ -387,8 +384,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           </DialogHeader>
           <form onSubmit={handleOrderLab} className="space-y-3 py-2 text-xs">
             <HospitalPatientSelect
-              patients={patients}
-              loading={patientsLoading}
+              institutionId={hospital?.id}
               value={orderForm.patient_id}
               onChange={(id) => setOrderForm({ ...orderForm, patient_id: id })}
               label="Patient *"

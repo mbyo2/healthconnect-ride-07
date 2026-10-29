@@ -13,9 +13,31 @@ import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { EntitySelect, type EntityOption } from '@/components/ui/EntitySelect';
+import { InsurerQuickCreateDialog } from './InsurerQuickCreateDialog';
+import { useInstitutionTeam } from '@/hooks/useInstitutionTeam';
 
 export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const { user } = useAuth();
+  // Payers (W4): the insurer directory is platform-admin managed; admins
+  // get create-on-missing, everyone else can still type the name.
+  const { isPlatformAdmin } = useInstitutionTeam(null);
+
+  const searchInsurers = async (term: string): Promise<EntityOption[]> => {
+    const t = term.trim();
+    let query = (supabase.from('insurance_providers' as any) as any)
+      .select('id, name, code')
+      .eq('is_active', true)
+      .order('name')
+      .limit(25);
+    if (t) query = query.ilike('name', `%${t}%`);
+    const { data } = await query;
+    return ((data as any[]) || []).map((p) => ({
+      id: p.id,
+      label: p.name,
+      sublabel: p.code || undefined,
+    }));
+  };
   const [showNewClaim, setShowNewClaim] = useState(false);
   const [showInvoicePicker, setShowInvoicePicker] = useState(false);
   const [unpaidInvoices, setUnpaidInvoices] = useState<any[]>([]);
@@ -406,7 +428,28 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
           <form onSubmit={handleNewClaim} className="space-y-3 py-2">
             <div className="grid grid-cols-2 gap-2">
               <div><Label>Patient Name *</Label><Input value={claimForm.patient_name} onChange={e => setClaimForm({...claimForm, patient_name: e.target.value})} placeholder="Full name" required /></div>
-              <div><Label>Insurance Provider *</Label><Input value={claimForm.insurance_provider} onChange={e => setClaimForm({...claimForm, insurance_provider: e.target.value})} placeholder="e.g. NHIMA, Zambia Life" required /></div>
+              <div>
+                <EntitySelect
+                  entityName="insurer"
+                  label="Insurance Provider *"
+                  placeholder="Search insurers — e.g. NHIMA"
+                  value={claimForm.insurance_provider ? { id: claimForm.insurance_provider, label: claimForm.insurance_provider } : null}
+                  onChange={(opt) => setClaimForm({ ...claimForm, insurance_provider: opt?.label ?? '' })}
+                  search={searchInsurers}
+                  allowFreeText
+                  renderCreateDialog={isPlatformAdmin ? (ctx) => (
+                    <InsurerQuickCreateDialog
+                      open={ctx.open}
+                      onOpenChange={ctx.onOpenChange}
+                      initialName={ctx.initialTerm}
+                      onCreated={(ins) => ctx.onCreated({ id: ins.id, label: ins.name, sublabel: ins.code || undefined })}
+                    />
+                  ) : undefined}
+                  createUnavailableNote={!isPlatformAdmin
+                    ? "Only a platform admin can add a new insurer to the directory — you can still type the insurer's name here."
+                    : undefined}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div><Label>Policy Number</Label><Input value={claimForm.policy_number} onChange={e => setClaimForm({...claimForm, policy_number: e.target.value})} placeholder="Policy/Member No." /></div>

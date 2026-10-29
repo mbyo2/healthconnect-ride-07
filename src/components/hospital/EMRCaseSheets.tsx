@@ -15,7 +15,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
-import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { FileText, Plus, Search, User, Clock, Stethoscope, Save } from 'lucide-react';
 import { TemplatePicker } from '@/components/clinical/NoteTemplates';
 
@@ -57,7 +56,6 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
   const { nameFor } = usePatientNames(recentCases.map((c: any) => c.patient_id));
   const [saving, setSaving] = useState(false);
 
-  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
   const [newOpen, setNewOpen] = useState(false);
   const [newPatientId, setNewPatientId] = useState('');
   const [newTitle, setNewTitle] = useState('');
@@ -149,11 +147,9 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
           </DialogHeader>
           <div className="space-y-4">
             <HospitalPatientSelect
-              patients={patients}
-              loading={patientsLoading}
+              institutionId={hospital?.id}
               value={newPatientId}
               onChange={setNewPatientId}
-              emptyHint="No patients are registered at this facility yet. Register a walk-in through OPD Management or admit a patient in IPD, then create their case sheet here."
             />
             <div className="space-y-1.5">
               <Label>Visit title</Label>

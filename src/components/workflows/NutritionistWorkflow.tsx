@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -112,18 +113,13 @@ export const NutritionistWorkflow = () => {
           <CardHeader><CardTitle className="flex items-center gap-2"><Apple className="h-5 w-5 text-primary-500" />Diet Plan Builder</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <Label htmlFor="plan-patient" className="text-xs font-semibold">Patient *</Label>
-              <select
-                id="plan-patient"
+              <HospitalPatientSelect
+                institutionId={institutionId}
+                patients={planPatients}
                 value={planPatientId}
-                onChange={e => setPlanPatientId(e.target.value)}
-                className="mt-1 w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">Select patient…</option>
-                {planPatients.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+                onChange={setPlanPatientId}
+                label="Patient *"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">BMI</Label><Input value={plan.bmi} onChange={e => setPlan({...plan, bmi: e.target.value})} placeholder="24.5" className="mt-1" /></div>

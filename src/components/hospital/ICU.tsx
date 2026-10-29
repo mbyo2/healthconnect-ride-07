@@ -5,6 +5,8 @@ import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
+import { InstitutionPatientPicker } from "./InstitutionPatientPicker";
+import type { InstitutionPatient } from "@/lib/patients";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -37,9 +39,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
   const [obsBed, setObsBed] = useState<any>(null);
   const [timelinePatientId, setTimelinePatientId] = useState<string>("");
   const [obsForm, setObsForm] = useState({ heart_rate: "", bp_systolic: "", bp_diastolic: "", spo2: "", temperature: "", gcs_score: "", notes: "" });
-  const [patientQuery, setPatientQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [admitPatient, setAdmitPatient] = useState<InstitutionPatient | null>(null);
   const [admitPatientId, setAdmitPatientId] = useState("");
 
   const { data: beds, loading, error, refresh } = useHospitalModule<any>("icu_beds", "institution_id", hospital?.id, { orderBy: "bed_number", ascending: true });
@@ -56,20 +56,6 @@ export const ICU = ({ hospital }: { hospital: any }) => {
   const timeline = timelinePatientId
     ? myObs.filter((o) => o.patient_id === timelinePatientId)
     : [];
-
-  const searchPatients = async (query: string) => {
-    setPatientQuery(query);
-    if (query.trim().length < 2) { setSearchResults([]); return; }
-    setSearching(true);
-    try {
-      const { data } = await (supabase.rpc as any)("search_patients_for_provider", { p_search: query.trim() });
-      setSearchResults(data || []);
-    } catch (e) {
-      console.error("Patient search failed:", e);
-    } finally {
-      setSearching(false);
-    }
-  };
 
   const handleAddBed = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,8 +91,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       setShowAdmit(false);
       setAdmitBed(null);
       setAdmitPatientId("");
-      setPatientQuery("");
-      setSearchResults([]);
+      setAdmitPatient(null);
       refresh();
     } catch (e: any) { toast.error(e?.message || "Failed to admit patient"); }
     finally { setIsSubmitting(false); }
@@ -377,29 +362,20 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       </Dialog>
 
       {/* Admit dialog */}
-      <Dialog open={showAdmit} onOpenChange={(v) => { setShowAdmit(v); if (!v) { setAdmitBed(null); setAdmitPatientId(""); setPatientQuery(""); setSearchResults([]); } }}>
+      <Dialog open={showAdmit} onOpenChange={(v) => { setShowAdmit(v); if (!v) { setAdmitBed(null); setAdmitPatient(null); setAdmitPatientId(""); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Admit Patient — Bed {admitBed?.bed_number}</DialogTitle></DialogHeader>
           <form onSubmit={handleAdmit} className="space-y-3">
-            <div>
-              <label className="text-xs font-bold">Search patient</label>
-              <input value={patientQuery} onChange={(e) => searchPatients(e.target.value)}
-                className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="Type at least 2 characters…" />
-              {searching && <p className="text-xs text-graphite-500 mt-1">Searching…</p>}
-              {searchResults.length > 0 && (
-                <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-canvas-silk">
-                  {searchResults.map((p: any) => (
-                    <button type="button" key={p.id}
-                      onClick={() => { setAdmitPatientId(p.id); setPatientQuery(p.full_name || p.email || p.id); setSearchResults([]); }}
-                      className={`w-full text-left px-3 py-2 text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 ${admitPatientId === p.id ? "bg-primary-500/10" : ""}`}>
-                      <span className="font-bold">{p.full_name || "Unnamed patient"}</span>
-                      <span className="text-graphite-500"> {p.email || ""}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {admitPatientId && <p className="text-xs text-success-500 font-bold mt-1">Patient selected</p>}
-            </div>
+            <InstitutionPatientPicker
+              institutionId={hospital?.id}
+              value={admitPatient}
+              onChange={(p) => {
+                setAdmitPatient(p);
+                setAdmitPatientId(p?.id ?? "");
+              }}
+              label="Patient"
+              createSource="admission"
+            />
             <DialogFooter>
               <button type="button" onClick={() => setShowAdmit(false)} className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting || !admitPatientId} className="px-4 py-2 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 disabled:opacity-50">

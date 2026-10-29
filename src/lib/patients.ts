@@ -107,6 +107,29 @@ export async function findOrCreatePatient(
   };
 }
 
+/**
+ * The patient's active queue token at an institution, if any (status
+ * waiting or serving, most recent first). Used by flows that have a
+ * patient but no token-selection surface (e.g. Triage) to attach their
+ * record to the visit the patient is actually on — data-layer linking,
+ * never a guess across visits: completed/cancelled tokens never match.
+ */
+export async function findActiveQueueTokenId(
+  institutionId: string,
+  patientId: string,
+): Promise<string | null> {
+  if (!institutionId || !patientId) return null;
+  const { data, error } = await (supabase.from("queue_tokens" as any) as any)
+    .select("id")
+    .eq("institution_id", institutionId)
+    .eq("patient_id", patientId)
+    .in("status", ["waiting", "serving"])
+    .order("check_in_time", { ascending: false })
+    .limit(1);
+  if (error) return null;
+  return (data && data[0]?.id) || null;
+}
+
 export async function searchInstitutionPatients(
   institutionId: string,
   query: string,

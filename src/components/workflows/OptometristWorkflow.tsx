@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -174,21 +175,12 @@ export const OptometristWorkflow = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label>Patient</Label>
-              <Select value={examPatientId} onValueChange={setExamPatientId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select patient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {patients.map((p: any) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.first_name} {p.last_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <HospitalPatientSelect
+              institutionId={institutionId}
+              patients={patients}
+              value={examPatientId}
+              onChange={setExamPatientId}
+            />
 
             {examPatientId && pastExams.length > 0 && (
               <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">

@@ -23,22 +23,28 @@ const readSrc = (p: string) => readFileSync(resolve(__dirname, '../../', p), 'ut
 describe('fix 2 · patient selectors show the patient name, never a raw UUID', () => {
   const broken = '{p.full_name || p.email || p.id}';
 
-  it('NutritionistWorkflow diet-plan selector renders the hook name field', () => {
+  // Patient Unity W3 (2026-10-29): the native selects were replaced by
+  // the ONE roster picker (HospitalPatientSelect → InstitutionPatientPicker
+  // over search_institution_patients), which renders master-record names
+  // by construction — the raw-UUID label defect cannot recur.
+  it('NutritionistWorkflow diet-plan selector uses the roster patient picker', () => {
     const src = readSrc('src/components/workflows/NutritionistWorkflow.tsx');
     expect(src).not.toContain(broken);
-    expect(src).toContain('<option key={p.id} value={p.id}>{p.name}</option>');
+    expect(src).toContain('HospitalPatientSelect');
+    expect(src).toContain('institutionId={institutionId}');
   });
 
-  it('MidwifeWorkflow ANC selector renders the hook name field', () => {
+  it('MidwifeWorkflow ANC selector uses the roster patient picker', () => {
     const src = readSrc('src/components/workflows/MidwifeWorkflow.tsx');
     expect(src).not.toContain(broken);
-    expect(src).toContain('<option key={p.id} value={p.id}>{p.name}</option>');
+    expect(src).toContain('HospitalPatientSelect');
+    expect(src).toContain('institutionId={institutionId}');
   });
 
-  it('the shared hook contract is { id, name, source } resolved from profiles', () => {
+  it('the shared hook contract is { id, name, source } from the roster search', () => {
     const hook = readSrc('src/hooks/useHospitalPatients.ts');
-    expect(hook).toContain('name: nameMap[id]');
-    expect(hook).toContain("from('profiles' as any)");
+    expect(hook).toContain('searchInstitutionPatients');
+    expect(hook).toContain('name: p.name');
   });
 });
 

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useHospitalPatients } from '@/hooks/useHospitalPatients';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -120,18 +121,13 @@ export const MidwifeWorkflow = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="anc-patient" className="text-xs font-semibold">Patient *</Label>
-              <select
-                id="anc-patient"
+              <HospitalPatientSelect
+                institutionId={institutionId}
+                patients={ancPatients}
                 value={ancPatientId}
-                onChange={e => setAncPatientId(e.target.value)}
-                className="mt-1 w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">Select patient…</option>
-                {ancPatients.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+                onChange={setAncPatientId}
+                label="Patient *"
+              />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {ancField('Gestational Age (weeks)', 'gestationalAge', '28')}

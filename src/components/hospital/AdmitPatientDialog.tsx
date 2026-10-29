@@ -9,6 +9,8 @@ import { BedDouble } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { DepartmentSelect } from './DepartmentSelect';
+import { InstitutionPatientPicker } from './InstitutionPatientPicker';
+import type { InstitutionPatient } from '@/lib/patients';
 
 interface AdmitPatientDialogProps {
   hospital: any;
@@ -26,9 +28,9 @@ interface AdmitPatientDialogProps {
 
 /**
  * Shared OPD / A&E → IPD admission dialog. One workflow everywhere:
- * pick registered patient + department + bed → creates the admission,
- * occupies the bed. Walk-ins must be linked to a registered patient
- * record first (admissions require a real patient profile).
+ * pick the patient from the institution roster (or create the record
+ * inline — admissions require a real patient profile) + department +
+ * bed → creates the admission, occupies the bed.
  */
 export const AdmitPatientDialog = ({
   hospital,
@@ -48,7 +50,7 @@ export const AdmitPatientDialog = ({
   const [admissionType, setAdmissionType] = useState(defaultAdmissionType);
   const [departments, setDepartments] = useState<any[]>([]);
   const [beds, setBeds] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -60,19 +62,47 @@ export const AdmitPatientDialog = ({
     setBedId('');
     (async () => {
       try {
-        const [{ data: depts }, { data: bedRows }, { data: patientRows }] = await Promise.all([
+        const [{ data: depts }, { data: bedRows }] = await Promise.all([
           supabase.from('hospital_departments' as any).select('id, name').eq('hospital_id', hospital?.id).eq('is_active', true).order('name'),
           supabase.from('hospital_beds' as any).select('id, bed_number, bed_type, department:hospital_departments(name)').eq('hospital_id', hospital?.id).eq('status', 'available').limit(100),
-          supabase.from('profiles').select('id, first_name, last_name, phone').eq('role', 'patient').order('last_name').limit(200),
         ]);
         setDepartments(depts || []);
         setBeds(bedRows || []);
-        setPatients(patientRows || []);
       } catch (e) {
         console.error('Failed to load admit options:', e);
       }
+      // Resolve the display record for a pre-linked patient (the picker
+      // searches the roster; a pre-selected id needs its name resolved).
+      if (defaultPatientId) {
+        try {
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('id, first_name, last_name, email, phone, date_of_birth')
+            .eq('id', defaultPatientId)
+            .single();
+          if (prof) {
+            setSelectedPatient({
+              id: prof.id,
+              firstName: prof.first_name || '',
+              lastName: prof.last_name || '',
+              name: [prof.first_name, prof.last_name].filter(Boolean).join(' ') || defaultPatientName || 'Patient',
+              email: prof.email ?? null,
+              phone: prof.phone ?? null,
+              dateOfBirth: (prof as any).date_of_birth ?? null,
+              onRoster: true,
+              source: 'admission',
+            });
+          } else {
+            setSelectedPatient(null);
+          }
+        } catch {
+          setSelectedPatient(null);
+        }
+      } else {
+        setSelectedPatient(null);
+      }
     })();
-  }, [open, hospital?.id, defaultPatientId, defaultDiagnosis, defaultAdmissionType]);
+  }, [open, hospital?.id, defaultPatientId, defaultPatientName, defaultDiagnosis, defaultAdmissionType]);
 
   const handleAdmit = async () => {
     if (!patientId || !departmentId) {
@@ -121,22 +151,19 @@ export const AdmitPatientDialog = ({
         <div className="space-y-4">
           {defaultPatientName && !defaultPatientId && (
             <p className="text-xs text-muted-foreground">
-              {defaultPatientName} is a walk-in — link a registered patient record below (admissions require one).
+              {defaultPatientName} is a walk-in — find their record below, or create it inline (admissions require a patient record).
             </p>
           )}
-          <div className="space-y-2">
-            <Label>Registered Patient *</Label>
-            <Select value={patientId} onValueChange={setPatientId}>
-              <SelectTrigger><SelectValue placeholder="Select patient record" /></SelectTrigger>
-              <SelectContent>
-                {patients.map((p: any) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {[p.first_name, p.last_name].filter(Boolean).join(' ') || p.phone || p.id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <InstitutionPatientPicker
+            institutionId={hospital?.id}
+            value={selectedPatient}
+            onChange={(p) => {
+              setSelectedPatient(p);
+              setPatientId(p?.id ?? '');
+            }}
+            label="Patient *"
+            createSource="admission"
+          />
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Admission Type</Label>

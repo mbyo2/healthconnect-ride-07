@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Search, User, Receipt, CalendarClock, Ticket, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useInstitutionContext } from '@/context/InstitutionContext';
+import { searchInstitutionPatients } from '@/lib/patients';
 
 interface Hit {
   kind: 'patient' | 'invoice' | 'appointment' | 'queue';
@@ -62,16 +63,31 @@ export const GlobalSearchPalette = ({
         const hid = institution?.id;
         const results: Hit[] = [];
 
-        // Patients (via provider-safe search RPC).
-        const { data: patients } = await (supabase as any).rpc('search_patients_for_provider', { p_search: q });
-        ((patients as any[]) || []).slice(0, 5).forEach((p: any) => {
-          results.push({
-            kind: 'patient',
-            id: p.id,
-            title: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Patient',
-            subtitle: p.phone || p.email || 'Patient record',
+        // Patients: the active institution's roster search first (Patient
+        // Unity W3 — one patient list everywhere); the relationship-gated
+        // provider search remains the fallback when no institution is in
+        // context (standalone providers).
+        if (hid) {
+          const rosterPatients = await searchInstitutionPatients(hid, q).catch(() => []);
+          rosterPatients.slice(0, 5).forEach((p) => {
+            results.push({
+              kind: 'patient',
+              id: p.id,
+              title: p.name,
+              subtitle: p.phone || p.email || 'Patient record',
+            });
           });
-        });
+        } else {
+          const { data: patients } = await (supabase as any).rpc('search_patients_for_provider', { p_search: q });
+          ((patients as any[]) || []).slice(0, 5).forEach((p: any) => {
+            results.push({
+              kind: 'patient',
+              id: p.id,
+              title: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Patient',
+              subtitle: p.phone || p.email || 'Patient record',
+            });
+          });
+        }
 
         if (hid) {
           // Invoices by number.

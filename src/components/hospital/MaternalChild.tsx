@@ -5,7 +5,6 @@ import { Baby, HeartPulse, Syringe, Plus, Loader2, RefreshCw, CalendarCheck } fr
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
-import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +73,6 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
   const { data: ancVisits, loading: ancLoading, refresh: refreshAnc } = useHospitalModule<any>("anc_visits", "institution_id", hid, { orderBy: "visit_date", ascending: false });
   const { data: deliveries, loading: delLoading, refresh: refreshDel } = useHospitalModule<any>("deliveries", "institution_id", hid, { orderBy: "delivery_date", ascending: false });
   const { data: immunizations, loading: immLoading, refresh: refreshImm } = useHospitalModule<any>("immunizations", "institution_id", hid, { orderBy: "scheduled_date", ascending: true });
-  const { patients, loading: patientsLoading } = useHospitalPatients(hid);
   const { nameFor } = usePatientNames([
     ...ancVisits.map((v) => v.patient_id),
     ...deliveries.map((d) => d.patient_id),
@@ -326,7 +324,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Record ANC Visit</DialogTitle></DialogHeader>
           <form onSubmit={handleAddAnc} className="space-y-3">
-            <HospitalPatientSelect patients={patients} loading={patientsLoading} value={ancForm.patient_id} onChange={(id) => setAncForm({ ...ancForm, patient_id: id })} />
+            <HospitalPatientSelect institutionId={hid} value={ancForm.patient_id} onChange={(id) => setAncForm({ ...ancForm, patient_id: id })} />
             <div className="grid grid-cols-2 gap-3">
               <div><p className={labelCls}>Visit date</p><input type="date" className={inputCls} value={ancForm.visit_date} onChange={(e) => setAncForm({ ...ancForm, visit_date: e.target.value })} required /></div>
               <div><p className={labelCls}>Gestational age (weeks)</p><input type="number" step="0.5" min="0" className={inputCls} value={ancForm.gestational_age_weeks} onChange={(e) => setAncForm({ ...ancForm, gestational_age_weeks: e.target.value })} /></div>
@@ -354,7 +352,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Record Delivery</DialogTitle></DialogHeader>
           <form onSubmit={handleAddDelivery} className="space-y-3">
-            <HospitalPatientSelect patients={patients} loading={patientsLoading} value={deliveryForm.patient_id} onChange={(id) => setDeliveryForm({ ...deliveryForm, patient_id: id })} />
+            <HospitalPatientSelect institutionId={hid} value={deliveryForm.patient_id} onChange={(id) => setDeliveryForm({ ...deliveryForm, patient_id: id })} />
             <div className="grid grid-cols-2 gap-3">
               <div><p className={labelCls}>Delivery date</p><input type="date" className={inputCls} value={deliveryForm.delivery_date} onChange={(e) => setDeliveryForm({ ...deliveryForm, delivery_date: e.target.value })} required /></div>
               <div>
@@ -390,7 +388,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Schedule Vaccination</DialogTitle></DialogHeader>
           <form onSubmit={handleScheduleImmun} className="space-y-3">
-            <HospitalPatientSelect patients={patients} loading={patientsLoading} value={immunForm.patient_id} onChange={(id) => setImmunForm({ ...immunForm, patient_id: id })} />
+            <HospitalPatientSelect institutionId={hid} value={immunForm.patient_id} onChange={(id) => setImmunForm({ ...immunForm, patient_id: id })} />
             {/* Zambia EPI quick-pick */}
             <div>
               <p className={labelCls}>Quick-pick — Zambia EPI schedule</p>

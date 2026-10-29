@@ -598,6 +598,7 @@ export const OpticianWorkflow = () => {
           </DialogHeader>
           <div className="space-y-4">
             <HospitalPatientSelect
+              institutionId={institutionId}
               patients={patients}
               loading={patientsLoading}
               value={rxPatientId}

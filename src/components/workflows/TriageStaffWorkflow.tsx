@@ -15,6 +15,7 @@ import { useTriageAssessments, TriageAssessment } from '@/hooks/useTriageAssessm
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
 import {
+  findActiveQueueTokenId,
   findOrCreatePatient,
   splitPatientName,
   type InstitutionPatient,
@@ -83,10 +84,21 @@ export const TriageStaffWorkflow = () => {
         patientId = null;
       }
     }
+    // Data-layer token link (Patient Unity W3): this workflow has no
+    // token-selection surface, so attach the assessment to the patient's
+    // ACTIVE queue token at this institution when one exists.
+    let queueTokenId: string | null = null;
+    if (patientId && institutionId) {
+      try {
+        queueTokenId = await findActiveQueueTokenId(institutionId, patientId);
+      } catch {
+        queueTokenId = null;
+      }
+    }
     const result = await createAssessment({
       patient_name: form.patient_name,
       patient_id: patientId,
-      queue_token_id: null,
+      queue_token_id: queueTokenId,
       triage_level: form.triage_level,
       chief_complaint: form.chief_complaint,
       vital_signs: {

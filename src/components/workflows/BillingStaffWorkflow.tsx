@@ -19,6 +19,8 @@ import { useCurrency } from "@/hooks/use-currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { ServiceLineEditor, useInstitutionServices } from "@/components/billing/InvoiceServiceLines";
+import { searchInstitutionPatients } from "@/lib/patients";
+import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
 import {
   type InvoiceServiceLine,
   emptyServiceLine,
@@ -47,7 +49,8 @@ export const BillingStaffWorkflow = () => {
   const { currency } = useCurrency();
   const { institutionId } = useInstitutionAffiliation();
   // P1-26: invoice lines are priced services from service_pricing.
-  const { services } = useInstitutionServices(institutionId);
+  const { services, refresh: refreshServices } = useInstitutionServices(institutionId);
+  const { isAdmin: canCreateService } = useInstitutionTeam(institutionId);
 
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -70,11 +73,21 @@ export const BillingStaffWorkflow = () => {
     if (!patientName.trim()) return;
     setLoadingCharges(true);
     try {
-      const { data: profiles } = await supabase
-        .rpc("search_patients_for_provider", { p_search: patientName.trim() });
+      // Patient Unity W3: resolve the patient from the institution roster
+      // first (one list everywhere); the relationship-gated provider
+      // search remains the fallback for non-institution contexts.
+      let patientId: string | null = null;
+      if (institutionId) {
+        const rosterMatches = await searchInstitutionPatients(institutionId, patientName.trim()).catch(() => []);
+        if (rosterMatches.length > 0) patientId = rosterMatches[0].id;
+      }
+      if (!patientId) {
+        const { data: profiles } = await supabase
+          .rpc("search_patients_for_provider", { p_search: patientName.trim() });
+        if (profiles && profiles.length > 0) patientId = profiles[0].id;
+      }
 
-      if (profiles && profiles.length > 0) {
-        const patientId = profiles[0].id;
+      if (patientId) {
         const [apptsRes, labsRes, rxsRes, insRes] = await Promise.all([
           supabase.from("appointments").select("id, type, date").eq("patient_id", patientId).eq("status", "completed"),
           supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
@@ -159,7 +172,7 @@ export const BillingStaffWorkflow = () => {
   const handleCreateInvoice = async () => {
     if (!invoiceForm.patient_name.trim() || invoiceForm.items.length === 0) return;
     if (invoiceForm.items.some((i) => !i.service_pricing_id)) {
-      toast.error("Choose a priced service for every line");
+      toast.error("Every line needs a priced service — pick one from the price list, or create it right in the line");
       return;
     }
     setCreating(true);
@@ -335,6 +348,9 @@ export const BillingStaffWorkflow = () => {
                   services={services}
                   onChange={(items) => setInvoiceForm((prev) => ({ ...prev, items }))}
                   formatPrice={(n) => `K${n.toLocaleString()}`}
+                  institutionId={institutionId}
+                  canCreateService={canCreateService}
+                  onServiceCreated={() => void refreshServices()}
                 />
               </div>
 
