@@ -524,7 +524,7 @@ export const InstitutionDashboard = () => {
         actions={
           <>
             <button
-              onClick={() => window.open("/kiosk", "_blank", "noopener")}
+              onClick={() => window.open(`/kiosk?institution=${institution.id}`, "_blank", "noopener")}
               className="vf-btn-secondary gap-1.5 text-sm"
               aria-label="Open self-service kiosk (new tab)"
             >

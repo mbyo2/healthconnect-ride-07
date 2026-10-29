@@ -481,7 +481,7 @@ export const PatientFlowManagement = () => {
                 <div className="col-span-full text-center py-12">
                   <p className="text-muted-foreground mb-1">No patients in flow right now</p>
                   <p className="text-sm text-muted-foreground mb-4">Check a patient in to start tracking their journey through the facility.</p>
-                  <Button onClick={() => navigate("/kiosk")} className="gap-1.5 min-h-[44px]"><UserRound className="h-4 w-4" /> Check In Patient</Button>
+                  <Button onClick={() => navigate(`/kiosk?institution=${institution.id}`)} className="gap-1.5 min-h-[44px]"><UserRound className="h-4 w-4" /> Check In Patient</Button>
                 </div>
               ) : (
               activeFlows.map((flow) => {
