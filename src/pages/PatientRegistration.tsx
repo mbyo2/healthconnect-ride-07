@@ -93,6 +93,29 @@ export const PatientRegistration = () => {
   // zod validation and submit intact.)
   const [passwordValue, setPasswordValue] = useState("");
   const [confirmPasswordValue, setConfirmPasswordValue] = useState("");
+  // Claim flow (Patient Unity W1): a facility may already have registered
+  // this person as a walk-in (shadow account). Signup then reports the
+  // email as taken — offer to claim the existing record instead of failing.
+  const [claimEmail, setClaimEmail] = useState<string | null>(null);
+  const [claimSending, setClaimSending] = useState(false);
+
+  const handleClaimAccount = async () => {
+    if (!claimEmail) return;
+    setClaimSending(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(claimEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      showSuccess(
+        "Claim link sent — check your email to set your password and claim your patient record.",
+      );
+    } catch (e: any) {
+      showError(e?.message || "Could not send the claim link. Please try again.");
+    } finally {
+      setClaimSending(false);
+    }
+  };
 
   const personalInfoForm = useForm<z.infer<typeof personalInfoSchema>>({
     resolver: zodResolver(personalInfoSchema),
@@ -262,6 +285,22 @@ export const PatientRegistration = () => {
 
       if (authError) throw authError;
 
+      // Existing-account detection: with email confirmation on, GoTrue
+      // answers an already-registered email with an obfuscated user whose
+      // identities list is empty. That is the claim case (e.g. a facility
+      // registered this patient at the desk) — route to claim, not success.
+      if (
+        signUpData?.user &&
+        Array.isArray(signUpData.user.identities) &&
+        signUpData.user.identities.length === 0
+      ) {
+        setClaimEmail(personalData.email);
+        showError(
+          "This email already has a patient record. Claim it below to set your password and take ownership of it.",
+        );
+        return;
+      }
+
       // The signUp response carries the new user even when email confirmation
       // is enabled (no session yet). Use it directly — a separate getUser()
       // call returns null without a session and must never gate completion.
@@ -314,7 +353,15 @@ export const PatientRegistration = () => {
       showSuccess("Account created successfully! Please check your email to verify your account.");
       navigate("/auth?tab=signin");
     } catch (error: any) {
-      showError(error.message || "Failed to create account");
+      const message = error?.message || "Failed to create account";
+      if (/already registered|already been registered|user already/i.test(message)) {
+        setClaimEmail(personalInfoForm.getValues().email || null);
+        showError(
+          "This email already has a patient record. Claim it below to set your password and take ownership of it.",
+        );
+      } else {
+        showError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -833,6 +880,23 @@ export const PatientRegistration = () => {
           <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
         </CardHeader>
         <CardContent className="pt-4">
+          {claimEmail && (
+            <div className="mb-4 rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-950/30">
+              <p className="text-sm font-semibold">This record already exists</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                A health facility may have registered you during a visit. Claim the
+                existing record for {claimEmail} — your visits and medical history
+                stay attached. We will email you a link to set your password.
+              </p>
+              <Button
+                onClick={handleClaimAccount}
+                disabled={claimSending}
+                className="mt-3 bg-primary-500 hover:bg-primary-600 text-sm min-h-[44px]"
+              >
+                {claimSending ? "Sending…" : "Email me a link to claim my record"}
+              </Button>
+            </div>
+          )}
           <div>{renderStep()}</div>
 
           <div className="flex justify-between mt-6">

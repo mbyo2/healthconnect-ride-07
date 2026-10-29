@@ -12,6 +12,13 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { AlertTriangle, Heart, Users, Clock, Stethoscope, Search, Loader2, Plus, Activity } from 'lucide-react';
 import { useTriageAssessments, TriageAssessment } from '@/hooks/useTriageAssessments';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
+import {
+  findOrCreatePatient,
+  splitPatientName,
+  type InstitutionPatient,
+} from '@/lib/patients';
 import { format } from 'date-fns';
 
 const TRIAGE_CONFIG = {
@@ -26,8 +33,10 @@ const MOBILITY_OPTIONS = ['Ambulatory', 'Wheelchair', 'Stretcher', 'Immobile'];
 
 export const TriageStaffWorkflow = () => {
   const { assessments, loading, critical, urgent, standard, nonUrgent, createAssessment } = useTriageAssessments();
+  const { institutionId } = useInstitutionAffiliation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
   const [form, setForm] = useState({
     patient_name: '',
     triage_level: 'standard' as TriageAssessment['triage_level'],
@@ -49,12 +58,34 @@ export const TriageStaffWorkflow = () => {
 
   const updateForm = (key: string, value: any) => setForm(prev => ({ ...prev, [key]: value }));
 
+  const handlePatientPick = (p: InstitutionPatient | null) => {
+    setSelectedPatient(p);
+    if (p) updateForm('patient_name', p.name);
+  };
+
   const handleSubmit = async () => {
     if (!form.patient_name.trim() || !form.chief_complaint.trim()) return;
     setCreating(true);
+    // Patient Unity W2: assessments attach to the master patient. Picked
+    // patient wins; a typed name is resolved through find_or_create_patient
+    // (dedupe or shadow-create) so triage stops writing unlinked records.
+    let patientId = selectedPatient?.id ?? null;
+    if (!patientId && institutionId) {
+      try {
+        const { firstName, lastName } = splitPatientName(form.patient_name);
+        const resolved = await findOrCreatePatient(
+          institutionId,
+          { firstName, lastName },
+          'triage',
+        );
+        patientId = resolved.patientId;
+      } catch {
+        patientId = null;
+      }
+    }
     const result = await createAssessment({
       patient_name: form.patient_name,
-      patient_id: null,
+      patient_id: patientId,
       queue_token_id: null,
       triage_level: form.triage_level,
       chief_complaint: form.chief_complaint,
@@ -75,6 +106,7 @@ export const TriageStaffWorkflow = () => {
       disposition: form.disposition || null,
     });
     if (result) {
+      setSelectedPatient(null);
       setForm({
         patient_name: '', triage_level: 'standard', chief_complaint: '',
         blood_pressure: '', heart_rate: '', temperature: '', respiratory_rate: '', spo2: '',
@@ -129,10 +161,27 @@ export const TriageStaffWorkflow = () => {
               <DialogTitle>Triage Assessment Form</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {institutionId && (
+                <InstitutionPatientPicker
+                  institutionId={institutionId}
+                  value={selectedPatient}
+                  onChange={handlePatientPick}
+                  label="Patient (search the roster, or create)"
+                  createSource="triage"
+                />
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Patient Name *</Label>
-                  <Input value={form.patient_name} onChange={e => updateForm('patient_name', e.target.value)} />
+                  <Input
+                    value={form.patient_name}
+                    onChange={e => {
+                      if (selectedPatient && e.target.value !== selectedPatient.name) {
+                        setSelectedPatient(null);
+                      }
+                      updateForm('patient_name', e.target.value);
+                    }}
+                  />
                 </div>
                 <div>
                   <Label>Triage Level *</Label>

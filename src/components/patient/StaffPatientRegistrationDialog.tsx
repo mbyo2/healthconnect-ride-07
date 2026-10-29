@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { UserPlus, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { findOrCreatePatient } from "@/lib/patients";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,29 +78,33 @@ export const StaffPatientRegistrationDialog: React.FC<StaffPatientRegistrationDi
 
     setSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      const { error } = await supabase
-        .from("institution_patient_registry" as any)
-        .insert({
-          institution_id: institutionId,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
+      // Patient Unity W1: registration goes through find_or_create_patient —
+      // it dedupes against the master record, creates a shadow account for
+      // walk-ins, and always writes the roster link + linked registry row,
+      // so the patient is immediately usable in Queue, Lab, EMR, etc.
+      const result = await findOrCreatePatient(
+        institutionId,
+        {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           phone: phone.trim() || null,
           email: email.trim() || null,
-          date_of_birth: dateOfBirth || null,
+          dateOfBirth: dateOfBirth || null,
           gender: gender || null,
           address: address.trim() || null,
-          emergency_contact_name: emergencyName.trim() || null,
-          emergency_contact_phone: emergencyPhone.trim() || null,
-          blood_type: bloodType || null,
+          emergencyContactName: emergencyName.trim() || null,
+          emergencyContactPhone: emergencyPhone.trim() || null,
+          bloodType: bloodType || null,
           allergies: allergies.trim() || null,
-          registered_by: user?.id || null,
-        });
+        },
+        "registration",
+      );
 
-      if (error) throw error;
-
-      toast.success(`Patient ${firstName} ${lastName} registered`);
+      toast.success(
+        result.created
+          ? `Patient ${firstName} ${lastName} registered`
+          : `${firstName} ${lastName} matched an existing patient record — linked to this facility`,
+      );
       reset();
       onOpenChange(false);
       onRegistered?.();

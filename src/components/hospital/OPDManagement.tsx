@@ -12,8 +12,12 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
-import { useHospitalPatients } from '@/hooks/useHospitalPatients';
-import { HospitalPatientSelect } from './HospitalPatientSelect';
+import { InstitutionPatientPicker } from './InstitutionPatientPicker';
+import {
+  findOrCreatePatient,
+  splitPatientName,
+  type InstitutionPatient,
+} from '@/lib/patients';
 import { StaffSelect } from './StaffSelect';
 import { DepartmentSelect } from './DepartmentSelect';
 
@@ -64,16 +68,27 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
     bp: '', temp: '', pulse: '', weight: ''
   });
 
-  // Existing patients — pick instead of re-typing (smooth-data principle).
-  const { patients: knownPatients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
-  const [selectedExistingId, setSelectedExistingId] = useState('');
+  // Existing patients — pick from the institution roster instead of
+  // re-typing (smooth-data principle). The pick carries the master
+  // patient id, not just the name (Patient Unity W2).
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
 
-  const handleExistingPatientPick = (id: string) => {
-    setSelectedExistingId(id);
-    const p = knownPatients.find((k) => k.id === id);
+  const handlePatientPick = (p: InstitutionPatient | null) => {
+    setSelectedPatient(p);
     if (p) {
-      setNewPatient((prev) => ({ ...prev, name: p.name }));
+      setNewPatient((prev) => ({
+        ...prev,
+        name: p.name,
+        phone: p.phone || prev.phone,
+      }));
     }
+  };
+
+  // Editing the name away from the picked patient clears the pick, so a
+  // token can never carry one patient's id under another patient's name.
+  const handleNameChange = (name: string) => {
+    if (selectedPatient && name !== selectedPatient.name) setSelectedPatient(null);
+    setNewPatient((prev) => ({ ...prev, name }));
   };
 
   // OPD → IPD handoff state (shared admit dialog)
@@ -119,6 +134,22 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
     setSaving(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
+
+      // Patient Unity W2: a queue token ALWAYS carries the master patient
+      // id. Picked patient wins; a typed walk-in name is resolved through
+      // find_or_create_patient (dedupe or shadow-create) so the token is
+      // never an anonymous name-only record again.
+      let patientId = selectedPatient?.id ?? null;
+      if (!patientId) {
+        const { firstName, lastName } = splitPatientName(newPatient.name);
+        const resolved = await findOrCreatePatient(
+          hospital.id,
+          { firstName, lastName, phone: newPatient.phone || null },
+          'queue',
+        );
+        patientId = resolved.patientId;
+      }
+
       const vitals: Record<string, string> = {};
       if (newPatient.bp) vitals.bp = newPatient.bp;
       if (newPatient.temp) vitals.temp = newPatient.temp;
@@ -137,6 +168,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       const { error } = await (supabase.from('queue_tokens' as any) as any).insert({
         institution_id: hospital.id,
         token_number: `OPD-${dayStamp}-${seq}`,
+        patient_id: patientId,
         patient_name: newPatient.name,
         department: newPatient.department,
         priority: 'normal',
@@ -147,7 +179,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       if (error) throw error;
 
       setNewPatient({ name: '', phone: '', department: '', doctor: '', bp: '', temp: '', pulse: '', weight: '' });
-      setSelectedExistingId('');
+      setSelectedPatient(null);
       setShowRegDialog(false);
       toast.success(`Token issued for ${newPatient.name}`);
       refresh();
@@ -374,23 +406,21 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
             <DialogTitle>OPD Patient Registration</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {/* Returning patient? Pick them — no re-typing. */}
-            {knownPatients.length > 0 && (
-              <div className="p-3 rounded-xl bg-primary-50 dark:bg-primary-950/30 border border-primary-200 dark:border-primary-800">
-                <HospitalPatientSelect
-                  patients={knownPatients}
-                  loading={patientsLoading}
-                  value={selectedExistingId}
-                  onChange={handleExistingPatientPick}
-                  label="Returning patient (pick instead of typing)"
-                  emptyHint=""
-                />
-              </div>
-            )}
+            {/* Returning patient? Pick them from the roster — or create
+                them inline without leaving this workflow. */}
+            <div className="p-3 rounded-xl bg-primary-50 dark:bg-primary-950/30 border border-primary-200 dark:border-primary-800">
+              <InstitutionPatientPicker
+                institutionId={hospital?.id}
+                value={selectedPatient}
+                onChange={handlePatientPick}
+                label="Patient (search the roster, or create)"
+                createSource="queue"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Patient Name *</Label>
-                <Input value={newPatient.name} onChange={e => setNewPatient(p => ({ ...p, name: e.target.value }))} placeholder="Full name" />
+                <Input value={newPatient.name} onChange={e => handleNameChange(e.target.value)} placeholder="Full name" />
               </div>
               <div className="space-y-2">
                 <Label>Phone</Label>

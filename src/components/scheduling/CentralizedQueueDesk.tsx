@@ -17,6 +17,13 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQueueTokens, type QueueToken as LiveQueueToken } from "@/hooks/useQueueTokens";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
+import {
+  findOrCreatePatient,
+  splitPatientName,
+  type InstitutionPatient,
+} from "@/lib/patients";
 
 const PRIORITY_OPTIONS = [
   { value: "normal", label: "Normal Walk-in" },
@@ -40,12 +47,19 @@ const STATUS_META: Record<LiveQueueToken["status"], { label: string; className: 
 export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => {
   const { tokens, loading, waiting, serving, completed, createToken, updateTokenStatus } =
     useQueueTokens();
+  const { institutionId } = useInstitutionAffiliation();
   const [showNewTokenModal, setShowNewTokenModal] = useState(false);
   const [newTokenPatient, setNewTokenPatient] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
   const [newTokenDept, setNewTokenDept] = useState("General OPD");
   const [newTokenPriority, setNewTokenPriority] = useState<"normal" | "urgent" | "emergency">("normal");
   const [searchQuery, setSearchQuery] = useState("");
   const [creating, setCreating] = useState(false);
+
+  const handlePatientPick = (p: InstitutionPatient | null) => {
+    setSelectedPatient(p);
+    if (p) setNewTokenPatient(p.name);
+  };
 
   const handleCreateToken = async () => {
     if (!newTokenPatient.trim()) {
@@ -53,15 +67,39 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
       return;
     }
     setCreating(true);
-    const created = await createToken({
-      patient_name: newTokenPatient.trim(),
-      department: newTokenDept,
-      priority: newTokenPriority,
-    });
-    setCreating(false);
-    if (created) {
-      setShowNewTokenModal(false);
-      setNewTokenPatient("");
+    try {
+      // Patient Unity W2: tokens always carry the master patient id. A
+      // typed walk-in name is resolved (dedupe or shadow-create) first —
+      // if that fails we stop rather than issue an anonymous token.
+      let patientId = selectedPatient?.id ?? null;
+      if (!patientId) {
+        if (!institutionId) {
+          toast.error("No facility context available for this desk");
+          return;
+        }
+        const { firstName, lastName } = splitPatientName(newTokenPatient.trim());
+        const resolved = await findOrCreatePatient(
+          institutionId,
+          { firstName, lastName },
+          "queue",
+        );
+        patientId = resolved.patientId;
+      }
+      const created = await createToken({
+        patient_name: newTokenPatient.trim(),
+        patient_id: patientId,
+        department: newTokenDept,
+        priority: newTokenPriority,
+      });
+      if (created) {
+        setShowNewTokenModal(false);
+        setNewTokenPatient("");
+        setSelectedPatient(null);
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to resolve patient record");
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -150,6 +188,13 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                 <DialogTitle className="font-bold text-lg">Generate Queue Token</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 py-2 text-xs">
+                <InstitutionPatientPicker
+                  institutionId={institutionId}
+                  value={selectedPatient}
+                  onChange={handlePatientPick}
+                  label="Patient (search the roster, or create)"
+                  createSource="queue"
+                />
                 <div>
                   <label htmlFor="queue-patient-name" className="font-bold">Patient Name *</label>
                   <input
@@ -157,7 +202,13 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                     className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     placeholder="Enter full name"
                     value={newTokenPatient}
-                    onChange={(e) => setNewTokenPatient(e.target.value)}
+                    onChange={(e) => {
+                      // Editing away from the picked patient clears the pick.
+                      if (selectedPatient && e.target.value !== selectedPatient.name) {
+                        setSelectedPatient(null);
+                      }
+                      setNewTokenPatient(e.target.value);
+                    }}
                   />
                 </div>
                 <div>
