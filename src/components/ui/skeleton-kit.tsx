@@ -786,25 +786,172 @@ export function SkeletonOrderCard() {
   );
 }
 
-/**
- * Whole-app frame for route/auth loading (used by LoadingScreen):
- * header bar + page body skeleton instead of a centred spinner.
+/* ─── App shell chrome: header + bottom nav twins ───
+ *
+ * The full-page loading gate (LoadingScreen) replaces the whole shell,
+ * MobileLayout included, so the frame must carry the header itself.
+ * These twins mirror BOTH real headers element for element:
+ *  - desktop (>1024px, where useDeviceType reports isDesktop):
+ *    DesktopNav — sticky bar, AppLogo (32px mark + wordmark), the
+ *    pill nav container with icon+label items, then the right cluster
+ *    (search, currency, theme, bell, avatar — or Sign In / Get Started
+ *    when signed out);
+ *  - mobile/tablet (≤1024px): the fixed Header — logo (wordmark hides
+ *    below 420px), institution switcher, search, bell, currency,
+ *    theme, language, avatar/menu — plus the floating BottomNav pill
+ *    (signed-in only, exactly like MobileLayout).
+ * Breakpoint note: the real switch is a JS width check (>1024), so the
+ * twins switch on the matching min-[1025px] media query instead of
+ * Tailwind's lg (1024px) to land on the same side of the line.
  */
-export function SkeletonAppFrame() {
+
+export type SkeletonChromeVariant = "authed" | "guest";
+
+/** AppLogo size="sm" twin: 32px mark + "Doc' O Clock" wordmark bar. */
+function SkeletonLogoMark({ wordmarkClassName }: { wordmarkClassName?: string }) {
   return (
-    <div aria-hidden className="flex min-h-full w-full flex-col">
-      <div className="flex h-16 items-center justify-between border-b border-canvas-silk px-4 dark:border-slate-800 sm:px-6">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-9 rounded-xl" />
-          <SkeletonLine className="h-5 w-32" />
+    <div className="flex shrink-0 items-center gap-2">
+      <Skeleton className="h-8 w-8 rounded-lg" />
+      <SkeletonLine className={cn("h-5 w-[104px]", wordmarkClassName)} />
+    </div>
+  );
+}
+
+function SkeletonDesktopHeader({ variant }: { variant: SkeletonChromeVariant }) {
+  // Label widths approximate the real role nav items (patient set /
+  // signed-out set); every role's bar has the same container geometry.
+  const navLabelWidths =
+    variant === "authed"
+      ? ["w-[74px]", "w-[82px]", "w-[112px]", "w-[66px]"]
+      : ["w-[38px]", "w-[84px]", "w-[88px]", "w-[92px]", "w-[76px]"];
+  return (
+    <div className="sticky top-0 z-50 hidden border-b border-canvas-silk bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 min-[1025px]:block">
+      <div className="mx-auto flex h-16 min-w-0 max-w-content items-center justify-between px-4 md:px-6 lg:h-[4.25rem] lg:px-8 xl:px-12">
+        <div className="flex min-w-0 items-center gap-4 lg:gap-8">
+          <SkeletonLogoMark />
+          {/* Pill nav container — same border/fill/padding as DesktopNav */}
+          <div className="hidden items-center gap-0.5 rounded-nav border border-canvas-silk bg-canvas-mist/60 p-1 dark:border-slate-700 dark:bg-slate-800/50 md:flex">
+            {navLabelWidths.map((w, i) => (
+              <div key={i} className="flex shrink-0 items-center gap-2 px-3 py-2 lg:px-4">
+                <Skeleton className="h-4 w-4 shrink-0 rounded" />
+                <SkeletonLine className={cn("h-3.5", w)} />
+              </div>
+            ))}
+            {variant === "authed" && (
+              <Skeleton className="mx-0.5 h-9 w-[76px] shrink-0 rounded-nav" />
+            )}
+          </div>
         </div>
-        <div className="hidden items-center gap-2 sm:flex">
-          <Skeleton className="h-9 w-20 rounded-pill" />
-          <Skeleton className="h-9 w-20 rounded-pill" />
-          <SkeletonCircle className="h-9 w-9" />
+        <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+          {/* Search icon button (collapsible search, desktop only) */}
+          <Skeleton className="hidden h-10 w-10 rounded-pill md:block" />
+          <Skeleton className="h-8 w-[52px] rounded-md" />
+          <Skeleton className="h-9 w-9 rounded-md" />
+          {variant === "authed" ? (
+            <>
+              <SkeletonCircle className="h-9 w-9" />
+              <SkeletonCircle className="h-9 w-9" />
+            </>
+          ) : (
+            <>
+              <Skeleton className="hidden h-10 w-[88px] rounded-pill sm:block lg:h-11" />
+              <Skeleton className="h-10 w-[118px] rounded-pill lg:h-11" />
+            </>
+          )}
         </div>
       </div>
-      <div className="mx-auto w-full max-w-content flex-1 space-y-6 px-4 py-6 sm:px-6">
+    </div>
+  );
+}
+
+function SkeletonMobileHeader({ variant }: { variant: SkeletonChromeVariant }) {
+  return (
+    <div className="border-b border-canvas-silk bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 min-[1025px]:hidden">
+      <div className="flex h-16 items-center justify-between px-3 sm:px-4">
+        {/* Real mobile Header: wordmark hides below 420px */}
+        <SkeletonLogoMark wordmarkClassName="hidden min-[420px]:block" />
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {variant === "authed" && (
+            <>
+              {/* InstitutionSwitcher: icon-only on xs, labelled from sm */}
+              <Skeleton className="h-9 w-10 rounded-pill sm:w-[76px]" />
+              <Skeleton className="h-9 w-9 rounded-pill sm:h-10 sm:w-10" />
+              <Skeleton className="h-9 w-9 rounded-pill sm:h-10 sm:w-10" />
+            </>
+          )}
+          <Skeleton className="hidden h-8 w-[46px] rounded-md min-[420px]:block" />
+          <Skeleton className="h-9 w-9 rounded-md" />
+          {/* Language select (compact twin; the real trigger is a wide
+              select that crowds the xs bar, so it joins from 560px) */}
+          <Skeleton className="hidden h-9 w-[52px] rounded-md min-[560px]:block" />
+          {variant === "authed" ? (
+            <SkeletonCircle className="ml-1 h-8 w-8 sm:h-9 sm:w-9" />
+          ) : (
+            <Skeleton className="ml-1 h-9 w-9 rounded-pill sm:h-10 sm:w-10" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Header twin for the active shell (desktop bar or mobile bar). */
+export function SkeletonHeaderBar({
+  variant = "authed",
+}: {
+  variant?: SkeletonChromeVariant;
+}) {
+  return (
+    <>
+      <SkeletonDesktopHeader variant={variant} />
+      <SkeletonMobileHeader variant={variant} />
+    </>
+  );
+}
+
+/**
+ * BottomNav twin — the floating pill bar MobileLayout renders for
+ * signed-in users on mobile/tablet: five icon+label slots (labels
+ * join at 400px, exactly like BottomNavItem).
+ */
+export function SkeletonBottomNav() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 min-[1025px]:hidden"
+    >
+      <div className="relative mx-auto mb-3 max-w-md px-4">
+        <div className="flex items-center justify-evenly rounded-pill border border-canvas-silk bg-white/95 px-2 py-1.5 shadow-pill-nav backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-900/95">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="flex min-h-[50px] min-w-0 flex-1 flex-col items-center justify-center px-2 py-1.5"
+            >
+              <Skeleton className="h-9 w-9 rounded-full" />
+              <SkeletonLine className="mt-1 hidden h-2.5 w-10 min-[400px]:block" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Whole-app frame for route/auth loading (used by LoadingScreen):
+ * the shell's header twin + page body skeleton + (signed-in) bottom
+ * nav twin, instead of a centred spinner — the layout the user is
+ * about to see, header included, is already on screen.
+ */
+export function SkeletonAppFrame({
+  variant = "authed",
+}: {
+  variant?: SkeletonChromeVariant;
+}) {
+  return (
+    <div aria-hidden className="flex min-h-full w-full flex-col">
+      <SkeletonHeaderBar variant={variant} />
+      <div className="mx-auto w-full max-w-[1800px] flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 xl:px-12">
         <div className="space-y-2">
           <SkeletonLine className="h-7 w-64 max-w-full" />
           <SkeletonLine className="h-4 w-96 max-w-full" />
@@ -820,6 +967,7 @@ export function SkeletonAppFrame() {
           ))}
         </div>
       </div>
+      {variant === "authed" && <SkeletonBottomNav />}
     </div>
   );
 }
