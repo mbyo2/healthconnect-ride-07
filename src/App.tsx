@@ -12,28 +12,40 @@ import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { TwoFactorGate } from '@/components/auth/TwoFactorGate';
 
+import { reloadOnceForChunkError } from '@/lib/chunkRecovery';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 import { PageTitleManager } from '@/components/PageTitleManager';
 import { ScrollToTop } from '@/components/ScrollToTop';
 
-// Bounded retry wrapper for lazy imports to handle stale chunk errors without hanging indefinitely
+// Bounded retry wrapper for lazy imports to handle stale chunk errors without hanging indefinitely.
+// Final failure of a chunk load almost always means this tab is running a
+// stale build (open across a deploy, so its module map points at chunk files
+// the current deployment no longer serves): reload once to pick up the
+// current shell instead of throwing into the error boundary, whose retry
+// could only re-run the same doomed import. Non-chunk errors rethrow as-is.
 const lazyWithRetry = (importFn: () => Promise<any>) =>
   lazy(async () => {
     let retries = 2;
+    let lastError: unknown;
     while (retries > 0) {
       try {
         return await importFn();
       } catch (err) {
+        lastError = err;
         retries -= 1;
-        if (retries === 0) {
-          console.error('Failed to load page component chunk after retries:', err);
-          throw err;
+        if (retries > 0) {
+          await new Promise((r) => setTimeout(r, 800));
         }
-        await new Promise((r) => setTimeout(r, 800));
       }
     }
-    return importFn();
+    console.error('Failed to load page component chunk after retries:', lastError);
+    if (reloadOnceForChunkError(lastError)) {
+      // The page is reloading onto the current build — stay in the
+      // Suspense fallback rather than flashing the error boundary.
+      return new Promise<any>(() => {});
+    }
+    throw lastError;
   });
 
 // EAGERLY import the Landing page — it's the primary entry point for all visitors
