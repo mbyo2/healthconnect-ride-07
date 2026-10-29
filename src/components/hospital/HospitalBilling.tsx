@@ -40,7 +40,8 @@ function suggestedServiceLabel(c: AssembledCharge): string {
       return d.replace(/^Immunization:\s*/, "").replace(/\s*\(Dose.*$/, "");
     case "anc_visit":
       return "ANC Visit";
-    case "admission": {
+    case "admission":
+    case "bed_segment": {
       const m = d.match(/\(([^)]+)\)/);
       return `${m ? `${m[1]} ` : ""}Ward Bed (per day)`;
     }
@@ -101,7 +102,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes, procRes, imagingRes, admissionsRes, ancRes, immRes, catalogueRes, policiesRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, procRes, imagingRes, bedSegRes, ancRes, immRes, catalogueRes, policiesRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type").eq("patient_id", patientId).eq("payment_status", "pending"),
         // Prescription statuses are pending/filled/partially_filled —
@@ -110,7 +111,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).in("status", ["pending", "filled", "partially_filled"]),
         supabase.from("procedure_executions").select("id, procedure_id, execution_date, procedure:clinical_procedures(procedure_name)").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(100),
         supabase.from("imaging_orders" as any).select("id, modality, body_part, status, ordered_at").eq("patient_id", patientId).eq("institution_id", hospital.id).eq("status", "completed").limit(100),
-        supabase.from("hospital_admissions" as any).select("id, admission_date, bed_id, bed:hospital_beds(bed_number, bed_type)").eq("patient_id", patientId).eq("hospital_id", hospital.id).eq("status", "admitted").limit(20),
+        supabase.from("admission_bed_segments" as any).select("id, admission_id, bed_id, bed_type, segment_start, segment_end, bed:hospital_beds(bed_number)").eq("patient_id", patientId).eq("hospital_id", hospital.id).limit(50),
         supabase.from("anc_visits" as any).select("id, visit_number, visit_date").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(50),
         supabase.from("immunizations" as any).select("id, vaccine_name, dose_number, administered_date").eq("patient_id", patientId).eq("institution_id", hospital.id).not("administered_date", "is", null).limit(50),
         supabase.from("service_pricing").select("id, service_code, service_label, base_price, category, institution_id")
@@ -201,26 +202,40 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           selected: true,
         });
       });
-      // Ward & bed charges: per-day service × days admitted (the day
-      // count is the quantity; the rate is the price-list row's price).
-      ((admissionsRes.data || []) as any[]).forEach((a: any) => {
-        if (!a.bed_id) return;
-        const bedType = (a.bed?.bed_type || "general").toString();
-        const admittedAt = new Date(a.admission_date).getTime();
-        const days = Math.max(1, Math.ceil((Date.now() - admittedAt) / 86400000));
-        const bedLabel = bedType.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
-        charges.push({
-          key: `admission-${a.id}`,
-          category: "Ward & Bed Charges",
-          description: `Bed ${a.bed?.bed_number || ""} (${bedLabel}) × ${days} day${days > 1 ? "s" : ""}`.trim(),
-          date: a.admission_date,
-          quantity: days,
-          service: matchServiceOrdered(services, bedType.replace(/_/g, "-"), bedType, "ward", "bed"),
-          source_kind: "admission",
-          source_id: a.id,
-          selected: true,
+      // Ward & bed charges: one line per bed segment of the stay (a
+      // transfer splits the stay into segments, each priced at its
+      // own bed's per-night rate). How many nights are still owed on
+      // a segment is decided by the server rule
+      // (admission_segment_nights_due: midnights crossed, minus the
+      // nights already billed) — the quantity sent with the line is
+      // a preview only; create_hospital_bill recomputes it on the
+      // server and bills exactly the nights still owed, so billing
+      // mid-stay and again at discharge charges every night once.
+      // Segments are discovered for admitted AND discharged stays,
+      // so bed charges can be raised at discharge, not only before.
+      const bedDues = await Promise.all(
+        ((bedSegRes.data || []) as any[]).map(async (s: any) => {
+          const { data } = await (supabase as any).rpc("admission_segment_nights_due", { p_segment_id: s.id });
+          return { seg: s, due: Number(data) || 0 };
+        })
+      );
+      bedDues
+        .filter(({ due }) => due > 0)
+        .forEach(({ seg: s, due }) => {
+          const bedType = (s.bed_type || "general").toString();
+          const bedLabel = bedType.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+          charges.push({
+            key: `bedseg-${s.id}`,
+            category: "Ward & Bed Charges",
+            description: `Bed ${s.bed?.bed_number || ""} (${bedLabel}) × ${due} night${due > 1 ? "s" : ""}`.trim(),
+            date: s.segment_start,
+            quantity: due,
+            service: matchServiceOrdered(services, bedType.replace(/_/g, "-"), bedType, "ward", "bed"),
+            source_kind: "bed_segment",
+            source_id: s.id,
+            selected: true,
+          });
         });
-      });
       ((ancRes.data || []) as any[]).forEach((v: any) => {
         charges.push({
           key: `anc-${v.id}`,
