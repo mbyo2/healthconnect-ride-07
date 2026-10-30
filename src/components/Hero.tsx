@@ -119,25 +119,25 @@ export const Hero = () => {
               <p className="text-xs font-medium text-graphite-600 mb-3">Care across Zambia</p>
               <div className="flex items-center justify-center -space-x-3">
                 <LandingImg
-                  src="/images/landing/care-1200.jpg"
+                  src="/images/landing/care-1200.webp"
                   alt="African female doctor"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
                 <LandingImg
-                  src="/images/landing/avatar-1.jpg"
+                  src="/images/landing/avatar-1.webp"
                   alt="African clinician"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
                 <LandingImg
-                  src="/images/landing/avatar-doc-2.jpg"
+                  src="/images/landing/avatar-doc-2.webp"
                   alt="African male doctor"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
                 <LandingImg
-                  src="/images/landing/avatar-doc-3.jpg"
+                  src="/images/landing/avatar-doc-3.webp"
                   alt="African healthcare professional"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
@@ -164,25 +164,25 @@ export const Hero = () => {
                 <p className="text-xs font-medium text-graphite-500 mb-3">For patients and providers</p>
                 <div className="flex items-center -space-x-3 mb-2">
                   <LandingImg
-                    src="/images/landing/care-1200.jpg"
+                    src="/images/landing/care-1200.webp"
                     alt="African female doctor"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
                   <LandingImg
-                    src="/images/landing/avatar-1.jpg"
+                    src="/images/landing/avatar-1.webp"
                     alt="African clinician"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
                   <LandingImg
-                    src="/images/landing/avatar-doc-2.jpg"
+                    src="/images/landing/avatar-doc-2.webp"
                     alt="African male doctor"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
                   <LandingImg
-                    src="/images/landing/avatar-doc-3.jpg"
+                    src="/images/landing/avatar-doc-3.webp"
                     alt="African healthcare professional"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"

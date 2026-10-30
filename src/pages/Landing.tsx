@@ -66,7 +66,7 @@ const Landing = () => {
         <meta name="geo.placename" content="Zambia" />
         <link rel="canonical" href={`${SITE_URL}/`} />
         {/* Hero photo is same-origin: preload it so first paint is instant. */}
-        <link rel="preload" as="image" href="/images/landing/hero-1600.jpg" fetchpriority="high" />
+        <link rel="preload" as="image" href="/images/landing/hero-1600.webp" fetchpriority="high" />
 
         <meta property="og:title" content="Doc' O Clock — Healthcare Platform for Zambia" />
         <meta property="og:description" content="Connect with verified doctors, book appointments, attend video consultations, and order medications — all in one platform." />

@@ -428,7 +428,7 @@ export const Auth = () => {
       {/* Brand panel — desktop only; layout only, form logic untouched */}
       <div className="relative hidden overflow-hidden lg:block" aria-hidden>
         <img
-          src="/images/landing/hero-1600.jpg"
+          src="/images/landing/hero-1600.webp"
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />

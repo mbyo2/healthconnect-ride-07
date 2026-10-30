@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Percent, Plus, Trash2, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 import {
   Dialog,
   DialogContent,
@@ -145,7 +146,7 @@ export function DoctorFractionManager({ institutionId }: { institutionId: string
       toast.success("Fraction rule added");
     },
     onError: (e: any) => {
-      toast.error(e.message || "Failed to add rule");
+      toast.error(friendlyErrorMessage(e, "Failed to add rule. You may not have permission."));
     },
   });
 

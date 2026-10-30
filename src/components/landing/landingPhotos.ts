@@ -12,25 +12,25 @@
  */
 const LOCAL: Record<string, string> = {
   // Hero + care + old-Hero avatars
-  "photo-1581594693702-fbdc51b2763b": "/images/landing/hero-1600.jpg",
-  "photo-1594824476967-48c8b964273f": "/images/landing/care-1200.jpg",
-  "photo-1622253692010-333f2da6031d": "/images/landing/avatar-1.jpg",
-  "photo-1559839734-2b71ea197ec2": "/images/landing/avatar-doc-2.jpg",
-  "photo-1651008376811-b90baee60c1f": "/images/landing/avatar-doc-3.jpg",
+  "photo-1581594693702-fbdc51b2763b": "/images/landing/hero-1600.webp",
+  "photo-1594824476967-48c8b964273f": "/images/landing/care-1200.webp",
+  "photo-1622253692010-333f2da6031d": "/images/landing/avatar-1.webp",
+  "photo-1559839734-2b71ea197ec2": "/images/landing/avatar-doc-2.webp",
+  "photo-1651008376811-b90baee60c1f": "/images/landing/avatar-doc-3.webp",
   // How-it-works steps
-  "photo-1576091160399-112ba8d25d1d": "/images/landing/book-800.jpg",
-  "photo-1576091160550-2173dba999ef": "/images/landing/consult-800.jpg",
-  "photo-1587854692152-cbe660dbde88": "/images/landing/pharmacy-800.jpg",
+  "photo-1576091160399-112ba8d25d1d": "/images/landing/book-800.webp",
+  "photo-1576091160550-2173dba999ef": "/images/landing/consult-800.webp",
+  "photo-1587854692152-cbe660dbde88": "/images/landing/pharmacy-800.webp",
   // Bands + providers
-  "photo-1579684385127-1ef15d508118": "/images/landing/scale-1600.jpg",
-  "photo-1666214280557-f1b5022eb634": "/images/landing/providers-1200.jpg",
-  "photo-1551601651-2a8555f1a136": "/images/landing/cta-1600.jpg",
+  "photo-1579684385127-1ef15d508118": "/images/landing/scale-1600.webp",
+  "photo-1666214280557-f1b5022eb634": "/images/landing/providers-1200.webp",
+  "photo-1551601651-2a8555f1a136": "/images/landing/cta-1600.webp",
   // Testimonial avatars
-  "photo-1505421031134-e57263cae630": "/images/landing/avatar-0.jpg",
-  "photo-1532076904124-d4e8fe7fbbec": "/images/landing/avatar-2.jpg",
-  "photo-1714118657863-2843a622718b": "/images/landing/avatar-3.jpg",
-  "photo-1620424037570-15137a4a562d": "/images/landing/avatar-4.jpg",
-  "photo-1655313836628-af779ac11e14": "/images/landing/avatar-5.jpg",
+  "photo-1505421031134-e57263cae630": "/images/landing/avatar-0.webp",
+  "photo-1532076904124-d4e8fe7fbbec": "/images/landing/avatar-2.webp",
+  "photo-1714118657863-2843a622718b": "/images/landing/avatar-3.webp",
+  "photo-1620424037570-15137a4a562d": "/images/landing/avatar-4.webp",
+  "photo-1655313836628-af779ac11e14": "/images/landing/avatar-5.webp",
 };
 
 export const LANDING_PHOTOS = {
