@@ -122,15 +122,17 @@ main {
 
 /* ─── Skeleton shimmer (YouTube-style) ───
    THE one shimmer implementation for every loading placeholder in the app.
-   Token-driven: the base is --muted (flips with the theme — never a light
-   slab on a dark page) and the sweep is a low-alpha --foreground wash, so
-   it reads correctly on light and dark surfaces alike. Motion honours the
+   Token-driven: the base is --skeleton (flips with the theme and is
+   deliberately well separated from card surfaces in BOTH themes —
+   the old --muted base sat at ~1.1:1 against its cards, so skeletons
+   rendered as blank sections with invisible lines/buttons) and the
+   sweep is the --skeleton-sweep highlight. Motion honours the
    OS preference below and the per-account a11y reduced-motion setting
    above (which globally freezes animations, leaving a static block). */
 .doc-shimmer {
   position: relative;
   overflow: hidden;
-  background-color: hsl(var(--muted));
+  background-color: hsl(var(--skeleton));
 }
 .doc-shimmer::after {
   content: "";
@@ -140,7 +142,7 @@ main {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    hsl(var(--foreground) / 0.07) 50%,
+    var(--skeleton-sweep) 50%,
     transparent 100%
   );
   animation: doc-shimmer-sweep 1.6s ease-in-out infinite;
@@ -218,6 +220,13 @@ html {
     --secondary-foreground: 24 10% 10%;
     --muted:            40 6% 96%;
     --muted-foreground: 24 10% 35%;       /* darker for better contrast - WCAG AA compliant */
+    /* Skeleton placeholder tokens — deliberately MUCH darker than
+       --muted: a skeleton block must separate from the card it sits on
+       (≥1.4:1 against --card/white) or the loading page reads as blank
+       white sections with invisible lines and buttons. Pinned by
+       src/test/skeleton-coverage.test.tsx — do not lighten. */
+    --skeleton:         40 10% 83%;
+    --skeleton-sweep:   rgb(255 255 255 / 0.55);
     --accent:           18 91% 52%;       /* #f55c15 — Ember */
     --accent-foreground: 0 0% 100%;
     --destructive:      0 100% 50%;
@@ -282,6 +291,10 @@ html {
     --secondary-foreground: 40 10% 98%;
     --muted:            24 8% 14%;
     --muted-foreground: 25 5% 70%;        /* lighter in dark mode for better contrast */
+    /* Skeleton placeholder tokens (dark) — ≥1.4:1 against --card and
+       slate-900 shells; see the light-mode note. Pinned by test. */
+    --skeleton:         24 8% 24%;
+    --skeleton-sweep:   rgb(255 255 255 / 0.10);
     --accent:           18 91% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive:      0 72% 51%;

@@ -1,4 +1,5 @@
 import { csvCell } from "@/utils/csvSafe";
+import { Skeleton } from "@/components/ui/skeleton";
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -539,7 +540,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           {loading ? (
             <div className="space-y-2" role="status" aria-label="Loading reorder queue">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                <Skeleton key={i} aria-hidden className="h-16 rounded-2xl" />
               ))}
             </div>
           ) : lowStockItems.length === 0 ? (

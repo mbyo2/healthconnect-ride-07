@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -224,7 +225,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
             {loading ? (
               <div className="space-y-2" role="status" aria-label="Loading patients">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                  <Skeleton key={i} aria-hidden className="h-20 rounded-2xl" />
                 ))}
               </div>
             ) : filteredPatients.length === 0 ? (

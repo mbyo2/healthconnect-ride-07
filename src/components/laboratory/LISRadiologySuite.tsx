@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import {
   TestTube2,
@@ -325,7 +326,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="status" aria-label="Loading imaging orders">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="h-48 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                <Skeleton key={i} aria-hidden className="h-48 rounded-2xl" />
               ))}
             </div>
           ) : studies.length === 0 ? (

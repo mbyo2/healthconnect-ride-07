@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -257,7 +258,7 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
 
       {/* Ticket list */}
       {isLoading ? (
-        <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="h-16 rounded-xl bg-muted/50 animate-pulse" />)}</div>
+        <div className="space-y-2">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 rounded-xl" aria-hidden />)}</div>
       ) : filteredTickets.length === 0 ? (
         <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">
           <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-40" />

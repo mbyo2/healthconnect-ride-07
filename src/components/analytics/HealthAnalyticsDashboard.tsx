@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SkeletonLine } from "@/components/ui/skeleton-kit";
 import { TrendingUp, TrendingDown, Heart, Activity, Brain, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -101,9 +102,9 @@ export const HealthAnalyticsDashboard: React.FC<HealthAnalyticsDashboardProps> =
           {[...Array(4)].map((_, i) => (
             <Card key={i}>
               <CardContent className="p-6">
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                <div className="space-y-3">
+                  <SkeletonLine className="h-4 w-3/4" />
+                  <SkeletonLine className="h-8 w-1/2" />
                 </div>
               </CardContent>
             </Card>

@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Globe, CheckCircle2, XCircle, Hourglass } from "lucide-react";
+import { Globe, CheckCircle2, XCircle } from "lucide-react";
+import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { toast } from "sonner";
 
 /**
@@ -235,9 +236,11 @@ export const MarketplaceListingApprovals = () => {
           their marketplace visibility immediately. Listing requires platform payment mode.
         </p>
         {loading ? (
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <Hourglass className="h-4 w-4 animate-pulse" /> Loading requests…
-          </p>
+          <div aria-hidden className="divide-y divide-canvas-silk dark:divide-slate-800">
+            {[0, 1, 2].map((i) => (
+              <SkeletonListRow key={i} action />
+            ))}
+          </div>
         ) : pending.length === 0 ? (
           <p className="text-sm text-muted-foreground">No pending marketplace listing requests.</p>
         ) : (

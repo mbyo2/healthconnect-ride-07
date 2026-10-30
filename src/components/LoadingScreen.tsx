@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { SkeletonAppFrame } from "@/components/ui/skeleton-kit";
+import { resolveRouteSkeleton } from "@/lib/routeSkeleton";
 import { useAuth } from "@/context/AuthContext";
 import { safeLocalRemove, safeLocalClear, safeSessionRemove, safeSessionClear } from '@/utils/storage';
 import { supabase } from "@/integrations/supabase/client";
@@ -39,10 +40,28 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
     window.location.reload();
   }, []);
 
+  // Route-matched twin: the page being loaded wears its OWN skeleton
+  // (src/lib/routeSkeleton.tsx), not a generic dashboard frame. This
+  // component also renders above the Router (main.tsx), so the path
+  // comes from window.location rather than a router hook.
+  const routeSkeleton =
+    typeof window !== "undefined"
+      ? resolveRouteSkeleton(window.location.pathname)
+      : null;
+
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
       <span role="status" className="sr-only">{message}</span>
-      <SkeletonAppFrame variant={user ? "authed" : "guest"} />
+      {routeSkeleton && !routeSkeleton.chrome ? (
+        // Shell-less screens (kiosk, queue display, video call): the
+        // twin owns the whole viewport — no app header/nav shapes.
+        routeSkeleton.body
+      ) : (
+        <SkeletonAppFrame
+          variant={user ? "authed" : "guest"}
+          body={routeSkeleton?.body}
+        />
+      )}
 
       {showRetry && (
         <div className="fixed inset-x-0 bottom-8 flex justify-center animate-fade-in">

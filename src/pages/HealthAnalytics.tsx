@@ -5,6 +5,8 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { useHealthData } from "@/hooks/useHealthData";
 import { useAuth } from "@/context/AuthContext";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonLine } from "@/components/ui/skeleton-kit";
 
 const HealthAnalytics = () => {
   const { user } = useAuth();
@@ -98,15 +100,15 @@ const HealthAnalytics = () => {
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Loading vitals">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs animate-pulse">
-                  <div className="h-3 w-24 rounded bg-slate-200 dark:bg-slate-700 mb-3" />
-                  <div className="h-8 w-20 rounded bg-slate-200 dark:bg-slate-700 mb-2" />
-                  <div className="h-3 w-28 rounded bg-slate-200 dark:bg-slate-700" />
+                <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+                  <SkeletonLine className="h-3 w-24 mb-3" />
+                  <Skeleton className="h-8 w-20 mb-2" />
+                  <SkeletonLine className="h-3 w-28" />
                 </div>
               ))}
             </div>
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-              <div className="h-[380px] rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+              <Skeleton className="h-[380px] w-full rounded-xl" />
             </div>
           </>
         ) : !hasAnyData ? (

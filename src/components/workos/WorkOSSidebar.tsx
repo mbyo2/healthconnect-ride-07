@@ -149,7 +149,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                       <span className="truncate">{board.name}</span>
                     </div>
                     <span className={`text-xs px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                      isActive ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-800 text-slate-400"
+                      isActive ? "bg-white/25 text-white" : "bg-slate-800 text-slate-400"
                     }`}>
                       {board.count}
                     </span>
@@ -191,7 +191,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                       <span className="truncate">{board.name}</span>
                     </div>
                     <span className={`text-xs px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                      isActive ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-800 text-slate-400"
+                      isActive ? "bg-white/25 text-white" : "bg-slate-800 text-slate-400"
                     }`}>
                       {board.count}
                     </span>

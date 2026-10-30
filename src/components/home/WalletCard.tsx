@@ -109,7 +109,7 @@ export const WalletCard = () => {
                     <div>
                         <div className="text-4xl font-bold tracking-tight">
                             {isLoading ? (
-                                <div className="h-10 w-32 bg-white dark:bg-slate-900/20 animate-pulse rounded-lg" />
+                                <div className="h-10 w-32 bg-white/25 animate-pulse rounded-lg" />
                             ) : (
                                 formatPrice(balance ?? 0)
                             )}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,7 +60,7 @@ export const InstitutionWalletPanel = ({ institutionId, institutionName }: { ins
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="h-12 rounded-xl bg-muted animate-pulse" role="status" aria-label="Loading institution wallet" />
+          <Skeleton className="h-12 rounded-xl" role="status" aria-label="Loading institution wallet" />
         ) : balance === null ? (
           <p className="text-sm text-muted-foreground">
             Institution wallet isn't available — it appears after the first settled payment.

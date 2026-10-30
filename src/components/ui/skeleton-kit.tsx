@@ -786,6 +786,268 @@ export function SkeletonOrderCard() {
   );
 }
 
+/* ─── Shape-class page twins (route-level fallback) ───
+ *
+ * The route-level loading gate (LoadingScreen) resolves one of these
+ * per route (see src/lib/routeSkeleton.tsx) so a page never loads
+ * behind another page's skeleton. Hero pages use the bespoke twins
+ * above; the long tail uses these shape classes — the same container,
+ * header, toolbar and content geometry the real pages share.
+ */
+
+/** Table page — page title, toolbar chips, card with a real table. */
+export function SkeletonTablePage({ rows = 6, cells = 5 }: { rows?: number; cells?: number }) {
+  return (
+    <div aria-hidden className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-2">
+          <SkeletonLine className="h-7 w-56 max-w-full" />
+          <SkeletonLine className="h-4 w-80 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-36 rounded-pill" />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-9 w-24 rounded-full" />
+        ))}
+      </div>
+      <div className="overflow-hidden rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="border-b border-canvas-silk bg-canvas dark:border-slate-800 dark:bg-slate-950">
+              {Array.from({ length: cells }).map((_, c) => (
+                <th key={c} className="px-4 py-3">
+                  <SkeletonLine className="h-3 w-16" />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+            <SkeletonTableRows rows={rows} cells={cells} />
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/** List page — page title + a card of avatar list rows. */
+export function SkeletonListPage({ rows = 5 }: { rows?: number }) {
+  return (
+    <div aria-hidden className="space-y-5">
+      <div className="space-y-2">
+        <SkeletonLine className="h-7 w-52 max-w-full" />
+        <SkeletonLine className="h-4 w-72 max-w-full" />
+      </div>
+      <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+        {Array.from({ length: rows }).map((_, i) => (
+          <SkeletonListRow key={i} action />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Marketplace — header, tab chips, product-card grid. */
+export function SkeletonMarketplaceGrid() {
+  return (
+    <div aria-hidden className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-2">
+          <SkeletonLine className="h-7 w-48 max-w-full" />
+          <SkeletonLine className="h-4 w-72 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-56 max-w-full rounded-pill" />
+      </div>
+      <div className="flex gap-2 overflow-hidden">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-9 w-24 shrink-0 rounded-full" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <SkeletonProductCard key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Split shell — list/index column + detail pane (chat, map, scribe). */
+export function SkeletonSplitShell() {
+  return (
+    <div aria-hidden className="flex gap-5">
+      <div className="hidden w-80 shrink-0 space-y-3 md:block">
+        <Skeleton className="h-11 w-full rounded-pill" />
+        <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+          {[0, 1, 2, 3].map((i) => (
+            <SkeletonListRow key={i} />
+          ))}
+        </div>
+      </div>
+      <div className="min-w-0 flex-1 space-y-4 rounded-2xl border border-canvas-silk bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center gap-3 border-b border-canvas-silk pb-4 dark:border-slate-800">
+          <SkeletonCircle className="h-10 w-10" />
+          <div className="space-y-2">
+            <SkeletonLine className="h-4 w-36" />
+            <SkeletonLine className="h-3 w-20" />
+          </div>
+        </div>
+        <SkeletonBlock className="h-40" />
+        <SkeletonBlock className="h-24" />
+        <Skeleton className="h-11 w-full rounded-pill" />
+      </div>
+    </div>
+  );
+}
+
+/** Form page — page title + settings-style cards of label/input rows. */
+export function SkeletonFormPage() {
+  return (
+    <div aria-hidden className="mx-auto w-full max-w-3xl space-y-5">
+      <div className="space-y-2">
+        <SkeletonLine className="h-7 w-52 max-w-full" />
+        <SkeletonLine className="h-4 w-80 max-w-full" />
+      </div>
+      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <SkeletonForm rows={4} />
+      </div>
+      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <SkeletonForm rows={2} />
+      </div>
+    </div>
+  );
+}
+
+/** Video call — shell-less dark screen: stage block + control row. */
+export function SkeletonCallScreen() {
+  return (
+    <div aria-hidden className="flex min-h-screen flex-col bg-slate-950 p-6">
+      <div className="flex items-center justify-between">
+        <SkeletonOnDark className="h-5 w-40 rounded-md" />
+        <SkeletonOnDark className="h-8 w-24 rounded-full" />
+      </div>
+      <div className="mx-auto grid w-full max-w-5xl flex-1 grid-cols-1 content-center gap-4 py-8 sm:grid-cols-2">
+        <SkeletonOnDark className="h-64 w-full rounded-2xl" />
+        <SkeletonOnDark className="hidden h-64 w-full rounded-2xl sm:block" />
+      </div>
+      <div className="flex items-center justify-center gap-3 pb-4">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <SkeletonOnDark key={i} className="h-12 w-12 rounded-full" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Auth / centred-card pages — logo, title, form card, submit button. */
+export function SkeletonAuthCard() {
+  return (
+    <div aria-hidden className="mx-auto w-full max-w-md space-y-6 py-6">
+      <div className="flex flex-col items-center space-y-3">
+        <Skeleton className="h-12 w-12 rounded-2xl" />
+        <SkeletonLine className="h-6 w-48" />
+        <SkeletonLine className="h-4 w-64 max-w-full" />
+      </div>
+      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <SkeletonForm rows={3} />
+      </div>
+    </div>
+  );
+}
+
+/** Public article pages — narrow reading column. */
+export function SkeletonArticlePage() {
+  return (
+    <div aria-hidden className="mx-auto w-full max-w-3xl space-y-6 py-4">
+      <div className="space-y-3">
+        <SkeletonLine className="h-9 w-96 max-w-full" />
+        <SkeletonLine className="h-5 w-64 max-w-full" />
+      </div>
+      {[0, 1, 2].map((g) => (
+        <div key={g} className="space-y-2.5">
+          <SkeletonLine className="h-5 w-40" />
+          <SkeletonLine className="h-4 w-full" />
+          <SkeletonLine className="h-4 w-full" />
+          <SkeletonLine className="h-4 w-3/4" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Kiosk — shell-less touch screen: top bar + big action cards.
+ * Mirrors SelfServiceKiosk's bone background and menu geometry. */
+export function SkeletonKioskMenu() {
+  return (
+    <div aria-hidden className="flex min-h-screen flex-col bg-canvas-bone p-6 font-sans dark:bg-slate-950 sm:p-10">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-b border-canvas-silk pb-4 dark:border-slate-800">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-12 w-12 rounded-2xl" />
+          <div className="space-y-2">
+            <SkeletonLine className="h-5 w-44" />
+            <SkeletonLine className="h-3 w-28" />
+          </div>
+        </div>
+        <SkeletonLine className="h-6 w-20" />
+      </div>
+      <div className="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-4 py-8 sm:grid-cols-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex min-h-[150px] flex-col justify-center gap-3 rounded-2xl border border-canvas-silk bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <Skeleton className="h-12 w-12 rounded-2xl" />
+            <SkeletonLine className="h-5 w-32" />
+            <SkeletonLine className="h-3.5 w-44 max-w-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Public queue display — shell-less dark big screen: header row,
+ * the big now-serving panel and the waiting list. Mirrors
+ * PublicQueueDisplay (slate-950 in both themes). */
+export function SkeletonQueueDisplay() {
+  return (
+    <div aria-hidden className="flex min-h-screen flex-col bg-slate-950 p-6 font-sans sm:p-10">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center gap-3">
+          <SkeletonOnDark className="h-12 w-12 rounded-2xl" />
+          <div className="space-y-2">
+            <SkeletonOnDark className="h-5 w-48 rounded-md" />
+            <SkeletonOnDark className="h-3 w-32 rounded-md" />
+          </div>
+        </div>
+        <SkeletonOnDark className="h-8 w-28 rounded-md" />
+      </div>
+      <div className="grid flex-1 grid-cols-1 gap-6 py-8 lg:grid-cols-12">
+        <div className="flex flex-col justify-between rounded-2xl border-2 border-slate-800 bg-slate-900 p-8 sm:p-12 lg:col-span-7">
+          <div className="space-y-3">
+            <SkeletonOnDark className="h-4 w-36 rounded-md" />
+            <SkeletonOnDark className="h-24 w-64 max-w-full rounded-2xl" />
+            <SkeletonOnDark className="h-6 w-48 rounded-md" />
+          </div>
+          <SkeletonOnDark className="mt-10 h-5 w-56 rounded-md" />
+        </div>
+        <div className="space-y-3 lg:col-span-5">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/90 p-4"
+            >
+              <SkeletonOnDark className="h-6 w-24 rounded-md" />
+              <SkeletonOnDark className="h-6 w-16 rounded-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── App shell chrome: header + bottom nav twins ───
  *
  * The full-page loading gate (LoadingScreen) replaces the whole shell,
@@ -945,27 +1207,35 @@ export function SkeletonBottomNav() {
  */
 export function SkeletonAppFrame({
   variant = "authed",
+  body,
 }: {
   variant?: SkeletonChromeVariant;
+  /** Route-matched body twin (see src/lib/routeSkeleton.tsx). Defaults
+   * to the generic dashboard body for callers that don't resolve one. */
+  body?: React.ReactNode;
 }) {
   return (
     <div aria-hidden className="flex min-h-full w-full flex-col">
       <SkeletonHeaderBar variant={variant} />
       <div className="mx-auto w-full max-w-[1800px] flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 xl:px-12">
-        <div className="space-y-2">
-          <SkeletonLine className="h-7 w-64 max-w-full" />
-          <SkeletonLine className="h-4 w-96 max-w-full" />
-        </div>
-        <SkeletonStatGrid />
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <SkeletonCard className="h-56 lg:col-span-2" />
-          <SkeletonCard className="h-56" />
-        </div>
-        <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
-          {[0, 1, 2].map((i) => (
-            <SkeletonListRow key={i} action />
-          ))}
-        </div>
+        {body ?? (
+          <>
+            <div className="space-y-2">
+              <SkeletonLine className="h-7 w-64 max-w-full" />
+              <SkeletonLine className="h-4 w-96 max-w-full" />
+            </div>
+            <SkeletonStatGrid />
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+              <SkeletonCard className="h-56 lg:col-span-2" />
+              <SkeletonCard className="h-56" />
+            </div>
+            <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+              {[0, 1, 2].map((i) => (
+                <SkeletonListRow key={i} action />
+              ))}
+            </div>
+          </>
+        )}
       </div>
       {variant === "authed" && <SkeletonBottomNav />}
     </div>

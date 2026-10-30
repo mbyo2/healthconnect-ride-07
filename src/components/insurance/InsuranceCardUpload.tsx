@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -352,7 +353,7 @@ export const InsuranceCardUpload = () => {
         <Card>
           <CardContent className="py-8">
             <div className="space-y-3">
-              <div className="h-16 rounded-lg bg-muted animate-pulse" />
+              <Skeleton aria-hidden className="h-16 rounded-lg" />
             </div>
           </CardContent>
         </Card>

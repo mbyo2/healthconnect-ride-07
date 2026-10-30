@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/hooks/use-currency";
@@ -68,7 +69,7 @@ export const WalletHistory = () => {
                 <CardContent>
                     <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
+                            <Skeleton key={i} className="h-16 rounded-lg" aria-hidden />
                         ))}
                     </div>
                 </CardContent>

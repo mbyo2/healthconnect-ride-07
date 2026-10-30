@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SkeletonLine } from "@/components/ui/skeleton-kit";
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -384,14 +385,14 @@ export const ComprehensiveMedicalRecords = () => {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={i}>
             <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <SkeletonLine className="h-4 w-1/4" />
+              <SkeletonLine className="h-3 w-1/2" />
             </CardHeader>
             <CardContent>
-              <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              <SkeletonLine className="h-3 w-full mb-2" />
+              <SkeletonLine className="h-3 w-3/4" />
             </CardContent>
           </Card>
         ))}

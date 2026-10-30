@@ -55,7 +55,7 @@ export const FloatingAIChat = () => {
         >
           {/* Brand header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground shrink-0">
-            <div className="h-10 w-10 rounded-full bg-white dark:bg-slate-900/20 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-white/25 flex items-center justify-center">
               <Bot className="h-5 w-5" />
             </div>
             <div className="flex-1 min-w-0">
@@ -68,7 +68,7 @@ export const FloatingAIChat = () => {
             <button
               onClick={() => setOpen(false)}
               aria-label="Close chat"
-              className="h-9 w-9 rounded-full hover:bg-white dark:bg-slate-900/20 flex items-center justify-center transition-colors"
+              className="h-9 w-9 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
             >
               <X className="h-5 w-5" />
             </button>

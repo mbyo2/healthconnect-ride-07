@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Landmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +45,7 @@ export const PlatformWalletPanel = () => {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="h-12 rounded-xl bg-muted animate-pulse" role="status" aria-label="Loading platform wallet" />
+          <Skeleton className="h-12 rounded-xl" role="status" aria-label="Loading platform wallet" />
         ) : (
           <>
             <p className="text-3xl font-bold tabular-nums">{formatPrice(balance ?? 0)}</p>

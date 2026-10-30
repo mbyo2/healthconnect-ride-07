@@ -1,5 +1,6 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -519,7 +520,7 @@ export function LabMetricsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <ChartCard title="Tests — Last 7 Days" description="Completed vs pending">
           {trendLoading ? (
-            <div className="h-48 rounded-lg bg-muted animate-pulse" />
+            <Skeleton aria-hidden className="h-48 rounded-lg" />
           ) : (
             <TrendAreaChart data={weeklyTrend || []} dataKey="completed" />
           )}
@@ -628,7 +629,7 @@ export function InstitutionMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -884,7 +885,7 @@ export function NurseMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1032,7 +1033,7 @@ export function FinanceMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1139,7 +1140,7 @@ export function SuperAdminMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1217,7 +1218,7 @@ export function CXOMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1297,7 +1298,7 @@ export function RadiologistMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1378,7 +1379,7 @@ export function HRMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1460,7 +1461,7 @@ export function OTMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1526,7 +1527,7 @@ export function InventoryMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1605,7 +1606,7 @@ export function TriageMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1706,7 +1707,7 @@ export function AmbulanceMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1768,7 +1769,7 @@ export function MaintenanceMetricsDashboard() {
       <div className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} aria-hidden className="h-24 rounded-lg" />
           ))}
         </div>
       </div>
@@ -1864,12 +1865,12 @@ function MetricsSkeleton() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-28 rounded-xl bg-muted/50 animate-pulse" />
+          <Skeleton key={i} aria-hidden className="h-28 rounded-xl" />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {[1, 2].map(i => (
-          <div key={i} className="h-64 rounded-xl bg-muted/50 animate-pulse" />
+          <Skeleton key={i} aria-hidden className="h-64 rounded-xl" />
         ))}
       </div>
     </div>

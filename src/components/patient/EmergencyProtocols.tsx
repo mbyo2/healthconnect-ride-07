@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SkeletonLine } from "@/components/ui/skeleton-kit";
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -247,15 +248,15 @@ export const EmergencyProtocols = () => {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={i}>
             <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <SkeletonLine className="h-4 w-1/3" />
+              <SkeletonLine className="h-3 w-1/2" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                <SkeletonLine className="h-3 w-full" />
+                <SkeletonLine className="h-3 w-3/4" />
               </div>
             </CardContent>
           </Card>

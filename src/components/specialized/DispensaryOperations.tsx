@@ -1,4 +1,5 @@
 import { safeDocumentWrite } from "@/utils/safePrint";
+import { Skeleton } from "@/components/ui/skeleton";
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -341,7 +342,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="status" aria-label="Loading dispensary stock">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                <Skeleton key={i} aria-hidden className="h-32 rounded-2xl" />
               ))}
             </div>
           ) : filteredStock.length === 0 ? (

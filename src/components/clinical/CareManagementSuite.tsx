@@ -1,4 +1,5 @@
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -264,7 +265,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="status" aria-label="Loading beds">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-36 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                <Skeleton key={i} aria-hidden className="h-36 rounded-2xl" />
               ))}
             </div>
           ) : filteredBeds.length === 0 ? (
@@ -352,7 +353,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           {loading ? (
             <div className="space-y-2" role="status" aria-label="Loading admitted patients">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" aria-hidden />
+                <Skeleton key={i} aria-hidden className="h-16 rounded-2xl" />
               ))}
             </div>
           ) : admitted.length === 0 ? (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,7 +63,7 @@ export const EarningsPanel = () => {
         {loading ? (
           <div className="grid grid-cols-3 gap-3" role="status" aria-label="Loading earnings">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" aria-hidden />
+              <Skeleton key={i} className="h-16 rounded-xl" aria-hidden />
             ))}
           </div>
         ) : (
