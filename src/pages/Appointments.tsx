@@ -34,6 +34,7 @@ import {
   Info,
   Wallet
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // An appointment is a telemedicine visit only when the appointment itself
 // was booked as one (BookingModal writes 'video_consultation'; 'telemedicine'
@@ -170,7 +171,7 @@ export const AppointmentsPage = () => {
       }
     },
     onSuccess: () => toast.success("Appointment cancelled"),
-    onError: (e: any) => toast.error(e?.message || "Could not cancel the appointment."),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Could not cancel the appointment.")),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["appointments"] }),
   });
 
@@ -202,7 +203,7 @@ export const AppointmentsPage = () => {
       }));
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
-    onError: (e: any) => toast.error(e?.message || "Could not accept appointment."),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Could not accept appointment.")),
   });
 
   const declineAppointment = useMutation({
@@ -217,7 +218,7 @@ export const AppointmentsPage = () => {
       toast.success("Appointment declined");
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
-    onError: (e: any) => toast.error(e?.message || "Could not decline appointment."),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Could not decline appointment.")),
   });
 
   // Provider availability for the reschedule dialog (day_of_week + hours).
@@ -305,7 +306,7 @@ export const AppointmentsPage = () => {
       setRescheduleTarget(null);
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
-    onError: (e: any) => toast.error(e?.message || "Could not reschedule"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Could not reschedule")),
   });
 
   // Filtered Appointments

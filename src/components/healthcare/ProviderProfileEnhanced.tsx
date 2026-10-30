@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, GraduationCap, Briefcase, Clock, DollarSign, FileText, Plus, X, Info, Award, MapPin } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ProfessionalReference {
   name: string;
@@ -222,7 +223,7 @@ export const ProviderProfileEnhanced = () => {
       navigate("/provider-dashboard");
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      toast.error(friendlyErrorMessage(error, "Failed to update profile"));
     } finally {
       setIsSubmitting(false);
     }

@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/hooks/use-currency';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const MISReports = ({ hospital }: { hospital: any }) => {
   const { formatPrice } = useCurrency();
@@ -25,7 +26,7 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
       downloadCsv(result.filename, result.rows);
       toast.success(`${title} exported.`);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to generate report');
+      toast.error(friendlyErrorMessage(e, 'Failed to generate report'));
     } finally {
       setGenerating(null);
     }

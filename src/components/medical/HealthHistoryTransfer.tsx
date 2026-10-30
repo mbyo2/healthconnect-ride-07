@@ -18,6 +18,7 @@ import {
   toFHIRImmunization,
   createFHIRBundle,
 } from "@/utils/fhir-standard";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Health History Transfer: Export patient data as FHIR bundle,
@@ -184,7 +185,7 @@ export function HealthHistoryTransfer({ patientId }: { patientId: string }) {
 
       toast.success(`Exported ${resources.length} health records as FHIR bundle`);
     } catch (error: any) {
-      toast.error("Export failed: " + error.message);
+      toast.error(friendlyErrorMessage(error, "Export failed. Please try again."));
     } finally {
       setExporting(false);
     }

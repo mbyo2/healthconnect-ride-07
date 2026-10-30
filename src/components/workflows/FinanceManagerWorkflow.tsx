@@ -17,6 +17,7 @@ import { FinanceMetricsDashboard } from "@/components/metrics/RoleMetricsDashboa
 import { ReportCenter } from "@/components/reports/ReportCenter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const CLAIM_STATUS_COLOR: Record<string, string> = {
   submitted: "bg-warning-500",
@@ -98,7 +99,7 @@ export const FinanceManagerWorkflow = () => {
       setFollowUpClaim(null);
       setFollowUpNote("");
     } catch (e: any) {
-      toast.error(e?.message || "Failed to update claim.");
+      toast.error(friendlyErrorMessage(e, "Failed to update claim."));
     } finally {
       setSaving(false);
     }

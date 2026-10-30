@@ -24,21 +24,61 @@ const MAPPINGS: Array<{ pattern: RegExp; message: string }> = [
       "Please confirm your email first — check your inbox for the confirmation link, then sign in.",
   },
   {
-    pattern: /user already registered|already been registered|user_already_exists|already exists/i,
+    pattern: /user already registered|already been registered|user_already_exists/i,
     message: "An account with this email already exists. Try signing in instead.",
   },
   {
-    pattern: /token.*expired|expired.*token|jwt expired|invalid_token|refresh token/i,
+    pattern: /token.*expired|expired.*token|jwt expired|invalid[ _]token|refresh[ _]token|session[ _]not[ _]found/i,
     message: "Your session has expired. Please sign in again to continue.",
   },
   {
-    pattern: /rate limit|too many requests|over_request_rate_limit/i,
+    pattern: /rate[ _]limit|too many requests|over_request_rate_limit|over_email_send_rate_limit/i,
     message: "Too many attempts in a short time. Please wait a moment and try again.",
   },
   {
-    pattern: /failed to fetch|network|load failed|connection|offline/i,
+    pattern: /failed to fetch|network|load failed|connection|offline|ERR_NETWORK|NetworkError|net::ERR/i,
     message:
       "We couldn't reach the server. Check your internet connection and try again.",
+  },
+  {
+    pattern: /row-level security|permission denied|not authorized|42501/i,
+    message:
+      "You don't have permission to do that. If you believe you should, ask your administrator to check your access.",
+  },
+  {
+    pattern: /duplicate key|unique constraint|23505/i,
+    message:
+      "That already exists — it looks like it was already saved. Refresh the page and check before trying again.",
+  },
+  {
+    pattern: /otp[ _]expired|token has expired or is invalid|code.*(expired|invalid)/i,
+    message: "That code has expired or isn't valid. Request a new one and try again.",
+  },
+  {
+    pattern: /same[ _]password|new password.*different/i,
+    message: "Your new password must be different from your current password.",
+  },
+  {
+    pattern: /failed to send a request|FunctionsFetchError|FunctionsHttpError|non-2xx|edge function returned/i,
+    message:
+      "That action couldn't be completed on the server. Please try again in a moment.",
+  },
+  {
+    pattern: /aborterror|timed out|timeout|statement timeout/i,
+    message: "That took too long to complete. Check your connection and try again.",
+  },
+  {
+    pattern: /payload too large|request entity too large|file.*too large/i,
+    message: "That file is too large. Choose a smaller file and try again.",
+  },
+  {
+    pattern: /mime type.*not supported|invalid mime|file type.*not (supported|allowed)/i,
+    message: "That file type isn't supported. Choose a different file and try again.",
+  },
+  {
+    pattern: /resource was not found|object not found|storage.*not found/i,
+    message:
+      "That file could not be found. It may have been removed — refresh the page and try again.",
   },
   {
     pattern: /password.*(at least|weak|short|strength)|weak_password/i,
@@ -52,7 +92,7 @@ const MAPPINGS: Array<{ pattern: RegExp; message: string }> = [
 
 /** Heuristics for "this is a system message, not crafted copy". */
 const TECHNICAL_PATTERN =
-  /PGRST\d+|PostgREST|row-level security|violates .*constraint|duplicate key|JWT|postgres|supabase|TypeError|ReferenceError|SyntaxError|undefined is not|null value in column|permission denied|relation .* does not exist|\{"?\s*"?code"?\s*:|stack trace/i;
+  /PGRST\d+|PostgREST|row-level security|violates .*constraint|duplicate key|JWT|postgres|supabase|TypeError|ReferenceError|SyntaxError|undefined is not|null value in column|permission denied|relation .* does not exist|schema cache|could not find the table|JSON object requested|multiple \(or no\) rows|invalid input syntax|column .* does not exist|function .* does not exist|value too long|invalid input value for enum|\{"?\s*"?code"?\s*:|stack trace/i;
 
 function rawMessageOf(error: unknown): string {
   if (error instanceof Error) return error.message || "";

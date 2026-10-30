@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ClinicalProcedure {
   id: string;
@@ -139,7 +140,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       }
     } catch (e: any) {
       console.error("Procedures desk failed:", e);
-      toast.error(e?.message || "Could not load recorded procedures.");
+      toast.error(friendlyErrorMessage(e, "Could not load recorded procedures."));
     } finally {
       setLoading(false);
     }
@@ -203,7 +204,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       await fetchDesk();
     } catch (e: any) {
       console.error("Log procedure failed:", e);
-      toast.error(e?.message || "Could not save the procedure. Check permissions and try again.");
+      toast.error(friendlyErrorMessage(e, "Could not save the procedure. Check permissions and try again."));
     } finally {
       setSaving(false);
     }

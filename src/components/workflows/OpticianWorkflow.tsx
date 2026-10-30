@@ -23,6 +23,7 @@ import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { ApplicationStatusBanner, ProfileCompleteBanner } from "@/components/dashboard/StatusBanners";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ActionItem {
   title: string;
@@ -161,7 +162,7 @@ export const OpticianWorkflow = () => {
       setRxPatientId("");
       setRxForm(emptyRx);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to save prescription.");
+      toast.error(friendlyErrorMessage(e, "Failed to save prescription."));
     } finally {
       setSavingRx(false);
     }
@@ -193,7 +194,7 @@ export const OpticianWorkflow = () => {
       setOrderRxId("");
       setOrderForm({ frame: "", lens_type: "single_vision", notes: "" });
     } catch (e: any) {
-      toast.error(e?.message || "Failed to create order.");
+      toast.error(friendlyErrorMessage(e, "Failed to create order."));
     } finally {
       setSavingOrder(false);
     }
@@ -213,7 +214,7 @@ export const OpticianWorkflow = () => {
       toast.success(`Order marked ${status}.`);
       queryClient.invalidateQueries({ queryKey: ["lens-orders", institutionId] });
     } catch (e: any) {
-      toast.error(e?.message || "Failed to update order.");
+      toast.error(friendlyErrorMessage(e, "Failed to update order."));
     }
   };
 

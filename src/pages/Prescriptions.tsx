@@ -24,6 +24,7 @@ import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard, NextStepsCard } from "@/components/guidance";
 import { useNavigate } from "react-router-dom";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface MedicationItem {
   id: string;
@@ -498,7 +499,7 @@ export const Prescriptions = () => {
       queryClient.invalidateQueries({ queryKey: ["prescriptions"] });
     } catch (error: any) {
       console.error("Error creating multi-medication prescription:", error);
-      toast.error(error?.message || "Failed to create prescription");
+      toast.error(friendlyErrorMessage(error, "Failed to create prescription"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1208,7 +1209,7 @@ export const Prescriptions = () => {
                                     toast.success("Prescription claimed.");
                                     refetch();
                                   } catch (e: any) {
-                                    toast.error(e.message || "Failed to claim prescription.");
+                                    toast.error(friendlyErrorMessage(e, "Failed to claim prescription."));
                                   }
                                 }}
                                 className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1"

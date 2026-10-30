@@ -44,6 +44,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
 import { format } from 'date-fns';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // Define the medication type enum to match the database
 type MedicationType = 'tablet' | 'capsule' | 'liquid' | 'injection' | 'cream' |
@@ -186,7 +187,7 @@ export const MedicationInventory = () => {
       resetForm();
       setIsDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 
@@ -224,7 +225,7 @@ export const MedicationInventory = () => {
       refetch();
       setIsDeleteDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 

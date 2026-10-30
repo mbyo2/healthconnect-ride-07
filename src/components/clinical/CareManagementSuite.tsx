@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { ensureBillingDraft } from "@/services/dischargeWorkflow";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface LiveBed {
   id: string;
@@ -162,7 +163,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       fetchData();
     } catch (error: any) {
       console.error("Error discharging patient:", error);
-      toast.error(error?.message || "Failed to discharge patient");
+      toast.error(friendlyErrorMessage(error, "Failed to discharge patient"));
     } finally {
       setDischargingId(null);
     }

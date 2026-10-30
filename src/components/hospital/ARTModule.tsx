@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const CYCLE_TYPES = ["IVF", "IUI", "ICSI", "FET"];
 const STAGES = ["consultation", "stimulation", "retrieval", "fertilization", "transfer", "waiting", "completed"];
@@ -106,7 +107,7 @@ export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
       setCycleForm({ patient_id: "", partner_patient_id: "", cycle_type: "IVF", start_date: "", notes: "" });
       loadCycles();
     } catch (e: any) {
-      toast.error(e.message || "Failed to create cycle");
+      toast.error(friendlyErrorMessage(e, "Failed to create cycle"));
     } finally {
       setIsSubmitting(false);
     }
@@ -125,7 +126,7 @@ export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
       setSelectedCycle(updated);
       loadCycles();
     } catch (e: any) {
-      toast.error(e.message || "Failed to update stage");
+      toast.error(friendlyErrorMessage(e, "Failed to update stage"));
     }
   };
 
@@ -149,7 +150,7 @@ export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
       setProcForm({ procedure_type: "", procedure_date: new Date().toISOString().slice(0, 10), outcome: "", notes: "" });
       loadCycleDetail(selectedCycle);
     } catch (e: any) {
-      toast.error(e.message || "Failed to log procedure");
+      toast.error(friendlyErrorMessage(e, "Failed to log procedure"));
     } finally {
       setIsSubmitting(false);
     }
@@ -171,7 +172,7 @@ export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
       setStaffId("");
       loadCycleDetail(selectedCycle);
     } catch (e: any) {
-      toast.error(e.message || "Failed to assign staff");
+      toast.error(friendlyErrorMessage(e, "Failed to assign staff"));
     } finally {
       setIsSubmitting(false);
     }

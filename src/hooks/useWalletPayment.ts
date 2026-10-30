@@ -9,6 +9,7 @@ import {
   authRedirectUrl,
   currentReturnTo,
 } from "@/utils/pendingAction";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export interface WalletPayInput {
   amount: number;
@@ -90,7 +91,7 @@ export function useWalletPayment() {
       queryClient.invalidateQueries({ queryKey: ["wallet-balance"] });
       return true;
     } catch (e: any) {
-      const msg = e?.message || "Wallet payment failed";
+      const msg = friendlyErrorMessage(e, "Wallet payment failed");
       if (/insufficient/i.test(msg)) {
         toast.error("Insufficient wallet balance — top up first.");
       } else {

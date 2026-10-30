@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Surgery {
   id: string;
@@ -93,7 +94,7 @@ export const OTStaffWorkflow = () => {
       setForm({ patient_name: '', procedure_name: '', ot_room: 'OT-1', scheduled_time: '', surgeon_name: '', anaesthesia_type: 'general', notes: '' });
       fetchSurgeries();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to schedule surgery');
+      toast.error(friendlyErrorMessage(err, 'Failed to schedule surgery'));
     }
   };
 
@@ -115,7 +116,7 @@ export const OTStaffWorkflow = () => {
       setSurgeries(prev => prev.map(s => s.id === id ? { ...s, status: status as any } : s));
       toast.success(`Surgery marked as ${status}`);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to update');
+      toast.error(friendlyErrorMessage(err, 'Failed to update'));
     }
   };
 
@@ -142,7 +143,7 @@ export const OTStaffWorkflow = () => {
       setAnaesSurgery(null);
       setAnaesForm({ anaesthetist_name: '', pre_op_assessment: '', drugs_administered: '', intraop_monitoring: '', recovery_vitals: '', post_anaesthesia_status: 'stable', complications: '', consent_signed: false, notes: '' });
     } catch (err: any) {
-      toast.error(err.message || 'Failed to save anaesthesia record');
+      toast.error(friendlyErrorMessage(err, 'Failed to save anaesthesia record'));
     }
   };
 

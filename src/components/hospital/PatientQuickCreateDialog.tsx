@@ -24,6 +24,7 @@ import {
   type InstitutionPatient,
   type PatientSource,
 } from "@/lib/patients";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Props {
   institutionId: string;
@@ -110,7 +111,7 @@ export const PatientQuickCreateDialog = ({
       onOpenChange(false);
       onCreated(patient);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to create patient");
+      toast.error(friendlyErrorMessage(e, "Failed to create patient"));
     } finally {
       setSaving(false);
     }

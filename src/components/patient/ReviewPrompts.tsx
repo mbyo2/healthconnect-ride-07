@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Post-visit review prompts (Zocdoc parity)
@@ -116,7 +117,7 @@ export function ReviewPromptCard() {
       toast.success("Thank you for your review!");
     },
     onError: (e: any) => {
-      toast.error(e.message || "Failed to submit review");
+      toast.error(friendlyErrorMessage(e, "Failed to submit review"));
     },
   });
 

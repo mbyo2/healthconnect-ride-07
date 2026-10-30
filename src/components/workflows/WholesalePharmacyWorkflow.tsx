@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface WholesaleOrder {
   id: string;
@@ -162,7 +163,7 @@ export const WholesalePharmacyWorkflow = () => {
       queryClient.invalidateQueries({ queryKey: ['wholesale-orders'] });
       toast.success('Order updated.');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to update order'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to update order')),
   });
 
   const saveTier = useMutation({
@@ -181,7 +182,7 @@ export const WholesalePharmacyWorkflow = () => {
       setTierForm({ product_name: '', min_quantity: '10', unit_price: '' });
       toast.success('Price tier saved.');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to save tier'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to save tier')),
   });
 
   const deleteTier = useMutation({
@@ -193,7 +194,7 @@ export const WholesalePharmacyWorkflow = () => {
       queryClient.invalidateQueries({ queryKey: ['wholesale-tiers'] });
       toast.success('Price tier removed.');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to delete tier'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to delete tier')),
   });
 
   const nextStatus = (status: string): string | null => {

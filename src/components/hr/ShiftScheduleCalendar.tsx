@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface ShiftSchedule {
   id: string;
@@ -122,7 +123,7 @@ export const ShiftScheduleCalendar: React.FC = () => {
         notes: '',
       });
     } catch (err: any) {
-      toast.error('Failed to schedule shift: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to schedule shift. Please try again."));
     }
   };
 

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface PromoCode {
   id: string;
@@ -55,7 +56,7 @@ export const useCreatePromoCode = () => {
       qc.invalidateQueries({ queryKey: ['promo-codes'] });
       toast.success('Promo code created!');
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e)),
   });
 };
 
@@ -93,6 +94,6 @@ export const useRedeemPromoCode = () => {
       qc.invalidateQueries({ queryKey: ['user-subscription'] });
       toast.success(`Promo code applied! ${data.discount_type === 'percentage' ? data.discount_value + '% off' : 'Discount applied'}`);
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e)),
   });
 };

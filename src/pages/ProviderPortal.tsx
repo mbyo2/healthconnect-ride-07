@@ -25,7 +25,7 @@ export const ProviderPortal = () => {
 
         if (error) {
           console.error("Error checking session:", error);
-          setError(error.message);
+          setError(friendlyErrorMessage(error, "An unexpected error occurred"));
           return;
         }
 
@@ -83,7 +83,7 @@ export const ProviderPortal = () => {
 
       } catch (err) {
         console.error("Unexpected error during session check:", err);
-        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+        setError(friendlyErrorMessage(err, "An unexpected error occurred"));
       } finally {
         setIsLoading(false);
       }

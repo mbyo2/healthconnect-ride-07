@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ProviderTypeOption { value: string; label: string; requiresLicense: boolean; }
 
@@ -181,7 +182,7 @@ export const HealthPersonnelApplicationForm = () => {
         throw new Error(result.error || "Registration failed");
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to complete registration.", { id: "registration", duration: 6000 });
+      toast.error(friendlyErrorMessage(error, "Failed to complete registration."), { id: "registration", duration: 6000 });
       setRegistrationStage("");
     } finally {
       setIsSubmitting(false);

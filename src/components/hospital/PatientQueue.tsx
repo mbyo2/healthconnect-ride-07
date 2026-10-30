@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Props {
   hospital: any;
@@ -46,7 +47,7 @@ export const PatientQueue = ({ hospital, departments }: Props) => {
       toast.success(`${row.token_number} marked ${status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update queue token');
+      toast.error(friendlyErrorMessage(e, 'Failed to update queue token'));
     }
   };
 

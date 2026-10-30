@@ -18,6 +18,7 @@ import { InstitutionPatientPicker } from "./InstitutionPatientPicker";
 import { PricedServiceQuickCreateDialog, PRICED_SERVICE_CATEGORIES } from "@/components/billing/PricedServiceQuickCreateDialog";
 import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
 import type { InstitutionPatient } from "@/lib/patients";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * A human label for the price-list service a charge needs, derived from
@@ -495,7 +496,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       setPendingPatientCharges([]);
       onRefresh();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to generate invoice");
+      toast.error(friendlyErrorMessage(error, "Failed to generate invoice"));
     } finally {
       setIsSubmitting(false);
     }

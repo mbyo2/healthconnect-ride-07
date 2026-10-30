@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight, User, Phone, Mail, MapPin, Calendar, CreditCard, Heart, AlertTriangle, CheckCircle, Sparkles } from "lucide-react";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 import { flushPendingPatientProfile, type PendingPatientProfile } from "@/hooks/useFlushPendingPatientProfile";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // Schema for each step
 const personalInfoSchema = z.object({
@@ -111,7 +112,7 @@ export const PatientRegistration = () => {
         "Claim link sent — check your email to set your password and claim your patient record.",
       );
     } catch (e: any) {
-      showError(e?.message || "Could not send the claim link. Please try again.");
+      showError(friendlyErrorMessage(e, "Could not send the claim link. Please try again."));
     } finally {
       setClaimSending(false);
     }
@@ -360,7 +361,7 @@ export const PatientRegistration = () => {
           "This email already has a patient record. Claim it below to set your password and take ownership of it.",
         );
       } else {
-        showError(message);
+        showError(friendlyErrorMessage(error, "Failed to create account"));
       }
     } finally {
       setLoading(false);

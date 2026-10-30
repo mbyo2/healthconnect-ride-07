@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Activity, RefreshCw, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // NEWS2 (National Early Warning Score 2) — honest, transparent scoring.
 // This is a screening aid, NOT a diagnosis and NOT an "AI prediction".
@@ -102,7 +103,7 @@ export default function DeteriorationScores({ patientId }: { patientId: string }
       setParams(ps);
       setRecordedAt(data.recorded_at);
     } catch (e: any) {
-      toast.error(e?.message || "Could not load vital signs");
+      toast.error(friendlyErrorMessage(e, "Could not load vital signs"));
     } finally {
       setLoading(false);
     }

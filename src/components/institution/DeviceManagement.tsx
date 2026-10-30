@@ -15,6 +15,7 @@ import {
   Thermometer, Microscope, MonitorSpeaker, Pill, AlertTriangle,
   RefreshCw, Settings, Zap, Radio, MapPin, BatteryMedium
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface InstitutionDevice {
   id: string;
@@ -215,7 +216,7 @@ export const DeviceManagement = ({ institutionId }: { institutionId: string }) =
       resetForm();
       fetchDevices();
     } catch (error: any) {
-      toast.error(error.message || "Failed to register device");
+      toast.error(friendlyErrorMessage(error, "Failed to register device"));
     } finally {
       setIsRegistering(false);
     }

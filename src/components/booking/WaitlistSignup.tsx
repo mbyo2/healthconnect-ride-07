@@ -20,6 +20,7 @@ import {
   authRedirectUrl,
   currentReturnTo,
 } from '@/utils/pendingAction';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface WaitlistSignupProps {
   provider: Provider;
@@ -118,7 +119,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose, onRequestOpen }: Wai
       toast.success("You've been added to the waitlist! We'll notify you when a slot opens.");
       onClose();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to join waitlist');
+      toast.error(friendlyErrorMessage(err, 'Failed to join waitlist'));
     } finally {
       setSubmitting(false);
     }

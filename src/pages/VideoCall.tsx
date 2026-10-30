@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { VideoOff } from 'lucide-react';
 import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
 import { providerDisplayName } from '@/utils/providerDisplay';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -194,7 +195,7 @@ const VideoCall = () => {
         console.error('Failed to load video consultation:', err);
         if (!cancelled) {
           setFatalError(
-            err?.message || 'Could not load this visit. Check your connection and try again.'
+            friendlyErrorMessage(err, 'Could not load this visit. Check your connection and try again.')
           );
         }
       } finally {
@@ -249,7 +250,7 @@ const VideoCall = () => {
       console.error('Failed to start video call:', err);
       toast.dismiss();
       setFatalError(
-        err?.message || 'Could not start the video call. Check your connection and try again.'
+        friendlyErrorMessage(err, 'Could not start the video call. Check your connection and try again.')
       );
     } finally {
       setStartingCall(false);

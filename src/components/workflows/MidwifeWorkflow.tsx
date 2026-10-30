@@ -15,6 +15,7 @@ import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, Baby, Heart
 } from 'lucide-react';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const MidwifeWorkflow = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export const MidwifeWorkflow = () => {
       setAncPatientId('');
       setAnc({ gestationalAge: '', fundalHeight: '', fetalHeartRate: '', bp: '', weight: '', urineProtein: '', hemoglobin: '', notes: '' });
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save ANC visit');
+      toast.error(friendlyErrorMessage(e, 'Failed to save ANC visit'));
     } finally {
       setSavingANC(false);
     }

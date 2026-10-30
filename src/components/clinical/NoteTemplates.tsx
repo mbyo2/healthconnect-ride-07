@@ -16,6 +16,7 @@ import { Zap, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export interface NoteTemplate {
   id: string;
@@ -182,7 +183,7 @@ function TemplateCreator({ onCreated }: { onCreated: () => void }) {
       setContent("");
       onCreated();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to create template");
+      toast.error(friendlyErrorMessage(e, "Failed to create template"));
     } finally {
       setSaving(false);
     }

@@ -10,6 +10,7 @@ import {
   ShieldCheck, FileText, Car, HeartPulse, GraduationCap,
   CheckCircle, XCircle, Clock, AlertTriangle, Upload,
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Screening {
   id: string;
@@ -100,7 +101,7 @@ export const CourierScreening = ({ pharmacyId }: { pharmacyId: string }) => {
       );
       queryClient.invalidateQueries({ queryKey: ["courier-screenings", pharmacyId] });
     } catch (e: any) {
-      toast.error(e.message || "Approval failed");
+      toast.error(friendlyErrorMessage(e, "Approval failed"));
     }
   };
 
@@ -124,7 +125,7 @@ export const CourierScreening = ({ pharmacyId }: { pharmacyId: string }) => {
       setSelectedId(null);
       queryClient.invalidateQueries({ queryKey: ["courier-screenings", pharmacyId] });
     } catch (e: any) {
-      toast.error(e.message || "Rejection failed");
+      toast.error(friendlyErrorMessage(e, "Rejection failed"));
     }
   };
 

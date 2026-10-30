@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { openIndexedDB, safeCryptoUUID } from '@/utils/storage';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface OfflineAction {
   id: string;  // Single id property
@@ -175,7 +176,7 @@ export const useOfflineMode = () => {
         await markActionFailed(action, error);
         toast({
           title: "Offline change failed to sync",
-          description: error instanceof Error ? error.message : "A queued change could not be synced and was kept in the queue.",
+          description: friendlyErrorMessage(error, "A queued change could not be synced and was kept in the queue."),
           variant: "destructive",
         });
       }

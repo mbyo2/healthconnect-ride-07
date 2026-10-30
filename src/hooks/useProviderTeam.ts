@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface TeamMember {
   id: string;
@@ -56,7 +57,7 @@ export const useInviteTeamMember = () => {
       qc.invalidateQueries({ queryKey: ['provider-team'] });
       toast.success('Team member invited!');
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e)),
   });
 };
 

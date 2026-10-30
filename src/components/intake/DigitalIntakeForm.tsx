@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileCheck, AlertCircle, Plus, Trash2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface DigitalIntakeFormProps {
   appointmentId?: string;
@@ -95,7 +96,7 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
       queryClient.invalidateQueries({ queryKey: ['intake-form'] });
       onComplete?.();
     },
-    onError: (err: any) => toast.error(err.message)
+    onError: (err: any) => toast.error(friendlyErrorMessage(err))
   });
 
   if (existingForm?.status === 'submitted') {

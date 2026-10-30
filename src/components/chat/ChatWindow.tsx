@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Message } from "@/types/communication";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ChatWindowProps {
   providerId: string;
@@ -34,7 +35,7 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
         .order('created_at', { ascending: true });
 
       if (error) {
-        toast.error(error.message);
+        toast.error(friendlyErrorMessage(error));
         return;
       }
 
@@ -82,7 +83,7 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
 
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }

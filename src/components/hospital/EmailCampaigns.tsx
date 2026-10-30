@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const getStatusPill = (status: string) => {
   const styles: Record<string, string> = {
@@ -137,7 +138,7 @@ export const EmailCampaigns = ({ hospital: hospitalProp }: { hospital?: any }) =
       setAudienceCount(null);
       loadCampaigns();
     } catch (e: any) {
-      toast.error(e.message || "Failed to save campaign");
+      toast.error(friendlyErrorMessage(e, "Failed to save campaign"));
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +158,7 @@ export const EmailCampaigns = ({ hospital: hospitalProp }: { hospital?: any }) =
       toast.success(`Campaign sending — ${resp.data?.queued || 0} recipients queued`);
       loadCampaigns();
     } catch (e: any) {
-      toast.error(e.message || "Failed to send campaign");
+      toast.error(friendlyErrorMessage(e, "Failed to send campaign"));
     } finally {
       setIsSubmitting(false);
     }

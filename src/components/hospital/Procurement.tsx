@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const PO_STATUSES = ["draft", "sent", "partially_received", "received", "cancelled"] as const;
 type POStatus = (typeof PO_STATUSES)[number];
@@ -135,7 +136,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       setShowNewPO(false);
       resetPOForm();
       refreshOrders();
-    } catch (e: any) { toast.error(e?.message || "Failed to create purchase order"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to create purchase order")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -148,7 +149,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       toast.success(`PO ${po.order_number} → ${status.replace(/_/g, " ")}`);
       refreshOrders();
       if (viewingPO?.id === po.id) setViewingPO({ ...viewingPO, status });
-    } catch (e: any) { toast.error(e?.message || "Failed to update status"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update status")); }
   };
 
   const deletePO = async (po: any) => {
@@ -161,7 +162,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`PO ${po.order_number} deleted`);
       refreshOrders();
-    } catch (e: any) { toast.error(e?.message || "Failed to delete"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to delete")); }
   };
 
   // ── Suppliers ────────────────────────────────────────────
@@ -189,7 +190,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       setEditingSupplier(null);
       resetSupplierForm();
       refreshSuppliers();
-    } catch (e: any) { toast.error(e?.message || "Failed to save supplier"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to save supplier")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -215,7 +216,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Supplier ${s.is_active ? "deactivated" : "activated"}`);
       refreshSuppliers();
-    } catch (e: any) { toast.error(e?.message || "Failed to update supplier"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update supplier")); }
   };
 
   const viewingItems = viewingPO ? poItems.filter((i) => i.purchase_order_id === viewingPO.id) : [];

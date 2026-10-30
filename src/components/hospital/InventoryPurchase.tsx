@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,7 +57,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       });
       refresh();
     } catch (e: any) {
-      toast.error(e.message || "Failed to add inventory item");
+      toast.error(friendlyErrorMessage(e, "Failed to add inventory item"));
     } finally {
       setIsSubmitting(false);
     }

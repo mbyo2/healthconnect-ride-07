@@ -8,6 +8,7 @@ import { Upload, FileSpreadsheet, CheckCircle, XCircle, Download, Loader2 } from
 import { supabase } from '@/integrations/supabase/client';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface ParsedRecord {
   staff_id: string;
@@ -144,7 +145,7 @@ export const BulkAttendanceImport: React.FC<{ onComplete: () => void }> = ({ onC
         onComplete();
       }
     } catch (err: any) {
-      toast.error('Import failed: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Import failed. Please try again."));
     } finally {
       setImporting(false);
     }

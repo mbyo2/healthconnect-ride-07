@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Phone, ArrowLeft, Loader2 } from 'lucide-react';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface PhoneOTPLoginProps {
   onBack?: () => void;
@@ -38,7 +39,7 @@ export const PhoneOTPLogin = ({ onBack }: PhoneOTPLoginProps) => {
       toast.success('OTP sent to ' + formatted);
       setStep('verify');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to send OTP');
+      toast.error(friendlyErrorMessage(err, 'Failed to send OTP'));
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ export const PhoneOTPLogin = ({ onBack }: PhoneOTPLoginProps) => {
       if (error) throw error;
       toast.success('Phone verified! Welcome.');
     } catch (err: any) {
-      toast.error(err.message || 'Invalid OTP');
+      toast.error(friendlyErrorMessage(err, 'Invalid OTP'));
     } finally {
       setLoading(false);
     }

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface BookingModalProps {
   provider: Provider;
@@ -346,11 +347,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       }
     } catch (error) {
       console.error('Booking error:', error);
-      setSubmitError(
-        error instanceof Error && error.message
-          ? error.message
-          : "We couldn't create your appointment. Your details are safe — try again."
-      );
+      setSubmitError(friendlyErrorMessage(error, "We couldn't create your appointment. Your details are safe — try again."));
     } finally {
       setIsSubmitting(false);
     }

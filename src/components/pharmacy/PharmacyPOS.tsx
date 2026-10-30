@@ -13,6 +13,7 @@ import {
   Search, Plus, Minus, Trash2, ShoppingCart, Receipt, CreditCard, Banknote,
   Smartphone, Shield, Printer, X, Package
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface CartItem {
   medication_inventory_id: string | null;
@@ -158,7 +159,7 @@ export const PharmacyPOS = () => {
       queryClient.invalidateQueries({ queryKey: ["pos-inventory"] }); queryClient.invalidateQueries({ queryKey: ["pos-session"] });
       toast.success("Sale completed!");
     },
-    onError: (err: any) => toast.error(err.message || "Sale failed"),
+    onError: (err: any) => toast.error(friendlyErrorMessage(err, "Sale failed")),
   });
 
   const openRegister = useMutation({

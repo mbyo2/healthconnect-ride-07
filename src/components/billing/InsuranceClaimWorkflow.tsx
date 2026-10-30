@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface InsuranceClaim {
   id: string;
@@ -162,7 +163,7 @@ export const InsuranceClaimWorkflow: React.FC = () => {
         notes: '',
       });
     } catch (err: any) {
-      toast.error('Failed to create claim: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to create claim. Please try again."));
     } finally {
       setCreating(false);
     }
@@ -184,7 +185,7 @@ export const InsuranceClaimWorkflow: React.FC = () => {
       toast.success('Claim submitted to insurance');
       fetchClaims();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(friendlyErrorMessage(err));
     }
   };
 
@@ -204,7 +205,7 @@ export const InsuranceClaimWorkflow: React.FC = () => {
       toast.success(`Claim status updated to ${status}`);
       fetchClaims();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(friendlyErrorMessage(err));
     }
   };
 

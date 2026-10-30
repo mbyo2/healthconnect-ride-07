@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DepartmentSelect } from './DepartmentSelect';
 import { InstitutionPatientPicker } from './InstitutionPatientPicker';
 import type { InstitutionPatient } from '@/lib/patients';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface AdmitPatientDialogProps {
   hospital: any;
@@ -134,7 +135,7 @@ export const AdmitPatientDialog = ({
       onOpenChange(false);
       onAdmitted?.(data as any);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to admit patient');
+      toast.error(friendlyErrorMessage(e, 'Failed to admit patient'));
     } finally {
       setSubmitting(false);
     }

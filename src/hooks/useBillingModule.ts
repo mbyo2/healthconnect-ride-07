@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface BillingInvoice {
   id: string;
@@ -116,7 +117,7 @@ export function useBillingModule() {
       toast.success(`Invoice ${(result as any).invoice_number} created`);
       return result as unknown as BillingInvoice;
     } catch (err: any) {
-      toast.error('Failed to create invoice: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to create invoice. Please try again."));
       return null;
     }
   };
@@ -144,7 +145,7 @@ export function useBillingModule() {
       toast.success('Payment recorded');
       fetchAll();
     } catch (err: any) {
-      toast.error('Failed to record payment: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to record payment. Please try again."));
     }
   };
 
@@ -178,7 +179,7 @@ export function useBillingModule() {
       fetchAll();
       return result as unknown as InsuranceClaim;
     } catch (err: any) {
-      toast.error('Failed to submit claim: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to submit claim. Please try again."));
       return null;
     }
   };

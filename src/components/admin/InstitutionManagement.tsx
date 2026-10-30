@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { toast } from "sonner";
 import { Building2, ShieldAlert, UserCog, Search, Ban, CheckCircle2 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface InstitutionRow {
   id: string;
@@ -70,7 +71,7 @@ export const InstitutionManagement = () => {
         }))
       );
     } catch (e: any) {
-      toast.error("Failed to load institutions: " + (e.message || "unknown error"));
+      toast.error(friendlyErrorMessage(e, "Failed to load institutions. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -114,7 +115,7 @@ export const InstitutionManagement = () => {
       toast.success(`Institution ${suspended ? "suspended (write-blocked)" : "unsuspended"}`);
       fetchInstitutions();
     } catch (e: any) {
-      toast.error("Failed: " + (e.message || "unknown error"));
+      toast.error(friendlyErrorMessage(e));
     } finally {
       setProcessing(null);
     }
@@ -147,7 +148,7 @@ export const InstitutionManagement = () => {
       setTransferEmail("");
       fetchInstitutions();
     } catch (e: any) {
-      toast.error("Transfer failed: " + (e.message || "unknown error"));
+      toast.error(friendlyErrorMessage(e, "Transfer failed. Please try again."));
     } finally {
       setProcessing(null);
     }

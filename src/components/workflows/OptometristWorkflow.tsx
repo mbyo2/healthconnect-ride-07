@@ -17,6 +17,7 @@ import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, Eye, Glasses, Loader2
 } from 'lucide-react';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const OptometristWorkflow = () => {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ export const OptometristWorkflow = () => {
       fetchPastExams();
     } catch (err: any) {
       console.error('Failed to save eye exam:', err);
-      toast.error(err.message || 'Failed to save examination');
+      toast.error(friendlyErrorMessage(err, 'Failed to save examination'));
     } finally {
       setSaving(false);
     }

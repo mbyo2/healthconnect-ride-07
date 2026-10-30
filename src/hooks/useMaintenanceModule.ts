@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface WorkOrder {
   id: string;
@@ -132,7 +133,7 @@ export function useMaintenanceModule() {
       toast.success('Work order created');
       fetchAll();
       return result;
-    } catch (err: any) { toast.error(err.message); return null; }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); return null; }
   };
 
   const updateWorkOrder = async (id: string, data: Partial<WorkOrder>) => {
@@ -142,7 +143,7 @@ export function useMaintenanceModule() {
       if (error) throw error;
       toast.success('Work order updated');
       fetchAll();
-    } catch (err: any) { toast.error(err.message); }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); }
   };
 
   const addAsset = async (data: Partial<Asset>) => {
@@ -155,7 +156,7 @@ export function useMaintenanceModule() {
       toast.success('Asset registered');
       fetchAll();
       return result;
-    } catch (err: any) { toast.error(err.message); return null; }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); return null; }
   };
 
   /** Update an asset (e.g. shareable flag, terms, rate). RLS restricts to own staff. */
@@ -166,7 +167,7 @@ export function useMaintenanceModule() {
       if (error) throw error;
       // Optimistic local update for zero-latency feel (realtime will confirm)
       setAssets((prev) => prev.map((a) => (a.id === id ? { ...a, ...data } : a)));
-    } catch (err: any) { toast.error(err.message); throw err; }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); throw err; }
   };
 
   const openOrders = workOrders.filter(w => !['completed', 'cancelled'].includes(w.status));

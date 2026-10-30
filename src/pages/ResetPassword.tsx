@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { CheckCircle2, Lock, Eye, EyeOff } from "lucide-react";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const resetPasswordSchema = z.object({
   password: z.string()
@@ -67,7 +68,7 @@ export default function ResetPassword() {
     setLoading(false);
 
     if (error) {
-      showError("Password reset failed", error.message);
+      showError("Password reset failed", friendlyErrorMessage(error, "Please try again."));
     } else {
       setSuccess(true);
       showSuccess("Password updated successfully!");

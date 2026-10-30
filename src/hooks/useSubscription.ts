@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface SubscriptionPlan {
   id: string;
@@ -204,7 +205,7 @@ export const useSubscribeToPlan = () => {
       toast.success(isTrial ? 'Free trial activated! Enjoy your 30-day trial.' : 'Subscription activated successfully!');
     },
     onError: (error: any) => {
-      toast.error('Failed to subscribe: ' + error.message);
+      toast.error(friendlyErrorMessage(error, "Failed to subscribe. Please try again."));
     },
   });
 };

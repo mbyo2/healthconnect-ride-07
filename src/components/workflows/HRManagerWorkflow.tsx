@@ -15,6 +15,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: "Annual Leave",
@@ -126,7 +127,7 @@ export const HRManagerWorkflow = () => {
         setEmpLookup(found);
       }
     } catch (err: any) {
-      setEmpError("Lookup failed: " + err.message);
+      setEmpError(friendlyErrorMessage(err, "Lookup failed. Check the email and try again."));
     }
     setEmpLookingUp(false);
   };
@@ -166,7 +167,7 @@ export const HRManagerWorkflow = () => {
       const summary = await previewPayroll(start, end);
       setPayrollPreview(summary);
     } catch (err: any) {
-      setPayrollPreviewError(err.message || "Could not build payroll preview");
+      setPayrollPreviewError(friendlyErrorMessage(err, "Could not build payroll preview"));
     }
     setPayrollPreviewing(false);
   };

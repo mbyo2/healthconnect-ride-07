@@ -44,6 +44,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
 import { format } from 'date-fns';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface MedicationInventoryItem {
   id: string;
@@ -212,7 +213,7 @@ export const InventoryTransactions = () => {
       resetForm();
       setIsDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 

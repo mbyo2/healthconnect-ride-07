@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
 import { dispatchNotification } from "@/hooks/useNotifications";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const getStatusPill = (status: string, order?: any) => {
   // A completed result with no verifier is NOT a released report — it is
@@ -120,7 +121,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       setShowOrderDialog(false);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to order lab test");
+      toast.error(friendlyErrorMessage(e, "Failed to order lab test"));
     } finally {
       setIsSubmitting(false);
     }
@@ -193,7 +194,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       setResultInput("");
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to submit result");
+      toast.error(friendlyErrorMessage(e, "Failed to submit result"));
     } finally {
       setIsSubmitting(false);
     }
@@ -209,7 +210,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       toast.success(`${order.test_number} status updated`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to update lab order");
+      toast.error(friendlyErrorMessage(e, "Failed to update lab order"));
     }
   };
 

@@ -66,6 +66,7 @@ import {
   type StockAuditLine,
 } from "./pharmacyStockService";
 import { format } from "date-fns";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const SCOPE_META: Record<AuditScope, { label: string }> = {
   full: { label: "Full count" },
@@ -211,7 +212,7 @@ export function StockAudit() {
       setSelectedSessionId(newSession.id);
     },
     onError: (err) =>
-      toast.error(err instanceof Error ? err.message : "Failed to start session."),
+      toast.error(friendlyErrorMessage(err, "Failed to start session.")),
   });
 
   const [savingCounts, setSavingCounts] = useState(false);
@@ -232,7 +233,7 @@ export function StockAudit() {
       toast.success(`Saved ${dirtyLines.length} count${dirtyLines.length === 1 ? "" : "s"}.`);
       invalidateSessionData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save counts.");
+      toast.error(friendlyErrorMessage(err, "Failed to save counts."));
     } finally {
       setSavingCounts(false);
     }
@@ -253,7 +254,7 @@ export function StockAudit() {
       invalidateSessionData();
     },
     onError: (err) =>
-      toast.error(err instanceof Error ? err.message : "Failed to add batches."),
+      toast.error(friendlyErrorMessage(err, "Failed to add batches.")),
   });
 
   const submitMutation = useMutation({
@@ -263,7 +264,7 @@ export function StockAudit() {
       invalidateSessionData();
     },
     onError: (err) =>
-      toast.error(err instanceof Error ? err.message : "Failed to submit session."),
+      toast.error(friendlyErrorMessage(err, "Failed to submit session.")),
   });
 
   const cancelMutation = useMutation({
@@ -273,7 +274,7 @@ export function StockAudit() {
       invalidateSessionData();
     },
     onError: (err) =>
-      toast.error(err instanceof Error ? err.message : "Failed to cancel session."),
+      toast.error(friendlyErrorMessage(err, "Failed to cancel session.")),
   });
 
   const approveMutation = useMutation({
@@ -283,7 +284,7 @@ export function StockAudit() {
       invalidateSessionData();
     },
     onError: (err) =>
-      toast.error(err instanceof Error ? err.message : "Failed to approve session."),
+      toast.error(friendlyErrorMessage(err, "Failed to approve session.")),
   });
 
   /* ------------------------------------------------------------- confirm ui --- */

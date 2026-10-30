@@ -18,6 +18,7 @@ import { BreakGlassDialog } from "@/components/clinical/BreakGlassDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { isPatientRecordAccessible } from "@/utils/patientRecordAccess";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PatientRecord {
   id: string;
@@ -176,7 +177,7 @@ export const PatientRecords = () => {
       queryClient.invalidateQueries({ queryKey: ['break-glass-grants'] });
       queryClient.invalidateQueries({ queryKey: ['medical_records'] });
     } catch (e: any) {
-      toast.error(e?.message || "Failed to revoke access");
+      toast.error(friendlyErrorMessage(e, "Failed to revoke access"));
     }
   };
 

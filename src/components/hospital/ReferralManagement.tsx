@@ -17,6 +17,7 @@ import { usePatientNames } from '@/hooks/usePatientNames';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { ListSkeleton } from '@/components/ui/list-skeleton';
 import { USER_ROLES } from '@/config/roleConfig';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // Roles a referral can be addressed to (receiving clinician who can act on
 // it and close the feedback loop). ReferralFeedback matches on the doctor's
@@ -222,7 +223,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       refresh();
       refreshIncoming();
     } catch (e: any) {
-      toast.error(e?.message || 'Could not create referral');
+      toast.error(friendlyErrorMessage(e, 'Could not create referral'));
     } finally {
       setSaving(false);
     }
@@ -236,7 +237,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       refresh();
       refreshIncoming();
     } catch (e: any) {
-      toast.error(e?.message || 'Could not update referral');
+      toast.error(friendlyErrorMessage(e, 'Could not update referral'));
     }
   };
 

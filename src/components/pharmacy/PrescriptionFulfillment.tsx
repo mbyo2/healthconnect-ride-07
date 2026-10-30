@@ -15,6 +15,7 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { resolveInventoryItem, precheckDispenseLines, dispenseFEFO } from "./pharmacyStockService";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Prescription {
   id: string;
@@ -257,8 +258,10 @@ export function PrescriptionFulfillment() {
       // P0-7: the server-side safety gate refuses allergy/interaction
       // conflicts with HTTP 400 + a plain-language message — show that
       // message verbatim so the pharmacist sees WHY, not a generic failure.
+      // friendlyErrorMessage passes short plain-language messages (like the
+      // gate's) through unchanged and only collapses technical system text.
       if (error) {
-        toast({ title: error.message || "Failed to dispense prescription", variant: "destructive" });
+        toast({ title: friendlyErrorMessage(error, "Failed to dispense prescription"), variant: "destructive" });
         return;
       }
 
@@ -304,7 +307,7 @@ export function PrescriptionFulfillment() {
       loadPrescriptions();
     } catch (e: any) {
       console.error("Error creating pharmacy prescription:", e);
-      toast({ title: "Failed to dispense prescription", description: e?.message, variant: "destructive" });
+      toast({ title: "Failed to dispense prescription", description: friendlyErrorMessage(e), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -388,7 +391,7 @@ export function PrescriptionFulfillment() {
       toast({ title: "Prescription Status Updated" });
     } catch (error: any) {
       console.error("Error updating fulfillment status:", error);
-      toast({ title: "Could not fill prescription", description: error?.message, variant: "destructive" });
+      toast({ title: "Could not fill prescription", description: friendlyErrorMessage(error), variant: "destructive" });
     }
   };
 

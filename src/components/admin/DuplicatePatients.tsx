@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface CandidatePair {
   id_a: string;
@@ -80,7 +81,7 @@ export default function DuplicatePatients() {
         `Merged. History moved across ${tableCount} table${tableCount === 1 ? "" : "s"}.`
       );
     },
-    onError: (e: any) => toast.error(e?.message || "Merge failed"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Merge failed")),
   });
 
   return (

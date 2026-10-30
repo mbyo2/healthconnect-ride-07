@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
 import type { InstitutionPatient } from '@/lib/patients';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface OTProps {
   hospital?: any;
@@ -133,7 +134,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       toast.success('Surgery scheduled successfully');
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to schedule surgery');
+      toast.error(friendlyErrorMessage(e, 'Failed to schedule surgery'));
     } finally {
       setSaving(false);
     }
@@ -150,7 +151,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       toast.success('Surgery status updated');
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update surgery');
+      toast.error(friendlyErrorMessage(e, 'Failed to update surgery'));
     }
   };
 
@@ -190,7 +191,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       toast.success('Anaesthesia record saved');
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save anaesthesia record');
+      toast.error(friendlyErrorMessage(e, 'Failed to save anaesthesia record'));
     } finally {
       setSaving(false);
     }
@@ -211,7 +212,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
       toast.success('Consent form signed');
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to record consent');
+      toast.error(friendlyErrorMessage(e, 'Failed to record consent'));
     }
   };
 

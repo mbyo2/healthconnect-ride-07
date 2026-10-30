@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export interface ServiceTariff {
   id: string;
@@ -330,7 +331,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
         }))
       );
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to load tariffs');
+      toast.error(friendlyErrorMessage(e, 'Failed to load tariffs'));
       setTariffs([]);
     } finally {
       setLoading(false);
@@ -418,7 +419,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       toast.success(`Loaded ${rows.length} ${sourceLabel} starter tariffs${converted ? ' — review prices for your market' : ' — adjust them to your fees'}`);
       load();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to load starter tariffs');
+      toast.error(friendlyErrorMessage(e, 'Failed to load starter tariffs'));
     } finally {
       setSeeding(false);
     }
@@ -438,7 +439,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       setEditingId(null);
       toast.success('Updated service price successfully!');
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save price');
+      toast.error(friendlyErrorMessage(e, 'Failed to save price'));
     }
   };
 
@@ -476,7 +477,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       setNewService({ code: '', name: '', category: 'opd', department: 'General OPD', basePrice: 0, costPrice: 0, insurancePrice: 0, isAvailable: true });
       toast.success(`Added new service: ${payload.name}`);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to add tariff');
+      toast.error(friendlyErrorMessage(e, 'Failed to add tariff'));
     }
   };
 
@@ -486,7 +487,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       if (error) throw error;
       setTariffs((prev) => prev.map((t) => (t.id === id ? { ...t, isAvailable: next } : t)));
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update status');
+      toast.error(friendlyErrorMessage(e, 'Failed to update status'));
     }
   };
 

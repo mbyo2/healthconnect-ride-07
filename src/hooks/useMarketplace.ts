@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { MarketplaceProduct, Order, Cart, CartItem } from '@/types/marketplace';
 import { toast } from 'sonner';
 import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const useMarketplace = () => {
   const { user } = useAuth();
@@ -242,7 +243,7 @@ export const useMarketplace = () => {
       toast.success('Order created — complete your payment to confirm it.');
     },
     onError: (error: any) => {
-      toast.error('Failed to place order: ' + error.message);
+      toast.error(friendlyErrorMessage(error, "Failed to place order. Please try again."));
     }
   });
 

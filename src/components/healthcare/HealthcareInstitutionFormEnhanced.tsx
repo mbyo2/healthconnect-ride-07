@@ -20,6 +20,7 @@ import { useFormDraft } from "@/hooks/use-form-draft";
 import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -356,7 +357,7 @@ export const HealthcareInstitutionFormEnhanced = () => {
       navigate("/institution-status");
     } catch (error: any) {
       console.error("Error registering institution:", error);
-      toast.error(error.message || "Failed to register institution");
+      toast.error(friendlyErrorMessage(error, "Failed to register institution"));
     } finally {
       setIsSubmitting(false);
     }

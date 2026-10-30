@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeftRight, CheckCircle2, XCircle } from "lucide-react";
 import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Admin inbox: institution payment-mode change requests.
@@ -164,7 +165,7 @@ export const PaymentModeApprovals = () => {
       fetchRequests();
     } catch (error: any) {
       console.error("Approve payment-mode request failed:", error);
-      toast.error(error.message || "Failed to approve request");
+      toast.error(friendlyErrorMessage(error, "Failed to approve request"));
     } finally {
       setProcessing(null);
     }
@@ -178,7 +179,7 @@ export const PaymentModeApprovals = () => {
       fetchRequests();
     } catch (error: any) {
       console.error("Deny payment-mode request failed:", error);
-      toast.error(error.message || "Failed to deny request");
+      toast.error(friendlyErrorMessage(error, "Failed to deny request"));
     } finally {
       setProcessing(null);
     }

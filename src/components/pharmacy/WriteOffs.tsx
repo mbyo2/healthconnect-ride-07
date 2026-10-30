@@ -56,6 +56,7 @@ import {
   type WriteOffReason,
   type WriteOffStatus,
 } from "./pharmacyStockService";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const REASONS: { value: WriteOffReason; label: string }[] = [
   { value: "expired", label: "Expired" },
@@ -184,7 +185,7 @@ export function WriteOffs() {
       invalidate();
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to submit write-off request.");
+      toast.error(friendlyErrorMessage(err, "Failed to submit write-off request."));
     },
   });
 
@@ -196,7 +197,7 @@ export function WriteOffs() {
       invalidate();
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to approve write-off.");
+      toast.error(friendlyErrorMessage(err, "Failed to approve write-off."));
     },
   });
 
@@ -210,7 +211,7 @@ export function WriteOffs() {
       invalidate();
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to reject write-off.");
+      toast.error(friendlyErrorMessage(err, "Failed to reject write-off."));
     },
   });
 
@@ -222,7 +223,7 @@ export function WriteOffs() {
       invalidate();
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to post write-off.");
+      toast.error(friendlyErrorMessage(err, "Failed to post write-off."));
     },
   });
 

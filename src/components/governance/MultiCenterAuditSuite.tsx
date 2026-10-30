@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface AuditEvent {
   id: string;
@@ -149,7 +150,7 @@ function FacilityAuditTrail() {
       setEvents(rows.map((r) => ({ ...r, actorName: names[r.user_id] || r.user_id.slice(0, 8) })));
     } catch (e: any) {
       console.error("Audit feed failed:", e);
-      toast.error(e?.message || "Could not load the audit trail.");
+      toast.error(friendlyErrorMessage(e, "Could not load the audit trail."));
     } finally {
       setLoading(false);
     }

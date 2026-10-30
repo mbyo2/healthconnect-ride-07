@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface MedicalShift {
   id: string;
@@ -193,7 +194,7 @@ export const MedicalShiftHR = () => {
     } catch (error: any) {
       console.error("Error creating shift:", error);
       toast.error("Failed to create shift", {
-        description: error?.message || "Please try again.",
+        description: friendlyErrorMessage(error, "Please try again."),
       });
     }
   };

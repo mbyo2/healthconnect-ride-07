@@ -6,6 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Plus, Loader2, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface DepartmentSelectProps {
   hospitalId: string;
@@ -115,7 +116,7 @@ export const DepartmentSelect = ({
       onChange(valueMode === 'id' ? created.id : created.name);
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || 'Failed to create department');
+      toast.error(friendlyErrorMessage(e, 'Failed to create department'));
     } finally {
       setCreating(false);
     }

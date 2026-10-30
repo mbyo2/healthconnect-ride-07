@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { USER_ROLES, PRIVILEGED_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 import { syncAdminLevel } from '@/lib/adminLevelSync';
 import { useUserRoles } from '@/context/UserRolesContext';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 type AppRole = UserRole;
 
@@ -98,7 +99,7 @@ export const RoleManagement: React.FC = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: friendlyErrorMessage(error),
         variant: 'destructive'
       });
     } finally {
@@ -141,7 +142,7 @@ export const RoleManagement: React.FC = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to assign role',
+        description: friendlyErrorMessage(error, 'Failed to assign role'),
         variant: 'destructive'
       });
     }
@@ -180,7 +181,7 @@ export const RoleManagement: React.FC = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to revoke role',
+        description: friendlyErrorMessage(error, 'Failed to revoke role'),
         variant: 'destructive'
       });
     }

@@ -9,6 +9,7 @@ import { Loader2, CheckCircle2, AlertCircle, Building2, UserCheck, LogIn } from 
 import { toast } from "sonner";
 import { setActiveInstitutionOverride } from "@/hooks/useInstitutionContext";
 import { clearApiCaches } from "@/utils/service-worker";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface InvitationDetails {
   id: string;
@@ -78,7 +79,7 @@ const AcceptInvitation = () => {
 
     if (rpcError) {
       toast.error("Failed to accept invitation");
-      setError(rpcError.message);
+      setError(friendlyErrorMessage(rpcError, "Could not accept invitation"));
       return;
     }
     if (!data?.success) {

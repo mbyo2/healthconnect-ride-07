@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@supabase/auth-helpers-react';
 import { UserConnection, PrimaryProviderAssignment, ConnectionRequest } from '@/types/connections';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const useConnections = () => {
   const session = useSession();
@@ -148,7 +149,7 @@ export const useConnections = () => {
       toast.success('Connection request sent successfully');
     },
     onError: (error: any) => {
-      toast.error('Failed to send connection request: ' + error.message);
+      toast.error(friendlyErrorMessage(error, "Failed to send connection request. Please try again."));
     }
   });
 
@@ -187,7 +188,7 @@ export const useConnections = () => {
       toast.success(`Connection ${action} successfully`);
     },
     onError: (error: any) => {
-      toast.error('Failed to update connection: ' + error.message);
+      toast.error(friendlyErrorMessage(error, "Failed to update connection. Please try again."));
     }
   });
 
@@ -213,7 +214,7 @@ export const useConnections = () => {
       toast.success('Primary provider assigned successfully');
     },
     onError: (error: any) => {
-      toast.error('Failed to assign primary provider: ' + error.message);
+      toast.error(friendlyErrorMessage(error, "Failed to assign primary provider. Please try again."));
     }
   });
 

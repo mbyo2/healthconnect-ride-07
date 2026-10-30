@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ScheduleRow {
   id: string;
@@ -131,7 +132,7 @@ export default function VaccinationSchedule({ patientId }: { patientId: string }
       if (error) throw error;
     },
     onError: (e: any) =>
-      toast.error(e?.message || "Failed to record dose"),
+      toast.error(friendlyErrorMessage(e, "Failed to record dose")),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["immunizations-given", patientId] });
       setMarking(null);

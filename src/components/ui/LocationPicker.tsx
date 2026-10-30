@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Search, Loader2, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface LocationData {
   address: string;
@@ -96,7 +97,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       }
     } catch (error: any) {
       console.error('Location detection failed:', error);
-      toast.error(error.message || 'Failed to detect location. Please search or enter manually.');
+      toast.error(friendlyErrorMessage(error, 'Failed to detect location. Please search or enter manually.'));
     } finally {
       setLoading(false);
     }

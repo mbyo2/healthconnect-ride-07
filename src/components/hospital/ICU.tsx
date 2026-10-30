@@ -9,6 +9,7 @@ import { InstitutionPatientPicker } from "./InstitutionPatientPicker";
 import type { InstitutionPatient } from "@/lib/patients";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const STATUS_COLORS: Record<string, string> = {
   occupied: "bg-error-500",
@@ -73,7 +74,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       setShowAddBed(false);
       setBedForm({ bed_number: "", ward_name: "ICU" });
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to add bed"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to add bed")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -93,7 +94,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       setAdmitPatientId("");
       setAdmitPatient(null);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to admit patient"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to admit patient")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -107,7 +108,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       toast.success(`Bed ${bed.bed_number} discharged — now available`);
       if (timelinePatientId === bed.patient_id) setTimelinePatientId("");
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to discharge bed"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to discharge bed")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -120,7 +121,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Bed ${bed.bed_number} marked ${next}`);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to update bed status"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update bed status")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -149,7 +150,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       setShowObsForm(false);
       setObsForm({ heart_rate: "", bp_systolic: "", bp_diastolic: "", spo2: "", temperature: "", gcs_score: "", notes: "" });
       refreshObs();
-    } catch (e: any) { toast.error(e?.message || "Failed to record observations"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record observations")); }
     finally { setIsSubmitting(false); }
   };
 

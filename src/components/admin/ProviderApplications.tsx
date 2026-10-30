@@ -11,6 +11,7 @@ import {
   ShieldCheck, GraduationCap, DollarSign, Video, Home,
   Building2, Languages, Award, Stethoscope,
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ProviderApp {
   id: string;
@@ -123,7 +124,7 @@ export const ProviderApplications = () => {
         : merged;
       setApps(filtered as ProviderApp[]);
     } catch (e: any) {
-      toast.error(e.message || "Failed to load applications");
+      toast.error(friendlyErrorMessage(e, "Failed to load applications"));
     } finally {
       setLoading(false);
     }
@@ -198,7 +199,7 @@ export const ProviderApplications = () => {
       setSelected(null);
       fetchApps();
     } catch (e: any) {
-      toast.error(e.message || "Failed to update decision");
+      toast.error(friendlyErrorMessage(e, "Failed to update decision"));
     } finally {
       setProcessing(false);
     }
@@ -223,7 +224,7 @@ export const ProviderApplications = () => {
       setNotes("");
       fetchApps();
     } catch (e: any) {
-      toast.error(e.message || "Failed to update suspension");
+      toast.error(friendlyErrorMessage(e, "Failed to update suspension"));
     } finally {
       setProcessing(false);
     }

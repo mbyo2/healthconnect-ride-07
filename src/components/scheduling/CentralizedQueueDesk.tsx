@@ -24,6 +24,7 @@ import {
   splitPatientName,
   type InstitutionPatient,
 } from "@/lib/patients";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const PRIORITY_OPTIONS = [
   { value: "normal", label: "Normal Walk-in" },
@@ -97,7 +98,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
         setSelectedPatient(null);
       }
     } catch (e: any) {
-      toast.error(e?.message || "Failed to resolve patient record");
+      toast.error(friendlyErrorMessage(e, "Failed to resolve patient record"));
     } finally {
       setCreating(false);
     }

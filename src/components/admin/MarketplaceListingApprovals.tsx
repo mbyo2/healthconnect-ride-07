@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Globe, CheckCircle2, XCircle } from "lucide-react";
 import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Admin inbox: institution marketplace listing change requests.
@@ -162,7 +163,7 @@ export const MarketplaceListingApprovals = () => {
       fetchRequests();
     } catch (error: any) {
       console.error("Approve listing request failed:", error);
-      toast.error(error.message || "Failed to approve request");
+      toast.error(friendlyErrorMessage(error, "Failed to approve request"));
     } finally {
       setProcessing(null);
     }
@@ -176,7 +177,7 @@ export const MarketplaceListingApprovals = () => {
       fetchRequests();
     } catch (error: any) {
       console.error("Deny listing request failed:", error);
-      toast.error(error.message || "Failed to deny request");
+      toast.error(friendlyErrorMessage(error, "Failed to deny request"));
     } finally {
       setProcessing(null);
     }

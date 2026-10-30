@@ -26,6 +26,7 @@ import {
   buildInvoiceLinesPayload,
   serviceLinesSubtotal,
 } from "@/lib/invoicePricing";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Invoice {
   id: string;
@@ -141,7 +142,7 @@ export const Billing = () => {
       fetchInvoices();
     } catch (err: any) {
       console.error("Failed to create invoice:", err);
-      toast.error(err.message || "Failed to create invoice");
+      toast.error(friendlyErrorMessage(err, "Failed to create invoice"));
     } finally {
       setSubmitting(false);
     }
@@ -168,7 +169,7 @@ export const Billing = () => {
       toast.success("Payment recorded — invoice updated from ledger");
       fetchInvoices();
     } catch (err: any) {
-      toast.error(err.message || "Failed to record payment");
+      toast.error(friendlyErrorMessage(err, "Failed to record payment"));
     }
   };
 
@@ -209,7 +210,7 @@ export const Billing = () => {
         }
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to start online payment");
+      toast.error(friendlyErrorMessage(err, "Failed to start online payment"));
     } finally {
       setLencoSending(false);
     }

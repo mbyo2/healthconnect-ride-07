@@ -20,6 +20,7 @@ import { OrderSetPicker, type OrderSetItem } from "@/components/clinical/OrderSe
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Clinician lab ordering. The six ordering roles (doctor, specialist,
@@ -163,7 +164,7 @@ const LabOrders = () => {
         });
       } catch { /* notification is best-effort */ }
     },
-    onError: (e: any) => toast.error(e.message || "Failed to place lab order"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Failed to place lab order")),
   });
 
   // Access control is handled by RouteGuard requireRoles in App.tsx.

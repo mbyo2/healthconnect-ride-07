@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Tag, RefreshCw, Save, Calculator } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PlanRow {
   id: string;
@@ -102,7 +103,7 @@ export function SubscriptionPricingAdmin() {
       .eq("id", p.id);
     setSavingId(null);
     if (error) {
-      toast.error(error.message || "Failed to save pricing");
+      toast.error(friendlyErrorMessage(error, "Failed to save pricing"));
       return;
     }
     toast.success(`${p.name} pricing updated — live on the pricing page now`);

@@ -6,6 +6,7 @@ import { Building, Users, DollarSign, Wrench, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface StaffRow {
   id: string;
@@ -177,7 +178,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       fetchAll();
     } catch (error: any) {
       console.error("Error adding asset:", error);
-      toast.error(error?.message || "Failed to log asset");
+      toast.error(friendlyErrorMessage(error, "Failed to log asset"));
     } finally {
       setSavingAsset(false);
     }

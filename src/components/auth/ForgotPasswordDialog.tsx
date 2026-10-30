@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Mail, CheckCircle2 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -55,7 +56,7 @@ export function ForgotPasswordDialog() {
     setLoading(false);
 
     if (resetError) {
-      setError(resetError.message);
+      setError(friendlyErrorMessage(resetError, "Could not send the password reset email. Please try again."));
     } else {
       setSent(true);
     }

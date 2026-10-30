@@ -39,6 +39,7 @@ import {
   type QaStatus,
 } from "./pharmacyStockService";
 import { format } from "date-fns";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type QaDecision = Exclude<QaStatus, "pending">;
 
@@ -164,9 +165,7 @@ export function QualityControl() {
       setNotes("");
     },
     onError: (err) => {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to update QA status."
-      );
+      toast.error(friendlyErrorMessage(err, "Failed to update QA status."));
     },
   });
 

@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const SymptomsDiary = () => {
   const [symptoms, setSymptoms] = useState("");
@@ -34,7 +35,7 @@ export const SymptomsDiary = () => {
       setSeverity("");
       setNotes("");
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { UserPlus, UserMinus, Building2, Search } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Admin UI for managing patient-institution links.
@@ -79,7 +80,7 @@ export function PatientInstitutionManager({ institutionId }: { institutionId: st
       setSelectedPatient("");
     },
     onError: (err: any) => {
-      toast.error("Failed to link patient: " + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to link patient. Please try again."));
     },
   });
 
@@ -97,7 +98,7 @@ export function PatientInstitutionManager({ institutionId }: { institutionId: st
       toast.success("Patient unlinked");
     },
     onError: (err: any) => {
-      toast.error("Failed to unlink: " + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to unlink. Please try again."));
     },
   });
 

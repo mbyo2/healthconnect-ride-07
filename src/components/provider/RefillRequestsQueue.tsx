@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, XCircle, Clock, Pill } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Provider-side refill request queue: approve or deny patient refill requests.
@@ -141,7 +142,7 @@ export const RefillRequestsQueue = () => {
       });
     } catch (error: any) {
       console.error("Error deciding refill:", error);
-      toast.error(error?.message || "Failed to process request");
+      toast.error(friendlyErrorMessage(error, "Failed to process request"));
     } finally {
       setProcessing(null);
     }

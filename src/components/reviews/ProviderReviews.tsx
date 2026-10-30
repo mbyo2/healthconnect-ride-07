@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, ThumbsUp, CheckCircle, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface ProviderReviewsProps {
   providerId: string;
@@ -84,7 +85,7 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
       setReviewText('');
       setShowForm(false);
     },
-    onError: (err: any) => toast.error(err.message || 'Failed to submit review')
+    onError: (err: any) => toast.error(friendlyErrorMessage(err, 'Failed to submit review'))
   });
 
   const ratingDistribution = [5, 4, 3, 2, 1].map(r => ({

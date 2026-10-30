@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface HospitalInventoryItem {
   id: string;
@@ -70,7 +71,7 @@ export function useHospitalInventory() {
       fetchItems();
       return result;
     } catch (err: any) {
-      toast.error('Failed: ' + err.message);
+      toast.error(friendlyErrorMessage(err));
       return null;
     }
   };
@@ -84,7 +85,7 @@ export function useHospitalInventory() {
       toast.success('Item updated');
       fetchItems();
     } catch (err: any) {
-      toast.error('Failed: ' + err.message);
+      toast.error(friendlyErrorMessage(err));
     }
   };
 

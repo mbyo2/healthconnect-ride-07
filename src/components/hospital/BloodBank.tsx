@@ -7,6 +7,7 @@ import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -78,7 +79,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       toast.success("Blood stock added");
       setShowAddStock(false);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to add stock"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to add stock")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -95,7 +96,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       setShowNewRequest(false);
       setReqForm({ patient_id: "", blood_type: "O+", component_type: "prbc", units_required: 1, urgency: "routine" });
       refreshRequests();
-    } catch (e: any) { toast.error(e?.message || "Failed to create request"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to create request")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -111,7 +112,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         refreshRequests();
         refresh();
         refreshAudit();
-      } catch (e: any) { toast.error(e?.message || "Failed to issue blood"); }
+      } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to issue blood")); }
       finally { setIsSubmitting(false); }
       return;
     }
@@ -120,7 +121,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Request ${row.request_number || ""} ${status}`);
       refreshRequests();
-    } catch (e: any) { toast.error(e?.message || "Failed to update request"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update request")); }
   };
 
   const handleAddDonor = async (e: React.FormEvent) => {
@@ -137,7 +138,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       setShowAddDonor(false);
       setDonorForm({ full_name: "", blood_type: "O+", phone: "", email: "", date_of_birth: "", gender: "", address: "", notes: "" });
       refreshDonors();
-    } catch (e: any) { toast.error(e?.message || "Failed to register donor"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to register donor")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -163,7 +164,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       setDonationForm({ donor_id: "", blood_type: "O+", component_type: "whole_blood", units_collected: 1, expiry_date: "", screening_status: "pending", screening_notes: "" });
       refreshDonations();
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to record donation"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record donation")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -186,7 +187,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       setShowCompatTest(false);
       setCompatForm({ request_id: "", donor_blood_type: "O+", recipient_blood_type: "O+", test_type: "crossmatch", result: "pending", notes: "" });
       refreshCompat();
-    } catch (e: any) { toast.error(e?.message || "Failed to record test"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record test")); }
     finally { setIsSubmitting(false); }
   };
 

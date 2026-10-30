@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface SurgeryPackage {
   id: string;
@@ -83,7 +84,7 @@ export function PackageManager() {
       queryClient.invalidateQueries({ queryKey: ["surgery-packages", institutionId] });
       toast.success("Package updated.");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed."),
+    onError: (e) => toast.error(friendlyErrorMessage(e, "Update failed.")),
   });
 
   const toggleVisit = useMutation({
@@ -98,7 +99,7 @@ export function PackageManager() {
       queryClient.invalidateQueries({ queryKey: ["visit-packages", institutionId] });
       toast.success("Package updated.");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed."),
+    onError: (e) => toast.error(friendlyErrorMessage(e, "Update failed.")),
   });
 
   const fmt = (n: number) => `K${Number(n || 0).toLocaleString()}`;

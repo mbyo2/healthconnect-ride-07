@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getDocumentLabels, areRequiredDocumentsComplete } from '@/config/documentRequirements';
 import type { CountryCode } from '@/config/documentRequirements';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const DocumentUploadSection = ({ userId, userRole, countryCode = 'ZM' }: { userId: string; userRole: string; countryCode?: CountryCode }) => {
   const [uploading, setUploading] = useState(false);
@@ -77,7 +78,7 @@ const DocumentUploadSection = ({ userId, userRole, countryCode = 'ZM' }: { userI
       toast.success(`${docLabel} uploaded successfully`);
       queryClient.invalidateQueries({ queryKey: ['registration-docs', userId] });
     } catch (err: any) {
-      toast.error(err.message || 'Upload failed');
+      toast.error(friendlyErrorMessage(err, 'Upload failed'));
     } finally {
       setUploading(false);
       e.target.value = '';

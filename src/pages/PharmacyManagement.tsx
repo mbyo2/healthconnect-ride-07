@@ -18,6 +18,7 @@ import {
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { InventoryControlTabs } from "@/components/pharmacy/InventoryControlTabs";
 import { buildPharmacySaleItemsPayload, PHARMACY_SALE_TAX_RATE } from "@/lib/pharmacySale";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // Cart-preview only: the charged tax is computed server-side by
 // create_pharmacy_sale at the same 16% rate (a server constant there).
@@ -148,7 +149,7 @@ export const PharmacyManagement = () => {
       refetchInventory();
       queryClient.invalidateQueries({ queryKey: ["pharmacy-sales-today", pharmacy?.id] });
     } catch (error: any) {
-      toast.error(error?.message || "Failed to complete sale");
+      toast.error(friendlyErrorMessage(error, "Failed to complete sale"));
     } finally {
       setIsProcessing(false);
     }

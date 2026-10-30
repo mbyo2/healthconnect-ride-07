@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Heart, Activity, Brain, Eye, Bot, ArrowRight, Sparkles, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const Symptoms = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
@@ -93,7 +94,7 @@ const Symptoms = () => {
       setSeverity("");
       setDescription("");
     } catch (err: any) {
-      toast.error(err?.message || "Could not save your symptoms");
+      toast.error(friendlyErrorMessage(err, "Could not save your symptoms"));
     } finally {
       setSaving(false);
     }

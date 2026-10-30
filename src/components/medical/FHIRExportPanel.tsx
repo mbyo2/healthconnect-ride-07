@@ -8,6 +8,7 @@ import { Download, FileJson, Loader2, CheckCircle, AlertCircle } from 'lucide-re
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const RESOURCE_TYPES = [
   { id: 'Patient', label: 'Patient Demographics', description: 'Name, contact, DOB' },
@@ -57,7 +58,7 @@ export const FHIRExportPanel = ({ patientId }: { patientId?: string }) => {
       setLastExport({ resourceCount: data.total || 0, timestamp: new Date().toISOString() });
       toast.success(`Exported ${data.total} FHIR resources`);
     } catch (err: any) {
-      toast.error('Export failed: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Export failed. Please try again."));
     } finally {
       setIsExporting(false);
     }

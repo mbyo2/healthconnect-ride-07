@@ -10,6 +10,7 @@ import { usePatientNames } from '@/hooks/usePatientNames';
 import { supabase } from '@/integrations/supabase/client';
 import { ensureBillingDraft } from '@/services/dischargeWorkflow';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const EMPTY = {
   admission_diagnosis: '',
@@ -75,7 +76,7 @@ export const DischargeSummary = ({ hospital, admissions }: { hospital: any; admi
       toast.success(finalize ? 'Discharge summary finalized' : 'Draft saved');
       setSelected({ ...selected, ...patch });
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save discharge summary');
+      toast.error(friendlyErrorMessage(e, 'Failed to save discharge summary'));
     } finally {
       setSaving(false);
     }

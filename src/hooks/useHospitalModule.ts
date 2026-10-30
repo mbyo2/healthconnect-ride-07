@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { withTimeout, TIMEOUTS } from '@/utils/async';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Options {
   select?: string;
@@ -64,7 +65,7 @@ export function useHospitalModule<T = any>(
       setError(
         timedOut
           ? 'Request timed out — the connection is slow. Pull to retry.'
-          : e?.message || 'Failed to load data'
+          : friendlyErrorMessage(e, 'Failed to load data')
       );
       setData([]);
     } finally {

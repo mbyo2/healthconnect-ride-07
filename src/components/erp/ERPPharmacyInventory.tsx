@@ -20,6 +20,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface StockRow {
   id: string;
@@ -204,7 +205,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       fetchAll();
     } catch (error: any) {
       console.error("Error creating PO:", error);
-      toast.error(error?.message || "Failed to create purchase order");
+      toast.error(friendlyErrorMessage(error, "Failed to create purchase order"));
     } finally {
       setCreatingPO(false);
     }

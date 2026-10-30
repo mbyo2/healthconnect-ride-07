@@ -15,6 +15,7 @@ import { usePatientNames } from '@/hooks/usePatientNames';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const triageColors: Record<string, { bg: string; label: string }> = {
   critical: { bg: 'bg-red-500', label: 'Immediate' },
@@ -69,7 +70,7 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
       toast.success(`Case ${row.case_number || ''} → ${status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update case');
+      toast.error(friendlyErrorMessage(e, 'Failed to update case'));
     }
   };
 
@@ -120,7 +121,7 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
       setForm({ patientName: '', phone: '', triage: 'urgent', complaint: '', arrivalMode: 'walk-in', bp: '', pulse: '', spo2: '', temp: '' });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to register case');
+      toast.error(friendlyErrorMessage(e, 'Failed to register case'));
     } finally {
       setSaving(false);
     }

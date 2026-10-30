@@ -25,6 +25,7 @@ import { EntitySelect, type EntityOption } from '@/components/ui/EntitySelect';
 import { useInstitutionTeam } from '@/hooks/useInstitutionTeam';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -186,7 +187,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       setRxMedications([{ id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }]);
       refreshRx();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to create prescription');
+      toast.error(friendlyErrorMessage(e, 'Failed to create prescription'));
     } finally {
       setIsSubmitting(false);
     }
@@ -200,7 +201,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       toast.success(`${rx.medication_name} → ${status}`);
       refreshRx();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update prescription');
+      toast.error(friendlyErrorMessage(e, 'Failed to update prescription'));
     }
   };
 
@@ -235,7 +236,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
       setWriteOffForm({ item_id: '', quantity: 1, reason: 'expired', notes: '' });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to write off');
+      toast.error(friendlyErrorMessage(e, 'Failed to write off'));
     } finally {
       setIsSubmitting(false);
     }

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { useCurrency } from "@/hooks/use-currency";
 import { buildPosSaleItemsPayload } from "@/lib/posSale";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface DispensaryItem {
   id: string;
@@ -263,7 +264,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
       fetchStock();
     } catch (error: any) {
       console.error("Error completing dispense:", error);
-      toast.error(error?.message || "Failed to complete dispensing — no stock was changed");
+      toast.error(friendlyErrorMessage(error, "Failed to complete dispensing — no stock was changed"));
     } finally {
       setProcessing(false);
     }

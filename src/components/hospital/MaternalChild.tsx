@@ -9,6 +9,7 @@ import { usePatientNames } from "@/hooks/usePatientNames";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type Tab = "anc" | "deliveries" | "immunizations";
 
@@ -108,7 +109,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
       setShowAnc(false);
       setAncForm({ patient_id: "", visit_date: todayISO(), gestational_age_weeks: "", weight_kg: "", bp_systolic: "", bp_diastolic: "", hemoglobin: "", urine_protein: "", fetal_heart_rate: "", notes: "", next_visit_date: "" });
       refreshAnc();
-    } catch (e: any) { toast.error(e?.message || "Failed to record ANC visit"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record ANC visit")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -134,7 +135,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
       setShowDelivery(false);
       setDeliveryForm({ patient_id: "", delivery_date: todayISO(), delivery_type: "normal", birth_weight_kg: "", baby_gender: "", apgar_score: "", complications: "" });
       refreshDel();
-    } catch (e: any) { toast.error(e?.message || "Failed to record delivery"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record delivery")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -157,7 +158,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
       setShowImmun(false);
       setImmunForm({ patient_id: "", vaccine_name: "", dose_number: "1", scheduled_date: todayISO(), batch_number: "" });
       refreshImm();
-    } catch (e: any) { toast.error(e?.message || "Failed to schedule vaccination"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to schedule vaccination")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -172,7 +173,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`${row.vaccine_name} marked as administered`);
       refreshImm();
-    } catch (e: any) { toast.error(e?.message || "Failed to mark as administered"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to mark as administered")); }
     finally { setMarkingId(null); }
   };
 

@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -346,7 +347,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
+      const errorMessage = friendlyErrorMessage(error, 'Failed to get response. Please try again.');
       toast.error(errorMessage);
 
       // Keep the user's message and show a retryable error instead of

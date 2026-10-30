@@ -32,6 +32,7 @@ import {
   Printer,
 } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 import { cn } from "@/lib/utils";
 
 interface PatientRow {
@@ -113,7 +114,7 @@ export function BarcodeVerify() {
       if (error) throw error;
       setPatientList((data as PatientRow[]) || []);
     } catch (err: any) {
-      toast.error("Patient search failed", { description: err?.message });
+      toast.error("Patient search failed", { description: friendlyErrorMessage(err) });
     } finally {
       setSearching(false);
     }
@@ -142,7 +143,7 @@ export function BarcodeVerify() {
         if (error) throw error;
         setPrescriptions((data as PrescriptionRow[]) || []);
       } catch (err: any) {
-        toast.error("Could not load prescriptions", { description: err?.message });
+        toast.error("Could not load prescriptions", { description: friendlyErrorMessage(err) });
       } finally {
         setLoadingRx(false);
       }
@@ -221,7 +222,7 @@ export function BarcodeVerify() {
       }
       // Mismatch: the hard-stop overlay renders from lastResult; no toast needed.
     } catch (err: any) {
-      toast.error("Scan could not be logged", { description: err?.message });
+      toast.error("Scan could not be logged", { description: friendlyErrorMessage(err) });
     } finally {
       setSaving(false);
     }
@@ -255,7 +256,7 @@ export function BarcodeVerify() {
         description: "The mismatch was overridden with a documented reason.",
       });
     } catch (err: any) {
-      toast.error("Override failed", { description: err?.message });
+      toast.error("Override failed", { description: friendlyErrorMessage(err) });
     } finally {
       setOverrideSaving(false);
     }

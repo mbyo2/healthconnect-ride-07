@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface SmartInvoiceSettings {
   id: string;
@@ -203,7 +204,7 @@ export const ZraSmartInvoiceIntegration = () => {
       // no-cors yields an opaque response — reaching the host at all counts.
       return { ok: true, detail: `HTTP ${res.status} (opaque no-cors probe)`, durationMs: Date.now() - started };
     } catch (e: any) {
-      const reason = e?.name === "AbortError" ? "timed out after 8s" : (e?.message || "unreachable");
+      const reason = e?.name === "AbortError" ? "timed out after 8s" : friendlyErrorMessage(e, "unreachable");
       return { ok: false, detail: `Device unreachable: ${reason}`, durationMs: Date.now() - started };
     } finally {
       clearTimeout(timer);
@@ -253,7 +254,7 @@ export const ZraSmartInvoiceIntegration = () => {
       fetchZraData();
     } catch (error: any) {
       console.error("Error initializing VSDC:", error);
-      toast.error(error?.message || "Initialization attempt failed before logging.");
+      toast.error(friendlyErrorMessage(error, "Initialization attempt failed before logging."));
     }
   };
 
@@ -288,7 +289,7 @@ export const ZraSmartInvoiceIntegration = () => {
       fetchZraData();
     } catch (error: any) {
       console.error("Error syncing codes:", error);
-      toast.error(error?.message || "Code sync attempt failed before logging.");
+      toast.error(friendlyErrorMessage(error, "Code sync attempt failed before logging."));
     }
   };
 

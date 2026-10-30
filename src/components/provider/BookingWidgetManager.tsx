@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface BookingWidget {
   id: string;
@@ -61,7 +62,7 @@ export const BookingWidgetManager = () => {
       toast.success('Booking widget created!');
       queryClient.invalidateQueries({ queryKey: ['booking-widget'] });
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(friendlyErrorMessage(err)),
   });
 
   const getEmbedCode = (widgetKey: string) => {

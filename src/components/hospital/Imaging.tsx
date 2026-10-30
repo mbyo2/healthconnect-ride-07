@@ -9,6 +9,7 @@ import { usePatientNames } from "@/hooks/usePatientNames";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const MODALITIES = ["xray", "ct", "mri", "ultrasound", "mammography"] as const;
 const MODALITY_LABELS: Record<string, string> = {
@@ -105,7 +106,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
       setShowNewOrder(false);
       setOrderForm({ patient_id: "", modality: "xray", body_part: "", clinical_indication: "", priority: "routine" });
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to create imaging order"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to create imaging order")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -115,7 +116,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Order ${order.order_number || ""} → ${status.replace("_", " ")}`);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to update order"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update order")); }
   };
 
   const openReport = (order: any) => {
@@ -164,7 +165,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
       setReportingOrder(null);
       loadResults();
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to save report"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to save report")); }
     finally { setIsSubmitting(false); }
   };
 

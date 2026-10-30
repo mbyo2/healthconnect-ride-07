@@ -13,6 +13,7 @@ import { ensureDeliveryOrderForOrder } from "@/services/deliveryService";
 import { useAuth } from "@/context/AuthContext";
 import { AutoDispatch } from "@/components/delivery/AutoDispatch";
 import { LiveDeliveryMap } from "@/components/delivery/LiveDeliveryMap";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface DeliveryTrackingProps {
   pharmacyId: string;
@@ -120,7 +121,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
       queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] });
     } catch (e: any) {
       console.error("Advance delivery failed:", e);
-      toast.error(e?.message || "Could not update delivery status.");
+      toast.error(friendlyErrorMessage(e, "Could not update delivery status."));
     } finally {
       setAdvancingId(null);
     }
@@ -177,7 +178,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
       await handToCourier(orderId);
       queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] });
     } catch (e: any) {
-      toast.error(e?.message || "Fulfillment failed");
+      toast.error(friendlyErrorMessage(e, "Fulfillment failed"));
     } finally {
       setFulfillingId(null);
     }

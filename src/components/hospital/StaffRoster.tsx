@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePatientNames } from '@/hooks/usePatientNames';
 import { DepartmentSelect } from './DepartmentSelect';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface StaffRosterProps {
   hospital: any;
@@ -102,7 +103,7 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
       setForm({ staffId: '', department: '', shift: 'morning', date: new Date().toISOString().split('T')[0], role: 'Doctor' });
       fetchRoster();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to assign duty');
+      toast.error(friendlyErrorMessage(e, 'Failed to assign duty'));
     } finally {
       setSaving(false);
     }
@@ -115,7 +116,7 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
       toast.success('Duty assignment removed');
       fetchRoster();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to remove assignment');
+      toast.error(friendlyErrorMessage(e, 'Failed to remove assignment'));
     }
   };
 

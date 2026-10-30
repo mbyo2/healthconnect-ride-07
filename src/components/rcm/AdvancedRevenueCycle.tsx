@@ -17,6 +17,7 @@ import {
 } from "@/utils/rcm-engine";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // ─── Demo Claims Pipeline ─────────────────────────────────────────────────────
 const DEMO_CLAIMS: InsuranceClaim[] = [
@@ -355,7 +356,7 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
       else if (action === "submit") toast.success(`Claim ${claim.claimNumber} submitted electronically.`);
     } catch (e: any) {
       console.error("Claim action failed:", e);
-      toast.error(e?.message || `Could not ${action} claim ${claim.claimNumber}. Not saved.`);
+      toast.error(friendlyErrorMessage(e, `Could not ${action} claim ${claim.claimNumber}. Not saved.`));
     }
   };
 

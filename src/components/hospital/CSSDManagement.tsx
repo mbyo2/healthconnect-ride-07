@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
   dirty: { label: 'Awaiting Wash', variant: 'outline' },
@@ -40,7 +41,7 @@ export const CSSDManagement = ({ hospital }: { hospital: any }) => {
       toast.success(`${row.item_name} → ${statusConfig[status]?.label || status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update item');
+      toast.error(friendlyErrorMessage(e, 'Failed to update item'));
     }
   };
 

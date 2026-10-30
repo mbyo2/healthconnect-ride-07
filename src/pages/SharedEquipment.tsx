@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, MapPin, Building2, Loader2, CheckCircle, XCircle, Clock, Ban } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type SharedMachine = {
   id: string;
@@ -80,7 +81,7 @@ export default function SharedEquipment() {
       // Never show our own institution's machines here (can't request your own)
       setMachines(((data || []) as SharedMachine[]).filter((m) => m.institution_id !== institutionId));
     } catch (e: any) {
-      toast.error(e.message || "Failed to load shared machines");
+      toast.error(friendlyErrorMessage(e, "Failed to load shared machines"));
     } finally {
       setLoading(false);
     }
@@ -161,7 +162,7 @@ export default function SharedEquipment() {
       setReqOpen(false);
       fetchRequests();
     } catch (e: any) {
-      toast.error(e.message || "Failed to send request");
+      toast.error(friendlyErrorMessage(e, "Failed to send request"));
     } finally {
       setSaving(false);
     }
@@ -176,7 +177,7 @@ export default function SharedEquipment() {
       toast.success(status === "approved" ? "Request approved" : status === "declined" ? "Request declined" : "Marked completed");
       fetchRequests();
     } catch (e: any) {
-      toast.error(e.message || "Failed to update request");
+      toast.error(friendlyErrorMessage(e, "Failed to update request"));
     }
   };
 
@@ -189,7 +190,7 @@ export default function SharedEquipment() {
       toast.success("Request cancelled");
       fetchRequests();
     } catch (e: any) {
-      toast.error(e.message || "Failed to cancel");
+      toast.error(friendlyErrorMessage(e, "Failed to cancel"));
     }
   };
 

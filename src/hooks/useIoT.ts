@@ -6,6 +6,7 @@ import { bluetoothService } from '@/services/iot/bluetooth-service';
 import { usbService } from '@/services/iot/usb-service';
 import { serialService } from '@/services/iot/serial-service';
 import { ConnectionType } from '@/types/iot';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // Throttle function to prevent excessive updates
 const throttle = <T extends (...args: any[]) => void>(func: T, limit: number): T => {
@@ -316,7 +317,7 @@ export function useIoT(userId: string | undefined) {
     } else if (error.name === 'NotSupportedError') {
       toast.error('Protocol is not supported or disabled on this device.');
     } else {
-      toast.error(`Failed to connect: ${error.message || 'Unknown error'}`);
+      toast.error(friendlyErrorMessage(error, "Failed to connect. Please try again."));
     }
   };
 

@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { toast } from 'sonner';
 import { BarcodeScanner } from '@/components/shared/BarcodeScanner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface SampleCollection {
   id: string;
@@ -84,7 +85,7 @@ export const PhlebotomistWorkflow = () => {
       setForm({ patient_name: '', sample_type: 'blood', collection_type: 'in_lab', address: '', scheduled_time: '' });
       fetchSamples();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create sample');
+      toast.error(friendlyErrorMessage(err, 'Failed to create sample'));
     }
   };
 
@@ -100,7 +101,7 @@ export const PhlebotomistWorkflow = () => {
       setSamples(prev => prev.map(s => s.id === id ? { ...s, status: status as any, ...(status === 'collected' ? { collected_at: new Date().toISOString() } : {}) } : s));
       toast.success(`Sample marked as ${status}`);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to update');
+      toast.error(friendlyErrorMessage(err, 'Failed to update'));
     }
   };
 

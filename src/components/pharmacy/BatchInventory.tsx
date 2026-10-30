@@ -55,6 +55,7 @@ import {
   type QaStatus,
   type ReceiveBatchInput,
 } from "./pharmacyStockService";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /* ------------------------------------------------------------------ */
 /* Badge helpers                                                       */
@@ -169,7 +170,7 @@ function ReceiveBatchDialog({
       onOpenChange(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to receive batch");
+      toast.error(friendlyErrorMessage(error, "Failed to receive batch"));
     },
   });
 

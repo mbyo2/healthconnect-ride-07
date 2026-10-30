@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Plus, MessageSquare, Loader2, Send, UserCheck, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Ticket {
   id: string;
@@ -124,7 +125,7 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
       setShowCreate(false);
       toast.success('Ticket created. Our support team will respond soon.');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to create ticket'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to create ticket')),
   });
 
   const updateTicket = useMutation({
@@ -141,7 +142,7 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
       }
       toast.success('Ticket updated.');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to update ticket'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to update ticket')),
   });
 
   const sendReply = useMutation({
@@ -165,7 +166,7 @@ export const SupportTicketSystem = ({ showAll = false }: { showAll?: boolean }) 
       queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
       setReplyText('');
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to send reply'),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, 'Failed to send reply')),
   });
 
   const [createForm, setCreateForm] = useState({ subject: '', description: '', category: 'technical', priority: 'medium' });

@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type Tab = "rotations" | "research" | "discussions";
 
@@ -87,7 +88,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
       setShowRotation(false);
       setRotForm({ student_name: "", student_id_number: "", university: "", department: "General", start_date: todayISO(), end_date: "" });
       refreshRot();
-    } catch (e: any) { toast.error(e?.message || "Failed to register rotation"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to register rotation")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -97,7 +98,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Rotation marked as ${status}`);
       refreshRot();
-    } catch (e: any) { toast.error(e?.message || "Failed to update rotation"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update rotation")); }
   };
 
   const handleAddStudy = async (e: React.FormEvent) => {
@@ -121,7 +122,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
       setShowStudy(false);
       setStudyForm({ title: "", principal_investigator: "", study_type: "observational", start_date: todayISO(), end_date: "", ethics_approval_number: "", description: "" });
       refreshStudy();
-    } catch (e: any) { toast.error(e?.message || "Failed to register study"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to register study")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -138,7 +139,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Study moved to ${next.replace("_", " ")}`);
       refreshStudy();
-    } catch (e: any) { toast.error(e?.message || "Failed to advance study"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to advance study")); }
     finally { setAdvancingId(null); }
   };
 
@@ -162,7 +163,7 @@ export const TeachingResearch = ({ hospital }: { hospital: any }) => {
       setShowDiscussion(false);
       setDiscForm({ title: "", discussion_date: todayISO(), department: "General", case_summary: "", learning_points: "" });
       refreshDisc();
-    } catch (e: any) { toast.error(e?.message || "Failed to schedule discussion"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to schedule discussion")); }
     finally { setIsSubmitting(false); }
   };
 

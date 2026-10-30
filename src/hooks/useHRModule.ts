@@ -5,6 +5,7 @@ import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { calculatePayroll } from '@/utils/zambiaPayroll';
 import { fetchInstitutionTaxConfig } from '@/utils/taxConfig';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface LeaveRequest {
   id: string;
@@ -141,7 +142,7 @@ export function useHRModule() {
       fetchAll();
       return result as unknown as LeaveRequest;
     } catch (err: any) {
-      toast.error('Failed to submit leave request: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to submit leave request. Please try again."));
       return null;
     }
   };
@@ -163,7 +164,7 @@ export function useHRModule() {
       toast.success(approved ? 'Leave approved' : 'Leave rejected');
       fetchAll();
     } catch (err: any) {
-      toast.error('Failed to update leave: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to update leave. Please try again."));
     }
   };
 
@@ -193,7 +194,7 @@ export function useHRModule() {
       toast.success('Attendance recorded');
       fetchAll();
     } catch (err: any) {
-      toast.error('Failed to record attendance: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to record attendance. Please try again."));
     }
   };
 
@@ -279,7 +280,7 @@ export function useHRModule() {
       fetchEmployees();
       return true;
     } catch (err: any) {
-      toast.error('Failed to save employee: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to save employee. Please try again."));
       return null;
     }
   };
@@ -294,7 +295,7 @@ export function useHRModule() {
       toast.success(status === 'active' ? 'Employee reactivated' : 'Employee deactivated');
       fetchEmployees();
     } catch (err: any) {
-      toast.error('Failed to update employee: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to update employee. Please try again."));
     }
   };
 
@@ -386,7 +387,7 @@ export function useHRModule() {
       fetchAll();
       return true;
     } catch (err: any) {
-      toast.error('Failed to run payroll: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to run payroll. Please try again."));
       return false;
     }
   };

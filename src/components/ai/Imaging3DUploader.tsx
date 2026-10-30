@@ -10,6 +10,7 @@ import { Layers, Upload, X, Loader2, Lightbulb, Image as ImageIcon } from 'lucid
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 type ImagingType = 'ct' | 'mri' | 'pet_ct';
 type BodyPart = 'head' | 'chest' | 'abdomen' | 'pelvis' | 'spine' | 'extremity' | 'whole_body';
@@ -98,7 +99,7 @@ export const Imaging3DUploader = () => {
       toast.success('Scan slices reviewed');
     } catch (error) {
       console.error('3D imaging analysis error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to analyze imaging');
+      toast.error(friendlyErrorMessage(error, 'Failed to analyze imaging'));
     } finally {
       setIsAnalyzing(false);
     }

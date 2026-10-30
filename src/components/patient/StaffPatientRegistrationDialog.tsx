@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface StaffPatientRegistrationDialogProps {
   institutionId: string;
@@ -110,7 +111,7 @@ export const StaffPatientRegistrationDialog: React.FC<StaffPatientRegistrationDi
       onRegistered?.();
     } catch (error: any) {
       console.error("Staff patient registration failed:", error);
-      toast.error(error.message || "Failed to register patient");
+      toast.error(friendlyErrorMessage(error, "Failed to register patient"));
     } finally {
       setSubmitting(false);
     }

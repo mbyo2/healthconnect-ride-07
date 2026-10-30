@@ -7,6 +7,7 @@ import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const getStatusPill = (status: string) => {
   switch (status) {
@@ -54,7 +55,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       setForm({ patient_name: "", exam_type: "X-Ray", exam_name: "", body_part: "", priority: "routine", notes: "" });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to create imaging order");
+      toast.error(friendlyErrorMessage(e, "Failed to create imaging order"));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +70,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       toast.success(`Study → ${status.replace("_", " ")}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to update study");
+      toast.error(friendlyErrorMessage(e, "Failed to update study"));
     }
   };
 

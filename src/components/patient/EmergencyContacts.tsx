@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Phone, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface EmergencyContact {
   id: string;
@@ -45,7 +46,7 @@ export const EmergencyContacts = () => {
       if (error) throw error;
       setContacts(data || []);
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 
@@ -77,7 +78,7 @@ export const EmergencyContacts = () => {
       });
       fetchContacts();
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -95,7 +96,7 @@ export const EmergencyContacts = () => {
       toast.success("Contact deleted successfully!");
       fetchContacts();
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     }
   };
 

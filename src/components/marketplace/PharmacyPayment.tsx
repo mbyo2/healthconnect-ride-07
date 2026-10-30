@@ -12,6 +12,7 @@ import { peekPendingAction, takePendingAction } from "@/utils/pendingAction";
 import { FlowResult } from "@/components/ui/flow-result";
 import { supabase } from "@/integrations/supabase/client";
 import type { Order } from "@/types/marketplace";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PharmacyPaymentProps {
   order: Order;
@@ -134,11 +135,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       }
     } catch (error) {
       console.error('Payment error:', error);
-      setPayError(
-        error instanceof Error && error.message
-          ? error.message
-          : "Payment failed. No money moved — try again or switch method."
-      );
+      setPayError(friendlyErrorMessage(error, "Payment failed. No money moved — try again or switch method."));
       setLoading(false);
     }
   };

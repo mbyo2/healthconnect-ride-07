@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export type LencoOperator = "mtn" | "airtel" | "zamtel" | "tnm";
 
@@ -73,7 +74,7 @@ export function useLencoPayment() {
           /* keep original */
         }
         console.error("Lenco createCollection API error:", details);
-        toast.error(`Mobile money unavailable: ${details}. Please try PayPal or wallet balance.`);
+        toast.error(`${friendlyErrorMessage(details, "Mobile money is unavailable right now")}. Please try PayPal or wallet balance.`);
         return null;
       }
       if (!data?.reference) {
@@ -83,7 +84,7 @@ export function useLencoPayment() {
       return data as LencoCollectionResult;
     } catch (e: any) {
       console.error("Lenco createCollection error", e);
-      toast.error(`Payment error: ${e?.message || "Failed to start payment"}. Please try PayPal or wallet balance.`);
+      toast.error(`${friendlyErrorMessage(e, "Failed to start payment")}. Please try PayPal or wallet balance.`);
       return null;
     } finally {
       setLoading(false);
@@ -100,7 +101,7 @@ export function useLencoPayment() {
       return data as LencoVerifyResult;
     } catch (e: any) {
       console.error("Lenco verifyPayment error", e);
-      toast.error(e?.message || "Could not check payment status yet. Try again in a few seconds.");
+      toast.error(friendlyErrorMessage(e, "Could not check payment status yet. Try again in a few seconds."));
       return null;
     } finally {
       setVerifying(false);

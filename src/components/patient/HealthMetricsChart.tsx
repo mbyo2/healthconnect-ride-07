@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface HealthMetric {
   recorded_at: string;
@@ -30,7 +31,7 @@ export const HealthMetricsChart = () => {
         if (error) throw error;
         setMetrics((data as unknown as HealthMetric[]) || []);
       } catch (error: any) {
-        toast.error(error.message);
+        toast.error(friendlyErrorMessage(error));
       } finally {
         setLoading(false);
       }

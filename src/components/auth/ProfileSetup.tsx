@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export const ProfileSetup = () => {
       toast.success("Photo uploaded");
     } catch (err: any) {
       console.error("Avatar upload failed:", err);
-      toast.error(err?.message || "Photo upload failed — please try again");
+      toast.error(friendlyErrorMessage(err, "Photo upload failed — please try again"));
     } finally {
       setAvatarUploading(false);
     }
@@ -137,7 +138,7 @@ export const ProfileSetup = () => {
       navigate('/dashboard', { replace: true });
     } catch (error: any) {
       console.error('Profile completion failed:', error);
-      toast.error(error.message || 'Failed to save profile');
+      toast.error(friendlyErrorMessage(error, 'Failed to save profile'));
     } finally {
       setLoading(false);
     }

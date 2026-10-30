@@ -14,6 +14,7 @@ import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, HeartHandshake
 } from 'lucide-react';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const PHQ9_QUESTIONS = [
   'Little interest or pleasure in doing things',
@@ -91,7 +92,7 @@ export const PsychologistWorkflow = () => {
       setNotes('');
       setPatientId('');
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save PHQ-9 assessment');
+      toast.error(friendlyErrorMessage(e, 'Failed to save PHQ-9 assessment'));
     } finally {
       setSaving(false);
     }

@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const DOSAGE_FORMS = ["Tablet", "Capsule", "Syrup", "Suspension", "Injection", "IV Infusion", "Drops", "Cream", "Ointment", "Suppository", "Inhaler", "Powder"];
 const MOVEMENT_TYPES = ["received", "issued", "adjusted", "expired", "damaged"] as const;
@@ -110,7 +111,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
       setShowAddStock(false);
       setStockForm({ drug_name: "", generic_name: "", strength: "", dosage_form: "Tablet", batch_number: "", quantity: 0, unit: "units", expiry_date: "", reorder_level: 10, supplier: "", unit_cost: "" });
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to add stock"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to add stock")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -138,7 +139,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
       setMoveItem(null);
       refresh();
       refreshMovements();
-    } catch (e: any) { toast.error(e?.message || "Failed to record movement"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record movement")); }
     finally { setIsSubmitting(false); }
   };
 

@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * Problem List / Active Conditions (Epic parity)
@@ -113,7 +114,7 @@ export function ProblemList({ patientId, canEdit = false }: {
       toast.success("Problem added to list");
     },
     onError: (e: any) => {
-      toast.error(e.message || "Failed to add problem");
+      toast.error(friendlyErrorMessage(e, "Failed to add problem"));
     },
   });
 

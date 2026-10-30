@@ -20,6 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Globe, Loader2, RotateCcw, Save, Plus, Trash2, AlertCircle } from "lucide-react";
 import { COUNTRY_CONFIGS, type CountryStatutoryConfig } from "@/utils/universalPayroll";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // ─── Local interface (matches agreed shape; see file header) ────────────────
 export interface PayeBracket {
@@ -221,7 +222,7 @@ export default function LocalisationTaxCard({ institutionId }: { institutionId: 
       if (cancelled) return;
       if (error) {
         console.error("Localisation load failed:", error);
-        toast.error("Could not load localisation settings.", { description: error.message });
+        toast.error("Could not load localisation settings.", { description: friendlyErrorMessage(error) });
         setLoading(false);
         return;
       }
@@ -393,7 +394,7 @@ export default function LocalisationTaxCard({ institutionId }: { institutionId: 
       toast.success("Localisation settings saved.");
     } catch (e: any) {
       console.error("Localisation save failed:", e);
-      toast.error("Could not save localisation settings.", { description: e?.message });
+      toast.error("Could not save localisation settings.", { description: friendlyErrorMessage(e) });
     } finally {
       setSaving(false);
     }

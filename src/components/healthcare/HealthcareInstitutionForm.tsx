@@ -18,6 +18,7 @@ import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload
 import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
 import { provisionInstitutionWorkspace } from "@/services/institutionProvisioning";
 import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // Draft key — a half-filled institution application survives reloads and
 // the login redirect, so nobody retypes 40 fields after signing in.
@@ -328,7 +329,7 @@ export const HealthcareInstitutionForm = () => {
       navigate("/institution-status");
     } catch (error: any) {
       console.error("Error registering institution:", error);
-      toast.error(error.message || "Failed to register institution");
+      toast.error(friendlyErrorMessage(error, "Failed to register institution"));
     } finally {
       setIsSubmitting(false);
     }

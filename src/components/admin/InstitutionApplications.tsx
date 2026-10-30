@@ -11,6 +11,7 @@ import {
   Check, X, Loader2, FileText, ExternalLink, CheckCircle,
   Building2, Globe, Activity, ShieldCheck,
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface InstitutionApplication {
   id: string;
@@ -132,7 +133,7 @@ export const InstitutionApplications = () => {
       }));
       setApps(merged as InstitutionApplication[]);
     } catch (e: any) {
-      toast.error(e.message || "Failed to load applications");
+      toast.error(friendlyErrorMessage(e, "Failed to load applications"));
     } finally {
       setLoading(false);
     }
@@ -264,7 +265,7 @@ export const InstitutionApplications = () => {
       setSelected(null);
       fetchApps();
     } catch (e: any) {
-      toast.error(e.message || "Failed");
+      toast.error(friendlyErrorMessage(e, "Failed"));
     } finally {
       setProcessing(false);
     }

@@ -7,6 +7,7 @@ import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const CAMP_TYPES = [
   { key: "screening", label: "Health Screening" },
@@ -88,7 +89,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       setShowNewCamp(false);
       setCampForm({ name: "", location: "", camp_date: "", camp_type: "general", target_population: "", notes: "" });
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to create camp"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to create camp")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -99,7 +100,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       toast.success(`Camp ${status}`);
       setCancelTarget(null);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to update camp"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update camp")); }
   };
 
   // ---- Registration actions (fast walk-in capture) ----
@@ -121,7 +122,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       setShowRegister(false);
       setRegForm({ camp_id: regForm.camp_id, full_name: "", phone: "", age: "", gender: "" });
       refreshRegs();
-    } catch (e: any) { toast.error(e?.message || "Failed to register"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to register")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -166,7 +167,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       setShowScreening(false);
       setScreeningFor(null);
       refreshRegs();
-    } catch (e: any) { toast.error(e?.message || "Failed to save screening"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to save screening")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -187,7 +188,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       if (err) throw err;
       toast.success(patientId ? "Linked to patient record in EHR" : "Saved to EHR — will link automatically when the patient registers with this phone number");
       refreshRegs();
-    } catch (e: any) { toast.error(e?.message || "Failed to sync"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to sync")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -197,7 +198,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       if (err) throw err;
       toast.success("Follow-up marked done");
       refreshRegs();
-    } catch (e: any) { toast.error(e?.message || "Failed to update"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update")); }
   };
 
   const glance = [

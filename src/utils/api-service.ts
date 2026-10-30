@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // API Error types
 export interface ApiError {
@@ -47,7 +48,7 @@ export async function apiCall<T>(
         logError(context, error);
 
         if (showToast) {
-            toast.error(`${context}: ${apiError.message}`);
+            toast.error(friendlyErrorMessage(error, `${context} failed. Please try again.`));
         }
 
         return { data: null, error: apiError };
@@ -74,7 +75,7 @@ export async function supabaseQuery<T>(
             logError(context, error);
 
             if (showToast) {
-                toast.error(`${context}: ${apiError.message}`);
+                toast.error(friendlyErrorMessage(error, `${context} failed. Please try again.`));
             }
 
             return { data: null, error: apiError };
@@ -92,7 +93,7 @@ export async function supabaseQuery<T>(
         logError(context, error);
 
         if (showToast) {
-            toast.error(`${context}: ${apiError.message}`);
+            toast.error(friendlyErrorMessage(error, `${context} failed. Please try again.`));
         }
 
         return { data: null, error: apiError };

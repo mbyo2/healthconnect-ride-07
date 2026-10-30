@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
 import { FileText, Plus, Search, User, Clock, Stethoscope, Save } from 'lucide-react';
 import { TemplatePicker } from '@/components/clinical/NoteTemplates';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Props {
   hospital: any;
@@ -93,7 +94,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
       setActiveCase(data);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Could not create case sheet');
+      toast.error(friendlyErrorMessage(e, 'Could not create case sheet'));
     } finally {
       setCreating(false);
     }
@@ -122,7 +123,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
       toast.success('Case sheet saved');
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to save case sheet');
+      toast.error(friendlyErrorMessage(e, 'Failed to save case sheet'));
     } finally {
       setSaving(false);
     }

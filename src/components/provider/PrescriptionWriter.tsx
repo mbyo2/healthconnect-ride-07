@@ -10,6 +10,7 @@ import { checkInteractions, getPatientActiveMedications, isBlocking, summarize, 
 import { loadDoseRanges, checkDose, type DoseCheckResult, type DoseRange } from "@/utils/dose-check";
 import { AlertTriangle, Plus, Trash2, Pill, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface MedicationItem {
   id: string;
@@ -212,7 +213,7 @@ export const PrescriptionWriter = () => {
       ]);
     } catch (error: any) {
       console.error("Error creating prescription:", error);
-      toast.error(error?.message || "Failed to create prescription");
+      toast.error(friendlyErrorMessage(error, "Failed to create prescription"));
     } finally {
       setIsSubmitting(false);
     }

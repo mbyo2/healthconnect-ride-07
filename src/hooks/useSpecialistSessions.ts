@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface SessionTemplate {
   id: string;
@@ -74,7 +75,7 @@ export function useSpecialistSessions() {
       toast.success('Session scheduled');
       fetchAll();
       return result;
-    } catch (err: any) { toast.error(err.message); return null; }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); return null; }
   };
 
   const updateSession = async (id: string, data: Partial<SpecialistSession>) => {
@@ -84,7 +85,7 @@ export function useSpecialistSessions() {
       if (error) throw error;
       toast.success('Session updated');
       fetchAll();
-    } catch (err: any) { toast.error(err.message); }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); }
   };
 
   const todaySessions = sessions.filter(s => s.session_date === new Date().toISOString().split('T')[0]);

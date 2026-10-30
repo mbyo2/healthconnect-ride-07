@@ -20,6 +20,7 @@ import {
 } from '@/lib/patients';
 import { StaffSelect } from './StaffSelect';
 import { DepartmentSelect } from './DepartmentSelect';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface OPDProps {
   hospital: any;
@@ -184,7 +185,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       toast.success(`Token issued for ${newPatient.name}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to register patient');
+      toast.error(friendlyErrorMessage(e, 'Failed to register patient'));
     } finally {
       setSaving(false);
     }
@@ -200,7 +201,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       toast.success(`Patient status updated to ${status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update status');
+      toast.error(friendlyErrorMessage(e, 'Failed to update status'));
     }
   };
 

@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // LOINC mapping for the vital_signs columns we convert.
 const VITAL_DEFS: { key: string; label: string; unit: string; loinc: string }[] = [
@@ -77,7 +78,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
         if (opts.length && !selectedPatientId) setSelectedPatientId(opts[0].id);
       } catch (e: any) {
         console.error("FHIR roster failed:", e);
-        toast.error(e?.message || "Could not load the patient roster.");
+        toast.error(friendlyErrorMessage(e, "Could not load the patient roster."));
       } finally {
         if (!cancelled) setLoading(false);
       }

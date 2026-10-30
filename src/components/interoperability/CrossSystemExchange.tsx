@@ -10,6 +10,7 @@ import { Send, Loader2, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const RESOURCE_TYPES = [
   { id: 'Patient', label: 'Patient Demographics' },
@@ -169,7 +170,7 @@ export const CrossSystemExchange: React.FC<{ institutionId?: string }> = ({ inst
       });
 
       setLastResult({ ok: false, message: err.message });
-      toast.error('Send failed: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Send failed. Please try again."));
     } finally {
       setSending(false);
     }

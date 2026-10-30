@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface AmbulanceDispatch {
   id: string;
@@ -75,7 +76,7 @@ export function useAmbulanceDispatch() {
       toast.success(`Dispatch created — ${data.ambulance_unit}`);
       fetchDispatches();
       return result;
-    } catch (err: any) { toast.error(err.message); return null; }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); return null; }
   };
 
   const updateStatus = async (id: string, status: string, extras?: Record<string, any>) => {
@@ -90,7 +91,7 @@ export function useAmbulanceDispatch() {
       if (error) throw error;
       toast.success(`Status → ${status}`);
       fetchDispatches();
-    } catch (err: any) { toast.error(err.message); }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); }
   };
 
   const active = dispatches.filter(d => !['delivered', 'completed', 'cancelled'].includes(d.status));

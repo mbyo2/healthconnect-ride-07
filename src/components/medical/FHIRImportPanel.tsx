@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Upload, FileJson, CheckCircle2, AlertCircle } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * FHIR Import: Receive and import a transferred health history bundle
@@ -76,7 +77,7 @@ export function FHIRImportPanel({ patientId }: { patientId: string }) {
           }
         } catch (err: any) {
           results.failed++;
-          results.details.push(`✗ Failed ${resource.resourceType}: ${err.message}`);
+          results.details.push(`✗ Failed ${resource.resourceType}: ${friendlyErrorMessage(err, "Import failed")}`);
         }
       }
 
@@ -95,7 +96,7 @@ export function FHIRImportPanel({ patientId }: { patientId: string }) {
       setImportResult(results);
       toast.success(`Imported ${results.success} records`);
     } catch (error: any) {
-      toast.error("Import failed: " + error.message);
+      toast.error(friendlyErrorMessage(error, "Import failed. Please try again."));
     } finally {
       setImporting(false);
     }

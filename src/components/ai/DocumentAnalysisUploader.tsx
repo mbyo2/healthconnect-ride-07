@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FileText, Upload, X, Loader2, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 type DocumentType = 'lab_report' | 'prescription' | 'radiology_report' | 'pathology_report' | 'discharge_summary';
 
@@ -67,7 +68,7 @@ export const DocumentAnalysisUploader = () => {
       toast.success('Document analyzed successfully');
     } catch (error) {
       console.error('Document analysis error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to analyze document');
+      toast.error(friendlyErrorMessage(error, 'Failed to analyze document'));
     } finally {
       setIsAnalyzing(false);
     }

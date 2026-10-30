@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mic, Square, FileText, Check, X, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface SoapDraft {
   subjective: string;
@@ -135,7 +136,7 @@ export default function AmbientScribe() {
       setEditedDraft(data.draft as SoapDraft);
       toast.success("Draft notes generated — review before approving");
     } catch (e: any) {
-      toast.error(e?.message || "Could not generate notes");
+      toast.error(friendlyErrorMessage(e, "Could not generate notes"));
     } finally {
       setGenerating(false);
     }
@@ -161,7 +162,7 @@ export default function AmbientScribe() {
       setPhase("saved");
       toast.success("Notes approved and saved to the clinical record");
     } catch (e: any) {
-      toast.error(e?.message || "Could not save notes");
+      toast.error(friendlyErrorMessage(e, "Could not save notes"));
     } finally {
       setSaving(false);
     }

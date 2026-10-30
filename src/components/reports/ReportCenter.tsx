@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { jsPDF } from 'jspdf';
 import { buildMisReport, downloadCsv } from '@/services/misReports';
 import { useCurrency } from '@/hooks/use-currency';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // ── Report catalogue with role gating ────────────────────────────
 interface ReportDef {
@@ -142,7 +143,7 @@ export const ReportCenter = ({
         toast.success(`${title} exported as CSV.`);
       }
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to generate report');
+      toast.error(friendlyErrorMessage(e, 'Failed to generate report'));
     } finally {
       setWorking(null);
     }

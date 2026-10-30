@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface InsuranceCard {
   id: string;
@@ -150,7 +151,7 @@ export const InsuranceCardUpload = () => {
       setPolicyNumber('');
       queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
     } catch (err: any) {
-      toast.error(err.message || 'Upload failed');
+      toast.error(friendlyErrorMessage(err, 'Upload failed'));
     } finally {
       setUploading(false);
     }

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowUpRight, ArrowDownLeft, Loader2, Eye, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface Exchange {
   id: string;
@@ -55,7 +56,7 @@ export default function FHIRExchanges() {
       }
       setExchanges(rows.map(r => ({ ...r, patient_name: r.patient_id ? names[r.patient_id] || r.patient_id.slice(0, 8) : '—' })));
     } catch (e: any) {
-      toast.error('Failed to load exchanges: ' + e.message);
+      toast.error(friendlyErrorMessage(e, "Failed to load exchanges. Please try again."));
     } finally {
       setLoading(false);
     }

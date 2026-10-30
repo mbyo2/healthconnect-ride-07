@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface TriageAssessment {
   id: string;
@@ -102,7 +103,7 @@ export function useTriageAssessments() {
       toast.success(`Triage assessment completed for ${data.patient_name}`);
       return result as unknown as TriageAssessment;
     } catch (err: any) {
-      toast.error('Failed to create assessment: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to create assessment. Please try again."));
       return null;
     }
   };

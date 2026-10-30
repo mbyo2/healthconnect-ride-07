@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PediatricPatient {
   id: string;
@@ -152,7 +153,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       queryClient.invalidateQueries({ queryKey: ["peds-vaccines"] });
     } catch (e: any) {
       console.error("Record dose failed:", e);
-      toast.error(e?.message || "Could not file the dose. Check permissions and try again.");
+      toast.error(friendlyErrorMessage(e, "Could not file the dose. Check permissions and try again."));
     } finally {
       setRecordingDose(null);
     }
@@ -236,7 +237,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       queryClient.invalidateQueries({ queryKey: ["peds-growth"] });
     } catch (e: any) {
       console.error("Save growth failed:", e);
-      toast.error(e?.message || "Could not file the measurements. Check permissions and try again.");
+      toast.error(friendlyErrorMessage(e, "Could not file the measurements. Check permissions and try again."));
     } finally {
       setSavingGrowth(false);
     }

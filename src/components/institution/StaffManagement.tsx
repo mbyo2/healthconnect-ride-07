@@ -17,6 +17,7 @@ import {
   Plus, Trash2, Loader2, Upload, UserPlus, Users, Calendar,
   Mail, Clock, CheckCircle, XCircle, AlertCircle, Search, Download
 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // Format role identifiers like "hr_manager" -> "HR Manager", "lab_technician" -> "Lab Technician"
 function formatRoleLabel(role: string | null | undefined): string {
@@ -308,7 +309,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
       setInviteDialogOpen(false);
       fetchInvitations();
     } catch (error: any) {
-      toast.error(error.message || "Failed to send invitation");
+      toast.error(friendlyErrorMessage(error, "Failed to send invitation"));
     } finally {
       setIsInviting(false);
     }
@@ -367,7 +368,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
       resetAddForm();
       fetchStaff();
     } catch (error: any) {
-      toast.error(error.message || "Failed to add staff member");
+      toast.error(friendlyErrorMessage(error, "Failed to add staff member"));
     } finally {
       setIsAdding(false);
     }

@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface JointROM {
   id: string;
@@ -184,7 +185,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
       queryClient.invalidateQueries({ queryKey: ["physio-sessions"] });
     } catch (e: any) {
       console.error("Log physio session failed:", e);
-      toast.error(e?.message || "Could not file the session. Check permissions and try again.");
+      toast.error(friendlyErrorMessage(e, "Could not file the session. Check permissions and try again."));
     } finally {
       setSavingSession(false);
     }

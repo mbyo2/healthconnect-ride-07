@@ -22,6 +22,7 @@ import {
   Shield, Bug, Video, Megaphone, Code2, Bell, CreditCard,
   ChevronRight, Tent
 } from 'lucide-react';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface ActionItem {
   title: string;
@@ -186,7 +187,7 @@ export const NurseWorkflow = () => {
       // Refresh the dashboard stats to show the new vitals count
       setVitalsToday((prev) => (prev ?? 0) + 1);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to record vitals');
+      toast.error(friendlyErrorMessage(e, 'Failed to record vitals'));
     } finally {
       setSavingVitals(false);
     }

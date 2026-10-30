@@ -30,6 +30,7 @@ import {
   authRedirectUrl,
   currentReturnTo,
 } from '@/utils/pendingAction';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface VideoConsultationBookingProps {
   onBookingComplete?: (consultationId: string) => void;
@@ -272,11 +273,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
       }
     } catch (error) {
       console.error('Error booking consultation:', error);
-      setSubmitError(
-        error instanceof Error && error.message
-          ? error.message
-          : "We couldn't book your consultation. Nothing was charged — try again."
-      );
+      setSubmitError(friendlyErrorMessage(error, "We couldn't book your consultation. Nothing was charged — try again."));
     } finally {
       setIsLoading(false);
     }

@@ -8,6 +8,7 @@ import { Loader2, AlertTriangle, Stethoscope, ShieldCheck, Ambulance, Activity }
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { RatingBadge } from "@/components/RatingBadge";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type TriageResponse = {
   session_id: string;
@@ -118,7 +119,7 @@ export default function TriageIntake() {
       }
     } catch (err: any) {
       toast.error("Triage failed", {
-        description: err?.message ?? "Please try again.",
+        description: friendlyErrorMessage(err, "Please try again."),
       });
     } finally {
       setAssessing(false);
@@ -170,7 +171,7 @@ export default function TriageIntake() {
       navigate("/appointments");
     } catch (err: any) {
       toast.error("Booking failed", {
-        description: err?.message ?? "Please try again.",
+        description: friendlyErrorMessage(err, "Please try again."),
       });
     } finally {
       setBooking(null);

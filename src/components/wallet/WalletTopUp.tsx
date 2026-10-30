@@ -12,6 +12,7 @@ import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 import { useLencoWidget, generateWidgetReference } from "@/hooks/useLencoWidget";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type PaymentMethod = 'paypal' | 'lenco' | 'card';
 
@@ -159,7 +160,7 @@ export const WalletTopUp = () => {
             }
         } catch (error) {
             console.error('Top up error:', error);
-            toast.error(error instanceof Error ? error.message : "Failed to initiate top up");
+            toast.error(friendlyErrorMessage(error, "Failed to initiate top up"));
         } finally {
             setIsLoading(false);
         }

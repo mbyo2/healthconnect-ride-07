@@ -14,6 +14,7 @@ import { SuperAdminMetricsDashboard } from "@/components/metrics/RoleMetricsDash
 import { ChartCard, TrendAreaChart } from "@/components/metrics/MetricsCharts";
 import { useCurrency } from "@/hooks/use-currency";
 import { getEffectiveSubscriptionStatus } from "@/services/subscriptionStatus";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const TABS = [
   { id: "overview", label: "Platform Overview", icon: LayoutDashboard },
@@ -193,7 +194,7 @@ function InstitutionsTab() {
       toast.success(`Institution ${suspended ? "suspended" : "re-activated"}.`);
       refetch();
     } catch (e: any) {
-      toast.error("Failed: " + (e.message || "unknown error"));
+      toast.error(friendlyErrorMessage(e));
     } finally {
       setProcessing(null);
     }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ProcedurePrice {
   procedure_id: string;
@@ -95,7 +96,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       toast.success(`"${name}" added at K${price.toLocaleString()}`);
     } catch (e: any) {
       console.error("Failed to add procedure:", e);
-      toast.error(`Failed to add procedure: ${e?.message || "unknown error"}`);
+      toast.error(friendlyErrorMessage(e, "Failed to add procedure. Please try again."));
     } finally {
       setAdding(false);
     }
@@ -164,7 +165,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       );
     } catch (e: any) {
       console.error("Failed to save price:", e);
-      toast.error(`Failed to save price: ${e?.message || e?.details || "unknown error"}`);
+      toast.error(friendlyErrorMessage(e, "Failed to save price. Please try again."));
     } finally {
       setSaving(null);
     }

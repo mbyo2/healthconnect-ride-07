@@ -13,6 +13,7 @@ import {
   type CharterModule,
   type ModulePrice,
 } from "@/services/institutionModules";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type Institution = { id: string; name: string; type_code: string | null; city: string | null };
 
@@ -72,7 +73,7 @@ export const InstitutionModuleManager = () => {
       setCatalog(all);
       setPrices(priceMap);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to load modules");
+      toast.error(friendlyErrorMessage(e, "Failed to load modules"));
       setModules([]);
     } finally {
       setLoading(false);
@@ -106,7 +107,7 @@ export const InstitutionModuleManager = () => {
       toast.success(enable ? `“${m.module_name}” enabled for ${selected?.name}${priceLabel ? ` (${priceLabel})` : ""}` : `“${m.module_name}” suspended for ${selected?.name}`);
       await loadModules(selectedId, selected?.type_code || null);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to update module");
+      toast.error(friendlyErrorMessage(e, "Failed to update module"));
     } finally {
       setSaving(null);
     }
@@ -119,7 +120,7 @@ export const InstitutionModuleManager = () => {
       toast.success(`“${m.module_name}” reset to tier default`);
       await loadModules(selectedId, selected?.type_code || null);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to reset module");
+      toast.error(friendlyErrorMessage(e, "Failed to reset module"));
     } finally {
       setSaving(null);
     }
@@ -139,7 +140,7 @@ export const InstitutionModuleManager = () => {
       setGrantKey("");
       await loadModules(selectedId, selected?.type_code || null);
     } catch (e: any) {
-      toast.error(e?.message || "Failed to grant module");
+      toast.error(friendlyErrorMessage(e, "Failed to grant module"));
     } finally {
       setSaving(null);
     }

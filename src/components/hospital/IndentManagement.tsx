@@ -8,6 +8,7 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { DepartmentSelect } from "@/components/hospital/DepartmentSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const getStatusPill = (status: string) => {
   if (status === "approved") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Approved</span>;
@@ -102,7 +103,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       setDepartment(""); setPriority("routine"); setNotes(""); setItems([blankItem()]);
       setActiveTab("queue");
       refreshAll();
-    } catch (e: any) { toast.error(e?.message || "Failed to raise indent"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to raise indent")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -133,7 +134,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       toast.success(`Indent ${selected.indent_number} approved`);
       setShowApprove(false); setSelected(null);
       refreshAll();
-    } catch (e: any) { toast.error(e?.message || "Failed to approve"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to approve")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -154,7 +155,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       toast.success(`Indent ${selected.indent_number} rejected`);
       setShowReject(false); setSelected(null);
       refreshAll();
-    } catch (e: any) { toast.error(e?.message || "Failed to reject"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to reject")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -198,7 +199,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       toast.success(allComplete ? "Indent fulfilled" : "Partial issue recorded");
       setShowFulfill(false); setSelected(null);
       refreshAll();
-    } catch (e: any) { toast.error(e?.message || "Failed to record issue"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to record issue")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -211,7 +212,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       toast.success("Indent cancelled");
       setShowCancelConfirm(false); setSelected(null);
       refreshAll();
-    } catch (e: any) { toast.error(e?.message || "Failed to cancel"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to cancel")); }
   };
 
   const glance = [

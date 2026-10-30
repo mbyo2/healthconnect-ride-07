@@ -38,6 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface UserWithRoles {
   id: string;
@@ -165,7 +166,7 @@ export function UserManagement() {
       fetchUsers(searchTerm);
     } catch (error: any) {
       console.error('Error assigning role:', error);
-      toast.error(error.message || 'Failed to assign role');
+      toast.error(friendlyErrorMessage(error, 'Failed to assign role'));
     } finally {
       setIsSubmitting(false);
     }
@@ -195,7 +196,7 @@ export function UserManagement() {
       fetchUsers(searchTerm);
     } catch (error: any) {
       console.error('Error revoking role:', error);
-      toast.error(error.message || 'Failed to revoke role');
+      toast.error(friendlyErrorMessage(error, 'Failed to revoke role'));
     }
   };
 

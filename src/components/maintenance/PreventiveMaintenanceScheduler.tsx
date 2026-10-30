@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface AssetWithMaintenance {
   id: string;
@@ -119,7 +120,7 @@ export const PreventiveMaintenanceScheduler: React.FC = () => {
         estimated_duration_hours: 1,
       });
     } catch (err: any) {
-      toast.error('Failed to create schedule: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to create schedule. Please try again."));
     }
   };
 
@@ -139,7 +140,7 @@ export const PreventiveMaintenanceScheduler: React.FC = () => {
       toast.success('Maintenance marked as completed');
       fetchData();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(friendlyErrorMessage(err));
     }
   };
 

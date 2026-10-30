@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { exportToCSV } from "@/utils/pdfExport";
 import { getCoaTemplate, listCoaTemplates, type CoaTemplate } from "@/utils/chartOfAccountsTemplates";
 import { COUNTRY_CONFIGS } from "@/utils/universalPayroll";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export interface CountryTaxConfig {
   countryCode: string;
@@ -128,7 +129,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
         setTemplateCode(cfgRes.data.country_code ?? "ZM");
       }
     } catch (e: any) {
-      setLoadError(e?.message ?? "Could not load the financial ledger.");
+      setLoadError(friendlyErrorMessage(e, "Could not load the financial ledger."));
     } finally {
       setLoading(false);
     }
@@ -189,7 +190,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       toast.success(`"${template.label}" chart loaded — all balances start at zero.`);
       await load();
     } catch (e: any) {
-      toast.error(e?.message ?? "Could not create the chart of accounts.");
+      toast.error(friendlyErrorMessage(e, "Could not create the chart of accounts."));
     } finally {
       setSeeding(false);
     }
@@ -215,7 +216,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       setNewAccount({ code: "", name: "", type: "Asset" });
       await load();
     } catch (e: any) {
-      toast.error(e?.message ?? "Could not add the account.");
+      toast.error(friendlyErrorMessage(e, "Could not add the account."));
     }
   };
 
@@ -266,7 +267,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       });
       await load();
     } catch (e: any) {
-      toast.error(e?.message ?? "Could not post the journal entry.");
+      toast.error(friendlyErrorMessage(e, "Could not post the journal entry."));
     } finally {
       setPosting(false);
     }
@@ -312,7 +313,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       if (error) throw error;
       toast.success(`Tax jurisdiction saved: ${preset.countryName} (${preset.currency})`);
     } catch (e: any) {
-      toast.error(e?.message ?? "Could not save the tax jurisdiction.");
+      toast.error(friendlyErrorMessage(e, "Could not save the tax jurisdiction."));
     }
   };
 

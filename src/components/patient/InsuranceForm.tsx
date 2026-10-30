@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const InsuranceForm = () => {
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,7 @@ export const InsuranceForm = () => {
         coverage_end_date: "",
       });
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(friendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }

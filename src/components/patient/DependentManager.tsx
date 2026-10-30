@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export interface Dependent {
   id: string;
@@ -101,7 +102,7 @@ export default function DependentManager() {
       });
       toast.success("Family member added");
     },
-    onError: (e: any) => toast.error(e?.message || "Failed to add family member"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Failed to add family member")),
   });
 
   const removeMutation = useMutation({

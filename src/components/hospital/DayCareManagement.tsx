@@ -9,6 +9,7 @@ import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { usePatientNames } from '@/hooks/usePatientNames';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
   scheduled: { label: 'Scheduled', variant: 'outline' },
@@ -40,7 +41,7 @@ export const DayCareManagement = ({ hospital }: { hospital: any }) => {
       toast.success(`${row.procedure_name} → ${statusConfig[status]?.label || status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update procedure');
+      toast.error(friendlyErrorMessage(e, 'Failed to update procedure'));
     }
   };
 

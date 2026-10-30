@@ -18,6 +18,7 @@ import { HospitalPatientSelect } from "./HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const BED_TYPES = ["general", "private", "semi_private"];
 const BED_STATUSES = ["available", "occupied", "maintenance"];
@@ -73,7 +74,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
       setBedForm({ ward_name: "", bed_number: "", bed_type: "general" });
       setShowAddBed(false);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to add bed"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to add bed")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -95,7 +96,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
       toast.success(`Patient admitted to bed ${selectedBed.bed_number}`);
       setShowAdmitDialog(false);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to admit patient"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to admit patient")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -109,7 +110,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Bed ${bed.bed_number} is now available`);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to discharge"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to discharge")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -127,7 +128,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Bed ${bed.bed_number} marked ${next}`);
       refresh();
-    } catch (e: any) { toast.error(e?.message || "Failed to update bed"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to update bed")); }
     finally { setIsSubmitting(false); }
   };
 
@@ -173,7 +174,7 @@ export const IPDWards = ({ hospital }: { hospital: any }) => {
       setShowTransferDialog(false);
       refresh();
       refreshTransfers();
-    } catch (e: any) { toast.error(e?.message || "Failed to transfer patient"); }
+    } catch (e: any) { toast.error(friendlyErrorMessage(e, "Failed to transfer patient")); }
     finally { setIsSubmitting(false); }
   };
 

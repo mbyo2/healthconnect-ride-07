@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { EntitySelect, type EntityOption } from '@/components/ui/EntitySelect';
 import { InsurerQuickCreateDialog } from './InsurerQuickCreateDialog';
 import { useInstitutionTeam } from '@/hooks/useInstitutionTeam';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const { user } = useAuth();
@@ -73,7 +74,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
       // Reuse the settlement path so the linked bill is updated.
       await setStatus(updated, adjudicateStatus, prevStatus);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to record adjudication');
+      toast.error(friendlyErrorMessage(e, 'Failed to record adjudication'));
     }
   };
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -187,7 +188,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
       setClaimForm({ patient_name: '', insurance_provider: '', policy_number: '', claim_amount: '', pre_auth_number: '', diagnosis: '', admission_date: '', discharge_date: '' });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to create claim');
+      toast.error(friendlyErrorMessage(e, 'Failed to create claim'));
     } finally {
       setIsSubmitting(false);
     }
@@ -236,7 +237,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
       toast.success(`Claim ${status}`);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to update claim');
+      toast.error(friendlyErrorMessage(e, 'Failed to update claim'));
     }
   };
 

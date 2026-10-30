@@ -32,11 +32,53 @@ describe("friendlyErrorMessage", () => {
     );
   });
 
-  it("collapses row-level-security system text to the fallback", () => {
+  it("maps row-level-security system text to permission copy (never raw)", () => {
     const raw =
       'new row violates row-level security policy for table "appointments"';
-    expect(friendlyErrorMessage(new Error(raw), "Could not save.")).toBe(
-      "Could not save.",
+    const msg = friendlyErrorMessage(new Error(raw), "Could not save.");
+    expect(msg).toContain("don't have permission");
+    expect(msg).not.toContain("row-level security");
+  });
+
+  it("maps duplicate-key violations to already-saved copy", () => {
+    const raw =
+      'duplicate key value violates unique constraint "patients_phone_key"';
+    const msg = friendlyErrorMessage(new Error(raw), "Could not save.");
+    expect(msg).toContain("already exists");
+    expect(msg).not.toContain("duplicate key");
+  });
+
+  it("does NOT hijack crafted 'already exists' copy with sign-in wording", () => {
+    const crafted = "A patient with this phone number already exists.";
+    expect(friendlyErrorMessage(new Error(crafted))).toBe(crafted);
+  });
+
+  it("maps edge-function non-2xx failures to server copy", () => {
+    const msg = friendlyErrorMessage(
+      new Error("Edge Function returned a non-2xx status code"),
+      "Fallback.",
+    );
+    expect(msg).toContain("couldn't be completed on the server");
+  });
+
+  it("maps timeouts to took-too-long copy", () => {
+    expect(
+      friendlyErrorMessage(new Error("The operation timed out")),
+    ).toContain("took too long");
+  });
+
+  it("maps unsupported file types to choose-a-different-file copy", () => {
+    const msg = friendlyErrorMessage(
+      new Error('mime type "application/x-msdownload" is not supported'),
+      "Fallback.",
+    );
+    expect(msg).toContain("file type isn't supported");
+  });
+
+  it("collapses schema-cache PostgREST text to the fallback", () => {
+    const raw = "Could not find the table 'public.widgets' in the schema cache";
+    expect(friendlyErrorMessage(new Error(raw), "Could not load.")).toBe(
+      "Could not load.",
     );
   });
 

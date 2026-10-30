@@ -26,6 +26,7 @@ import {
   setQaStatus,
   type MedicineBatch,
 } from "./pharmacyStockService";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type RadarBand = "expired" | "le30" | "le90";
 
@@ -121,7 +122,7 @@ export function ExpiryRadar() {
       setConfirmBatch(null);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to quarantine batch");
+      toast.error(friendlyErrorMessage(error, "Failed to quarantine batch"));
     },
   });
 
@@ -138,7 +139,7 @@ export function ExpiryRadar() {
       setConfirmAllOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to quarantine expired batches");
+      toast.error(friendlyErrorMessage(error, "Failed to quarantine expired batches"));
     },
   });
 

@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface PathologistReview {
   id: string;
@@ -73,7 +74,7 @@ export function usePathologistReviews() {
       if (error) throw error;
       toast.success('Report signed off & released');
       fetchReviews();
-    } catch (err: any) { toast.error(err.message); }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); }
   };
 
   const flagCritical = async (id: string) => {
@@ -84,7 +85,7 @@ export function usePathologistReviews() {
       if (error) throw error;
       toast.warning('Report flagged as CRITICAL');
       fetchReviews();
-    } catch (err: any) { toast.error(err.message); }
+    } catch (err: any) { toast.error(friendlyErrorMessage(err)); }
   };
 
   const pending = reviews.filter(r => r.status === 'pending_review');

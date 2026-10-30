@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Referral {
   id: string;
@@ -122,7 +123,7 @@ export default function ReferralFeedback() {
       setForm({ outcome_status: "seen", feedback_notes: "", treatment_summary: "" });
       toast.success("Feedback sent to the referring doctor");
     },
-    onError: (e: any) => toast.error(e?.message || "Failed to send feedback"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Failed to send feedback")),
   });
 
   if (!user) return null;

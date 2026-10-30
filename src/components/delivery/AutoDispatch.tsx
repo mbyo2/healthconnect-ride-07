@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2, Zap, UserCheck } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface AutoDispatchProps {
   deliveryId: string;
@@ -80,7 +81,7 @@ export function AutoDispatch({
       queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries"] });
       onDispatched?.();
     } catch (e: any) {
-      toast.error(e?.message || "Dispatch failed");
+      toast.error(friendlyErrorMessage(e, "Dispatch failed"));
     } finally {
       setDispatching(false);
     }
@@ -98,7 +99,7 @@ export function AutoDispatch({
       queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries"] });
       onDispatched?.();
     } catch (e: any) {
-      toast.error(e?.message || "Assignment failed");
+      toast.error(friendlyErrorMessage(e, "Assignment failed"));
     } finally {
       setAssigningId(null);
     }

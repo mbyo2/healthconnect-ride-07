@@ -9,6 +9,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { SkeletonListRow } from "@/components/ui/skeleton-kit";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ChatContact {
   id: string;
@@ -105,7 +106,7 @@ export const ChatList = () => {
         setContacts(profiles || []);
       } catch (error: any) {
         setLoadError(true);
-        toast.error("Error fetching contacts: " + error.message);
+        toast.error(friendlyErrorMessage(error, "Error fetching contacts. Please try again."));
       } finally {
         setLoading(false);
       }

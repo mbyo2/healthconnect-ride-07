@@ -45,6 +45,7 @@ import VaccinationSchedule from "@/components/clinical/VaccinationSchedule";
 import { ClinicalReminders } from "@/components/clinical/ClinicalReminders";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SkeletonForm, SkeletonListRow, SkeletonProviderDashboard } from "@/components/ui/skeleton-kit";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 // ── constants (match Profile.tsx) ────────────────────────────────────────────
 
@@ -171,7 +172,7 @@ const MyPracticeEditor = () => {
       if (error) throw error;
       toast.success("Practice details saved");
     } catch (err: any) {
-      toast.error(err.message || "Failed to save");
+      toast.error(friendlyErrorMessage(err, "Failed to save"));
     } finally {
       setSaving(false);
     }

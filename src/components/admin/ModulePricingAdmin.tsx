@@ -11,6 +11,7 @@ import {
   setModulePrice,
   type ModulePrice,
 } from "@/services/institutionModules";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type Draft = { price: string; is_billable: boolean };
 
@@ -72,7 +73,7 @@ export function ModulePricingAdmin() {
       toast.success(`Price saved for “${row.module_name}”`);
       await load();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to save price");
+      toast.error(friendlyErrorMessage(e, "Failed to save price"));
     } finally {
       setSavingKey(null);
     }

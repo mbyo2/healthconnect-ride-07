@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const EmergencyResponse = () => {
   const { user, profile } = useAuth();
@@ -120,7 +121,7 @@ const EmergencyResponse = () => {
       setLocationSharing(true);
       toast.success("Location sharing is active while this page remains open.");
     } catch (error: any) {
-      toast.error(error?.message || "Allow location access to share your location.");
+      toast.error(friendlyErrorMessage(error, "Allow location access to share your location."));
     }
   };
 

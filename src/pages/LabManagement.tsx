@@ -18,6 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { dispatchNotification } from "@/hooks/useNotifications";
 import { queueLabResultAlert } from "@/utils/sms-reminder-service";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const LabManagement = () => {
   const { user } = useAuth();
@@ -109,7 +110,7 @@ const LabManagement = () => {
       setShowTestDialog(false);
       queryClient.invalidateQueries({ queryKey: ["lab-test-catalog"] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to save test");
+      toast.error(friendlyErrorMessage(e, "Failed to save test"));
     } finally {
       setSavingTest(false);
     }
@@ -125,7 +126,7 @@ const LabManagement = () => {
       queryClient.invalidateQueries({ queryKey: ["lab-test-catalog"] });
       setTestToDelete(null);
     } catch (e: any) {
-      toast.error(e.message || "Failed to remove test");
+      toast.error(friendlyErrorMessage(e, "Failed to remove test"));
     } finally {
       setDeletingTest(false);
     }
@@ -475,7 +476,7 @@ const LabManagement = () => {
       toast.success("Sample collected");
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to record sample collection");
+      toast.error(friendlyErrorMessage(e, "Failed to record sample collection"));
     } finally {
       setIsSubmitting(false);
     }
@@ -492,7 +493,7 @@ const LabManagement = () => {
       toast.success("Sample moved to analysis");
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to start analysis");
+      toast.error(friendlyErrorMessage(e, "Failed to start analysis"));
     } finally {
       setIsSubmitting(false);
     }

@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // Accounts that can NEVER be deleted — enforced in UI, Edge Function, and RPC.
 const PROTECTED_EMAILS = ['mbyo2@gmail.com', 'kondwaninyirenda99@gmail.com'];
@@ -120,7 +121,7 @@ export function UserDeletionPanel() {
       setDryRun(res.data as DryRunResult);
     } catch (e: any) {
       console.error('Dry run failed', e);
-      toast.error(e.message || 'Dry run failed');
+      toast.error(friendlyErrorMessage(e, 'Dry run failed'));
     } finally {
       setDryRunning(false);
     }
@@ -152,7 +153,7 @@ export function UserDeletionPanel() {
       setSearchTerm('');
     } catch (e: any) {
       console.error('Deletion failed', e);
-      toast.error(e.message || 'Deletion failed — nothing was deleted (rolled back)');
+      toast.error(friendlyErrorMessage(e, 'Deletion failed — nothing was deleted (rolled back)'));
     } finally {
       setDeleting(false);
     }

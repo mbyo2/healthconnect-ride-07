@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Bike, Plus, Pencil, Trash2, X, Phone, Star, Package } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Courier {
   id: string;
@@ -106,7 +107,7 @@ export const CourierManager = ({ pharmacyId }: { pharmacyId: string }) => {
       queryClient.invalidateQueries({ queryKey: ["couriers", pharmacyId] });
       resetForm();
     } catch (e: any) {
-      toast.error(e.message || "Failed to save courier");
+      toast.error(friendlyErrorMessage(e, "Failed to save courier"));
     }
   };
 
@@ -132,7 +133,7 @@ export const CourierManager = ({ pharmacyId }: { pharmacyId: string }) => {
       toast.success("Courier removed");
       queryClient.invalidateQueries({ queryKey: ["couriers", pharmacyId] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to remove courier");
+      toast.error(friendlyErrorMessage(e, "Failed to remove courier"));
     }
   };
 
@@ -145,7 +146,7 @@ export const CourierManager = ({ pharmacyId }: { pharmacyId: string }) => {
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ["couriers", pharmacyId] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to update availability");
+      toast.error(friendlyErrorMessage(e, "Failed to update availability"));
     }
   };
 

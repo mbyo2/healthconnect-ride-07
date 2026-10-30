@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Trash2, Search, Loader2 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Personnel {
     id: string;
@@ -96,7 +97,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
             fetchPersonnel();
         } catch (error: any) {
             console.error("Error adding personnel:", error);
-            toast.error(error.message || "Failed to add personnel");
+            toast.error(friendlyErrorMessage(error, "Failed to add personnel"));
         } finally {
             setIsAdding(false);
         }

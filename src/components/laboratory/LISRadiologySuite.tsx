@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface LiveSample {
   id: string;
@@ -161,7 +162,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       fetchAll();
     } catch (error: any) {
       console.error("Error verifying sample:", error);
-      toast.error(error?.message || "Failed to verify sample");
+      toast.error(friendlyErrorMessage(error, "Failed to verify sample"));
     } finally {
       setVerifyingId(null);
     }

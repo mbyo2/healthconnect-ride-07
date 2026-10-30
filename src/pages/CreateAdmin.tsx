@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { supabase } from '@/integrations/supabase/client';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const CreateAdmin: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -69,7 +70,7 @@ const CreateAdmin: React.FC = () => {
       setCredentials({ email: data.email, adminLevel: data.adminLevel });
       setForm({ email: '', password: '', firstName: '', lastName: '', adminLevel: 'admin' });
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create admin');
+      toast.error(friendlyErrorMessage(err, 'Failed to create admin'));
     } finally {
       setIsCreating(false);
     }

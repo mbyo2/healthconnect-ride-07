@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from './useInstitutionAffiliation';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 export interface QueueToken {
   id: string;
@@ -99,7 +100,7 @@ export function useQueueTokens() {
       toast.success(`Token ${(token as any).token_number} generated for ${data.patient_name}`);
       return token as unknown as QueueToken;
     } catch (err: any) {
-      toast.error('Failed to create token: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to create token. Please try again."));
       return null;
     }
   };
@@ -118,7 +119,7 @@ export function useQueueTokens() {
       if (error) throw error;
       toast.success(`Token status updated to ${status}`);
     } catch (err: any) {
-      toast.error('Failed to update token: ' + err.message);
+      toast.error(friendlyErrorMessage(err, "Failed to update token. Please try again."));
     }
   };
 

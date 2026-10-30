@@ -351,7 +351,7 @@ const InstitutionSettings = () => {
       });
     } catch (e: any) {
       console.error("Failed to log listing request:", e);
-      toast.error(e?.message || "Could not send the listing request. Please try again.");
+      toast.error(friendlyErrorMessage(e, "Could not send the listing request. Please try again."));
     } finally {
       setRequestingListing(false);
     }
@@ -381,7 +381,7 @@ const InstitutionSettings = () => {
       });
     } catch (e: any) {
       console.error("Failed to log payment-mode request:", e);
-      toast.error(e?.message || "Could not send the change request. Please try again.");
+      toast.error(friendlyErrorMessage(e, "Could not send the change request. Please try again."));
     } finally {
       setRequestingMode(false);
     }
@@ -418,7 +418,7 @@ const InstitutionSettings = () => {
     } catch (error: any) {
       console.error("Failed to toggle module:", error);
       toast.error("Failed to update module", {
-        description: error?.message || "Please try again.",
+        description: friendlyErrorMessage(error, "Please try again."),
       });
     }
   };

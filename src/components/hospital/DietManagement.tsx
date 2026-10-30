@@ -7,6 +7,7 @@ import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 export const DietManagement = ({ hospital }: { hospital: any }) => {
   const [showPrescribeDiet, setShowPrescribeDiet] = useState(false);
@@ -64,7 +65,7 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
       });
       refresh();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to prescribe diet plan");
+      toast.error(friendlyErrorMessage(e, "Failed to prescribe diet plan"));
     } finally {
       setIsSubmitting(false);
     }

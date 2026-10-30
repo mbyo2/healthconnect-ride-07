@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { SUPPORTED_MACHINES, parseHL7ORU } from "@/utils/hl7-parser";
 import { cn } from "@/lib/utils";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * LIS Machine Management (Danphe parity)
@@ -93,7 +94,7 @@ export function LISMachineManager({ institutionId }: { institutionId: string }) 
       toast.success("LIS machine registered");
     },
     onError: (e: any) => {
-      toast.error(e.message || "Failed to register machine");
+      toast.error(friendlyErrorMessage(e, "Failed to register machine"));
     },
   });
 

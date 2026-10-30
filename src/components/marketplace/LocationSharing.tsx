@@ -10,6 +10,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapPin, Loader2 } from "lucide-react";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 function LocationPicker({
   position,
@@ -193,7 +194,7 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
         duration: 6000,
       });
     } catch (e: any) {
-      toast.error(e?.message || "Could not send the listing request. Please try again.");
+      toast.error(friendlyErrorMessage(e, "Could not send the listing request. Please try again."));
     } finally {
       setRequestingListing(false);
     }
@@ -228,7 +229,7 @@ export const LocationSharing = ({ institutionId, userId }: Props) => {
       }
       toast.success("Location settings saved");
     } catch (e: any) {
-      toast.error(e.message || "Failed to save");
+      toast.error(friendlyErrorMessage(e, "Failed to save"));
     } finally {
       setSaving(false);
     }

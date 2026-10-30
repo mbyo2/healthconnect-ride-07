@@ -35,6 +35,7 @@ import {
 import { toast } from 'sonner';
 import { Plus, MoreHorizontal, Phone, Mail, MapPin, Store } from 'lucide-react';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 // Define the Supplier interface
 interface Supplier {
@@ -91,7 +92,7 @@ const SupplierManagement = () => {
       setSuppliers(data as Supplier[]);
     } catch (error: any) {
       console.error('Error fetching suppliers:', error);
-      toast.error(`Failed to load suppliers: ${error.message}`);
+      toast.error(friendlyErrorMessage(error, "Failed to load suppliers. Please try again."));
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +133,7 @@ const SupplierManagement = () => {
       fetchSuppliers();
     } catch (error: any) {
       console.error('Error adding supplier:', error);
-      toast.error(`Failed to add supplier: ${error.message}`);
+      toast.error(friendlyErrorMessage(error, "Failed to add supplier. Please try again."));
     }
   };
 
@@ -169,7 +170,7 @@ const SupplierManagement = () => {
       fetchSuppliers();
     } catch (error: any) {
       console.error('Error updating supplier:', error);
-      toast.error(`Failed to update supplier: ${error.message}`);
+      toast.error(friendlyErrorMessage(error, "Failed to update supplier. Please try again."));
     }
   };
 
@@ -187,7 +188,7 @@ const SupplierManagement = () => {
       fetchSuppliers();
     } catch (error: any) {
       console.error('Error deleting supplier:', error);
-      toast.error(`Failed to delete supplier: ${error.message}`);
+      toast.error(friendlyErrorMessage(error, "Failed to delete supplier. Please try again."));
     }
   };
 
@@ -412,7 +413,7 @@ const SupplierManagement = () => {
                             
                             fetchSuppliers();
                           } catch (error: any) {
-                            toast.error(`Failed to update status: ${error.message}`);
+                            toast.error(friendlyErrorMessage(error, "Failed to update status. Please try again."));
                           }
                         }}
                       />

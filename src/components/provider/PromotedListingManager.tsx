@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface PromotedListing {
   id: string;
@@ -58,7 +59,7 @@ export const PromotedListingManager = () => {
       toast.success('Promoted listing activated!');
       queryClient.invalidateQueries({ queryKey: ['promoted-listing'] });
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(friendlyErrorMessage(err)),
   });
 
   const toggleActive = useMutation({

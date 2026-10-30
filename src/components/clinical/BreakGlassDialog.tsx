@@ -15,6 +15,7 @@ import {
 import { AlertTriangle, Siren, Search, UserCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface BreakGlassDialogProps {
   /** Preselected patient — skips the search step. */
@@ -102,7 +103,7 @@ export function BreakGlassDialog({
       setResults(rows);
       setSearched(true);
     } catch (e: any) {
-      toast.error(e?.message || "Patient search failed");
+      toast.error(friendlyErrorMessage(e, "Patient search failed"));
     } finally {
       setSearching(false);
     }
@@ -128,7 +129,7 @@ export function BreakGlassDialog({
       setDialogOpen(false);
       onGranted?.();
     } catch (e: any) {
-      toast.error(e?.message || "Failed to grant emergency access");
+      toast.error(friendlyErrorMessage(e, "Failed to grant emergency access"));
     } finally {
       setIsSubmitting(false);
     }

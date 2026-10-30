@@ -16,6 +16,7 @@ import { UserX, Phone, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { dispatchNotification } from "@/hooks/useNotifications";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 /**
  * No-show workflow (Epic parity)
@@ -113,7 +114,7 @@ export function NoShowManager({ institutionId }: { institutionId?: string }) {
       queryClient.invalidateQueries({ queryKey: ["no-shows"] });
       toast.success("Patient notified to rebook");
     },
-    onError: (e: any) => toast.error(e?.message || "Failed to request reschedule"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Failed to request reschedule")),
   });
 
   // Contact follow-up: send the patient a real follow-up notification and
@@ -140,7 +141,7 @@ export function NoShowManager({ institutionId }: { institutionId?: string }) {
       queryClient.invalidateQueries({ queryKey: ["no-shows"] });
       toast.success("Follow-up sent to patient");
     },
-    onError: (e: any) => toast.error(e?.message || "Failed to contact patient"),
+    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Failed to contact patient")),
   });
 
   if (isLoading) {
@@ -254,7 +255,7 @@ export function MarkNoShowButton({
       onMarked?.();
     },
     onError: (e: any) => {
-      toast.error(e?.message || "Failed to mark as no-show");
+      toast.error(friendlyErrorMessage(e, "Failed to mark as no-show"));
     },
   });
 

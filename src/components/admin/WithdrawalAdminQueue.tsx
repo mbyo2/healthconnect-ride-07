@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Banknote, CheckCircle2, XCircle, Send } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -115,7 +116,7 @@ export const WithdrawalAdminQueue = () => {
       }));
       fetchRequests();
     } catch (error: any) {
-      toast.error(error.message || "Payout failed");
+      toast.error(friendlyErrorMessage(error, "Payout failed"));
     } finally {
       setProcessing(null);
     }
