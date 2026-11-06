@@ -230,6 +230,77 @@ export type Database = {
         }
         Relationships: []
       }
+      admission_bed_segments: {
+        Row: {
+          admission_id: string
+          bed_id: string | null
+          bed_type: string | null
+          created_at: string
+          hospital_id: string
+          id: string
+          nights_billed: number
+          patient_id: string
+          segment_end: string | null
+          segment_start: string
+          updated_at: string
+        }
+        Insert: {
+          admission_id: string
+          bed_id?: string | null
+          bed_type?: string | null
+          created_at?: string
+          hospital_id: string
+          id?: string
+          nights_billed?: number
+          patient_id: string
+          segment_end?: string | null
+          segment_start: string
+          updated_at?: string
+        }
+        Update: {
+          admission_id?: string
+          bed_id?: string | null
+          bed_type?: string | null
+          created_at?: string
+          hospital_id?: string
+          id?: string
+          nights_billed?: number
+          patient_id?: string
+          segment_end?: string | null
+          segment_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_bed_segments_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_admissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_bed_segments_bed_id_fkey"
+            columns: ["bed_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_beds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_bed_segments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_bed_segments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_chat_conversations: {
         Row: {
           created_at: string | null
@@ -322,6 +393,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_rate_limit_events: {
+        Row: {
+          created_at: string
+          function_name: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          id?: never
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          id?: never
+          user_id?: string
+        }
+        Relationships: []
+      }
       allergy_severity: {
         Row: {
           code: string
@@ -375,6 +467,7 @@ export type Database = {
           id: string
           institution_id: string | null
           notes: string | null
+          patient_id: string | null
           patient_name: string
           pickup_lat: number | null
           pickup_lng: number | null
@@ -402,6 +495,7 @@ export type Database = {
           id?: string
           institution_id?: string | null
           notes?: string | null
+          patient_id?: string | null
           patient_name: string
           pickup_lat?: number | null
           pickup_lng?: number | null
@@ -429,6 +523,7 @@ export type Database = {
           id?: string
           institution_id?: string | null
           notes?: string | null
+          patient_id?: string | null
           patient_name?: string
           pickup_lat?: number | null
           pickup_lng?: number | null
@@ -454,6 +549,82 @@ export type Database = {
           },
           {
             foreignKeyName: "ambulance_dispatches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "ambulance_dispatches_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ambulance_dispatches_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ambulance_positions: {
+        Row: {
+          accuracy_m: number | null
+          dispatch_id: string
+          id: string
+          institution_id: string | null
+          lat: number
+          lng: number
+          recorded_at: string
+          recorded_by: string | null
+        }
+        Insert: {
+          accuracy_m?: number | null
+          dispatch_id: string
+          id?: string
+          institution_id?: string | null
+          lat: number
+          lng: number
+          recorded_at?: string
+          recorded_by?: string | null
+        }
+        Update: {
+          accuracy_m?: number | null
+          dispatch_id?: string
+          id?: string
+          institution_id?: string | null
+          lat?: number
+          lng?: number
+          recorded_at?: string
+          recorded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambulance_positions_dispatch_id_fkey"
+            columns: ["dispatch_id"]
+            isOneToOne: false
+            referencedRelation: "ambulance_dispatches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ambulance_positions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ambulance_positions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ambulance_positions_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
@@ -760,13 +931,18 @@ export type Database = {
           appointment_date: string | null
           appointment_time: string | null
           appointment_type: string | null
+          booked_for_name: string | null
           cancelled_at: string | null
           consultation_fee: number | null
           created_at: string
           date: string
+          dependent_id: string | null
           duration: number | null
+          follow_up_status: string | null
           id: string
           institution_id: string | null
+          no_show_at: string | null
+          no_show_reason: string | null
           notes: string | null
           patient_id: string
           patient_visit_type: string | null
@@ -781,13 +957,18 @@ export type Database = {
           appointment_date?: string | null
           appointment_time?: string | null
           appointment_type?: string | null
+          booked_for_name?: string | null
           cancelled_at?: string | null
           consultation_fee?: number | null
           created_at?: string
           date: string
+          dependent_id?: string | null
           duration?: number | null
+          follow_up_status?: string | null
           id?: string
           institution_id?: string | null
+          no_show_at?: string | null
+          no_show_reason?: string | null
           notes?: string | null
           patient_id: string
           patient_visit_type?: string | null
@@ -802,13 +983,18 @@ export type Database = {
           appointment_date?: string | null
           appointment_time?: string | null
           appointment_type?: string | null
+          booked_for_name?: string | null
           cancelled_at?: string | null
           consultation_fee?: number | null
           created_at?: string
           date?: string
+          dependent_id?: string | null
           duration?: number | null
+          follow_up_status?: string | null
           id?: string
           institution_id?: string | null
+          no_show_at?: string | null
+          no_show_reason?: string | null
           notes?: string | null
           patient_id?: string
           patient_visit_type?: string | null
@@ -820,6 +1006,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "appointments_dependent_id_fkey"
+            columns: ["dependent_id"]
+            isOneToOne: false
+            referencedRelation: "patient_dependents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "appointments_institution_id_fkey"
             columns: ["institution_id"]
@@ -867,6 +1060,127 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      art_cycle_staff: {
+        Row: {
+          assigned_at: string
+          cycle_id: string
+          id: string
+          role: string
+          staff_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          cycle_id: string
+          id?: string
+          role?: string
+          staff_id: string
+        }
+        Update: {
+          assigned_at?: string
+          cycle_id?: string
+          id?: string
+          role?: string
+          staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "art_cycle_staff_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "art_cycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      art_cycles: {
+        Row: {
+          confidentiality_level: string
+          created_at: string
+          created_by: string | null
+          cycle_number: number
+          cycle_type: string
+          id: string
+          institution_id: string
+          notes: string | null
+          partner_patient_id: string | null
+          patient_id: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          confidentiality_level?: string
+          created_at?: string
+          created_by?: string | null
+          cycle_number?: number
+          cycle_type: string
+          id?: string
+          institution_id: string
+          notes?: string | null
+          partner_patient_id?: string | null
+          patient_id: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          confidentiality_level?: string
+          created_at?: string
+          created_by?: string | null
+          cycle_number?: number
+          cycle_type?: string
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          partner_patient_id?: string | null
+          patient_id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      art_procedures: {
+        Row: {
+          created_at: string
+          cycle_id: string
+          id: string
+          notes: string | null
+          outcome: string | null
+          performed_by: string | null
+          procedure_date: string
+          procedure_type: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_id: string
+          id?: string
+          notes?: string | null
+          outcome?: string | null
+          performed_by?: string | null
+          procedure_date?: string
+          procedure_type: string
+        }
+        Update: {
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          notes?: string | null
+          outcome?: string | null
+          performed_by?: string | null
+          procedure_date?: string
+          procedure_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "art_procedures_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "art_cycles"
             referencedColumns: ["id"]
           },
         ]
@@ -986,6 +1300,7 @@ export type Database = {
           created_at: string | null
           id: string
           institution_id: string
+          is_shareable: boolean
           last_maintenance_date: string | null
           location: string | null
           maintenance_interval_days: number | null
@@ -996,6 +1311,8 @@ export type Database = {
           purchase_cost: number | null
           purchase_date: string | null
           serial_number: string | null
+          share_rate: number | null
+          share_terms: string | null
           status: string | null
           updated_at: string | null
           warranty_expiry: string | null
@@ -1009,6 +1326,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           institution_id: string
+          is_shareable?: boolean
           last_maintenance_date?: string | null
           location?: string | null
           maintenance_interval_days?: number | null
@@ -1019,6 +1337,8 @@ export type Database = {
           purchase_cost?: number | null
           purchase_date?: string | null
           serial_number?: string | null
+          share_rate?: number | null
+          share_terms?: string | null
           status?: string | null
           updated_at?: string | null
           warranty_expiry?: string | null
@@ -1032,6 +1352,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           institution_id?: string
+          is_shareable?: boolean
           last_maintenance_date?: string | null
           location?: string | null
           maintenance_interval_days?: number | null
@@ -1042,6 +1363,8 @@ export type Database = {
           purchase_cost?: number | null
           purchase_date?: string | null
           serial_number?: string | null
+          share_rate?: number | null
+          share_terms?: string | null
           status?: string | null
           updated_at?: string | null
           warranty_expiry?: string | null
@@ -2676,6 +2999,65 @@ export type Database = {
           },
         ]
       }
+      camp_registrations: {
+        Row: {
+          age: number | null
+          camp_id: string
+          created_at: string
+          follow_up_date: string | null
+          follow_up_done: boolean
+          full_name: string
+          gender: string | null
+          id: string
+          patient_id: string | null
+          phone: string | null
+          referral_needed: boolean
+          referred_to: string | null
+          screening_results: Json
+          synced_to_ehr: boolean
+        }
+        Insert: {
+          age?: number | null
+          camp_id: string
+          created_at?: string
+          follow_up_date?: string | null
+          follow_up_done?: boolean
+          full_name: string
+          gender?: string | null
+          id?: string
+          patient_id?: string | null
+          phone?: string | null
+          referral_needed?: boolean
+          referred_to?: string | null
+          screening_results?: Json
+          synced_to_ehr?: boolean
+        }
+        Update: {
+          age?: number | null
+          camp_id?: string
+          created_at?: string
+          follow_up_date?: string | null
+          follow_up_done?: boolean
+          full_name?: string
+          gender?: string | null
+          id?: string
+          patient_id?: string | null
+          phone?: string | null
+          referral_needed?: boolean
+          referred_to?: string | null
+          screening_results?: Json
+          synced_to_ehr?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camp_registrations_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "health_camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       care_team_assignments: {
         Row: {
           assigned_at: string | null
@@ -2987,6 +3369,86 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "messages"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_denials: {
+        Row: {
+          appeal_deadline: string | null
+          appeal_notes: string | null
+          assigned_to: string | null
+          claim_id: string | null
+          created_at: string
+          denial_code: string | null
+          denial_reason: string
+          denied_amount: number
+          id: string
+          institution_id: string
+          resolved_at: string | null
+          status: string
+          supporting_documents: Json | null
+          updated_at: string
+        }
+        Insert: {
+          appeal_deadline?: string | null
+          appeal_notes?: string | null
+          assigned_to?: string | null
+          claim_id?: string | null
+          created_at?: string
+          denial_code?: string | null
+          denial_reason: string
+          denied_amount?: number
+          id?: string
+          institution_id: string
+          resolved_at?: string | null
+          status?: string
+          supporting_documents?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          appeal_deadline?: string | null
+          appeal_notes?: string | null
+          assigned_to?: string | null
+          claim_id?: string | null
+          created_at?: string
+          denial_code?: string | null
+          denial_reason?: string
+          denied_amount?: number
+          id?: string
+          institution_id?: string
+          resolved_at?: string | null
+          status?: string
+          supporting_documents?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_denials_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_denials_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_denials_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_denials_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
         ]
       }
@@ -3546,6 +4008,7 @@ export type Database = {
       }
       comprehensive_prescriptions: {
         Row: {
+          barcode: string | null
           created_at: string | null
           digital_signature: string | null
           dosage: string
@@ -3556,6 +4019,8 @@ export type Database = {
           id: string
           indication: string | null
           instructions: string
+          interaction_overridden_by: string | null
+          interaction_override_reason: string | null
           is_controlled_substance: boolean | null
           medication_name: string
           notes: string | null
@@ -3571,6 +4036,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          barcode?: string | null
           created_at?: string | null
           digital_signature?: string | null
           dosage: string
@@ -3581,6 +4047,8 @@ export type Database = {
           id?: string
           indication?: string | null
           instructions: string
+          interaction_overridden_by?: string | null
+          interaction_override_reason?: string | null
           is_controlled_substance?: boolean | null
           medication_name: string
           notes?: string | null
@@ -3596,6 +4064,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          barcode?: string | null
           created_at?: string | null
           digital_signature?: string | null
           dosage?: string
@@ -3606,6 +4075,8 @@ export type Database = {
           id?: string
           indication?: string | null
           instructions?: string
+          interaction_overridden_by?: string | null
+          interaction_override_reason?: string | null
           is_controlled_substance?: boolean | null
           medication_name?: string
           notes?: string | null
@@ -3755,12 +4226,129 @@ export type Database = {
         }
         Relationships: []
       }
+      country_configurations: {
+        Row: {
+          anc_contacts: Json
+          country_code: string
+          country_name: string
+          created_at: string
+          currency_code: string
+          currency_locale: string
+          currency_symbol: string
+          data_protection: Json
+          date_format: string
+          epi_schedule: Json
+          facility_licensing: Json
+          income_level: string
+          insurance_schemes: Json
+          is_active: boolean
+          languages: Json
+          payment_rails: Json
+          updated_at: string
+          usd_reference_rate: number | null
+        }
+        Insert: {
+          anc_contacts?: Json
+          country_code: string
+          country_name: string
+          created_at?: string
+          currency_code: string
+          currency_locale?: string
+          currency_symbol: string
+          data_protection?: Json
+          date_format?: string
+          epi_schedule?: Json
+          facility_licensing?: Json
+          income_level?: string
+          insurance_schemes?: Json
+          is_active?: boolean
+          languages?: Json
+          payment_rails?: Json
+          updated_at?: string
+          usd_reference_rate?: number | null
+        }
+        Update: {
+          anc_contacts?: Json
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          currency_code?: string
+          currency_locale?: string
+          currency_symbol?: string
+          data_protection?: Json
+          date_format?: string
+          epi_schedule?: Json
+          facility_licensing?: Json
+          income_level?: string
+          insurance_schemes?: Json
+          is_active?: boolean
+          languages?: Json
+          payment_rails?: Json
+          updated_at?: string
+          usd_reference_rate?: number | null
+        }
+        Relationships: []
+      }
+      country_default_tariffs: {
+        Row: {
+          base_price: number
+          category: string
+          code: string
+          cost_price: number
+          country_code: string
+          created_at: string
+          department: string | null
+          effective_from: string
+          id: string
+          insurance_price: number | null
+          name: string
+          price_source: string
+        }
+        Insert: {
+          base_price?: number
+          category: string
+          code: string
+          cost_price?: number
+          country_code: string
+          created_at?: string
+          department?: string | null
+          effective_from?: string
+          id?: string
+          insurance_price?: number | null
+          name: string
+          price_source?: string
+        }
+        Update: {
+          base_price?: number
+          category?: string
+          code?: string
+          cost_price?: number
+          country_code?: string
+          created_at?: string
+          department?: string | null
+          effective_from?: string
+          id?: string
+          insurance_price?: number | null
+          name?: string
+          price_source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_default_tariffs_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "country_configurations"
+            referencedColumns: ["country_code"]
+          },
+        ]
+      }
       country_statutory_configs: {
         Row: {
           country_code: string
           country_name: string
           created_at: string
           currency: string
+          fiscal_year_start: number | null
           health_levy_rate: number | null
           id: string
           institution_id: string | null
@@ -3768,6 +4356,7 @@ export type Database = {
           napsa_employee_rate: number | null
           napsa_employer_rate: number | null
           napsa_reduces_paye: boolean | null
+          nhima_ceiling: number | null
           nhima_employee_rate: number | null
           nhima_employer_rate: number | null
           nhima_has_ceiling: boolean | null
@@ -3778,6 +4367,7 @@ export type Database = {
           paye_band_2_rate: number | null
           paye_band_3_limit: number | null
           paye_band_3_rate: number | null
+          paye_brackets: Json | null
           paye_tax_rate: number | null
           pension_rate: number | null
           sdl_annual_threshold: number | null
@@ -3791,6 +4381,7 @@ export type Database = {
           country_name?: string
           created_at?: string
           currency?: string
+          fiscal_year_start?: number | null
           health_levy_rate?: number | null
           id?: string
           institution_id?: string | null
@@ -3798,6 +4389,7 @@ export type Database = {
           napsa_employee_rate?: number | null
           napsa_employer_rate?: number | null
           napsa_reduces_paye?: boolean | null
+          nhima_ceiling?: number | null
           nhima_employee_rate?: number | null
           nhima_employer_rate?: number | null
           nhima_has_ceiling?: boolean | null
@@ -3808,6 +4400,7 @@ export type Database = {
           paye_band_2_rate?: number | null
           paye_band_3_limit?: number | null
           paye_band_3_rate?: number | null
+          paye_brackets?: Json | null
           paye_tax_rate?: number | null
           pension_rate?: number | null
           sdl_annual_threshold?: number | null
@@ -3821,6 +4414,7 @@ export type Database = {
           country_name?: string
           created_at?: string
           currency?: string
+          fiscal_year_start?: number | null
           health_levy_rate?: number | null
           id?: string
           institution_id?: string | null
@@ -3828,6 +4422,7 @@ export type Database = {
           napsa_employee_rate?: number | null
           napsa_employer_rate?: number | null
           napsa_reduces_paye?: boolean | null
+          nhima_ceiling?: number | null
           nhima_employee_rate?: number | null
           nhima_employer_rate?: number | null
           nhima_has_ceiling?: boolean | null
@@ -3838,6 +4433,7 @@ export type Database = {
           paye_band_2_rate?: number | null
           paye_band_3_limit?: number | null
           paye_band_3_rate?: number | null
+          paye_brackets?: Json | null
           paye_tax_rate?: number | null
           pension_rate?: number | null
           sdl_annual_threshold?: number | null
@@ -3939,6 +4535,105 @@ export type Database = {
             columns: ["courier_id"]
             isOneToOne: false
             referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_locations: {
+        Row: {
+          accuracy_m: number | null
+          courier_id: string
+          delivery_id: string | null
+          id: string
+          lat: number
+          lng: number
+          recorded_at: string
+        }
+        Insert: {
+          accuracy_m?: number | null
+          courier_id: string
+          delivery_id?: string | null
+          id?: string
+          lat: number
+          lng: number
+          recorded_at?: string
+        }
+        Update: {
+          accuracy_m?: number | null
+          courier_id?: string
+          delivery_id?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_locations_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_locations_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_tracking"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_ratings: {
+        Row: {
+          courier_id: string
+          created_at: string | null
+          delivery_order_id: string
+          feedback: string | null
+          id: string
+          package_handling: number | null
+          professionalism: number | null
+          rated_by: string
+          rating: number
+          timeliness: number | null
+        }
+        Insert: {
+          courier_id: string
+          created_at?: string | null
+          delivery_order_id: string
+          feedback?: string | null
+          id?: string
+          package_handling?: number | null
+          professionalism?: number | null
+          rated_by: string
+          rating: number
+          timeliness?: number | null
+        }
+        Update: {
+          courier_id?: string
+          created_at?: string | null
+          delivery_order_id?: string
+          feedback?: string | null
+          id?: string
+          package_handling?: number | null
+          professionalism?: number | null
+          rated_by?: string
+          rating?: number
+          timeliness?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_ratings_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_ratings_delivery_order_id_fkey"
+            columns: ["delivery_order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -4047,62 +4742,148 @@ export type Database = {
           },
         ]
       }
+      courier_verifications: {
+        Row: {
+          courier_id: string
+          created_at: string | null
+          document_type: string
+          document_url: string
+          id: string
+          rejection_reason: string | null
+          status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          courier_id: string
+          created_at?: string | null
+          document_type: string
+          document_url: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          courier_id?: string
+          created_at?: string | null
+          document_type?: string
+          document_url?: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_verifications_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       couriers: {
         Row: {
+          background_check_passed: boolean | null
           created_at: string | null
           current_latitude: number | null
           current_longitude: number | null
+          emergency_contact: string | null
+          emergency_phone: string | null
           full_name: string
           id: string
+          id_number: string | null
+          institution_id: string | null
           is_active: boolean
           is_available: boolean
           last_location_update: string | null
           pharmacy_id: string | null
           phone: string
           rating: number | null
+          safety_training_completed: boolean | null
           total_deliveries: number
           updated_at: string | null
           user_id: string
           vehicle_plate: string | null
           vehicle_type: string
+          verification_status: string | null
         }
         Insert: {
+          background_check_passed?: boolean | null
           created_at?: string | null
           current_latitude?: number | null
           current_longitude?: number | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
           full_name: string
           id?: string
+          id_number?: string | null
+          institution_id?: string | null
           is_active?: boolean
           is_available?: boolean
           last_location_update?: string | null
           pharmacy_id?: string | null
           phone: string
           rating?: number | null
+          safety_training_completed?: boolean | null
           total_deliveries?: number
           updated_at?: string | null
           user_id: string
           vehicle_plate?: string | null
           vehicle_type?: string
+          verification_status?: string | null
         }
         Update: {
+          background_check_passed?: boolean | null
           created_at?: string | null
           current_latitude?: number | null
           current_longitude?: number | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
           full_name?: string
           id?: string
+          id_number?: string | null
+          institution_id?: string | null
           is_active?: boolean
           is_available?: boolean
           last_location_update?: string | null
           pharmacy_id?: string | null
           phone?: string
           rating?: number | null
+          safety_training_completed?: boolean | null
           total_deliveries?: number
           updated_at?: string | null
           user_id?: string
           vehicle_plate?: string | null
           vehicle_type?: string
+          verification_status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "couriers_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "couriers_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "couriers_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
           {
             foreignKeyName: "couriers_pharmacy_id_fkey"
             columns: ["pharmacy_id"]
@@ -4125,6 +4906,48 @@ export type Database = {
             referencedColumns: ["institution_id"]
           },
         ]
+      }
+      csp_reports: {
+        Row: {
+          blocked_uri: string | null
+          disposition: string | null
+          document_uri: string | null
+          effective_directive: string | null
+          id: number
+          line_number: number | null
+          raw: Json
+          received_at: string
+          source_file: string | null
+          user_agent: string | null
+          violated_directive: string | null
+        }
+        Insert: {
+          blocked_uri?: string | null
+          disposition?: string | null
+          document_uri?: string | null
+          effective_directive?: string | null
+          id?: never
+          line_number?: number | null
+          raw: Json
+          received_at?: string
+          source_file?: string | null
+          user_agent?: string | null
+          violated_directive?: string | null
+        }
+        Update: {
+          blocked_uri?: string | null
+          disposition?: string | null
+          document_uri?: string | null
+          effective_directive?: string | null
+          id?: never
+          line_number?: number | null
+          raw?: Json
+          received_at?: string
+          source_file?: string | null
+          user_agent?: string | null
+          violated_directive?: string | null
+        }
+        Relationships: []
       }
       cssd_items: {
         Row: {
@@ -4630,6 +5453,358 @@ export type Database = {
           },
         ]
       }
+      delivery_incidents: {
+        Row: {
+          courier_id: string | null
+          created_at: string | null
+          delivery_order_id: string | null
+          description: string
+          id: string
+          incident_type: string
+          photo_urls: string[] | null
+          reported_by: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+        }
+        Insert: {
+          courier_id?: string | null
+          created_at?: string | null
+          delivery_order_id?: string | null
+          description: string
+          id?: string
+          incident_type: string
+          photo_urls?: string[] | null
+          reported_by: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+        }
+        Update: {
+          courier_id?: string | null
+          created_at?: string | null
+          delivery_order_id?: string | null
+          description?: string
+          id?: string
+          incident_type?: string
+          photo_urls?: string[] | null
+          reported_by?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_incidents_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_incidents_delivery_order_id_fkey"
+            columns: ["delivery_order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_orders: {
+        Row: {
+          actual_distance_km: number | null
+          appointment_id: string | null
+          assigned_at: string | null
+          courier_id: string | null
+          created_at: string | null
+          delivered_at: string | null
+          delivery_fee: number | null
+          delivery_photo_required: boolean | null
+          distance_km: number | null
+          estimated_arrival: string | null
+          id: string
+          items: Json | null
+          marketplace_order_id: string | null
+          notes: string | null
+          order_type: string
+          patient_address: string | null
+          patient_id: string
+          patient_latitude: number | null
+          patient_longitude: number | null
+          patient_phone: string | null
+          pharmacy_id: string | null
+          picked_up_at: string | null
+          pickup_address: string | null
+          pickup_latitude: number | null
+          pickup_longitude: number | null
+          pickup_photo_required: boolean | null
+          prescription_id: string | null
+          provider_id: string | null
+          requires_seal: boolean | null
+          seal_verified: boolean | null
+          status: string
+          total_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_distance_km?: number | null
+          appointment_id?: string | null
+          assigned_at?: string | null
+          courier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number | null
+          delivery_photo_required?: boolean | null
+          distance_km?: number | null
+          estimated_arrival?: string | null
+          id?: string
+          items?: Json | null
+          marketplace_order_id?: string | null
+          notes?: string | null
+          order_type: string
+          patient_address?: string | null
+          patient_id: string
+          patient_latitude?: number | null
+          patient_longitude?: number | null
+          patient_phone?: string | null
+          pharmacy_id?: string | null
+          picked_up_at?: string | null
+          pickup_address?: string | null
+          pickup_latitude?: number | null
+          pickup_longitude?: number | null
+          pickup_photo_required?: boolean | null
+          prescription_id?: string | null
+          provider_id?: string | null
+          requires_seal?: boolean | null
+          seal_verified?: boolean | null
+          status?: string
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_distance_km?: number | null
+          appointment_id?: string | null
+          assigned_at?: string | null
+          courier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number | null
+          delivery_photo_required?: boolean | null
+          distance_km?: number | null
+          estimated_arrival?: string | null
+          id?: string
+          items?: Json | null
+          marketplace_order_id?: string | null
+          notes?: string | null
+          order_type?: string
+          patient_address?: string | null
+          patient_id?: string
+          patient_latitude?: number | null
+          patient_longitude?: number | null
+          patient_phone?: string | null
+          pharmacy_id?: string | null
+          picked_up_at?: string | null
+          pickup_address?: string | null
+          pickup_latitude?: number | null
+          pickup_longitude?: number | null
+          pickup_photo_required?: boolean | null
+          prescription_id?: string | null
+          provider_id?: string | null
+          requires_seal?: boolean | null
+          seal_verified?: boolean | null
+          status?: string
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_orders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_orders_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "couriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_orders_marketplace_order_id_fkey"
+            columns: ["marketplace_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_orders_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_orders_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_orders_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      delivery_photos: {
+        Row: {
+          delivery_order_id: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          photo_type: string
+          photo_url: string
+          taken_at: string | null
+          taken_by: string | null
+        }
+        Insert: {
+          delivery_order_id: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          photo_type: string
+          photo_url: string
+          taken_at?: string | null
+          taken_by?: string | null
+        }
+        Update: {
+          delivery_order_id?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          photo_type?: string
+          photo_url?: string
+          taken_at?: string | null
+          taken_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_photos_delivery_order_id_fkey"
+            columns: ["delivery_order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_seals: {
+        Row: {
+          broken_seal_notes: string | null
+          broken_seal_reported: boolean | null
+          created_at: string | null
+          delivery_order_id: string
+          id: string
+          seal_number: string
+          seal_photo_url: string | null
+          sealed_at: string | null
+          sealed_by: string | null
+          verification_photo_url: string | null
+          verified_by_patient: boolean | null
+          verified_intact: boolean | null
+        }
+        Insert: {
+          broken_seal_notes?: string | null
+          broken_seal_reported?: boolean | null
+          created_at?: string | null
+          delivery_order_id: string
+          id?: string
+          seal_number: string
+          seal_photo_url?: string | null
+          sealed_at?: string | null
+          sealed_by?: string | null
+          verification_photo_url?: string | null
+          verified_by_patient?: boolean | null
+          verified_intact?: boolean | null
+        }
+        Update: {
+          broken_seal_notes?: string | null
+          broken_seal_reported?: boolean | null
+          created_at?: string | null
+          delivery_order_id?: string
+          id?: string
+          seal_number?: string
+          seal_photo_url?: string | null
+          sealed_at?: string | null
+          sealed_by?: string | null
+          verification_photo_url?: string | null
+          verified_by_patient?: boolean | null
+          verified_intact?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_seals_delivery_order_id_fkey"
+            columns: ["delivery_order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string | null
+          delivery_order_id: string
+          from_status: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          notes: string | null
+          to_status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string | null
+          delivery_order_id: string
+          from_status?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          to_status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string | null
+          delivery_order_id?: string
+          from_status?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_status_history_delivery_order_id_fkey"
+            columns: ["delivery_order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_tracking: {
         Row: {
           created_at: string | null
@@ -4709,6 +5884,65 @@ export type Database = {
           zone_name?: string
         }
         Relationships: []
+      }
+      dental_charts: {
+        Row: {
+          chart: Json
+          created_at: string
+          id: string
+          notes: string | null
+          patient_id: string
+          provider_id: string
+          updated_at: string
+        }
+        Insert: {
+          chart?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          provider_id: string
+          updated_at?: string
+        }
+        Update: {
+          chart?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          provider_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dental_charts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dental_charts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dental_charts_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dental_charts_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       department_staff: {
         Row: {
@@ -5400,6 +6634,169 @@ export type Database = {
           },
         ]
       }
+      doctor_fraction_earnings: {
+        Row: {
+          appointment_id: string | null
+          billing_id: string | null
+          created_at: string | null
+          doctor_amount: number | null
+          doctor_id: string
+          doctor_percentage: number
+          gross_amount: number
+          id: string
+          institution_amount: number | null
+          institution_id: string
+          paid_at: string | null
+          procedure_category: string | null
+          procedure_name: string
+          rule_id: string | null
+          source_split_id: string | null
+          status: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          billing_id?: string | null
+          created_at?: string | null
+          doctor_amount?: number | null
+          doctor_id: string
+          doctor_percentage: number
+          gross_amount: number
+          id?: string
+          institution_amount?: number | null
+          institution_id: string
+          paid_at?: string | null
+          procedure_category?: string | null
+          procedure_name: string
+          rule_id?: string | null
+          source_split_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          billing_id?: string | null
+          created_at?: string | null
+          doctor_amount?: number | null
+          doctor_id?: string
+          doctor_percentage?: number
+          gross_amount?: number
+          id?: string
+          institution_amount?: number | null
+          institution_id?: string
+          paid_at?: string | null
+          procedure_category?: string | null
+          procedure_name?: string
+          rule_id?: string | null
+          source_split_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_fraction_earnings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_earnings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_earnings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_earnings_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "doctor_fraction_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_earnings_source_split_id_fkey"
+            columns: ["source_split_id"]
+            isOneToOne: false
+            referencedRelation: "payment_splits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctor_fraction_rules: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          doctor_id: string
+          doctor_percentage: number
+          effective_from: string | null
+          effective_to: string | null
+          id: string
+          institution_id: string
+          institution_percentage: number | null
+          is_active: boolean | null
+          procedure_category: string | null
+          procedure_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          doctor_id: string
+          doctor_percentage: number
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          institution_id: string
+          institution_percentage?: number | null
+          is_active?: boolean | null
+          procedure_category?: string | null
+          procedure_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          doctor_id?: string
+          doctor_percentage?: number
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          institution_id?: string
+          institution_percentage?: number | null
+          is_active?: boolean | null
+          procedure_category?: string | null
+          procedure_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_fraction_rules_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_rules_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_fraction_rules_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       dpo_payments: {
         Row: {
           amount: number
@@ -5674,6 +7071,95 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_campaign_recipients: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          email: string
+          error_message: string | null
+          id: string
+          patient_id: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          email: string
+          error_message?: string | null
+          id?: string
+          patient_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          email?: string
+          error_message?: string | null
+          id?: string
+          patient_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_campaigns: {
+        Row: {
+          body_html: string
+          created_at: string
+          created_by: string | null
+          failed_count: number
+          id: string
+          institution_id: string
+          name: string
+          scheduled_at: string | null
+          sent_count: number
+          status: string
+          subject: string
+          target_audience: Json
+          updated_at: string
+        }
+        Insert: {
+          body_html: string
+          created_at?: string
+          created_by?: string | null
+          failed_count?: number
+          id?: string
+          institution_id: string
+          name: string
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          subject: string
+          target_audience?: Json
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string
+          created_at?: string
+          created_by?: string | null
+          failed_count?: number
+          id?: string
+          institution_id?: string
+          name?: string
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+          target_audience?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       emergency_access_grants: {
         Row: {
@@ -6302,6 +7788,111 @@ export type Database = {
         }
         Relationships: []
       }
+      equipment_share_requests: {
+        Row: {
+          asset_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          notes: string | null
+          owner_institution_id: string
+          purpose: string | null
+          requested_by: string
+          requested_date: string | null
+          requester_institution_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_institution_id: string
+          purpose?: string | null
+          requested_by: string
+          requested_date?: string | null
+          requester_institution_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_institution_id?: string
+          purpose?: string | null
+          requested_by?: string
+          requested_date?: string | null
+          requester_institution_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_share_requests_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "asset_register"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "shareable_equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_owner_institution_id_fkey"
+            columns: ["owner_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_owner_institution_id_fkey"
+            columns: ["owner_institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_owner_institution_id_fkey"
+            columns: ["owner_institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_requester_institution_id_fkey"
+            columns: ["requester_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_requester_institution_id_fkey"
+            columns: ["requester_institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_share_requests_requester_institution_id_fkey"
+            columns: ["requester_institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       expense_categories: {
         Row: {
           category_code: string
@@ -6699,6 +8290,30 @@ export type Database = {
           },
         ]
       }
+      favorite_providers: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          provider_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          provider_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          provider_id?: string
+        }
+        Relationships: []
+      }
       feature_gates: {
         Row: {
           created_at: string | null
@@ -6723,6 +8338,51 @@ export type Database = {
           free_limit?: number | null
           id?: string
           requires_plan_type?: string[] | null
+        }
+        Relationships: []
+      }
+      fhir_exchanges: {
+        Row: {
+          bundle: Json | null
+          created_at: string
+          direction: string
+          error_message: string | null
+          id: string
+          initiated_by: string | null
+          institution_id: string | null
+          patient_id: string | null
+          resources: string[]
+          status: string
+          target_system: string
+          updated_at: string
+        }
+        Insert: {
+          bundle?: Json | null
+          created_at?: string
+          direction: string
+          error_message?: string | null
+          id?: string
+          initiated_by?: string | null
+          institution_id?: string | null
+          patient_id?: string | null
+          resources?: string[]
+          status?: string
+          target_system: string
+          updated_at?: string
+        }
+        Update: {
+          bundle?: Json | null
+          created_at?: string
+          direction?: string
+          error_message?: string | null
+          id?: string
+          initiated_by?: string | null
+          institution_id?: string | null
+          patient_id?: string | null
+          resources?: string[]
+          status?: string
+          target_system?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -7375,6 +9035,161 @@ export type Database = {
           },
         ]
       }
+      health_camps: {
+        Row: {
+          camp_date: string
+          camp_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          institution_id: string
+          location: string
+          name: string
+          notes: string | null
+          status: string
+          target_population: number | null
+          updated_at: string
+        }
+        Insert: {
+          camp_date: string
+          camp_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id: string
+          location: string
+          name: string
+          notes?: string | null
+          status?: string
+          target_population?: number | null
+          updated_at?: string
+        }
+        Update: {
+          camp_date?: string
+          camp_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id?: string
+          location?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          target_population?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_camps_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_camps_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_camps_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      health_data_transfers: {
+        Row: {
+          consent_given: boolean
+          consent_recorded_at: string | null
+          created_at: string
+          from_institution_id: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          resource_count: number
+          status: string
+          to_institution_id: string
+          transfer_type: string
+          transferred_by: string
+        }
+        Insert: {
+          consent_given?: boolean
+          consent_recorded_at?: string | null
+          created_at?: string
+          from_institution_id?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          resource_count?: number
+          status?: string
+          to_institution_id: string
+          transfer_type?: string
+          transferred_by: string
+        }
+        Update: {
+          consent_given?: boolean
+          consent_recorded_at?: string | null
+          created_at?: string
+          from_institution_id?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          resource_count?: number
+          status?: string
+          to_institution_id?: string
+          transfer_type?: string
+          transferred_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_data_transfers_from_institution_id_fkey"
+            columns: ["from_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_data_transfers_from_institution_id_fkey"
+            columns: ["from_institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_data_transfers_from_institution_id_fkey"
+            columns: ["from_institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "health_data_transfers_to_institution_id_fkey"
+            columns: ["to_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_data_transfers_to_institution_id_fkey"
+            columns: ["to_institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_data_transfers_to_institution_id_fkey"
+            columns: ["to_institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       health_personnel_applications: {
         Row: {
           created_at: string | null
@@ -7521,6 +9336,7 @@ export type Database = {
           business_registration_number: string | null
           city: string | null
           country: string | null
+          country_code: string
           created_at: string | null
           currency: string | null
           email: string | null
@@ -7571,6 +9387,7 @@ export type Database = {
           business_registration_number?: string | null
           city?: string | null
           country?: string | null
+          country_code?: string
           created_at?: string | null
           currency?: string | null
           email?: string | null
@@ -7621,6 +9438,7 @@ export type Database = {
           business_registration_number?: string | null
           city?: string | null
           country?: string | null
+          country_code?: string
           created_at?: string | null
           currency?: string | null
           email?: string | null
@@ -7928,12 +9746,17 @@ export type Database = {
           due_date: string | null
           hospital_id: string
           id: string
+          institution_id: string | null
           insurance_claim_id: string | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          insurer_portion: number
           invoice_number: string
           items: Json
           notes: string | null
           paid_amount: number | null
           patient_id: string
+          patient_portion: number
           payment_status: string | null
           subtotal: number
           tax: number | null
@@ -7948,12 +9771,17 @@ export type Database = {
           due_date?: string | null
           hospital_id: string
           id?: string
+          institution_id?: string | null
           insurance_claim_id?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          insurer_portion?: number
           invoice_number: string
           items: Json
           notes?: string | null
           paid_amount?: number | null
           patient_id: string
+          patient_portion?: number
           payment_status?: string | null
           subtotal: number
           tax?: number | null
@@ -7968,12 +9796,17 @@ export type Database = {
           due_date?: string | null
           hospital_id?: string
           id?: string
+          institution_id?: string | null
           insurance_claim_id?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          insurer_portion?: number
           invoice_number?: string
           items?: Json
           notes?: string | null
           paid_amount?: number | null
           patient_id?: string
+          patient_portion?: number
           payment_status?: string | null
           subtotal?: number
           tax?: number | null
@@ -8005,6 +9838,27 @@ export type Database = {
           {
             foreignKeyName: "hospital_billing_hospital_id_fkey"
             columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "hospital_billing_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_billing_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_billing_institution_id_fkey"
+            columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
             referencedColumns: ["institution_id"]
@@ -8675,6 +10529,20 @@ export type Database = {
             referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "imaging_results_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "imaging_results_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       immunizations: {
@@ -8763,6 +10631,117 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "provider_directory"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      indent_items: {
+        Row: {
+          id: string
+          indent_id: string
+          item_name: string
+          notes: string | null
+          quantity_approved: number
+          quantity_issued: number
+          quantity_requested: number
+          unit: string
+        }
+        Insert: {
+          id?: string
+          indent_id: string
+          item_name: string
+          notes?: string | null
+          quantity_approved?: number
+          quantity_issued?: number
+          quantity_requested: number
+          unit?: string
+        }
+        Update: {
+          id?: string
+          indent_id?: string
+          item_name?: string
+          notes?: string | null
+          quantity_approved?: number
+          quantity_issued?: number
+          quantity_requested?: number
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indent_items_indent_id_fkey"
+            columns: ["indent_id"]
+            isOneToOne: false
+            referencedRelation: "indents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indents: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          department: string
+          id: string
+          indent_number: string
+          institution_id: string
+          notes: string | null
+          priority: string
+          rejection_reason: string | null
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          department: string
+          id?: string
+          indent_number: string
+          institution_id: string
+          notes?: string | null
+          priority?: string
+          rejection_reason?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          department?: string
+          id?: string
+          indent_number?: string
+          institution_id?: string
+          notes?: string | null
+          priority?: string
+          rejection_reason?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indents_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indents_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indents_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
         ]
       }
@@ -9518,33 +11497,111 @@ export type Database = {
           },
         ]
       }
+      institution_patients: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          first_seen_at: string
+          institution_id: string
+          last_seen_at: string
+          patient_id: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          first_seen_at?: string
+          institution_id: string
+          last_seen_at?: string
+          patient_id: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          first_seen_at?: string
+          institution_id?: string
+          last_seen_at?: string
+          patient_id?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_patients_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patients_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patients_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "institution_patients_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patients_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institution_personnel: {
         Row: {
           created_at: string
+          department: string | null
           id: string
           institution_id: string | null
           joined_at: string
           role: string | null
+          salary_monthly: number
           status: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
           created_at?: string
+          department?: string | null
           id?: string
           institution_id?: string | null
           joined_at?: string
           role?: string | null
+          salary_monthly?: number
           status?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string
+          department?: string | null
           id?: string
           institution_id?: string | null
           joined_at?: string
           role?: string | null
+          salary_monthly?: number
           status?: string | null
           updated_at?: string
           user_id?: string | null
@@ -9638,6 +11695,67 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clinical_procedures"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_reminder_settings: {
+        Row: {
+          appointment_template: string | null
+          created_at: string | null
+          id: string
+          institution_id: string
+          lab_result_template: string | null
+          refill_template: string | null
+          sms_enabled: boolean | null
+          sms_sender_id: string | null
+          updated_at: string | null
+          whatsapp_enabled: boolean | null
+        }
+        Insert: {
+          appointment_template?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id: string
+          lab_result_template?: string | null
+          refill_template?: string | null
+          sms_enabled?: boolean | null
+          sms_sender_id?: string | null
+          updated_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Update: {
+          appointment_template?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id?: string
+          lab_result_template?: string | null
+          refill_template?: string | null
+          sms_enabled?: boolean | null
+          sms_sender_id?: string | null
+          updated_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_reminder_settings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: true
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_reminder_settings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: true
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_reminder_settings_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: true
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
         ]
       }
@@ -10240,18 +12358,26 @@ export type Database = {
         Row: {
           approved_amount: number | null
           claim_amount: number
+          claim_number: string | null
+          claim_type: string | null
+          claimed_amount: number | null
           created_at: string
           created_by: string
+          diagnosis_codes: string[] | null
           documents: Json | null
+          hospital_billing_id: string | null
           id: string
           institution_id: string
           insurance_provider: string
           invoice_id: string | null
+          notes: string | null
           patient_id: string | null
           patient_name: string
           policy_number: string
+          procedure_codes: string[] | null
           processed_at: string | null
           rejection_reason: string | null
+          service_date: string | null
           status: string
           submitted_at: string
           updated_at: string
@@ -10259,18 +12385,26 @@ export type Database = {
         Insert: {
           approved_amount?: number | null
           claim_amount: number
+          claim_number?: string | null
+          claim_type?: string | null
+          claimed_amount?: number | null
           created_at?: string
           created_by: string
+          diagnosis_codes?: string[] | null
           documents?: Json | null
+          hospital_billing_id?: string | null
           id?: string
           institution_id: string
           insurance_provider: string
           invoice_id?: string | null
+          notes?: string | null
           patient_id?: string | null
           patient_name: string
           policy_number: string
+          procedure_codes?: string[] | null
           processed_at?: string | null
           rejection_reason?: string | null
+          service_date?: string | null
           status?: string
           submitted_at?: string
           updated_at?: string
@@ -10278,23 +12412,38 @@ export type Database = {
         Update: {
           approved_amount?: number | null
           claim_amount?: number
+          claim_number?: string | null
+          claim_type?: string | null
+          claimed_amount?: number | null
           created_at?: string
           created_by?: string
+          diagnosis_codes?: string[] | null
           documents?: Json | null
+          hospital_billing_id?: string | null
           id?: string
           institution_id?: string
           insurance_provider?: string
           invoice_id?: string | null
+          notes?: string | null
           patient_id?: string | null
           patient_name?: string
           policy_number?: string
+          procedure_codes?: string[] | null
           processed_at?: string | null
           rejection_reason?: string | null
+          service_date?: string | null
           status?: string
           submitted_at?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "insurance_claims_hospital_billing_id_fkey"
+            columns: ["hospital_billing_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_billing"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "insurance_claims_institution_id_fkey"
             columns: ["institution_id"]
@@ -10339,64 +12488,26 @@ export type Database = {
           },
         ]
       }
-      claim_denials: {
+      insurance_coverage_terms: {
         Row: {
-          appeal_deadline: string | null
-          appeal_notes: string | null
-          assigned_to: string | null
-          claim_id: string | null
-          created_at: string
-          denied_amount: number
-          denial_code: string | null
-          denial_reason: string
-          id: string
-          institution_id: string
-          resolved_at: string | null
-          status: string
-          supporting_documents: Json | null
+          coverage_percentage: number
+          notes: string | null
+          provider_name: string
           updated_at: string
         }
         Insert: {
-          appeal_deadline?: string | null
-          appeal_notes?: string | null
-          assigned_to?: string | null
-          claim_id?: string | null
-          created_at?: string
-          denied_amount?: number
-          denial_code?: string | null
-          denial_reason: string
-          id?: string
-          institution_id: string
-          resolved_at?: string | null
-          status?: string
-          supporting_documents?: Json | null
+          coverage_percentage: number
+          notes?: string | null
+          provider_name: string
           updated_at?: string
         }
         Update: {
-          appeal_deadline?: string | null
-          appeal_notes?: string | null
-          assigned_to?: string | null
-          claim_id?: string | null
-          created_at?: string
-          denied_amount?: number
-          denial_code?: string | null
-          denial_reason?: string
-          id?: string
-          institution_id?: string
-          resolved_at?: string | null
-          status?: string
-          supporting_documents?: Json | null
+          coverage_percentage?: number
+          notes?: string | null
+          provider_name?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "claim_denials_institution_id_fkey"
-            columns: ["institution_id"]
-            isOneToOne: false
-            referencedRelation: "healthcare_institutions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       insurance_information: {
         Row: {
@@ -11317,6 +13428,45 @@ export type Database = {
           },
         ]
       }
+      kb_articles: {
+        Row: {
+          body: string
+          category: string
+          created_at: string | null
+          id: string
+          is_published: boolean | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       lab_reflex_tests: {
         Row: {
           auto_add: boolean | null
@@ -11417,6 +13567,13 @@ export type Database = {
             referencedRelation: "lab_tests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lab_requests_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests_patient_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       lab_results: {
@@ -11491,6 +13648,13 @@ export type Database = {
             columns: ["test_id"]
             isOneToOne: false
             referencedRelation: "lab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests_patient_view"
             referencedColumns: ["id"]
           },
         ]
@@ -11586,6 +13750,13 @@ export type Database = {
             columns: ["test_id"]
             isOneToOne: false
             referencedRelation: "lab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_test_requests_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests_patient_view"
             referencedColumns: ["id"]
           },
         ]
@@ -11697,6 +13868,41 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hospital_admissions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
           {
             foreignKeyName: "lab_tests_insurance_claim_id_fkey"
@@ -12102,6 +14308,263 @@ export type Database = {
         }
         Relationships: []
       }
+      lens_orders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dispensed_at: string | null
+          frame: string | null
+          id: string
+          institution_id: string | null
+          lens_type: string | null
+          notes: string | null
+          ordered_at: string | null
+          patient_id: string
+          patient_name: string | null
+          prescription_id: string | null
+          ready_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dispensed_at?: string | null
+          frame?: string | null
+          id?: string
+          institution_id?: string | null
+          lens_type?: string | null
+          notes?: string | null
+          ordered_at?: string | null
+          patient_id: string
+          patient_name?: string | null
+          prescription_id?: string | null
+          ready_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dispensed_at?: string | null
+          frame?: string | null
+          id?: string
+          institution_id?: string | null
+          lens_type?: string | null
+          notes?: string | null
+          ordered_at?: string | null
+          patient_id?: string
+          patient_name?: string | null
+          prescription_id?: string | null
+          ready_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lens_orders_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lens_orders_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lens_orders_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "lens_orders_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "optical_prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lis_machines: {
+        Row: {
+          connection_status: string | null
+          created_at: string | null
+          id: string
+          institution_id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_heartbeat: string | null
+          machine_id: string | null
+          machine_name: string
+          manufacturer: string
+          model: string
+          port: number | null
+          protocol: string | null
+          test_mapping: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          connection_status?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_heartbeat?: string | null
+          machine_id?: string | null
+          machine_name: string
+          manufacturer: string
+          model: string
+          port?: number | null
+          protocol?: string | null
+          test_mapping?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          connection_status?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_heartbeat?: string | null
+          machine_id?: string | null
+          machine_name?: string
+          manufacturer?: string
+          model?: string
+          port?: number | null
+          protocol?: string | null
+          test_mapping?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lis_machines_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lis_machines_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lis_machines_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      lis_results: {
+        Row: {
+          abnormal_flag: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          institution_id: string
+          lab_test_id: string | null
+          machine_id: string
+          mapped_test_type: string | null
+          patient_id: string | null
+          processed_at: string | null
+          protocol: string
+          raw_message: string
+          reference_range: string | null
+          result_timestamp: string | null
+          result_value: string
+          sample_id: string | null
+          status: string | null
+          test_code: string
+          test_name: string | null
+          unit: string | null
+        }
+        Insert: {
+          abnormal_flag?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          institution_id: string
+          lab_test_id?: string | null
+          machine_id: string
+          mapped_test_type?: string | null
+          patient_id?: string | null
+          processed_at?: string | null
+          protocol: string
+          raw_message: string
+          reference_range?: string | null
+          result_timestamp?: string | null
+          result_value: string
+          sample_id?: string | null
+          status?: string | null
+          test_code: string
+          test_name?: string | null
+          unit?: string | null
+        }
+        Update: {
+          abnormal_flag?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          institution_id?: string
+          lab_test_id?: string | null
+          machine_id?: string
+          mapped_test_type?: string | null
+          patient_id?: string | null
+          processed_at?: string | null
+          protocol?: string
+          raw_message?: string
+          reference_range?: string | null
+          result_timestamp?: string | null
+          result_value?: string
+          sample_id?: string | null
+          status?: string | null
+          test_code?: string
+          test_name?: string | null
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lis_results_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lis_results_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lis_results_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "lis_results_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "lis_machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       location_updates: {
         Row: {
           delivery_id: string
@@ -12228,6 +14691,13 @@ export type Database = {
             columns: ["asset_id"]
             isOneToOne: false
             referencedRelation: "asset_register"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedules_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "shareable_equipment"
             referencedColumns: ["id"]
           },
           {
@@ -12819,6 +15289,66 @@ export type Database = {
         }
         Relationships: []
       }
+      medication_dose_ranges: {
+        Row: {
+          aliases: string[] | null
+          created_at: string | null
+          dose_unit: string
+          hepatic_warning: string | null
+          id: string
+          is_active: boolean | null
+          max_daily_dose: number | null
+          max_frequency_per_day: number | null
+          max_single_dose: number | null
+          medication_name: string
+          min_single_dose: number | null
+          notes: string | null
+          pediatric_max_single_dose: number | null
+          pediatric_mg_per_kg_max: number | null
+          pediatric_mg_per_kg_min: number | null
+          pregnancy_category: string | null
+          renal_warning: string | null
+        }
+        Insert: {
+          aliases?: string[] | null
+          created_at?: string | null
+          dose_unit?: string
+          hepatic_warning?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_daily_dose?: number | null
+          max_frequency_per_day?: number | null
+          max_single_dose?: number | null
+          medication_name: string
+          min_single_dose?: number | null
+          notes?: string | null
+          pediatric_max_single_dose?: number | null
+          pediatric_mg_per_kg_max?: number | null
+          pediatric_mg_per_kg_min?: number | null
+          pregnancy_category?: string | null
+          renal_warning?: string | null
+        }
+        Update: {
+          aliases?: string[] | null
+          created_at?: string | null
+          dose_unit?: string
+          hepatic_warning?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_daily_dose?: number | null
+          max_frequency_per_day?: number | null
+          max_single_dose?: number | null
+          medication_name?: string
+          min_single_dose?: number | null
+          notes?: string | null
+          pediatric_max_single_dose?: number | null
+          pediatric_mg_per_kg_max?: number | null
+          pediatric_mg_per_kg_min?: number | null
+          pregnancy_category?: string | null
+          renal_warning?: string | null
+        }
+        Relationships: []
+      }
       medication_frequency: {
         Row: {
           code: string
@@ -12988,6 +15518,87 @@ export type Database = {
           },
         ]
       }
+      medication_scans: {
+        Row: {
+          barcode_scanned: string
+          expected_barcode: string | null
+          id: string
+          institution_id: string | null
+          location: string | null
+          medication_name: string
+          override_reason: string | null
+          patient_id: string | null
+          prescription_id: string | null
+          scanned_at: string
+          scanned_by: string | null
+          verification_result: string
+        }
+        Insert: {
+          barcode_scanned: string
+          expected_barcode?: string | null
+          id?: string
+          institution_id?: string | null
+          location?: string | null
+          medication_name: string
+          override_reason?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          scanned_at?: string
+          scanned_by?: string | null
+          verification_result: string
+        }
+        Update: {
+          barcode_scanned?: string
+          expected_barcode?: string | null
+          id?: string
+          institution_id?: string | null
+          location?: string | null
+          medication_name?: string
+          override_reason?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          scanned_at?: string
+          scanned_by?: string | null
+          verification_result?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_scans_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_scans_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_scans_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "medication_scans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_scans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medications: {
         Row: {
           created_at: string
@@ -13141,6 +15752,94 @@ export type Database = {
           },
           {
             foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      message_queue: {
+        Row: {
+          appointment_id: string | null
+          attempts: number | null
+          channel: string
+          created_at: string | null
+          delivered_at: string | null
+          id: string
+          institution_id: string | null
+          last_error: string | null
+          message_body: string
+          patient_id: string | null
+          phone_number: string
+          provider: string | null
+          provider_message_id: string | null
+          reference_id: string | null
+          reference_type: string | null
+          scheduled_for: string | null
+          sent_at: string | null
+          status: string | null
+          template_key: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          attempts?: number | null
+          channel: string
+          created_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          institution_id?: string | null
+          last_error?: string | null
+          message_body: string
+          patient_id?: string | null
+          phone_number: string
+          provider?: string | null
+          provider_message_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string | null
+          template_key?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          attempts?: number | null
+          channel?: string
+          created_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          institution_id?: string | null
+          last_error?: string | null
+          message_body?: string
+          patient_id?: string | null
+          phone_number?: string
+          provider?: string | null
+          provider_message_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string | null
+          template_key?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_queue_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_queue_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_queue_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
@@ -13316,6 +16015,63 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          appointment_reminder_hours: number | null
+          appointment_reminders: boolean | null
+          created_at: string | null
+          email_enabled: boolean | null
+          id: string
+          lab_result_alerts: boolean | null
+          language: string | null
+          medication_reminders: boolean | null
+          patient_id: string
+          preferred_phone: string | null
+          push_enabled: boolean | null
+          refill_reminders: boolean | null
+          second_reminder_hours: number | null
+          sms_enabled: boolean | null
+          updated_at: string | null
+          whatsapp_enabled: boolean | null
+        }
+        Insert: {
+          appointment_reminder_hours?: number | null
+          appointment_reminders?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          lab_result_alerts?: boolean | null
+          language?: string | null
+          medication_reminders?: boolean | null
+          patient_id: string
+          preferred_phone?: string | null
+          push_enabled?: boolean | null
+          refill_reminders?: boolean | null
+          second_reminder_hours?: number | null
+          sms_enabled?: boolean | null
+          updated_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Update: {
+          appointment_reminder_hours?: number | null
+          appointment_reminders?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          lab_result_alerts?: boolean | null
+          language?: string | null
+          medication_reminders?: boolean | null
+          patient_id?: string
+          preferred_phone?: string | null
+          push_enabled?: boolean | null
+          refill_reminders?: boolean | null
+          second_reminder_hours?: number | null
+          sms_enabled?: boolean | null
+          updated_at?: string | null
+          whatsapp_enabled?: boolean | null
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           appointment_reminders: boolean | null
@@ -13436,6 +16192,82 @@ export type Database = {
           },
         ]
       }
+      optical_prescriptions: {
+        Row: {
+          created_at: string
+          id: string
+          institution_id: string | null
+          notes: string | null
+          od_axis: number | null
+          od_cylinder: number | null
+          od_sphere: number | null
+          os_axis: number | null
+          os_cylinder: number | null
+          os_sphere: number | null
+          patient_id: string
+          pd: number | null
+          prescribed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          od_axis?: number | null
+          od_cylinder?: number | null
+          od_sphere?: number | null
+          os_axis?: number | null
+          os_cylinder?: number | null
+          os_sphere?: number | null
+          patient_id: string
+          pd?: number | null
+          prescribed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          od_axis?: number | null
+          od_cylinder?: number | null
+          od_sphere?: number | null
+          os_axis?: number | null
+          os_cylinder?: number | null
+          os_sphere?: number | null
+          patient_id?: string
+          pd?: number | null
+          prescribed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "optical_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "optical_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "optical_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -13481,6 +16313,108 @@ export type Database = {
           },
         ]
       }
+      order_set_items: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          display_order: number | null
+          id: string
+          is_optional: boolean | null
+          item_name: string
+          item_type: string
+          order_set_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          display_order?: number | null
+          id?: string
+          is_optional?: boolean | null
+          item_name: string
+          item_type: string
+          order_set_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          display_order?: number | null
+          id?: string
+          is_optional?: boolean | null
+          item_name?: string
+          item_type?: string
+          order_set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_set_items_order_set_id_fkey"
+            columns: ["order_set_id"]
+            isOneToOne: false
+            referencedRelation: "order_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_sets: {
+        Row: {
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          institution_id: string | null
+          is_active: boolean | null
+          is_system: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_sets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_sets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_sets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           actual_delivery_time: string | null
@@ -13495,6 +16429,7 @@ export type Database = {
           pharmacy_id: string | null
           prescription_id: string | null
           status: string
+          status_history: Json
           total_amount: number
           updated_at: string | null
         }
@@ -13511,6 +16446,7 @@ export type Database = {
           pharmacy_id?: string | null
           prescription_id?: string | null
           status?: string
+          status_history?: Json
           total_amount: number
           updated_at?: string | null
         }
@@ -13527,6 +16463,7 @@ export type Database = {
           pharmacy_id?: string | null
           prescription_id?: string | null
           status?: string
+          status_history?: Json
           total_amount?: number
           updated_at?: string | null
         }
@@ -14031,6 +16968,20 @@ export type Database = {
             referencedRelation: "revenue_leakage_summary_view"
             referencedColumns: ["institution_id"]
           },
+          {
+            foreignKeyName: "pathologist_reviews_pathologist_fk"
+            columns: ["pathologist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pathologist_reviews_pathologist_fk"
+            columns: ["pathologist_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       patient_access_audit: {
@@ -14229,6 +17180,54 @@ export type Database = {
           severity?: string | null
           status?: string | null
           treatment_plan?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      patient_dependents: {
+        Row: {
+          created_at: string | null
+          date_of_birth: string | null
+          first_name: string
+          gender: string | null
+          guardian_id: string
+          id: string
+          is_active: boolean | null
+          last_name: string
+          linked_patient_id: string | null
+          national_id: string | null
+          notes: string | null
+          relationship: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date_of_birth?: string | null
+          first_name: string
+          gender?: string | null
+          guardian_id: string
+          id?: string
+          is_active?: boolean | null
+          last_name: string
+          linked_patient_id?: string | null
+          national_id?: string | null
+          notes?: string | null
+          relationship?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date_of_birth?: string | null
+          first_name?: string
+          gender?: string | null
+          guardian_id?: string
+          id?: string
+          is_active?: boolean | null
+          last_name?: string
+          linked_patient_id?: string | null
+          national_id?: string | null
+          notes?: string | null
+          relationship?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -14564,6 +17563,64 @@ export type Database = {
           },
         ]
       }
+      patient_institution_links: {
+        Row: {
+          created_at: string
+          enrolled_at: string
+          enrolled_by: string | null
+          id: string
+          institution_id: string
+          notes: string | null
+          patient_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enrolled_at?: string
+          enrolled_by?: string | null
+          id?: string
+          institution_id: string
+          notes?: string | null
+          patient_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enrolled_at?: string
+          enrolled_by?: string | null
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          patient_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_institution_links_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_institution_links_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_institution_links_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       patient_insurance: {
         Row: {
           created_at: string | null
@@ -14613,6 +17670,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      patient_merges: {
+        Row: {
+          created_at: string | null
+          duplicate_id: string
+          id: string
+          merged_by: string | null
+          reason: string | null
+          survivor_id: string
+          tables_moved: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          duplicate_id: string
+          id?: string
+          merged_by?: string | null
+          reason?: string | null
+          survivor_id: string
+          tables_moved?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          duplicate_id?: string
+          id?: string
+          merged_by?: string | null
+          reason?: string | null
+          survivor_id?: string
+          tables_moved?: Json | null
+        }
+        Relationships: []
       }
       patient_queue: {
         Row: {
@@ -16054,6 +19141,7 @@ export type Database = {
           filled_at: string | null
           filled_by: string | null
           id: string
+          institution_id: string | null
           medications: Json
           notes: string | null
           patient_id: string
@@ -16069,6 +19157,7 @@ export type Database = {
           filled_at?: string | null
           filled_by?: string | null
           id?: string
+          institution_id?: string | null
           medications: Json
           notes?: string | null
           patient_id: string
@@ -16084,6 +19173,7 @@ export type Database = {
           filled_at?: string | null
           filled_by?: string | null
           id?: string
+          institution_id?: string | null
           medications?: Json
           notes?: string | null
           patient_id?: string
@@ -16121,6 +19211,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "provider_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
           {
             foreignKeyName: "pharmacy_prescriptions_patient_id_fkey"
@@ -17141,6 +20252,7 @@ export type Database = {
           data_retention_period: string | null
           date_of_birth: string | null
           email: string | null
+          email_marketing_opt_out: boolean
           first_name: string | null
           gender: string | null
           graduation_year: number | null
@@ -17148,6 +20260,7 @@ export type Database = {
           id: string
           insurance_providers_accepted: string[] | null
           is_profile_complete: boolean | null
+          is_shadow_account: boolean
           is_suspended: boolean
           is_verified: boolean | null
           languages_spoken: string[] | null
@@ -17156,6 +20269,7 @@ export type Database = {
           location: string | null
           longitude: number | null
           medical_school: string | null
+          merged_into: string | null
           phone: string | null
           primary_practice_location: string | null
           professional_references: Json | null
@@ -17202,6 +20316,7 @@ export type Database = {
           data_retention_period?: string | null
           date_of_birth?: string | null
           email?: string | null
+          email_marketing_opt_out?: boolean
           first_name?: string | null
           gender?: string | null
           graduation_year?: number | null
@@ -17209,6 +20324,7 @@ export type Database = {
           id: string
           insurance_providers_accepted?: string[] | null
           is_profile_complete?: boolean | null
+          is_shadow_account?: boolean
           is_suspended?: boolean
           is_verified?: boolean | null
           languages_spoken?: string[] | null
@@ -17217,6 +20333,7 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           medical_school?: string | null
+          merged_into?: string | null
           phone?: string | null
           primary_practice_location?: string | null
           professional_references?: Json | null
@@ -17263,6 +20380,7 @@ export type Database = {
           data_retention_period?: string | null
           date_of_birth?: string | null
           email?: string | null
+          email_marketing_opt_out?: boolean
           first_name?: string | null
           gender?: string | null
           graduation_year?: number | null
@@ -17270,6 +20388,7 @@ export type Database = {
           id?: string
           insurance_providers_accepted?: string[] | null
           is_profile_complete?: boolean | null
+          is_shadow_account?: boolean
           is_suspended?: boolean
           is_verified?: boolean | null
           languages_spoken?: string[] | null
@@ -17278,6 +20397,7 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           medical_school?: string | null
+          merged_into?: string | null
           phone?: string | null
           primary_practice_location?: string | null
           professional_references?: Json | null
@@ -18467,9 +21587,13 @@ export type Database = {
         Row: {
           created_at: string | null
           diagnosis: string | null
+          feedback_at: string | null
+          feedback_by: string | null
+          feedback_notes: string | null
           hospital_id: string
           id: string
           notes: string | null
+          outcome_status: string | null
           patient_id: string
           priority: string | null
           reason_for_referral: string
@@ -18478,16 +21602,22 @@ export type Database = {
           referred_to_department: string | null
           referred_to_doctor: string | null
           referred_to_hospital_id: string | null
+          referred_to_name: string | null
           referring_doctor_id: string
           status: string | null
+          treatment_summary: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           diagnosis?: string | null
+          feedback_at?: string | null
+          feedback_by?: string | null
+          feedback_notes?: string | null
           hospital_id: string
           id?: string
           notes?: string | null
+          outcome_status?: string | null
           patient_id: string
           priority?: string | null
           reason_for_referral: string
@@ -18496,16 +21626,22 @@ export type Database = {
           referred_to_department?: string | null
           referred_to_doctor?: string | null
           referred_to_hospital_id?: string | null
+          referred_to_name?: string | null
           referring_doctor_id: string
           status?: string | null
+          treatment_summary?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           diagnosis?: string | null
+          feedback_at?: string | null
+          feedback_by?: string | null
+          feedback_notes?: string | null
           hospital_id?: string
           id?: string
           notes?: string | null
+          outcome_status?: string | null
           patient_id?: string
           priority?: string | null
           reason_for_referral?: string
@@ -18514,8 +21650,10 @@ export type Database = {
           referred_to_department?: string | null
           referred_to_doctor?: string | null
           referred_to_hospital_id?: string | null
+          referred_to_name?: string | null
           referring_doctor_id?: string
           status?: string | null
+          treatment_summary?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -19253,6 +22391,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scribe_sessions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          consultation_id: string | null
+          created_at: string
+          generated_notes: Json | null
+          id: string
+          patient_consented: boolean
+          patient_id: string | null
+          provider_id: string
+          status: string
+          transcript_text: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          consultation_id?: string | null
+          created_at?: string
+          generated_notes?: Json | null
+          id?: string
+          patient_consented?: boolean
+          patient_id?: string | null
+          provider_id: string
+          status?: string
+          transcript_text?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          consultation_id?: string | null
+          created_at?: string
+          generated_notes?: Json | null
+          id?: string
+          patient_consented?: boolean
+          patient_id?: string | null
+          provider_id?: string
+          status?: string
+          transcript_text?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       security_audit_log: {
         Row: {
@@ -21004,6 +24187,105 @@ export type Database = {
           },
         ]
       }
+      support_ticket_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          sender_id: string
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          sender_id: string
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          sender_id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          institution_id: string | null
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          institution_id?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          institution_id?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       surgery_packages: {
         Row: {
           code: string
@@ -22004,6 +25286,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          accessibility_mode: boolean | null
+          change_history: Json
+          created_at: string | null
+          date_format: string | null
+          id: string
+          language: string | null
+          notifications_enabled: boolean | null
+          setting_key: string | null
+          status: string | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+          value: Json | null
+        }
+        Insert: {
+          accessibility_mode?: boolean | null
+          change_history?: Json
+          created_at?: string | null
+          date_format?: string | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          setting_key?: string | null
+          status?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+          value?: Json | null
+        }
+        Update: {
+          accessibility_mode?: boolean | null
+          change_history?: Json
+          created_at?: string | null
+          date_format?: string | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          setting_key?: string | null
+          status?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          value?: Json | null
+        }
+        Relationships: []
+      }
       user_streaks: {
         Row: {
           current_streak: number | null
@@ -22244,6 +25574,45 @@ export type Database = {
           },
         ]
       }
+      vaccination_schedule: {
+        Row: {
+          country_code: string | null
+          created_at: string | null
+          dose_number: number
+          due_age_days: number
+          due_age_label: string
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          schedule_key: string
+          vaccine_name: string
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string | null
+          dose_number: number
+          due_age_days: number
+          due_age_label: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          schedule_key: string
+          vaccine_name: string
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string | null
+          dose_number?: number
+          due_age_days?: number
+          due_age_label?: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          schedule_key?: string
+          vaccine_name?: string
+        }
+        Relationships: []
+      }
       video_consultations: {
         Row: {
           appointment_id: string | null
@@ -22412,6 +25781,7 @@ export type Database = {
           device_id: string | null
           heart_rate: number | null
           id: string
+          institution_id: string | null
           metadata: Json | null
           oxygen_saturation: number | null
           recorded_at: string | null
@@ -22427,6 +25797,7 @@ export type Database = {
           device_id?: string | null
           heart_rate?: number | null
           id?: string
+          institution_id?: string | null
           metadata?: Json | null
           oxygen_saturation?: number | null
           recorded_at?: string | null
@@ -22442,6 +25813,7 @@ export type Database = {
           device_id?: string | null
           heart_rate?: number | null
           id?: string
+          institution_id?: string | null
           metadata?: Json | null
           oxygen_saturation?: number | null
           recorded_at?: string | null
@@ -22457,6 +25829,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "iot_devices"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vital_signs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vital_signs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vital_signs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
         ]
       }
@@ -22752,6 +26145,153 @@ export type Database = {
           },
         ]
       }
+      wholesale_orders: {
+        Row: {
+          buyer_institution_id: string
+          created_at: string
+          id: string
+          items: Json
+          notes: string | null
+          order_number: string
+          ordered_by: string
+          seller_pharmacy_id: string
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_institution_id: string
+          created_at?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_number: string
+          ordered_by: string
+          seller_pharmacy_id: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_institution_id?: string
+          created_at?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_number?: string
+          ordered_by?: string
+          seller_pharmacy_id?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_orders_buyer_institution_id_fkey"
+            columns: ["buyer_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_buyer_institution_id_fkey"
+            columns: ["buyer_institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_buyer_institution_id_fkey"
+            columns: ["buyer_institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_seller_pharmacy_id_fkey"
+            columns: ["seller_pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_seller_pharmacy_id_fkey"
+            columns: ["seller_pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_seller_pharmacy_id_fkey"
+            columns: ["seller_pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      wholesale_price_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          inventory_id: string | null
+          min_quantity: number
+          pharmacy_id: string
+          product_name: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inventory_id?: string | null
+          min_quantity?: number
+          pharmacy_id: string
+          product_name: string
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inventory_id?: string | null
+          min_quantity?: number
+          pharmacy_id?: string
+          product_name?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_price_tiers_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "pharmacy_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_price_tiers_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_price_tiers_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_price_tiers_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       withdrawal_requests: {
         Row: {
           admin_note: string | null
@@ -22864,6 +26404,13 @@ export type Database = {
             columns: ["asset_id"]
             isOneToOne: false
             referencedRelation: "asset_register"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "shareable_equipment"
             referencedColumns: ["id"]
           },
           {
@@ -23483,6 +27030,315 @@ export type Database = {
           },
         ]
       }
+      lab_results_patient_view: {
+        Row: {
+          created_at: string | null
+          document_url: string | null
+          id: string | null
+          is_abnormal: boolean | null
+          notes: string | null
+          patient_id: string | null
+          reference_range: string | null
+          request_id: string | null
+          result_value: string | null
+          test_date: string | null
+          test_id: string | null
+          test_name: string | null
+          unit: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_url?: never
+          id?: string | null
+          is_abnormal?: never
+          notes?: never
+          patient_id?: string | null
+          reference_range?: string | null
+          request_id?: string | null
+          result_value?: never
+          test_date?: string | null
+          test_id?: string | null
+          test_name?: string | null
+          unit?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_url?: never
+          id?: string | null
+          is_abnormal?: never
+          notes?: never
+          patient_id?: string | null
+          reference_range?: string | null
+          request_id?: string | null
+          result_value?: never
+          test_date?: string | null
+          test_id?: string | null
+          test_name?: string | null
+          unit?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_results_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests_patient_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_tests_patient_view: {
+        Row: {
+          admission_id: string | null
+          balance: number | null
+          created_at: string | null
+          entered_by: string | null
+          external_referrer_facility: string | null
+          external_referrer_name: string | null
+          id: string | null
+          institution_id: string | null
+          insurance_claim_id: string | null
+          lab_id: string | null
+          notes: string | null
+          order_source: string | null
+          ordered_by: string | null
+          patient_id: string | null
+          payment_status: string | null
+          performed_by: string | null
+          price: number | null
+          priority: string | null
+          result: Json | null
+          result_summary: string | null
+          results_date: string | null
+          sample_collected_at: string | null
+          sample_type: string | null
+          status: string | null
+          test_category: string | null
+          test_number: string | null
+          test_type: string | null
+          total_amount: number | null
+          updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          admission_id?: string | null
+          balance?: number | null
+          created_at?: string | null
+          entered_by?: string | null
+          external_referrer_facility?: string | null
+          external_referrer_name?: string | null
+          id?: string | null
+          institution_id?: string | null
+          insurance_claim_id?: string | null
+          lab_id?: string | null
+          notes?: string | null
+          order_source?: string | null
+          ordered_by?: string | null
+          patient_id?: string | null
+          payment_status?: string | null
+          performed_by?: string | null
+          price?: number | null
+          priority?: string | null
+          result?: never
+          result_summary?: never
+          results_date?: string | null
+          sample_collected_at?: string | null
+          sample_type?: string | null
+          status?: string | null
+          test_category?: string | null
+          test_number?: string | null
+          test_type?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          admission_id?: string | null
+          balance?: number | null
+          created_at?: string | null
+          entered_by?: string | null
+          external_referrer_facility?: string | null
+          external_referrer_name?: string | null
+          id?: string | null
+          institution_id?: string | null
+          insurance_claim_id?: string | null
+          lab_id?: string | null
+          notes?: string | null
+          order_source?: string | null
+          ordered_by?: string | null
+          patient_id?: string | null
+          payment_status?: string | null
+          performed_by?: string | null
+          price?: number | null
+          priority?: string | null
+          result?: never
+          result_summary?: never
+          results_date?: string | null
+          sample_collected_at?: string | null
+          sample_type?: string | null
+          status?: string | null
+          test_category?: string | null
+          test_number?: string | null
+          test_type?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_tests_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_admissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "lab_tests_insurance_claim_id_fkey"
+            columns: ["insurance_claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_verifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "lab_tests_ordered_by_fkey"
+            columns: ["ordered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_ordered_by_fkey"
+            columns: ["ordered_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_applications: {
         Row: {
           applicant_id: string | null
@@ -23692,6 +27548,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shareable_equipment: {
+        Row: {
+          asset_name: string | null
+          asset_tag: string | null
+          category: string | null
+          condition: string | null
+          id: string | null
+          institution_city: string | null
+          institution_id: string | null
+          institution_name: string | null
+          is_shareable: boolean | null
+          location: string | null
+          manufacturer: string | null
+          model_number: string | null
+          next_maintenance_date: string | null
+          share_rate: number | null
+          share_terms: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_register_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_register_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_register_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       user_two_factor_status: {
         Row: {
           created_at: string | null
@@ -23716,6 +27616,19 @@ export type Database = {
     }
     Functions: {
       accept_staff_invitation: { Args: { _token: string }; Returns: Json }
+      admission_segment_nights_due: {
+        Args: { p_segment_id: string }
+        Returns: number
+      }
+      ai_rate_limit_hit: {
+        Args: {
+          p_function_name: string
+          p_limit: number
+          p_user_id: string
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       apply_drug_stock_movement: {
         Args: {
           p_item_id: string
@@ -23725,10 +27638,27 @@ export type Database = {
         }
         Returns: string
       }
+      appointment_actor_has_clinical_role: {
+        Args: {
+          p_appointment_institution: string
+          p_appointment_provider: string
+        }
+        Returns: boolean
+      }
+      approve_prescription_refill: {
+        Args: { p_provider_note?: string; p_refill_id: string }
+        Returns: Json
+      }
       approve_stock_audit_session: {
         Args: { p_session_id: string }
         Returns: Json
       }
+      asset_owner_institution: { Args: { p_asset_id: string }; Returns: string }
+      audit_log_institution_id: {
+        Args: { p_event_data: Json }
+        Returns: string
+      }
+      can_access_art_cycle: { Args: { p_cycle_id: string }; Returns: boolean }
       can_access_institution_blood_bank: {
         Args: { p_institution_id: string }
         Returns: boolean
@@ -23737,8 +27667,53 @@ export type Database = {
         Args: { p_institution_id: string }
         Returns: boolean
       }
+      can_insert_delivery_custody: {
+        Args: { p_delivery_order_id: string }
+        Returns: boolean
+      }
+      can_manage_courier_document: {
+        Args: { p_screening_id: string }
+        Returns: boolean
+      }
+      can_manage_courier_record: {
+        Args: { p_courier_id: string }
+        Returns: boolean
+      }
+      can_manage_courier_verification: {
+        Args: { p_courier_id: string }
+        Returns: boolean
+      }
+      can_manage_optical: {
+        Args: { p_institution_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      can_merge_patients: { Args: never; Returns: boolean }
       can_perform_service: {
         Args: { provider_id: string; service_category_id: string }
+        Returns: boolean
+      }
+      can_record_vitals_for: {
+        Args: { p_patient_id: string }
+        Returns: boolean
+      }
+      can_view_courier_location: {
+        Args: { p_courier_id: string; p_delivery_tracking_id: string }
+        Returns: boolean
+      }
+      can_view_delivery_history: {
+        Args: { p_delivery_order_id: string }
+        Returns: boolean
+      }
+      can_view_delivery_incident: {
+        Args: { p_courier_id: string; p_reported_by: string }
+        Returns: boolean
+      }
+      can_view_delivery_seal_or_photo: {
+        Args: { p_delivery_order_id: string }
+        Returns: boolean
+      }
+      can_view_support_ticket: {
+        Args: { p_ticket_id: string; p_user_id: string }
         Returns: boolean
       }
       check_financial_controls: {
@@ -23766,6 +27741,74 @@ export type Database = {
         }[]
       }
       cleanup_old_form_data: { Args: never; Returns: undefined }
+      collect_patient_allergens: {
+        Args: { p_patient_id: string }
+        Returns: {
+          allergen: string
+          severity: string
+          structured: boolean
+        }[]
+      }
+      create_hospital_bill: {
+        Args: {
+          p_due_date?: string
+          p_hospital_id: string
+          p_insurance_info_id?: string
+          p_lines: Json
+          p_patient_id: string
+        }
+        Returns: Json
+      }
+      create_insurance_provider: {
+        Args: { p_code?: string; p_name: string }
+        Returns: {
+          code: string
+          id: string
+          name: string
+        }[]
+      }
+      create_manual_invoice: {
+        Args: {
+          p_discount?: number
+          p_due_date?: string
+          p_institution_id: string
+          p_insurance_provider?: string
+          p_lines: Json
+          p_notes?: string
+          p_patient_id: string
+          p_patient_name: string
+          p_tax?: number
+        }
+        Returns: Json
+      }
+      create_pharmacy_sale: {
+        Args: {
+          p_customer_id?: string
+          p_items: Json
+          p_payment_method?: string
+          p_pharmacy_id: string
+          p_prescription_id?: string
+        }
+        Returns: Json
+      }
+      create_pos_sale: {
+        Args: {
+          p_customer_name?: string
+          p_customer_phone?: string
+          p_discount_percent?: number
+          p_items: Json
+          p_payment_method?: string
+          p_payment_reference?: string
+          p_pharmacy_id: string
+          p_prescription_id?: string
+        }
+        Returns: Json
+      }
+      current_courier_id: { Args: never; Returns: string }
+      delete_patient_allergy: {
+        Args: { p_allergy_id: string }
+        Returns: undefined
+      }
       delete_user: { Args: never; Returns: undefined }
       dispense_medicine_batches: {
         Args: {
@@ -23779,11 +27822,56 @@ export type Database = {
         }
         Returns: Json
       }
+      drug_classes_for: { Args: { p_name: string }; Returns: string[] }
+      drug_names_match: { Args: { p_a: string; p_b: string }; Returns: boolean }
       emergency_patient_search: {
         Args: { q: string }
         Returns: {
           nm: string
           pid: string
+        }[]
+      }
+      ensure_hospital_billing_draft: {
+        Args: { p_admission_id: string; p_hospital_id: string }
+        Returns: Json
+      }
+      expire_lapsed_subscriptions: { Args: never; Returns: number }
+      find_or_create_patient: {
+        Args: {
+          p_address?: string
+          p_allergies?: string
+          p_blood_type?: string
+          p_chronic_conditions?: string
+          p_date_of_birth?: string
+          p_email?: string
+          p_emergency_contact_name?: string
+          p_emergency_contact_phone?: string
+          p_first_name: string
+          p_gender?: string
+          p_institution_id: string
+          p_last_name: string
+          p_phone?: string
+          p_source?: string
+        }
+        Returns: {
+          created: boolean
+          matched_by: string
+          patient_id: string
+        }[]
+      }
+      find_potential_duplicates: {
+        Args: { p_limit?: number }
+        Returns: {
+          dob_a: string
+          dob_b: string
+          id_a: string
+          id_b: string
+          match_reason: string
+          name_a: string
+          name_b: string
+          phone_a: string
+          phone_b: string
+          score: number
         }[]
       }
       fulfill_marketplace_order: { Args: { p_order_id: string }; Returns: Json }
@@ -23906,6 +27994,16 @@ export type Database = {
           slot_time: string
         }[]
       }
+      get_public_platform_counts: {
+        Args: never
+        Returns: {
+          appointments: number
+          doctors: number
+          hospitals: number
+          patients: number
+          pharmacies: number
+        }[]
+      }
       get_public_profile: {
         Args: { _user_id: string }
         Returns: {
@@ -23916,6 +28014,10 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           specialty: string
         }[]
+      }
+      get_smart_invoice_settings_public: {
+        Args: { p_institution_id: string }
+        Returns: Json
       }
       get_staff_invitation_by_token: {
         Args: { p_token: string }
@@ -23958,6 +28060,7 @@ export type Database = {
         Args: { _patient: string; _provider: string }
         Returns: boolean
       }
+      has_collecting_role: { Args: { p_user_id: string }; Returns: boolean }
       has_patient_relationship: {
         Args: { p_patient_id: string }
         Returns: boolean
@@ -23969,6 +28072,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_kb_views: { Args: { p_slug: string }; Returns: undefined }
       increment_template_use: {
         Args: { p_template_id: string }
         Returns: undefined
@@ -23978,12 +28082,40 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      is_asset_shareable: { Args: { p_asset_id: string }; Returns: boolean }
+      is_assigned_courier: {
+        Args: { p_delivery_order_id: string }
+        Returns: boolean
+      }
+      is_camp_staff: { Args: { p_camp_id: string }; Returns: boolean }
+      is_courier_assigned_to_patient: {
+        Args: { p_courier_id: string }
+        Returns: boolean
+      }
+      is_courier_row: { Args: { p_courier_id: string }; Returns: boolean }
+      is_indent_staff: { Args: { p_indent_id: string }; Returns: boolean }
       is_institution_admin: {
         Args: { institution_id: string }
         Returns: boolean
       }
+      is_institution_admin_of: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
+      is_institution_finance_staff: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
+      is_institution_member: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
       is_institution_staff: {
         Args: { institution_id: string; user_id: string }
+        Returns: boolean
+      }
+      is_institution_staff_for_patient: {
+        Args: { p_patient_id: string }
         Returns: boolean
       }
       is_institution_staff_member: {
@@ -23998,6 +28130,10 @@ export type Database = {
         Args: { p_institution_id: string }
         Returns: boolean
       }
+      is_own_courier_document: {
+        Args: { p_screening_id: string }
+        Returns: boolean
+      }
       is_pharmacy_operator: {
         Args: { p_institution_id: string }
         Returns: boolean
@@ -24006,10 +28142,68 @@ export type Database = {
       is_service_role: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      is_support_staff: { Args: { p_user_id: string }; Returns: boolean }
       is_verified_prescriber: { Args: { p_user_id: string }; Returns: boolean }
+      is_zra_institution_admin: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
+      is_zra_institution_member: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
       issue_blood: {
         Args: { p_issued_by?: string; p_notes?: string; p_request_id: string }
         Returns: string
+      }
+      kiosk_check_in: {
+        Args: {
+          p_department?: string
+          p_institution_id: string
+          p_notes?: string
+          p_patient_id: string
+        }
+        Returns: {
+          already_checked_in: boolean
+          department: string
+          patient_name: string
+          token_id: string
+          token_number: string
+        }[]
+      }
+      kiosk_lookup_patient: {
+        Args: { p_institution_id: string; p_phone: string }
+        Returns: {
+          active_token_number: string
+          first_name: string
+          has_appointment_today: boolean
+          last_name: string
+          patient_id: string
+        }[]
+      }
+      kiosk_terminal_info: {
+        Args: { p_institution_id: string }
+        Returns: {
+          can_operate: boolean
+          institution_name: string
+        }[]
+      }
+      lab_institution_access: {
+        Args: { p_institution_id: string; p_viewer: string }
+        Returns: boolean
+      }
+      lab_result_in_scope: {
+        Args: {
+          p_request_id: string
+          p_technician_id: string
+          p_test_id: string
+          p_viewer: string
+        }
+        Returns: boolean
+      }
+      list_patient_insurance: {
+        Args: { p_hospital_id: string; p_patient_id: string }
+        Returns: Json
       }
       log_emergency_lookup: {
         Args: { p_ids: string[]; p_term: string }
@@ -24020,9 +28214,19 @@ export type Database = {
         Args: { _staff_role: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      merge_patients: {
+        Args: { p_duplicate: string; p_reason?: string; p_survivor: string }
+        Returns: Json
+      }
+      next_wholesale_order_number: { Args: never; Returns: string }
+      normalize_drug_name: { Args: { p_name: string }; Returns: string }
       post_stock_writeoff: {
         Args: { p_writeoff_id: string }
         Returns: undefined
+      }
+      prescription_till_paid: {
+        Args: { p_hospital_id: string; p_prescription_id: string }
+        Returns: Json
       }
       process_full_payment: {
         Args: {
@@ -24089,6 +28293,14 @@ export type Database = {
             }
             Returns: Json
           }
+      profile_admin_level_of: {
+        Args: { p_profile_id: string }
+        Returns: Database["public"]["Enums"]["admin_level"]
+      }
+      profile_role_of: {
+        Args: { p_profile_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       quarantine_expired_batches: {
         Args: { p_institution_id?: string }
         Returns: number
@@ -24128,6 +28340,27 @@ export type Database = {
         Args: { p_grant_id: string }
         Returns: boolean
       }
+      screen_medications: {
+        Args: {
+          p_exclude_prescription_id?: string
+          p_med_names: string[]
+          p_patient_id: string
+        }
+        Returns: Json
+      }
+      search_institution_patients: {
+        Args: { p_institution_id: string; p_query?: string }
+        Returns: {
+          date_of_birth: string
+          email: string
+          first_name: string
+          last_name: string
+          on_roster: boolean
+          patient_id: string
+          phone: string
+          source: string
+        }[]
+      }
       search_patients_for_provider: {
         Args: { p_search: string }
         Returns: {
@@ -24153,12 +28386,17 @@ export type Database = {
         Args: { p_provider_id: string }
         Returns: boolean
       }
+      summarize_safety_findings: { Args: { p_blocking: Json }; Returns: string }
       transfer_institution_superadmin: {
         Args: { p_institution_id: string; p_new_admin_id: string }
         Returns: undefined
       }
       user_affiliated_with_institution: {
         Args: { p_institution_id: string }
+        Returns: boolean
+      }
+      user_can_report_for_institution: {
+        Args: { p_institution_id: string; p_user_id: string }
         Returns: boolean
       }
       user_can_verify_for_lab: {
@@ -24169,6 +28407,7 @@ export type Database = {
         Args: { profile_id: string; viewer_id: string }
         Returns: boolean
       }
+      user_institution_ids: { Args: never; Returns: string[] }
       user_is_institution_staff_for_institution: {
         Args: { p_institution_id: string; p_user_id: string }
         Returns: boolean
@@ -24239,6 +28478,9 @@ export type Database = {
         | "community_health_worker"
         | "traditional_practitioner"
         | "medical_records_officer"
+        | "optician"
+        | "finance_manager"
+        | "courier"
       attendance_status: "present" | "absent" | "late" | "half_day" | "on_leave"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
@@ -24396,6 +28638,9 @@ export type Database = {
         | "triage_staff"
         | "maintenance_manager"
         | "ambulance_staff"
+        | "finance_manager"
+        | "courier"
+        | "optician"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -24570,6 +28815,9 @@ export const Constants = {
         "community_health_worker",
         "traditional_practitioner",
         "medical_records_officer",
+        "optician",
+        "finance_manager",
+        "courier",
       ],
       attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
       experience_level: ["entry", "intermediate", "expert"],
@@ -24728,6 +28976,9 @@ export const Constants = {
         "triage_staff",
         "maintenance_manager",
         "ambulance_staff",
+        "finance_manager",
+        "courier",
+        "optician",
       ],
     },
   },
