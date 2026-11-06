@@ -15399,6 +15399,7 @@ export type Database = {
           purchase_order_ref: string | null
           quantity_available: number
           supplier_name: string | null
+          tax_template_id: string | null
           unit_price: number | null
           updated_at: string
         }
@@ -15418,6 +15419,7 @@ export type Database = {
           purchase_order_ref?: string | null
           quantity_available?: number
           supplier_name?: string | null
+          tax_template_id?: string | null
           unit_price?: number | null
           updated_at?: string
         }
@@ -15437,6 +15439,7 @@ export type Database = {
           purchase_order_ref?: string | null
           quantity_available?: number
           supplier_name?: string | null
+          tax_template_id?: string | null
           unit_price?: number | null
           updated_at?: string
         }
@@ -15461,6 +15464,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
             referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "medication_inventory_tax_template_id_fkey"
+            columns: ["tax_template_id"]
+            isOneToOne: false
+            referencedRelation: "tax_templates"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -18941,6 +18951,7 @@ export type Database = {
           quantity: number
           reorder_level: number
           supplier_id: string | null
+          tax_template_id: string | null
           unit_price: number
           updated_at: string | null
         }
@@ -18960,6 +18971,7 @@ export type Database = {
           quantity?: number
           reorder_level?: number
           supplier_id?: string | null
+          tax_template_id?: string | null
           unit_price: number
           updated_at?: string | null
         }
@@ -18979,6 +18991,7 @@ export type Database = {
           quantity?: number
           reorder_level?: number
           supplier_id?: string | null
+          tax_template_id?: string | null
           unit_price?: number
           updated_at?: string | null
         }
@@ -19009,6 +19022,13 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "pharmacy_suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_inventory_tax_template_id_fkey"
+            columns: ["tax_template_id"]
+            isOneToOne: false
+            referencedRelation: "tax_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -22547,6 +22567,7 @@ export type Database = {
           is_active: boolean
           service_code: string
           service_label: string
+          tax_template_id: string | null
           updated_at: string
         }
         Insert: {
@@ -22559,6 +22580,7 @@ export type Database = {
           is_active?: boolean
           service_code: string
           service_label: string
+          tax_template_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -22571,9 +22593,18 @@ export type Database = {
           is_active?: boolean
           service_code?: string
           service_label?: string
+          tax_template_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "service_pricing_tax_template_id_fkey"
+            columns: ["tax_template_id"]
+            isOneToOne: false
+            referencedRelation: "tax_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_tariffs: {
         Row: {
@@ -24488,6 +24519,67 @@ export type Database = {
           },
           {
             foreignKeyName: "tax_rates_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      tax_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          institution_id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          rate_percent: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          rate_percent?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          rate_percent?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_templates_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tax_templates_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tax_templates_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
@@ -28326,6 +28418,14 @@ export type Database = {
       request_break_glass_access: {
         Args: { p_patient_id: string; p_reason: string }
         Returns: string
+      }
+      resolve_item_tax_rate: {
+        Args: {
+          p_fallback?: number
+          p_institution_id: string
+          p_template_id: string
+        }
+        Returns: number
       }
       resolve_payment_amount: {
         Args: { _reference_id: string; _reference_type: string }
