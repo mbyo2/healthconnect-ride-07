@@ -299,7 +299,9 @@ export function useInstitutionContext() {
         .eq('user_id', user.id);
       const grantedRoles = (grantedRoleRows || []).map((r: any) => String(r.role));
       const businessType = (user.user_metadata?.business_type || '') as string;
-      const isInstitutionalRole = grantedRoles.some((userRole) => [
+      // Primary granted role (non-patient first) drives the auto-provisioned facility type.
+      const userRole = grantedRoles.find((r) => r !== 'patient') || grantedRoles[0] || '';
+      const isInstitutionalRole = grantedRoles.some((r) => [
         'pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist',
         'hospital', 'clinic', 'specialized_clinic',
         'laboratory', 'lab', 'lab_technician', 'nursing_home', 'institution_admin',
@@ -313,7 +315,7 @@ export function useInstitutionContext() {
         'receptionist', 'hr_manager', 'billing_staff', 'finance_manager',
         'inventory_manager', 'maintenance_manager', 'ambulance_staff', 'pathologist',
         'ot_staff', 'triage_staff',
-      ].includes(userRole)) || businessType.length > 0;
+      ].includes(r)) || businessType.length > 0;
 
       // Skip auto-provisioning if we found staff links but couldn't fetch
       // institution details (RLS issue). The user is staff somewhere —
