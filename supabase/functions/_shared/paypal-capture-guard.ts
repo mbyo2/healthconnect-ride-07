@@ -94,7 +94,7 @@ export function evaluateCapture(input: CaptureGuardInput): CaptureDecision {
     return {
       action: 'refuse',
       settleAmount: 0,
-      mismatch: { kind: 'invalid_capture_amount', ...base },
+      mismatch: { kind: 'invalid_capture_amount' as const, ...base },
     };
   }
 
@@ -102,7 +102,7 @@ export function evaluateCapture(input: CaptureGuardInput): CaptureDecision {
     return {
       action: 'refuse',
       settleAmount: 0,
-      mismatch: { kind: 'currency_mismatch', ...base },
+      mismatch: { kind: 'currency_mismatch' as const, ...base },
     };
   }
 
@@ -121,13 +121,13 @@ export function evaluateCapture(input: CaptureGuardInput): CaptureDecision {
       return {
         action: 'refuse',
         settleAmount: 0,
-        mismatch: { kind: 'under_capture', ...base },
+        mismatch: { kind: 'under_capture' as const, ...base },
       };
     }
     return {
       action: 'settle_partial',
       settleAmount,
-      mismatch: { kind: 'under_capture', ...base },
+      mismatch: { kind: 'under_capture' as const, ...base },
     };
   }
 
@@ -135,6 +135,6 @@ export function evaluateCapture(input: CaptureGuardInput): CaptureDecision {
   return {
     action: 'settle',
     settleAmount: ledgerAmount,
-    mismatch: { kind: 'over_capture', ...base },
+    mismatch: { kind: 'over_capture' as const, ...base },
   };
 }
