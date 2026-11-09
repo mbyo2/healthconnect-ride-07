@@ -599,7 +599,14 @@ export async function settleTransferByReference(
     return { status: 'failed', settled: true };
   }
 
-  // successful — claim paid atomically, then debit the wallet
+  // successful — claim paid atomically, then debit the wallet THROUGH the
+  // process_wallet_transaction RPC (the same path settle.ts uses for
+  // collections): it locks the wallet row, moves the balance and writes the
+  // wallet_transactions ledger row in ONE transaction, keyed by gateway_ref.
+  // The previous code did a manual balance update plus a direct
+  // wallet_transactions insert naming a nonexistent user_id column and
+  // ignored the insert error — the balance moved but the ledger row never
+  // landed, silently breaking reconciliation.
   const { data: claimed } = await admin
     .from('withdrawal_requests')
     .update({ status: 'paid', paid_at: new Date().toISOString(), updated_at: new Date().toISOString() })
@@ -613,30 +620,46 @@ export async function settleTransferByReference(
 
   const payoutAmount = Number((withdrawal as any).amount);
   const providerId = (withdrawal as any).provider_id;
-  const { data: wallet } = await admin
-    .from('user_wallets')
-    .select('balance')
-    .eq('user_id', providerId)
-    .maybeSingle();
-  const currentBalance = Number((wallet as any)?.balance || 0);
-  if (currentBalance < payoutAmount) {
-    // The money has LEFT with Lenco — a shortfall means an earlier debit
-    // was missed. Debit in full (truthful negative liability) and shout.
-    console.error(
-      `settleTransferByReference: wallet shortfall for ${reference}: balance ${currentBalance} < payout ${payoutAmount}`,
-    );
-  }
-  await admin
-    .from('user_wallets')
-    .update({ balance: currentBalance - payoutAmount, updated_at: new Date().toISOString() })
-    .eq('user_id', providerId);
-  await admin.from('wallet_transactions').insert({
-    user_id: providerId,
-    transaction_type: 'debit',
-    amount: payoutAmount,
-    description: `Withdrawal payout ${reference}`,
-    gateway_ref: `PAYOUT:${withdrawalId}`,
+  const { error: debitError } = await admin.rpc('process_wallet_transaction', {
+    p_user_id: providerId,
+    p_transaction_type: 'debit',
+    p_amount: payoutAmount,
+    p_description: `Withdrawal payout ${reference}`,
+    p_payment_id: null,
+    p_gateway_ref: `PAYOUT:${withdrawalId}`,
   });
+  if (debitError) {
+    const isUniqueViolation = (debitError as any)?.code === '23505' ||
+      String((debitError as any)?.message || '').includes('uq_wallet_transactions_gateway_ref');
+    if (!isUniqueViolation) {
+      // The money has LEFT with Lenco but the debit did not land (e.g. the
+      // balance no longer covers the payout — an earlier debit was missed).
+      // Never swallow this: un-claim the withdrawal (paid -> processing, so
+      // a webhook re-delivery or status re-check can retry the debit; the
+      // 'processing' state also keeps lenco-process-payout from ever
+      // re-sending the transfer) and mark the payout ledger row with the
+      // failure so the gap stays visible until it is resolved.
+      console.error(
+        `settleTransferByReference: payout wallet debit FAILED for ${reference}: ${(debitError as any)?.message || debitError}`,
+      );
+      await admin
+        .from('withdrawal_requests')
+        .update({ status: 'processing', paid_at: null, updated_at: new Date().toISOString() })
+        .eq('id', withdrawalId)
+        .eq('status', 'paid');
+      await admin
+        .from('lenco_payments')
+        .update({
+          status: 'paid',
+          lenco_lenco_reference: st.lencoReference || null,
+          result_message: `successful at Lenco but wallet debit FAILED: ${(debitError as any)?.message || 'unknown error'}`,
+        })
+        .eq('id', (ledger as any).id);
+      return { status: 'successful', settled: false, reason: 'wallet_debit_failed' };
+    }
+    // Unique violation on gateway_ref: a concurrent settlement already
+    // debited this payout — idempotent success (same pattern as settle.ts).
+  }
   await admin
     .from('lenco_payments')
     .update({
