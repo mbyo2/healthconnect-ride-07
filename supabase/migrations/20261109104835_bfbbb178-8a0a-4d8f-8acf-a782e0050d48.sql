@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.resolve_item_tax_rate(uuid, uuid, numeric) FROM authenticated;

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Search, User, Receipt, CalendarClock, Ticket, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useInstitutionContext } from '@/context/InstitutionContext';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { searchInstitutionPatients } from '@/lib/patients';
 
 interface Hit {
