@@ -338,7 +338,7 @@ export const PharmacyManagement = () => {
           <div className="pt-3 border-t border-canvas-silk space-y-3">
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
-              <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Tax (16%)</span><span>{formatPrice(cartTax)}</span></div>
+              <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Tax (est., final per item at checkout)</span><span>{formatPrice(cartTax)}</span></div>
               <div className="flex justify-between text-base font-semibold text-slate-900 dark:text-slate-100 pt-1 border-t">
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
