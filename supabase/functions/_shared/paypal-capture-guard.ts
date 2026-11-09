@@ -52,7 +52,7 @@ export interface CaptureMismatch {
 }
 
 export type CaptureDecision =
-  | { action: 'settle'; settleAmount: number; mismatch: null }
+  | { action: 'settle'; settleAmount: number; mismatch: CaptureMismatch | null }
   | { action: 'settle_partial'; settleAmount: number; mismatch: CaptureMismatch }
   | { action: 'refuse'; settleAmount: 0; mismatch: CaptureMismatch };
 
