@@ -18,6 +18,7 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import LocalisationTaxCard from "@/components/settings/LocalisationTaxCard";
+import TaxTemplatesCard from "@/components/settings/TaxTemplatesCard";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 
@@ -1024,6 +1025,7 @@ const InstitutionSettings = () => {
 
         {/* ── Localisation & Tax Settings ── */}
         {institution?.id && <LocalisationTaxCard institutionId={institution.id} />}
+        {institution?.id && <TaxTemplatesCard institutionId={institution.id} />}
 
         {/* ── Save ── */}
         <Button type="submit" disabled={saving} className="w-full md:w-auto vf-btn-primary">
