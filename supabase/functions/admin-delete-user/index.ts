@@ -50,6 +50,12 @@ interface FkEdge {
   delete_rule: string;
 }
 
+// L-1 (security sweep 2026-11-10): errors that carry raw DB / system
+// text must never reach the client. Crafted operator diagnostics are
+// thrown as OpError and pass through; anything else gets a generic
+// message in the catch below, with the detail in the server log.
+class OpError extends Error {}
+
 const tblKey = (s: string, t: string) => `${s}.${t}`;
 const isRoot = (s: string, t: string) =>
   (s === "auth" && t === "users") || (s === "public" && t === "profiles");
@@ -131,7 +137,7 @@ serve(async (req) => {
     const { data: edges, error: discErr } = await supabase.rpc(
       "admin_delete_user_discover"
     );
-    if (discErr) throw new Error(`FK discovery failed: ${discErr.message}`);
+    if (discErr) throw new Error("FK discovery failed");
     const allEdges = (edges || []) as FkEdge[];
 
     // Build dependents map: parentKey -> edges where child references parent
@@ -257,7 +263,7 @@ serve(async (req) => {
       const hit = predMemo.get(key);
       if (hit) return hit;
       if (visiting.has(key)) {
-        throw new Error(`FK cycle detected at ${key} — refusing to delete (manual review required)`);
+        throw new OpError(`FK cycle detected at ${key} — refusing to delete (manual review required)`);
       }
       visiting.add(key);
       const node = nodes.get(key)!;
@@ -279,7 +285,7 @@ serve(async (req) => {
       }
       visiting.delete(key);
       if (conds.length === 0) {
-        throw new Error(`No user-link predicate for ${key} — refusing to delete`);
+        throw new OpError(`No user-link predicate for ${key} — refusing to delete`);
       }
       const pred = conds.join(" OR ");
       predMemo.set(key, pred);
@@ -349,7 +355,7 @@ serve(async (req) => {
         "admin_delete_user_counts",
         { p_steps: steps, p_target: targetUserId, p_detach: detachSteps }
       );
-      if (countErr) throw new Error(`Dry-run failed: ${countErr.message}`);
+      if (countErr) throw new Error("Dry-run failed");
 
       const nonzero = (counts || []).filter((c: any) => Number(c.row_count) > 0);
       const deletes = nonzero.filter((c: any) => c.action === "delete");
@@ -392,11 +398,16 @@ serve(async (req) => {
         p_target_email: targetEmail,
       }
     );
-    if (execErr) throw new Error(`Deletion failed and was rolled back: ${execErr.message}`);
+    if (execErr) throw new Error("Deletion failed and was rolled back");
 
     return json({ mode: "delete", target, report });
   } catch (e: any) {
     console.error("admin-delete-user error:", e.message);
-    return json({ error: e.message || "Deletion failed" }, 500);
+    // L-1: only crafted operator diagnostics (OpError) reach the
+    // client. Raw DB / system text gets a generic message.
+    const message = e instanceof OpError
+      ? e.message
+      : "Deletion failed. Please try again or contact support.";
+    return json({ error: message }, 500);
   }
 });

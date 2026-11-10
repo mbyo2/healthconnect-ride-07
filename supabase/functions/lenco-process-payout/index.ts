@@ -27,6 +27,7 @@ import {
   settleTransferByReference,
   normalizePhone,
 } from "../_shared/lenco.ts";
+import { aiRateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,6 +60,13 @@ serve(async (req) => {
       .in("role", ["super_admin", "admin", "finance_manager"]);
 
     if (!roles || roles.length === 0) throw new Error("Admin access required");
+
+    // M-5 (security sweep 2026-11-10): per-admin rate limit on the
+    // payout path. Payouts are rare, admin-only operations; 10/min
+    // bounds accidental double-submit loops and abuse of a stolen
+    // admin session. Shared Postgres limiter.
+    const rateLimited = await aiRateLimitResponse(user.id, 'lenco-process-payout', 10, corsHeaders);
+    if (rateLimited) return rateLimited;
 
     const { withdrawal_id } = await req.json();
     if (!withdrawal_id) throw new Error("withdrawal_id required");
@@ -117,7 +125,7 @@ serve(async (req) => {
         .update({ status: "approved", updated_at: new Date().toISOString() })
         .eq("id", withdrawal_id)
         .eq("status", "processing");
-      throw new Error(`Payout ledger creation failed: ${ledgerError.message}`);
+      throw new Error("Payout ledger creation failed");
     }
 
     const revertClaim = async (reason: string) => {
@@ -176,11 +184,14 @@ serve(async (req) => {
           result = { ...result, success: true, status: statusCheck.status, lencoReference: statusCheck.lencoReference };
         } else {
           await revertClaim(result.error || "Transfer failed");
-          throw new Error(`Transfer failed: ${result.error}`);
+          // L-1: the provider's raw error text stays in the ledger row
+          // (revertClaim) and the server log — the client gets a generic
+          // message, never gateway internals.
+          throw new Error("Transfer failed");
         }
       } else {
         await revertClaim(result.error || "Transfer failed");
-        throw new Error(result.error || "Transfer failed");
+        throw new Error("Transfer failed");
       }
     }
 
@@ -211,8 +222,25 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err: any) {
+    // L-1: only crafted operator messages reach the client. Anything
+    // else (DB / provider / network internals) gets a generic message;
+    // the detail stays in the server log.
+    const msg = String(err?.message || "");
+    const crafted =
+      msg === "Missing authorization" ||
+      msg === "Unauthorized" ||
+      msg === "Admin access required" ||
+      msg === "withdrawal_id required" ||
+      msg === "Withdrawal not found" ||
+      msg === "Cannot pay: no admin approval recorded" ||
+      msg === "Withdrawal is no longer in approved state (may already be processing)" ||
+      msg === "Payout ledger creation failed" ||
+      msg === "Transfer failed" ||
+      msg.startsWith("Cannot pay: status is ") ||
+      (msg.startsWith("Transfer WD-") && msg.includes("already exists with status: "));
+    console.error("lenco-process-payout error", err);
     return new Response(
-      JSON.stringify({ success: false, error: err.message }),
+      JSON.stringify({ success: false, error: crafted ? msg : "Could not process the payout. Please try again." }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -8,6 +8,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
+import { deidentifyScribeInput } from '../_shared/deidentify.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -102,6 +103,9 @@ CRITICAL RULES:
 - If information is missing for a section, use an empty string or empty array.
 - Flag uncertainty: if the transcript is unclear about something important, note it in "uncertainties".
 - This is a DRAFT for clinician review, not a final record.
+- Direct identifiers were removed from the transcript before it reached
+  you (shown as [NAME], [PHONE], [EMAIL], [NRC], [ADDRESS], [DOB]).
+  Do NOT attempt to reconstruct them; leave those fields blank.
 
 JSON schema:
 {
@@ -164,9 +168,21 @@ serve(async (req) => {
     }
     const { transcript, patient_context } = parsed.data;
 
+    // M-4 (security sweep 2026-11-10): de-identify BEFORE the upstream
+    // call. Names, phones, emails, NRC numbers and addresses in the
+    // transcript / free-text context must never reach the third-party AI
+    // providers. Only the scrubbed text is sent; the raw text is never
+    // logged. The consent/contract basis for sending consultation text
+    // to third-party AI at all remains a CEO decision — this scrubber
+    // reduces exposure, it does not settle it.
+    const scrubbed = deidentifyScribeInput({ transcript, patient_context });
+    if (scrubbed.redactions > 0) {
+      console.log(`ambient-scribe: removed ${scrubbed.redactions} identifier(s) before AI call`);
+    }
+
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Patient context: ${patient_context || 'Not provided'}\n\nTRANSCRIPT:\n${transcript}\n\nGenerate the SOAP draft JSON now.` },
+      { role: "user", content: `Patient context: ${scrubbed.patient_context || 'Not provided'}\n\nTRANSCRIPT:\n${scrubbed.transcript}\n\nGenerate the SOAP draft JSON now.` },
     ];
     const { text, model } = await chatComplete(messages, 1500);
 
@@ -176,7 +192,9 @@ serve(async (req) => {
     try {
       notes = JSON.parse(cleaned);
     } catch {
-      return new Response(JSON.stringify({ error: 'AI returned invalid format', raw: text.slice(0, 2000) }),
+      // Do not echo the model's raw output: it can repeat identifiers
+      // from the transcript. The clinician re-runs the scribe instead.
+      return new Response(JSON.stringify({ error: 'The AI returned a note in an unexpected format. Please try again.' }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
@@ -186,8 +204,10 @@ serve(async (req) => {
       disclaimer: 'DRAFT — requires clinician review and approval before use as a clinical record.',
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e: any) {
+    // Never surface provider/system error text to the client.
+    console.error('ambient-scribe error', e);
     const status = e?.message?.includes('not configured') ? 503 : 500;
-    return new Response(JSON.stringify({ error: e?.message ?? 'Internal error' }),
+    return new Response(JSON.stringify({ error: status === 503 ? 'The AI scribe is not configured right now. Please try again later.' : 'Could not generate notes. Please try again.' }),
       { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });

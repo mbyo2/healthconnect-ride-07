@@ -5,6 +5,7 @@ const corsHeaders = {
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { resolveReferenceAmount, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
 import { initiateMobileMoneyCollection, normalizePhone, type LencoOperator } from '../_shared/lenco.ts';
+import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const ALLOWED_OPERATORS: LencoOperator[] = ['mtn', 'airtel', 'zamtel', 'tnm'];
 
@@ -75,6 +76,13 @@ Deno.serve(async (req) => {
     const userId = claims.claims.sub as string;
     const userEmail = (claims.claims.email as string) || '';
 
+    // M-5 (security sweep 2026-11-10): per-user rate limit. Each call
+    // initiates a real Lenco collection + phone prompt, so unbounded
+    // calls are prompt spam against the caller's own number and load
+    // against the provider. Same shared Postgres limiter as doc-chat.
+    const rateLimited = await aiRateLimitResponse(userId, 'lenco-create-payment', 10, corsHeaders);
+    if (rateLimited) return rateLimited;
+
     const body = await req.json().catch(() => ({}));
     const clientAmount = Number(body.amount);
     // Platform prices and Lenco mobile money collections are ZMW only
@@ -104,6 +112,19 @@ Deno.serve(async (req) => {
 
     const admin = createClient(supabaseUrl, serviceKey);
 
+    // L-6 (security sweep 2026-11-10) — DELIBERATE, DOCUMENTED: this
+    // function does NOT verify the caller owns the reference
+    // (invoice / order / appointment). Paying someone else's bill is
+    // the intended behaviour — "pay on behalf" (e.g. family paying a
+    // relative's invoice; nursing-home family billing). It is safe by
+    // construction: the money leaves the CALLER's own mobile-money
+    // account (their phone approves the prompt), the caller can only
+    // verify/settle their own collections (lenco-verify-payment
+    // 404s for other users' references), and paying another person's
+    // bill can only settle that person's debt — it cannot extract
+    // money from them. Do NOT add an ownership check here without a
+    // CEO decision: it would break family payments.
+    //
     // ── PAYMENT MODE GATE ──────────────────────────────────────────
     // If this payment is for an institution in 'own' (HMS-only) mode,
     // reject it — their patients pay the facility directly, never via us.
@@ -156,8 +177,10 @@ Deno.serve(async (req) => {
         bearer: 'merchant',
       });
     } catch (e: any) {
+      // L-1: never surface the provider's raw error text to the client —
+      // it can carry gateway internals. Detail stays in the server log.
       console.error('Lenco initiate collection failed', e?.message || e);
-      return new Response(JSON.stringify({ error: 'Mobile money provider error', message: e?.message || 'Failed to start collection' }), {
+      return new Response(JSON.stringify({ error: 'Mobile money provider error', message: 'Could not start the mobile money payment. Please try again.' }), {
         status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -214,8 +237,9 @@ Deno.serve(async (req) => {
         : 'Payment initiated.',
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e) {
+    // L-1: never surface raw system error text to the client.
     console.error('lenco-create-payment error', e);
-    return new Response(JSON.stringify({ error: String((e as any)?.message || e) }), {
+    return new Response(JSON.stringify({ error: 'Could not start the payment. Please try again.' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

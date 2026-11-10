@@ -4,6 +4,7 @@ const corsHeaders = {
 };
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { verifyAndSettleLenco } from '../_shared/lenco.ts';
+import { aiRateLimitResponse } from '../_shared/rate-limit.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -33,6 +34,13 @@ Deno.serve(async (req) => {
       });
     }
     const userId = claims.claims.sub as string;
+
+    // M-5 (security sweep 2026-11-10): per-user rate limit. The client
+    // polls this after the customer approves on their phone, so the
+    // limit is generous (30/min) — it exists to bound status-check
+    // abuse, not to break legitimate polling. Shared Postgres limiter.
+    const rateLimited = await aiRateLimitResponse(userId, 'lenco-verify-payment', 30, corsHeaders);
+    if (rateLimited) return rateLimited;
 
     const url = new URL(req.url);
     let reference = url.searchParams.get('reference');
@@ -74,8 +82,9 @@ Deno.serve(async (req) => {
           : 'This payment did not complete. No money was taken from your wallet record.',
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e) {
+    // L-1: never surface raw system error text to the client.
     console.error('lenco-verify-payment error', e);
-    return new Response(JSON.stringify({ error: String((e as any)?.message || e) }), {
+    return new Response(JSON.stringify({ error: 'Could not check the payment status. Please try again.' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

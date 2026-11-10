@@ -225,16 +225,44 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
 
   // Platform-only revenue (subscriptions, HMS fees): all of it goes to the
   // app owner wallet, there is no second party.
+  //
+  // L-5 (security sweep 2026-11-10): this used to be a read-modify-write
+  // done here (SELECT balance, UPDATE balance = old + amount), so
+  // concurrent settlements could lose a credit. It now routes through
+  // the locking settle_platform_revenue RPC: the wallet row is locked
+  // FOR UPDATE, the credit is recorded in app_owner_wallet_credits
+  // (external_ref UNIQUE = idempotency key), and the balance moves with
+  // one atomic increment — the same pattern as process_wallet_transaction
+  // for user wallets. Note process_wallet_transaction itself cannot be
+  // used here: it credits user_wallets by user id, and the app owner
+  // wallet is a separate table with no user id.
   if (!payee) {
     if (PLATFORM_ONLY_TYPES.has(type)) {
-      const { data: wallet } = await admin.from('app_owner_wallet').select('id, balance').limit(1).maybeSingle();
-      if (wallet) {
-        await admin
-          .from('app_owner_wallet')
-          .update({ balance: Number(wallet.balance || 0) + amount, updated_at: new Date().toISOString() })
-          .eq('id', wallet.id);
+      const { data: credit, error: creditErr } = await admin.rpc('settle_platform_revenue', {
+        p_amount: amount,
+        p_external_ref: externalRef,
+        p_gateway: gateway,
+        p_payer_id: payerId,
+        p_reference_type: referenceType,
+        p_reference_id: referenceId,
+        p_description: description ?? null,
+        p_currency: currency,
+      });
+      if (creditErr) {
+        console.error('settlePayment platform credit failed', creditErr);
+        return { settled: false, reason: 'platform_credit_failed' };
       }
-      return { settled: true, payeeType: 'app_owner', payeeAmount: amount, platformFee: amount };
+      if (!credit?.settled) {
+        console.error('settlePayment platform credit refused', credit);
+        return { settled: false, reason: (credit?.reason as string) || 'platform_credit_failed' };
+      }
+      return {
+        settled: true,
+        already: (credit as any)?.already === true,
+        payeeType: 'app_owner',
+        payeeAmount: amount,
+        platformFee: amount,
+      };
     }
     console.warn('settlePayment: no payee resolved', { referenceType, referenceId });
     return { settled: false, reason: 'payee_unresolved' };

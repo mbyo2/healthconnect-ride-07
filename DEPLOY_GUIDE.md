@@ -49,7 +49,6 @@ payment set together keeps them in sync:
 supabase functions deploy process-wallet-payment
 supabase functions deploy dpo-create-token
 supabase functions deploy dpo-verify-token
-supabase functions deploy process-mobile-money
 supabase functions deploy create-daily-room
 ```
 

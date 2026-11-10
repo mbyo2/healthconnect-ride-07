@@ -101,7 +101,8 @@ Deno.serve(async (req) => {
     console.error('lenco-webhook error', e);
     // Return 200 anyway so Lenco does not retry-storm a poisoned payload;
     // the failure is in our logs and the frontend verify path still works.
-    return new Response(JSON.stringify({ ok: false, error: String((e as any)?.message || e) }), {
+    // L-1: generic message only — never the raw system error text.
+    return new Response(JSON.stringify({ ok: false, error: 'Webhook processing failed' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
