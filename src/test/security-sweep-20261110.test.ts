@@ -167,6 +167,19 @@ describe('crafted error messages (L-1)', () => {
     expect(counting).toContain('seenParents');
     expect(counting).toContain('!seenParents.has(pk)');
   });
+
+  it('admin_delete_user_execute never deletes storage.objects directly (live-proven 2026-11-10)', () => {
+    // storage.protect_delete() raises 42501 on any DELETE FROM
+    // storage.objects, which failed EVERY user deletion. The RPC must
+    // count + report retained objects instead, and must sweep the
+    // trigger-inserted audit rows before deleting auth.users.
+    const s = read('supabase/migrations/20261110_admin_delete_user_storage_fix.sql');
+    // No executable DELETE FROM storage.objects (comments may mention it).
+    expect(s).not.toMatch(/^\s*DELETE FROM storage\.objects/m);
+    expect(s).toContain('retained — delete via Storage API');
+    expect(s).toContain('deleted (final sweep)');
+    expect(s).toContain('DELETE FROM public.security_audit_log WHERE user_id = p_target');
+  });
 });
 
 // ── L-5: platform-only revenue through the locking RPC ─────────────
