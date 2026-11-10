@@ -300,9 +300,18 @@ serve(async (req) => {
 
     for (const k of deleteKeys) {
       const node = nodes.get(k)!;
+      // Dedupe by parent: a child with TWO FK columns to the same parent
+      // (e.g. ward_transfers -> ward_beds twice, employee_records ->
+      // institution_staff twice) contributes ONE dependency. The
+      // decrement loop below already dedupes with seenParents; without
+      // the same dedupe here the parent's indegree never reaches 0 and
+      // every deletion is refused with a phantom "FK cycle"
+      // (live-proven 2026-11-10: ward_beds + institution_staff stuck).
+      const seenParents = new Set<string>();
       for (const e of node.edges) {
         const pk = tblKey(e.ref_schema, e.ref_table);
-        if (deleteKeys.includes(pk)) {
+        if (deleteKeys.includes(pk) && !seenParents.has(pk)) {
+          seenParents.add(pk);
           // k depends on pk: pk must come AFTER k
           indegree.set(pk, (indegree.get(pk) || 0) + 1);
           if (!childrenOf.has(pk)) childrenOf.set(pk, []);

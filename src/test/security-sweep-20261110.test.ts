@@ -156,6 +156,17 @@ describe('crafted error messages (L-1)', () => {
     expect(s).toContain('class OpError');
     expect(s).toContain('Deletion failed. Please try again or contact support.');
   });
+
+  it('admin-delete-user topological sort dedupes multi-column FKs (live-proven 2026-11-10)', () => {
+    // A child with two FK columns to the same parent (ward_transfers ->
+    // ward_beds twice) counted the parent's indegree twice but decremented
+    // once, so every deletion was refused with a phantom "FK cycle".
+    // Both the counting loop and the decrement loop must dedupe by parent.
+    const s = read('supabase/functions/admin-delete-user/index.ts');
+    const counting = s.slice(s.indexOf('const indegree = new Map'), s.indexOf('const ordered: string[]'));
+    expect(counting).toContain('seenParents');
+    expect(counting).toContain('!seenParents.has(pk)');
+  });
 });
 
 // ── L-5: platform-only revenue through the locking RPC ─────────────
