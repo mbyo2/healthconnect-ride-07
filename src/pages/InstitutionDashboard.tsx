@@ -499,9 +499,16 @@ export const InstitutionDashboard = () => {
 
   return (
     <div className="pb-16">
+      {/* Header + module tabs stick as ONE unit below the global header.
+          They used to be two separate sticky bars at the same top offset
+          (header card via .doc-page-header at z-40, tablist at z-20), so on
+          scroll the tab pills slid under the stuck header card and were
+          clipped in half (CEO phone screenshot, 2026-11-11). One wrapper
+          sticks; the inner header is made static via [position:static]. */}
+      <div className="sticky top-[4.5rem] z-40 bg-background">
       {/* Header */}
       <InstitutionPageHeader
-        className="py-5 shadow-sm"
+        className="py-5 shadow-sm [position:static]"
         icon={cfg.icon}
         iconClassName="shadow-button"
         iconStyle={{ background: cfg.color }}
@@ -548,37 +555,9 @@ export const InstitutionDashboard = () => {
         }
       />
 
-      {/* Dashboard data load failure — plain-language banner with retry
-          (previously a failed fetch silently rendered a dashboard of zeros). */}
-      {dataError && (
-        <div className="pt-4">
-          <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-error-500/30 bg-error-500/10 px-4 py-3">
-            <p className="text-sm font-medium text-error-700 dark:text-error-300">
-              We couldn't load your dashboard data. The numbers below may be incomplete — please try again.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setFetchRetryCount((c) => c + 1)}
-              className="self-start sm:self-auto"
-            >
-              Retry
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Subscription renewal notice — only for effectively expired /
-          past-due subscriptions; renders nothing otherwise. */}
-      {subscriptionGate && (
-        <div className="pt-4">
-          <SubscriptionExpiryBanner gate={subscriptionGate} isAdmin={isAdmin} />
-        </div>
-      )}
-
         {/* Main Suite Tab Navigation */}
-        <div className="pt-4 sticky top-[4.5rem] z-20 bg-background">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-border scrollbar-none" role="tablist" aria-label="Institution modules">
+        <div className="pt-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-2 border-b border-border scrollbar-none" role="tablist" aria-label="Institution modules">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
             { id: "patients", label: "Patient Hub (Central MRN)", icon: UserRound },
@@ -656,6 +635,36 @@ export const InstitutionDashboard = () => {
           })}
         </div>
       </div>
+
+      </div>
+
+      {/* Dashboard data load failure — plain-language banner with retry
+          (previously a failed fetch silently rendered a dashboard of zeros). */}
+      {dataError && (
+        <div className="pt-4">
+          <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-error-500/30 bg-error-500/10 px-4 py-3">
+            <p className="text-sm font-medium text-error-700 dark:text-error-300">
+              We couldn't load your dashboard data. The numbers below may be incomplete — please try again.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFetchRetryCount((c) => c + 1)}
+              className="self-start sm:self-auto"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription renewal notice — only for effectively expired /
+          past-due subscriptions; renders nothing otherwise. */}
+      {subscriptionGate && (
+        <div className="pt-4">
+          <SubscriptionExpiryBanner gate={subscriptionGate} isAdmin={isAdmin} />
+        </div>
+      )}
 
       {/* Tab Contents */}
       <div className="pt-6 space-y-6">

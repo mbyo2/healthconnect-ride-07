@@ -48,7 +48,7 @@ export const InstitutionPageHeader = ({
   return (
     <div className={`doc-page-header px-4 sm:px-6 ${className}`}>
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           {icon && (
             <div
               className={`h-10 w-10 rounded-xl text-white flex items-center justify-center shrink-0 ${iconClassName}`}
@@ -57,9 +57,12 @@ export const InstitutionPageHeader = ({
               {icon}
             </div>
           )}
-          <div>
+          {/* min-w-0 + a wrappable title span: a long institution name
+              must wrap inside the card, never push the card (or the page)
+              wider than the phone screen. */}
+          <div className="min-w-0 flex-1">
             <h1 className={`${titleClassName} flex items-center gap-2 flex-wrap`}>
-              {title}
+              <span className="min-w-0 [overflow-wrap:anywhere]">{title}</span>
               {badges}
             </h1>
             {subtitle && <p className={subtitleClassName}>{subtitle}</p>}

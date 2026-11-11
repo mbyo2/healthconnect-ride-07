@@ -31,14 +31,17 @@ export const InstitutionSwitcher = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 gap-2 px-3 rounded-pill border border-border hover:bg-canvas-bone "
+          className="h-9 gap-2 px-2 sm:px-3 rounded-pill border border-border hover:bg-canvas-bone "
           aria-label="Switch institution"
         >
-          <Building2 className="h-4 w-4 text-primary-500" />
-          <span className="max-w-[120px] truncate text-xs font-medium hidden sm:inline">
+          <Building2 className="h-4 w-4 shrink-0 text-primary-500" />
+          {/* Name joins at md (capped tighter until 900px) and the chevron
+              at sm, so the pill is icon-only on phones and the header
+              cluster fits 360px. (Responsive shell fix, 2026-11-11.) */}
+          <span className="max-w-[72px] min-[900px]:max-w-[120px] truncate text-xs font-medium hidden md:inline">
             {institution?.name || 'Select institution'}
           </span>
-          <ChevronsUpDown className="h-3 w-3 opacity-50" />
+          <ChevronsUpDown className="h-3 w-3 shrink-0 opacity-50 max-sm:hidden" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">

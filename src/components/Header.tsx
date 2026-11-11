@@ -58,10 +58,13 @@ export function Header() {
         Skip to main content
       </a>
       <div className="flex h-16 items-center justify-between px-3 sm:px-4">
-        {/* Wordmark text hides below 420px so the action cluster never overflows narrow phones */}
+        {/* Wordmark text hides below sm: with the full action cluster
+            (switcher + search + bell + currency + theme + language +
+            avatar) even the compact controls need the whole 360–639px
+            width, so the wordmark only joins once sm gives it room. */}
         <AppLogo
           size="sm"
-          className="gap-1.5 sm:gap-2 shrink-0 [&_span]:hidden min-[420px]:[&_span]:inline"
+          className="gap-1.5 sm:gap-2 shrink-0 [&_span]:hidden sm:[&_span]:inline"
         />
 
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">

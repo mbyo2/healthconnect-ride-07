@@ -295,7 +295,12 @@ export default function StaffDashboard() {
         </div>
       </div>
 
-      <div className="bg-background border-b border-border sticky top-[4.5rem] z-40 scroll-mt-20">
+      {/* Sticky offset = global-header offset (4.5rem) + this page's own
+          sticky header card height (py-4 32px + title/subtitle lines 44px
+          + border 1px = 77px). At the old shared offset the tab bar stuck
+          at the same place as the header card and the two overlapped —
+          the same clip defect fixed on InstitutionDashboard 2026-11-11. */}
+      <div className="bg-background border-b border-border sticky top-[calc(4.5rem+77px)] z-40 scroll-mt-20">
         <div>
           <div className="flex gap-1 overflow-x-auto">
             {config.tabs.map((tab) => (

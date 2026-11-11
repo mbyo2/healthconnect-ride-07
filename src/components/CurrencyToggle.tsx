@@ -17,9 +17,13 @@ export function CurrencyToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs font-bold bg-background/80 hover:bg-muted border-border shadow-xs">
+        <Button variant="outline" size="sm" className="h-8 gap-1 px-2 md:px-2.5 text-xs font-bold bg-background/80 hover:bg-muted border-border shadow-xs">
           <Globe className="h-3.5 w-3.5 text-primary" />
-          <span>{currency === 'ZMW' ? 'K (ZMW)' : currency === 'USD' ? '$ (USD)' : currency}</span>
+          {/* Full "K (ZMW)" label from md up; below md the header cluster
+              only has room for the symbol — the menu still names every
+              currency in full. (Responsive shell fix, 2026-11-11.) */}
+          <span className="hidden md:inline">{currency === 'ZMW' ? 'K (ZMW)' : currency === 'USD' ? '$ (USD)' : currency}</span>
+          <span className="md:hidden">{currency === 'ZMW' ? 'K' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'KES' ? 'KSh' : currency === 'NGN' ? '₦' : currency === 'ZAR' ? 'R' : currency}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 z-[70] text-xs">
