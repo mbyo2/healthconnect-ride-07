@@ -10,11 +10,15 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState } from "@/components/shared";
 import { SkeletonAppointmentsBoard } from "@/components/ui/skeleton-kit";
-import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
+import { SuggestionBanner } from "@/components/guidance";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { createNotification } from "@/services/notifications";
 import { MarkNoShowButton } from "@/components/appointments/NoShowWorkflow";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Calendar,
   Clock,
@@ -359,19 +363,19 @@ export const AppointmentsPage = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">✓ Completed</span>;
+        return <StatusBadge tone="positive">Completed</StatusBadge>;
       case "cancelled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-error-50 text-error-500 border border-error-100">✕ Cancelled</span>;
+        return <StatusBadge tone="negative">Cancelled</StatusBadge>;
       case "in_progress":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-warning-50 text-warning-500 border border-warning-100">● In Progress</span>;
+        return <StatusBadge tone="info">In Progress</StatusBadge>;
       case "pending":
         // A pending booking is a request awaiting provider confirmation —
         // it must never read "Scheduled" (matches BookingConfirmed's
         // "Request sent" wording). Display mapping only; the stored
         // server status stays "pending".
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-warning-50 text-warning-600 border border-warning-100">◉ Request sent</span>;
+        return <StatusBadge tone="warning">Request sent</StatusBadge>;
       default:
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-primary-50 text-primary-500 border border-primary-100">◉ Scheduled</span>;
+        return <StatusBadge tone="info">Scheduled</StatusBadge>;
     }
   };
 
@@ -384,40 +388,40 @@ export const AppointmentsPage = () => {
     return (
       <div
         key={app.id}
-        className="m-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/60 p-3"
+        className="m-3 rounded-lg border border-border bg-card p-3 shadow-xs"
       >
         <div className="flex items-start gap-3">
-          <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0 uppercase">
+          <div className="h-9 w-9 rounded-full bg-muted text-muted-foreground font-semibold text-xs flex items-center justify-center flex-shrink-0 uppercase">
             {person?.first_name?.[0]}{person?.last_name?.[0]}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
+            <div className="font-semibold text-sm text-foreground">
               {isProvider
                 ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
             {isProvider && (
-              <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+              <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
             )}
             {!isProvider && person?.specialty && (
-              <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
+              <div className="text-xs text-muted-foreground font-medium">{person.specialty}</div>
             )}
             {!isProvider && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {(person?.consultation_fee_min || person?.consultation_fee_max) && (
-                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-primary-50 text-primary-500">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                     <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
                       ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
                       : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                   </span>
                 )}
                 {isVideo && (
-                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                     <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                   </span>
                 )}
                 {person?.typical_wait_time && (
-                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-700">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                     <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
                   </span>
                 )}
@@ -428,70 +432,50 @@ export const AppointmentsPage = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
-          <span className="font-mono font-bold text-slate-900 dark:text-slate-200 text-xs">
+          <span className="tnum font-medium text-foreground text-xs">
             {format(apptDate, "MMM d, yyyy")} · {app.time}
           </span>
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-            isVideo ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30"
-          }`}>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-border bg-muted text-muted-foreground">
             {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-            <span>{isVideo ? "Video" : "In-Person"}</span>
+            <span>{isVideo ? "Video" : "In person"}</span>
           </span>
-          <span className="text-slate-600 dark:text-slate-400 font-medium text-xs">
+          <span className="text-muted-foreground font-medium text-xs">
             {person?.address || "Clinic Facility"}
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mt-3">
           {isVideo && isToday(apptDate) && (
-            <Link
-              to={`/video-call/${app.id}`}
-              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-success-500 text-white text-xs font-bold hover:bg-success-500 transition-all inline-flex items-center"
-            >
-              JOIN
-            </Link>
+            <Button asChild size="sm" variant="success" className="min-h-[44px]">
+            <Link to={`/video-call/${app.id}`}>Join</Link>
+            </Button>
           )}
           {isProvider && app.status === "pending" && (
             <>
-              <button
-                onClick={() => acceptAppointment.mutate(app.id)}
-                className="px-3 py-1.5 min-h-[44px] rounded-lg bg-green-600 text-white text-xs font-bold hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
-              >
-                ACCEPT
-              </button>
-              <button
-                onClick={() => declineAppointment.mutate(app.id)}
-                className="px-3 py-1.5 min-h-[44px] rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
-              >
-                DECLINE
-              </button>
+              <Button size="sm" onClick={() => acceptAppointment.mutate(app.id)} className="min-h-[44px]">
+              Accept
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => declineAppointment.mutate(app.id)} className="min-h-[44px] text-destructive hover:text-destructive">
+              Decline
+              </Button>
             </>
           )}
           {isProvider && app.status !== "pending" && (
-            <button
-              onClick={() => completeAppointment.mutate(app.id)}
-              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all active:scale-95 inline-flex items-center"
-            >
-              DONE
-            </button>
+            <Button size="sm" variant="secondary" onClick={() => completeAppointment.mutate(app.id)} className="min-h-[44px]">
+            Done
+            </Button>
           )}
           {isProvider && (
-            <button
-              onClick={() => openReschedule(app)}
-              className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-500/40 text-primary-600 dark:text-primary-400 text-xs font-bold hover:bg-primary-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
-            >
-              RESCHEDULE
-            </button>
+            <Button size="sm" variant="outline" onClick={() => openReschedule(app)} className="min-h-[44px]">
+            Reschedule
+            </Button>
           )}
           {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
             <MarkNoShowButton appointmentId={app.id} />
           )}
-          <button
-            onClick={() => setCancelTarget(app)}
-            className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
-          >
-            CANCEL
-          </button>
+          <Button size="sm" variant="ghost" onClick={() => setCancelTarget(app)} className="min-h-[44px] text-muted-foreground">
+          Cancel
+          </Button>
         </div>
       </div>
     );
@@ -503,30 +487,30 @@ export const AppointmentsPage = () => {
     return (
       <div
         key={app.id}
-        className="m-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/60 p-3"
+        className="m-3 rounded-lg border border-border bg-card p-3 shadow-xs"
       >
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm text-slate-800 dark:text-slate-200">
+            <div className="font-semibold text-sm text-foreground">
               {isProvider
                 ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
             {isProvider && (
-              <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+              <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
             )}
             {!isProvider && person?.specialty && (
-              <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
+              <div className="text-xs text-muted-foreground font-medium mt-0.5">{person.specialty}</div>
             )}
             {!isProvider && (person?.consultation_fee_min || isVideoAppointment(app)) && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {person?.consultation_fee_min && (
-                  <span className="inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                     <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                   </span>
                 )}
                 {isVideoAppointment(app) && (
-                  <span className="inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                     <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                   </span>
                 )}
@@ -537,11 +521,11 @@ export const AppointmentsPage = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs">
-          <span className="font-mono text-slate-600 dark:text-slate-400">
+          <span className="tnum text-muted-foreground">
             {format(apptDate, "MMM d, yyyy")} • {app.time}
           </span>
           <span className="text-slate-500">
-            {isVideoAppointment(app) ? "Video Visit" : "In-Person"}
+            {isVideoAppointment(app) ? "Video visit" : "In person"}
           </span>
           <span className="text-slate-500">
             {person?.address || "To be confirmed"}
@@ -550,12 +534,9 @@ export const AppointmentsPage = () => {
 
         {!isProvider && app.provider_id && (
           <div className="mt-3">
-            <button
-              onClick={() => navigate(`/provider/${app.provider_id}`)}
-              className="px-3 py-1.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
-            >
-              Re-Book
-            </button>
+            <Button size="sm" onClick={() => navigate(`/provider/${app.provider_id}`)} className="min-h-[44px]">
+            Re-book
+            </Button>
           </div>
         )}
       </div>
@@ -564,20 +545,20 @@ export const AppointmentsPage = () => {
 
   return (
     <NetworkErrorBoundary>
-      <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      <div className="pb-16">
         {/* Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
-          <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
+              <div className="h-11 w-11 rounded-lg bg-primary-500 text-white flex items-center justify-center shadow-button">
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2.5 text-midnight">
+                <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2.5 text-foreground">
                   {isProvider ? "Appointment Workspace" : "My Appointments"}
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-sm text-graphite-500 font-medium tracking-wide">
+                <p className="text-sm text-muted-foreground">
                   {isProvider ? "Manage clinic visits, video consultations & e-intake" : "Upcoming visits, video links & prescription notes"}
                 </p>
               </div>
@@ -585,48 +566,46 @@ export const AppointmentsPage = () => {
 
             <div className="flex items-center gap-2 flex-wrap">
               {!isProvider && (
-                <button
-                  onClick={() => navigate("/search")}
-                  className="vf-btn-primary text-sm gap-2 active:scale-95"
-                >
+                <Button onClick={() => navigate("/search")} className="gap-2">
                   <CalendarPlus className="h-4 w-4" />
-                  <span>Book New Appointment</span>
-                </button>
+                  <span>Book new appointment</span>
+                </Button>
               )}
             </div>
           </div>
 
           {/* Views & Filters Bar */}
-          <div className="max-w-content mx-auto mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-canvas-silk">
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-border">
             {/* Filter inputs */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative min-w-[220px]">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
-                <input
+                <Input
                   type="text"
                   placeholder="Search name, specialty, or notes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="pl-9 h-9"
                 />
               </div>
 
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none"
-              >
-                <option value="all">All Statuses</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-9 w-[160px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
         {/* Main Board Body */}
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
+        <div className="pt-6">
           {isLoading ? (
             <div role="status" aria-label="Loading appointments">
               <SkeletonAppointmentsBoard />
@@ -646,27 +625,17 @@ export const AppointmentsPage = () => {
                 />
               )}
 
-              {/* Health Tip for Patients */}
-              {!isProvider && upcoming.length > 0 && (
-                <HealthTipCard
-                  title="Prepare for Your Appointment"
-                  tip="Write down your symptoms, current medications, and questions before your visit. This helps your doctor provide better care."
-                  category="wellness"
-                  source="Doc' O Clock Health Team"
-                />
-              )}
-
               {/* Upcoming Appointments Table Group */}
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-slate-900 flex items-center justify-between">
+              <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+                <div className="px-5 py-4 bg-muted/50 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-                      <h2 className="font-semibold text-sm text-white">
+                      <span className="w-2 h-2 rounded-full bg-success-500" />
+                      <h2 className="font-semibold text-sm text-foreground">
                         Upcoming &amp; Active Appointments
                       </h2>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-500 text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
                       {upcoming.length}
                     </span>
                   </div>
@@ -693,7 +662,7 @@ export const AppointmentsPage = () => {
                   <div className="hidden sm:block w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                        <tr className="text-xs font-medium text-muted-foreground border-b border-border bg-muted/50">
                           <th className="py-3 px-6 w-[240px]">Participant</th>
                           <th className="py-3 px-3 w-[140px] text-center">Status</th>
                           <th className="py-3 px-3 w-[150px]">Date & Time</th>
@@ -702,48 +671,48 @@ export const AppointmentsPage = () => {
                           <th className="py-3 px-3 w-[150px] text-center">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
+                      <tbody className="divide-y divide-border text-sm">
                         {upcoming.map((app) => {
                           const person = isProvider ? app.patient : app.provider;
                           const isVideo = isVideoAppointment(app);
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60 transition-colors">
+                            <tr key={app.id} className="hover:bg-muted/50 transition-colors">
                               <td className="py-4 px-6">
                                 <div className="flex items-center gap-3">
-                                  <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0 uppercase">
+                                  <div className="h-9 w-9 rounded-full bg-muted text-muted-foreground font-semibold text-xs flex items-center justify-center flex-shrink-0 uppercase">
                                     {person?.first_name?.[0]}{person?.last_name?.[0]}
                                   </div>
                                   <div>
-                                    <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                                    <div className="font-semibold text-sm text-foreground">
                                       {isProvider
                                         ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                                         : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
                                     </div>
                                     {isProvider && (
-                                      <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+                                      <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
                                     )}
                                     {!isProvider && person?.specialty && (
-                                      <div className="text-xs text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
+                                      <div className="text-xs text-muted-foreground font-medium">{person.specialty}</div>
                                     )}
                                     {/* New: fee + telemedicine + wait time for patient view */}
                                     {!isProvider && (
                                       <div className="flex flex-wrap gap-1 mt-1">
                                         {(person?.consultation_fee_min || person?.consultation_fee_max) && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-primary-50 text-primary-500">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                                             <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
                                               ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
                                               : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                                           </span>
                                         )}
                                         {isVideo && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                                             <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                           </span>
                                         )}
                                         {person?.typical_wait_time && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-700">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                                             <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
                                           </span>
                                         )}
@@ -757,75 +726,55 @@ export const AppointmentsPage = () => {
                                 {getStatusPill(app.status)}
                               </td>
 
-                              <td className="py-4 px-3 font-mono font-bold text-slate-900 dark:text-slate-200">
+                              <td className="py-4 px-3 tnum font-medium text-foreground">
                                 <div>{format(apptDate, "MMM d, yyyy")}</div>
-                                <div className="text-xs text-slate-400 font-medium">{app.time}</div>
+                                <div className="text-xs text-muted-foreground">{app.time}</div>
                               </td>
 
                               <td className="py-4 px-3">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                                  isVideo ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30"
-                                }`}>
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-border bg-muted text-muted-foreground">
                                   {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-                                  <span>{isVideo ? "Video" : "In-Person"}</span>
+                                  <span>{isVideo ? "Video" : "In person"}</span>
                                 </span>
                               </td>
 
-                              <td className="py-4 px-3 text-slate-600 dark:text-slate-400 font-medium truncate max-w-[180px]">
+                              <td className="py-4 px-3 text-muted-foreground truncate max-w-[180px]">
                                 {person?.address || "Clinic Facility"}
                               </td>
 
                               <td className="py-4 px-3 text-center">
                                 <div className="flex items-center justify-center gap-2">
                                   {isVideo && isToday(apptDate) && (
-                                    <Link
-                                      to={`/video-call/${app.id}`}
-                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-success-500 text-white text-xs font-bold hover:bg-success-500 transition-all inline-flex items-center"
-                                    >
-                                      JOIN
-                                    </Link>
+                                    <Button asChild size="sm" variant="success" className="min-h-[44px]">
+                                    <Link to={`/video-call/${app.id}`}>Join</Link>
+                                    </Button>
                                   )}
                                   {isProvider && app.status === "pending" && (
                                     <>
-                                      <button
-                                        onClick={() => acceptAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[44px] rounded-lg bg-green-600 text-white text-xs font-bold hover:bg-green-700 transition-all active:scale-95 inline-flex items-center"
-                                      >
-                                        ACCEPT
-                                      </button>
-                                      <button
-                                        onClick={() => declineAppointment.mutate(app.id)}
-                                        className="px-3 py-1.5 min-h-[44px] rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-all active:scale-95 inline-flex items-center"
-                                      >
-                                        DECLINE
-                                      </button>
+                                      <Button size="sm" onClick={() => acceptAppointment.mutate(app.id)} className="min-h-[44px]">
+                                      Accept
+                                      </Button>
+                                      <Button size="sm" variant="outline" onClick={() => declineAppointment.mutate(app.id)} className="min-h-[44px] text-destructive hover:text-destructive">
+                                      Decline
+                                      </Button>
                                     </>
                                   )}
                                   {isProvider && app.status !== "pending" && (
-                                    <button
-                                      onClick={() => completeAppointment.mutate(app.id)}
-                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all active:scale-95 inline-flex items-center"
-                                    >
-                                      DONE
-                                    </button>
+                                    <Button size="sm" variant="secondary" onClick={() => completeAppointment.mutate(app.id)} className="min-h-[44px]">
+                                    Done
+                                    </Button>
                                   )}
                                   {isProvider && (
-                                    <button
-                                      onClick={() => openReschedule(app)}
-                                      className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-500/40 text-primary-600 dark:text-primary-400 text-xs font-bold hover:bg-primary-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
-                                    >
-                                      RESCHEDULE
-                                    </button>
+                                    <Button size="sm" variant="outline" onClick={() => openReschedule(app)} className="min-h-[44px]">
+                                    Reschedule
+                                    </Button>
                                   )}
                                   {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
                                     <MarkNoShowButton appointmentId={app.id} />
                                   )}
-                                  <button
-                                    onClick={() => setCancelTarget(app)}
-                                    className="px-3 py-1.5 min-h-[44px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 inline-flex items-center"
-                                  >
-                                    CANCEL
-                                  </button>
+                                  <Button size="sm" variant="ghost" onClick={() => setCancelTarget(app)} className="min-h-[44px] text-muted-foreground">
+                                  Cancel
+                                  </Button>
                                 </div>
                               </td>
                             </tr>
@@ -839,13 +788,13 @@ export const AppointmentsPage = () => {
               </div>
 
               {/* Past Appointments Group */}
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-canvas-bone dark:bg-slate-950 border-b border-canvas-silk dark:border-slate-800 flex items-center justify-between">
+              <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+                <div className="px-5 py-4 bg-muted/50 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <h2 className="font-semibold text-sm text-slate-600 dark:text-slate-400">
+                    <h2 className="font-semibold text-sm text-foreground">
                       Past &amp; Completed
                     </h2>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
                       {past.length}
                     </span>
                   </div>
@@ -867,7 +816,7 @@ export const AppointmentsPage = () => {
                   <div className="hidden sm:block w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                        <tr className="text-xs font-medium text-muted-foreground border-b border-border bg-muted/50">
                           <th className="py-2.5 px-4 w-[240px]">Participant</th>
                           <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                           <th className="py-2.5 px-3 w-[150px]">Date & Time</th>
@@ -876,33 +825,33 @@ export const AppointmentsPage = () => {
                           <th className="py-2.5 px-3 w-[150px] text-center">Re-Book</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
+                      <tbody className="divide-y divide-border text-sm">
                         {past.map((app) => {
                           const person = isProvider ? app.patient : app.provider;
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60 transition-colors">
-                              <td className="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
+                            <tr key={app.id} className="hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">
                                 <div>
                                   <div>{isProvider
                                     ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
                                     : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}</div>
                                   {isProvider && (
-                                    <div className="text-[11px] font-mono text-slate-400 mt-0.5">Ref {bookingRef(app)}</div>
+                                    <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
                                   )}
                                   {!isProvider && person?.specialty && (
-                                    <div className="text-xs text-primary-500 font-bold mt-0.5">{person.specialty}</div>
+                                    <div className="text-xs text-muted-foreground font-medium mt-0.5">{person.specialty}</div>
                                   )}
                                   {!isProvider && (person?.consultation_fee_min || isVideoAppointment(app)) && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {person?.consultation_fee_min && (
-                                        <span className="inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
+                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                                           <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                                         </span>
                                       )}
                                       {isVideoAppointment(app) && (
-                                        <span className="inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                                           <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                         </span>
                                       )}
@@ -915,26 +864,23 @@ export const AppointmentsPage = () => {
                                 {getStatusPill(app.status)}
                               </td>
 
-                              <td className="py-3 px-3 font-mono text-slate-600 dark:text-slate-400">
+                              <td className="py-3 px-3 tnum text-muted-foreground">
                                 {format(apptDate, "MMM d, yyyy")} • {app.time}
                               </td>
 
-                              <td className="py-3 px-3 text-slate-500">
-                                {isVideoAppointment(app) ? "Video Visit" : "In-Person"}
+                              <td className="py-3 px-3 text-muted-foreground">
+                                {isVideoAppointment(app) ? "Video visit" : "In person"}
                               </td>
 
-                              <td className="py-3 px-3 text-slate-500 truncate max-w-[180px]">
+                              <td className="py-3 px-3 text-muted-foreground truncate max-w-[180px]">
                                 {person?.address || "To be confirmed"}
                               </td>
 
                               <td className="py-3 px-3 text-center">
                                 {!isProvider && app.provider_id && (
-                                  <button
-                                    onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
-                                  >
-                                    Re-Book
-                                  </button>
+                                  <Button size="sm" onClick={() => navigate(`/provider/${app.provider_id}`)} className="min-h-[44px]">
+                                  Re-book
+                                  </Button>
                                 )}
                               </td>
                             </tr>
@@ -955,17 +901,17 @@ export const AppointmentsPage = () => {
           slot. Validated against working hours + double-booking; the patient
           is notified automatically. */}
       <Dialog open={!!rescheduleTarget} onOpenChange={(open) => !open && setRescheduleTarget(null)}>
-        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card p-6">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl font-medium text-midnight">
+            <DialogTitle className="text-lg font-semibold text-foreground">
               Reschedule appointment
             </DialogTitle>
           </DialogHeader>
           {rescheduleTarget && (
             <div className="space-y-4 py-2">
-              <p className="text-sm text-graphite-500">
+              <p className="text-sm text-muted-foreground">
                 Currently{" "}
-                <span className="font-semibold text-midnight">
+                <span className="font-semibold text-foreground">
                   {rescheduleTarget.date ? format(parseISO(rescheduleTarget.date), "MMM d, yyyy") : ""} at {rescheduleTarget.time || "—"}
                 </span>
                 {rescheduleTarget.patient && (
@@ -974,26 +920,26 @@ export const AppointmentsPage = () => {
                 . Choose the new slot below.
               </p>
               <div>
-                <label className="text-sm font-semibold text-midnight block mb-1.5">New date</label>
-                <input
+                <label className="text-sm font-semibold text-foreground block mb-1.5">New date</label>
+                <Input
                   type="date"
                   value={newDate}
                   min={format(new Date(), "yyyy-MM-dd")}
                   onChange={(e) => setNewDate(e.target.value)}
-                  className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm"
+                  
                 />
               </div>
               <div>
-                <label className="text-sm font-semibold text-midnight block mb-1.5">New time</label>
-                <input
+                <label className="text-sm font-semibold text-foreground block mb-1.5">New time</label>
+                <Input
                   type="time"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm"
+                  
                 />
               </div>
               {providerAvailability.length > 0 && (
-                <p className="text-xs text-graphite-500">
+                <p className="text-xs text-muted-foreground">
                   Working days:{" "}
                   {[...new Set(providerAvailability.map((r: any) => r.day_of_week))]
                     .sort()
@@ -1004,19 +950,15 @@ export const AppointmentsPage = () => {
             </div>
           )}
           <DialogFooter>
-            <button
-              onClick={() => setRescheduleTarget(null)}
-              className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 text-sm font-semibold text-graphite-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
+            <Button variant="outline" onClick={() => setRescheduleTarget(null)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => rescheduleAppointment.mutate()}
               disabled={rescheduleAppointment.isPending}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 disabled:opacity-50"
             >
               {rescheduleAppointment.isPending ? "Moving…" : "Confirm new slot"}
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1031,19 +973,17 @@ export const AppointmentsPage = () => {
             This will free the slot for other patients. This action cannot be undone.
           </p>
           <DialogFooter>
-            <button
-              onClick={() => setCancelTarget(null)}
-              className="px-4 py-2 min-h-[44px] rounded-xl border border-canvas-silk dark:border-slate-700 text-sm font-semibold text-graphite-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
+            <Button variant="outline" onClick={() => setCancelTarget(null)} className="min-h-[44px]">
               Keep appointment
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="destructive"
               onClick={() => { cancelAppointment.mutate(cancelTarget.id); setCancelTarget(null); }}
               disabled={cancelAppointment.isPending}
-              className="px-4 py-2 min-h-[44px] rounded-xl bg-error-500 hover:bg-error-600 text-white text-sm font-bold disabled:opacity-50"
+              className="min-h-[44px]"
             >
               {cancelAppointment.isPending ? "Cancelling…" : "Yes, cancel"}
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
