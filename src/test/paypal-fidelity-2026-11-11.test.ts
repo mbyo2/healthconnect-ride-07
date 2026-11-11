@@ -138,20 +138,38 @@ describe("paypal fidelity 2026-11-11: list conversions", () => {
 });
 
 describe("paypal fidelity 2026-11-11: round-3 seeded re-check fixes", () => {
-  it("activity feed lab rows read test_type (lab_tests has no test_name)", () => {
-    // Phantom column: selecting test_name from lab_tests 400s the whole
-    // PostgREST query, so lab rows silently never rendered. The live
-    // name column on lab_tests is test_type (test_name is lab_results).
-    expect(patientHome).toContain(".select('id, test_type, status, created_at')");
-    expect(patientHome).toContain("t.test_type || 'Lab test'");
-    expect(patientHome).not.toContain("test_name");
+  // ROUND 4 (these pins replace the two round-3 lab pins that stood
+  // here): the
+  // round-3 pins asserted a lab_tests select with test_type — they
+  // pinned the WRONG SOURCE. Patient RLS on lab_tests returns zero
+  // rows for unverified tests (proven by JWT replay 2026-11-11:
+  // lab_tests → 200 [] while lab_results_patient_view returned the
+  // row), so lab rows could never render from lab_tests at all. The
+  // patient lab surface is lab_results_patient_view — the same view
+  // PatientLabResults reads — with verified_at marking verification.
+  const activityRegion = patientHome.slice(
+    patientHome.indexOf("patient-recent-activity"),
+    patientHome.indexOf(".slice(0, 6)")
+  );
+
+  it("activity feed lab rows read lab_results_patient_view (the patient surface)", () => {
+    expect(activityRegion).toContain("lab_results_patient_view");
+    expect(activityRegion).toContain(
+      ".select('id, test_name, verified_at, created_at')"
+    );
+    expect(activityRegion).toContain("t.test_name || 'Lab result'");
   });
 
-  it("activity feed maps lab status 'completed' to Result ready", () => {
-    // Live lab_tests statuses are only pending | sample_collected |
-    // in_progress | completed | cancelled — 'resulted' never occurs.
-    expect(patientHome).toContain("t.status === 'completed' ? 'Result ready'");
-    expect(patientHome).not.toContain("'resulted'");
+  it("activity feed never queries lab_tests (invisible to patients pre-verification)", () => {
+    expect(activityRegion).not.toContain("from('lab_tests')");
+    expect(activityRegion).not.toContain("test_type");
+  });
+
+  it("activity feed lab status derives from verified_at", () => {
+    expect(activityRegion).toContain(
+      "t.verified_at ? 'Result ready' : 'Pending verification'"
+    );
+    expect(activityRegion).not.toContain("'resulted'");
   });
 
   it("appointments: no <table> in the upcoming or past list sections", () => {

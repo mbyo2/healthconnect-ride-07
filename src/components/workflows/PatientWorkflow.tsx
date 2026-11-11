@@ -190,12 +190,17 @@ export const PatientWorkflow = React.memo(() => {
   // the patient's latest appointments, lab results and prescriptions
   // merged into ONE hairline list. Every select mirrors the exact
   // tables/columns the dedicated patient components already use
-  // (appointments + provider_directory for names; lab_tests carries
-  // test_type and statuses pending | sample_collected | in_progress |
-  // completed | cancelled, with 'completed' presented as "Result ready"
-  // — see PatientLabResults; comprehensive_prescriptions — see the
-  // count query above), so this
-  // adds no new data surface, only a new presentation of the same rows.
+  // (appointments + provider_directory for names;
+  // comprehensive_prescriptions — see the count query above).
+  // LAB ROWS come from lab_results_patient_view, mirroring
+  // PatientLabResults exactly: patient RLS on lab_tests returns ZERO
+  // rows for unverified tests, so lab_tests is invisible to the patient
+  // pre-verification (proven by JWT replay 2026-11-11: lab_tests → []
+  // while the view returned the row). The view is the patient surface —
+  // the patient's own result rows with value columns NULL until
+  // verified and verified_at marking verification, presented here as
+  // "Result ready" vs "Pending verification". This adds no new data
+  // surface, only a new presentation of the same rows.
   type ActivityItem = {
     key: string;
     kind: 'appointment' | 'lab' | 'prescription';
@@ -216,9 +221,8 @@ export const PatientWorkflow = React.memo(() => {
           .order('date', { ascending: false })
           .order('created_at', { ascending: false })
           .limit(4),
-        supabase
-          .from('lab_tests')
-          .select('id, test_type, status, created_at')
+        (supabase.from('lab_results_patient_view' as any) as any)
+          .select('id, test_name, verified_at, created_at')
           .eq('patient_id', user.id)
           .order('created_at', { ascending: false })
           .limit(4),
@@ -260,9 +264,9 @@ export const PatientWorkflow = React.memo(() => {
         items.push({
           key: `lab-${t.id}`,
           kind: 'lab',
-          title: t.test_type || 'Lab test',
+          title: t.test_name || 'Lab result',
           date: new Date(t.created_at),
-          status: t.status === 'completed' ? 'Result ready' : t.status,
+          status: t.verified_at ? 'Result ready' : 'Pending verification',
           route: '/medical-records',
         });
       });
