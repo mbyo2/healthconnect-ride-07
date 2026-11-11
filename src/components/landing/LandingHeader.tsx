@@ -25,21 +25,25 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
   const isActive = (route: string) => location.pathname === route.split("?")[0];
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+    // CLASSIC PayPal shell (CEO decision 2026-11-11 17:12): the landing
+    // bar is the same classic navy #003087 as the app bars, with white
+    // content in BOTH modes (navybar is a fixed hex token — dark mode
+    // never turns it slate/black/white). It is a full-width fixed bar,
+    // not a floating pill; the hero's top padding reserves its height so
+    // no content hides under it.
+    <header
+      className={`fixed inset-x-0 top-0 z-50 w-full border-b border-white/10 bg-navybar text-white transition-shadow duration-300 ${
+        scrolled ? "shadow-md" : ""
+      }`}
+    >
       <a
         href="#main-content"
-        className="pointer-events-auto sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[60] focus:rounded-pill focus:bg-primary-500 focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[60] focus:rounded-pill focus:bg-primary-500 focus:px-4 focus:py-2 focus:text-sm focus:text-white"
       >
         Skip to main content
       </a>
 
-      <div
-        className={`pointer-events-auto mx-auto flex max-w-content items-center gap-2 rounded-nav border px-2 py-1.5 shadow-pill-nav backdrop-blur-xl transition-all duration-300 sm:px-3 ${
-          scrolled
-            ? "border-canvas-silk bg-white dark:bg-slate-900/95"
-            : "border-white/70 bg-white dark:bg-slate-900/80"
-        }`}
-      >
+      <div className="mx-auto flex h-16 max-w-content items-center gap-2 px-3 sm:px-4">
         {/* Single interactive element for the logo home action: AppLogo is
             rendered link-less (linkTo="") and this Link is the one anchor.
             Its accessible name comes from aria-label alone — the img alt
@@ -50,7 +54,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           aria-label="Doc' O Clock home"
         >
           <AppLogo size="sm" linkTo="" showText={false} className="shrink-0" />
-          <span className="hidden font-display text-[15px] tracking-tight text-midnight sm:inline">
+          <span className="hidden font-display text-[15px] tracking-tight text-white sm:inline">
             Doc&apos; O Clock
           </span>
         </Link>
@@ -63,8 +67,8 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
               onClick={() => navigate(item.route)}
               className={`rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide transition-colors min-h-[44px] inline-flex items-center ${
                 isActive(item.route)
-                  ? "bg-canvas-mist text-midnight"
-                  : "text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight"
+                  ? "bg-white/15 text-white font-semibold"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               {item.label}
@@ -73,7 +77,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => navigate("/emergency")}
-            className="rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide text-accent-600 hover:bg-accent-50 min-h-[44px] inline-flex items-center"
+            className="rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide text-white/80 hover:bg-white/10 hover:text-white min-h-[44px] inline-flex items-center"
           >
             Emergency
           </button>
@@ -83,7 +87,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-pill p-3 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
+            className="rounded-pill p-3 text-white hover:bg-white/10 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -91,20 +95,20 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => navigate("/auth")}
-            className="hidden rounded-pill px-3.5 py-2 text-[13px] font-medium text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight sm:inline-flex"
+            className="hidden rounded-pill px-3.5 py-2 text-[13px] font-medium text-white hover:bg-white/10 sm:inline-flex"
           >
             Sign in
           </button>
           <button
             type="button"
             onClick={() => navigate("/search")}
-            className="vf-btn-primary !px-4 !py-3 text-[13px]"
+            className="rounded-pill bg-gold px-4 py-3 text-[13px] font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
           >
             Get started
           </button>
           <button
             type="button"
-            className="rounded-pill p-3 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist lg:hidden"
+            className="rounded-pill p-3 text-white hover:bg-white/10 lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle menu"
@@ -115,8 +119,8 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="pointer-events-auto mx-auto mt-2 max-w-content rounded-card border border-canvas-silk bg-white dark:bg-slate-900/95 p-3 shadow-pill-nav backdrop-blur-xl lg:hidden">
-          <div className="space-y-1">
+        <div className="mx-auto max-w-content px-3 pb-3 sm:px-4 lg:hidden">
+          <div className="space-y-1 rounded-card border border-canvas-silk bg-white p-3 shadow-pill-nav dark:bg-slate-900/95">
             {[...NAV_ITEMS, { label: "Emergency", route: "/emergency" }].map((item) => (
               <button
                 key={item.label}
@@ -153,7 +157,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
                   navigate("/search");
                   setMobileMenuOpen(false);
                 }}
-                className="flex-1 vf-btn-primary !py-2.5 text-xs"
+                className="flex-1 rounded-pill bg-gold py-2.5 text-xs font-semibold text-gold-ink transition-colors hover:bg-gold-deep inline-flex items-center justify-center"
               >
                 Get started
               </button>

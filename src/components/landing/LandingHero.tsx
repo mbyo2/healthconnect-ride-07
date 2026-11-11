@@ -60,7 +60,10 @@ export const LandingHero = () => {
             placeholder="Search doctors, specialties, or pharmacies"
             className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-midnight outline-none placeholder:text-graphite-400"
           />
-          <button type="submit" className="vf-btn-primary !px-5 !py-3 shrink-0">
+          <button
+            type="submit"
+            className="inline-flex shrink-0 items-center justify-center rounded-pill bg-gold px-5 py-3 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
+          >
             Find a doctor
           </button>
         </form>

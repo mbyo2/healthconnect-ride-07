@@ -18,6 +18,9 @@ const desktopNav = read("../components/DesktopNav.tsx");
 const mobileHeader = read("../components/Header.tsx");
 const currencyToggle = read("../components/CurrencyToggle.tsx");
 const skeletonKit = read("../components/ui/skeleton-kit.tsx");
+const landingHeader = read("../components/landing/LandingHeader.tsx");
+const landingHero = read("../components/landing/LandingHero.tsx");
+const landingFeatures = read("../components/landing/LandingFeatures.tsx");
 
 describe("classic shell: tokens", () => {
   it("tailwind config carries navybar #003087 and the gold ramp", () => {
@@ -61,6 +64,50 @@ describe("classic shell: navy bars, white content, both modes", () => {
   it("header skeleton twins render the navy bar", () => {
     expect(skeletonKit).toContain("border-white/10 bg-navybar min-[1025px]:block");
     expect(skeletonKit).toContain("border-white/10 bg-navybar min-[1025px]:hidden");
+  });
+});
+
+// LANDING SHELL (2026-11-11, follow-up): the public landing was the one
+// surface that escaped the classic conversion — it kept its own white
+// floating pill bar (bg-white / dark slate) with blue vf-btn-primary
+// CTAs while every app bar went navy. Measured at a true 390×844 render:
+// landing "Get started" computed rgb(0,102,245) vs the app bar's exact
+// rgb(0,48,135) navy and sign-in's exact rgb(255,196,57) gold. The
+// landing now wears the same shell: navybar full-width bar, white
+// content in both modes, gold primaries; blue stays on links/accents.
+describe("classic shell: landing", () => {
+  it("LandingHeader is a full-width navybar bar with white content", () => {
+    expect(landingHeader).toContain("bg-navybar text-white");
+    expect(landingHeader).toContain("border-b border-white/10");
+    // The old floating-pill bar strings are gone. (The mobile menu's
+    // dropdown CARD keeps its bg-white / dark slate card surface — it is
+    // a dropdown panel like the app bars' menus, not the bar itself.)
+    expect(landingHeader).not.toContain("border-canvas-silk bg-white dark:bg-slate-900/95");
+    expect(landingHeader).not.toContain("border-white/70 bg-white dark:bg-slate-900/80");
+    expect(landingHeader).not.toContain("rounded-nav border px-2 py-1.5");
+  });
+
+  it("landing nav mirrors the app bars: active pill is white/15, never gold", () => {
+    expect(landingHeader).toContain("bg-white/15 text-white font-semibold");
+    expect(landingHeader).toContain("text-white/80 hover:bg-white/10 hover:text-white");
+  });
+
+  it("landing Get started (bar + mobile panel) is the gold pill with ink text", () => {
+    expect(landingHeader).toContain("rounded-pill bg-gold px-4 py-3");
+    expect(landingHeader).toContain("bg-gold py-2.5 text-xs font-semibold text-gold-ink");
+    expect(landingHeader).not.toContain("vf-btn-primary");
+  });
+
+  it("hero search submit (Find a doctor) is gold, not vf-btn-primary blue", () => {
+    expect(landingHero).toContain("rounded-pill bg-gold px-5 py-3 text-sm font-semibold text-gold-ink");
+    expect(landingHero).not.toContain("vf-btn-primary");
+  });
+
+  it("landing section primaries (Find Doctors Now / Join as Healthcare Provider) are gold", () => {
+    expect(landingFeatures).toContain("Find Doctors Now");
+    expect(landingFeatures).toContain("Join as Healthcare Provider");
+    expect(landingFeatures).not.toContain("vf-btn-primary");
+    expect(landingFeatures.match(/rounded-pill bg-gold px-6 py-3 text-sm font-semibold text-gold-ink/g)).toHaveLength(2);
   });
 });
 

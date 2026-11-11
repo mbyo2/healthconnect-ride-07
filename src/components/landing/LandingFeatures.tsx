@@ -345,7 +345,10 @@ Core features
                 </span>
               ))}
             </div>
-            <button onClick={() => navigate("/search")} className="vf-btn-primary">
+            <button
+              onClick={() => navigate("/search")}
+              className="inline-flex items-center justify-center gap-2 rounded-pill bg-gold px-6 py-3 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
+            >
               Find Doctors Now <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -399,7 +402,10 @@ export const ForProviders = () => {
               ))}
             </div>
             <div className="flex flex-wrap gap-3 pt-1">
-              <button onClick={() => navigate("/auth?tab=signup")} className="vf-btn-primary">
+              <button
+                onClick={() => navigate("/auth?tab=signup")}
+                className="inline-flex items-center justify-center gap-2 rounded-pill bg-gold px-6 py-3 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
+              >
                 Join as Healthcare Provider <ArrowRight className="h-4 w-4" />
               </button>
               <button onClick={() => navigate("/pricing")} className="vf-btn-secondary">
