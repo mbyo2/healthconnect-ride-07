@@ -106,3 +106,58 @@ describe("paypal interior 2026-11-11: shell + home arrangement", () => {
     expect(patientHome).not.toContain("Patient Onboarding</span>\n          </div>");
   });
 });
+
+describe("paypal interior 2026-11-11: suggestion banner dark mode + old-blue remnants", () => {
+  const banner = read("../components/guidance/SuggestionBanner.tsx");
+
+  it("every banner variant pairs its pale tint with a dark surface", () => {
+    // Root cause of the /appointments dark defect: bg-primary-50 is a
+    // fixed #f0f6ff that never adapts, while index.css remaps
+    // .text-graphite-600 to light #d6d3d1 under .dark — light text on a
+    // pale slab at ~1.2:1. No variant bg may be a light-only tint again.
+    expect(banner).not.toMatch(/bg: 'bg-(primary|success|warning|accent)-50'/);
+    expect(banner).toContain("dark:bg-primary-500/10");
+    expect(banner).toContain("dark:bg-success-500/10");
+    expect(banner).toContain("dark:bg-warning-500/10");
+    expect(banner).toContain("dark:bg-accent-500/10");
+  });
+
+  it("banner titles and icons carry light dark-mode steps", () => {
+    expect(banner).toContain("dark:text-primary-100");
+    expect(banner).toContain("dark:text-success-100");
+    expect(banner).toContain("dark:text-warning-100");
+    expect(banner).toContain("dark:text-accent-100");
+    expect(banner).toContain("dark:text-primary-400");
+    expect(banner).toContain("dark:text-success-400");
+    expect(banner).toContain("dark:text-warning-400");
+    expect(banner).toContain("dark:text-accent-400");
+  });
+
+  it("no old Signal Blue ramp hex survives anywhere in src or the config", () => {
+    // The pre-PayPal primary ramp (parent of the PayPal-interior
+    // commit): hard-coded copies lingered in chart colours, a splash
+    // heading, confetti and a dark token after the ramp was replaced.
+    const oldRamp = [
+      "#397dff", "#f0f5ff", "#e0ebff", "#c2d7ff", "#94bfff",
+      "#5da3ff", "#2563eb", "#1d4ed8", "#1e40af", "#1e3a8a",
+    ];
+    for (const hex of oldRamp) {
+      expect(config.toLowerCase()).not.toContain(hex);
+      expect(css.toLowerCase()).not.toContain(hex);
+    }
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        const p = join(dir, name);
+        if (statSync(p).isDirectory()) {
+          if (name !== "test") walk(p);
+        } else if (/\.(tsx|ts|css)$/.test(name)) {
+          const content = readFileSync(p, "utf8").toLowerCase();
+          if (oldRamp.some((hex) => content.includes(hex))) offenders.push(p);
+        }
+      }
+    };
+    walk(resolve(__dirname, ".."));
+    expect(offenders).toEqual([]);
+  });
+});

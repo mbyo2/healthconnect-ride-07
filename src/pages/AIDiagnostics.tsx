@@ -83,7 +83,7 @@ const AIDiagnostics = () => {
           {/* Feature Quick-Access Bento Grid */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
-              { id: "chat", title: "AI Assistant", sub: "Chat & image analysis", color: "#397DFF", icon: <MessageSquare className="h-5 w-5" /> },
+              { id: "chat", title: "AI Assistant", sub: "Chat & image analysis", color: "#0066F5", icon: <MessageSquare className="h-5 w-5" /> },
               { id: "documents", title: "Doc OCR", sub: "Lab & Rx data extraction", color: "#22C55E", icon: <FileText className="h-5 w-5" /> },
               { id: "imaging", title: "3D Volumetric", sub: "CT / MRI / PET-CT", color: "#F59E0B", icon: <Layers className="h-5 w-5" /> },
               { id: "symptoms", title: "Symptom Analysis", sub: "Guided intake collector", color: "#F55C15", icon: <ClipboardList className="h-5 w-5" /> },

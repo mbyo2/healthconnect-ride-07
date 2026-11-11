@@ -270,7 +270,7 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="hours" fill="#94bfff" name="Sleep hours" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="hours" fill="#88B8FC" name="Sleep hours" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>

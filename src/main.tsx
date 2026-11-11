@@ -52,7 +52,7 @@ function renderErrorFallback(rootElement: HTMLElement, error?: Error) {
   errorDiv.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
       <div style="width: 48px; height: 48px; background: #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">D0C</div>
-      <h2 style="margin: 0; color: #1E40AF;">Doc' O Clock</h2>
+      <h2 style="margin: 0; color: #002070;">Doc' O Clock</h2>
       <p style="margin: 0; color: #e11d48; font-weight: 600;">System Initialization Failed</p>
       <p style="margin: 0; color: #4b5563;">We encountered a problem while loading the application. This might be due to a temporary connection issue.</p>
 

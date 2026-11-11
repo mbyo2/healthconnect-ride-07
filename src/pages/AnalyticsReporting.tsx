@@ -521,7 +521,7 @@ const AnalyticsReporting = () => {
 
   // Semantic theme palette for charts (primary / success / accent / warning / slate)
   const CATEGORY_COLORS: Record<string, string> = {
-    financial: "#397DFF",
+    financial: "#0066F5",
     operational: "#00A86B",
     clinical: "#F55C15",
     patient: "#F59E0B",
@@ -800,7 +800,7 @@ const AnalyticsReporting = () => {
                             <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Area type="monotone" dataKey="count" stroke="#397DFF" fill="#397DFF" fillOpacity={0.2} />
+                            <Area type="monotone" dataKey="count" stroke="#0066F5" fill="#0066F5" fillOpacity={0.2} />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -1027,7 +1027,7 @@ const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis tick={{ fontSize: 10 }} />
                             <Tooltip formatter={(v: number) => [`${currency} ${Number(v).toLocaleString()}`, "Collected"]} />
-                            <Bar dataKey="value" fill="#397DFF" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="value" fill="#0066F5" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -1069,7 +1069,7 @@ const AnalyticsReporting = () => {
                           <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
                           <YAxis tick={{ fontSize: 10 }} />
                           <Tooltip formatter={(v: number) => [`${currency} ${Number(v).toLocaleString()}`, "Revenue"]} />
-                          <Line type="monotone" dataKey="revenue" stroke="#397DFF" strokeWidth={2} dot={false} />
+                          <Line type="monotone" dataKey="revenue" stroke="#0066F5" strokeWidth={2} dot={false} />
                         </ReLineChart>
                       </ResponsiveContainer>
                     </div>
@@ -1128,7 +1128,7 @@ const AnalyticsReporting = () => {
                             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
                             <Tooltip />
-                            <Bar dataKey="count" fill="#397DFF" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="count" fill="#0066F5" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>

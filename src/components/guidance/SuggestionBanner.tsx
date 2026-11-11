@@ -34,30 +34,39 @@ export const SuggestionBanner = ({
 
   if (isDismissed) return null;
 
+  // Dark mode: the *-50 tints are fixed pale hexes that never adapt,
+  // while index.css remaps .text-graphite-600 to a light grey under
+  // .dark — a pale slab ends up carrying light text (~1.2:1, the
+  // /appointments defect). Every variant therefore pairs its tint with
+  // a translucent dark surface, a dark border step and light title/icon
+  // steps, the same /10-tint treatment StatusBanners uses. Only steps
+  // that exist in tailwind.config.ts are used (success/warning ramps
+  // end at 700, so their light titles use 700 — the old 900 classes
+  // named steps that were never generated).
   const variants = {
     info: {
-      bg: 'bg-primary-50',
-      border: 'border-primary-200',
-      icon: 'text-primary-600',
-      title: 'text-primary-900',
+      bg: 'bg-primary-50 dark:bg-primary-500/10',
+      border: 'border-primary-200 dark:border-primary-500/30',
+      icon: 'text-primary-600 dark:text-primary-400',
+      title: 'text-primary-900 dark:text-primary-100',
     },
     success: {
-      bg: 'bg-success-50',
-      border: 'border-success-200',
-      icon: 'text-success-600',
-      title: 'text-success-900',
+      bg: 'bg-success-50 dark:bg-success-500/10',
+      border: 'border-success-200 dark:border-success-500/30',
+      icon: 'text-success-600 dark:text-success-400',
+      title: 'text-success-700 dark:text-success-100',
     },
     warning: {
-      bg: 'bg-warning-50',
-      border: 'border-warning-200',
-      icon: 'text-warning-600',
-      title: 'text-warning-900',
+      bg: 'bg-warning-50 dark:bg-warning-500/10',
+      border: 'border-warning-200 dark:border-warning-500/30',
+      icon: 'text-warning-600 dark:text-warning-400',
+      title: 'text-warning-700 dark:text-warning-100',
     },
     tip: {
-      bg: 'bg-accent-50',
-      border: 'border-accent-200',
-      icon: 'text-accent-600',
-      title: 'text-accent-900',
+      bg: 'bg-accent-50 dark:bg-accent-500/10',
+      border: 'border-accent-200 dark:border-accent-500/30',
+      icon: 'text-accent-600 dark:text-accent-400',
+      title: 'text-accent-900 dark:text-accent-100',
     },
   };
 

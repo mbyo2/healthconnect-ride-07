@@ -268,7 +268,7 @@ const IoTMonitoring = () => {
                       color: 'var(--foreground)'
                     }} 
                   />
-                  <Line type="monotone" dataKey="value" stroke="#397DFF" strokeWidth={3} dot={{ r: 3, fill: "#397DFF" }} />
+                  <Line type="monotone" dataKey="value" stroke="#0066F5" strokeWidth={3} dot={{ r: 3, fill: "#0066F5" }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

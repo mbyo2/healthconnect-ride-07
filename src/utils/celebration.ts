@@ -20,7 +20,7 @@ export const celebrate = (options?: {
   }
 
   // Confetti burst in Doc'O Clock blue
-  const colors = ["#2563eb", "#3b82f6", "#60a5fa", "#ffffff", "#fbbf24"];
+  const colors = ["#0038BA", "#0066F5", "#418FFB", "#ffffff", "#fbbf24"];
   const base = {
     colors,
     disableForReducedMotion: true,

@@ -210,7 +210,7 @@ export default function HealthDashboard() {
                   label="Blood Pressure"
                   value={`${vitalHistory.latest.systolic}/${vitalHistory.latest.diastolic ?? '–'} mmHg`}
                   icon={Activity}
-                  color="#397DFF" /* theme: primary-500 */
+                  color="#0066F5" /* theme: primary-500 */
                   sparklineData={vitalHistory.systolic}
                 />
               )}

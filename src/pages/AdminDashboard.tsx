@@ -130,7 +130,7 @@ export const AdminDashboard = () => {
 
     const userTypeDistribution = [
       // Semantic theme palette: primary / success / accent / warning
-      { name: 'Patients', value: patients.length, color: '#397DFF' },
+      { name: 'Patients', value: patients.length, color: '#0066F5' },
       { name: 'Providers', value: providers.length, color: '#22C55E' },
       { name: 'Institutions', value: institutions.length, color: '#F55C15' },
       { name: 'Admins', value: admins.length, color: '#F59E0B' },
@@ -287,7 +287,7 @@ export const AdminDashboard = () => {
                     <TrendChart
                       data={overview.userGrowthData}
                       lines={[
-                        { dataKey: 'patients', name: 'Patients', color: '#397DFF' },
+                        { dataKey: 'patients', name: 'Patients', color: '#0066F5' },
                         { dataKey: 'providers', name: 'Providers', color: '#22C55E' },
                         { dataKey: 'institutions', name: 'Institutions', color: '#F55C15' },
                       ]}
