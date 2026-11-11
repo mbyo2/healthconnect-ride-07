@@ -191,10 +191,10 @@ const AdvancedDashboard = () => {
     };
 
     const quickStats = [
-        { label: 'Appointments', value: appointmentCount.toString(), icon: Calendar, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950/20' },
-        { label: 'Health Score', value: `${healthScore}%`, icon: Heart, color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/20' },
-        { label: 'Active Days', value: activeDays.toString(), icon: Activity, color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/20' },
-        { label: 'Providers', value: providerCount.toString(), icon: Users, color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-950/20' },
+        { label: 'Appointments', value: appointmentCount.toString(), icon: Calendar, color: 'text-primary-600 dark:text-primary-400', bgColor: 'bg-primary-500/10' },
+        { label: 'Health Score', value: `${healthScore}%`, icon: Heart, color: 'text-primary-600 dark:text-primary-400', bgColor: 'bg-primary-500/10' },
+        { label: 'Active Days', value: activeDays.toString(), icon: Activity, color: 'text-primary-600 dark:text-primary-400', bgColor: 'bg-primary-500/10' },
+        { label: 'Providers', value: providerCount.toString(), icon: Users, color: 'text-primary-600 dark:text-primary-400', bgColor: 'bg-primary-500/10' },
     ];
 
     const upcomingAppointments = appointments.map(apt => ({
@@ -216,23 +216,23 @@ const AdvancedDashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-background p-4 md:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div>
+            <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
                             Welcome back, {profile?.first_name || 'User'}
                         </h1>
                         <p className="text-muted-foreground mt-1">Here's your health overview for today</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                         <Button asChild variant="outline" className="w-full sm:w-auto min-h-[44px]">
-                            <Link to="/appointments">View All Appointments</Link>
+                            <Link to="/appointments">View all appointments</Link>
                         </Button>
                         <Button
                             variant="outline"
-                            className="w-full sm:w-auto min-h-[44px] border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
+                            className="w-full sm:w-auto min-h-[44px] border-error-500/40 text-error-600 hover:bg-error-500/10 dark:text-error-400"
                             onClick={() => setShowEmergencyConfirm(true)}
                         >
                             <Siren className="h-4 w-4 mr-1" /> Emergency
@@ -245,7 +245,7 @@ const AdvancedDashboard = () => {
                     <DialogContent className="max-w-md">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
-                                <Siren className="h-5 w-5 text-red-500" />
+                                <Siren className="h-5 w-5 text-error-500" />
                                 Go to Emergency?
                             </DialogTitle>
                             <DialogDescription>
@@ -261,7 +261,7 @@ const AdvancedDashboard = () => {
                                 className="min-h-[44px]"
                                 onClick={() => { setShowEmergencyConfirm(false); navigate('/emergency'); }}
                             >
-                                <Siren className="h-4 w-4 mr-1" /> Yes, Emergency
+                                <Siren className="h-4 w-4 mr-1" /> Yes, go to emergency
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -270,14 +270,14 @@ const AdvancedDashboard = () => {
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {quickStats.map((stat, index) => (
-                        <Card key={index} className="hover:shadow-lg transition-shadow">
+                        <Card key={index}>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm text-muted-foreground">{stat.label}</p>
-                                        <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                                        <p className="text-2xl font-semibold tnum mt-1">{stat.value}</p>
                                     </div>
-                                    <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                                         <stat.icon className={`w-6 h-6 ${stat.color}`} />
                                     </div>
                                 </div>
@@ -357,7 +357,7 @@ const AdvancedDashboard = () => {
                             {healthMetrics.map((metric, index) => (
                                 <div key={index} className="p-4 border rounded-lg">
                                     <p className="text-sm text-muted-foreground">{metric.label}</p>
-                                    <p className="text-2xl font-bold mt-1">{metric.value}</p>
+                                    <p className="text-2xl font-semibold mt-1">{metric.value}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                         <span className={`text-sm font-medium ${metric.status === 'normal' || metric.status === 'good'
                                             ? 'text-green-600 dark:text-green-400'
