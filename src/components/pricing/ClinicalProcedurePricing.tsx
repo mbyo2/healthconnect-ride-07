@@ -225,7 +225,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
           </button>
         </div>
       )}
-      <div className="rounded-xl border overflow-hidden">
+      <div className="rounded-xl border overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/50 text-left">

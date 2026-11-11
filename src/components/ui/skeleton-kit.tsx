@@ -181,7 +181,7 @@ export function SkeletonProviderCard() {
       {/* Footer: availability chip + Estimate / Profile / Book buttons */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2.5 ">
         <Skeleton className="h-6 w-28 rounded-full" />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Skeleton className="h-11 w-[104px] rounded-md" />
           <Skeleton className="h-11 w-[92px] rounded-md" />
           <Skeleton className="h-11 w-[132px] rounded-md" />

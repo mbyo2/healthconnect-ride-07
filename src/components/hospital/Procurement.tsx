@@ -303,7 +303,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               description={statusFilter === "all" ? "Create your first purchase order." : `No orders with status "${statusFilter}".`}
             />
           ) : (
-            <div className="rounded-2xl border border-border overflow-hidden">
+            <div className="rounded-2xl border border-border overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">
@@ -481,7 +481,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               </div>
               <div className="space-y-2">
                 {poForm.items.map((item, idx) => (
-                  <div key={idx} className="grid grid-cols-[1fr_70px_70px_90px_32px] gap-2 items-center">
+                  <div key={idx} className="grid grid-cols-[minmax(0,1fr)_70px_70px_90px_32px] gap-2 items-center">
                     <input
                       value={item.item_name}
                       onChange={(e) => {
@@ -490,7 +490,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Item name"
-                      className="rounded-xl border border-border px-3 py-2 text-sm"
+                      className="min-w-0 rounded-xl border border-border px-3 py-2 text-sm"
                       required={idx === 0}
                     />
                     <input
@@ -504,7 +504,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Qty"
-                      className="rounded-xl border border-border px-2 py-2 text-sm"
+                      className="min-w-0 rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <input
                       value={item.unit}
@@ -514,7 +514,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Unit"
-                      className="rounded-xl border border-border px-2 py-2 text-sm"
+                      className="min-w-0 rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <input
                       type="number"
@@ -527,7 +527,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Unit price"
-                      className="rounded-xl border border-border px-2 py-2 text-sm"
+                      className="min-w-0 rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <button
                       type="button"
@@ -680,7 +680,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 ) : viewingItems.length === 0 ? (
                   <p className="text-xs text-graphite-400">No line items found.</p>
                 ) : (
-                  <div className="rounded-xl border border-border overflow-hidden">
+                  <div className="rounded-xl border border-border overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
                         <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">

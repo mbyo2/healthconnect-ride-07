@@ -444,7 +444,7 @@ export const ForProviders = () => {
               ].map((m) => (
                 <div key={m.label} className="p-4 rounded-card bg-canvas-bone border border-canvas-silk">
                   <div className="text-xs text-graphite-400 font-medium uppercase tracking-wider">{m.label}</div>
-                  <div className="text-2xl font-display font-light text-primary-500 mt-1">{m.value}</div>
+                  <div className="text-[clamp(1.2rem,6vw,1.5rem)] font-display font-light text-primary-500 mt-1">{m.value}</div>
                   <div className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{m.sub}</div>
                 </div>
               ))}

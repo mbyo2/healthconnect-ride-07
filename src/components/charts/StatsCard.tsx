@@ -24,15 +24,15 @@ export const StatsCard = ({
   return (
     <div className="vf-card p-5">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
             {label}
           </p>
-          <p className="text-3xl font-medium text-midnight mb-2">
+          <p className="text-[clamp(1.5rem,7vw,1.875rem)] font-medium text-midnight mb-2 tnum">
             {value}
           </p>
           {change && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {change.isPositive ? (
                 <TrendingUp className="h-4 w-4 text-success-500" />
               ) : (

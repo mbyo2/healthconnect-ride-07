@@ -67,9 +67,9 @@ export const RoleSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 text-xs font-medium">
+        <Button variant="outline" size="sm" className="gap-2 text-xs font-medium" aria-label={`Current role: ${getRoleLabel(activeRole)}`}>
           {getRoleIcon(activeRole)}
-          <Badge variant="secondary" className="text-xs capitalize">
+          <Badge variant="secondary" className="text-xs capitalize max-sm:hidden">
             {getRoleLabel(activeRole)}
           </Badge>
           <ChevronDown className="h-3 w-3 opacity-60" />

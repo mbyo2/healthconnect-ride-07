@@ -210,7 +210,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Actions footer */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-border">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <NextAvailableChip provider={provider} booked={bookedByProvider.get(provider.id)} />
                     {provider.typical_wait_time && (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
@@ -220,7 +220,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => navigate("/cost-estimator")}
                       className="px-3 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-medium flex items-center gap-1 hover:bg-muted"
