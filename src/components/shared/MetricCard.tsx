@@ -1,4 +1,5 @@
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ReactNode } from 'react';
 
 interface MetricCardProps {
@@ -115,16 +116,15 @@ export const SimpleMetric = ({ label, value, icon: Icon, color = '#397dff' }: Si
   return (
     <div className="flex items-center gap-3 p-3 vf-card">
       {Icon && (
-        <div 
-          className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: `${color}15`, color }}
+        <div
+          className="h-8 w-8 rounded-md bg-primary-500/10 text-primary-600 flex items-center justify-center flex-shrink-0"
         >
           <Icon className="h-4 w-4" />
         </div>
       )}
       <div>
-        <p className="text-xs text-graphite-500">{label}</p>
-        <p className="text-lg font-display font-medium text-midnight">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-lg font-semibold tnum text-foreground">{value}</p>
       </div>
     </div>
   );
@@ -164,18 +164,15 @@ export const ActionableCard = ({
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-display font-medium text-midnight text-sm mb-1">
+          <h3 className="font-semibold text-foreground text-sm mb-1">
             {title}
           </h3>
-          <p className="text-xs text-graphite-500 mb-3">
+          <p className="text-xs text-muted-foreground mb-3">
             {description}
           </p>
-          <button 
-            onClick={onAction}
-            className="vf-btn-secondary text-xs px-3 py-1.5"
-          >
+          <Button variant="outline" size="sm" onClick={onAction}>
             {actionLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
