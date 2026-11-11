@@ -18,6 +18,19 @@ import type { UserRole } from '@/config/roleConfig';
 
 const dedupeRoutes = (routes: string[]) => [...new Set(routes)];
 
+// Back-office trim (CEO-approved 2026-11-11): /pharmacy-management and
+// /lab-management are module-owner surfaces — getRoleNavigation offers them
+// only to the pharmacy/lab roles, institution_admin, admin and super_admin.
+// The facility back-office roles (receptionist, hr_manager, cxo,
+// billing_staff, finance_manager, inventory_manager, maintenance_manager,
+// medical_records_officer) held both routes silently via the
+// INSTITUTION_OPERATIONAL_ROUTES bundle although no menu offers them those
+// pages. Those roles compose from this filtered bundle instead. The bundle
+// itself is unchanged, so every menu-listed role keeps full access.
+const INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE = INSTITUTION_OPERATIONAL_ROUTES.filter(
+  (r) => r !== '/pharmacy-management' && r !== '/lab-management',
+);
+
 // ─── Per-role permissions ───────────────────────────────────────────
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
   // ── Patient ──────────────────────────────────────────────
@@ -745,7 +758,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
 
   // ── Medical Records / Health Information Officer ─────────────
   [USER_ROLES.MEDICAL_RECORDS_OFFICER]: dedupeRoutes([
-    ...INSTITUTION_OPERATIONAL_ROUTES,
+    ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
     '/medical-records',
     '/wallet',
   ]),
@@ -807,7 +820,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
 ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/appointments',
   '/appointments/:id',
 ]);
@@ -815,7 +828,7 @@ ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/institution/personnel',
   '/institution/reports',
   '/institution/settings',
@@ -826,7 +839,7 @@ ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.CXO] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
   '/institution/reports',
   '/institution/personnel',
@@ -866,7 +879,7 @@ ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes billing staff
   '/wallet',
   '/institution/reports',
@@ -876,7 +889,7 @@ ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/wallet',
   '/institution/reports',
   '/institution/settings',
@@ -888,7 +901,7 @@ ROLE_PERMISSIONS[USER_ROLES.FINANCE_MANAGER] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes inventory managers
   '/pharmacy-inventory',
   '/institution/reports',
@@ -913,7 +926,7 @@ ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = dedupeRoutes([
 ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = dedupeRoutes([
   ...(ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] || []),
   '/staff-dashboard',
-  ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_OPERATIONAL_ROUTES_BACK_OFFICE,
   '/institution/devices',
   '/institution/reports',
   '/institution/settings',
