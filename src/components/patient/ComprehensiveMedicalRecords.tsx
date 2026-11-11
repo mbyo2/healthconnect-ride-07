@@ -75,6 +75,7 @@ export const ComprehensiveMedicalRecords = () => {
   const { availableRoles, isAdmin, isSuperAdmin } = useUserRoles();
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date_desc');
@@ -137,6 +138,7 @@ export const ComprehensiveMedicalRecords = () => {
   const fetchMedicalRecords = async () => {
     try {
       setLoading(true);
+      setLoadError(false);
       let query = supabase
         .from('comprehensive_medical_records')
         .select('*')
@@ -151,10 +153,13 @@ export const ComprehensiveMedicalRecords = () => {
 
       query = query.order(orderColumn, orderDirection);
 
-      // Completed imaging results live in imaging_orders, not
-      // comprehensive_medical_records — fetch them alongside so patients can
-      // see their imaging results here. Only relevant for the 'all'/'imaging'
-      // filters; other record-type filters exclude them.
+      // Completed imaging reports live in imaging_results (findings /
+      // impression / reported_at), NOT on imaging_orders — querying those
+      // columns from imaging_orders fails with 42703 and used to take the
+      // whole records load down with it. Patients may see their own results
+      // once status = 'final' (RLS), joined to the parent order for the
+      // modality / body part / order number. Only relevant for the
+      // 'all'/'imaging' filters; other record-type filters exclude them.
       // Lab results and prescriptions are also aggregated (2026-10-10).
       const includeImaging = filterType === 'all' || filterType === 'imaging';
       const includeLabs = filterType === 'all' || filterType === 'lab';
@@ -162,10 +167,10 @@ export const ComprehensiveMedicalRecords = () => {
       const [recordsRes, imagingRes, labsRes, prescriptionsRes] = await Promise.all([
         query,
         includeImaging
-          ? (supabase.from('imaging_orders' as any) as any)
-              .select('id, order_number, modality, body_part, status, findings, impression, created_at, completed_at')
+          ? (supabase.from('imaging_results' as any) as any)
+              .select('id, findings, impression, reported_at, created_at, imaging_orders(order_number, modality, body_part)')
               .eq('patient_id', user?.id)
-              .eq('status', 'completed')
+              .eq('status', 'final')
               .order('created_at', { ascending: false })
           : Promise.resolve({ data: [], error: null }),
         includeLabs
@@ -190,21 +195,24 @@ export const ComprehensiveMedicalRecords = () => {
       if (prescriptionsRes.error) throw prescriptionsRes.error;
 
       const baseRecords = (recordsRes.data as unknown as MedicalRecord[]) || [];
-      const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((img: any) => ({
-        id: `imaging-${img.id}`,
-        record_type: 'imaging',
-        title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
-        description: [img.impression && `Impression: ${img.impression}`, img.findings && `Findings: ${img.findings}`]
-          .filter(Boolean)
-          .join('\n') || 'Completed imaging study.',
-        clinical_data: { order_number: img.order_number, modality: img.modality, body_part: img.body_part },
-        visit_date: img.completed_at || img.created_at,
-        severity_level: 'low',
-        status: 'completed',
-        is_private: false,
-        created_at: img.created_at,
-        record_source: 'provider' as const,
-      }));
+      const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((res: any) => {
+        const order = res.imaging_orders || {};
+        return {
+          id: `imaging-${res.id}`,
+          record_type: 'imaging',
+          title: `Imaging: ${order.modality || 'Study'} - ${order.body_part || 'Report'} (${order.order_number || '—'})`,
+          description: [res.impression && `Impression: ${res.impression}`, res.findings && `Findings: ${res.findings}`]
+            .filter(Boolean)
+            .join('\n') || 'Completed imaging study.',
+          clinical_data: { order_number: order.order_number, modality: order.modality, body_part: order.body_part },
+          visit_date: res.reported_at || res.created_at,
+          severity_level: 'low',
+          status: 'completed',
+          is_private: false,
+          created_at: res.created_at,
+          record_source: 'provider' as const,
+        };
+      });
 
       const labRecords: MedicalRecord[] = (labsRes.data || []).map((lab: any) => ({
         id: `lab-${lab.id}`,
@@ -245,7 +253,10 @@ export const ComprehensiveMedicalRecords = () => {
       setRecords(merged);
     } catch (error) {
       console.error('Error fetching medical records:', error);
-      toast.error('Failed to load medical records');
+      // A failed load is NOT an empty record set: flag it so the render
+      // shows a crafted error state with retry instead of the
+      // "No Medical Records" empty state (and no red toast on top of it).
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -397,6 +408,21 @@ export const ComprehensiveMedicalRecords = () => {
           </Card>
         ))}
       </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center space-y-3">
+          <AlertTriangle className="h-10 w-10 mx-auto text-destructive" />
+          <h3 className="text-base font-semibold">We couldn&apos;t load your medical records</h3>
+          <p className="text-sm text-muted-foreground">
+            Something went wrong while fetching them. Check your connection and try again.
+          </p>
+          <Button onClick={() => fetchMedicalRecords()}>Try again</Button>
+        </CardContent>
+      </Card>
     );
   }
 

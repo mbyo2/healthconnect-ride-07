@@ -33,10 +33,13 @@ export function useMedicalRecords(userId: string | undefined) {
                     .select('*')
                     .eq('patient_id', userId)
                     .order('visit_date', { ascending: false }),
-                (supabase.from('imaging_orders' as any) as any)
-                    .select('id, order_number, modality, body_part, status, created_at, completed_at')
+                // Imaging reports live in imaging_results (imaging_orders has
+                // no findings/impression/completed_at — selecting them there
+                // 42703s); patients see their own once status = 'final'.
+                (supabase.from('imaging_results' as any) as any)
+                    .select('id, findings, impression, reported_at, created_at, imaging_orders(order_number, modality, body_part)')
                     .eq('patient_id', userId)
-                    .eq('status', 'completed')
+                    .eq('status', 'final')
                     .order('created_at', { ascending: false }),
                 (supabase.from('lab_results' as any) as any)
                     .select('id, test_name, result_value, unit, reference_range, test_date, created_at')
@@ -64,18 +67,21 @@ export function useMedicalRecords(userId: string | undefined) {
                 created_at: record.created_at
             }));
 
-            // Add completed imaging orders as medical records
-            const imagingRecords = (imagingRes.data || []).map((img: any) => ({
-                id: `imaging-${img.id}`,
-                title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
-                provider: 'Radiology',
-                date: img.completed_at || img.created_at,
-                category: 'Imaging',
-                hash: generateMockRecordHash(),
-                verified: true,
-                shared_with: [],
-                created_at: img.created_at
-            }));
+            // Add completed imaging reports as medical records
+            const imagingRecords = (imagingRes.data || []).map((res: any) => {
+                const order = res.imaging_orders || {};
+                return {
+                    id: `imaging-${res.id}`,
+                    title: `Imaging: ${order.modality || 'Study'} - ${order.body_part || 'Report'} (${order.order_number || '—'})`,
+                    provider: 'Radiology',
+                    date: res.reported_at || res.created_at,
+                    category: 'Imaging',
+                    hash: generateMockRecordHash(),
+                    verified: true,
+                    shared_with: [],
+                    created_at: res.created_at
+                };
+            });
 
             // Add lab results as medical records
             const labRecords = (labsRes.data || []).map((lab: any) => ({

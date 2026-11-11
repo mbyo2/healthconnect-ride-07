@@ -22,8 +22,10 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // Comprehensive records plus completed imaging orders (imaging results live
-    // in imaging_orders, not comprehensive_medical_records).
+    // Comprehensive records plus completed imaging reports (findings and
+    // impressions live in imaging_results, NOT imaging_orders — selecting
+    // them from imaging_orders fails with 42703; patients see their own
+    // results once status = 'final', joined to the parent order).
     // NOTE: provider_id references auth.users (not profiles), so we fetch
     // provider names via the RLS-safe provider_directory view instead of a
     // profiles join hint (which 400s).
@@ -40,10 +42,10 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
       `)
         .eq('patient_id', user.id)
         .order('visit_date', { ascending: false }),
-      (supabase.from('imaging_orders' as any) as any)
-        .select('id, order_number, modality, body_part, status, findings, impression, created_at, completed_at')
+      (supabase.from('imaging_results' as any) as any)
+        .select('id, findings, impression, reported_at, created_at, imaging_orders(order_number, modality, body_part)')
         .eq('patient_id', user.id)
-        .eq('status', 'completed')
+        .eq('status', 'final')
         .order('created_at', { ascending: false }),
     ]);
 
@@ -71,14 +73,17 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
       status: record.status || 'Active'
     }));
 
-    const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((img: any) => ({
-      id: `imaging-${img.id}`,
-      title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
-      date: img.completed_at || img.created_at,
-      provider: 'Radiology',
-      type: 'imaging',
-      status: 'Completed'
-    }));
+    const imagingRecords: MedicalRecord[] = (imagingRes.data || []).map((res: any) => {
+      const order = res.imaging_orders || {};
+      return {
+        id: `imaging-${res.id}`,
+        title: `Imaging: ${order.modality || 'Study'} - ${order.body_part || 'Report'} (${order.order_number || '—'})`,
+        date: res.reported_at || res.created_at,
+        provider: 'Radiology',
+        type: 'imaging',
+        status: 'Completed'
+      };
+    });
 
     return [...mapped, ...imagingRecords].sort(
       (a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
