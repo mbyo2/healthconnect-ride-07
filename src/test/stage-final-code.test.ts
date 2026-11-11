@@ -29,7 +29,11 @@ describe('B1 · provider appointment list shows the booking reference', () => {
     // tables (was 4 renders across mobile cards + desktop rows).
     expect(renders.length).toBe(2);
     // Each render is gated to the provider side of the list.
-    const gates = page.match(/\{isProvider && \(\s*<div className="text-\[11px\] font-mono/g) || [];
+    // PIN MOVED (full-page sweep 2026-11-11): the gate div's figure
+    // class changed font-mono -> tabular-nums (Manrope tabular figures
+    // replace the mono dialect); the gate + render guarantee is
+    // unchanged.
+    const gates = page.match(/\{isProvider && \(\s*<div className="text-\[11px\] tabular-nums/g) || [];
     expect(gates.length).toBe(2);
   });
 });
