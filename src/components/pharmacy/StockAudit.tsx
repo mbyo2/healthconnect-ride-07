@@ -99,7 +99,7 @@ function parseCounted(value: string | undefined): number | null {
  * submit for approval, and post inventory adjustments.
  */
 export function StockAudit() {
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -298,6 +298,12 @@ export function StockAudit() {
     if (confirmAction === "approve") approveMutation.mutate();
     setConfirmAction(null);
   };
+
+  // Gate on loading (see BatchInventory): institutionId is null while the
+  // institution context resolves, even for a signed-in institution user.
+  if (loading) {
+    return <p className="text-sm text-muted-foreground">Loading your institution…</p>;
+  }
 
   if (!institutionId) {
     return <p className="text-sm text-muted-foreground">No institution selected.</p>;

@@ -83,6 +83,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/telemedicine',
     '/medications',
     '/health-analytics',    // patient trends & outcomes
+    '/emergency-response',  // menu (Emergency Response) includes doctors
       '/maternal-child',     // ANC/delivery/immunization registers
 ]),
 
@@ -117,6 +118,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
+    '/emergency-response',  // menu (Emergency Response) includes nurses
       '/maternal-child',     // ANC/delivery/immunization registers
 ]),
 
@@ -144,6 +146,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/telemedicine',
     '/health-analytics',
     '/medications',
+    '/emergency-response',  // menu (Emergency Response) includes health_personnel
     // NOTE: removed pharmacy-portal, pharmacy-inventory, pharmacy-management,
     //       hospital-management, lab-management — those belong to their own roles
   ]),
@@ -268,6 +271,13 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/hospital-management',
     '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',     // medical supplies inventory
+    // Menu parity (2026-11-11): getRoleNavigation below already offers
+    // institution_admin the Pharmacy Portal, Pharmacy Management and Lab
+    // Management — the matrix must grant what the menu promises, or the
+    // route guard bounces institution admins off their own modules.
+    '/pharmacy-portal',
+    '/pharmacy-management',
+    '/lab-management',
     '/medications',
     ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
   ]),
@@ -285,6 +295,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/appointments',
     '/appointments/:id',
     '/wallet',
+    '/chat',                  // menu (Messages) includes institution_staff
     '/medical-records',
     '/hospital-management',
     '/pharmacy-portal',       // DB is_pharmacy_operator() includes staff
@@ -487,6 +498,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     '/admin-dashboard',
     '/wallet',
+    // Menu parity (2026-11-11): the navigation already lists admin on
+    // Messages, Map and IoT Monitoring — grant what the menu promises.
+    '/chat',
+    '/map',
+    '/iot-monitoring',
     '/healthcare-application',
     '/hospital-management',
     '/pharmacy-management',
@@ -543,6 +559,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/telemedicine',
     '/medications',
     '/health-analytics',
+    '/emergency-response',  // menu (Emergency Response) includes clinical officers
       '/maternal-child',     // ANC/delivery/immunization registers
 ]),
 
@@ -576,6 +593,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',
     '/telemedicine',
+    '/emergency-response',  // menu (Emergency Response) includes registered nurses
   ]),
 
   // ── Enrolled Nurse (NMCZ) ────────────────────────────────────

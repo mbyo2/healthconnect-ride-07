@@ -510,7 +510,7 @@ function BatchDetailsSheet({
 /* ------------------------------------------------------------------ */
 
 export function BatchInventory() {
-  const { institution, institutionId } = useInstitutionContext();
+  const { institution, institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -543,6 +543,20 @@ export function BatchInventory() {
 
   function handleReceived() {
     queryClient.invalidateQueries({ queryKey: ["medicine-batches"] });
+  }
+
+  // Institution context resolves asynchronously (ownership/staff lookups);
+  // until it settles, institutionId is null even for a signed-in institution
+  // admin. Gate on loading like PharmacyDashboard does — otherwise this tab
+  // falsely claims "no institution selected" for the portal's own operator.
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center text-sm text-muted-foreground">
+          Loading your institution…
+        </CardContent>
+      </Card>
+    );
   }
 
   if (!institutionId) {

@@ -102,7 +102,7 @@ function formatDateTime(value: string | null): string {
  * Section A: batches awaiting a QA decision. Section B: recent QA decisions.
  */
 export function QualityControl() {
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -192,6 +192,12 @@ export function QualityControl() {
       isRelease,
     });
   };
+
+  // Gate on loading (see BatchInventory): institutionId is null while the
+  // institution context resolves, even for a signed-in institution user.
+  if (loading) {
+    return <p className="text-sm text-muted-foreground">Loading your institution…</p>;
+  }
 
   if (!institutionId) {
     return <p className="text-sm text-muted-foreground">No institution selected.</p>;

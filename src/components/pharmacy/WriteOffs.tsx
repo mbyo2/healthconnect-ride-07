@@ -99,7 +99,7 @@ function formatDate(value: string | null): string {
 const WRITEOFFS_KEY = "stock-writeoffs";
 
 export function WriteOffs() {
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -243,6 +243,18 @@ export function WriteOffs() {
       notes: notes.trim(),
     });
   };
+
+  // Gate on loading (see BatchInventory): institutionId is null while the
+  // institution context resolves, even for a signed-in institution user.
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center text-sm text-muted-foreground">
+          Loading your institution…
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!institutionId) {
     return (

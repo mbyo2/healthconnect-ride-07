@@ -70,7 +70,7 @@ function formatDate(value: string | null): string {
 }
 
 export function StockValuation() {
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
 
   const valuationQuery = useQuery({
@@ -114,6 +114,18 @@ export function StockValuation() {
       }))
       .sort((a, b) => (a.month < b.month ? 1 : a.month > b.month ? -1 : 0));
   }, [summaryQuery.data]);
+
+  // Gate on loading (see BatchInventory): institutionId is null while the
+  // institution context resolves, even for a signed-in institution user.
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center text-sm text-muted-foreground">
+          Loading your institution…
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!institutionId) {
     return (

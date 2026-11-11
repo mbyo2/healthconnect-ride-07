@@ -80,7 +80,7 @@ function expiryLabel(batch: MedicineBatch): string {
 }
 
 export function ExpiryRadar() {
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, loading } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -142,6 +142,18 @@ export function ExpiryRadar() {
       toast.error(friendlyErrorMessage(error, "Failed to quarantine expired batches"));
     },
   });
+
+  // Gate on the context's loading state (see BatchInventory): institutionId
+  // is null while the context resolves, even for a signed-in institution user.
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center text-sm text-muted-foreground">
+          Loading your institution…
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!institutionId) {
     return (
