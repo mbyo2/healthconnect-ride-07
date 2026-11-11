@@ -24,11 +24,13 @@ describe('B1 · provider appointment list shows the booking reference', () => {
 
   it('renders the reference in the provider view at every list site', () => {
     const renders = page.match(/Ref \{bookingRef\(app\)\}/g) || [];
-    // upcoming mobile card, upcoming desktop row, past mobile card, past desktop row
-    expect(renders.length).toBe(4);
+    // Upcoming row + past row: one hairline renderer per section since
+    // the 2026-11-11 fidelity conversion retired the separate desktop
+    // tables (was 4 renders across mobile cards + desktop rows).
+    expect(renders.length).toBe(2);
     // Each render is gated to the provider side of the list.
     const gates = page.match(/\{isProvider && \(\s*<div className="text-\[11px\] font-mono/g) || [];
-    expect(gates.length).toBe(4);
+    expect(gates.length).toBe(2);
   });
 });
 
@@ -51,7 +53,11 @@ describe('B2 · Telemedicine chip reflects the appointment type, not provider ca
   it('every row type label goes through the shared helper', () => {
     expect(page).not.toContain('app.type === "video_consultation"');
     const helperUses = page.match(/isVideoAppointment\(app\)/g) || [];
-    expect(helperUses.length).toBeGreaterThanOrEqual(6);
+    // Threshold recalibrated 4 (was 6) with the 2026-11-11 fidelity
+    // conversion: one renderer per section replaced the duplicated
+    // mobile-card + desktop-row label sites; every remaining row label
+    // still goes through the helper.
+    expect(helperUses.length).toBeGreaterThanOrEqual(4);
   });
 });
 

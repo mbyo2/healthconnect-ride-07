@@ -113,9 +113,9 @@ describe("paypal fidelity 2026-11-11: patient home anatomy", () => {
 });
 
 describe("paypal fidelity 2026-11-11: list conversions", () => {
-  it("appointments: mobile items are hairline rows, sections shadow-free", () => {
+  it("appointments: items are hairline rows at every width, sections shadow-free", () => {
     expect(appointments).not.toContain("m-3 rounded-lg border border-border bg-card p-3 shadow-xs");
-    expect(appointments).toContain("sm:hidden divide-y divide-border");
+    expect(appointments).toContain("divide-y divide-border px-4");
     expect(appointments).not.toContain("shadow-xs");
     expect(appointments).not.toContain("shadow-button");
   });
@@ -134,6 +134,38 @@ describe("paypal fidelity 2026-11-11: list conversions", () => {
     expect(medicalRecords).not.toContain("shadow-button");
     expect(medicalRecords).toContain("divide-y divide-border");
     expect(medicalRecords).not.toContain("p-3.5 rounded-xl border border-border bg-background");
+  });
+});
+
+describe("paypal fidelity 2026-11-11: round-3 seeded re-check fixes", () => {
+  it("activity feed lab rows read test_type (lab_tests has no test_name)", () => {
+    // Phantom column: selecting test_name from lab_tests 400s the whole
+    // PostgREST query, so lab rows silently never rendered. The live
+    // name column on lab_tests is test_type (test_name is lab_results).
+    expect(patientHome).toContain(".select('id, test_type, status, created_at')");
+    expect(patientHome).toContain("t.test_type || 'Lab test'");
+    expect(patientHome).not.toContain("test_name");
+  });
+
+  it("activity feed maps lab status 'completed' to Result ready", () => {
+    // Live lab_tests statuses are only pending | sample_collected |
+    // in_progress | completed | cancelled — 'resulted' never occurs.
+    expect(patientHome).toContain("t.status === 'completed' ? 'Result ready'");
+    expect(patientHome).not.toContain("'resulted'");
+  });
+
+  it("appointments: no <table> in the upcoming or past list sections", () => {
+    // Desktop previously kept data tables inside both section cards
+    // while mobile used hairline rows; both lists are now the single
+    // hairline-row renderer at every width.
+    const lists = appointments.slice(
+      appointments.indexOf("Upcoming &amp; Active Appointments"),
+      appointments.indexOf("{/* Reschedule dialog")
+    );
+    expect(lists).not.toContain("<table");
+    expect(lists).not.toContain("<thead");
+    expect(lists).toContain("{upcoming.map((app) => renderUpcomingRow(app))}");
+    expect(lists).toContain("{past.map((app) => renderPastRow(app))}");
   });
 });
 

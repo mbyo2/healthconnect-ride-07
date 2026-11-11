@@ -379,9 +379,11 @@ export const AppointmentsPage = () => {
     }
   };
 
-  // Mobile card rendering (below sm) — same data, same actions/handlers as
-  // the desktop tables below; markup follows the AgendaTimeline card idiom.
-  const renderUpcomingMobileCard = (app: any) => {
+  // Hairline list rows (PayPal anatomy, fidelity follow-up 2026-11-11) —
+  // ONE row renderer serves every viewport: avatar/name block, status
+  // pill, date/time + mode/location meta line, then the actions. The old
+  // desktop <table> rendering was retired so desktop matches mobile.
+  const renderUpcomingRow = (app: any) => {
     const person = isProvider ? app.patient : app.provider;
     const isVideo = isVideoAppointment(app);
     const apptDate = parseISO(app.date);
@@ -481,7 +483,7 @@ export const AppointmentsPage = () => {
     );
   };
 
-  const renderPastMobileCard = (app: any) => {
+  const renderPastRow = (app: any) => {
     const person = isProvider ? app.patient : app.provider;
     const apptDate = parseISO(app.date);
     return (
@@ -625,7 +627,7 @@ export const AppointmentsPage = () => {
                 />
               )}
 
-              {/* Upcoming Appointments Table Group */}
+              {/* Upcoming Appointments Group */}
               <div className="rounded-2xl border border-border bg-card overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -655,135 +657,9 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <>
-                  <div className="sm:hidden divide-y divide-border px-4">
-                    {upcoming.map((app) => renderUpcomingMobileCard(app))}
+                  <div className="divide-y divide-border px-4">
+                    {upcoming.map((app) => renderUpcomingRow(app))}
                   </div>
-                  <div className="hidden sm:block w-full overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[900px]">
-                      <thead>
-                        <tr className="text-xs font-medium text-muted-foreground border-b border-border bg-muted/50">
-                          <th className="py-3 px-6 w-[240px]">Participant</th>
-                          <th className="py-3 px-3 w-[140px] text-center">Status</th>
-                          <th className="py-3 px-3 w-[150px]">Date & Time</th>
-                          <th className="py-3 px-3 w-[130px]">Consult Mode</th>
-                          <th className="py-3 px-3 w-[180px]">Location / Contact</th>
-                          <th className="py-3 px-3 w-[150px] text-center">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border text-sm">
-                        {upcoming.map((app) => {
-                          const person = isProvider ? app.patient : app.provider;
-                          const isVideo = isVideoAppointment(app);
-                          const apptDate = parseISO(app.date);
-
-                          return (
-                            <tr key={app.id} className="hover:bg-muted/50 transition-colors">
-                              <td className="py-4 px-6">
-                                <div className="flex items-center gap-3">
-                                  <div className="h-9 w-9 rounded-full bg-muted text-muted-foreground font-semibold text-xs flex items-center justify-center flex-shrink-0 uppercase">
-                                    {person?.first_name?.[0]}{person?.last_name?.[0]}
-                                  </div>
-                                  <div>
-                                    <div className="font-semibold text-sm text-foreground">
-                                      {isProvider
-                                        ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
-                                        : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
-                                    </div>
-                                    {isProvider && (
-                                      <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
-                                    )}
-                                    {!isProvider && person?.specialty && (
-                                      <div className="text-xs text-muted-foreground font-medium">{person.specialty}</div>
-                                    )}
-                                    {/* New: fee + telemedicine + wait time for patient view */}
-                                    {!isProvider && (
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                        {(person?.consultation_fee_min || person?.consultation_fee_max) && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
-                                            <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
-                                              ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
-                                              : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
-                                          </span>
-                                        )}
-                                        {isVideo && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
-                                            <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
-                                          </span>
-                                        )}
-                                        {person?.typical_wait_time && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
-                                            <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
-                                          </span>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </td>
-
-                              <td className="py-4 px-3 text-center">
-                                {getStatusPill(app.status)}
-                              </td>
-
-                              <td className="py-4 px-3 tnum font-medium text-foreground">
-                                <div>{format(apptDate, "MMM d, yyyy")}</div>
-                                <div className="text-xs text-muted-foreground">{app.time}</div>
-                              </td>
-
-                              <td className="py-4 px-3">
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-border bg-muted text-muted-foreground">
-                                  {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-                                  <span>{isVideo ? "Video" : "In person"}</span>
-                                </span>
-                              </td>
-
-                              <td className="py-4 px-3 text-muted-foreground truncate max-w-[180px]">
-                                {person?.address || "Clinic Facility"}
-                              </td>
-
-                              <td className="py-4 px-3 text-center">
-                                <div className="flex items-center justify-center gap-2">
-                                  {isVideo && isToday(apptDate) && (
-                                    <Button asChild size="sm" variant="success" className="min-h-[44px]">
-                                    <Link to={`/video-call/${app.id}`}>Join</Link>
-                                    </Button>
-                                  )}
-                                  {isProvider && app.status === "pending" && (
-                                    <>
-                                      <Button size="sm" onClick={() => acceptAppointment.mutate(app.id)} className="min-h-[44px]">
-                                      Accept
-                                      </Button>
-                                      <Button size="sm" variant="outline" onClick={() => declineAppointment.mutate(app.id)} className="min-h-[44px] text-destructive hover:text-destructive">
-                                      Decline
-                                      </Button>
-                                    </>
-                                  )}
-                                  {isProvider && app.status !== "pending" && (
-                                    <Button size="sm" variant="secondary" onClick={() => completeAppointment.mutate(app.id)} className="min-h-[44px]">
-                                    Done
-                                    </Button>
-                                  )}
-                                  {isProvider && (
-                                    <Button size="sm" variant="outline" onClick={() => openReschedule(app)} className="min-h-[44px]">
-                                    Reschedule
-                                    </Button>
-                                  )}
-                                  {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
-                                    <MarkNoShowButton appointmentId={app.id} />
-                                  )}
-                                  <Button size="sm" variant="ghost" onClick={() => setCancelTarget(app)} className="min-h-[44px] text-muted-foreground">
-                                  Cancel
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                  </>
                 )}
               </div>
 
@@ -811,87 +687,9 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <>
-                  <div className="sm:hidden divide-y divide-border px-4">
-                    {past.map((app) => renderPastMobileCard(app))}
+                  <div className="divide-y divide-border px-4">
+                    {past.map((app) => renderPastRow(app))}
                   </div>
-                  <div className="hidden sm:block w-full overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[900px]">
-                      <thead>
-                        <tr className="text-xs font-medium text-muted-foreground border-b border-border bg-muted/50">
-                          <th className="py-2.5 px-4 w-[240px]">Participant</th>
-                          <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
-                          <th className="py-2.5 px-3 w-[150px]">Date & Time</th>
-                          <th className="py-2.5 px-3 w-[130px]">Consult Mode</th>
-                          <th className="py-2.5 px-3 w-[180px]">Location</th>
-                          <th className="py-2.5 px-3 w-[150px] text-center">Re-Book</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border text-sm">
-                        {past.map((app) => {
-                          const person = isProvider ? app.patient : app.provider;
-                          const apptDate = parseISO(app.date);
-
-                          return (
-                            <tr key={app.id} className="hover:bg-muted/50 transition-colors">
-                              <td className="py-3 px-4 font-medium text-foreground">
-                                <div>
-                                  <div>{isProvider
-                                    ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
-                                    : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}</div>
-                                  {isProvider && (
-                                    <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
-                                  )}
-                                  {!isProvider && person?.specialty && (
-                                    <div className="text-xs text-muted-foreground font-medium mt-0.5">{person.specialty}</div>
-                                  )}
-                                  {!isProvider && (person?.consultation_fee_min || isVideoAppointment(app)) && (
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {person?.consultation_fee_min && (
-                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
-                                          <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
-                                        </span>
-                                      )}
-                                      {isVideoAppointment(app) && (
-                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
-                                          <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
-
-                              <td className="py-3 px-3 text-center">
-                                {getStatusPill(app.status)}
-                              </td>
-
-                              <td className="py-3 px-3 tnum text-muted-foreground">
-                                {format(apptDate, "MMM d, yyyy")} • {app.time}
-                              </td>
-
-                              <td className="py-3 px-3 text-muted-foreground">
-                                {isVideoAppointment(app) ? "Video visit" : "In person"}
-                              </td>
-
-                              <td className="py-3 px-3 text-muted-foreground truncate max-w-[180px]">
-                                {person?.address || "To be confirmed"}
-                              </td>
-
-                              <td className="py-3 px-3 text-center">
-                                {!isProvider && app.provider_id && (
-                                  <Button size="sm" onClick={() => navigate(`/provider/${app.provider_id}`)} className="min-h-[44px]">
-                                  Re-book
-                                  </Button>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                  </>
                 )}
               </div>
             </div>

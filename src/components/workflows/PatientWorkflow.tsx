@@ -190,9 +190,11 @@ export const PatientWorkflow = React.memo(() => {
   // the patient's latest appointments, lab results and prescriptions
   // merged into ONE hairline list. Every select mirrors the exact
   // tables/columns the dedicated patient components already use
-  // (appointments + provider_directory for names; lab_tests status is
-  // 'resulted' with the dated row in lab_results — see PatientLabResults;
-  // comprehensive_prescriptions — see the count query above), so this
+  // (appointments + provider_directory for names; lab_tests carries
+  // test_type and statuses pending | sample_collected | in_progress |
+  // completed | cancelled, with 'completed' presented as "Result ready"
+  // — see PatientLabResults; comprehensive_prescriptions — see the
+  // count query above), so this
   // adds no new data surface, only a new presentation of the same rows.
   type ActivityItem = {
     key: string;
@@ -216,7 +218,7 @@ export const PatientWorkflow = React.memo(() => {
           .limit(4),
         supabase
           .from('lab_tests')
-          .select('id, test_name, status, created_at')
+          .select('id, test_type, status, created_at')
           .eq('patient_id', user.id)
           .order('created_at', { ascending: false })
           .limit(4),
@@ -258,9 +260,9 @@ export const PatientWorkflow = React.memo(() => {
         items.push({
           key: `lab-${t.id}`,
           kind: 'lab',
-          title: t.test_name || 'Lab test',
+          title: t.test_type || 'Lab test',
           date: new Date(t.created_at),
-          status: t.status === 'resulted' ? 'Result ready' : t.status,
+          status: t.status === 'completed' ? 'Result ready' : t.status,
           route: '/medical-records',
         });
       });
