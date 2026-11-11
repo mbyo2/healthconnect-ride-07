@@ -7,11 +7,14 @@ import { useCurrency } from "@/hooks/use-currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowDownLeft, ArrowUpRight, Clock, Search, Receipt } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Clock, Search, Receipt, Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { downloadReceiptPdf } from "@/utils/receiptPdf";
+import { WALLET_HISTORY_LIMIT, buildWalletStatementCsv, downloadWalletStatementPdf } from "@/utils/walletStatement";
+import { csvFilename, downloadCsv } from "@/utils/csvExport";
 
 interface Transaction {
     id: string;
@@ -19,6 +22,8 @@ interface Transaction {
     amount: number;
     balance_after: number;
     description: string;
+    gateway_ref?: string | null;
+    payment_id?: string | null;
     created_at: string;
 }
 
@@ -38,7 +43,10 @@ export const WalletHistory = () => {
                     .from('wallet_transactions')
                     .select('*, user_wallets!inner(user_id)')
                     .eq('user_wallets.user_id', user.id)
-                    .order('created_at', { ascending: false });
+                    .order('created_at', { ascending: false })
+                    // Own wallet only (RLS owner-scoped); explicit cap —
+                    // the statement export covers exactly these rows.
+                    .limit(WALLET_HISTORY_LIMIT);
 
                 if (error) throw error;
                 setTransactions((data as any) || []);
@@ -56,6 +64,21 @@ export const WalletHistory = () => {
         t.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.transaction_type.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Statement export: built only from the rows above — the signed-in
+    // user's own fetched wallet history, nothing else.
+    const handleStatementCsv = () => {
+        downloadCsv(csvFilename('wallet-statement'), buildWalletStatementCsv(filteredTransactions));
+        toast.success(`Statement downloaded — ${filteredTransactions.length} transactions.`);
+    };
+
+    const handleStatementPdf = () => {
+        downloadWalletStatementPdf({
+            holderName: user?.email || 'Wallet Holder',
+            holderEmail: user?.email,
+            transactions: filteredTransactions,
+        });
+    };
 
     if (isLoading) {
         return (
@@ -85,18 +108,47 @@ export const WalletHistory = () => {
                         <Clock className="h-5 w-5 text-primary-500" />
                         Transaction History
                     </CardTitle>
-                    <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden />
-                        <Input
-                            type="search"
-                            placeholder="Search transactions..."
-                            aria-label="Search transactions"
-                            className="pl-9 bg-background/80 border-border focus:ring-primary"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                    <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <div className="relative flex-1 min-w-[10rem] md:w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden />
+                            <Input
+                                type="search"
+                                placeholder="Search transactions..."
+                                aria-label="Search transactions"
+                                className="pl-9 bg-background/80 border-border focus:ring-primary"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleStatementCsv}
+                            disabled={filteredTransactions.length === 0}
+                            title="Download statement as CSV"
+                            className="whitespace-nowrap"
+                        >
+                            <Download className="h-4 w-4 mr-1.5" aria-hidden />
+                            Statement CSV
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleStatementPdf}
+                            disabled={filteredTransactions.length === 0}
+                            title="Download statement as PDF"
+                            className="whitespace-nowrap"
+                        >
+                            <FileText className="h-4 w-4 mr-1.5" aria-hidden />
+                            Statement PDF
+                        </Button>
                     </div>
                 </div>
+                {transactions.length >= WALLET_HISTORY_LIMIT && (
+                    <p className="text-xs text-muted-foreground">
+                        Showing your most recent {WALLET_HISTORY_LIMIT.toLocaleString()} transactions — your statement covers exactly these.
+                    </p>
+                )}
             </CardHeader>
             <CardContent className="p-0">
                 <ScrollArea className="h-[500px]">

@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
-import { Eye, Search, RefreshCw } from 'lucide-react';
+import { Eye, Search, RefreshCw, Download } from 'lucide-react';
+import { AUDIT_TRAIL_FETCH_LIMIT, buildPatientAccessCsv } from '@/utils/auditExports';
+import { csvFilename, downloadCsv } from '@/utils/csvExport';
 import {
   Select,
   SelectContent,
@@ -58,7 +60,7 @@ export function PatientAccessAudit() {
         .from('patient_access_audit')
         .select('id, accessed_at, accessor_id, patient_id, access_type, search_term, reason')
         .order('accessed_at', { ascending: false })
-        .limit(500);
+        .limit(AUDIT_TRAIL_FETCH_LIMIT);
       if (error) throw error;
 
       const list = (data || []) as PatientAccessRow[];
@@ -103,6 +105,13 @@ export function PatientAccessAudit() {
     }
     return out;
   }, [rows, typeFilter, surfaceFilter, searchQuery]);
+
+  // Export exactly the filtered rows on screen (from the loaded
+  // newest-first window) as CSV.
+  const handleExportCsv = () => {
+    downloadCsv(csvFilename('patient-access-log'), buildPatientAccessCsv(filtered));
+    toast.success(`Exported ${filtered.length} patient access records as CSV.`);
+  };
 
   const badgeVariant = (t: string): 'default' | 'destructive' | 'outline' | 'secondary' => {
     switch (t) {
@@ -191,7 +200,16 @@ export function PatientAccessAudit() {
           <Button variant="outline" onClick={fetchRows} className="gap-1.5">
             <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
+          <Button variant="outline" onClick={handleExportCsv} disabled={filtered.length === 0} className="gap-1.5">
+            <Download className="h-4 w-4" /> Export CSV
+          </Button>
         </div>
+        {rows.length >= AUDIT_TRAIL_FETCH_LIMIT && (
+          <p className="text-xs text-muted-foreground">
+            Showing the most recent {AUDIT_TRAIL_FETCH_LIMIT} access records — the export covers
+            exactly the filtered rows on screen.
+          </p>
+        )}
         {isLoading ? (
           <p className="text-sm text-muted-foreground py-8 text-center">Loading patient access log…</p>
         ) : filtered.length === 0 ? (

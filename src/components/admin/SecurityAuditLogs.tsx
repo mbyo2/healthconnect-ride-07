@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
-import { Shield, AlertCircle, CheckCircle, Info, Filter, Search, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Shield, AlertCircle, CheckCircle, Info, Filter, Search, RefreshCw, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { AUDIT_TRAIL_FETCH_LIMIT, buildSecurityAuditCsv } from '@/utils/auditExports';
+import { csvFilename, downloadCsv } from '@/utils/csvExport';
 import {
   Select,
   SelectContent,
@@ -68,7 +70,7 @@ export function SecurityAuditLogs() {
         .from('security_audit_log')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(500); // Increased for better filtering
+        .limit(AUDIT_TRAIL_FETCH_LIMIT); // Newest-first window; exports cover exactly these loaded rows
 
       if (logsError) throw logsError;
 
@@ -176,6 +178,14 @@ export function SecurityAuditLogs() {
 
     return filtered;
   }, [logs, eventFilter, searchQuery, categoryFilter, userFilter, dateFrom, dateTo]);
+
+  // Export exactly the rows the current filters produce (from the loaded
+  // newest-first window) — same evidence the admin is looking at.
+  const handleExportCsv = () => {
+    const csv = buildSecurityAuditCsv(filteredLogs, getEventCategory);
+    downloadCsv(csvFilename('security-audit-log'), csv);
+    toast.success(`Exported ${filteredLogs.length} audit events as CSV.`);
+  };
 
   const clearFilters = () => {
     setEventFilter('all');
@@ -315,12 +325,21 @@ export function SecurityAuditLogs() {
             </CardTitle>
             <CardDescription>
               Showing {paginatedLogs.length} of {filteredLogs.length} audit logs
+              {logs.length >= AUDIT_TRAIL_FETCH_LIMIT && (
+                <> — most recent {AUDIT_TRAIL_FETCH_LIMIT} events loaded; the export covers exactly the filtered rows on screen</>
+              )}
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchLogs} disabled={isLoading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={filteredLogs.length === 0}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={fetchLogs} disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
