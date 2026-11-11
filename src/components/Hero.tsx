@@ -71,7 +71,7 @@ export const Hero = () => {
                   className="pl-10 h-12 rounded-pill border-canvas-silk bg-white dark:bg-slate-900 focus:border-primary-500 focus:ring-primary-500/20"
                 />
               </div>
-              <Button type="submit" size="lg" className="vf-btn-primary h-12 px-6">
+              <Button type="submit" size="lg" className="h-12 px-6">
                 Search
               </Button>
             </form>
@@ -89,7 +89,7 @@ export const Hero = () => {
             )}
 
             <div className="flex flex-col sm:flex-row gap-3 opacity-0 animate-hero-rise" style={{ animationDelay: "0.35s" }}>
-              <Button asChild size="lg" className="vf-btn-primary flex-1 sm:flex-none h-12">
+              <Button asChild size="lg" className="flex-1 sm:flex-none h-12">
                 <Link to="/auth?tab=signup">Get Started Free</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="vf-btn-secondary flex-1 sm:flex-none h-12">
