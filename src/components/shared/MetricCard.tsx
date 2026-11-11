@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface MetricCardProps {
@@ -29,28 +29,27 @@ function MetricCardBody({
     <>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <p className="text-xs font-medium text-graphite-500 uppercase tracking-wide mb-1">
+          <p className="text-xs font-medium text-muted-foreground mb-1">
             {label ?? title}
           </p>
-          <p className="text-2xl font-display font-medium text-midnight">
+          <p className="text-2xl font-semibold tnum text-foreground">
             {value}
           </p>
           {subtitle && (
-            <p className="text-xs text-graphite-500 mt-1">{subtitle}</p>
+            <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           )}
           {trend && (
             <div className="flex items-center gap-1 mt-2">
-              <span className={`text-xs font-medium ${trend.isPositive ? 'text-success-500' : 'text-error-500'}`}>
-                {trend.isPositive ? '↑' : '↓'} {trend.value}
+              <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${trend.isPositive ? 'text-success-600 dark:text-success-400' : 'text-error-600 dark:text-error-400'}`}>
+                {trend.isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />} {trend.value}
               </span>
-              <span className="text-xs text-graphite-500">vs last period</span>
+              <span className="text-xs text-muted-foreground">vs last period</span>
             </div>
           )}
         </div>
         {Icon && (
           <div
-            className="h-10 w-10 rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: `${color}15`, color }}
+            className="h-10 w-10 rounded-lg bg-primary-500/10 text-primary-600 flex items-center justify-center"
           >
             <Icon className="h-5 w-5" />
           </div>
@@ -76,7 +75,7 @@ export const MetricCard = ({
         type="button"
         onClick={onClick}
         aria-label={typeof (label ?? title) === 'string' ? String(label ?? title) : undefined}
-        className="vf-card p-4 w-full text-left cursor-pointer hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-primary"
+        className="vf-card p-4 w-full text-left cursor-pointer hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary"
       >
         <MetricCardBody
           label={label}

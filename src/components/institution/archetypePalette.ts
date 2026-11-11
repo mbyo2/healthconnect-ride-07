@@ -1,26 +1,26 @@
 /**
- * Per-archetype identity colours for institution surfaces.
+ * Institution identity colour.
  *
- * Data-only palette: these hues are the facility-archetype brand colours
- * used for the InstitutionDashboard identity chip (inline style) and chart
- * series. They live here — named by archetype — so the page file carries
- * no raw hex and chip contrast can be tuned in one place.
- *
- * Values are byte-identical to the colours previously inlined in
- * InstitutionDashboard's TYPE_CONFIG.
+ * This file previously held an 11-colour per-archetype rainbow (sky,
+ * violet, purple, red, green, teal, orange…) consumed by the
+ * InstitutionDashboard identity chip and chart series. Colour
+ * discipline (2026-11-11 interior rebuild): the interior reserves
+ * colour for status + ONE brand accent, so every archetype now maps
+ * to the single Signal Blue accent. The map shape is kept so callers
+ * don't change; the values are deliberately uniform.
  */
 export const archetypePalette: Record<string, string> = {
-  solo_practice: "#0ea5e9",
-  pharmacy: "#0073ea",
-  wholesale_pharmacy: "#7c3aed",
-  diagnostics: "#a25ddc",
-  general_hospital: "#e44258",
-  clinic: "#00c875",
-  specialty_hospital: "#0d9488",
-  long_term_care: "#fdab3d",
-  dialysis_centre: "#0ea5e9",
-  dental_clinic: "#38bdf8",
-  trauma_centre: "#ef4444",
+  solo_practice: "#397dff",
+  pharmacy: "#397dff",
+  wholesale_pharmacy: "#397dff",
+  diagnostics: "#397dff",
+  general_hospital: "#397dff",
+  clinic: "#397dff",
+  specialty_hospital: "#397dff",
+  long_term_care: "#397dff",
+  dialysis_centre: "#397dff",
+  dental_clinic: "#397dff",
+  trauma_centre: "#397dff",
 };
 
 export default archetypePalette;

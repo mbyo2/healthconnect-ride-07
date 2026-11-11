@@ -11,6 +11,8 @@ import {
   Siren, BedDouble, HeartPulse, Scissors, Ambulance
 } from "lucide-react";
 import { SkeletonInstitutionDashboard } from "@/components/ui/skeleton-kit";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { InstitutionPageHeader } from "@/components/institution/InstitutionPageHeader";
 import { archetypePalette } from "@/components/institution/archetypePalette";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -387,7 +389,7 @@ export const InstitutionDashboard = () => {
             typeBuckets.set(t, (typeBuckets.get(t) || 0) + 1);
           });
           setWeeklyFlow([1, 2, 3, 4, 5, 6, 0].map((i) => ({ name: dayNames[i], visits: weekBuckets[i] })));
-          const TYPE_COLORS = ["#397dff", "#22C55E", "#f55c15", "#a855f7", "#EF4444", "#eab308"];
+          const TYPE_COLORS = ["#397dff", "#00a86b", "#f59e0b", "#f55c15", "#737373", "#94bfff"];
           setVisitMix(
             [...typeBuckets.entries()]
               .sort((a, b) => b[1] - a[1])
@@ -451,7 +453,7 @@ export const InstitutionDashboard = () => {
 
   if (instLoading || dataLoading) {
     return (
-      <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
+      <div className="pb-16">
         <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6" role="status" aria-label="Loading institution dashboard">
           <SkeletonInstitutionDashboard />
         </div>
@@ -461,16 +463,16 @@ export const InstitutionDashboard = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
-        <div className="max-w-md w-full vf-card text-center space-y-4">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
+        <div className="max-w-md w-full rounded-lg border border-border bg-card p-6 shadow-xs text-center space-y-4">
           <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-          <h2 className="font-display text-xl font-medium text-midnight">Setting Up Your Dashboard</h2>
-          <p className="text-sm text-graphite-500">
+          <h2 className="text-xl font-semibold text-foreground">Setting Up Your Dashboard</h2>
+          <p className="text-sm text-muted-foreground">
             We couldn't load an institution workspace for this account. If you just
             registered a facility, refresh in a moment. If you're joining as staff,
             ask your institution administrator to send you a staff invitation.
           </p>
-          <button onClick={() => window.location.reload()} className="vf-btn-primary mx-auto">
+          <Button onClick={() => window.location.reload()} className="mx-auto">
             Refresh
           </button>
         </div>
@@ -496,7 +498,7 @@ export const InstitutionDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <InstitutionPageHeader
         className="py-5 shadow-sm"
@@ -506,13 +508,13 @@ export const InstitutionDashboard = () => {
         title={institution.name}
         badges={
           <>
-            <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
+            <StatusBadge tone={institution.is_verified ? "positive" : "warning"}>
               {institution.is_verified ? "Verified" : "Pending"}
-            </span>
+            </StatusBadge>
             {isAdmin && (
-              <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium bg-primary-100 text-primary-600 border border-primary-200" title="You are the superadmin in charge of this institution">
+              <StatusBadge tone="info">
                 Super Admin
-              </span>
+              </StatusBadge>
             )}
           </>
         }
@@ -523,24 +525,24 @@ export const InstitutionDashboard = () => {
         }
         actions={
           <>
-            <button
+            <Button variant="outline" size="sm"
               onClick={() => window.open(`/kiosk?institution=${institution.id}`, "_blank", "noopener")}
-              className="vf-btn-secondary gap-1.5 text-sm"
+              className="gap-1.5"
               aria-label="Open self-service kiosk (new tab)"
             >
               <Ticket className="h-3.5 w-3.5" /> Self-Service Kiosk
-            </button>
-            <button
+            </Button>
+            <Button variant="outline" size="sm"
               onClick={() => window.open(`/queue-display?institution=${institution.id}`, "_blank", "noopener")}
-              className="vf-btn-secondary gap-1.5 text-sm"
+              className="gap-1.5"
               aria-label="Open public TV display (new tab)"
             >
               <Tv className="h-3.5 w-3.5" /> Public TV Screen
-            </button>
+            </Button>
             {isAdmin && (
-              <button onClick={() => navigate("/institution/settings")} className="vf-btn-secondary gap-1.5 text-sm">
+              <Button variant="outline" size="sm" onClick={() => navigate("/institution/settings")} className="gap-1.5">
                 <Settings className="h-3.5 w-3.5" /> Settings
-              </button>
+              </Button>
             )}
           </>
         }
@@ -549,17 +551,19 @@ export const InstitutionDashboard = () => {
       {/* Dashboard data load failure — plain-language banner with retry
           (previously a failed fetch silently rendered a dashboard of zeros). */}
       {dataError && (
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
-          <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-error-200 bg-error-50 dark:bg-slate-900 px-4 py-3">
-            <p className="text-sm font-medium text-error-600 dark:text-slate-200">
+        <div className="pt-4">
+          <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-error-500/30 bg-error-500/10 px-4 py-3">
+            <p className="text-sm font-medium text-error-700 dark:text-error-300">
               We couldn't load your dashboard data. The numbers below may be incomplete — please try again.
             </p>
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setFetchRetryCount((c) => c + 1)}
-              className="vf-btn-secondary gap-1.5 text-sm self-start sm:self-auto"
+              className="self-start sm:self-auto"
             >
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -567,14 +571,14 @@ export const InstitutionDashboard = () => {
       {/* Subscription renewal notice — only for effectively expired /
           past-due subscriptions; renders nothing otherwise. */}
       {subscriptionGate && (
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
+        <div className="pt-4">
           <SubscriptionExpiryBanner gate={subscriptionGate} isAdmin={isAdmin} />
         </div>
       )}
 
         {/* Main Suite Tab Navigation */}
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4 sticky top-[7.5rem] lg:top-[8.5rem] z-20 bg-canvas dark:bg-slate-950">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none" role="tablist" aria-label="Institution modules">
+        <div className="pt-4 sticky top-[4.5rem] z-20 bg-background">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-border scrollbar-none" role="tablist" aria-label="Institution modules">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
             { id: "patients", label: "Patient Hub (Central MRN)", icon: UserRound },
@@ -620,7 +624,7 @@ export const InstitutionDashboard = () => {
                       { description: `Required module: ${rule?.requiredModules.join(" or ") || "—"}. Contact your administrator to enable it.` }
                     );
                   }}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
+                  className="px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
                 >
                   <Lock className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -634,12 +638,12 @@ export const InstitutionDashboard = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 title={atypicalNote || undefined}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all ${
+                className={`px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors ${
                   isActive
-                    ? "bg-primary-500 text-white shadow-xs"
+                    ? "bg-primary text-primary-foreground"
                     : isAtypical
-                      ? "bg-white dark:bg-slate-900 border border-dashed border-canvas-silk dark:border-slate-800 text-muted-foreground/60 dark:text-slate-500 hover:bg-primary-50 hover:text-primary-500 hover:border-solid"
-                      : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500"
+                      ? "bg-card border border-dashed border-border text-muted-foreground/60 hover:bg-muted hover:text-foreground hover:border-solid"
+                      : "bg-card border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -654,7 +658,7 @@ export const InstitutionDashboard = () => {
       </div>
 
       {/* Tab Contents */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="pt-6 space-y-6">
         {/* 1. Overview */}
         {activeTab === "overview" && (
           <div className="space-y-6">
@@ -706,19 +710,19 @@ export const InstitutionDashboard = () => {
             )}
 
             {/* Type-specific Quick Navigation */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-              <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-3">{cfg.label} Quick Access Modules</p>
+            <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+              <p className="text-xs font-medium text-muted-foreground mb-3">{cfg.label} quick access</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {cfg.quickLinks.map((action) => (
                   <button
                     key={action.label}
                     onClick={() => navigate(action.path)}
-                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800 transition-all group text-center"
+                    className="flex flex-col items-center gap-2 p-3 rounded-lg border border-border hover:bg-muted transition-colors group text-center"
                   >
-                    <span className="h-8 w-8 rounded-lg bg-canvas-mist dark:bg-slate-800 flex items-center justify-center text-graphite-500 dark:text-slate-400 group-hover:text-primary-500 group-hover:bg-primary-100 transition-colors">
+                    <span className="h-8 w-8 rounded-md bg-muted flex items-center justify-center text-muted-foreground">
                       {action.icon}
                     </span>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary-500">{action.label}</span>
+                    <span className="text-xs font-medium text-foreground">{action.label}</span>
                   </button>
                 ))}
               </div>
@@ -730,15 +734,15 @@ export const InstitutionDashboard = () => {
                 small institution grows its module set over time. Admin-granted
                 modules show a "New" badge; suspended modules are hidden. */}
             {charter.length > 0 && (
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-                <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-1">
-                  {headerLabel} Modules
+              <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  {headerLabel} modules
                 </p>
-                <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   {charter.filter((m) => m.effective === "live").length} live now,{" "}
                   {charter.filter((m) => m.effective === "planned").length} available to add.
                   {charter.some((m) => m.source === "admin_grant") && (
-                    <> · <span className="text-primary-600 font-bold">includes modules added for your facility by the platform team</span></>
+                    <> · <span className="text-primary-600 font-medium">includes modules added for your facility by the platform team</span></>
                   )}
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
@@ -750,24 +754,24 @@ export const InstitutionDashboard = () => {
                     const badge = isGranted ? "New" : isLive ? "Live" : priceLabel ? `Available · ${priceLabel}` : "Available";
                     const inner = (
                       <>
-                        <span className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
                           {isLive ? (
                             <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
                           ) : (
-                            <Hourglass className="h-3.5 w-3.5 text-graphite-400 shrink-0" />
+                            <Hourglass className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                           )}
                           <span className="truncate">{m.module_name}</span>
                         </span>
-                        <span className={`text-xs font-semibold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
+                        <span className={`text-xs font-medium ${isLive ? "text-success-600 dark:text-success-400" : "text-primary-600 dark:text-primary-400"}`}>
                           {badge}
                         </span>
                       </>
                     );
                     const cls =
-                      "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
+                      "flex items-center justify-between gap-2 p-2.5 rounded-lg border text-left transition-colors " +
                       (isLive
-                        ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
-                        : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80 hover:border-primary-500 hover:opacity-100 cursor-pointer");
+                        ? "border-border hover:bg-muted"
+                        : "border-border bg-muted/50 opacity-80 hover:opacity-100 cursor-pointer");
                     const title = m.description
                       ? isGranted ? `${m.description} — added for your facility by the platform team` : isLive ? m.description : `${m.description} — available on request, open Modules & Add-ons in Settings`
                       : m.module_name;
@@ -792,7 +796,7 @@ export const InstitutionDashboard = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
               <QuickActions />
             </div>
 
@@ -802,18 +806,18 @@ export const InstitutionDashboard = () => {
               <div className="vf-card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-display text-sm font-medium text-midnight flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-primary-500" /> 
                       Revenue & Activity Trends
                     </h3>
-                    <p className="text-xs text-graphite-500 mt-1">Last 6 months performance</p>
+                    <p className="text-xs text-muted-foreground mt-1">Last 6 months performance</p>
                   </div>
                 </div>
                 <SimpleBarChart
                   data={chartData}
                   bars={[
                     { dataKey: 'revenue', name: 'Revenue', color: cfg.color },
-                    { dataKey: 'appointments', name: 'Appointments', color: '#22C55E' },
+                    { dataKey: 'appointments', name: 'Appointments', color: '#00a86b' },
                   ]}
                   height={250}
                 />
@@ -830,10 +834,10 @@ export const InstitutionDashboard = () => {
               {/* Patient Flow by Day */}
               <div className="vf-card p-5">
                 <div className="mb-4">
-                  <h3 className="font-display text-sm font-medium text-midnight">
+                  <h3 className="text-sm font-semibold text-foreground">
                     Weekly Patient Flow
                   </h3>
-                  <p className="text-xs text-graphite-500 mt-1">Appointments per day — last 7 days</p>
+                  <p className="text-xs text-muted-foreground mt-1">Appointments per day — last 7 days</p>
                 </div>
                 <SimpleBarChart
                   data={weeklyFlow}
@@ -847,10 +851,10 @@ export const InstitutionDashboard = () => {
               {/* Department/Service Distribution */}
               <div className="vf-card p-5">
                 <div className="mb-4">
-                  <h3 className="font-display text-sm font-medium text-midnight">
+                  <h3 className="text-sm font-semibold text-foreground">
                     Service Distribution
                   </h3>
-                  <p className="text-xs text-graphite-500 mt-1">Appointments by type — last 90 days</p>
+                  <p className="text-xs text-muted-foreground mt-1">Appointments by type — last 90 days</p>
                 </div>
                 {visitMix.length > 0 ? (
                   <DonutChart
@@ -858,7 +862,7 @@ export const InstitutionDashboard = () => {
                     height={250}
                   />
                 ) : (
-                  <p className="text-sm text-graphite-500 text-center py-16">
+                  <p className="text-sm text-muted-foreground text-center py-16">
                     No appointment data yet — the mix appears once visits are booked.
                   </p>
                 )}
@@ -929,7 +933,7 @@ export const InstitutionDashboard = () => {
         {/* 13. Revenue Cycle Management & Insurance */}
         {activeTab === "rcm" && (
           <div className="space-y-6">
-            <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
+            <div className="rounded-lg border border-border bg-card p-6 shadow-xs">
               <AdvancedRevenueCycle />
             </div>
             <DoctorFractionManager institutionId={institution.id} />
@@ -938,7 +942,7 @@ export const InstitutionDashboard = () => {
 
         {/* 14. Multi-Center Enterprise Governance & Cryptographic Audit */}
         {activeTab === "governance" && (
-          <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
+          <div className="rounded-lg border border-border bg-card p-6 shadow-xs">
             <MultiCenterAuditSuite institutionId={institution.id} />
           </div>
         )}
