@@ -29,11 +29,11 @@ function MetricCardBody({
   return (
     <>
       <div className="flex items-start justify-between mb-2">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-muted-foreground mb-1">
             {label ?? title}
           </p>
-          <p className="text-2xl font-semibold tnum text-foreground">
+          <p className="text-statnum tabular-nums text-foreground">
             {value}
           </p>
           {subtitle && (

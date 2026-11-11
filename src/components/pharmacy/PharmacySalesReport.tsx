@@ -93,7 +93,7 @@ export const PharmacySalesReport = () => {
               <DollarSign className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Revenue</span>
             </div>
-            <p className="text-2xl font-bold">{formatPrice(totalRevenue)}</p>
+            <p className="text-statnum tabular-nums">{formatPrice(totalRevenue)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -102,7 +102,7 @@ export const PharmacySalesReport = () => {
               <ShoppingCart className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Transactions</span>
             </div>
-            <p className="text-2xl font-bold">{totalTransactions}</p>
+            <p className="text-statnum tabular-nums">{totalTransactions}</p>
           </CardContent>
         </Card>
         <Card>
@@ -111,7 +111,7 @@ export const PharmacySalesReport = () => {
               <TrendingUp className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Avg Sale</span>
             </div>
-            <p className="text-2xl font-bold">{formatPrice(avgTransaction)}</p>
+            <p className="text-statnum tabular-nums">{formatPrice(avgTransaction)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -120,7 +120,7 @@ export const PharmacySalesReport = () => {
               <Users className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Cash</span>
             </div>
-            <p className="text-2xl font-bold">{formatPrice(paymentBreakdown.cash || 0)}</p>
+            <p className="text-statnum tabular-nums">{formatPrice(paymentBreakdown.cash || 0)}</p>
           </CardContent>
         </Card>
       </div>

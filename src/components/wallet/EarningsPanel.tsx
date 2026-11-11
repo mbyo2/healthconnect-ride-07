@@ -70,15 +70,15 @@ export const EarningsPanel = () => {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 rounded-xl bg-success-500/10">
               <p className="text-xs font-bold uppercase text-muted-foreground">This month</p>
-              <p className="text-lg font-bold text-success-600">{formatPrice(monthEarnings)}</p>
+              <p className="text-lg font-extrabold tabular-nums sm:text-statnum text-success-600">{formatPrice(monthEarnings)}</p>
             </div>
             <div className="p-3 rounded-xl bg-primary-500/10">
               <p className="text-xs font-bold uppercase text-muted-foreground">All time</p>
-              <p className="text-lg font-bold text-primary-600">{formatPrice(totalEarnings)}</p>
+              <p className="text-lg font-extrabold tabular-nums sm:text-statnum text-foreground">{formatPrice(totalEarnings)}</p>
             </div>
             <div className="p-3 rounded-xl bg-muted">
               <p className="text-xs font-bold uppercase text-muted-foreground">Payouts</p>
-              <p className="text-lg font-bold flex items-center justify-center gap-1">
+              <p className="text-lg font-extrabold tabular-nums sm:text-statnum flex items-center justify-center gap-1">
                 <Wallet className="h-4 w-4" aria-hidden />
                 {payoutCount}
               </p>

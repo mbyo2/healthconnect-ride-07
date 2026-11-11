@@ -418,11 +418,11 @@ export const Billing = () => {
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
-              <div className="flex justify-between"><span>Subtotal:</span><span>{formatPrice(calculateTotals().subtotal)}</span></div>
-              <div className="flex justify-between"><span>Tax:</span><span>{formatPrice(tax)}</span></div>
-              <div className="flex justify-between"><span>Discount:</span><span>-{formatPrice(discount)}</span></div>
+              <div className="flex justify-between"><span>Subtotal:</span><span className="tabular-nums">{formatPrice(calculateTotals().subtotal)}</span></div>
+              <div className="flex justify-between"><span>Tax:</span><span className="tabular-nums">{formatPrice(tax)}</span></div>
+              <div className="flex justify-between"><span>Discount:</span><span className="tabular-nums">-{formatPrice(discount)}</span></div>
               <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
-                <span>Total:</span><span>{formatPrice(calculateTotals().total)}</span>
+                <span>Total:</span><span className="tabular-nums">{formatPrice(calculateTotals().total)}</span>
               </div>
             </div>
           </div>
@@ -522,14 +522,14 @@ export const Billing = () => {
 
                 {/* Totals */}
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span className="tabular-nums">{formatPrice(showReceipt.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Tax:</span><span className="tabular-nums">{formatPrice(showReceipt.tax)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Discount:</span><span className="tabular-nums">-{formatPrice(showReceipt.discount)}</span></div>
                   <div className="flex justify-between font-bold text-base pt-2 border-t">
-                    <span>Total:</span><span>{formatPrice(showReceipt.total_amount)}</span>
+                    <span>Total:</span><span className="tabular-nums">{formatPrice(showReceipt.total_amount)}</span>
                   </div>
-                  <div className="flex justify-between text-green-600 font-medium"><span>Paid:</span><span>{formatPrice(showReceipt.paid_amount)}</span></div>
-                  <div className="flex justify-between font-medium"><span>Balance Due:</span><span className={showReceipt.balance > 0 ? "text-red-600" : "text-green-600"}>{formatPrice(showReceipt.balance)}</span></div>
+                  <div className="flex justify-between text-green-600 font-medium"><span>Paid:</span><span className="tabular-nums">{formatPrice(showReceipt.paid_amount)}</span></div>
+                  <div className="flex justify-between font-medium"><span>Balance Due:</span><span className={`tabular-nums ${showReceipt.balance > 0 ? "text-red-600" : "text-green-600"}`}>{formatPrice(showReceipt.balance)}</span></div>
                 </div>
 
                 {showReceipt.notes && (

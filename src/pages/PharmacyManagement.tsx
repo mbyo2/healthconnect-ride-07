@@ -237,13 +237,13 @@ export const PharmacyManagement = () => {
         <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 rounded-2xl bg-card border border-border">
             <div className="text-[13px] font-medium text-muted-foreground">Stock retail value</div>
-            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{formatPrice(totalRetailValue)}</div>
+            <div className="text-statnum text-foreground tabular-nums mt-1">{formatPrice(totalRetailValue)}</div>
             <div className="text-[13px] text-muted-foreground mt-0.5">{inventory.length} total items</div>
           </div>
 
           <div className="p-4 rounded-2xl bg-card border border-border">
             <div className="text-[13px] font-medium text-muted-foreground">Today's sales revenue</div>
-            <div className="text-2xl font-bold text-success-600 tabular-nums mt-1">
+            <div className="text-statnum text-success-600 tabular-nums mt-1">
               {formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0))}
             </div>
             <div className="text-[13px] text-muted-foreground mt-0.5">{todaySales.length} transactions</div>
@@ -251,13 +251,13 @@ export const PharmacyManagement = () => {
 
           <div className="p-4 rounded-2xl bg-card border border-border">
             <div className="text-[13px] font-medium text-muted-foreground">Low stock warnings</div>
-            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{lowStockItems.length}</div>
+            <div className="text-statnum text-foreground tabular-nums mt-1">{lowStockItems.length}</div>
             <div className="text-[13px] text-muted-foreground mt-0.5">Reorder required</div>
           </div>
 
           <div className="p-4 rounded-2xl bg-card border border-border">
             <div className="text-[13px] font-medium text-muted-foreground">Active cart items</div>
-            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{cart.length}</div>
+            <div className="text-statnum text-foreground tabular-nums mt-1">{cart.length}</div>
             <div className="text-[13px] text-muted-foreground mt-0.5">Subtotal: {formatPrice(cartSubtotal)}</div>
           </div>
         </div>

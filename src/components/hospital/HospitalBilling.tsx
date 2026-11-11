@@ -530,7 +530,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         ].map((c) => (
           <div key={c.label} className="p-4 rounded-2xl bg-card border border-slate-200/60 shadow-sm text-center">
             <div style={{ color: c.color }} className="flex justify-center mb-1.5">{c.icon}</div>
-            <div className="text-2xl font-bold tracking-tight font-mono" style={{ color: c.color }}>{c.value}</div>
+            <div className="text-statnum tabular-nums text-foreground">{c.value}</div>
             <div className="text-xs text-muted-foreground font-medium mt-0.5">{c.label}</div>
           </div>
         ))}
@@ -583,7 +583,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                   <td className="py-3 px-4 font-mono font-semibold text-foreground">{inv.invoice_number}</td>
                   <td className="py-3 px-3 font-medium text-primary-600 dark:text-primary-400">{inv.patient?.first_name} {inv.patient?.last_name}</td>
                   <td className="py-3 px-3 text-muted-foreground">{new Date(inv.created_at).toLocaleDateString()}</td>
-                  <td className="py-3 px-3 text-right font-semibold text-foreground">{formatPrice(inv.total_amount)}</td>
+                  <td className="py-3 px-3 text-right font-semibold tabular-nums text-foreground">{formatPrice(inv.total_amount)}</td>
                   <td className="py-3 px-3 text-right">
                     {inv.balance > 0 ? <span className="font-semibold text-red-500">{formatPrice(inv.balance)}</span> : <span className="text-slate-400">—</span>}
                   </td>
@@ -672,7 +672,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                       </span>
                     </span>
                     {c.service ? (
-                      <span className="font-mono font-semibold text-sm">{formatPrice(c.service.base_price * c.quantity)}</span>
+                      <span className="font-semibold text-sm tabular-nums">{formatPrice(c.service.base_price * c.quantity)}</span>
                     ) : (
                       <span className="flex items-center gap-2 whitespace-nowrap">
                         <span className="text-xs font-bold text-warning-600 dark:text-warning-400">Not on the price list</span>
@@ -691,7 +691,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 ))}
                 <div className="pt-2 mt-1 border-t border-slate-200/60 flex items-center justify-between">
                   <span className="font-semibold text-foreground">Bill total (from price list)</span>
-                  <span className="font-mono font-bold text-sm">{formatPrice(previewTotal)}</span>
+                  <span className="font-bold text-base tabular-nums">{formatPrice(previewTotal)}</span>
                 </div>
                 {notOnPriceList.length > 0 && (
                   <p className="text-xs text-muted-foreground">

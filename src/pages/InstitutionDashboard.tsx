@@ -561,7 +561,7 @@ export const InstitutionDashboard = () => {
               {cfg.icon}
             </span>
           </div>
-          <p className="text-heronum mt-2">{counts.todayAppointments}</p>
+          <p className="text-heronum tabular-nums mt-2">{counts.todayAppointments}</p>
           <p className="text-[13px] text-slate-900/70 dark:text-muted-foreground mt-1.5">
             {counts.patients} patients · {counts.appointments} appointments · {institution.currency || "ZMW"} {(counts.revenue / 1000).toFixed(1)}k collected (6mo)
           </p>
@@ -777,7 +777,7 @@ export const InstitutionDashboard = () => {
                     <p className="text-sm font-semibold text-foreground">{row.label}</p>
                     <p className="text-[13px] text-muted-foreground">{row.sub}</p>
                   </div>
-                  <span className="text-lg font-extrabold text-foreground">{row.value}</span>
+                  <span className="text-lg font-extrabold tabular-nums text-foreground">{row.value}</span>
                 </div>
               ))}
             </div>

@@ -126,7 +126,7 @@ export const PublicQueueDisplay: React.FC = () => {
                   Loading queue…
                 </div>
               ) : currentlyCalled ? (
-                <div className="text-7xl sm:text-9xl font-bold tabular-nums tracking-tight">
+                <div className="text-7xl sm:text-9xl font-extrabold tabular-nums tracking-tight">
                   {currentlyCalled.tokenNumber}
                 </div>
               ) : (

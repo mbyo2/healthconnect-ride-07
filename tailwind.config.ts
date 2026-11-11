@@ -307,10 +307,18 @@ export default {
         'heading-lg': ['3.5rem', { lineHeight: '1.14', fontWeight: '300', letterSpacing: '-0.015em' }],
         // PayPal-app type ramp for rebuilt product surfaces (2026-11-11):
         // greeting = the bold "Adam H." header (28px/800), heronum = the
-        // hero card's headline number (40px/800). Fixed ramp — rebuilt
-        // surfaces use these, not ad-hoc sizes.
+        // hero card's headline number (44px/800 at full width — the PayPal
+        // app balance scale, CEO reference photos 2026-11-11), statnum =
+        // the PayPal web "Insights" figure scale (30px/800) for
+        // stat/insight cards. Both numeral tokens are FLUID (clamp): the
+        // CEO's overflow complaint was words and numbers spilling out of
+        // their containers, so the figures step down with the viewport
+        // and always fit phone widths (360-430px) — never past the card
+        // edge. Fixed ramp — rebuilt surfaces use these, not ad-hoc sizes.
+        // Every numeral on money/count surfaces also carries tabular-nums.
         'greeting': ['1.75rem', { lineHeight: '1.15', fontWeight: '800', letterSpacing: '-0.02em' }],
-        'heronum': ['2.5rem', { lineHeight: '1', fontWeight: '800', letterSpacing: '-0.02em' }],
+        'heronum': ['clamp(2rem, 11vw, 2.75rem)', { lineHeight: '1', fontWeight: '800', letterSpacing: '-0.02em' }],
+        'statnum': ['clamp(1.5rem, 7vw, 1.875rem)', { lineHeight: '1.05', fontWeight: '800', letterSpacing: '-0.02em' }],
         '4xl': '2.25rem',
         '5xl': '3rem',
         '6xl': '3.75rem',

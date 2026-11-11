@@ -488,7 +488,7 @@ const InstitutionPlanCard = ({ plan, onSubscribe, subscribing }: {
       <CardContent className="flex-1 space-y-4">
         <div className="text-center">
           <div className="flex items-baseline justify-center gap-1">
-            <span className="text-4xl font-bold">{formatKwacha(monthly)}</span>
+            <span className="text-heronum tabular-nums">{formatKwacha(monthly)}</span>
             <span className="text-muted-foreground">/month</span>
           </div>
           {annual > 0 && (

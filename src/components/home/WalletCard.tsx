@@ -110,7 +110,7 @@ export const WalletCard = () => {
             <CardContent className="max-lg:p-5 max-lg:pt-3">
                 <div className="flex flex-col gap-5">
                     <div>
-                        <div className="text-heronum text-foreground max-lg:text-slate-950 dark:max-lg:text-foreground">
+                        <div className="text-heronum tabular-nums text-foreground max-lg:text-slate-950 dark:max-lg:text-foreground">
                             {isLoading ? (
                                 <Skeleton className="h-10 w-32 rounded-lg" />
                             ) : (

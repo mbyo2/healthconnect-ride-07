@@ -101,7 +101,7 @@ export const PharmacyDashboard = () => {
             <Pill className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{inventorySummary?.totalItems || 0}</div>
+            <div className="text-statnum tabular-nums">{inventorySummary?.totalItems || 0}</div>
             <p className="text-xs text-muted-foreground">Total unique medications in inventory</p>
           </CardContent>
         </Card>
@@ -112,7 +112,7 @@ export const PharmacyDashboard = () => {
             <AlertCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{inventorySummary?.lowStock || 0}</div>
+            <div className="text-statnum tabular-nums">{inventorySummary?.lowStock || 0}</div>
             <p className="text-xs text-muted-foreground">Items below minimum stock level</p>
           </CardContent>
         </Card>
@@ -123,7 +123,7 @@ export const PharmacyDashboard = () => {
             <TrendingDown className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{inventorySummary?.expiringSoon || 0}</div>
+            <div className="text-statnum tabular-nums">{inventorySummary?.expiringSoon || 0}</div>
             <p className="text-xs text-muted-foreground">Medications expiring in next 3 months</p>
           </CardContent>
         </Card>

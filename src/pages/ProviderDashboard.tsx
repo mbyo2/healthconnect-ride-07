@@ -878,22 +878,22 @@ export const ProviderDashboard = () => {
         <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-5">
           <div className="vf-card space-y-3">
             <div className="text-[13px] font-medium text-muted-foreground">Today's Consultations</div>
-            <div className="text-3xl font-bold text-foreground tabular-nums">{todayAppointments.length}</div>
+            <div className="text-statnum text-foreground tabular-nums">{todayAppointments.length}</div>
             <div className="text-xs font-medium text-muted-foreground">{completedToday.length} Done • {scheduledToday.length} Pending</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-[13px] font-medium text-muted-foreground">Weekly Patient Volume</div>
-            <div className="text-3xl font-bold text-foreground tabular-nums">{weekStats?.total || 0}</div>
+            <div className="text-statnum text-foreground tabular-nums">{weekStats?.total || 0}</div>
             <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed this week</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-[13px] font-medium text-muted-foreground">Active Queue Status</div>
-            <div className="text-3xl font-bold text-foreground tabular-nums">{weekStats?.pending || 0}</div>
+            <div className="text-statnum text-foreground tabular-nums">{weekStats?.pending || 0}</div>
             <div className="text-xs font-medium text-muted-foreground">Awaiting Triage</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-[13px] font-medium text-muted-foreground">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-bold text-success-600 tabular-nums">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-statnum text-success-600 tabular-nums">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-xs font-medium text-emerald-500">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"

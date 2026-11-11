@@ -48,7 +48,7 @@ export const PlatformWalletPanel = () => {
           <Skeleton className="h-12 rounded-xl" role="status" aria-label="Loading platform wallet" />
         ) : (
           <>
-            <p className="text-3xl font-bold tabular-nums">{formatPrice(balance ?? 0)}</p>
+            <p className="text-heronum tabular-nums">{formatPrice(balance ?? 0)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Collected platform fees across all payment rails.
             </p>

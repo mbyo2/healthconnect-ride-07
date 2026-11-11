@@ -67,7 +67,7 @@ export const InstitutionWalletPanel = ({ institutionId, institutionName }: { ins
           </p>
         ) : (
           <>
-            <p className="text-3xl font-bold tabular-nums">{formatPrice(balance)}</p>
+            <p className="text-heronum tabular-nums">{formatPrice(balance)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Facility revenue share. Personal spending stays in your own wallet below.
             </p>

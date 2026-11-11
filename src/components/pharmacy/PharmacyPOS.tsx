@@ -315,7 +315,7 @@ export const PharmacyPOS = () => {
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
-                <span className="font-semibold w-16 text-right text-primary-500">{formatPrice(item.total)}</span>
+                <span className="font-semibold w-16 text-right tabular-nums text-foreground">{formatPrice(item.total)}</span>
                 <button aria-label={`Remove ${item.item_name} from cart`} onClick={() => removeItem(index)} className="h-6 w-6 rounded flex items-center justify-center text-error-500 hover:bg-error-50">
                   <X className="h-3 w-3" />
                 </button>
@@ -333,12 +333,12 @@ export const PharmacyPOS = () => {
         {/* Totals + Payment */}
         <div className="border-t border-border p-3 space-y-3">
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between font-medium"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            <div className="flex justify-between font-medium"><span className="text-muted-foreground">Subtotal</span><span className="tabular-nums">{formatPrice(subtotal)}</span></div>
             {discountPercent > 0 && (
-              <div className="flex justify-between font-medium text-success-500"><span>Discount ({discountPercent}%)</span><span>-{formatPrice(discountAmount)}</span></div>
+              <div className="flex justify-between font-medium text-success-500"><span>Discount ({discountPercent}%)</span><span className="tabular-nums">-{formatPrice(discountAmount)}</span></div>
             )}
             <div className="flex justify-between font-bold text-base pt-1 border-t border-border">
-              <span>Total</span><span className="text-primary-500">{formatPrice(totalAmount)}</span>
+              <span>Total</span><span className="tabular-nums text-foreground">{formatPrice(totalAmount)}</span>
             </div>
           </div>
 

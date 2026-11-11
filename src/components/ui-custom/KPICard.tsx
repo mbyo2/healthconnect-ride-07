@@ -24,7 +24,7 @@ export const KPICard = ({ title, value, subtitle, icon: Icon, color = "text-mute
           <span className="text-[13px] font-medium text-muted-foreground">{title}</span>
           <Icon className={`h-4 w-4 ${color}`} />
         </div>
-        <div className="text-2xl font-bold text-foreground tabular-nums">{value}</div>
+        <div className="text-statnum text-foreground tabular-nums">{value}</div>
         <div className="text-xs text-muted-foreground font-bold mt-0.5">{subtitle}</div>
         {trend && (
           <div className={`text-xs font-bold mt-1 ${trend.isPositive ? "text-success-500" : "text-error-500"}`}>

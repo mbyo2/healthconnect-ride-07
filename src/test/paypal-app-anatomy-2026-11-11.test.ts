@@ -39,9 +39,15 @@ describe("paypal app anatomy 2026-11-11: typography", () => {
     expect(css).toContain("letter-spacing: -0.02em");
   });
 
-  it("the fixed type ramp exists: greeting 28px/800, heronum 40px/800", () => {
+  it("the fixed type ramp exists: greeting 28px/800, heronum 44px/800", () => {
+    // Pin moved 2026-11-11 (PayPal numbers mission): the CEO's classic
+    // PayPal reference photos put the app balance at ~44px+, so heronum
+    // rose 40px → 44px to match the reference exactly; his follow-up
+    // clarification the same day (numbers overflowing their containers
+    // is the complaint) made the token fluid — clamp() steps it down at
+    // phone widths so the figure always fits its card.
     expect(config).toContain("'greeting': ['1.75rem'");
-    expect(config).toContain("'heronum': ['2.5rem'");
+    expect(config).toContain("'heronum': ['clamp(2rem, 11vw, 2.75rem)'");
   });
 });
 

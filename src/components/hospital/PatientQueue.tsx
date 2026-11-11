@@ -75,17 +75,17 @@ export const PatientQueue = ({ hospital, departments }: Props) => {
       <div className="grid grid-cols-3 gap-3">
         <Card><CardContent className="pt-4 text-center">
           <Users className="h-5 w-5 mx-auto text-primary mb-1" />
-          <p className="text-2xl font-bold text-foreground">{active.length}</p>
+          <p className="text-statnum tabular-nums text-foreground">{active.length}</p>
           <p className="text-xs text-muted-foreground">In Queue</p>
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
           <Clock className="h-5 w-5 mx-auto text-amber-500 mb-1" />
-          <p className="text-2xl font-bold text-foreground">{active.filter(q => q.status === 'waiting').length}</p>
+          <p className="text-statnum tabular-nums text-foreground">{active.filter(q => q.status === 'waiting').length}</p>
           <p className="text-xs text-muted-foreground">Waiting</p>
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
-          <p className="text-2xl font-bold text-foreground">{queues.filter(q => q.status === 'completed').length}</p>
+          <p className="text-statnum tabular-nums text-foreground">{queues.filter(q => q.status === 'completed').length}</p>
           <p className="text-xs text-muted-foreground">Completed</p>
         </CardContent></Card>
       </div>

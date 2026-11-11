@@ -178,7 +178,7 @@ export const CXOExecutiveDashboard: React.FC<CXODashboardProps> = ({ institution
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">{title}</p>
-              <p className="text-2xl font-bold">{formatFn(value)}</p>
+              <p className="text-statnum tabular-nums">{formatFn(value)}</p>
               {trend !== 0 && (
                 <div className={`flex items-center text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
