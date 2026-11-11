@@ -361,10 +361,10 @@ const Medications = () => {
       {/* Medication Lists */}
       <Tabs defaultValue="active">
         <TabsList className="bg-card border border-border p-1">
-          <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white min-h-[44px] px-4">
+          <TabsTrigger value="active" className="min-h-[44px] px-4">
             Active ({activeMedications.length})
           </TabsTrigger>
-          <TabsTrigger value="inactive" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white min-h-[44px] px-4">
+          <TabsTrigger value="inactive" className="min-h-[44px] px-4">
             Inactive ({inactiveMedications.length})
           </TabsTrigger>
         </TabsList>

@@ -318,16 +318,16 @@ export const ZambiaCompliance = () => {
 
         <Tabs defaultValue="nhima" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="nhima" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="nhima" className="">
               <Globe className="h-4 w-4 mr-2" /> NHIMA Configuration
             </TabsTrigger>
-            <TabsTrigger value="council" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="council" className="">
               <FileText className="h-4 w-4 mr-2" /> Medical Council
             </TabsTrigger>
-            <TabsTrigger value="tax" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="tax" className="">
               <BarChart3 className="h-4 w-4 mr-2" /> ZRA Tax
             </TabsTrigger>
-            <TabsTrigger value="regulations" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="regulations" className="">
               <CheckSquare className="h-4 w-4 mr-2" /> Health Regulations
             </TabsTrigger>
           </TabsList>

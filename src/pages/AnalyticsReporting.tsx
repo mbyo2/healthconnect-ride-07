@@ -757,16 +757,16 @@ const AnalyticsReporting = () => {
 
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="dashboard" className="">
               <BarChart3 className="h-4 w-4 mr-2" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="reports" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="reports" className="">
               <FileText className="h-4 w-4 mr-2" /> Reports
             </TabsTrigger>
-            <TabsTrigger value="financial" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="financial" className="">
               <DollarSign className="h-4 w-4 mr-2" /> Financial Analytics
             </TabsTrigger>
-            <TabsTrigger value="operational" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="operational" className="">
               <Activity className="h-4 w-4 mr-2" /> Operational Analytics
             </TabsTrigger>
           </TabsList>

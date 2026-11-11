@@ -389,16 +389,16 @@ export const EnhancedInventory = () => {
 
         <Tabs defaultValue="suppliers" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="suppliers" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="suppliers" className="">
               <Truck className="h-4 w-4 mr-2" /> Supplier Performance
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="">
               <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Orders
             </TabsTrigger>
-            <TabsTrigger value="reconciliation" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="reconciliation" className="">
               <RefreshCw className="h-4 w-4 mr-2" /> Reconciliation
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="">
               <BarChart3 className="h-4 w-4 mr-2" /> Analytics
             </TabsTrigger>
           </TabsList>

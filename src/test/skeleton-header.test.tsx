@@ -78,12 +78,16 @@ describe("SkeletonHeaderBar — desktop twin (DesktopNav)", () => {
 });
 
 describe("SkeletonHeaderBar — mobile twin (Header)", () => {
-  it("renders a mobile-only bar at h-16 with the wordmark hiding below 420px", () => {
+  // PIN MOVED (PayPal anatomy rollout wave 4, 2026-11-11): the twin's
+  // wordmark breakpoint follows the REAL header, which the responsive-
+  // shell mission moved from 420px to sm (640px) — wordmark shows only
+  // where the wider controls also fit. Twin fidelity is the invariant.
+  it("renders a mobile-only bar at h-16 with the wordmark hiding below sm", () => {
     const { container } = render(<SkeletonHeaderBar variant="authed" />);
     const html = container.innerHTML;
     expect(html).toContain("min-[1025px]:hidden");
     expect(html).toContain("h-16");
-    expect(html).toContain("min-[420px]:block");
+    expect(html).toContain("hidden sm:block");
   });
 
   it("signed-in cluster carries switcher, search, bell and avatar shapes", () => {

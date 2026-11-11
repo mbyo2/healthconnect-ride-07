@@ -462,16 +462,16 @@ export const ProcedureManagement = () => {
 
         <Tabs defaultValue="catalog" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="catalog" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="catalog" className="">
               <Activity className="h-4 w-4 mr-2" /> Procedure Catalog
             </TabsTrigger>
-            <TabsTrigger value="pricing" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="pricing" className="">
               <DollarSign className="h-4 w-4 mr-2" /> Institution Pricing
             </TabsTrigger>
-            <TabsTrigger value="executions" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="executions" className="">
               <Clock className="h-4 w-4 mr-2" /> Executions
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="inventory" className="">
               <Package className="h-4 w-4 mr-2" /> Inventory Mapping
             </TabsTrigger>
           </TabsList>

@@ -475,16 +475,16 @@ export const PayeTaxCalculations = () => {
 
         <Tabs defaultValue="slabs" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="slabs" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="slabs" className="">
               <BarChart3 className="h-4 w-4 mr-2" /> Tax Slabs
             </TabsTrigger>
-            <TabsTrigger value="calculations" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="calculations" className="">
               <Calculator className="h-4 w-4 mr-2" /> Calculations
             </TabsTrigger>
-            <TabsTrigger value="payroll" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="payroll" className="">
               <FileText className="h-4 w-4 mr-2" /> Payroll
             </TabsTrigger>
-            <TabsTrigger value="statutory" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="statutory" className="">
               <Users className="h-4 w-4 mr-2" /> Statutory Deductions
             </TabsTrigger>
           </TabsList>

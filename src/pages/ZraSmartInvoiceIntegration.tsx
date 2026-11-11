@@ -536,16 +536,16 @@ export const ZraSmartInvoiceIntegration = () => {
 
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="dashboard" className="">
               <Activity className="h-4 w-4 mr-2" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="submissions" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="submissions" className="">
               <FileText className="h-4 w-4 mr-2" /> Fiscal Submissions
             </TabsTrigger>
-            <TabsTrigger value="mappings" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="mappings" className="">
               <Database className="h-4 w-4 mr-2" /> Item Mappings
             </TabsTrigger>
-            <TabsTrigger value="logs" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="logs" className="">
               <Server className="h-4 w-4 mr-2" /> VSDC Logs
             </TabsTrigger>
           </TabsList>

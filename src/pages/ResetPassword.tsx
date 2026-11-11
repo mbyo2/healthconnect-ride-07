@@ -87,7 +87,7 @@ export default function ResetPassword() {
           <p className="text-sm text-muted-foreground">Create a new secure password</p>
         </div>
 
-        <Card className="p-6 shadow-xl border-t-4 border-t-primary">
+        <Card className="p-6">
           {success ? (
             <div className="flex flex-col items-center py-6 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-in zoom-in duration-300">

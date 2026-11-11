@@ -455,11 +455,11 @@ export const Auth = () => {
 
         <div className="vf-card !p-6 shadow-card">
           <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setSignupPath(null); }}>
-            <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-canvas-bone rounded-xl border border-canvas-silk">
-              <TabsTrigger value="signin" className="text-sm font-medium py-3 rounded-lg data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all min-h-[44px]">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="signin" className="text-sm font-medium">
                 Sign In
               </TabsTrigger>
-              <TabsTrigger value="signup" className="text-sm font-medium py-3 rounded-lg data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all min-h-[44px]">
+              <TabsTrigger value="signup" className="text-sm font-medium">
                 Register
               </TabsTrigger>
             </TabsList>

@@ -384,13 +384,13 @@ export const FinancialControls = () => {
 
         <Tabs defaultValue="audit" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="audit" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="audit" className="">
               <FileText className="h-4 w-4 mr-2" /> Revenue Audit Log
             </TabsTrigger>
-            <TabsTrigger value="discrepancies" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="discrepancies" className="">
               <AlertTriangle className="h-4 w-4 mr-2" /> Price Discrepancies
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="">
               <TrendingUp className="h-4 w-4 mr-2" /> Analytics
             </TabsTrigger>
           </TabsList>

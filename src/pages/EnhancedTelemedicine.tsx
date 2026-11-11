@@ -414,16 +414,16 @@ export const EnhancedTelemedicine = () => {
 
         <Tabs defaultValue="workflows" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="workflows" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="workflows" className="">
               <Activity className="h-4 w-4 mr-2" /> Active Workflows
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="tasks" className="">
               <CheckCircle className="h-4 w-4 mr-2" /> Clinical Tasks
             </TabsTrigger>
-            <TabsTrigger value="diagnostics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="diagnostics" className="">
               <FileText className="h-4 w-4 mr-2" /> Remote Diagnostics
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="">
               <MonitorSpeaker className="h-4 w-4 mr-2" /> Device Integration
             </TabsTrigger>
           </TabsList>

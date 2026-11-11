@@ -248,16 +248,16 @@ export const MultiCenterManagement = () => {
       <div className="px-4 sm:px-6 pt-6">
         <Tabs defaultValue="networks" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="networks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="networks" className="">
               <Network className="h-4 w-4 mr-2" /> Networks
             </TabsTrigger>
-            <TabsTrigger value="members" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="members" className="">
               <Users className="h-4 w-4 mr-2" /> Members
             </TabsTrigger>
-            <TabsTrigger value="countries" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="countries" className="">
               <Globe className="h-4 w-4 mr-2" /> Countries
             </TabsTrigger>
-            <TabsTrigger value="billing" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="billing" className="">
               <DollarSign className="h-4 w-4 mr-2" /> Cross-Billing
             </TabsTrigger>
           </TabsList>

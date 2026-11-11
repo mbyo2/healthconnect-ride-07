@@ -433,16 +433,16 @@ export const PatientFlowManagement = () => {
 
         <Tabs defaultValue="active" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="active" className="">
               <Activity className="h-4 w-4 mr-2" /> Active Flows
             </TabsTrigger>
-            <TabsTrigger value="stages" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="stages" className="">
               <MapPin className="h-4 w-4 mr-2" /> Flow Stages
             </TabsTrigger>
-            <TabsTrigger value="capacity" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="capacity" className="">
               <BarChart3 className="h-4 w-4 mr-2" /> Capacity
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="">
               <TrendingUp className="h-4 w-4 mr-2" /> Analytics
             </TabsTrigger>
           </TabsList>

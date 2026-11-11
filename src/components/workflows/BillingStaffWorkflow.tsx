@@ -520,19 +520,19 @@ export const BillingStaffWorkflow = () => {
       {/* Module Tabs */}
       <Tabs defaultValue="invoices">
         <TabsList className="flex items-center gap-1 p-1 bg-card border border-border rounded-xl">
-          <TabsTrigger value="invoices" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="invoices" className="text-xs font-semibold px-4 py-1.5 rounded-md ">
             Invoices ({invoices.length})
           </TabsTrigger>
-          <TabsTrigger value="accounting" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="accounting" className="text-xs font-semibold px-4 py-1.5 rounded-md ">
             Multi-Country Accounting
           </TabsTrigger>
-          <TabsTrigger value="claims" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="claims" className="text-xs font-semibold px-4 py-1.5 rounded-md ">
             Insurance Claims ({claims.length})
           </TabsTrigger>
-          <TabsTrigger value="tpa" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="tpa" className="text-xs font-semibold px-4 py-1.5 rounded-md ">
             TPA Workflow
           </TabsTrigger>
-          <TabsTrigger value="denials" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="denials" className="text-xs font-semibold px-4 py-1.5 rounded-md ">
             Denials
           </TabsTrigger>
         </TabsList>

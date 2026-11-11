@@ -509,16 +509,16 @@ export const EnhancedDiagnostics = () => {
 
         <Tabs defaultValue="orders" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="orders" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="">
               <FlaskConical className="h-4 w-4 mr-2" /> Diagnostic Orders
             </TabsTrigger>
-            <TabsTrigger value="results" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="results" className="">
               <FileText className="h-4 w-4 mr-2" /> Results Management
             </TabsTrigger>
-            <TabsTrigger value="scheduling" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="scheduling" className="">
               <Calendar className="h-4 w-4 mr-2" /> Staff Scheduling
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="">
               <Video className="h-4 w-4 mr-2" /> Telemedicine Integration
             </TabsTrigger>
           </TabsList>

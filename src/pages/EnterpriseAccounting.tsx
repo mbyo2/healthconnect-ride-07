@@ -459,16 +459,16 @@ export const EnterpriseAccounting = () => {
 
         <Tabs defaultValue="gl" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="gl" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="gl" className="">
               <BookOpen className="h-4 w-4 mr-2" /> General Ledger
             </TabsTrigger>
-            <TabsTrigger value="assets" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="assets" className="">
               <FileText className="h-4 w-4 mr-2" /> Asset Management
             </TabsTrigger>
-            <TabsTrigger value="reconciliation" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="reconciliation" className="">
               <RefreshCw className="h-4 w-4 mr-2" /> Bank Reconciliation
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="">
               <ArrowUpRight className="h-4 w-4 mr-2" /> ERP Integration
             </TabsTrigger>
           </TabsList>

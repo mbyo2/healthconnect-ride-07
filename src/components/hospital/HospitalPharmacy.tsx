@@ -323,7 +323,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               { val: "inventory", label: `Inventory & Margins (${inventory.length})` },
               { val: "alerts", label: "Alerts & Audit" },
             ].map((t) => (
-              <TabsTrigger key={t.val} value={t.val} className="text-xs font-semibold px-3 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">{t.label}</TabsTrigger>
+              <TabsTrigger key={t.val} value={t.val} className="text-xs font-semibold px-3 py-1.5 rounded-md transition-all">{t.label}</TabsTrigger>
             ))}
           </TabsList>
         </div>

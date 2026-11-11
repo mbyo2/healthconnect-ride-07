@@ -754,7 +754,7 @@ export const SelfServiceKiosk: React.FC = () => {
         {/* 5. Success / Token Printed Screen — always a REAL queue token
             from the hospital's queue, never a locally invented number. */}
         {mode === "success" && (
-          <div className="max-w-md mx-auto p-8 rounded-2xl bg-card border border-emerald-500 shadow-xl text-center space-y-6">
+          <div className="max-w-md mx-auto p-8 rounded-2xl bg-card border border-emerald-500 text-center space-y-6">
             <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center font-bold mx-auto">
               <CheckCircle2 className="h-9 w-9" />
             </div>

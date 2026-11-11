@@ -506,21 +506,21 @@ export function SkeletonAppointmentCard() {
 }
 
 /**
- * Appointments board — mirrors the Appointments page group: the dark
- * slate group header (title + count pill), the 6-column table on
- * desktop, and the stacked cards on mobile.
+ * Appointments board — mirrors the Appointments page group: the light
+ * hairline group header (dot + title + count pill), the 6-column table
+ * on desktop, and the stacked rows on mobile.
  */
 export function SkeletonAppointmentsBoard() {
   return (
     <div
       aria-hidden
-      className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900"
+      className="overflow-hidden rounded-2xl border border-border bg-card"
     >
-      {/* Group header — dark in both modes, like the real one */}
-      <div className="flex items-center gap-3 bg-slate-900 px-5 py-4">
-        <SkeletonOnDark className="h-2 w-2 shrink-0 rounded-full" />
-        <SkeletonOnDark className="h-4 w-56 max-w-full rounded-md" />
-        <SkeletonOnDark className="h-5 w-8 shrink-0 rounded-full" />
+      {/* Group header — light hairline bar, like the real one */}
+      <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+        <Skeleton className="h-2 w-2 shrink-0 rounded-full" />
+        <SkeletonLine className="h-4 w-56 max-w-full rounded-md" />
+        <Skeleton className="h-5 w-8 shrink-0 rounded-full" />
       </div>
 
       {/* Desktop table twin */}
@@ -836,7 +836,7 @@ export function SkeletonTablePage({ rows = 6, cells = 5 }: { rows?: number; cell
           <Skeleton key={i} className="h-9 w-24 rounded-full" />
         ))}
       </div>
-      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-border bg-canvas dark:bg-slate-950">
@@ -1032,24 +1032,25 @@ export function SkeletonKioskMenu() {
   );
 }
 
-/** Public queue display — shell-less dark big screen: header row,
- * the big now-serving panel and the waiting list. Mirrors
- * PublicQueueDisplay (slate-950 in both themes). */
+/** Public queue display — shell-less big screen: header row, the
+ * sky now-calling hero and the waiting list. Mirrors the current
+ * PublicQueueDisplay (canvas page + ONE sky hero; dark theme turns
+ * the hero into a dark hairline card). */
 export function SkeletonQueueDisplay() {
   return (
-    <div aria-hidden className="flex min-h-screen flex-col bg-slate-950 p-6 font-sans sm:p-10">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+    <div aria-hidden className="flex min-h-screen flex-col bg-canvas p-6 font-sans sm:p-10">
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="flex items-center gap-3">
-          <SkeletonOnDark className="h-12 w-12 rounded-2xl" />
+          <Skeleton className="h-12 w-12 rounded-2xl" />
           <div className="space-y-2">
-            <SkeletonOnDark className="h-5 w-48 rounded-md" />
-            <SkeletonOnDark className="h-3 w-32 rounded-md" />
+            <SkeletonLine className="h-5 w-48 rounded-md" />
+            <SkeletonLine className="h-3 w-32 rounded-md" />
           </div>
         </div>
-        <SkeletonOnDark className="h-8 w-28 rounded-md" />
+        <SkeletonLine className="h-8 w-28 rounded-md" />
       </div>
       <div className="grid flex-1 grid-cols-1 gap-6 py-8 lg:grid-cols-12">
-        <div className="flex flex-col justify-between rounded-2xl border-2 border-slate-800 bg-slate-900 p-8 sm:p-12 lg:col-span-7">
+        <div className="flex flex-col justify-between rounded-[24px] border border-[#60CDFF] bg-[#60CDFF] p-8 dark:border-border dark:bg-card sm:p-12 lg:col-span-7">
           <div className="space-y-3">
             <SkeletonOnDark className="h-4 w-36 rounded-md" />
             <SkeletonOnDark className="h-24 w-64 max-w-full rounded-2xl" />
@@ -1061,10 +1062,10 @@ export function SkeletonQueueDisplay() {
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/90 p-4"
+              className="flex items-center justify-between rounded-2xl border border-border bg-card p-4"
             >
-              <SkeletonOnDark className="h-6 w-24 rounded-md" />
-              <SkeletonOnDark className="h-6 w-16 rounded-full" />
+              <SkeletonLine className="h-6 w-24 rounded-md" />
+              <Skeleton className="h-6 w-16 rounded-full" />
             </div>
           ))}
         </div>
@@ -1084,7 +1085,7 @@ export function SkeletonQueueDisplay() {
  *    (search, currency, theme, bell, avatar — or Sign In / Get Started
  *    when signed out);
  *  - mobile/tablet (≤1024px): the fixed Header — logo (wordmark hides
- *    below 420px), institution switcher, search, bell, currency,
+ *    below sm), institution switcher, search, bell, currency,
  *    theme, language, avatar/menu — plus the floating BottomNav pill
  *    (signed-in only, exactly like MobileLayout).
  * Breakpoint note: the real switch is a JS width check (>1024), so the
@@ -1155,8 +1156,8 @@ function SkeletonMobileHeader({ variant }: { variant: SkeletonChromeVariant }) {
   return (
     <div className="border-b border-border bg-white/90 backdrop-blur-xl dark:bg-slate-900/90 min-[1025px]:hidden">
       <div className="flex h-16 items-center justify-between px-3 sm:px-4">
-        {/* Real mobile Header: wordmark hides below 420px */}
-        <SkeletonLogoMark wordmarkClassName="hidden min-[420px]:block" />
+        {/* Real mobile Header: wordmark hides below sm */}
+        <SkeletonLogoMark wordmarkClassName="hidden sm:block" />
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {variant === "authed" && (
             <>
@@ -1166,11 +1167,12 @@ function SkeletonMobileHeader({ variant }: { variant: SkeletonChromeVariant }) {
               <Skeleton className="h-9 w-9 rounded-pill sm:h-10 sm:w-10" />
             </>
           )}
-          <Skeleton className="hidden h-8 w-[46px] rounded-md min-[420px]:block" />
+          {/* CurrencyToggle: compact symbol chip, visible at every width */}
+          <Skeleton className="h-8 w-[46px] rounded-md" />
           <Skeleton className="h-9 w-9 rounded-md" />
-          {/* Language select (compact twin; the real trigger is a wide
-              select that crowds the xs bar, so it joins from 560px) */}
-          <Skeleton className="hidden h-9 w-[52px] rounded-md min-[560px]:block" />
+          {/* Language select: icon-only w-9 trigger on xs, full select
+              from sm — visible at every width in the real header */}
+          <Skeleton className="h-9 w-9 rounded-md sm:w-[140px]" />
           {variant === "authed" ? (
             <SkeletonCircle className="ml-1 h-8 w-8 sm:h-9 sm:w-9" />
           ) : (

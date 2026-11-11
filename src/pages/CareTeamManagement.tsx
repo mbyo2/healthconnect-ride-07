@@ -528,16 +528,16 @@ export const CareTeamManagement = () => {
 
         <Tabs defaultValue="assignments" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="assignments" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="assignments" className="">
               <Users className="h-4 w-4 mr-2" /> Team Assignments
             </TabsTrigger>
-            <TabsTrigger value="roles" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="roles" className="">
               <Shield className="h-4 w-4 mr-2" /> Role Definitions
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="tasks" className="">
               <CheckCircle className="h-4 w-4 mr-2" /> Clinical Tasks
             </TabsTrigger>
-            <TabsTrigger value="workflows" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="workflows" className="">
               <Activity className="h-4 w-4 mr-2" /> Workflows
             </TabsTrigger>
           </TabsList>

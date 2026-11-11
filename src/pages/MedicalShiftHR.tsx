@@ -453,16 +453,16 @@ export const MedicalShiftHR = () => {
 
         <Tabs defaultValue="shifts" className="space-y-6">
           <TabsList className="bg-card border border-border p-1">
-            <TabsTrigger value="shifts" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="shifts" className="">
               <Clock className="h-4 w-4 mr-2" /> Shifts
             </TabsTrigger>
-            <TabsTrigger value="assignments" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="assignments" className="">
               <Users className="h-4 w-4 mr-2" /> Assignments
             </TabsTrigger>
-            <TabsTrigger value="attendance" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="attendance" className="">
               <Fingerprint className="h-4 w-4 mr-2" /> Attendance
             </TabsTrigger>
-            <TabsTrigger value="devices" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+            <TabsTrigger value="devices" className="">
               <Settings className="h-4 w-4 mr-2" /> Biometric Devices
             </TabsTrigger>
           </TabsList>
