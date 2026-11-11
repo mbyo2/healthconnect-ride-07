@@ -165,23 +165,23 @@ export const MultiCenterManagement = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Network className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Multi-Center Management</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Network Administration & Cross-Institution Operations</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Network Administration & Cross-Institution Operations</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Create Network
                 </Button>
               </DialogTrigger>
@@ -191,7 +191,7 @@ export const MultiCenterManagement = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Network Name</Label>
+                    <Label className="text-xs font-semibold">Network Name</Label>
                     <Input
                       value={networkForm.network_name}
                       onChange={(e) => setNetworkForm({ ...networkForm, network_name: e.target.value })}
@@ -200,7 +200,7 @@ export const MultiCenterManagement = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Network Type</Label>
+                    <Label className="text-xs font-semibold">Network Type</Label>
                     <Select value={networkForm.network_type} onValueChange={(value) => setNetworkForm({ ...networkForm, network_type: value })}>
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -214,28 +214,28 @@ export const MultiCenterManagement = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Centralized Pricing</Label>
+                      <Label className="text-xs font-semibold">Centralized Pricing</Label>
                       <Switch
                         checked={networkForm.centralized_pricing}
                         onCheckedChange={(checked) => setNetworkForm({ ...networkForm, centralized_pricing: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Centralized Inventory</Label>
+                      <Label className="text-xs font-semibold">Centralized Inventory</Label>
                       <Switch
                         checked={networkForm.centralized_inventory}
                         onCheckedChange={(checked) => setNetworkForm({ ...networkForm, centralized_inventory: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Cross-Billing Enabled</Label>
+                      <Label className="text-xs font-semibold">Cross-Billing Enabled</Label>
                       <Switch
                         checked={networkForm.cross_billing_enabled}
                         onCheckedChange={(checked) => setNetworkForm({ ...networkForm, cross_billing_enabled: checked })}
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateNetwork} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateNetwork} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Network
                   </Button>
                 </div>
@@ -245,9 +245,9 @@ export const MultiCenterManagement = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         <Tabs defaultValue="networks" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="networks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Network className="h-4 w-4 mr-2" /> Networks
             </TabsTrigger>
@@ -266,7 +266,7 @@ export const MultiCenterManagement = () => {
           <TabsContent value="networks" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {networks.map((network) => (
-                <Card key={network.id} className="border-canvas-silk dark:border-slate-800 shadow-xs hover:shadow-md transition-shadow">
+                <Card key={network.id} className="border-border shadow-xs hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -292,8 +292,8 @@ export const MultiCenterManagement = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Institutions</span>
-                      <span className="font-bold">
+                      <span className="text-muted-foreground">Institutions</span>
+                      <span className="font-semibold">
                         {members.filter((m) => m.network_id === network.id).length}
                       </span>
                     </div>
@@ -308,11 +308,11 @@ export const MultiCenterManagement = () => {
                         <Badge className="bg-warning-500 text-white">Cross-Billing</Badge>
                       )}
                     </div>
-                    <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
+                    <div className="pt-2 border-t border-border">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full text-xs font-bold"
+                        className="w-full text-xs font-semibold"
                         onClick={() => {
                           setSelectedNetwork(network);
                           setShowMemberDialog(true);
@@ -329,30 +329,30 @@ export const MultiCenterManagement = () => {
 
           {/* Members Tab */}
           <TabsContent value="members" className="space-y-4">
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Institution</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Network</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Commission</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Joined</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Institution</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Network</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Role</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Commission</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Joined</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {members.map((member) => (
-                    <tr key={member.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={member.id} className="border-t border-border hover:bg-canvas-bone ">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-lg bg-primary-500 text-white flex items-center justify-center">
                             <Building2 className="h-4 w-4" />
                           </div>
                           <div>
-                            <div className="text-xs font-bold">{member.institution?.name}</div>
-                            <div className="text-xs text-graphite-500 dark:text-slate-400">{member.institution?.type}</div>
+                            <div className="text-xs font-semibold">{member.institution?.name}</div>
+                            <div className="text-xs text-muted-foreground">{member.institution?.type}</div>
                           </div>
                         </div>
                       </td>
@@ -364,7 +364,7 @@ export const MultiCenterManagement = () => {
                           {memberTypeLabels[member.member_type] || member.member_type}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold">{member.commission_rate}%</td>
+                      <td className="px-4 py-3 text-sm text-right tnum font-medium">{member.commission_rate}%</td>
                       <td className="px-4 py-3">
                         {member.is_active ? (
                           <Badge className="bg-success-500 text-white text-xs">Active</Badge>
@@ -372,7 +372,7 @@ export const MultiCenterManagement = () => {
                           <Badge className="bg-error-500 text-white text-xs">Inactive</Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(member.joined_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -399,7 +399,7 @@ export const MultiCenterManagement = () => {
           <TabsContent value="countries" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {countries.map((country) => (
-                <Card key={country.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={country.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
@@ -407,28 +407,28 @@ export const MultiCenterManagement = () => {
                       </div>
                       <div>
                         <CardTitle className="text-sm font-semibold">{country.name}</CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{country.code}</div>
+                        <div className="text-xs text-muted-foreground">{country.code}</div>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Currency</span>
-                      <span className="font-bold">{country.currency_code} ({country.currency_symbol})</span>
+                      <span className="text-muted-foreground">Currency</span>
+                      <span className="font-semibold">{country.currency_code} ({country.currency_symbol})</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Tax Rate</span>
-                      <span className="font-bold">{(country.tax_rate * 100).toFixed(0)}%</span>
+                      <span className="text-muted-foreground">Tax Rate</span>
+                      <span className="font-semibold">{(country.tax_rate * 100).toFixed(0)}%</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Phone Prefix</span>
-                      <span className="font-bold">{country.phone_prefix}</span>
+                      <span className="text-muted-foreground">Phone Prefix</span>
+                      <span className="font-semibold">{country.phone_prefix}</span>
                     </div>
-                    <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
+                    <div className="pt-2 border-t border-border">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full text-xs font-bold"
+                        className="w-full text-xs font-semibold"
                         onClick={() => navigate(`/country-settings/${country.id}`)}
                       >
                         <Settings className="h-3 w-3 mr-1" /> Configure
@@ -442,23 +442,23 @@ export const MultiCenterManagement = () => {
 
           {/* Cross-Billing Tab */}
           <TabsContent value="billing" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary-500" /> Cross-Institution Billing
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
+                <div className="rounded-xl bg-muted p-4">
                   <h4 className="text-xs font-semibold mb-3">Active Cross-Billing Networks</h4>
                   <div className="space-y-2">
                     {networks.filter((n) => n.cross_billing_enabled).map((network) => (
-                      <div key={network.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg">
+                      <div key={network.id} className="flex items-center justify-between p-3 bg-card rounded-lg">
                         <div className="flex items-center gap-3">
                           <CheckCircle className="h-4 w-4 text-success-500" />
                           <div>
-                            <div className="text-xs font-bold">{network.network_name}</div>
-                            <div className="text-xs text-graphite-500 dark:text-slate-400">
+                            <div className="text-xs font-semibold">{network.network_name}</div>
+                            <div className="text-xs text-muted-foreground">
                               {members.filter((m) => m.network_id === network.id).length} institutions
                             </div>
                           </div>
@@ -471,18 +471,18 @@ export const MultiCenterManagement = () => {
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
+                <div className="rounded-xl bg-muted p-4">
                   <h4 className="text-xs font-semibold mb-3">Billing Rules</h4>
                   <div className="space-y-2 text-xs">
-                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <ArrowRight className="h-3 w-3" />
                       <span>Commission rates apply per network member</span>
                     </div>
-                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <ArrowRight className="h-3 w-3" />
                       <span>Cross-currency conversion handled automatically</span>
                     </div>
-                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <ArrowRight className="h-3 w-3" />
                       <span>Tax compliance per country regulations</span>
                     </div>
@@ -502,7 +502,7 @@ export const MultiCenterManagement = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label className="text-xs font-bold">Network</Label>
+              <Label className="text-xs font-semibold">Network</Label>
               <Select
                 value={memberForm.network_id}
                 onValueChange={(value) => setMemberForm({ ...memberForm, network_id: value })}
@@ -520,7 +520,7 @@ export const MultiCenterManagement = () => {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-bold">Institution</Label>
+              <Label className="text-xs font-semibold">Institution</Label>
               <Select
                 value={memberForm.institution_id}
                 onValueChange={(value) => setMemberForm({ ...memberForm, institution_id: value })}
@@ -535,7 +535,7 @@ export const MultiCenterManagement = () => {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-bold">Member Type</Label>
+              <Label className="text-xs font-semibold">Member Type</Label>
               <Select
                 value={memberForm.member_type}
                 onValueChange={(value) => setMemberForm({ ...memberForm, member_type: value })}
@@ -552,7 +552,7 @@ export const MultiCenterManagement = () => {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-bold">Billing Code (Optional)</Label>
+              <Label className="text-xs font-semibold">Billing Code (Optional)</Label>
               <Input
                 value={memberForm.billing_code}
                 onChange={(e) => setMemberForm({ ...memberForm, billing_code: e.target.value })}
@@ -561,7 +561,7 @@ export const MultiCenterManagement = () => {
               />
             </div>
             <div>
-              <Label className="text-xs font-bold">Commission Rate (%)</Label>
+              <Label className="text-xs font-semibold">Commission Rate (%)</Label>
               <Input
                 type="number"
                 value={memberForm.commission_rate}
@@ -570,7 +570,7 @@ export const MultiCenterManagement = () => {
                 className="mt-1"
               />
             </div>
-            <Button onClick={handleAddMember} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+            <Button onClick={handleAddMember} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
               Add Institution
             </Button>
           </div>

@@ -208,7 +208,7 @@ export const ZambiaCompliance = () => {
       case "compliant": case "active": return "bg-success-500 text-white";
       case "non_compliant": case "suspended": return "bg-error-500 text-white";
       case "pending": case "pending_review": return "bg-warning-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -230,12 +230,12 @@ export const ZambiaCompliance = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access Zambia compliance.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access Zambia compliance.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -248,30 +248,30 @@ export const ZambiaCompliance = () => {
   const overallCompliance = getOverallCompliance();
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Flag className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-semibold">Zambia Compliance</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Regulatory Compliance Management</p>
+              <p className="text-xs text-muted-foreground font-medium">Regulatory Compliance Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className={`${overallCompliance.color} bg-opacity-10 text-xs font-bold px-3 py-1`}>
+            <Badge className={`${overallCompliance.color} bg-opacity-10 text-xs font-semibold px-3 py-1`}>
               {overallCompliance.status.replace(/_/g, " ").toUpperCase()}
             </Badge>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* Compliance Overview */}
-        <Card className="border-canvas-silk dark:border-slate-800 shadow-xs mb-6">
+        <Card className="border-border shadow-xs mb-6">
           <CardHeader>
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary-500" /> Overall Compliance Status
@@ -279,35 +279,35 @@ export const ZambiaCompliance = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
                 <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {nhimaConfig?.is_nhima_accredited ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold">NHIMA Accreditation</div>
-                  <div className="text-xs text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs font-semibold">NHIMA Accreditation</div>
+                  <div className="text-xs text-muted-foreground">
                     {nhimaConfig?.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
                 <div className={`h-10 w-10 rounded-lg ${medicalCouncilConfig?.compliance_status === "compliant" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {medicalCouncilConfig?.compliance_status === "compliant" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold">Medical Council</div>
-                  <div className="text-xs text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs font-semibold">Medical Council</div>
+                  <div className="text-xs text-muted-foreground">
                     {medicalCouncilConfig?.compliance_status || "Not Configured"}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
                 <div className={`h-10 w-10 rounded-lg ${taxConfig?.tax_compliance_status === "active" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {taxConfig?.tax_compliance_status === "active" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold">ZRA Tax Compliance</div>
-                  <div className="text-xs text-graphite-500 dark:text-slate-400">
+                  <div className="text-xs font-semibold">ZRA Tax Compliance</div>
+                  <div className="text-xs text-muted-foreground">
                     {taxConfig?.tax_compliance_status || "Not Configured"}
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export const ZambiaCompliance = () => {
         </Card>
 
         <Tabs defaultValue="nhima" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="nhima" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Globe className="h-4 w-4 mr-2" /> NHIMA Configuration
             </TabsTrigger>
@@ -338,7 +338,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">National Health Insurance Scheme Configuration</h3>
               <Dialog open={showNhimaDialog} onOpenChange={setShowNhimaDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure NHIMA
                   </Button>
                 </DialogTrigger>
@@ -348,7 +348,7 @@ export const ZambiaCompliance = () => {
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-xs font-bold">NHIMA Provider Code</Label>
+                      <Label className="text-xs font-semibold">NHIMA Provider Code</Label>
                       <Input
                         value={nhimaForm.nhima_provider_code}
                         onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_provider_code: e.target.value })}
@@ -357,7 +357,7 @@ export const ZambiaCompliance = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Facility Type</Label>
+                      <Label className="text-xs font-semibold">Facility Type</Label>
                       <Select
                         value={nhimaForm.nhima_facility_type}
                         onValueChange={(value) => setNhimaForm({ ...nhimaForm, nhima_facility_type: value })}
@@ -374,7 +374,7 @@ export const ZambiaCompliance = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Accreditation Number</Label>
+                      <Label className="text-xs font-semibold">Accreditation Number</Label>
                       <Input
                         value={nhimaForm.nhima_accreditation_number}
                         onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_accreditation_number: e.target.value })}
@@ -383,7 +383,7 @@ export const ZambiaCompliance = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Claim Submission Method</Label>
+                      <Label className="text-xs font-semibold">Claim Submission Method</Label>
                       <Select
                         value={nhimaForm.nhima_claim_submission_method}
                         onValueChange={(value) => setNhimaForm({ ...nhimaForm, nhima_claim_submission_method: value })}
@@ -400,7 +400,7 @@ export const ZambiaCompliance = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold">Claim Processing Days</Label>
+                        <Label className="text-xs font-semibold">Claim Processing Days</Label>
                         <Input
                           type="number"
                           value={nhimaForm.nhima_claim_processing_days}
@@ -409,7 +409,7 @@ export const ZambiaCompliance = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Co-Payment %</Label>
+                        <Label className="text-xs font-semibold">Co-Payment %</Label>
                         <Input
                           type="number"
                           value={nhimaForm.nhima_co_payment_percentage}
@@ -419,7 +419,7 @@ export const ZambiaCompliance = () => {
                       </div>
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Service Tariff Version</Label>
+                      <Label className="text-xs font-semibold">Service Tariff Version</Label>
                       <Input
                         value={nhimaForm.nhima_service_tariff_version}
                         onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_service_tariff_version: e.target.value })}
@@ -427,7 +427,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveNhima} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                    <Button onClick={handleSaveNhima} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                       Save NHIMA Configuration
                     </Button>
                   </div>
@@ -436,30 +436,30 @@ export const ZambiaCompliance = () => {
             </div>
 
             {nhimaConfig ? (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Current NHIMA Configuration</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Provider Code</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhima_provider_code || "Not Set"}</div>
+                      <div className="text-xs text-muted-foreground">Provider Code</div>
+                      <div className="text-sm font-semibold">{nhimaConfig.nhima_provider_code || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Facility Type</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhima_facility_type || "Not Set"}</div>
+                      <div className="text-xs text-muted-foreground">Facility Type</div>
+                      <div className="text-sm font-semibold">{nhimaConfig.nhima_facility_type || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Accreditation #</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhima_accreditation_number || "Not Set"}</div>
+                      <div className="text-xs text-muted-foreground">Accreditation #</div>
+                      <div className="text-sm font-semibold">{nhimaConfig.nhima_accreditation_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Processing Days</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhima_claim_processing_days} days</div>
+                      <div className="text-xs text-muted-foreground">Processing Days</div>
+                      <div className="text-sm font-semibold">{nhimaConfig.nhima_claim_processing_days} days</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
+                  <div className="flex items-center gap-2 pt-2 border-t border-border">
                     <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-500 text-white text-xs" : "bg-error-500 text-white text-xs"}>
                       {nhimaConfig.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                     </Badge>
@@ -467,11 +467,11 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Globe className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">NHIMA Not Configured</h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your NHIMA settings to enable insurance claims</p>
+                  <p className="text-xs text-muted-foreground mb-4">Configure your NHIMA settings to enable insurance claims</p>
                   <Button onClick={() => setShowNhimaDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure NHIMA
                   </Button>
@@ -486,7 +486,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">Medical Council Compliance</h3>
               <Dialog open={showCouncilDialog} onOpenChange={setShowCouncilDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Council
                   </Button>
                 </DialogTrigger>
@@ -496,7 +496,7 @@ export const ZambiaCompliance = () => {
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-xs font-bold">Council Registration Number</Label>
+                      <Label className="text-xs font-semibold">Council Registration Number</Label>
                       <Input
                         value={councilForm.council_registration_number}
                         onChange={(e) => setCouncilForm({ ...councilForm, council_registration_number: e.target.value })}
@@ -505,7 +505,7 @@ export const ZambiaCompliance = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">License Expiry Date</Label>
+                      <Label className="text-xs font-semibold">License Expiry Date</Label>
                       <Input
                         type="date"
                         value={councilForm.license_expiry_date}
@@ -514,7 +514,7 @@ export const ZambiaCompliance = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Last Inspection Date</Label>
+                      <Label className="text-xs font-semibold">Last Inspection Date</Label>
                       <Input
                         type="date"
                         value={councilForm.inspection_date}
@@ -523,7 +523,7 @@ export const ZambiaCompliance = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Next Audit Date</Label>
+                      <Label className="text-xs font-semibold">Next Audit Date</Label>
                       <Input
                         type="date"
                         value={councilForm.next_audit_date}
@@ -531,7 +531,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveCouncil} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                    <Button onClick={handleSaveCouncil} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                       Save Council Configuration
                     </Button>
                   </div>
@@ -540,31 +540,31 @@ export const ZambiaCompliance = () => {
             </div>
 
             {medicalCouncilConfig ? (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Council Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Registration #</div>
-                      <div className="text-sm font-bold">{medicalCouncilConfig.council_registration_number || "Not Set"}</div>
+                      <div className="text-xs text-muted-foreground">Registration #</div>
+                      <div className="text-sm font-semibold">{medicalCouncilConfig.council_registration_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">License Expiry</div>
-                      <div className="text-sm font-bold">
+                      <div className="text-xs text-muted-foreground">License Expiry</div>
+                      <div className="text-sm font-semibold">
                         {medicalCouncilConfig.license_expiry_date 
                           ? new Date(medicalCouncilConfig.license_expiry_date).toLocaleDateString()
                           : "Not Set"}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
                     <Badge className={getComplianceStatusColor(medicalCouncilConfig.compliance_status) + " text-xs"}>
                       {medicalCouncilConfig.compliance_status || "Not Configured"}
                     </Badge>
                     {medicalCouncilConfig.next_audit_date && (
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                      <div className="text-xs text-muted-foreground">
                         Next Audit: {new Date(medicalCouncilConfig.next_audit_date).toLocaleDateString()}
                       </div>
                     )}
@@ -572,11 +572,11 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-8 text-center">
                   <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Medical Council Not Configured</h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your medical council compliance settings</p>
+                  <p className="text-xs text-muted-foreground mb-4">Configure your medical council compliance settings</p>
                   <Button onClick={() => setShowCouncilDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Council
                   </Button>
@@ -591,7 +591,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">Zambia Revenue Authority Tax Configuration</h3>
               <Dialog open={showTaxDialog} onOpenChange={setShowTaxDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Tax
                   </Button>
                 </DialogTrigger>
@@ -602,7 +602,7 @@ export const ZambiaCompliance = () => {
                   <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold">Tax Account Number</Label>
+                        <Label className="text-xs font-semibold">Tax Account Number</Label>
                         <Input
                           value={taxForm.tax_account_number}
                           onChange={(e) => setTaxForm({ ...taxForm, tax_account_number: e.target.value })}
@@ -611,7 +611,7 @@ export const ZambiaCompliance = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">VAT Registration #</Label>
+                        <Label className="text-xs font-semibold">VAT Registration #</Label>
                         <Input
                           value={taxForm.vat_registration_number}
                           onChange={(e) => setTaxForm({ ...taxForm, vat_registration_number: e.target.value })}
@@ -622,7 +622,7 @@ export const ZambiaCompliance = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold">VAT Rate (%)</Label>
+                        <Label className="text-xs font-semibold">VAT Rate (%)</Label>
                         <Input
                           type="number"
                           value={taxForm.vat_rate}
@@ -631,7 +631,7 @@ export const ZambiaCompliance = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Withholding Tax (%)</Label>
+                        <Label className="text-xs font-semibold">Withholding Tax (%)</Label>
                         <Input
                           type="number"
                           value={taxForm.withholding_tax_rate}
@@ -641,7 +641,7 @@ export const ZambiaCompliance = () => {
                       </div>
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Turnover Tax Threshold (ZMW)</Label>
+                      <Label className="text-xs font-semibold">Turnover Tax Threshold (ZMW)</Label>
                       <Input
                         type="number"
                         value={taxForm.turnover_tax_threshold}
@@ -651,14 +651,14 @@ export const ZambiaCompliance = () => {
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs font-bold">PAYE Configured</Label>
+                        <Label className="text-xs font-semibold">PAYE Configured</Label>
                         <Switch
                           checked={taxForm.paye_configured}
                           onCheckedChange={(checked) => setTaxForm({ ...taxForm, paye_configured: checked })}
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs font-bold">Requires ECFD System</Label>
+                        <Label className="text-xs font-semibold">Requires ECFD System</Label>
                         <Switch
                           checked={taxForm.requires_ecfd_system}
                           onCheckedChange={(checked) => setTaxForm({ ...taxForm, requires_ecfd_system: checked })}
@@ -666,7 +666,7 @@ export const ZambiaCompliance = () => {
                       </div>
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Next Filing Date</Label>
+                      <Label className="text-xs font-semibold">Next Filing Date</Label>
                       <Input
                         type="date"
                         value={taxForm.next_filing_date}
@@ -674,7 +674,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveTax} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                    <Button onClick={handleSaveTax} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                       Save Tax Configuration
                     </Button>
                   </div>
@@ -683,22 +683,22 @@ export const ZambiaCompliance = () => {
             </div>
 
             {taxConfig ? (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Tax Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">VAT Rate</div>
-                      <div className="text-sm font-bold">{taxConfig.vat_rate}%</div>
+                      <div className="text-xs text-muted-foreground">VAT Rate</div>
+                      <div className="text-sm font-semibold">{taxConfig.vat_rate}%</div>
                     </div>
                     <div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">Withholding Tax</div>
-                      <div className="text-sm font-bold">{taxConfig.withholding_tax_rate}%</div>
+                      <div className="text-xs text-muted-foreground">Withholding Tax</div>
+                      <div className="text-sm font-semibold">{taxConfig.withholding_tax_rate}%</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
+                  <div className="flex items-center gap-2 pt-2 border-t border-border">
                     <Badge className={getComplianceStatusColor(taxConfig.tax_compliance_status) + " text-xs"}>
                       {taxConfig.tax_compliance_status || "Not Configured"}
                     </Badge>
@@ -709,11 +709,11 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-8 text-center">
                   <BarChart3 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">ZRA Tax Not Configured</h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your tax compliance settings</p>
+                  <p className="text-xs text-muted-foreground mb-4">Configure your tax compliance settings</p>
                   <Button onClick={() => setShowTaxDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Tax
                   </Button>
@@ -733,27 +733,27 @@ export const ZambiaCompliance = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {regulations.map((regulation) => (
-                <Card key={regulation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={regulation.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-semibold">{regulation.regulation_name}</CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{regulation.regulation_code}</div>
+                        <div className="text-xs text-muted-foreground">{regulation.regulation_code}</div>
                       </div>
                       <Badge variant="outline" className="text-xs">{regulation.regulation_category}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Inspection Frequency</span>
-                      <span className="font-bold">{regulation.inspection_frequency}</span>
+                      <span className="text-muted-foreground">Inspection Frequency</span>
+                      <span className="font-semibold">{regulation.inspection_frequency}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Effective Date</span>
-                      <span className="font-bold">{new Date(regulation.effective_date).toLocaleDateString()}</span>
+                      <span className="text-muted-foreground">Effective Date</span>
+                      <span className="font-semibold">{new Date(regulation.effective_date).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {regulation.documentation_requirements.length} documentation requirements
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">

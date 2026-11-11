@@ -225,7 +225,7 @@ export const MedicalShiftHR = () => {
       case "evening": return "bg-warning-500";
       case "rotating": return "bg-purple-500";
       case "on_call": return "bg-error-500";
-      default: return "bg-graphite-500 dark:bg-slate-600";
+      default: return "bg-muted-foreground";
     }
   };
 
@@ -235,8 +235,8 @@ export const MedicalShiftHR = () => {
       case "absent": return "bg-error-500 text-white";
       case "late": return "bg-warning-500 text-white";
       case "early_departure": return "bg-purple-500 text-white";
-      case "on_leave": return "bg-graphite-500 dark:bg-slate-600 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      case "on_leave": return "bg-muted-foreground text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -245,7 +245,7 @@ export const MedicalShiftHR = () => {
       case "online": return "bg-success-500 text-white";
       case "offline": return "bg-error-500 text-white";
       case "syncing": return "bg-warning-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -253,12 +253,12 @@ export const MedicalShiftHR = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access shift HR.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access shift HR.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -274,23 +274,23 @@ export const MedicalShiftHR = () => {
   const onlineDevices = devices.filter((d) => d.connection_status === "online").length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Clock className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Medical Shift HR & Attendance</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Shift Management & Biometric Attendance Tracking</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Shift Management & Biometric Attendance Tracking</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showShiftDialog} onOpenChange={setShowShiftDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Shift
                 </Button>
               </DialogTrigger>
@@ -300,7 +300,7 @@ export const MedicalShiftHR = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Shift Name</Label>
+                    <Label className="text-xs font-semibold">Shift Name</Label>
                     <Input
                       value={shiftForm.shift_name}
                       onChange={(e) => setShiftForm({ ...shiftForm, shift_name: e.target.value })}
@@ -309,7 +309,7 @@ export const MedicalShiftHR = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Shift Type</Label>
+                    <Label className="text-xs font-semibold">Shift Type</Label>
                     <Select
                       value={shiftForm.shift_type}
                       onValueChange={(value) => setShiftForm({ ...shiftForm, shift_type: value })}
@@ -327,7 +327,7 @@ export const MedicalShiftHR = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Department</Label>
+                    <Label className="text-xs font-semibold">Department</Label>
                     <Select
                       value={shiftForm.department_id}
                       onValueChange={(value) => setShiftForm({ ...shiftForm, department_id: value })}
@@ -346,7 +346,7 @@ export const MedicalShiftHR = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Start Time</Label>
+                      <Label className="text-xs font-semibold">Start Time</Label>
                       <Input
                         type="time"
                         value={shiftForm.start_time}
@@ -355,7 +355,7 @@ export const MedicalShiftHR = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">End Time</Label>
+                      <Label className="text-xs font-semibold">End Time</Label>
                       <Input
                         type="time"
                         value={shiftForm.end_time}
@@ -365,7 +365,7 @@ export const MedicalShiftHR = () => {
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Break Duration (min)</Label>
+                    <Label className="text-xs font-semibold">Break Duration (min)</Label>
                     <Input
                       type="number"
                       value={shiftForm.break_duration_minutes}
@@ -375,28 +375,28 @@ export const MedicalShiftHR = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Overnight Shift</Label>
+                      <Label className="text-xs font-semibold">Overnight Shift</Label>
                       <Switch
                         checked={shiftForm.is_overnight}
                         onCheckedChange={(checked) => setShiftForm({ ...shiftForm, is_overnight: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Requires On Call</Label>
+                      <Label className="text-xs font-semibold">Requires On Call</Label>
                       <Switch
                         checked={shiftForm.requires_on_call}
                         onCheckedChange={(checked) => setShiftForm({ ...shiftForm, requires_on_call: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Auto Assign Rotation</Label>
+                      <Label className="text-xs font-semibold">Auto Assign Rotation</Label>
                       <Switch
                         checked={shiftForm.auto_assign_rotation}
                         onCheckedChange={(checked) => setShiftForm({ ...shiftForm, auto_assign_rotation: checked })}
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateShift} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateShift} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Shift
                   </Button>
                 </div>
@@ -406,53 +406,53 @@ export const MedicalShiftHR = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Shifts</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{activeShifts}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured shifts</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{activeShifts}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured shifts</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Today's Assignments</span>
                 <Users className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-purple-500">{todayAssignments}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Staff scheduled</div>
+              <div className="text-2xl font-semibold font-mono text-purple-500">{todayAssignments}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Staff scheduled</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Present Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">{presentToday}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Clock-in recorded</div>
+              <div className="text-2xl font-semibold font-mono text-success-500">{presentToday}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Clock-in recorded</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Online Devices</span>
                 <Fingerprint className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">{onlineDevices}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Biometric devices</div>
+              <div className="text-2xl font-semibold font-mono text-warning-500">{onlineDevices}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Biometric devices</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="shifts" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="shifts" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Clock className="h-4 w-4 mr-2" /> Shifts
             </TabsTrigger>
@@ -478,7 +478,7 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {shifts.map((shift) => (
-                <Card key={shift.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={shift.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -487,24 +487,24 @@ export const MedicalShiftHR = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-semibold">{shift.shift_name}</CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">{shift.shift_type}</div>
+                          <div className="text-xs text-muted-foreground">{shift.shift_type}</div>
                         </div>
                       </div>
                       {shift.is_active ? (
                         <Badge className="bg-success-500 text-white text-xs">Active</Badge>
                       ) : (
-                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-xs">Inactive</Badge>
+                        <Badge className="bg-muted-foreground text-white text-xs">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Hours</span>
-                      <span className="font-bold">{shift.start_time} - {shift.end_time}</span>
+                      <span className="text-muted-foreground">Hours</span>
+                      <span className="font-semibold">{shift.start_time} - {shift.end_time}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Break</span>
-                      <span className="font-bold">{shift.break_duration_minutes} min</span>
+                      <span className="text-muted-foreground">Break</span>
+                      <span className="font-semibold">{shift.break_duration_minutes} min</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {shift.is_overnight && (
@@ -517,8 +517,8 @@ export const MedicalShiftHR = () => {
                         <Badge className="bg-purple-500 text-white text-xs">Auto Rotation</Badge>
                       )}
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {shift.staff_requirements.length} staff required
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -550,7 +550,7 @@ export const MedicalShiftHR = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Assign Staff
                     </Button>
                   </DialogTrigger>
@@ -560,7 +560,7 @@ export const MedicalShiftHR = () => {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
-                        <Label className="text-xs font-bold">Shift</Label>
+                        <Label className="text-xs font-semibold">Shift</Label>
                         <Select
                           value={assignmentForm.shift_id}
                           onValueChange={(value) => setAssignmentForm({ ...assignmentForm, shift_id: value })}
@@ -578,7 +578,7 @@ export const MedicalShiftHR = () => {
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Staff Member</Label>
+                        <Label className="text-xs font-semibold">Staff Member</Label>
                         <Select
                           value={assignmentForm.staff_id}
                           onValueChange={(value) => setAssignmentForm({ ...assignmentForm, staff_id: value })}
@@ -592,7 +592,7 @@ export const MedicalShiftHR = () => {
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Shift Date</Label>
+                        <Label className="text-xs font-semibold">Shift Date</Label>
                         <Input
                           type="date"
                           value={assignmentForm.shift_date}
@@ -601,7 +601,7 @@ export const MedicalShiftHR = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Notes</Label>
+                        <Label className="text-xs font-semibold">Notes</Label>
                         <Textarea
                           value={assignmentForm.notes}
                           onChange={(e) => setAssignmentForm({ ...assignmentForm, notes: e.target.value })}
@@ -609,7 +609,7 @@ export const MedicalShiftHR = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAssignment} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                      <Button onClick={handleCreateAssignment} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                         Create Assignment
                       </Button>
                     </div>
@@ -621,33 +621,33 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-border shadow-xs overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Staff</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Shift</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Hours</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Assigned</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Staff</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Shift</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Date</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Hours</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Assigned</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {assignments.map((assignment) => (
-                    <tr key={assignment.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={assignment.id} className="border-t border-border hover:bg-canvas-bone ">
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">
+                        <div className="text-xs font-semibold">
                           {assignment.staff?.first_name} {assignment.staff?.last_name}
                         </div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
+                        <div className="text-xs text-muted-foreground">{assignment.staff?.specialty}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">{assignment.shift?.shift_name}</div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
+                        <div className="text-xs font-semibold">{assignment.shift?.shift_name}</div>
+                        <div className="text-xs text-muted-foreground">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(assignment.shift_date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-xs">
@@ -658,7 +658,7 @@ export const MedicalShiftHR = () => {
                           {assignment.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(assignment.assigned_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -704,29 +704,29 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-border shadow-xs overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Staff</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Clock In</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Clock Out</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Hours</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Overtime</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Biometric</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Staff</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Date</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Clock In</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Clock Out</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Hours</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Overtime</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Biometric</th>
                   </tr>
                 </thead>
                 <tbody>
                   {attendance.map((record) => (
-                    <tr key={record.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={record.id} className="border-t border-border hover:bg-canvas-bone ">
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">
+                        <div className="text-xs font-semibold">
                           {record.staff?.first_name} {record.staff?.last_name}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(record.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-xs">
@@ -736,7 +736,7 @@ export const MedicalShiftHR = () => {
                             {new Date(record.clock_in_time).toLocaleTimeString()}
                           </div>
                         ) : (
-                          <span className="text-graphite-500 dark:text-slate-400">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs">
@@ -746,13 +746,13 @@ export const MedicalShiftHR = () => {
                             {new Date(record.clock_out_time).toLocaleTimeString()}
                           </div>
                         ) : (
-                          <span className="text-graphite-500 dark:text-slate-400">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold">
+                      <td className="px-4 py-3 text-sm text-right tnum font-medium">
                         {record.total_hours_worked?.toFixed(1) || "-"}h
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-warning-500">
+                      <td className="px-4 py-3 text-xs font-semibold text-warning-500">
                         {record.overtime_hours?.toFixed(1) || "-"}h
                       </td>
                       <td className="px-4 py-3">
@@ -764,7 +764,7 @@ export const MedicalShiftHR = () => {
                         {record.biometric_verified ? (
                           <Fingerprint className="h-4 w-4 text-success-500" />
                         ) : (
-                          <Fingerprint className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
+                          <Fingerprint className="h-4 w-4 text-muted-foreground" />
                         )}
                       </td>
                     </tr>
@@ -785,7 +785,7 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {devices.map((device) => (
-                <Card key={device.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={device.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -794,7 +794,7 @@ export const MedicalShiftHR = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-semibold">{device.device_name}</CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">{device.device_type}</div>
+                          <div className="text-xs text-muted-foreground">{device.device_type}</div>
                         </div>
                       </div>
                       <Badge className={getDeviceStatusColor(device.connection_status) + " text-xs"}>
@@ -804,19 +804,19 @@ export const MedicalShiftHR = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Location</span>
-                      <span className="font-bold">{device.device_location}</span>
+                      <span className="text-muted-foreground">Location</span>
+                      <span className="font-semibold">{device.device_location}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Serial Number</span>
-                      <span className="font-bold">{device.serial_number || "N/A"}</span>
+                      <span className="text-muted-foreground">Serial Number</span>
+                      <span className="font-semibold">{device.serial_number || "N/A"}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">IP Address</span>
-                      <span className="font-bold">{device.ip_address || "N/A"}</span>
+                      <span className="text-muted-foreground">IP Address</span>
+                      <span className="font-semibold">{device.ip_address || "N/A"}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         Last Sync: {device.last_sync_at ? new Date(device.last_sync_at).toLocaleString() : "Never"}
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">

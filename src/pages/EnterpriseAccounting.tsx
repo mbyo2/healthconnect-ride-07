@@ -222,7 +222,7 @@ export const EnterpriseAccounting = () => {
       case "receipt": return "bg-success-500";
       case "payment": return "bg-error-500";
       case "adjustment": return "bg-warning-500";
-      default: return "bg-graphite-500 dark:bg-slate-600";
+      default: return "bg-muted-foreground";
     }
   };
 
@@ -240,7 +240,7 @@ export const EnterpriseAccounting = () => {
       case "reconciled": return "bg-success-500 text-white";
       case "pending": return "bg-warning-500 text-white";
       case "variance": return "bg-error-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -248,12 +248,12 @@ export const EnterpriseAccounting = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enterprise accounting.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access enterprise accounting.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -269,23 +269,23 @@ export const EnterpriseAccounting = () => {
   const pendingReconciliations = reconciliations.filter((r) => r.reconciliation_status !== "reconciled").length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <BookOpen className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Enterprise Accounting</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">General Ledger, Asset Management & Bank Reconciliation</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">General Ledger, Asset Management & Bank Reconciliation</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showGlDialog} onOpenChange={setShowGlDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New GL Entry
                 </Button>
               </DialogTrigger>
@@ -295,7 +295,7 @@ export const EnterpriseAccounting = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Entry Type</Label>
+                    <Label className="text-xs font-semibold">Entry Type</Label>
                     <Select
                       value={glForm.entry_type}
                       onValueChange={(value) => setGlForm({ ...glForm, entry_type: value })}
@@ -312,7 +312,7 @@ export const EnterpriseAccounting = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Reference Number</Label>
+                    <Label className="text-xs font-semibold">Reference Number</Label>
                     <Input
                       value={glForm.reference_number}
                       onChange={(e) => setGlForm({ ...glForm, reference_number: e.target.value })}
@@ -321,7 +321,7 @@ export const EnterpriseAccounting = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Description</Label>
+                    <Label className="text-xs font-semibold">Description</Label>
                     <Textarea
                       value={glForm.description}
                       onChange={(e) => setGlForm({ ...glForm, description: e.target.value })}
@@ -331,7 +331,7 @@ export const EnterpriseAccounting = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Debit Amount</Label>
+                      <Label className="text-xs font-semibold">Debit Amount</Label>
                       <Input
                         type="number"
                         value={glForm.debit_amount}
@@ -340,7 +340,7 @@ export const EnterpriseAccounting = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Credit Amount</Label>
+                      <Label className="text-xs font-semibold">Credit Amount</Label>
                       <Input
                         type="number"
                         value={glForm.credit_amount}
@@ -351,7 +351,7 @@ export const EnterpriseAccounting = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Currency</Label>
+                      <Label className="text-xs font-semibold">Currency</Label>
                       <Select
                         value={glForm.currency}
                         onValueChange={(value) => setGlForm({ ...glForm, currency: value })}
@@ -367,7 +367,7 @@ export const EnterpriseAccounting = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Cost Center</Label>
+                      <Label className="text-xs font-semibold">Cost Center</Label>
                       <Input
                         value={glForm.cost_center}
                         onChange={(e) => setGlForm({ ...glForm, cost_center: e.target.value })}
@@ -378,7 +378,7 @@ export const EnterpriseAccounting = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Account Code</Label>
+                      <Label className="text-xs font-semibold">Account Code</Label>
                       <Input
                         value={glForm.account_code}
                         onChange={(e) => setGlForm({ ...glForm, account_code: e.target.value })}
@@ -387,7 +387,7 @@ export const EnterpriseAccounting = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Account Name</Label>
+                      <Label className="text-xs font-semibold">Account Name</Label>
                       <Input
                         value={glForm.account_name}
                         onChange={(e) => setGlForm({ ...glForm, account_name: e.target.value })}
@@ -396,7 +396,7 @@ export const EnterpriseAccounting = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateGlEntry} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateGlEntry} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create GL Entry
                   </Button>
                 </div>
@@ -406,59 +406,59 @@ export const EnterpriseAccounting = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Assets</span>
                 <BookOpen className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">
+              <div className="text-2xl font-semibold font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalAssets / 1000).toFixed(1)}k
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Gross asset value</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Gross asset value</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Accumulated Depreciation</span>
                 <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-error-500">
+              <div className="text-2xl font-semibold font-mono text-error-500">
                 {institution.currency || "ZMW"} {(totalDepreciation / 1000).toFixed(1)}k
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Total depreciation</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Total depreciation</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Net Book Value</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">
+              <div className="text-2xl font-semibold font-mono text-success-500">
                 {institution.currency || "ZMW"} {(netBookValue / 1000).toFixed(1)}k
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current asset value</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Current asset value</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Reconciliations</span>
                 <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">{pendingReconciliations}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting reconciliation</div>
+              <div className="text-2xl font-semibold font-mono text-warning-500">{pendingReconciliations}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting reconciliation</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="gl" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="gl" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BookOpen className="h-4 w-4 mr-2" /> General Ledger
             </TabsTrigger>
@@ -500,29 +500,29 @@ export const EnterpriseAccounting = () => {
               </div>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-border shadow-xs overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Entry #</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Date</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Account</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Debit</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Credit</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Currency</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Entry #</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Date</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Type</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Account</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Debit</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Credit</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Currency</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {glEntries.map((entry) => (
-                    <tr key={entry.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={entry.id} className="border-t border-border hover:bg-canvas-bone ">
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">{entry.entry_number}</div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{entry.reference_number}</div>
+                        <div className="text-xs font-semibold">{entry.entry_number}</div>
+                        <div className="text-xs text-muted-foreground">{entry.reference_number}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(entry.entry_date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -531,13 +531,13 @@ export const EnterpriseAccounting = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">{entry.account_name}</div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{entry.account_code}</div>
+                        <div className="text-xs font-semibold">{entry.account_name}</div>
+                        <div className="text-xs text-muted-foreground">{entry.account_code}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-success-500">
+                      <td className="px-4 py-3 text-sm text-right tnum font-medium">
                         {entry.debit_amount > 0 ? `${entry.currency} ${entry.debit_amount.toFixed(2)}` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-error-500">
+                      <td className="px-4 py-3 text-sm text-right tnum font-medium">
                         {entry.credit_amount > 0 ? `${entry.currency} ${entry.credit_amount.toFixed(2)}` : "-"}
                       </td>
                       <td className="px-4 py-3 text-xs">{entry.currency}</td>
@@ -564,10 +564,10 @@ export const EnterpriseAccounting = () => {
                     <tr>
                       <td colSpan={9} className="px-4 py-12 text-center">
                         <div className="space-y-3">
-                          <BookOpen className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                          <p className="text-sm font-bold">No GL entries yet</p>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400">Record your first journal, receipt, payment or adjustment entry.</p>
-                          <Button onClick={() => setShowGlDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                          <BookOpen className="h-10 w-10 mx-auto text-muted-foreground" />
+                          <p className="text-sm font-semibold">No GL entries yet</p>
+                          <p className="text-xs text-muted-foreground">Record your first journal, receipt, payment or adjustment entry.</p>
+                          <Button onClick={() => setShowGlDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                             <Plus className="h-4 w-4 mr-1" /> New GL Entry
                           </Button>
                         </div>
@@ -600,7 +600,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssetDialog} onOpenChange={setShowAssetDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Add Asset
                     </Button>
                   </DialogTrigger>
@@ -611,7 +611,7 @@ export const EnterpriseAccounting = () => {
                     <div className="space-y-4 py-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-xs font-bold">Asset Code</Label>
+                          <Label className="text-xs font-semibold">Asset Code</Label>
                           <Input
                             value={assetForm.asset_code}
                             onChange={(e) => setAssetForm({ ...assetForm, asset_code: e.target.value })}
@@ -620,7 +620,7 @@ export const EnterpriseAccounting = () => {
                           />
                         </div>
                         <div>
-                          <Label className="text-xs font-bold">Asset Name</Label>
+                          <Label className="text-xs font-semibold">Asset Name</Label>
                           <Input
                             value={assetForm.asset_name}
                             onChange={(e) => setAssetForm({ ...assetForm, asset_name: e.target.value })}
@@ -630,7 +630,7 @@ export const EnterpriseAccounting = () => {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Category</Label>
+                        <Label className="text-xs font-semibold">Category</Label>
                         <Select
                           value={assetForm.asset_category}
                           onValueChange={(value) => setAssetForm({ ...assetForm, asset_category: value })}
@@ -649,7 +649,7 @@ export const EnterpriseAccounting = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-xs font-bold">Purchase Date</Label>
+                          <Label className="text-xs font-semibold">Purchase Date</Label>
                           <Input
                             type="date"
                             value={assetForm.purchase_date}
@@ -658,7 +658,7 @@ export const EnterpriseAccounting = () => {
                           />
                         </div>
                         <div>
-                          <Label className="text-xs font-bold">Purchase Cost</Label>
+                          <Label className="text-xs font-semibold">Purchase Cost</Label>
                           <Input
                             type="number"
                             value={assetForm.purchase_cost}
@@ -669,7 +669,7 @@ export const EnterpriseAccounting = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-xs font-bold">Depreciation Method</Label>
+                          <Label className="text-xs font-semibold">Depreciation Method</Label>
                           <Select
                             value={assetForm.depreciation_method}
                             onValueChange={(value) => setAssetForm({ ...assetForm, depreciation_method: value })}
@@ -685,7 +685,7 @@ export const EnterpriseAccounting = () => {
                           </Select>
                         </div>
                         <div>
-                          <Label className="text-xs font-bold">Useful Life (Years)</Label>
+                          <Label className="text-xs font-semibold">Useful Life (Years)</Label>
                           <Input
                             type="number"
                             value={assetForm.useful_life_years}
@@ -695,7 +695,7 @@ export const EnterpriseAccounting = () => {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Salvage Value</Label>
+                        <Label className="text-xs font-semibold">Salvage Value</Label>
                         <Input
                           type="number"
                           value={assetForm.salvage_value}
@@ -703,7 +703,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAsset} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                      <Button onClick={handleCreateAsset} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                         Add Asset
                       </Button>
                     </div>
@@ -716,12 +716,12 @@ export const EnterpriseAccounting = () => {
             </div>
 
             {assets.length === 0 && (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-12 text-center space-y-3">
-                  <FileText className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                  <p className="text-sm font-bold">No fixed assets yet</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Register medical equipment, vehicles, buildings and IT assets to track depreciation.</p>
-                  <Button onClick={() => setShowAssetDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                  <FileText className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No fixed assets yet</p>
+                  <p className="text-xs text-muted-foreground">Register medical equipment, vehicles, buildings and IT assets to track depreciation.</p>
+                  <Button onClick={() => setShowAssetDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Asset
                   </Button>
                 </CardContent>
@@ -729,12 +729,12 @@ export const EnterpriseAccounting = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {assets.map((asset) => (
-                <Card key={asset.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={asset.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-semibold">{asset.asset_name}</CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{asset.asset_code}</div>
+                        <div className="text-xs text-muted-foreground">{asset.asset_code}</div>
                       </div>
                       <Badge variant="outline" className="text-xs">{asset.asset_category}</Badge>
                     </div>
@@ -742,24 +742,24 @@ export const EnterpriseAccounting = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Purchase Cost</div>
-                        <div className="text-sm font-bold">{asset.currency} {asset.purchase_cost.toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">Purchase Cost</div>
+                        <div className="text-sm font-semibold">{asset.currency} {asset.purchase_cost.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Net Book Value</div>
-                        <div className="text-sm font-bold text-success-500">{asset.currency} {asset.net_book_value.toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">Net Book Value</div>
+                        <div className="text-sm font-semibold text-success-500">{asset.currency} {asset.net_book_value.toFixed(2)}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Depreciation Method</span>
-                      <span className="font-bold">{getDepreciationMethodLabel(asset.depreciation_method)}</span>
+                      <span className="text-muted-foreground">Depreciation Method</span>
+                      <span className="font-semibold">{getDepreciationMethodLabel(asset.depreciation_method)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Accumulated Depreciation</span>
-                      <span className="font-bold text-error-500">{asset.currency} {asset.accumulated_depreciation.toFixed(2)}</span>
+                      <span className="text-muted-foreground">Accumulated Depreciation</span>
+                      <span className="font-semibold text-error-500">{asset.currency} {asset.accumulated_depreciation.toFixed(2)}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         Year {asset.current_depreciation_year} of {asset.useful_life_years}
                       </div>
                       <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
@@ -792,7 +792,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showReconciliationDialog} onOpenChange={setShowReconciliationDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                     </Button>
                   </DialogTrigger>
@@ -802,7 +802,7 @@ export const EnterpriseAccounting = () => {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
-                        <Label className="text-xs font-bold">Bank Name</Label>
+                        <Label className="text-xs font-semibold">Bank Name</Label>
                         <Input
                           value={reconciliationForm.bank_name}
                           onChange={(e) => setReconciliationForm({ ...reconciliationForm, bank_name: e.target.value })}
@@ -811,7 +811,7 @@ export const EnterpriseAccounting = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Account Number</Label>
+                        <Label className="text-xs font-semibold">Account Number</Label>
                         <Input
                           value={reconciliationForm.account_number}
                           onChange={(e) => setReconciliationForm({ ...reconciliationForm, account_number: e.target.value })}
@@ -821,7 +821,7 @@ export const EnterpriseAccounting = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-xs font-bold">Currency</Label>
+                          <Label className="text-xs font-semibold">Currency</Label>
                           <Select
                             value={reconciliationForm.currency}
                             onValueChange={(value) => setReconciliationForm({ ...reconciliationForm, currency: value })}
@@ -837,7 +837,7 @@ export const EnterpriseAccounting = () => {
                           </Select>
                         </div>
                         <div>
-                          <Label className="text-xs font-bold">Statement Date</Label>
+                          <Label className="text-xs font-semibold">Statement Date</Label>
                           <Input
                             type="date"
                             value={reconciliationForm.statement_date}
@@ -847,7 +847,7 @@ export const EnterpriseAccounting = () => {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Statement Balance</Label>
+                        <Label className="text-xs font-semibold">Statement Balance</Label>
                         <Input
                           type="number"
                           value={reconciliationForm.statement_balance}
@@ -856,7 +856,7 @@ export const EnterpriseAccounting = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Notes</Label>
+                        <Label className="text-xs font-semibold">Notes</Label>
                         <Textarea
                           value={reconciliationForm.notes}
                           onChange={(e) => setReconciliationForm({ ...reconciliationForm, notes: e.target.value })}
@@ -864,7 +864,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                      <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                         Start Reconciliation
                       </Button>
                     </div>
@@ -877,12 +877,12 @@ export const EnterpriseAccounting = () => {
             </div>
 
             {reconciliations.length === 0 && (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-12 text-center space-y-3">
-                  <RefreshCw className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                  <p className="text-sm font-bold">No bank reconciliations yet</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Start your first reconciliation to match statement and book balances.</p>
-                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                  <RefreshCw className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No bank reconciliations yet</p>
+                  <p className="text-xs text-muted-foreground">Start your first reconciliation to match statement and book balances.</p>
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                   </Button>
                 </CardContent>
@@ -890,12 +890,12 @@ export const EnterpriseAccounting = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
-                <Card key={reconciliation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={reconciliation.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-semibold">{reconciliation.bank_name}</CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{reconciliation.account_number}</div>
+                        <div className="text-xs text-muted-foreground">{reconciliation.account_number}</div>
                       </div>
                       <Badge className={getReconciliationStatusColor(reconciliation.reconciliation_status) + " text-xs"}>
                         {reconciliation.reconciliation_status}
@@ -905,22 +905,22 @@ export const EnterpriseAccounting = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Statement Balance</div>
-                        <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.statement_balance.toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">Statement Balance</div>
+                        <div className="text-sm font-semibold">{reconciliation.currency} {reconciliation.statement_balance.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Book Balance</div>
-                        <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.book_balance.toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">Book Balance</div>
+                        <div className="text-sm font-semibold">{reconciliation.currency} {reconciliation.book_balance.toFixed(2)}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Variance</span>
-                      <span className={`font-bold ${reconciliation.variance !== 0 ? "text-error-500" : "text-success-500"}`}>
+                      <span className="text-muted-foreground">Variance</span>
+                      <span className={`font-semibold ${reconciliation.variance !== 0 ? "text-error-500" : "text-success-500"}`}>
                         {reconciliation.currency} {reconciliation.variance.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {new Date(reconciliation.statement_date).toLocaleDateString()}
                       </div>
                       <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
@@ -935,26 +935,26 @@ export const EnterpriseAccounting = () => {
 
           {/* ERP Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <ArrowUpRight className="h-4 w-4 text-primary-500" /> External ERP Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground text-xs">
                   <div className="text-center space-y-4">
                     <div className="flex justify-center gap-4">
-                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
-                        <div className="text-sm font-bold mb-1">SAP</div>
+                      <div className="p-4 rounded-xl bg-muted">
+                        <div className="text-sm font-semibold mb-1">SAP</div>
                         <div className="text-xs">Enterprise ERP</div>
                       </div>
-                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
-                        <div className="text-sm font-bold mb-1">Focus ERP</div>
+                      <div className="p-4 rounded-xl bg-muted">
+                        <div className="text-sm font-semibold mb-1">Focus ERP</div>
                         <div className="text-xs">Mid-market ERP</div>
                       </div>
-                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
-                        <div className="text-sm font-bold mb-1">Tally</div>
+                      <div className="p-4 rounded-xl bg-muted">
+                        <div className="text-sm font-semibold mb-1">Tally</div>
                         <div className="text-xs">Accounting Software</div>
                       </div>
                     </div>

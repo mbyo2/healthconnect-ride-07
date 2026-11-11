@@ -184,7 +184,7 @@ export const EnhancedInventory = () => {
       case "pending": case "in_progress": return "bg-primary-500 text-white";
       case "flagged": case "partial_received": return "bg-warning-500 text-white";
       case "cancelled": return "bg-error-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -192,12 +192,12 @@ export const EnhancedInventory = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Warehouse className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced inventory.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access enhanced inventory.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -216,23 +216,23 @@ export const EnhancedInventory = () => {
   const openDiscrepancies = reconciliations.filter((r) => r.status !== "completed").length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Package className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Enhanced Inventory</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Supply Chain & Purchase Order Management</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Supply Chain & Purchase Order Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Purchase Order
                 </Button>
               </DialogTrigger>
@@ -242,7 +242,7 @@ export const EnhancedInventory = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Supplier</Label>
+                    <Label className="text-xs font-semibold">Supplier</Label>
                     <Select
                       value={orderForm.supplier_id}
                       onValueChange={(value) => setOrderForm({ ...orderForm, supplier_id: value })}
@@ -260,7 +260,7 @@ export const EnhancedInventory = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Expected Delivery Date</Label>
+                    <Label className="text-xs font-semibold">Expected Delivery Date</Label>
                     <Input
                       type="date"
                       value={orderForm.expected_delivery_date}
@@ -269,7 +269,7 @@ export const EnhancedInventory = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Payment Terms</Label>
+                    <Label className="text-xs font-semibold">Payment Terms</Label>
                     <Input
                       value={orderForm.payment_terms}
                       onChange={(e) => setOrderForm({ ...orderForm, payment_terms: e.target.value })}
@@ -278,7 +278,7 @@ export const EnhancedInventory = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Shipping Address</Label>
+                    <Label className="text-xs font-semibold">Shipping Address</Label>
                     <Textarea
                       value={orderForm.shipping_address}
                       onChange={(e) => setOrderForm({ ...orderForm, shipping_address: e.target.value })}
@@ -287,7 +287,7 @@ export const EnhancedInventory = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Notes</Label>
+                    <Label className="text-xs font-semibold">Notes</Label>
                     <Textarea
                       value={orderForm.notes}
                       onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
@@ -295,7 +295,7 @@ export const EnhancedInventory = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Purchase Order
                   </Button>
                 </div>
@@ -303,7 +303,7 @@ export const EnhancedInventory = () => {
             </Dialog>
             <Dialog open={showReconciliationDialog} onOpenChange={setShowReconciliationDialog}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="text-xs font-bold">
+                <Button variant="outline" className="text-xs font-semibold">
                   <RefreshCw className="h-4 w-4 mr-1" /> Reconcile
                 </Button>
               </DialogTrigger>
@@ -313,7 +313,7 @@ export const EnhancedInventory = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Notes</Label>
+                    <Label className="text-xs font-semibold">Notes</Label>
                     <Textarea
                       value={reconciliationForm.notes}
                       onChange={(e) => setReconciliationForm({ ...reconciliationForm, notes: e.target.value })}
@@ -321,7 +321,7 @@ export const EnhancedInventory = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Start Reconciliation
                   </Button>
                 </div>
@@ -331,13 +331,13 @@ export const EnhancedInventory = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Avg Supplier Rating</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Supplier Rating</span>
                 <TrendingUp className="h-4 w-4 text-success-500" />
               </div>
               <div className="space-y-2">
@@ -348,47 +348,47 @@ export const EnhancedInventory = () => {
                   showTrend={false}
                 />
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-3 pt-3 border-t border-canvas-silk dark:border-slate-700">
+              <div className="text-xs text-muted-foreground font-semibold mt-3 pt-3 border-t border-border">
                 {supplierPerformance.length} suppliers tracked
               </div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Orders</span>
                 <ShoppingCart className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{pendingOrders}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{pendingOrders}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Order Value</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Order Value</span>
                 <DollarSign className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">
+              <div className="text-2xl font-semibold font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalOrderValue / 1000).toFixed(1)}k
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All orders</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">All orders</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Open Discrepancies</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Open Discrepancies</span>
                 <AlertTriangle className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-error-500">{openDiscrepancies}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require resolution</div>
+              <div className="text-2xl font-semibold font-mono text-error-500">{openDiscrepancies}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Require resolution</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="suppliers" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="suppliers" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Truck className="h-4 w-4 mr-2" /> Supplier Performance
             </TabsTrigger>
@@ -470,33 +470,33 @@ export const EnhancedInventory = () => {
               </div>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-border shadow-xs overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Order #</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Supplier</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Order Date</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Expected</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Amount</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Order #</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Supplier</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Order Date</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Expected</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-2.5">Amount</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {purchaseOrders.map((order) => (
-                    <tr key={order.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={order.id} className="border-t border-border hover:bg-canvas-bone ">
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">{order.order_number}</div>
+                        <div className="text-xs font-semibold">{order.order_number}</div>
                       </td>
                       <td className="px-4 py-3 text-xs">{order.supplier?.name || "N/A"}</td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(order.order_date).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : "N/A"}
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold">
+                      <td className="px-4 py-3 text-sm text-right tnum font-medium">
                         {institution.currency || "ZMW"} {Number(order.final_amount || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
@@ -520,10 +520,10 @@ export const EnhancedInventory = () => {
                     <tr>
                       <td colSpan={7} className="px-4 py-12 text-center">
                         <div className="space-y-3">
-                          <ShoppingCart className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                          <p className="text-sm font-bold">No purchase orders yet</p>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400">Create your first purchase order to restock supplies from a supplier.</p>
-                          <Button onClick={() => setShowOrderDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                          <ShoppingCart className="h-10 w-10 mx-auto text-muted-foreground" />
+                          <p className="text-sm font-semibold">No purchase orders yet</p>
+                          <p className="text-xs text-muted-foreground">Create your first purchase order to restock supplies from a supplier.</p>
+                          <Button onClick={() => setShowOrderDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                             <Plus className="h-4 w-4 mr-1" /> New Purchase Order
                           </Button>
                         </div>
@@ -555,12 +555,12 @@ export const EnhancedInventory = () => {
             </div>
 
             {reconciliations.length === 0 && (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-12 text-center space-y-3">
-                  <Package className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                  <p className="text-sm font-bold">No stock reconciliations yet</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Run your first stock count to compare physical inventory against system records.</p>
-                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                  <Package className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No stock reconciliations yet</p>
+                  <p className="text-xs text-muted-foreground">Run your first stock count to compare physical inventory against system records.</p>
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                   </Button>
                 </CardContent>
@@ -568,7 +568,7 @@ export const EnhancedInventory = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
-                <Card key={reconciliation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={reconciliation.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -576,7 +576,7 @@ export const EnhancedInventory = () => {
                           <RefreshCw className="h-4 w-4 text-primary-500" />
                           {new Date(reconciliation.reconciliation_date).toLocaleDateString()}
                         </CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           {reconciliation.total_items_checked} items checked
                         </div>
                       </div>
@@ -588,18 +588,18 @@ export const EnhancedInventory = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Discrepancies Found</div>
-                        <div className="text-sm font-bold text-error-500">{reconciliation.discrepancies_found}</div>
+                        <div className="text-xs text-muted-foreground">Discrepancies Found</div>
+                        <div className="text-sm font-semibold text-error-500">{reconciliation.discrepancies_found}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">Total Value</div>
-                        <div className="text-sm font-bold text-warning-500">
+                        <div className="text-xs text-muted-foreground">Total Value</div>
+                        <div className="text-sm font-semibold text-warning-500">
                           {institution.currency || "ZMW"} {Number(reconciliation.total_discrepancy_value || 0).toFixed(2)}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">{(reconciliation as any).notes || "No notes"}</div>
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">{(reconciliation as any).notes || "No notes"}</div>
                       <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
                         <Eye className="h-3 w-3" />
                       </Button>
@@ -613,19 +613,19 @@ export const EnhancedInventory = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-primary-500" /> Supply Chain Analytics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                  <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                     Supply chain analytics chart placeholder
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Cost Trends
@@ -634,22 +634,22 @@ export const EnhancedInventory = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Avg Order Value</span>
-                      <span className="font-bold text-success-500">
+                      <span className="text-muted-foreground">Avg Order Value</span>
+                      <span className="font-semibold text-success-500">
                         {purchaseOrders.length > 0 ? (totalOrderValue / purchaseOrders.length).toFixed(2) : "0.00"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">On-Time Delivery Rate</span>
-                      <span className="font-bold text-primary-500">
+                      <span className="text-muted-foreground">On-Time Delivery Rate</span>
+                      <span className="font-semibold text-primary-500">
                         {supplierPerformance.length > 0
                           ? (supplierPerformance.reduce((sum, s) => sum + Number(s.on_time_delivery_rate || 0), 0) / supplierPerformance.length * 100).toFixed(0)
                           : 0}%
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Discrepancy Rate</span>
-                      <span className="font-bold text-error-500">
+                      <span className="text-muted-foreground">Discrepancy Rate</span>
+                      <span className="font-semibold text-error-500">
                         {reconciliations.length > 0 
                           ? (reconciliations.reduce((sum, r) => sum + r.discrepancies_found, 0) / reconciliations.reduce((sum, r) => sum + r.total_items_checked, 1) * 100).toFixed(1)
                           : 0}%
