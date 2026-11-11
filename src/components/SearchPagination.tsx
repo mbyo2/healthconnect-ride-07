@@ -17,8 +17,7 @@ export const SearchPagination = () => {
   return (
     <div className="flex flex-col items-center justify-center space-y-2 pt-4 pb-8">
       <p className="text-sm text-muted-foreground">
-        Showing providers {totalCount > 0 ? (currentPage - 1) * 10 + 1 : 0} 
-        - {Math.min(currentPage * 10, totalCount)} of {totalCount}
+        {`Showing providers ${totalCount > 0 ? (currentPage - 1) * 10 + 1 : 0} - ${Math.min(currentPage * 10, totalCount)} of ${totalCount}`}
       </p>
       
       <div className="flex items-center space-x-2">

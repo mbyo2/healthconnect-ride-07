@@ -25,8 +25,6 @@ interface WorkflowStep {
 interface Workflow {
   id: string;
   title: string;
-  color: string;
-  bgColor: string;
   steps: WorkflowStep[];
 }
 
@@ -34,8 +32,6 @@ const workflows: Workflow[] = [
   {
     id: 'doctor-visit',
     title: 'Doctor Visit',
-    color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-500',
     steps: [
       { icon: Search, label: 'Find', route: '/marketplace-users' },
       { icon: Calendar, label: 'Book', route: '/appointments' },
@@ -46,8 +42,6 @@ const workflows: Workflow[] = [
   {
     id: 'medicine',
     title: 'Get Medicine',
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bgColor: 'bg-emerald-500',
     steps: [
       { icon: Pill, label: 'Rx', route: '/prescriptions' },
       { icon: ShoppingCart, label: 'Buy', route: '/marketplace' },
@@ -58,8 +52,6 @@ const workflows: Workflow[] = [
   {
     id: 'emergency',
     title: 'Emergency',
-    color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-500',
     steps: [
       { icon: AlertTriangle, label: 'SOS', route: '/emergency' },
       { icon: Building2, label: 'Hospital', route: '/healthcare-institutions' },
@@ -83,8 +75,11 @@ export const ConnectedWorkflows: React.FC = () => {
       <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible">
         {workflows.map((workflow) => (
           <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all border-border min-w-[200px] snap-start flex-shrink-0 sm:min-w-0">
-            <CardHeader className={`py-2 px-3 ${workflow.bgColor}`}>
-              <CardTitle className="text-xs font-bold text-white">{workflow.title}</CardTitle>
+            {/* Single-primary tint system (same as the MetricCard family):
+                pale primary band + primary title for every workflow — no
+                per-card rainbow colours. */}
+            <CardHeader className="py-2 px-3 bg-primary-500/10">
+              <CardTitle className="text-xs font-bold text-primary-500">{workflow.title}</CardTitle>
             </CardHeader>
             <CardContent className="p-2">
               <div className="flex items-center justify-evenly gap-1">
@@ -97,7 +92,7 @@ export const ConnectedWorkflows: React.FC = () => {
                       title={step.label}
                     >
                       <div className="p-1.5 rounded-full bg-muted group-hover/step:bg-primary/10 transition-colors">
-                        <step.icon className={`h-3.5 w-3.5 ${workflow.color} group-hover/step:scale-110 transition-transform`} />
+                        <step.icon className="h-3.5 w-3.5 text-primary-500 group-hover/step:scale-110 transition-transform" />
                       </div>
                     </button>
                     {idx < workflow.steps.length - 1 && (
