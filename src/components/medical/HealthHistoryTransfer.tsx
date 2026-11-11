@@ -41,7 +41,9 @@ export function HealthHistoryTransfer({ patientId }: { patientId: string }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("healthcare_institutions")
-        .select("id, name, institution_type")
+        // The institution kind column is `type` on the live table —
+        // the institution-type column does not exist and fails 42703 (2026-11-11).
+        .select("id, name, type")
         .order("name");
       return (data as any[]) || [];
     },
@@ -217,7 +219,7 @@ export function HealthHistoryTransfer({ patientId }: { patientId: string }) {
             <SelectContent>
               {(institutions || []).map((inst: any) => (
                 <SelectItem key={inst.id} value={inst.id}>
-                  {inst.name} ({inst.institution_type})
+                  {inst.name} ({inst.type})
                 </SelectItem>
               ))}
             </SelectContent>

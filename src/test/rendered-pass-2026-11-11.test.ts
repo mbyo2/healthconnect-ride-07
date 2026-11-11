@@ -44,6 +44,35 @@ describe("rendered pass 2026-11-11: imaging source for medical records", () => {
   });
 });
 
+describe("rendered pass 2026-11-11 (follow-up): phantom columns on /medical-records", () => {
+  // Live re-check (2026-11-11) showed the error card again for a fresh
+  // patient even though the four aggregated queries look clean in SQL:
+  // replayed verbatim through PostgREST as the QA patient, the
+  // prescriptions leg selected `frequency` from comprehensive_prescriptions,
+  // which has no such column (42703) — the Promise.all threw and the whole
+  // component fell into its error state. Dosing directions live in
+  // `instructions` on the live table.
+  it("ComprehensiveMedicalRecords aggregates prescriptions on live columns only", () => {
+    const m = comprehensive.match(/comprehensive_prescriptions[\s\S]{0,900}?\.select\('([^']+)'\)/);
+    expect(m).not.toBeNull();
+    const cols = (m as RegExpMatchArray)[1].split(",").map((c) => c.trim());
+    expect(cols).toContain("medication_name");
+    expect(cols).toContain("instructions");
+    expect(cols).not.toContain("frequency");
+    expect(comprehensive).not.toContain("rx.frequency");
+  });
+
+  // Same failure class on two sibling sections of the same page: the
+  // institution kind column on healthcare_institutions is `type`; the
+  // institution-type column does not exist (42703 via PostgREST).
+  it.each([
+    ["PatientPortal", "../components/patient/PatientPortal.tsx"],
+    ["HealthHistoryTransfer", "../components/medical/HealthHistoryTransfer.tsx"],
+  ])("%s never references the phantom institution-type column", (_name, rel) => {
+    expect(read(rel)).not.toContain("institution_type");
+  });
+});
+
 describe("rendered pass 2026-11-11: presentation fixes", () => {
   it("patient access categories render human labels, not camelCase keys", () => {
     const portal = read("../components/patient/PatientPortal.tsx");

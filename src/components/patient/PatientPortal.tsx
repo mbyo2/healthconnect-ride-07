@@ -38,12 +38,15 @@ export function PatientPortal() {
       if (!user?.id) return [];
       const { data, error } = await supabase
         .from("patient_institution_links")
+        // Live healthcare_institutions names this column `type` (enum
+        // healthcare_provider_type) — there is no institution-type column;
+        // selecting it fails 42703 (verified 2026-11-11).
         .select(`
           id,
           status,
           enrolled_at,
           healthcare_institutions!patient_institution_links_institution_id_fkey (
-            id, name, institution_type, city
+            id, name, type, city
           )
         `)
         .eq("patient_id", user.id)
@@ -89,7 +92,7 @@ export function PatientPortal() {
                       {link.healthcare_institutions?.name}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {link.healthcare_institutions?.institution_type} •{" "}
+                      {link.healthcare_institutions?.type} •{" "}
                       {link.healthcare_institutions?.city}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">

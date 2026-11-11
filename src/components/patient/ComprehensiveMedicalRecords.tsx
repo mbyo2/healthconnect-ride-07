@@ -182,7 +182,14 @@ export const ComprehensiveMedicalRecords = () => {
           : Promise.resolve({ data: [], error: null }),
         includeMeds
           ? (supabase.from('comprehensive_prescriptions' as any) as any)
-              .select('id, medication_name, dosage, frequency, created_at')
+              // Live comprehensive_prescriptions has NO frequency column
+              // (verified against information_schema 2026-11-11): selecting
+              // it fails 42703 and takes this whole Promise.all down, which
+              // is what left brand-new patients on the error card. Dosing
+              // directions live in `instructions`; frequency exists only on
+              // medication_administration_records and inside the
+              // pharmacy_prescriptions medications jsonb.
+              .select('id, medication_name, dosage, instructions, created_at')
               .eq('patient_id', user?.id)
               .order('created_at', { ascending: false })
               .limit(50)
@@ -233,7 +240,7 @@ export const ComprehensiveMedicalRecords = () => {
         id: `rx-${rx.id}`,
         record_type: 'medication',
         title: `Prescription: ${rx.medication_name}`,
-        description: [rx.dosage, rx.frequency].filter(Boolean).join(' — ') || 'Prescribed medication.',
+        description: [rx.dosage, rx.instructions].filter(Boolean).join(' — ') || 'Prescribed medication.',
         clinical_data: { medication_name: rx.medication_name },
         visit_date: rx.created_at,
         severity_level: 'low',
