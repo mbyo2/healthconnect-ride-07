@@ -10,18 +10,18 @@ export const QuickActions = () => {
   const navigate = useNavigate();
 
   const actions = [
-    { label: 'Admit Patient', icon: Bed, route: '/hospital-management?tab=ipd', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
-    { label: 'Add Staff', icon: UserPlus, route: '/institution/personnel', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-    { label: 'New Appointment', icon: Calendar, route: '/institution/appointments', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
-    { label: 'OPD Queue', icon: Stethoscope, route: '/hospital-management?tab=opd', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
-    { label: 'Create Invoice', icon: DollarSign, route: '/hospital-management?tab=billing', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
-    { label: 'Schedule OT', icon: Scissors, route: '/hospital-management?tab=ot', color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
-    { label: 'Discharge', icon: ClipboardList, route: '/hospital-management?tab=discharge', color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
-    { label: 'View Reports', icon: BarChart3, route: '/hospital-management?tab=mis', color: 'bg-slate-500/10 text-muted-foreground' },
-    { label: 'Inventory', icon: Package, route: '/hospital-management?tab=inventory', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
-    { label: 'IoT Devices', icon: Wifi, route: '/institution/devices', color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
-    { label: 'Patient Records', icon: FileText, route: '/institution/patients', color: 'bg-pink-500/10 text-pink-600 dark:text-pink-400' },
-    { label: 'Settings', icon: Settings, route: '/institution/settings', color: 'bg-gray-500/10 text-gray-600 dark:text-gray-400' },
+    { label: 'Admit Patient', icon: Bed, route: '/hospital-management?tab=ipd', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Add Staff', icon: UserPlus, route: '/institution/personnel', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'New Appointment', icon: Calendar, route: '/institution/appointments', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'OPD Queue', icon: Stethoscope, route: '/hospital-management?tab=opd', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Create Invoice', icon: DollarSign, route: '/hospital-management?tab=billing', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Schedule OT', icon: Scissors, route: '/hospital-management?tab=ot', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Discharge', icon: ClipboardList, route: '/hospital-management?tab=discharge', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'View Reports', icon: BarChart3, route: '/hospital-management?tab=mis', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Inventory', icon: Package, route: '/hospital-management?tab=inventory', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'IoT Devices', icon: Wifi, route: '/institution/devices', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Patient Records', icon: FileText, route: '/institution/patients', color: 'bg-primary-500/10 text-primary-600' },
+    { label: 'Settings', icon: Settings, route: '/institution/settings', color: 'bg-primary-500/10 text-primary-600' },
   ];
 
   return (

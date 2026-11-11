@@ -1146,7 +1146,7 @@ export const Prescriptions = () => {
                             <span>{p.medication_name}</span>
                           </div>
                           {p.prescription_number && (
-                            <span className="inline-block px-1.5 py-0.2 rounded bg-muted font-mono text-xs text-slate-500 mt-0.5">
+                            <span className="inline-block px-1.5 py-0.2 rounded bg-muted font-semibold tabular-nums text-xs text-slate-500 mt-0.5">
                               {p.prescription_number}
                             </span>
                           )}
@@ -1181,14 +1181,14 @@ export const Prescriptions = () => {
                         </td>
 
                         {/* Refills */}
-                        <td className="py-3 px-3 font-mono font-bold text-center">
+                        <td className="py-3 px-3 font-bold text-center tabular-nums">
                           <span className="px-2 py-0.5 rounded bg-muted">
                             {p.refills_remaining || 0} left
                           </span>
                         </td>
 
                         {/* Date */}
-                        <td className="py-3 px-3 font-mono text-slate-500">
+                        <td className="py-3 px-3 text-slate-500 tabular-nums">
                           {new Date(p.prescribed_date).toLocaleDateString()}
                         </td>
 

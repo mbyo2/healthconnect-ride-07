@@ -464,7 +464,7 @@ export const InstitutionDashboard = () => {
   if (!institution) {
     return (
       <div className="flex items-center justify-center p-6 min-h-[60vh]">
-        <div className="max-w-md w-full rounded-lg border border-border bg-card p-6 shadow-xs text-center space-y-4">
+        <div className="max-w-md w-full rounded-lg border border-border bg-card p-6 text-center space-y-4">
           <Building2 className="h-12 w-12 mx-auto text-primary-500" />
           <h2 className="text-xl font-semibold text-foreground">Setting Up Your Dashboard</h2>
           <p className="text-sm text-muted-foreground">
@@ -828,7 +828,7 @@ export const InstitutionDashboard = () => {
             )}
 
             {/* Type-specific Quick Navigation */}
-            <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+            <div className="rounded-lg border border-border bg-card p-4">
               <p className="text-xs font-medium text-muted-foreground mb-3">{cfg.label} quick access</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {cfg.quickLinks.map((action) => (
@@ -852,7 +852,7 @@ export const InstitutionDashboard = () => {
                 small institution grows its module set over time. Admin-granted
                 modules show a "New" badge; suspended modules are hidden. */}
             {charter.length > 0 && (
-              <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+              <div className="rounded-lg border border-border bg-card p-4">
                 <p className="text-xs font-medium text-muted-foreground mb-1">
                   {headerLabel} modules
                 </p>
@@ -914,7 +914,7 @@ export const InstitutionDashboard = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+            <div className="rounded-lg border border-border bg-card p-4">
               <QuickActions />
             </div>
 
@@ -942,7 +942,7 @@ export const InstitutionDashboard = () => {
               </div>
 
               {/* Activity Feed */}
-              <div className="vf-card shadow-sm overflow-hidden">
+              <div className="vf-card overflow-hidden">
                 <RecentActivityFeed activities={activities} />
               </div>
             </div>
@@ -1051,7 +1051,7 @@ export const InstitutionDashboard = () => {
         {/* 13. Revenue Cycle Management & Insurance */}
         {activeTab === "rcm" && (
           <div className="space-y-6">
-            <div className="rounded-lg border border-border bg-card p-6 shadow-xs">
+            <div className="rounded-lg border border-border bg-card p-6">
               <AdvancedRevenueCycle />
             </div>
             <DoctorFractionManager institutionId={institution.id} />
@@ -1060,7 +1060,7 @@ export const InstitutionDashboard = () => {
 
         {/* 14. Multi-Center Enterprise Governance & Cryptographic Audit */}
         {activeTab === "governance" && (
-          <div className="rounded-lg border border-border bg-card p-6 shadow-xs">
+          <div className="rounded-lg border border-border bg-card p-6">
             <MultiCenterAuditSuite institutionId={institution.id} />
           </div>
         )}

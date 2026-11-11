@@ -98,7 +98,7 @@ export const PublicQueueDisplay: React.FC = () => {
         </div>
 
         <div className="text-right">
-          <div className="text-3xl font-bold font-mono tracking-wider">
+          <div className="text-3xl font-bold tabular-nums tracking-wider">
             {currentTime}
           </div>
           <div className="text-xs font-semibold text-muted-foreground mt-0.5">
@@ -126,7 +126,7 @@ export const PublicQueueDisplay: React.FC = () => {
                   Loading queue…
                 </div>
               ) : currentlyCalled ? (
-                <div className="text-7xl sm:text-9xl font-bold font-mono tracking-tight">
+                <div className="text-7xl sm:text-9xl font-bold tabular-nums tracking-tight">
                   {currentlyCalled.tokenNumber}
                 </div>
               ) : (
@@ -184,7 +184,7 @@ export const PublicQueueDisplay: React.FC = () => {
                 className="p-4 rounded-2xl bg-card border border-border flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-accent text-accent-foreground font-mono font-bold text-sm flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-xl bg-accent text-accent-foreground font-bold tabular-nums text-sm flex items-center justify-center">
                     {tok.tokenNumber}
                   </div>
                   <div>

@@ -189,7 +189,7 @@ const MyPracticeEditor = () => {
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase text-muted-foreground flex items-center gap-1.5 border-b border-canvas-mist pb-2">
+      <h3 className="text-[13px] font-medium text-muted-foreground flex items-center gap-1.5 border-b border-canvas-mist pb-2">
         <Icon className="h-4 w-4" /> {title}
       </h3>
       {children}
@@ -228,7 +228,7 @@ const MyPracticeEditor = () => {
       <Section icon={GraduationCap} title="Education">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Medical School</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Medical School</Label>
             <Input
               value={data.medical_school}
               onChange={e => setData(p => ({ ...p, medical_school: e.target.value }))}
@@ -237,7 +237,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Graduation Year</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Graduation Year</Label>
             <Input
               type="number" min="1960" max="2030"
               value={data.graduation_year}
@@ -263,7 +263,7 @@ const MyPracticeEditor = () => {
       <Section icon={MapPin} title="Practice Details">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Primary Practice Location</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Primary Practice Location</Label>
             <Input
               value={data.primary_practice_location}
               onChange={e => setData(p => ({ ...p, primary_practice_location: e.target.value }))}
@@ -272,7 +272,7 @@ const MyPracticeEditor = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Avg. Wait Time</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Avg. Wait Time</Label>
             <Input
               value={data.typical_wait_time}
               onChange={e => setData(p => ({ ...p, typical_wait_time: e.target.value }))}
@@ -316,7 +316,7 @@ const MyPracticeEditor = () => {
       <Section icon={DollarSign} title="Consultation Fees (ZMW)">
         <div className="flex items-center gap-3 max-w-xs">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Min</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Min</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_min}
@@ -327,7 +327,7 @@ const MyPracticeEditor = () => {
           </div>
           <span className="mt-6 text-muted-foreground font-bold text-sm">–</span>
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Max</Label>
+            <Label className="text-[13px] font-medium text-muted-foreground">Max</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_max}
@@ -449,7 +449,7 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Label className="text-xs font-semibold uppercase text-muted-foreground shrink-0">
+        <Label className="text-[13px] font-medium text-muted-foreground shrink-0">
           Patient
         </Label>
         <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
@@ -877,23 +877,23 @@ export const ProviderDashboard = () => {
         </div>
         <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-5">
           <div className="vf-card space-y-3">
-            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Today's Consultations</div>
-            <div className="text-3xl font-medium text-primary-500">{todayAppointments.length}</div>
-            <div className="text-xs font-medium text-success-500">{completedToday.length} Done • {scheduledToday.length} Pending</div>
+            <div className="text-[13px] font-medium text-muted-foreground">Today's Consultations</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{todayAppointments.length}</div>
+            <div className="text-xs font-medium text-muted-foreground">{completedToday.length} Done • {scheduledToday.length} Pending</div>
           </div>
           <div className="vf-card space-y-3">
-            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Weekly Patient Volume</div>
-            <div className="text-3xl font-medium text-midnight">{weekStats?.total || 0}</div>
+            <div className="text-[13px] font-medium text-muted-foreground">Weekly Patient Volume</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{weekStats?.total || 0}</div>
             <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed this week</div>
           </div>
           <div className="vf-card space-y-3">
-            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Active Queue Status</div>
-            <div className="text-3xl font-medium text-warning-500">{weekStats?.pending || 0}</div>
-            <div className="text-xs font-medium text-warning-500">Awaiting Triage</div>
+            <div className="text-[13px] font-medium text-muted-foreground">Active Queue Status</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{weekStats?.pending || 0}</div>
+            <div className="text-xs font-medium text-muted-foreground">Awaiting Triage</div>
           </div>
           <div className="vf-card space-y-3">
-            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-medium text-success-500">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-[13px] font-medium text-muted-foreground">Shift Earnings (ZMW)</div>
+            <div className="text-3xl font-bold text-success-600 tabular-nums">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-xs font-medium text-emerald-500">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"

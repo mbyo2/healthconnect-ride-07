@@ -683,7 +683,7 @@ export default function TriageAssistant() {
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-graphite-400">Recommended care</p>
+                <p className="text-[13px] font-medium text-muted-foreground">Recommended care</p>
                 <p className="text-lg font-semibold mt-1 flex items-center gap-2">
                   <Stethoscope className="h-5 w-5 text-primary-500" /> {assessment.profession.label}
                 </p>

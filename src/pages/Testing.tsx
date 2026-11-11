@@ -313,15 +313,15 @@ export default function Testing() {
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">94%</div>
+                  <div className="text-2xl font-bold text-foreground">94%</div>
                   <div className="text-sm text-muted-foreground">Pass Rate</div>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1,247</div>
+                  <div className="text-2xl font-bold text-foreground">1,247</div>
                   <div className="text-sm text-muted-foreground">Total Tests</div>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">12min</div>
+                  <div className="text-2xl font-bold text-foreground">12min</div>
                   <div className="text-sm text-muted-foreground">Avg Runtime</div>
                 </div>
               </div>

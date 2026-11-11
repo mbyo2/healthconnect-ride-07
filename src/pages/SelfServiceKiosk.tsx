@@ -649,7 +649,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
             <div className="p-4 rounded-2xl bg-muted/50/60 border border-border space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-muted-foreground uppercase">Amount From Your Invoice (K)</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Amount From Your Invoice (K)</span>
                 <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-semibold text-xs">
                   Payable Slip
                 </span>
@@ -718,7 +718,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
             {billRef ? (
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500 text-center space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-slate-300">Bill Slip Ready</p>
+                <p className="text-[13px] font-medium text-muted-foreground">Bill Slip Ready</p>
                 <p className="text-lg font-bold font-mono text-foreground">{billRef}</p>
                 <p className="text-2xl font-bold text-emerald-600">K{billAmount.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground dark:text-slate-300 font-medium">
@@ -760,7 +760,7 @@ export const SelfServiceKiosk: React.FC = () => {
             </div>
 
             <div>
-              <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Your Queue Token Number</span>
+              <span className="text-[13px] font-medium text-muted-foreground">Your Queue Token Number</span>
               <div className="text-6xl font-bold font-mono text-primary-500 mt-2">
                 {generatedToken.number}
               </div>

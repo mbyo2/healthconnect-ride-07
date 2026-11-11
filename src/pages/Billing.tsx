@@ -478,15 +478,15 @@ export const Billing = () => {
                 {/* Patient and invoice info */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide">Billed To</p>
+                    <p className="text-[13px] font-medium text-muted-foreground">Billed To</p>
                     <p className="font-semibold">{showReceipt.patient_name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide">Date</p>
+                    <p className="text-[13px] font-medium text-muted-foreground">Date</p>
                     <p className="font-semibold">{new Date(showReceipt.created_at).toLocaleDateString()}</p>
                     {showReceipt.due_date && (
                       <>
-                        <p className="text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wide mt-2">Due Date</p>
+                        <p className="text-[13px] font-medium text-muted-foreground mt-2">Due Date</p>
                         <p className="font-semibold">{new Date(showReceipt.due_date).toLocaleDateString()}</p>
                       </>
                     )}

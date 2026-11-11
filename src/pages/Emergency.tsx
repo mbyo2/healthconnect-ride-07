@@ -211,7 +211,7 @@ const Emergency = () => {
               >
                 <Ambulance className="h-8 w-8 mb-2" />
                 <span className="font-bold">Ambulance</span>
-                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.ambulance}</span>
+                <span className="text-lg font-semibold tabular-nums">{ZAMBIA_CONFIG.emergencyNumbers.ambulance}</span>
               </a>
               <a 
                 href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.police}`}
@@ -219,7 +219,7 @@ const Emergency = () => {
               >
                 <Shield className="h-8 w-8 mb-2" />
                 <span className="font-bold">Police</span>
-                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.police}</span>
+                <span className="text-lg font-semibold tabular-nums">{ZAMBIA_CONFIG.emergencyNumbers.police}</span>
               </a>
               <a 
                 href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.fire}`}
@@ -227,7 +227,7 @@ const Emergency = () => {
               >
                 <AlertTriangle className="h-8 w-8 mb-2" />
                 <span className="font-bold">Fire</span>
-                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.fire}</span>
+                <span className="text-lg font-semibold tabular-nums">{ZAMBIA_CONFIG.emergencyNumbers.fire}</span>
               </a>
               <button 
                 onClick={() => navigate('/healthcare-institutions')}
