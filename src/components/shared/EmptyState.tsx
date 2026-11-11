@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EmptyStateProps {
   icon: LucideIcon;
@@ -21,25 +22,25 @@ export const EmptyState = ({
 }: EmptyStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="h-16 w-16 rounded-2xl bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center mb-4">
+      <div className="h-16 w-16 rounded-lg bg-primary-500/10 flex items-center justify-center mb-4">
         <Icon className="h-8 w-8 text-primary-500" />
       </div>
-      <h3 className="font-display text-lg font-medium text-midnight mb-2 text-center">
+      <h3 className="text-lg font-semibold text-foreground mb-2 text-center">
         {title}
       </h3>
-      <p className="text-sm text-graphite-500 mb-6 text-center max-w-md">
+      <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
         {description}
       </p>
       <div className="flex items-center gap-3">
         {actionLabel && onAction && (
-          <button onClick={onAction} className="vf-btn-primary">
+          <Button onClick={onAction}>
             {actionLabel}
-          </button>
+          </Button>
         )}
         {secondaryActionLabel && onSecondaryAction && (
-          <button onClick={onSecondaryAction} className="vf-btn-secondary">
+          <Button variant="outline" onClick={onSecondaryAction}>
             {secondaryActionLabel}
-          </button>
+          </Button>
         )}
       </div>
     </div>
