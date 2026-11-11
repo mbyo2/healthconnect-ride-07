@@ -474,7 +474,7 @@ export const InstitutionDashboard = () => {
           </p>
           <Button onClick={() => window.location.reload()} className="mx-auto">
             Refresh
-          </button>
+          </Button>
         </div>
       </div>
     );
