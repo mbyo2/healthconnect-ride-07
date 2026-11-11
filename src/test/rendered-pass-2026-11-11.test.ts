@@ -114,3 +114,57 @@ describe("rendered pass 2026-11-11: presentation fixes", () => {
     expect(workflows).toContain("bg-primary-500/10");
   });
 });
+
+describe("rendered pass 2026-11-11 (sweep): phantom-column audit of the flagged siblings", () => {
+  // Repo-wide sweep off the /medical-records fix. Every remaining
+  // institution_type / frequency hit was checked against the live
+  // information_schema and its request shape replayed through PostgREST
+  // (QA patient session; Auth taxonomy as anon — the pre-login role).
+  // healthcare_institutions carries `type` / `type_code`, NOT
+  // institution_type; comprehensive_prescriptions carries dosing
+  // directions in `instructions`, NOT frequency. Both phantom selects
+  // still return 42703 live (negative controls), so any reintroduction
+  // below is a live break, not a style issue.
+  const status = read("../components/patient/PrescriptionStatus.tsx");
+
+  it("PrescriptionStatus renders live dosing directions, not the phantom frequency field", () => {
+    // Its rows come from select('*') on comprehensive_prescriptions, so a
+    // `frequency` field could never be populated — the row rendered blank
+    // for every patient. The live directions column is `instructions`.
+    expect(status).not.toContain("prescription.frequency");
+    expect(status).not.toContain("frequency: string");
+    expect(status).toContain("prescription.instructions");
+    expect(status).toContain("Directions:");
+  });
+
+  it("the flagged institution files query healthcare_institutions on live columns only", () => {
+    const manager = read("../components/admin/InstitutionModuleManager.tsx");
+    expect(manager).toContain('.select("id, name, type_code, city")');
+    const ctx = read("../hooks/useInstitutionContext.ts");
+    expect(ctx).not.toContain(".institution_type");
+    const apps = read("../components/admin/InstitutionApplications.tsx");
+    // institution_type is a real column of institution_applications (the
+    // source table, select '*'); the value is written INTO the live
+    // healthcare_institutions.type column on approval — never selected
+    // FROM healthcare_institutions.
+    expect(apps).toContain("type: selected.institution_type");
+    expect(apps).toContain(
+      '"id, admin_id, license_number, address, city, country, phone, email, website, is_verified, "'
+    );
+    expect(apps).toContain('"operational_since, status"');
+  });
+
+  it("Auth taxonomy selects use the live lookup tables, never a phantom column", () => {
+    const auth = read("../pages/Auth.tsx");
+    expect(auth).toContain('from("institution_types").select("code, name")');
+    expect(auth).not.toContain("healthcare_institutions");
+  });
+
+  it.each([
+    ["Prescriptions page", "../pages/Prescriptions.tsx", '"refills_remaining, instructions, quantity, generic_name, strength, "'],
+    ["VisitSummary", "../pages/VisitSummary.tsx", "'id, medication_name, dosage, instructions, quantity, prescribed_date, status'"],
+    ["BarcodeVerify", "../components/pharmacy/BarcodeVerify.tsx", '"id, patient_id, medication_name, dosage, quantity, prescription_number, barcode, status, prescribed_date"'],
+  ])("%s selects comprehensive_prescriptions on live columns (instructions, not frequency)", (_name, rel, needle) => {
+    expect(read(rel)).toContain(needle);
+  });
+});

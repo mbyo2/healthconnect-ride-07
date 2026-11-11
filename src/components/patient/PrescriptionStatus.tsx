@@ -11,7 +11,11 @@ interface Prescription {
   id: string;
   medication_name: string;
   dosage: string;
-  frequency: string;
+  // Live comprehensive_prescriptions has NO frequency column (verified
+  // against information_schema 2026-11-11): the field was always undefined
+  // at runtime and the row rendered blank. Dosing directions live in
+  // `instructions` (prescribers write "<frequency>. <notes>" into it).
+  instructions?: string;
   prescribed_date: string;
   end_date?: string;
   notes?: string;
@@ -110,8 +114,8 @@ export const PrescriptionStatus = () => {
                 <span>{prescription.dosage}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Frequency:</span>
-                <span>{prescription.frequency}</span>
+                <span className="text-muted-foreground">Directions:</span>
+                <span>{prescription.instructions}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Prescribed:</span>
