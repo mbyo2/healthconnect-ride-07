@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Pill, ShieldCheck, HeartPulse,
   CheckCircle, ArrowRight, ChevronRight, Stethoscope,
-  Building2, Activity, CheckCircle2, MapPin
+  Building2, Activity, CheckCircle2
 } from "lucide-react";
 import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
@@ -212,18 +212,14 @@ export const Features = () => {
       preview: (
         <div className="space-y-2.5">
           {[
-            { spec: "Cardiology", detail: "Video & clinic visits", price: "from K500" },
-            { spec: "Emergency Medicine", detail: "Video visits", price: "from K350" },
-            { spec: "General Medicine", detail: "Clinic visits", price: "from K200" },
+            { step: "Search", detail: "Find a doctor by name, specialty or location" },
+            { step: "See the fee upfront", detail: "Each provider sets their own consultation fee" },
+            { step: "Pick a time", detail: "Choose an available slot — the provider confirms it" },
           ].map((d, i) => (
-            <div key={`${d.spec}-${i}`} className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
+            <div key={`${d.step}-${i}`} className="flex items-center gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
               <div>
-                <div className="font-medium text-sm text-midnight">{d.spec}</div>
+                <div className="font-medium text-sm text-midnight">{d.step}</div>
                 <div className="text-xs text-graphite-500 dark:text-slate-400">{d.detail}</div>
-              </div>
-              <div className="text-right shrink-0">
-                <div className="text-xs font-bold text-primary-600">{d.price}</div>
-                <span className="text-xs text-graphite-400 font-medium">Illustrative preview</span>
               </div>
             </div>
           ))}
@@ -240,15 +236,15 @@ export const Features = () => {
       preview: (
         <div className="space-y-2.5">
           {[
-            { med: "Amoxicillin 500mg (20 Caps)", doc: "Sample prescription · Out for Delivery", status: "Out for Delivery" },
-            { med: "Metformin 500mg (60 Tabs)", doc: "Sample prescription · Ready for Pickup", status: "Ready for Pickup" },
-          ].map((p) => (
-            <div key={p.med} className="p-3.5 rounded-2xl bg-canvas-bone border border-canvas-silk space-y-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-midnight">{p.med}</span>
-                <span className="px-2 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">{p.status}</span>
+            { step: "Issued by your doctor", detail: "Sent digitally after your consultation" },
+            { step: "Lands in your records", detail: "View your prescription any time in the app" },
+            { step: "Pickup or delivery", detail: "From a licensed pharmacy of your choice" },
+          ].map((d, i) => (
+            <div key={`${d.step}-${i}`} className="flex items-center gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
+              <div>
+                <div className="font-medium text-sm text-midnight">{d.step}</div>
+                <div className="text-xs text-graphite-500 dark:text-slate-400">{d.detail}</div>
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400">{p.doc}</div>
             </div>
           ))}
         </div>
@@ -262,21 +258,19 @@ export const Features = () => {
       metrics: ["Cover shown at booking", "Claims filed digitally", "NHIMA accepted"],
       badge: "Insurance",
       preview: (
-        <div className="p-4 rounded-2xl bg-canvas-bone border border-canvas-silk space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-canvas-silk">
-            <span className="text-xs font-medium text-midnight">NHIMA Insurance Card #8829104</span>
-            <span className="px-2 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">ACTIVE</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <span className="text-xs text-graphite-400 block">Consultation Co-pay</span>
-              <span className="font-medium text-success-500">100% Covered (K0)</span>
+        <div className="space-y-2.5">
+          {[
+            { step: "Add your cover", detail: "Save your NHIMA or private insurance details to your profile" },
+            { step: "Checked at booking", detail: "Eligibility is checked before you pay" },
+            { step: "Insurer confirms", detail: "Your insurer confirms the final coverage" },
+          ].map((d, i) => (
+            <div key={`${d.step}-${i}`} className="flex items-center gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
+              <div>
+                <div className="font-medium text-sm text-midnight">{d.step}</div>
+                <div className="text-xs text-graphite-500 dark:text-slate-400">{d.detail}</div>
+              </div>
             </div>
-            <div>
-              <span className="text-xs text-graphite-400 block">Prescription Benefit</span>
-              <span className="font-medium text-success-500">Full Coverage</span>
-            </div>
-          </div>
+          ))}
         </div>
       ),
     },
@@ -290,16 +284,14 @@ export const Features = () => {
       preview: (
         <div className="space-y-2.5">
           {[
-            { facility: "ICU Bed", detail: "Trauma care · Available now", dist: "2.4 km" },
-            { facility: "Emergency Room", detail: "Open 24/7 · 3 beds free", dist: "4.1 km" },
-          ].map((h) => (
-            <div key={h.facility} className="p-3 rounded-2xl bg-canvas-bone border border-canvas-silk flex items-center justify-between gap-2">
+            { step: "Call 116", detail: "Emergency dispatch, 24/7" },
+            { step: "Share your location", detail: "So help can find you fast" },
+            { step: "Nearest open facility", detail: "Get directed to care near you" },
+          ].map((d, i) => (
+            <div key={`${d.step}-${i}`} className="flex items-center gap-3 p-3 rounded-2xl bg-canvas-bone border border-canvas-silk">
               <div>
-                <div className="text-xs font-medium text-midnight">{h.facility}</div>
-                <div className="text-xs text-primary-600 font-medium">{h.detail} · <span className="text-graphite-400">Illustrative preview</span></div>
-              </div>
-              <div className="flex items-center gap-1 text-xs text-graphite-400 shrink-0">
-                <MapPin className="h-3 w-3" /> {h.dist}
+                <div className="font-medium text-sm text-midnight">{d.step}</div>
+                <div className="text-xs text-graphite-500 dark:text-slate-400">{d.detail}</div>
               </div>
             </div>
           ))}

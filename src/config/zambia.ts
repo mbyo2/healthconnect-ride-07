@@ -248,46 +248,6 @@ export const ZAMBIA_CONFIG = {
   },
 };
 
-// Zambian-specific testimonial templates
-export const ZAMBIAN_TESTIMONIALS = [
-  {
-    name: 'Chipo Mwanza',
-    role: 'Patient',
-    city: 'Lusaka',
-    content: 'Doc\' O Clock has made healthcare so much easier for my family. I can book appointments at UTH without queuing for hours!',
-  },
-  {
-    name: 'Dr. Mulenga Banda',
-    role: 'Healthcare Provider',
-    city: 'Ndola',
-    content: 'As a doctor in the Copperbelt, this platform helps me reach more patients and manage my practice efficiently.',
-  },
-  {
-    name: 'Thandiwe Phiri',
-    role: 'Mother of Two',
-    city: 'Kitwe',
-    content: 'The emergency feature saved my child\'s life. I found the nearest hospital and called an ambulance within minutes.',
-  },
-  {
-    name: 'Bwalya Chilufya',
-    role: 'Pharmacy Owner',
-    city: 'Lusaka',
-    content: 'Managing prescriptions and inventory has never been easier. My customers love ordering medicine through the app.',
-  },
-  {
-    name: 'Mwila Tembo',
-    role: 'Patient',
-    city: 'Livingstone',
-    content: 'Living far from major hospitals, this app connects me to doctors via video call. Truly life-changing technology!',
-  },
-  {
-    name: 'Dr. Ngosa Zimba',
-    role: 'Specialist',
-    city: 'Lusaka',
-    content: 'The platform helps me manage referrals and follow up with patients across Zambia. Healthcare is becoming more accessible.',
-  },
-];
-
 // DEPRECATED: Use usePlatformStats() hook for dynamic stats instead
 // export const ZAMBIAN_STATS = { ... };
 

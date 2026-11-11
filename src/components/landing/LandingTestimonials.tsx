@@ -1,8 +1,5 @@
-import { Star, Quote, ThumbsUp, Award, TrendingUp, HeartPulse, ShieldCheck } from "lucide-react";
-import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
+import { Award, TrendingUp, HeartPulse, ShieldCheck } from "lucide-react";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
-import { TESTIMONIAL_PHOTOS, unsplash } from "./landingPhotos";
-import { LandingImg } from "./LandingImg";
 
 // Facility segments the platform serves — not claimed partnerships.
 const ECOSYSTEM = [
@@ -50,7 +47,7 @@ export const Testimonials = () => {
             Built for every corner of Zambia&apos;s healthcare ecosystem
           </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-3 mb-16">
+        <div className="flex flex-wrap justify-center gap-3">
           {ECOSYSTEM.map((p) => (
             <div
               key={p.name}
@@ -65,82 +62,6 @@ export const Testimonials = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="text-center mb-10 max-w-2xl mx-auto">
-          <div className="vf-eyebrow mb-5">
-            <ThumbsUp className="h-3.5 w-3.5 text-accent-500" />
-            Community Stories
-          </div>
-          <h2 className="font-display text-3xl sm:text-4xl font-medium text-midnight tracking-tight">
-            {stats.patients > 0
-              ? <>Loved by {formatStat(stats.patients)} Zambian patients</>
-              : <>Built for Zambian patients</>}
-          </h2>
-          <p className="text-base text-graphite-500 dark:text-slate-400 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
-            Illustrative stories showing how patients, providers and pharmacies across Zambia could use the platform.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {ZAMBIAN_TESTIMONIALS.slice(0, 6).map((t, idx) => (
-            <div key={idx} className="vf-card flex flex-col justify-between space-y-4 group">
-              <div className="space-y-3">
-                {/* Honesty labelling lives once at section level (see the
-                    intro above) — not repeated as a pill on every card. */}
-                <div className="flex items-center">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                </div>
-                <div className="relative pt-1">
-                  <Quote className="h-5 w-5 text-canvas-silk absolute -top-1 -left-1" />
-                  <p className="text-sm text-graphite-600 leading-relaxed pl-4 tracking-wide">
-                    &ldquo;{t.content}&rdquo;
-                  </p>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-canvas-mist flex items-center gap-3">
-                <LandingImg
-                  src={unsplash(TESTIMONIAL_PHOTOS[idx] ?? TESTIMONIAL_PHOTOS[0], 160)}
-                  alt={`Illustrative portrait for ${t.name}'s community story — Doc' O Clock`}
-                  className="h-10 w-10 rounded-full object-cover shrink-0"
-                  loading="lazy"
-                  decoding="async"
-                  width={80}
-                  height={80}
-                />
-                <div>
-                  <div className="font-medium text-sm text-midnight group-hover:text-primary-500 transition-colors">{t.name}</div>
-                  <div className="text-xs text-graphite-400">{t.role} · {t.city}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 flex justify-center">
-          <div className="inline-flex flex-wrap items-center justify-center gap-5 px-8 py-5 rounded-card bg-canvas-bone border border-canvas-silk">
-            <div className="flex gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-              ))}
-            </div>
-            <div className="text-center sm:text-left">
-              <div className="font-medium text-midnight text-sm sm:text-base">
-                {stats.appointments > 0
-                  ? <>{formatStat(stats.appointments)} consultations booked and counting</>
-                  : <>Bookings open across Zambia</>}
-              </div>
-              <div className="text-xs text-graphite-400">
-                {stats.patients > 0
-                  ? <>Over {formatStat(stats.patients)} Zambian patients on the platform</>
-                  : <>Patients, providers & pharmacies welcome</>}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

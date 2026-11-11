@@ -1,21 +1,11 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 import { unsplash, unsplashSrcSet } from "./landingPhotos";
 import { LandingImg } from "./LandingImg";
-
-// Care topics framing the illustrative stories below — not partner endorsements.
-const STORY_TABS = [
-  { id: "appointments", name: "Appointments", quote: 0 },
-  { id: "providers", name: "Providers", quote: 1 },
-  { id: "specialists", name: "Specialists", quote: 5 },
-  { id: "pharmacy", name: "Pharmacy", quote: 3 },
-  { id: "emergency", name: "Emergency", quote: 2 },
-];
 
 // Popular searches — every chip deep-links to a /search URL param that
 // SearchPage actually handles (q, category, specialty, mode). There is no
@@ -31,9 +21,6 @@ export const LandingHero = () => {
   const navigate = useNavigate();
   const stats = usePlatformStats();
   const [query, setQuery] = useState("");
-  const [activePartner, setActivePartner] = useState(0);
-
-  const featured = ZAMBIAN_TESTIMONIALS[STORY_TABS[activePartner].quote];
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -145,54 +132,7 @@ export const LandingHero = () => {
               fetchpriority="high"
               decoding="async"
             />
-            <article className="relative z-20 mx-4 mt-4 max-w-sm rounded-card border border-canvas-silk bg-white/95 p-5 shadow-card-hover backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 sm:absolute sm:bottom-5 sm:left-auto sm:right-6 sm:mx-0 sm:mt-0 sm:border-white/70">
-              <span className="mb-3 inline-block px-2.5 py-0.5 rounded-pill text-xs font-medium bg-success-50 text-success-500">
-                Illustrative story
-              </span>
-              <p className="font-display text-base leading-snug text-midnight">
-                &ldquo;{featured.content}&rdquo;
-              </p>
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-base font-medium text-midnight">{featured.name}</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">
-                    {featured.role} · {featured.city}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => navigate("/about")}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary-500 hover:text-primary-600"
-                >
-                  Patient stories <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </article>
           </div>
-        </div>
-      </div>
-
-      <div className="mt-10 border-y border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900">
-        <div className="mx-auto grid max-w-content grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          <div className="flex items-center border-b border-canvas-silk px-5 py-4 text-left sm:border-b-0 lg:border-r">
-            <p className="text-xs font-medium uppercase tracking-widest text-graphite-400">
-              Patient stories
-            </p>
-          </div>
-          {STORY_TABS.map((partner, i) => (
-            <button
-              key={partner.id}
-              type="button"
-              onClick={() => setActivePartner(i)}
-              className={`flex items-center justify-center border-b border-canvas-silk px-4 py-4 text-sm font-medium transition-colors sm:border-b-0 lg:border-r lg:last:border-r-0 ${
-                activePartner === i
-                  ? "bg-midnight text-white"
-                  : "text-graphite-600 dark:text-slate-300 hover:bg-canvas-bone hover:text-midnight"
-              }`}
-            >
-              {partner.name}
-            </button>
-          ))}
         </div>
       </div>
     </section>
