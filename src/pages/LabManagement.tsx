@@ -15,6 +15,10 @@ import { InstitutionInsuranceVerification } from "@/components/institution/Insti
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { dispatchNotification } from "@/hooks/useNotifications";
 import { queueLabResultAlert } from "@/utils/sms-reminder-service";
 import { providerDisplayName } from "@/utils/providerDisplay";
@@ -505,30 +509,30 @@ const LabManagement = () => {
 
   const getStatusPill = (status: string) => {
     switch (status) {
-      case "pending": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
-      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Sample Collected</span>;
-      case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">In Progress</span>;
-      case "completed": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
-      case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
-      default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">{status}</span>;
+      case "pending": return <StatusBadge tone="warning">Pending</StatusBadge>;
+      case "sample_collected": return <StatusBadge tone="info">Sample Collected</StatusBadge>;
+      case "in_progress": return <StatusBadge tone="info">In Progress</StatusBadge>;
+      case "completed": return <StatusBadge tone="positive">Completed</StatusBadge>;
+      case "cancelled": return <StatusBadge tone="negative">Cancelled</StatusBadge>;
+      default: return <StatusBadge status={status} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-      {/* Sticky Monday Top Header */}
+    <div className="pb-16">
+      {/* Sticky page header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-lg bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Microscope className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 {labTitle}
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 {labSubtitle}
               </p>
             </div>
@@ -537,32 +541,32 @@ const LabManagement = () => {
           <div className="flex items-center gap-2">
             <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
               <DialogTrigger asChild>
-                <button className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <Button className="min-h-[44px]">
                   <Plus className="h-4 w-4" />
                   <span>New Test Request</span>
-                </button>
+                </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+              <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle className="font-semibold text-base">Create New Lab Request</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 py-4 text-xs">
+                <div className="space-y-4 py-4">
                   <div>
-                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
-                    <input
+                    <label className="text-xs font-medium text-muted-foreground">Patient</label>
+                    <Input
                       placeholder="Search patient name..."
                       value={patientSearchTerm}
                       onChange={(e) => setPatientSearchTerm(e.target.value)}
-                      className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-medium"
+                      className="mt-1"
                     />
                     {patientSearchTerm && !selectedPatientId && (
-                      <div className="max-h-32 overflow-y-auto border border-canvas-silk dark:border-slate-800 rounded-md bg-white dark:bg-slate-900 mt-1 shadow-xs">
+                      <div className="max-h-32 overflow-y-auto border border-border rounded-md bg-card mt-1 shadow-xs">
                         {patients
                           ?.filter((p) => `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase()))
                           .map((p) => (
                             <div
                               key={p.id}
-                              className="p-2 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 cursor-pointer"
+                              className="p-2 text-sm font-medium hover:bg-muted cursor-pointer"
                               onClick={() => {
                                 setSelectedPatientId(p.id);
                                 setPatientSearchTerm(`${p.first_name} ${p.last_name}`);
@@ -576,9 +580,9 @@ const LabManagement = () => {
                   </div>
 
                   <div>
-                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Test Type</label>
+                    <label className="text-xs font-medium text-muted-foreground">Test Type</label>
                     <Select value={selectedTestType} onValueChange={setSelectedTestType}>
-                      <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 font-bold text-xs">
+                      <SelectTrigger className="mt-1">
                         <SelectValue placeholder="Select test type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -595,7 +599,7 @@ const LabManagement = () => {
                     <div className="space-y-2">
                       <InstitutionInsuranceVerification patientId={selectedPatientId} onVerified={(v) => setSelectedVerification(v)} />
                       {selectedVerification && (
-                        <div className="p-2.5 rounded-lg bg-success-500/10 border border-success-500/30 text-success-500 font-bold text-xs flex items-center gap-1.5">
+                        <div className="p-2.5 rounded-lg bg-success-500/10 border border-success-500/30 text-success-700 dark:text-success-400 font-medium text-xs flex items-center gap-1.5">
                           <CheckCircle2 className="h-4 w-4" />
                           <span>Insurance Applied: {selectedVerification.coverage_percentage}% Covered</span>
                         </div>
@@ -604,12 +608,12 @@ const LabManagement = () => {
                   )}
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setShowNewRequestDialog(false)} className="px-4 min-h-[44px] text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <Button variant="ghost" onClick={() => setShowNewRequestDialog(false)} className="min-h-[44px]">
                     Cancel
-                  </button>
-                  <button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="px-4 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-bold">
+                  </Button>
+                  <Button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="min-h-[44px]">
                     {isSubmitting && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />} Create Request
-                  </button>
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -617,7 +621,7 @@ const LabManagement = () => {
         </div>
 
         {/* View Selection Bar */}
-        <div className="max-w-[1500px] mx-auto mt-4 px-4 sm:px-6 flex items-center gap-2" role="tablist" aria-label="Laboratory views">
+        <div className="mt-4 flex items-center gap-2" role="tablist" aria-label="Laboratory views">
           {[
             { id: "requests", label: "Lab Orders Queue" },
             { id: "results", label: "Results Entry" },
@@ -628,10 +632,10 @@ const LabManagement = () => {
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
+              className={`px-4 min-h-[44px] rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               {tab.label}
@@ -640,62 +644,62 @@ const LabManagement = () => {
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="pt-6 space-y-6">
         {/* KPI Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+              <span className="text-xs font-medium text-muted-foreground">Pending orders</span>
               <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-2xl font-bold font-mono text-warning-500">{pendingRequests.length}</div>
-            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting sample processing</div>
+            <div className="text-2xl font-semibold tnum text-foreground">{pendingRequests.length}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Awaiting sample processing</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
+              <span className="text-xs font-medium text-muted-foreground">In analysis</span>
               <FlaskConical className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-2xl font-bold font-mono text-primary-500">{inProgressRequests.length}</div>
-            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently on bench</div>
+            <div className="text-2xl font-semibold tnum text-foreground">{inProgressRequests.length}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Currently on bench</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+              <span className="text-xs font-medium text-muted-foreground">Completed today</span>
               <CheckCircle2 className="h-5 w-5 text-success-500" />
             </div>
-            <div className="text-2xl font-bold font-mono text-success-500">
+            <div className="text-2xl font-semibold tnum text-foreground">
               {completedRequests.filter((r) => new Date(r.updated_at).toDateString() === new Date().toDateString()).length}
             </div>
-            <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Signed off & released</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Signed off & released</div>
           </div>
         </div>
 
         {/* Requests Tab */}
         {activeTab === "requests" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk dark:border-slate-800 pb-3">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FlaskConical className="h-4 w-4 text-primary-500" /> Active Pathology Orders
               </h2>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
-                <input
+                <Input
                   type="text"
                   placeholder="Search patient or test name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="pl-9 h-9"
                 />
               </div>
             </div>
 
-            <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
-              <table className="w-full text-left border-collapse text-xs">
+            <div className="w-full overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-border bg-muted/50 text-xs font-medium text-muted-foreground">
                     <th className="py-2.5 px-4">Test Number</th>
                     <th className="py-2.5 px-3">Patient</th>
                     <th className="py-2.5 px-3">Test Requested</th>
@@ -705,7 +709,7 @@ const LabManagement = () => {
                     <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-canvas-silk">
+                <tbody className="divide-y divide-border">
                   {requestsLoading && <SkeletonTableRows rows={5} cells={7} />}
                   {requests
                     ?.filter(
@@ -715,61 +719,52 @@ const LabManagement = () => {
                         r.test_type?.toLowerCase().includes(searchTerm.toLowerCase())
                     )
                     .map((request) => (
-                      <tr key={request.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">{request.test_number || "LAB-SYS"}</td>
-                        <td className="py-3 px-3 font-bold text-primary-500">
+                      <tr key={request.id} className="hover:bg-muted/50 transition-colors">
+                        <td className="py-3 px-4 tnum font-medium text-foreground">{request.test_number || "LAB-SYS"}</td>
+                        <td className="py-3 px-3 font-medium text-foreground">
                           {request.patient?.first_name} {request.patient?.last_name}
                         </td>
-                        <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{request.test_type || request.test?.name}</td>
-                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{request.provider?.last_name ? providerDisplayName({ first_name: request.provider?.first_name, last_name: request.provider?.last_name, role: (request.provider as any)?.role }) : "Staff"}</td>
+                        <td className="py-3 px-3 text-foreground">{request.test_type || request.test?.name}</td>
+                        <td className="py-3 px-3 text-muted-foreground">{request.provider?.last_name ? providerDisplayName({ first_name: request.provider?.first_name, last_name: request.provider?.last_name, role: (request.provider as any)?.role }) : "Staff"}</td>
                         <td className="py-3 px-3 text-center">
                           {request.priority === "urgent" || request.priority === "stat" ? (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500 flex items-center gap-1 mx-auto w-fit">
+                            <StatusBadge tone="urgent" className="mx-auto">
                               <AlertCircle className="h-3 w-3" /> STAT
-                            </span>
+                            </StatusBadge>
                           ) : (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Routine</span>
+                            <StatusBadge tone="neutral">Routine</StatusBadge>
                           )}
                         </td>
                         <td className="py-3 px-3 text-center">{getStatusPill(request.status)}</td>
                         <td className="py-3 px-3 text-center">
                           {request.status === "pending" && (
-                            <button
-                              onClick={() => collectSample(request)}
-                              disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 min-h-[44px] min-w-[44px]"
-                            >
+                            <Button size="sm" onClick={() => collectSample(request)} disabled={isSubmitting} className="min-h-[44px]">
                               Collect Sample
-                            </button>
+                            </Button>
                           )}
                           {request.status === "sample_collected" && (
-                            <button
-                              onClick={() => startAnalysis(request)}
-                              disabled={isSubmitting}
-                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 min-h-[44px] min-w-[44px]"
-                            >
+                            <Button size="sm" onClick={() => startAnalysis(request)} disabled={isSubmitting} className="min-h-[44px]">
                               Start Analysis
-                            </button>
+                            </Button>
                           )}
                           {request.status === "in_progress" && (
-                            <button
-                              onClick={() => { setSelectedRequest(request); setActiveTab("results"); }}
-                              className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-semibold min-h-[44px] min-w-[44px]"
-                            >
+                            <Button size="sm" variant="success" onClick={() => { setSelectedRequest(request); setActiveTab("results"); }} className="min-h-[44px]">
                               Enter Result
-                            </button>
+                            </Button>
                           )}
                           {request.status === "completed" && (
-                            <button
+                            <Button
+                              size="sm"
+                              variant="outline"
                               onClick={() => {
                                 setSelectedRequest(request);
                                 setResultSummary((request as any).result_summary || "");
                                 setActiveTab("results");
                               }}
-                              className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold min-h-[44px] min-w-[44px]"
+                              className="min-h-[44px]"
                             >
                               View Results
-                            </button>
+                            </Button>
                           )}
                         </td>
                       </tr>
@@ -778,15 +773,12 @@ const LabManagement = () => {
                     <tr>
                       <td colSpan={7} className="py-12 text-center">
                         <div className="space-y-3">
-                          <FlaskConical className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                          <p className="text-sm font-bold">No lab orders yet</p>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400">New test requests from providers will appear here for sample collection.</p>
-                          <button
-                            onClick={() => setShowNewRequestDialog(true)}
-                            className="px-4 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold"
-                          >
+                          <FlaskConical className="h-10 w-10 mx-auto text-muted-foreground" />
+                          <p className="text-sm font-semibold">No lab orders yet</p>
+                          <p className="text-xs text-muted-foreground">New test requests from providers will appear here for sample collection.</p>
+                          <Button onClick={() => setShowNewRequestDialog(true)} className="min-h-[44px]">
                             New Test Request
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -799,17 +791,17 @@ const LabManagement = () => {
 
         {/* Results Entry Tab */}
         {activeTab === "results" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
             <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary-500" />
               {selectedRequest?.status === "completed" ? "Lab Results — Review & Verification" : "Pathologist Results Verification Entry"}
             </h2>
             {selectedRequest ? (
-              <div className="space-y-4 text-xs">
-                <div className="p-4 rounded-xl bg-primary-50 border border-primary-500/20 flex justify-between items-center">
+              <div className="space-y-4 text-sm">
+                <div className="p-4 rounded-lg bg-primary-500/5 border border-primary-500/20 flex justify-between items-center">
                   <div>
-                    <p className="font-semibold text-sm text-primary-500">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400">
+                    <p className="font-semibold text-sm text-foreground">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       Patient: <strong>{selectedRequest.patient?.first_name} {selectedRequest.patient?.last_name}</strong>
                     </p>
                   </div>
@@ -819,31 +811,31 @@ const LabManagement = () => {
                 {selectedRequest.status === "completed" ? (
                   <>
                     <div>
-                      <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result Findings</label>
-                      <div className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 bg-canvas-silk dark:bg-slate-800 font-medium whitespace-pre-wrap">
+                      <label className="text-xs font-medium text-muted-foreground">Result findings</label>
+                      <div className="w-full min-h-[140px] mt-1 p-3 rounded-lg border border-border bg-muted/50 whitespace-pre-wrap">
                         {resultSummary || (selectedRequest as any).result_summary || "No findings recorded."}
                       </div>
                     </div>
                     {(selectedRequest as any).results_date && (
-                      <p className="text-graphite-500 dark:text-slate-400">
+                      <p className="text-muted-foreground">
                         Reported: <strong>{new Date((selectedRequest as any).results_date).toLocaleString()}</strong>
                       </p>
                     )}
                     <div className="flex gap-2">
-                      <button onClick={() => { setSelectedRequest(null); setResultSummary(""); setActiveTab("requests"); }} className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs">
+                      <Button variant="outline" onClick={() => { setSelectedRequest(null); setResultSummary(""); setActiveTab("requests"); }}>
                         Back to Orders
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="success"
                         onClick={verifyResult}
                         disabled={isSubmitting || (selectedRequest as any).verified_by || !canVerify}
-                        className="px-5 py-2 rounded-md bg-success-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs disabled:opacity-50"
                       >
                         {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                        {(selectedRequest as any).verified_by ? "Verified ✓" : "Verify & Sign Off"}
-                      </button>
+                        {(selectedRequest as any).verified_by ? "Verified" : "Verify & Sign Off"}
+                      </Button>
                     </div>
                     {!canVerify && !(selectedRequest as any).verified_by && (
-                      <p className="text-xs text-graphite-500 dark:text-slate-400">
+                      <p className="text-xs text-muted-foreground">
                         Verification is restricted to pathologists (or platform admins) — results you enter are signed off by a pathologist.
                       </p>
                     )}
@@ -851,39 +843,39 @@ const LabManagement = () => {
                 ) : (
                   <>
                 <div>
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result Findings Summary</label>
-                  <textarea
-                    className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  <label className="text-xs font-medium text-muted-foreground">Result findings summary</label>
+                  <Textarea
+                    className="min-h-[140px] mt-1"
                     placeholder="Enter quantitative values, microscopic findings, and clinical impressions..."
                     value={resultSummary}
                     onChange={(e) => setResultSummary(e.target.value)}
                   />
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-bold cursor-pointer p-3 rounded-xl border border-error-500/30 bg-error-50 dark:bg-red-950/40">
+                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer p-3 rounded-lg border border-error-500/30 bg-error-500/5">
                   <Checkbox checked={isCritical} onCheckedChange={(v) => setIsCritical(v === true)} />
                   <span>Flag as <strong className="text-error-500">CRITICAL VALUE</strong> — triggers automated push, SMS, & clinician dispatch alerts</span>
                 </label>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setSelectedRequest(null)} className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs">
+                  <Button variant="outline" onClick={() => setSelectedRequest(null)}>
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="success"
                     onClick={submitResult}
                     disabled={!resultSummary || isSubmitting}
-                    className="px-5 py-2 rounded-md bg-success-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Submit & Release Results
-                  </button>
+                  </Button>
                 </div>
                   </>
                 )}
               </div>
             ) : (
-              <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
+              <div className="text-center py-12 text-sm text-muted-foreground">
                 <FileText className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                <p className="font-bold">Select an in-progress lab test from the Orders queue to enter results.</p>
+                <p className="font-medium">Select an in-progress lab test from the Orders queue to enter results.</p>
               </div>
             )}
           </div>
@@ -891,22 +883,19 @@ const LabManagement = () => {
 
         {/* Catalog Tab */}
         {activeTab === "catalog" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Microscope className="h-4 w-4 text-primary-500" /> Diagnostic Test Catalog
               </h2>
-              <button
-                onClick={openNewTestDialog}
-                className="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-colors"
-              >
+              <Button size="sm" onClick={openNewTestDialog} className="min-h-[44px]">
                 <Plus className="h-3.5 w-3.5" /> Add Test
-              </button>
+              </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {catalogLoading &&
                 [0, 1, 2, 3].map((i) => (
-                  <div key={i} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2" aria-hidden>
+                  <div key={i} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center gap-2" aria-hidden>
                     <div className="min-w-0 flex-1 space-y-2">
                       <SkeletonLine className="h-3.5 w-1/2" />
                       <SkeletonLine className="h-3 w-2/3" />
@@ -915,24 +904,24 @@ const LabManagement = () => {
                   </div>
                 ))}
               {testCatalog.map((test) => (
-                <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
+                <div key={test.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center gap-2">
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{test.name}</h4>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
+                    <h4 className="font-semibold text-sm text-foreground">{test.name}</h4>
+                    <p className="text-xs text-muted-foreground">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="font-bold text-sm font-mono text-primary-500 mr-1">{formatPrice(test.price)}</span>
+                    <span className="font-semibold text-sm tnum text-foreground mr-1">{formatPrice(test.price)}</span>
                     <button
                       onClick={() => openEditTestDialog(test)}
                       title="Edit test"
-                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors flex items-center justify-center"
+                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => setTestToDelete(test)}
                       title="Remove test"
-                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-rose-600 transition-colors flex items-center justify-center"
+                      className="min-h-[44px] min-w-[44px] p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-destructive transition-colors flex items-center justify-center"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -941,29 +930,29 @@ const LabManagement = () => {
               ))}
             </div>
             {testCatalog.length === 0 && !catalogLoading && (
-              <p className="text-center text-xs text-slate-400 py-8">No tests in the catalog yet. Add your first test to start receiving orders.</p>
+              <p className="text-center text-sm text-muted-foreground py-8">No tests in the catalog yet. Add your first test to start receiving orders.</p>
             )}
           </div>
         )}
 
         {/* Add / Edit Test Dialog */}
         <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
-          <DialogContent className="sm:max-w-[440px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="sm:max-w-[440px]">
             <DialogHeader>
               <DialogTitle className="font-semibold text-base">{editingTest ? "Edit Test" : "Add Test to Catalog"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 py-2">
               <div>
-                <label className="text-xs font-bold text-slate-600">Test name *</label>
-                <input
+                <label className="text-xs font-medium text-muted-foreground">Test name *</label>
+                <Input
                   value={testForm.name}
                   onChange={(e) => setTestForm({ ...testForm, name: e.target.value })}
                   placeholder="e.g. Full Blood Count"
-                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                  className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-600">Category</label>
+                <label className="text-xs font-medium text-muted-foreground">Category</label>
                 <Select value={testForm.category} onValueChange={(v) => setTestForm({ ...testForm, category: v })}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue />
@@ -976,72 +965,57 @@ const LabManagement = () => {
                 </Select>
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-600">Price (ZMW) *</label>
-                <input
+                <label className="text-xs font-medium text-muted-foreground">Price (ZMW) *</label>
+                <Input
                   type="number"
                   min="0"
                   step="0.01"
                   value={testForm.price}
                   onChange={(e) => setTestForm({ ...testForm, price: e.target.value })}
                   placeholder="e.g. 150"
-                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                  className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-600">Description</label>
-                <textarea
+                <label className="text-xs font-medium text-muted-foreground">Description</label>
+                <Textarea
                   value={testForm.description}
                   onChange={(e) => setTestForm({ ...testForm, description: e.target.value })}
                   placeholder="Short description for patients and ordering clinicians"
                   rows={2}
-                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                  className="mt-1"
                 />
               </div>
             </div>
             <DialogFooter>
-              <button
-                onClick={() => setShowTestDialog(false)}
-                className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas"
-              >
+              <Button variant="outline" onClick={() => setShowTestDialog(false)}>
                 Cancel
-              </button>
-              <button
-                onClick={saveTest}
-                disabled={savingTest}
-                className="px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold disabled:opacity-50 inline-flex items-center gap-1.5"
-              >
+              </Button>
+              <Button onClick={saveTest} disabled={savingTest}>
                 {savingTest && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 {editingTest ? "Save Changes" : "Add Test"}
-              </button>
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         {/* Remove Test confirmation */}
         <Dialog open={!!testToDelete} onOpenChange={(open) => { if (!open) setTestToDelete(null); }}>
-          <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="sm:max-w-[380px]">
             <DialogHeader>
-              <DialogTitle className="text-sm font-bold">Remove test from catalog?</DialogTitle>
+              <DialogTitle className="text-base font-semibold">Remove test from catalog?</DialogTitle>
               <DialogDescription className="text-xs">
                 “{testToDelete?.name}” will be removed from your lab catalog. This cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <button
-                onClick={() => setTestToDelete(null)}
-                disabled={deletingTest}
-                className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas disabled:opacity-50"
-              >
+              <Button variant="outline" onClick={() => setTestToDelete(null)} disabled={deletingTest}>
                 Cancel
-              </button>
-              <button
-                onClick={deleteTest}
-                disabled={deletingTest}
-                className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold disabled:opacity-50 inline-flex items-center gap-1.5"
-              >
+              </Button>
+              <Button variant="destructive" onClick={deleteTest} disabled={deletingTest}>
                 {deletingTest && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Remove Test
-              </button>
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
