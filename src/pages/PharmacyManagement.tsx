@@ -173,11 +173,15 @@ export const PharmacyManagement = () => {
 
   return (
     <div className="pb-16">
-      {/* Sticky Monday Top Bar */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
+      {/* Identity header — STATIC, in flow. This tall card (title +
+          subtitle + action) must never stick: as a sticky bar it docked
+          over the stat row and hid its top half no matter how the page
+          was scrolled (CEO phone screenshot 2026-11-11). Same treatment
+          as InstitutionDashboard's inner header ([position:static]). */}
+      <div className="doc-page-header [position:static] px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
               <ShoppingCart className="h-5 w-5" />
             </div>
             <div>
@@ -194,7 +198,7 @@ export const PharmacyManagement = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetchInventory()}
-              className="px-3 py-1.5 rounded-md bg-muted hover:bg-muted text-foreground font-semibold text-xs flex items-center gap-1"
+              className="px-3.5 py-1.5 rounded-full bg-pill text-pill-foreground hover:bg-pill/80 font-semibold text-xs flex items-center gap-1"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               <span>Refresh Inventory</span>
@@ -203,32 +207,59 @@ export const PharmacyManagement = () => {
         </div>
       </div>
 
-      {/* Financial Banners */}
-      <div className="px-4 sm:px-6 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Stock Retail Value</div>
-          <div className="text-2xl font-semibold font-mono text-primary-500 mt-1">{formatPrice(totalRetailValue)}</div>
-          <div className="text-xs text-slate-400 mt-0.5">{inventory.length} total items</div>
+      {/* Financial summary — PayPal anatomy (rollout pattern, cf.
+          InstitutionDashboard KPIs): on mobile ONE hairline list (label +
+          muted subline left, bold ink value right); at sm+ a hairline
+          card grid. Numerals are ink — green ONLY on revenue (money-in).
+          The old rainbow numerals (blue/amber/purple) + uppercase labels
+          + mono figures were the pre-rollout dialect the CEO flagged
+          2026-11-11. Both renderings show the same figures. */}
+      <div className="px-4 sm:px-6 pt-6">
+        <div className="sm:hidden rounded-2xl border border-border bg-card px-4 divide-y divide-border">
+          {[
+            { label: "Stock retail value", sub: `${inventory.length} total items`, value: formatPrice(totalRetailValue), moneyIn: false },
+            { label: "Today's sales revenue", sub: `${todaySales.length} transactions`, value: formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0)), moneyIn: true },
+            { label: "Low stock warnings", sub: "Reorder required", value: lowStockItems.length.toString(), moneyIn: false },
+            { label: "Active cart items", sub: `Subtotal: ${formatPrice(cartSubtotal)}`, value: cart.length.toString(), moneyIn: false },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center gap-3 py-3.5 min-h-16">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">{row.label}</p>
+                <p className="text-[13px] text-muted-foreground">{row.sub}</p>
+              </div>
+              <span className={`text-lg font-extrabold tabular-nums ${row.moneyIn ? "text-success-600" : "text-foreground"}`}>
+                {row.value}
+              </span>
+            </div>
+          ))}
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Today's Sales Revenue</div>
-          <div className="text-2xl font-semibold font-mono text-success-500 mt-1">
-            {formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0))}
+        <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-card border border-border">
+            <div className="text-[13px] font-medium text-muted-foreground">Stock retail value</div>
+            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{formatPrice(totalRetailValue)}</div>
+            <div className="text-[13px] text-muted-foreground mt-0.5">{inventory.length} total items</div>
           </div>
-          <div className="text-xs text-emerald-500 font-semibold mt-0.5">{todaySales.length} transactions</div>
-        </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Low Stock Warnings</div>
-          <div className="text-2xl font-semibold font-mono text-warning-500 mt-1">{lowStockItems.length}</div>
-          <div className="text-xs text-amber-500 font-semibold mt-0.5">Reorder required</div>
-        </div>
+          <div className="p-4 rounded-2xl bg-card border border-border">
+            <div className="text-[13px] font-medium text-muted-foreground">Today's sales revenue</div>
+            <div className="text-2xl font-bold text-success-600 tabular-nums mt-1">
+              {formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0))}
+            </div>
+            <div className="text-[13px] text-muted-foreground mt-0.5">{todaySales.length} transactions</div>
+          </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Active Cart Items</div>
-          <div className="text-2xl font-semibold font-mono text-purple-600 mt-1">{cart.length}</div>
-          <div className="text-xs text-slate-400 mt-0.5">Subtotal: {formatPrice(cartSubtotal)}</div>
+          <div className="p-4 rounded-2xl bg-card border border-border">
+            <div className="text-[13px] font-medium text-muted-foreground">Low stock warnings</div>
+            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{lowStockItems.length}</div>
+            <div className="text-[13px] text-muted-foreground mt-0.5">Reorder required</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-card border border-border">
+            <div className="text-[13px] font-medium text-muted-foreground">Active cart items</div>
+            <div className="text-2xl font-bold text-foreground tabular-nums mt-1">{cart.length}</div>
+            <div className="text-[13px] text-muted-foreground mt-0.5">Subtotal: {formatPrice(cartSubtotal)}</div>
+          </div>
         </div>
       </div>
 
@@ -245,7 +276,7 @@ export const PharmacyManagement = () => {
       {/* Main Board Content */}
       <div className="px-4 sm:px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Inventory Product Grid */}
-        <div className="lg:col-span-2 rounded-2xl border border-border bg-card shadow-xs p-4 space-y-4">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-4 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-border">
             <h2 className="font-semibold text-base flex items-center gap-2">
               <Package className="h-5 w-5 text-primary-500" />
@@ -280,7 +311,7 @@ export const PharmacyManagement = () => {
                     <div className="text-xs text-muted-foreground">
                       Code: {item.product_code || "—"} • Stock: <strong className="text-foreground">{item.quantity}</strong>
                     </div>
-                    <div className="font-mono font-semibold text-sm text-primary-500 mt-1">
+                    <div className="font-semibold text-sm text-foreground tabular-nums mt-1">
                       {formatPrice(item.unit_price)}
                     </div>
                   </div>
@@ -288,7 +319,7 @@ export const PharmacyManagement = () => {
                   <button
                     aria-label={`Add ${item.product_name || "item"} to dispense list`}
                     disabled={item.quantity <= 0}
-                    className="p-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-30 transition-all"
+                    className="p-2 rounded-full bg-gold text-gold-ink hover:bg-gold-deep disabled:opacity-30 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -298,7 +329,7 @@ export const PharmacyManagement = () => {
         </div>
 
         {/* Right: Cart & POS Checkout */}
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="rounded-2xl border border-border bg-card p-4 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-border">
               <h2 className="font-semibold text-base flex items-center gap-2">
@@ -340,7 +371,7 @@ export const PharmacyManagement = () => {
               <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
               <div className="flex justify-between text-muted-foreground"><span>Tax (est., final per item at checkout)</span><span>{formatPrice(cartTax)}</span></div>
               <div className="flex justify-between text-base font-semibold text-foreground pt-1 border-t">
-                <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
+                <span>Total Due</span><span className="text-foreground tabular-nums">{formatPrice(cartTotal)}</span>
               </div>
               <p className="text-muted-foreground dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
             </div>
@@ -370,7 +401,7 @@ export const PharmacyManagement = () => {
             <button
               onClick={completeSale}
               disabled={cart.length === 0 || isProcessing}
-              className="w-full py-3 rounded-md bg-success-500 hover:bg-success-500 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-40 flex items-center justify-center gap-1.5"
+              className="w-full py-3 rounded-full bg-gold text-gold-ink hover:bg-gold-deep font-semibold text-sm transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
             >
               <CheckCircle className="h-4 w-4" />
               <span>Complete Sale ({formatPrice(cartTotal)})</span>

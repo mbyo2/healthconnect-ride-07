@@ -403,7 +403,11 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         </div>
 
         {/* Right Column: POS Dispensing Cart */}
-        <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4 text-xs h-fit sticky top-24">
+        {/* In-column sticky cart: reserves its column space in flow; the
+            dock clears the InstitutionDashboard sticky unit (header +
+            tabs) in both scroll contexts so its title row never slides
+            under that unit (CEO rule 2026-11-11). */}
+        <div className="p-5 rounded-2xl border border-border bg-card space-y-4 text-xs h-fit sticky top-[calc(var(--doc-sticky-top,0px)+64px)] md:top-[calc(var(--doc-sticky-top,0px)+168px)]">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-emerald-600" aria-hidden /> Dispensing Order Cart

@@ -592,7 +592,7 @@ export const InstitutionDashboard = () => {
           scroll the tab pills slid under the stuck header card and were
           clipped in half (CEO phone screenshot, 2026-11-11). One wrapper
           sticks; the inner header is made static via [position:static]. */}
-      <div className="sticky top-[4.5rem] z-40 bg-background">
+      <div className="sticky top-[var(--doc-sticky-top,0px)] z-40 bg-background">
       {/* Header */}
       <InstitutionPageHeader
         className="py-5 [position:static] max-md:hidden"

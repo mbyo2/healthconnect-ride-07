@@ -72,8 +72,15 @@ describe("responsive shell 2026-11-11: mobile header cluster fits 360px", () => 
 
 describe("responsive shell 2026-11-11: institution tabs never clip", () => {
   it("header + tablist stick as ONE unit; the inner page header is static", () => {
+    // PIN MOVED (module-layout occlusion fix, 2026-11-11): the wrapper's
+    // dock is no longer the literal 4.5rem — it reads the shell's
+    // --doc-sticky-top (MobileLayout sets 4.5rem on mobile, 0 on desktop),
+    // because the hard-coded 4.5rem displaced the unit DOWN over the first
+    // content row wherever the natural position sat above 72px (CEO:
+    // "content is hidden no matter I do"). The invariant — header + tabs
+    // stick as ONE unit — is unchanged.
     expect(institutionDashboard).toContain(
-      'className="sticky top-[4.5rem] z-40 bg-background"'
+      'className="sticky top-[var(--doc-sticky-top,0px)] z-40 bg-background"'
     );
     expect(institutionDashboard).toContain("[position:static]");
     // The old second sticky bar at the same offset (z-20) is gone.
@@ -94,7 +101,11 @@ describe("responsive shell 2026-11-11: institution tabs never clip", () => {
     // (32px title line + 16px subline + 32px padding + 1px border = 81px),
     // so the sticky offset grew to 82px with it. The invariant — tab bar
     // sticks below its own header card — is unchanged.
-    expect(staffDashboard).toContain("top-[calc(4.5rem+82px)]");
+    // PIN MOVED AGAIN (module-layout occlusion fix, 2026-11-11): the base
+    // of the calc is now the shell's --doc-sticky-top instead of the
+    // literal 4.5rem, so the bar docks correctly in both scroll contexts
+    // (see the InstitutionDashboard pin above). Invariant unchanged.
+    expect(staffDashboard).toContain("top-[calc(var(--doc-sticky-top,0px)+82px)]");
   });
 
   it("institution name can shrink/wrap inside the header card (min-w-0)", () => {

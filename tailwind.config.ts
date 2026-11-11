@@ -82,6 +82,17 @@ export default {
           800: "#002070",
           900: "#001752",
         },
+        // CLASSIC PayPal shell (CEO decision 2026-11-11 17:12): the top
+        // app bar is the classic navy #003087 in both modes, and primary
+        // action buttons are gold #FFC439 pills with near-black ink text
+        // (hover deepens to #F2B705, never blue). Action blue #0066f5
+        // remains the link / active-state / icon accent colour.
+        navybar: "#003087",
+        gold: {
+          DEFAULT: "#FFC439",
+          deep: "#F2B705",
+          ink: "#001435",
+        },
         // Accent = the same PayPal-blue family (pale tint surfaces via
         // the --accent token; numeric steps mirror the primary ramp).
         // There is no second brand hue in the product.

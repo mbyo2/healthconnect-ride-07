@@ -3,7 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { FloatingAIChat } from "@/components/FloatingAIChat";
 import { DesktopNav } from "@/components/DesktopNav";
 import { useDeviceType } from "@/hooks/use-device-type";
-import { ReactNode, useEffect, useState } from "react";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -44,9 +44,19 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   if (isDesktop) {
     return (
       <SidebarProvider>
-        <div className="flex flex-col min-h-screen bg-background w-full">
+        {/* Desktop scroll context: page-level sticky bars (.doc-page-header)
+            dock at 0 — DesktopNav is in-flow above this <main>, so the
+            scrollport top already sits below the nav. (The pre-2026-11-11
+            hard-coded 4.5rem dock displaced those bars over content.) */}
+        <div
+          className="flex flex-col min-h-screen bg-background w-full"
+          style={{ "--doc-sticky-top": "0px" } as CSSProperties}
+        >
           <DesktopNav />
-          <main id="main-content" className="flex-1 overflow-auto">
+          {/* scroll-pt: anchored/scrolled-to sections land BELOW the
+              docked page header (~104px worst case), never under it
+              (CEO rule 2026-11-11: sections don't hide content). */}
+          <main id="main-content" className="flex-1 overflow-auto scroll-pt-[6.5rem]">
             {/* One content column for the whole signed-in product:
                 1200px (max-w-content), matching the header — the
                 PayPal/Stripe anatomy of a calm top bar over a single
@@ -65,14 +75,22 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    // Mobile scroll context: the fixed h-16 Header overlays this <main>,
+    // so page-level sticky bars dock at 4.5rem (below the header + 8px
+    // clearance). Bottom padding pb-40 guarantees the last content can
+    // always scroll clear of the floating BottomNav + FAB stack
+    // (CEO phone report 2026-11-11: content hidden behind them).
+    <div
+      className="flex flex-col min-h-screen bg-background"
+      style={{ "--doc-sticky-top": "4.5rem" } as CSSProperties}
+    >
       <Header />
       <main
         id="main-content"
         role="main"
         className={cn(
-          "flex-1 pt-16 overflow-y-auto overflow-x-hidden",
-          isAuthenticated ? "pb-24" : "pb-6",
+          "flex-1 pt-16 overflow-y-auto overflow-x-hidden scroll-pt-[11rem]",
+          isAuthenticated ? "pb-40" : "pb-6",
           "min-h-0"
         )}
       >

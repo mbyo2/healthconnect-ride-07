@@ -428,13 +428,24 @@ main {
      it. Use this for in-page sticky bars; plain `sticky top-0` gets covered
      by the z-50 DesktopNav and hides actions like "Write E-Prescription". */
   .doc-page-header {
-    /* Docks below the fixed global header (h-16 + border). The extra 8px
-       absorbs sub-pixel rounding and any header content that runs taller
-       than h-16 on narrow viewports — previously the sticky bar's buttons
-       could slide under the header and eat clicks meant for them (QA 2026-10-09:
-       "Book Appointment" intercepted by the theme toggle). Stays below the
-       header's z-50 so dropdowns/menus always win. */
-    @apply sticky top-[4.5rem] z-40 bg-card border-b border-border;
+    /* The dock offset comes from the shell via --doc-sticky-top (set in
+       MobileLayout), because the two scroll contexts dock differently:
+       mobile pages scroll in a <main> UNDER the fixed h-16 header, so the
+       bar docks at 4.5rem (h-16 + 8px clearance — the extra 8px absorbs
+       sub-pixel rounding and any header content that runs taller than
+       h-16 on narrow viewports; QA 2026-10-09: "Book Appointment"
+       intercepted by the theme toggle); desktop pages scroll in a <main>
+       BELOW the in-flow sticky DesktopNav, so the bar docks at 0.
+       The old hard-coded 4.5rem was WRONG on the desktop path: a page
+       header's natural position there is the content wrapper's py-6/8
+       (24/32px), ABOVE the 72px threshold, so sticky displaced the bar
+       DOWN by 40–48px over the first content row at rest — permanently,
+       no scroll position revealed it (CEO phone report 2026-11-11:
+       "content is hidden no matter I do"). Default 0px can never
+       displace: a sticky bar only ever docks at or below its natural
+       position. Stays below the nav's z-50 so dropdowns/menus win. */
+    @apply sticky z-40 bg-card border-b border-border;
+    top: var(--doc-sticky-top, 0px);
   }
 
   /* ── Trust card surface (used by search/video surfaces) ── */
