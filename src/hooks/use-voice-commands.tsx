@@ -53,7 +53,6 @@ export { VOICE_COMMANDS } from './voice-command-constants';
 // Import necessary functionality from modules
 import { startListening, stopListening } from './voice-command-listeners';
 import { executeCommand } from './voice-command-executor';
-import { speak } from './voice-command-speech';
 
 interface UseVoiceCommandsProps {
   setTheme?: (theme: 'light' | 'dark' | 'system') => void;
@@ -63,10 +62,20 @@ interface UseVoiceCommandsProps {
 export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const navigate = useNavigate();
   const accessibility = useAccessibility();
   const { screenReaderAnnounce } = accessibility || { screenReaderAnnounce: () => {} };
+  // ALL speech in this subsystem flows through the AccessibilityContext
+  // choke point (speakContent / stopSpeaking / isSpeaking). This hook
+  // previously used a private ungated speak() that talked straight to
+  // speechSynthesis — it let Search read results aloud with the voice
+  // setting off (CEO bug, 2026-11-11). Spoken responses happen only
+  // inside a voice session the user explicitly started (microphone
+  // button), or via screenReaderAnnounce, which the context speaks aloud
+  // only when screen reader mode is on.
+  const speakContent = accessibility?.speakContent ?? (() => {});
+  const stopSpeaking = accessibility?.stopSpeaking ?? (() => {});
+  const isSpeaking = accessibility?.isSpeaking ?? false;
   
   // Use try/catch to safely access SearchContext
   let searchContext;
@@ -86,7 +95,11 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     recognition.lang = 'en-US';
   }
 
-  // Define announceForScreenReader
+  // Define announceForScreenReader. The announcement always reaches
+  // assistive technology via the aria-live region; it is SPOKEN aloud
+  // only when the user has screen reader mode on — the context owns that
+  // gate. (This used to also call a private speak() unconditionally, so
+  // every announcement was spoken even with the mode off.)
   const announceForScreenReader = useCallback((message: string) => {
     // Use accessibility context if available
     if (screenReaderAnnounce) {
@@ -98,14 +111,11 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       announcement.setAttribute('class', 'sr-only');
       announcement.textContent = message;
       document.body.appendChild(announcement);
-      
+
       setTimeout(() => {
         document.body.removeChild(announcement);
       }, 1000);
     }
-
-    // Also speak the message aloud
-    speak(message, setIsSpeaking);
   }, [screenReaderAnnounce]);
 
   // Start listening implementation
@@ -117,14 +127,14 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     
     // If speaking, wait until speech is done
     if (isSpeaking) {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
     }
-    
+
     startListening(recognition);
     setIsListening(true);
     toast.success('Voice commands activated');
     announceForScreenReader('Voice commands activated, I am now listening. Say "help" for available commands.');
-  }, [recognition, isSpeaking, announceForScreenReader]);
+  }, [recognition, isSpeaking, stopSpeaking, announceForScreenReader]);
 
   // Stop listening implementation
   const stopListeningHandler = useCallback(() => {
@@ -148,32 +158,34 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     if (lastResult.isFinal) {
       const command = lastResult[0].transcript.trim();
       const commandExecuted = executeCommand({
-        command, 
-        navigate, 
-        setTheme, 
-        theme, 
-        stopListening: stopListeningHandler, 
-        startListening: startListeningHandler, 
-        announceForScreenReader, 
+        command,
+        navigate,
+        setTheme,
+        theme,
+        stopListening: stopListeningHandler,
+        startListening: startListeningHandler,
+        announceForScreenReader,
         searchContext,
-        setIsSpeaking
+        speak: speakContent
       });
-      
+
       if (commandExecuted) {
         toast.success(`Command executed: ${command}`);
       } else {
-        // Provide feedback when command is not recognized
-        speak(`Sorry, I didn't understand the command: ${command}. Say "help" for available commands.`, setIsSpeaking);
+        // Provide feedback when command is not recognized — spoken via
+        // the choke point, inside the session the user started.
+        speakContent(`Sorry, I didn't understand the command: ${command}. Say "help" for available commands.`);
       }
     }
   }, [
-    navigate, 
-    setTheme, 
-    theme, 
-    stopListeningHandler, 
-    startListeningHandler, 
-    announceForScreenReader, 
-    searchContext
+    navigate,
+    setTheme,
+    theme,
+    stopListeningHandler,
+    startListeningHandler,
+    announceForScreenReader,
+    searchContext,
+    speakContent
   ]);
 
   useEffect(() => {
@@ -213,16 +225,18 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     stopListening: stopListeningHandler,
     transcript,
     executeCommand: (command: string) => executeCommand({
-      command, 
-      navigate, 
-      setTheme, 
-      theme, 
-      stopListening: stopListeningHandler, 
-      startListening: startListeningHandler, 
-      announceForScreenReader, 
+      command,
+      navigate,
+      setTheme,
+      theme,
+      stopListening: stopListeningHandler,
+      startListening: startListeningHandler,
+      announceForScreenReader,
       searchContext,
-      setIsSpeaking
+      speak: speakContent
     }),
-    speak: (message: string) => speak(message, setIsSpeaking)
+    // The context choke point, re-exported for the explicit one-shot
+    // controls in VoiceCommandButton (Hear Commands / help).
+    speak: speakContent
   };
 };

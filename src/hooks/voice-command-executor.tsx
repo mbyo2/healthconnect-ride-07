@@ -1,7 +1,7 @@
 
 import { NavigateFunction } from 'react-router-dom';
 import { VOICE_COMMANDS } from './voice-command-constants';
-import { readPageContent, speak } from './voice-command-speech';
+import { readPageContent } from './voice-command-speech';
 
 // Types for search context functionality
 interface SearchContext {
@@ -24,7 +24,9 @@ interface ExecuteCommandProps {
   startListening: () => void;
   announceForScreenReader: (message: string) => void;
   searchContext?: SearchContext;
-  setIsSpeaking: (speaking: boolean) => void;
+  /** The AccessibilityContext choke point (speakContent) — the only way
+   *  anything in the app speaks aloud. Injected by useVoiceCommands. */
+  speak: (message: string) => void;
 }
 
 // Handle search command
@@ -185,11 +187,11 @@ export const executeCommand = ({
   startListening,
   announceForScreenReader,
   searchContext,
-  setIsSpeaking
+  speak
 }: ExecuteCommandProps) => {
-  // Helper function to speak messages
+  // Helper function to speak messages (via the injected choke point)
   const speakMessage = (message: string) => {
-    speak(message, setIsSpeaking);
+    speak(message);
   };
 
   const normalizedCommand = command.toLowerCase().trim();

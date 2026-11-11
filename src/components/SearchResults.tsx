@@ -1,11 +1,11 @@
 
-import React, { useEffect, useCallback, memo } from "react";
+import React, { useCallback, memo } from "react";
 import { ProviderList } from "@/components/ProviderList";
 import ProviderMap from "@/components/ProviderMap";
 import { useSearch } from "@/context/SearchContext";
 import { SkeletonProviderCard, SkeletonSearchHeader } from "@/components/ui/skeleton-kit";
 import { SearchPagination } from "@/components/SearchPagination";
-import { useVoiceCommands } from "@/hooks/use-voice-commands";
+import { useAccessibility } from "@/context/AccessibilityContext";
 import { Button } from "@/components/ui/button";
 import { Volume2, MapPin, List } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -17,7 +17,7 @@ export const SearchResults = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm, setSearchTerm, setSearchQuery, setSelectedSpecialty, refreshProviders } = useSearch();
-  const { speak } = useVoiceCommands();
+  const { speakContent } = useAccessibility();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [sortBy, setSortBy] = useState<'recommended' | 'rating' | 'fee-low' | 'fee-high'>('recommended');
 
@@ -38,15 +38,13 @@ export const SearchResults = () => {
     return copy;
   }, [providers, sortBy]);
   
-  useEffect(() => {
-    if (!isLoading && speak && providers.length > 0) {
-      const searchDescription = searchTerm ? `for "${searchTerm}"` : "";
-      speak(`Found ${providers.length} healthcare providers ${searchDescription}. Viewing results 1 to ${Math.min(providers.length, 10)} of ${totalCount} total.`);
-    }
-  }, [isLoading, providers.length, speak, searchTerm, totalCount]);
-  
+  // Search NEVER speaks on load or when results render (CEO bug,
+  // 2026-11-11: results were read aloud via an ungated voice-command
+  // helper even with the voice setting off). The only speech here is the
+  // explicit "Read Results" button below — a deliberate one-shot through
+  // the AccessibilityContext choke point.
   const handleReadResults = useCallback(() => {
-    if (speak && providers.length > 0) {
+    if (providers.length > 0) {
       const providerSummaries = providers.slice(0, 5).map(provider => {
         const distancePart = provider.distance !== undefined ? `, ${provider.distance.toFixed(1)} kilometres away` : "";
         const feePart = provider.consultation_fee_min
@@ -59,11 +57,11 @@ export const SearchResults = () => {
         return `${provider.first_name} ${provider.last_name}, ${provider.specialty}${distancePart}${feePart}${telemedPart}${waitPart}`;
       }).join(". Next, ");
 
-      speak(`Top results: ${providerSummaries}${providers.length > 5 ? ". There are more results available." : ""}`);
-    } else if (speak) {
-      speak("No healthcare providers found matching your search criteria.");
+      speakContent(`Top results: ${providerSummaries}${providers.length > 5 ? ". There are more results available." : ""}`);
+    } else {
+      speakContent("No healthcare providers found matching your search criteria.");
     }
-  }, [speak, providers]);
+  }, [speakContent, providers]);
 
   if (isLoading && providers.length === 0) {
     return (

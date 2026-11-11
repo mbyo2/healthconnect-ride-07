@@ -77,6 +77,21 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
  *    under their scope immediately (including an explicit all-off record),
  *    restored on their next sign-in, and invisible to every other account.
  *    Sign-out resets the visible state to defaults.
+ * 4. SPEECH IS OPT-IN AND FLOWS THROUGH ONE CHOKE POINT (2026-11-11).
+ *    The CEO reported Search reading results aloud with the voice never
+ *    turned on: the voice-command subsystem kept a private, ungated
+ *    speak() that bypassed this context's flag entirely, and
+ *    SearchResults called it from an effect on every results load. That
+ *    helper is deleted. Every audible utterance now goes through
+ *    speakContent below — the only speechSynthesis call site in the app —
+ *    reached only from: screenReaderAnnounce while screen reader mode is
+ *    ON, an active voice-command session the user started with the
+ *    microphone button, or an explicit one-shot button (Test Voice /
+ *    Read Results / Hear Commands). Turning screen reader mode OFF
+ *    cancels any current speech immediately. One-time migration: a
+ *    screenReader:true stored before this fix is reset to OFF exactly
+ *    once per scope (marker key below); choices made after the reset
+ *    persist exactly, per guarantee 3.
  */
 export const A11Y_STORAGE_PREFIX = 'a11y.v2.';
 export const a11yStorageKey = (scope: string) => `${A11Y_STORAGE_PREFIX}${scope}`;
@@ -120,6 +135,35 @@ export function parseA11yRecord(raw: string | null): AccessibilityRecord | null 
 const loadLocalRecord = (scope: string): AccessibilityRecord =>
   parseA11yRecord(safeLocalGet(a11yStorageKey(scope))) ?? { ...DEFAULT_A11Y_RECORD, preferences: { ...DEFAULT_PREFERENCES } };
 
+/**
+ * One-time default-off migration for the voice flag (2026-11-11). A
+ * screenReader:true written before the opt-in fix cannot be trusted as a
+ * deliberate choice, so the first time a scope's record is settled with
+ * the flag on and no marker present, the flag is forced OFF and the
+ * marker written. After that, the stored value is the user's own choice
+ * and is respected exactly (guarantee 3). Every other preference in the
+ * record is left untouched.
+ */
+export const TTS_DEFAULT_OFF_RESET_PREFIX = 'a11y.tts-default-off.2026-11-11.';
+export const ttsResetMarkerKey = (scope: string) => `${TTS_DEFAULT_OFF_RESET_PREFIX}${scope}`;
+
+const ttsResetPending = (scope: string, rec: AccessibilityRecord): boolean =>
+  rec.preferences.screenReader && !safeLocalGet(ttsResetMarkerKey(scope));
+
+const withScreenReaderOff = (rec: AccessibilityRecord): AccessibilityRecord => ({
+  ...rec,
+  preferences: { ...rec.preferences, screenReader: false },
+});
+
+/** Commit the one-time reset for a scope whose final record is known. */
+export function commitTtsDefaultOffReset(scope: string, rec: AccessibilityRecord): AccessibilityRecord {
+  if (!ttsResetPending(scope, rec)) return rec;
+  safeLocalSet(ttsResetMarkerKey(scope), '1');
+  const corrected = withScreenReaderOff(rec);
+  safeLocalSet(a11yStorageKey(scope), JSON.stringify(corrected));
+  return corrected;
+}
+
 const detectSystemPreferences = (): SystemPreferences => {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
     return { reducedMotion: false, highContrast: false };
@@ -133,7 +177,9 @@ const detectSystemPreferences = (): SystemPreferences => {
 };
 
 export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [record, setRecord] = useState<AccessibilityRecord>(() => loadLocalRecord('guest'));
+  const [record, setRecord] = useState<AccessibilityRecord>(() =>
+    commitTtsDefaultOffReset('guest', loadLocalRecord('guest')),
+  );
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [systemPreferences, setSystemPreferences] = useState<SystemPreferences>(detectSystemPreferences);
   const scopeRef = useRef<string>('guest');
@@ -216,14 +262,18 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         if (suppressGuestRecordRef.current) {
           setRecord({ ...DEFAULT_A11Y_RECORD, preferences: { ...DEFAULT_PREFERENCES } });
         } else {
-          setRecord(loadLocalRecord('guest'));
+          setRecord(commitTtsDefaultOffReset('guest', loadLocalRecord('guest')));
         }
         return;
       }
 
       // Local record first (instant), then the server copy wins when the
-      // account has one — it is the cross-device source of truth.
-      setRecord(loadLocalRecord(scope));
+      // account has one — it is the cross-device source of truth. A stale
+      // stored screen-reader ON is previewed OFF immediately (so nothing
+      // can speak in the fetch window); the one-time reset is committed
+      // below once the final record for the scope is known.
+      const localRecord = loadLocalRecord(scope);
+      setRecord(ttsResetPending(scope, localRecord) ? withScreenReaderOff(localRecord) : localRecord);
       try {
         const { data } = await supabase
           .from('user_settings' as never)
@@ -235,10 +285,19 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         if (row && row.setting_key === 'accessibility_preferences' && row.value) {
           const serverRecord = parseA11yRecord(JSON.stringify(row.value));
           if (serverRecord) {
-            setRecord(serverRecord);
-            safeLocalSet(a11yStorageKey(scope), JSON.stringify(serverRecord));
+            const settled = commitTtsDefaultOffReset(scope, serverRecord);
+            setRecord(settled);
+            safeLocalSet(a11yStorageKey(scope), JSON.stringify(settled));
+            if (settled !== serverRecord) {
+              // The one-time correction is pushed back to the account so
+              // the stale ON does not resurrect from another device.
+              persistRecord(scope, settled);
+            }
+            return;
           }
         }
+        // No server record — the local record is final for this scope.
+        setRecord((current) => commitTtsDefaultOffReset(scope, current));
       } catch {
         /* local record stands */
       }
@@ -377,6 +436,10 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     applyRecord(next, true);
   }, [applyRecord]);
 
+  // THE speech choke point: the only speechSynthesis call site in the
+  // app. Callers are limited to gated announcements (screenReaderAnnounce
+  // below), a user-started voice-command session, and explicit one-shot
+  // read-aloud buttons — never page load, navigation, or data rendering.
   const speakContent = useCallback((message: string) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -395,6 +458,14 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsSpeaking(false);
     }
   }, []);
+
+  // Turning screen reader mode OFF silences the app immediately, however
+  // the change arrives — the menu switch, Settings, or Reset All all flow
+  // through this state. (On mount with the mode already off this fires a
+  // harmless no-op cancel.)
+  useEffect(() => {
+    if (!preferences.screenReader) stopSpeaking();
+  }, [preferences.screenReader, stopSpeaking]);
 
   // Announcements always reach assistive tech via the aria-live region;
   // they are SPOKEN aloud only when the user has screen reader mode on.
