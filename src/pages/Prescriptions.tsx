@@ -1036,7 +1036,7 @@ export const Prescriptions = () => {
               <SuggestionBanner
                 title="No Active Prescriptions"
                 description="Your prescriptions will appear here after your doctor prescribes medications during consultations."
-                variant="info"
+                variant="plain"
                 icon={Info}
                 actions={[
                   { label: 'Book Appointment', onClick: () => navigate('/appointments'), variant: 'primary' },

@@ -6,6 +6,7 @@ import { format, parseISO, isToday } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
+import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState } from "@/components/shared";
@@ -62,20 +63,29 @@ export const AppointmentsPage = () => {
   const [cancelTarget, setCancelTarget] = useState<any>(null);
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
-  const { availableRoles } = useUserRoles();
+  const { user } = useAuth();
+  const { availableRoles, loading: rolesLoading } = useUserRoles();
 
   // Every clinical cadre sees the provider-side schedule.
   const isProvider = availableRoles.some((r) =>
     (ALL_CLINICIAN_ROLES as readonly string[]).includes(r)
   );
 
+  // LOAD GATING (defect fix, 2026-11-11): this query previously fired on
+  // mount with a key that carried no identity and a fetcher that called
+  // the supabase auth getUser API and THREW when the session wasn't restored
+  // yet. useApiQuery's retry policy only retries network errors, so the
+  // throw parked the query in a permanent error state for the life of
+  // the mount — data defaulted to [] and the page rendered "No
+  // appointments scheduled yet" until a full reload, while Home's feed
+  // (keyed on user.id, enabled: !!user) loaded the same rows fine. The
+  // query is now keyed on the patient/provider id and enabled only once
+  // the auth identity AND the role set have resolved — the same gating
+  // every PatientWorkflow query already uses.
   const { data: appointments = [], isLoading } = useApiQuery<any[]>(
-    ["appointments", isProvider ? "provider" : "patient"],
+    ["appointments", user?.id ?? "pending", isProvider ? "provider" : "patient"],
     async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      if (!user) return [];
 
       if (isProvider) {
         // NOTE: appointments.patient_id FKs point at auth.users, so a
@@ -136,6 +146,7 @@ export const AppointmentsPage = () => {
       }
     },
     {
+      enabled: !!user?.id && !rolesLoading,
       staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: true,
       errorMessage: "Failed to load appointments",
@@ -475,7 +486,7 @@ export const AppointmentsPage = () => {
           {isProvider && ["scheduled", "confirmed"].includes(app.status) && (isToday(apptDate) || apptDateTime(app).getTime() <= Date.now()) && (
             <MarkNoShowButton appointmentId={app.id} />
           )}
-          <Button size="sm" variant="ghost" onClick={() => setCancelTarget(app)} className="min-h-[44px] text-muted-foreground">
+          <Button size="sm" variant="outline" onClick={() => setCancelTarget(app)} className="min-h-[44px]">
           Cancel
           </Button>
         </div>
@@ -619,7 +630,7 @@ export const AppointmentsPage = () => {
                 <SuggestionBanner
                   title="Get Started with Your Healthcare Journey"
                   description="Book your first appointment with a qualified healthcare provider. Browse by specialty or search for doctors near you."
-                  variant="info"
+                  variant="plain"
                   icon={Info}
                   actions={[
                     { label: 'Find a Doctor', onClick: () => navigate('/search'), variant: 'primary' },
@@ -627,24 +638,25 @@ export const AppointmentsPage = () => {
                 />
               )}
 
-              {/* Upcoming Appointments Group */}
-              <div className="rounded-2xl border border-border bg-card overflow-hidden">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-success-500" />
-                      <h2 className="font-semibold text-sm text-foreground">
-                        Upcoming &amp; Active Appointments
-                      </h2>
-                    </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
-                      {upcoming.length}
-                    </span>
+              {/* Upcoming Appointments Group — Recent-activity pattern
+                  (PayPal anatomy): quiet section label + count, then ONE
+                  hairline list (divide-y) directly on the page. No
+                  bordered card around the section, no card-on-card. */}
+              <div>
+                <div className="flex items-center gap-3 mb-1 px-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-success-500" />
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
+                      Upcoming &amp; Active Appointments
+                    </h2>
                   </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
+                    {upcoming.length}
+                  </span>
                 </div>
 
                 {upcoming.length === 0 ? (
-                  <div className="p-8">
+                  <div className="py-8">
                     <EmptyState
                       icon={Calendar}
                       title={isProvider ? "No upcoming appointments" : "No appointments scheduled yet"}
@@ -657,27 +669,25 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="divide-y divide-border px-4">
+                  <div className="divide-y divide-border">
                     {upcoming.map((app) => renderUpcomingRow(app))}
                   </div>
                 )}
               </div>
 
-              {/* Past Appointments Group */}
-              <div className="rounded-2xl border border-border bg-card overflow-hidden">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h2 className="font-semibold text-sm text-foreground">
-                      Past &amp; Completed
-                    </h2>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
-                      {past.length}
-                    </span>
-                  </div>
+              {/* Past Appointments Group — same list pattern as above. */}
+              <div>
+                <div className="flex items-center gap-3 mb-1 px-1">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
+                    Past &amp; Completed
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground tnum">
+                    {past.length}
+                  </span>
                 </div>
 
                 {past.length === 0 ? (
-                  <div className="p-8">
+                  <div className="py-8">
                     <EmptyState
                       icon={Clock}
                       title="No past appointments"
@@ -687,7 +697,7 @@ export const AppointmentsPage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="divide-y divide-border px-4">
+                  <div className="divide-y divide-border">
                     {past.map((app) => renderPastRow(app))}
                   </div>
                 )}

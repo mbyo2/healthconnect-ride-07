@@ -245,7 +245,7 @@ export const ProfileCompleteBanner = () => {
   if (pct >= 100) return null;
 
   return (
-    <Alert className="border-primary/30 bg-primary/5 dark:bg-primary/10 mb-4">
+    <Alert className="border-border bg-card mb-4">
       <User className="h-5 w-5 text-primary" />
       <AlertTitle className="flex items-center gap-2">
         Complete Your Profile

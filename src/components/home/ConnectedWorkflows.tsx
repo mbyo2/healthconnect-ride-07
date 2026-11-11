@@ -75,10 +75,10 @@ export const ConnectedWorkflows: React.FC = () => {
       <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible">
         {workflows.map((workflow) => (
           <Card key={workflow.id} className="overflow-hidden group transition-all border-border min-w-[200px] snap-start flex-shrink-0 sm:min-w-0">
-            {/* Single-primary tint system (same as the MetricCard family):
-                pale primary band + primary title for every workflow — no
-                per-card rainbow colours. */}
-            <CardHeader className="py-2 px-3 bg-primary-500/10">
+            {/* White hairline header (PayPal anatomy): no tinted strip —
+                the title carries the single primary accent as blue text
+                over a hairline divider; no per-card rainbow colours. */}
+            <CardHeader className="py-2 px-3 border-b border-border">
               <CardTitle className="text-xs font-bold text-primary-500">{workflow.title}</CardTitle>
             </CardHeader>
             <CardContent className="p-2">

@@ -11,7 +11,7 @@ interface SuggestionBannerProps {
     variant?: 'primary' | 'secondary';
   }>;
   icon?: LucideIcon;
-  variant?: 'info' | 'success' | 'warning' | 'tip';
+  variant?: 'info' | 'success' | 'warning' | 'tip' | 'plain';
   dismissible?: boolean;
   onDismiss?: () => void;
 }
@@ -67,6 +67,17 @@ export const SuggestionBanner = ({
       border: 'border-accent-200 dark:border-accent-500/30',
       icon: 'text-accent-600 dark:text-accent-400',
       title: 'text-accent-900 dark:text-accent-100',
+    },
+    // Plain (PayPal anatomy): a guidance prompt is not a status, so it
+    // carries no tint at all — white hairline card (bg-card adapts to
+    // dark mode on its own), blue icon, foreground title. Used on the
+    // patient shell (Appointments "Get Started", Prescriptions empty
+    // state) where the pale-blue info slab read as an unfinished tint.
+    plain: {
+      bg: 'bg-card',
+      border: 'border-border',
+      icon: 'text-primary-600 dark:text-primary-400',
+      title: 'text-foreground',
     },
   };
 

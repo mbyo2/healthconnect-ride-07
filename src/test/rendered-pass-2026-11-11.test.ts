@@ -106,12 +106,21 @@ describe("rendered pass 2026-11-11: presentation fixes", () => {
     expect(pagination).toContain("Showing providers ${");
   });
 
-  it("quick workflows use the single-primary tint, not rainbow bands", () => {
+  it("quick workflows headers are white hairline, not rainbow bands or tint strips", () => {
+    // PIN MOVED 2026-11-11 (appointments-load-and-anatomy mission,
+    // Finding 3): this pin previously REQUIRED the pale primary tint
+    // strip (bg-primary-500/10) as the "single-primary" system. The
+    // post-rollout rendered verification ordered the remaining tinted
+    // strips converted to white hairline cards with blue text — the
+    // pin's original intent (no per-card rainbow bands) is preserved
+    // and extended: no rainbow, and no tint strip either.
     const workflows = read("../components/home/ConnectedWorkflows.tsx");
     expect(workflows).not.toContain("bg-blue-500");
     expect(workflows).not.toContain("bg-emerald-500");
     expect(workflows).not.toContain("bg-red-500");
-    expect(workflows).toContain("bg-primary-500/10");
+    expect(workflows).not.toContain("bg-primary-500/10");
+    expect(workflows).toContain("border-b border-border");
+    expect(workflows).toContain("text-primary-500");
   });
 });
 

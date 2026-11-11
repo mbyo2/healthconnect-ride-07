@@ -113,7 +113,7 @@ export const PatientWorkflow = React.memo(() => {
   // so a `profiles!appointments_provider_id_fkey` join hint is invalid and
   // patient sessions cannot read profiles rows directly. Provider details
   // come from the public provider_directory view instead.
-  const { data: upcomingAppointment, isError: upcomingError, refetch: refetchUpcoming } = useQuery({
+  const { data: upcomingAppointment, isPending: upcomingPending, isError: upcomingError, refetch: refetchUpcoming } = useQuery({
     queryKey: ['patient-next-appointment', user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -289,6 +289,13 @@ export const PatientWorkflow = React.memo(() => {
     enabled: !!user?.id && isProfileComplete,
     staleTime: 60 * 1000,
   });
+
+  // The next-appointment card must never state "No upcoming
+  // appointments" before its query has settled: while identity is
+  // unresolved the query is disabled (pending, no data), and the card
+  // previously read that pending state as an empty schedule for
+  // seconds. Loading = no user yet OR first fetch still in flight.
+  const upcomingLoading = !user || upcomingPending;
 
   // Time-of-day greeting (PayPal anatomy: bold, black, tight, left).
   const greetingHour = new Date().getHours();
@@ -481,13 +488,15 @@ export const PatientWorkflow = React.memo(() => {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">
-                {upcomingError ? 'Appointments unavailable' : upcomingAppointment ? 'Next appointment' : 'Quick Consultation'}
+                {upcomingError ? 'Appointments unavailable' : upcomingLoading ? 'Next appointment' : upcomingAppointment ? 'Next appointment' : 'Quick Consultation'}
               </span>
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
             </div>
             <div className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
               {upcomingError ? (
                 <span>Couldn&apos;t load your appointments — tap to retry</span>
+              ) : upcomingLoading ? (
+                <span>Loading your appointments…</span>
               ) : upcomingAppointment ? (
                 <>
                   <span>
@@ -507,7 +516,9 @@ export const PatientWorkflow = React.memo(() => {
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              {upcomingAppointment
+              {upcomingLoading
+                ? 'Checking your schedule'
+                : upcomingAppointment
                 ? `Mode: ${upcomingAppointment.type === 'video_consultation' ? 'Video Consult' : 'Clinic Visit'} — Tap to view details`
                 : 'Book an appointment with a verified doctor in under 2 minutes'}
             </p>
@@ -515,7 +526,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div className="flex items-center gap-2">
             <span className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground group-hover:bg-primary/90 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
-              <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
+              <span>{upcomingLoading ? 'View Appointments' : upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
               <ChevronRight className="h-4 w-4" />
             </span>
           </div>

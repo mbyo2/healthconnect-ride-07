@@ -114,8 +114,17 @@ describe("paypal fidelity 2026-11-11: patient home anatomy", () => {
 
 describe("paypal fidelity 2026-11-11: list conversions", () => {
   it("appointments: items are hairline rows at every width, sections shadow-free", () => {
+    // PIN PARTIALLY MOVED 2026-11-11 (appointments-load-and-anatomy
+    // mission, Finding 2b): the list wrapper was "divide-y
+    // divide-border px-4" inside bordered section cards. The
+    // post-rollout rendered verification ordered the sections restyled
+    // to the Recent-activity pattern — quiet label + bare divide-y
+    // list, rows carrying their own px-1 — so the px-4 wrapper
+    // assertion is replaced by the bare-list assertion. The pin's
+    // intent (hairline rows, no card chrome, no shadows) is preserved
+    // and strengthened.
     expect(appointments).not.toContain("m-3 rounded-lg border border-border bg-card p-3 shadow-xs");
-    expect(appointments).toContain("divide-y divide-border px-4");
+    expect(appointments).toContain("divide-y divide-border");
     expect(appointments).not.toContain("shadow-xs");
     expect(appointments).not.toContain("shadow-button");
   });
