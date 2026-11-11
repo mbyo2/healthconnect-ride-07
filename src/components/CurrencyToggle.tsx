@@ -29,7 +29,7 @@ export function CurrencyToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 z-[70] text-xs">
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase">
+        <DropdownMenuLabel className="text-[13px] font-medium text-muted-foreground">
           Display Currency · ZMW default
         </DropdownMenuLabel>
         <p className="px-2 pb-1 text-xs text-muted-foreground">

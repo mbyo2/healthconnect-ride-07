@@ -334,11 +334,11 @@ export const EnhancedInventory = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Supplier Rating</span>
-                <TrendingUp className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Avg Supplier Rating</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="space-y-2">
                 <RatingDisplay 
@@ -353,35 +353,35 @@ export const EnhancedInventory = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Orders</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Orders</span>
                 <ShoppingCart className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{pendingOrders}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingOrders}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Order Value</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Total Order Value</span>
                 <DollarSign className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">
+              <div className="text-2xl font-bold text-foreground tabular-nums">
                 {institution.currency || "ZMW"} {(totalOrderValue / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">All orders</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Open Discrepancies</span>
-                <AlertTriangle className="h-4 w-4 text-error-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Open Discrepancies</span>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-error-500">{openDiscrepancies}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{openDiscrepancies}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Require resolution</div>
             </CardContent>
           </Card>
@@ -470,7 +470,7 @@ export const EnhancedInventory = () => {
               </div>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -555,7 +555,7 @@ export const EnhancedInventory = () => {
             </div>
 
             {reconciliations.length === 0 && (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-12 text-center space-y-3">
                   <Package className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No stock reconciliations yet</p>
@@ -568,7 +568,7 @@ export const EnhancedInventory = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
-                <Card key={reconciliation.id} className="border-border shadow-xs">
+                <Card key={reconciliation.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -613,7 +613,7 @@ export const EnhancedInventory = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-primary-500" /> Supply Chain Analytics
@@ -625,7 +625,7 @@ export const EnhancedInventory = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Cost Trends

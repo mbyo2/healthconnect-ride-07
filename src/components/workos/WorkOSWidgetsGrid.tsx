@@ -93,7 +93,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-emerald-500">K48,250</span>
+            <span className="text-2xl font-bold text-foreground tabular-nums">K48,250</span>
             <span className="text-xs font-semibold text-emerald-400">+22% vs yesterday</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Medications & Consultations</p>

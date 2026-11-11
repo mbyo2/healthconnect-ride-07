@@ -338,43 +338,43 @@ export const FinancialControls = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Flagged Transactions</span>
-                <AlertTriangle className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Flagged Transactions</span>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{flaggedCount}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{flaggedCount}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Requires review</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Audits</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Audits</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{pendingCount}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingCount}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting approval</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Price Discrepancies</span>
-                <DollarSign className="h-4 w-4 text-error-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Price Discrepancies</span>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-error-500">{discrepancies.length}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{discrepancies.length}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Unresolved</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Discrepancy</span>
-                <TrendingUp className="h-4 w-4 text-error-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Total Discrepancy</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-error-500">
+              <div className="text-2xl font-bold text-foreground tabular-nums">
                 {institution.currency || "ZMW"} {totalDiscrepancyAmount.toFixed(2)}
               </div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">At risk amount</div>
@@ -482,7 +482,7 @@ export const FinancialControls = () => {
               </div>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -582,7 +582,7 @@ export const FinancialControls = () => {
             </div>
 
             {discrepancies.length === 0 && (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-12 text-center space-y-3">
                   <CheckCircle className="h-10 w-10 mx-auto text-success-500" />
                   <p className="text-sm font-semibold">No price discrepancies</p>
@@ -595,12 +595,12 @@ export const FinancialControls = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {discrepancies.map((discrepancy) => (
-                <Card key={discrepancy.id} className="border-border shadow-xs">
+                <Card key={discrepancy.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-error-500" />
+                          <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                           {discrepancy.transaction_type} Discrepancy
                         </CardTitle>
                         <div className="text-xs text-muted-foreground mt-1">
@@ -651,7 +651,7 @@ export const FinancialControls = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Revenue Leak Trends
@@ -663,7 +663,7 @@ export const FinancialControls = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-primary-500" /> Control Effectiveness

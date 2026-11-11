@@ -113,19 +113,19 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       <div className="grid grid-cols-3 gap-3">
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-primary-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-primary-500">{supplies.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{supplies.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Total Stock Items</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-warning-500">{lowStock.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{lowStock.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Need Reorder</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Package className="h-5 w-5 mx-auto text-error-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-error-500">{expiringSoon.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{expiringSoon.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Expiring ≤ 90d</div>
         </div>
       </div>

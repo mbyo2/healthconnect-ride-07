@@ -244,7 +244,7 @@ const EmergencyResponse = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-error-50 dark:bg-red-950/40 border border-error-500/30">
                   <p className="text-xs font-semibold uppercase text-muted-foreground">Blood Type</p>
-                  <p className="text-2xl font-semibold font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
+                  <p className="text-2xl font-bold text-foreground tabular-nums mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
                 <div className="p-3 rounded-xl bg-canvas border border-border">
                   <p className="text-xs font-semibold uppercase text-muted-foreground">Known Allergies</p>

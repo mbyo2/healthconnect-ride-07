@@ -409,43 +409,43 @@ export const MedicalShiftHR = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Shifts</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Active Shifts</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{activeShifts}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activeShifts}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured shifts</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Today's Assignments</span>
-                <Users className="h-4 w-4 text-purple-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Today's Assignments</span>
+                <Users className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-purple-500">{todayAssignments}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{todayAssignments}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Staff scheduled</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Present Today</span>
-                <CheckCircle className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Present Today</span>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{presentToday}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{presentToday}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Clock-in recorded</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Online Devices</span>
-                <Fingerprint className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Online Devices</span>
+                <Fingerprint className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{onlineDevices}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{onlineDevices}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Biometric devices</div>
             </CardContent>
           </Card>
@@ -478,7 +478,7 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {shifts.map((shift) => (
-                <Card key={shift.id} className="border-border shadow-xs">
+                <Card key={shift.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -621,7 +621,7 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -704,7 +704,7 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -762,7 +762,7 @@ export const MedicalShiftHR = () => {
                       </td>
                       <td className="px-4 py-3">
                         {record.biometric_verified ? (
-                          <Fingerprint className="h-4 w-4 text-success-500" />
+                          <Fingerprint className="h-4 w-4 text-muted-foreground" />
                         ) : (
                           <Fingerprint className="h-4 w-4 text-muted-foreground" />
                         )}
@@ -785,7 +785,7 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {devices.map((device) => (
-                <Card key={device.id} className="border-border shadow-xs">
+                <Card key={device.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">

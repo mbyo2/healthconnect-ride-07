@@ -100,7 +100,7 @@ export const ProviderAnalyticsDashboard = () => {
               </div>
               <div>
                 <p className="text-xl font-bold font-mono text-foreground">{value}</p>
-                <p className="text-xs font-semibold text-muted-foreground uppercase">{label}</p>
+                <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@ export const ProviderAnalyticsDashboard = () => {
         <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <h3 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-              <MessageSquareText className="h-4 w-4 text-warning-500" /> Patient Ratings & Feedback
+              <MessageSquareText className="h-4 w-4 text-muted-foreground" /> Patient Ratings & Feedback
             </h3>
             <span className="text-xs font-bold text-muted-foreground">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
           </div>

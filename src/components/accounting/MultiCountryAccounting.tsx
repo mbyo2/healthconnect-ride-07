@@ -434,28 +434,28 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
-                <div className="text-xs font-semibold text-muted-foreground uppercase">Gross Revenue</div>
+                <div className="text-[13px] font-medium text-muted-foreground">Gross Revenue</div>
                 <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.revenue)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
               <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
-                <div className="text-xs font-semibold text-muted-foreground uppercase">Operating Expenses</div>
+                <div className="text-[13px] font-medium text-muted-foreground">Operating Expenses</div>
                 <div className="text-2xl font-bold text-error-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.expenses)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
               <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
-                <div className="text-xs font-semibold text-muted-foreground uppercase">Net Income</div>
+                <div className="text-[13px] font-medium text-muted-foreground">Net Income</div>
                 <div className="text-2xl font-bold text-success-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.netIncome)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">Revenue − expenses</div>
               </div>
               <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
-                <div className="text-xs font-semibold text-muted-foreground uppercase">Est. VAT ({country.vatRate}%)</div>
+                <div className="text-[13px] font-medium text-muted-foreground">Est. VAT ({country.vatRate}%)</div>
                 <div className="text-2xl font-bold text-warning-500 mt-1 tabular-nums">
                   {country.currency} {fmt(estimatedVat)}
                 </div>

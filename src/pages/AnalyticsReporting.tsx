@@ -713,41 +713,41 @@ const AnalyticsReporting = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards — live institution aggregates */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Appointments</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Appointments</span>
                 <Calendar className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-semibold text-primary-500">{live.appointments.length}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Booked at this institution</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Revenue Collected</span>
-                <DollarSign className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Revenue Collected</span>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="text-2xl font-semibold text-success-500">{currency} {totalRevenue.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">{collectedPayments.length} collected payments</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Registered Patients</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Registered Patients</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
               <div className="text-2xl font-semibold text-primary-500">{live.patientCount}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">In this institution's registry</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Reports Generated</span>
-                <FileText className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Reports Generated</span>
+                <FileText className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="text-2xl font-semibold text-warning-500">{reports.length}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">{scheduledReports} scheduled</div>
@@ -774,7 +774,7 @@ const AnalyticsReporting = () => {
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-4">
             {!hasLiveData ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center space-y-2">
                   <BarChart3 className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-semibold">No analytics yet</p>
@@ -786,7 +786,7 @@ const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary-500" /> Appointments Over Time
@@ -806,10 +806,10 @@ const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-success-500" /> Appointments by Status
+                        <Users className="h-4 w-4 text-muted-foreground" /> Appointments by Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -826,7 +826,7 @@ const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Activity className="h-4 w-4 text-primary-500" /> Activity by Category
@@ -852,7 +852,7 @@ const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-border shadow-xs">
+                <Card className="border-border">
                   <CardHeader>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <PieChart className="h-4 w-4 text-primary-500" /> Category Breakdown
@@ -910,7 +910,7 @@ const AnalyticsReporting = () => {
             </div>
 
             {filteredReports.length === 0 ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center space-y-2">
                   <FileText className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-semibold">No reports found</p>
@@ -928,7 +928,7 @@ const AnalyticsReporting = () => {
             ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredReports.map((report) => (
-                <Card key={report.id} className="border-border shadow-xs">
+                <Card key={report.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -1001,7 +1001,7 @@ const AnalyticsReporting = () => {
           {/* Financial Analytics Tab */}
           <TabsContent value="financial" className="space-y-4">
             {live.payments.length === 0 ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center space-y-2">
                   <DollarSign className="h-8 w-8 mx-auto text-success-500" />
                   <p className="text-sm font-semibold">No payments yet</p>
@@ -1013,7 +1013,7 @@ const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <DollarSign className="h-4 w-4 text-primary-500" /> Collected Revenue by Payment Method
@@ -1033,7 +1033,7 @@ const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary-500" /> Payments by Status
@@ -1055,7 +1055,7 @@ const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-border shadow-xs">
+                <Card className="border-border">
                   <CardHeader>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <LineChart className="h-4 w-4 text-primary-500" /> Revenue Trend (last 12 weeks)
@@ -1082,7 +1082,7 @@ const AnalyticsReporting = () => {
           {/* Operational Analytics Tab */}
           <TabsContent value="operational" className="space-y-4">
             {live.appointments.length + live.labTests.length + live.prescriptions.length === 0 ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center space-y-2">
                   <Activity className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-semibold">No operational data yet</p>
@@ -1094,7 +1094,7 @@ const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Activity className="h-4 w-4 text-primary-500" /> Appointment Cadence
@@ -1114,7 +1114,7 @@ const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardHeader>
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary-500" /> Appointments by Status
@@ -1136,7 +1136,7 @@ const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-border shadow-xs">
+                <Card className="border-border">
                   <CardHeader>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Clock className="h-4 w-4 text-primary-500" /> Clinical Activity

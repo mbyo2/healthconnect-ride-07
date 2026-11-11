@@ -357,7 +357,7 @@ const Profile = () => {
                 { id: "lastName", label: "Last Name" },
               ].map(f => (
                 <div key={f.id} className="space-y-1.5">
-                  <Label htmlFor={f.id} className="text-xs font-semibold text-muted-foreground uppercase">{f.label}</Label>
+                  <Label htmlFor={f.id} className="text-[13px] font-medium text-muted-foreground">{f.label}</Label>
                   <Input
                     id={f.id}
                     value={(formData as any)[f.id]}
@@ -368,11 +368,11 @@ const Profile = () => {
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label htmlFor="profile-email" className="text-xs font-semibold text-muted-foreground uppercase">Email Address</Label>
+                <Label htmlFor="profile-email" className="text-[13px] font-medium text-muted-foreground">Email Address</Label>
                 <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border border-border bg-background font-medium text-xs opacity-75" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-semibold text-muted-foreground uppercase">Phone Number</Label>
+                <Label htmlFor="phone" className="text-[13px] font-medium text-muted-foreground">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -385,7 +385,7 @@ const Profile = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="location" className="text-xs font-semibold text-muted-foreground uppercase">Address / Location</Label>
+              <Label htmlFor="location" className="text-[13px] font-medium text-muted-foreground">Address / Location</Label>
               <Input
                 id="location"
                 value={formData.location}
@@ -396,7 +396,7 @@ const Profile = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="bio" className="text-xs font-semibold text-muted-foreground uppercase">Bio / Clinical Background</Label>
+              <Label htmlFor="bio" className="text-[13px] font-medium text-muted-foreground">Bio / Clinical Background</Label>
               <Textarea
                 id="bio"
                 value={formData.bio}

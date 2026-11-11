@@ -206,7 +206,7 @@ const IoTMonitoring = () => {
                 <Heart className="w-5 h-5 text-error-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Heart Rate</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Heart Rate</p>
               <p className="text-3xl font-semibold text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
               <p className="text-xs text-muted-foreground font-medium">bpm</p>
             </div>
@@ -216,7 +216,7 @@ const IoTMonitoring = () => {
                 <Activity className="w-5 h-5 text-primary-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Blood Pressure</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Blood Pressure</p>
               <p className="text-3xl font-semibold text-primary-500 mt-1">
                 {vitalSigns?.blood_pressure
                   ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
@@ -230,7 +230,7 @@ const IoTMonitoring = () => {
                 <Thermometer className="w-5 h-5 text-warning-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Body Temperature</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Body Temperature</p>
               <p className="text-3xl font-semibold text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
               <p className="text-xs text-muted-foreground font-medium">°C</p>
             </div>
@@ -240,7 +240,7 @@ const IoTMonitoring = () => {
                 <Droplet className="w-5 h-5 text-primary-500" />
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Oxygen Saturation</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Oxygen Saturation</p>
               <p className="text-3xl font-semibold text-primary-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
               <p className="text-xs text-muted-foreground font-medium">% SpO2</p>
             </div>

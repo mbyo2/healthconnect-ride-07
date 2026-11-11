@@ -99,17 +99,17 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       <div className="grid grid-cols-3 gap-3">
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Image className="h-5 w-5 mx-auto text-primary-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-primary-500">{orders.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{orders.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Total Studies</div>
         </div>
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Clock className="h-5 w-5 mx-auto text-warning-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-warning-500">{pending}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{pending}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">In Queue</div>
         </div>
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-success-500">{reported}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{reported}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Reports Signed</div>
         </div>
       </div>

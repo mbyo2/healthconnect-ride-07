@@ -465,43 +465,43 @@ export const EnhancedDiagnostics = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Orders</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Orders</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{pendingOrders}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingOrders}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">In Progress</span>
+                <span className="text-[13px] font-medium text-muted-foreground">In Progress</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{inProgressOrders}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{inProgressOrders}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently processing</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Completed Today</span>
-                <CheckCircle className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Completed Today</span>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{completedToday}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{completedToday}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Results delivered</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Scheduled Staff</span>
-                <Users className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Scheduled Staff</span>
+                <Users className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{scheduledStaff}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{scheduledStaff}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Upcoming shifts</div>
             </CardContent>
           </Card>
@@ -561,7 +561,7 @@ export const EnhancedDiagnostics = () => {
               </div>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -624,7 +624,7 @@ export const EnhancedDiagnostics = () => {
 
           {/* Results Management Tab */}
           <TabsContent value="results" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary-500" /> Results Management
@@ -661,7 +661,7 @@ export const EnhancedDiagnostics = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {schedules.map((schedule) => (
-                <Card key={schedule.id} className="border-border shadow-xs">
+                <Card key={schedule.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -709,7 +709,7 @@ export const EnhancedDiagnostics = () => {
 
           {/* Telemedicine Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Video className="h-4 w-4 text-primary-500" /> Telemedicine-Diagnostic Integration

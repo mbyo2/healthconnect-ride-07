@@ -104,19 +104,19 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
       <div className="grid grid-cols-3 gap-3">
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Utensils className="h-5 w-5 mx-auto text-primary-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-primary-500">{activePlans.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{activePlans.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Active Meal Plans</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <AlertTriangle className="h-5 w-5 mx-auto text-error-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-error-500">{withAllergies.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{withAllergies.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Known Allergies</div>
         </div>
 
         <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
-          <div className="text-2xl font-bold font-mono text-success-500">{plans.length}</div>
+          <div className="text-2xl font-bold text-foreground tabular-nums">{plans.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Total Plans Issued</div>
         </div>
       </div>

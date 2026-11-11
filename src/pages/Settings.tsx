@@ -495,7 +495,7 @@ const Settings = () => {
                 <Globe className="h-4 w-4 text-primary-500" /> Language & Region
               </h2>
               <div className="space-y-1.5">
-                <label htmlFor="settings-language" className="text-xs font-semibold text-muted-foreground uppercase">Display Language</label>
+                <label htmlFor="settings-language" className="text-[13px] font-medium text-muted-foreground">Display Language</label>
                 <Select value={i18nLang} onValueChange={(val) => {
                   setI18nLang(val as any);
                   setLanguage(val);
@@ -511,7 +511,7 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-timezone" className="text-xs font-semibold text-muted-foreground uppercase">System Timezone</label>
+                <label htmlFor="settings-timezone" className="text-[13px] font-medium text-muted-foreground">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
                   <SelectTrigger id="settings-timezone" className="border-border text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -524,7 +524,7 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-date-format" className="text-xs font-semibold text-muted-foreground uppercase">Date Display Format</label>
+                <label htmlFor="settings-date-format" className="text-[13px] font-medium text-muted-foreground">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
                   <SelectTrigger id="settings-date-format" className="border-border text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>

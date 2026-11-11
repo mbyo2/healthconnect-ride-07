@@ -191,7 +191,7 @@ const SuperAdminDashboard = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase">Actions</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[13px] font-medium text-muted-foreground">Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-semibold">
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}
               </DropdownMenuItem>

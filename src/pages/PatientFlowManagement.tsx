@@ -389,43 +389,43 @@ export const PatientFlowManagement = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Patients</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Active Patients</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{activeFlows.length}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activeFlows.length}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently in flow</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Wait Time</span>
-                <Clock className="h-4 w-4 text-purple-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Avg Wait Time</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-purple-500">{averageWaitTime.toFixed(0)}m</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{averageWaitTime.toFixed(0)}m</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Per patient</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Capacity Utilization</span>
-                <BarChart3 className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Capacity Utilization</span>
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{utilizationRate.toFixed(0)}%</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{utilizationRate.toFixed(0)}%</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">{currentLoad}/{totalCapacity} patients</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Flow Stages</span>
-                <ArrowRight className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Flow Stages</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{stages.length}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{stages.length}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured stages</div>
             </CardContent>
           </Card>
@@ -491,7 +491,7 @@ export const PatientFlowManagement = () => {
                 );
 
                 return (
-                  <Card key={flow.id} className="border-border shadow-xs">
+                  <Card key={flow.id} className="border-border">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
@@ -562,7 +562,7 @@ export const PatientFlowManagement = () => {
 
             <div className="space-y-2">
               {stages.map((stage, index) => (
-                <Card key={stage.id} className="border-border shadow-xs">
+                <Card key={stage.id} className="border-border">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -601,7 +601,7 @@ export const PatientFlowManagement = () => {
           <TabsContent value="capacity" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {capacity.map((cap) => (
-                <Card key={cap.id} className="border-border shadow-xs">
+                <Card key={cap.id} className="border-border">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-primary-500" />
@@ -633,7 +633,7 @@ export const PatientFlowManagement = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Flow Analytics
@@ -645,7 +645,7 @@ export const PatientFlowManagement = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-primary-500" /> Bottlenecks

@@ -119,10 +119,10 @@ const VideoDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase">Upcoming Sessions (7d)</span>
+              <span className="text-[13px] font-medium text-muted-foreground">Upcoming Sessions (7d)</span>
               <Video className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-3xl font-semibold font-mono text-primary-500">{stats.loading ? "—" : stats.upcoming}</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{stats.loading ? "—" : stats.upcoming}</div>
             <div className="text-xs text-muted-foreground font-semibold mt-0.5">
               {stats.upcoming === 0 ? "No sessions scheduled" : `${stats.upcoming} sessions scheduled`}
             </div>
@@ -130,10 +130,10 @@ const VideoDashboard: React.FC = () => {
 
           <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase">Today's Appointments</span>
+              <span className="text-[13px] font-medium text-muted-foreground">Today's Appointments</span>
               <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-3xl font-semibold font-mono text-warning-500">{stats.loading ? "—" : stats.today}</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{stats.loading ? "—" : stats.today}</div>
             <div className="text-xs text-muted-foreground font-semibold mt-0.5">
               {stats.today === 0 ? "No sessions scheduled today" : `${stats.today} consultation(s) today`}
             </div>
@@ -141,10 +141,10 @@ const VideoDashboard: React.FC = () => {
 
           <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase">Active Live Calls</span>
+              <span className="text-[13px] font-medium text-muted-foreground">Active Live Calls</span>
               <Radio className="h-5 w-5 text-success-500 animate-pulse" />
             </div>
-            <div className="text-3xl font-semibold font-mono text-success-500">{stats.loading ? "—" : stats.active}</div>
+            <div className="text-3xl font-bold text-foreground tabular-nums">{stats.loading ? "—" : stats.active}</div>
             <div className="text-xs text-muted-foreground font-semibold mt-0.5">
               {stats.active === 0 ? "No active consultations" : `${stats.active} session(s) live`}
             </div>

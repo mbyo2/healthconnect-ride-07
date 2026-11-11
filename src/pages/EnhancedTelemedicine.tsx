@@ -370,43 +370,43 @@ export const EnhancedTelemedicine = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Workflows</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Active Workflows</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{activeWorkflows}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activeWorkflows}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently running</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Tasks</span>
-                <CheckCircle className="h-4 w-4 text-purple-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Tasks</span>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingTasks}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Diagnostic Orders</span>
-                <FileText className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Diagnostic Orders</span>
+                <FileText className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{pendingOrders}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingOrders}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Remote diagnostics</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Completed Today</span>
-                <TrendingUp className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Completed Today</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{completedToday}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{completedToday}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Workflow sessions</div>
             </CardContent>
           </Card>
@@ -455,7 +455,7 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {workflows.map((workflow) => (
-                <Card key={workflow.id} className="border-border shadow-xs">
+                <Card key={workflow.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -534,7 +534,7 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id} className="border-border shadow-xs">
+                <Card key={task.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -622,7 +622,7 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {orders.map((order) => (
-                <Card key={order.id} className="border-border shadow-xs">
+                <Card key={order.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -668,7 +668,7 @@ export const EnhancedTelemedicine = () => {
 
           {/* Device Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <MonitorSpeaker className="h-4 w-4 text-primary-500" /> IoT Device Integration

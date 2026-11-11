@@ -321,30 +321,30 @@ export const HRManagerWorkflow = () => {
       {/* Telemetry Telemetry Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Staff Present Today</div>
-          <div className="text-3xl font-bold font-mono text-success-500 mt-1">
+          <div className="text-[13px] font-medium text-muted-foreground">Staff Present Today</div>
+          <div className="text-3xl font-bold text-foreground tabular-nums mt-1">
             {todayAttendance.filter((a) => a.status === "present").length}
           </div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Biometric Clocked-In</div>
         </div>
 
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Late Arrivals</div>
-          <div className="text-3xl font-bold font-mono text-warning-500 mt-1">
+          <div className="text-[13px] font-medium text-muted-foreground">Late Arrivals</div>
+          <div className="text-3xl font-bold text-foreground tabular-nums mt-1">
             {todayAttendance.filter((a) => a.status === "late").length}
           </div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Grace period exceeded</div>
         </div>
 
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Pending Leaves</div>
-          <div className="text-3xl font-bold font-mono text-primary-500 mt-1">{pendingLeaves.length}</div>
+          <div className="text-[13px] font-medium text-muted-foreground">Pending Leaves</div>
+          <div className="text-3xl font-bold text-foreground tabular-nums mt-1">{pendingLeaves.length}</div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Awaiting Approval</div>
         </div>
 
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Active Payroll Items</div>
-          <div className="text-3xl font-bold font-mono text-primary-500 mt-1">{payroll.length}</div>
+          <div className="text-[13px] font-medium text-muted-foreground">Active Payroll Items</div>
+          <div className="text-3xl font-bold text-foreground tabular-nums mt-1">{payroll.length}</div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
         </div>
       </div>

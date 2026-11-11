@@ -484,43 +484,43 @@ export const CareTeamManagement = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Assignments</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Active Assignments</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{activeAssignments}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activeAssignments}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Current team members</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Tasks</span>
-                <Clock className="h-4 w-4 text-purple-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Tasks</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingTasks}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Available Roles</span>
-                <Shield className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Available Roles</span>
+                <Shield className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{totalRoles}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{totalRoles}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured roles</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Overdue Tasks</span>
-                <AlertTriangle className="h-4 w-4 text-error-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Overdue Tasks</span>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-error-500">{overdueTasks}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{overdueTasks}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Require attention</div>
             </CardContent>
           </Card>
@@ -562,7 +562,7 @@ export const CareTeamManagement = () => {
               </Button>
             </div>
 
-              <Card className="border-border shadow-xs overflow-hidden">
+              <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto">
               <table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
@@ -628,7 +628,7 @@ export const CareTeamManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {roles.map((role) => (
-                <Card key={role.id} className="border-border shadow-xs">
+                <Card key={role.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -699,7 +699,7 @@ export const CareTeamManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id} className="border-border shadow-xs">
+                <Card key={task.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -760,7 +760,7 @@ export const CareTeamManagement = () => {
 
           {/* Workflows Tab */}
           <TabsContent value="workflows" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary-500" /> Clinical Workflow Templates

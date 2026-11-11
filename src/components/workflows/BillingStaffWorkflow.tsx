@@ -500,19 +500,19 @@ export const BillingStaffWorkflow = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
-          <p className="text-2xl font-bold font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-foreground tabular-nums">K{todayCollections.toLocaleString()}</p>
           <p className="text-xs font-bold text-muted-foreground">Today's Total Collections</p>
         </div>
 
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
-          <p className="text-2xl font-bold font-mono text-primary-500">{pendingInvoices.length}</p>
+          <p className="text-2xl font-bold text-foreground tabular-nums">{pendingInvoices.length}</p>
           <p className="text-xs font-bold text-muted-foreground">Pending Invoices</p>
         </div>
 
         <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
-          <p className="text-2xl font-bold font-mono text-error-500">{pendingClaims.length}</p>
+          <p className="text-2xl font-bold text-foreground tabular-nums">{pendingClaims.length}</p>
           <p className="text-xs font-bold text-muted-foreground">Pending Insurance Claims</p>
         </div>
       </div>

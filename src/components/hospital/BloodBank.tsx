@@ -270,7 +270,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
               <tbody className="divide-y divide-border">
                 {tracked.map((t) => (
                   <tr key={t.type} className="hover:bg-muted transition-colors">
-                    <td className="py-3 px-4 text-2xl font-bold font-mono text-error-500">{t.type}</td>
+                    <td className="py-3 px-4 text-2xl font-bold text-foreground tabular-nums">{t.type}</td>
                     <td className="py-3 px-3 text-center">{getStockPill(t.status)}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{t.whole}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{t.prbc}</td>

@@ -99,7 +99,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
         }`}>
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
             <span>Stage Conversion Rate</span>
-            <Filter className="h-4 w-4 text-purple-500" />
+            <Filter className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="mt-2 text-2xl font-bold font-mono">82.4%</div>
           <div className="mt-1 text-xs text-purple-400 font-semibold">
@@ -112,9 +112,9 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
         }`}>
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
             <span>Discharge Success Rate</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-emerald-500">94.8%</div>
+          <div className="mt-2 text-2xl font-bold text-foreground tabular-nums">94.8%</div>
           <div className="mt-1 text-xs text-slate-400">Zero unplanned readmissions</div>
         </div>
 
@@ -123,9 +123,9 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
         }`}>
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
             <span>Total Pipeline Billing</span>
-            <DollarSign className="h-4 w-4 text-emerald-500" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-emerald-500">
+          <div className="mt-2 text-2xl font-bold text-foreground tabular-nums">
             ZMW K{totalBillingSum.toLocaleString()}
           </div>
           <div className="mt-1 text-xs text-slate-400">Est. gross operational revenue</div>

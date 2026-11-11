@@ -191,7 +191,7 @@ export const PharmacyPOS = () => {
           <h2 className="text-xl font-semibold text-foreground">Open Cash Register</h2>
           <p className="text-xs text-muted-foreground font-medium mt-1 mb-4">Start your cashier shift by entering the opening float</p>
           <div className="text-left mb-4">
-            <label className="text-xs font-semibold text-muted-foreground uppercase">Opening Cash Balance ({getSymbol()})</label>
+            <label className="text-[13px] font-medium text-muted-foreground">Opening Cash Balance ({getSymbol()})</label>
             <input type="number" value={openingBalanceInput} onChange={(e) => setOpeningBalanceInput(e.target.value)} className="w-full mt-1 p-2.5 rounded-md border border-border text-sm font-bold" />
           </div>
           <button onClick={() => openRegister.mutate(parseFloat(openingBalanceInput) || 0)} className="w-full py-2.5 rounded-md bg-primary-500 text-white font-semibold text-sm">

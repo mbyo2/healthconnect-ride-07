@@ -304,7 +304,7 @@ function KpiCard({ label, icon, value, caption, accent }: {
   return (
     <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-muted-foreground uppercase">{label}</span>
+        <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
         {icon}
       </div>
       <div className={`text-2xl font-semibold font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>

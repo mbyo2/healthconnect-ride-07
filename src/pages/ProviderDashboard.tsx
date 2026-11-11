@@ -934,7 +934,7 @@ export const ProviderDashboard = () => {
             Live modules open; planned modules are chartered but not built yet. */}
         {charter.length > 0 && (
           <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
+            <p className="text-[13px] font-medium text-muted-foreground mb-1">
               My Practice Modules
             </p>
             <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">

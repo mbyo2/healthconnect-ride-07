@@ -429,45 +429,45 @@ export const PayeTaxCalculations = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Tax Slabs</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Active Tax Slabs</span>
                 <BarChart3 className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{activeSlabs}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activeSlabs}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured bands</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Total PAYE Collected</span>
-                <DollarSign className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Total PAYE Collected</span>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">
+              <div className="text-2xl font-bold text-foreground tabular-nums">
                 {institution.currency || "ZMW"} {(totalPayeCollected / 1000).toFixed(1)}k
               </div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">This period</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Processed Payroll</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Processed Payroll</span>
                 <CheckCircle className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{processedPayroll}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{processedPayroll}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Completed runs</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Payroll</span>
-                <Clock className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Pending Payroll</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">{pendingPayroll}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{pendingPayroll}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
@@ -499,7 +499,7 @@ export const PayeTaxCalculations = () => {
             </div>
 
             {taxSlabs.length === 0 && (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-12 text-center space-y-3">
                   <Calculator className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No tax slabs yet</p>
@@ -512,7 +512,7 @@ export const PayeTaxCalculations = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {taxSlabs.map((slab) => (
-                <Card key={slab.id} className="border-border shadow-xs">
+                <Card key={slab.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -580,7 +580,7 @@ export const PayeTaxCalculations = () => {
               </Button>
             </div>
 
-            <Card className="border-border shadow-xs overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-muted/50">
                   <tr>
@@ -677,7 +677,7 @@ export const PayeTaxCalculations = () => {
             </div>
 
             {payroll.length === 0 && (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-12 text-center space-y-3">
                   <Users className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No payroll runs yet</p>
@@ -690,7 +690,7 @@ export const PayeTaxCalculations = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {payroll.map((pay) => (
-                <Card key={pay.id} className="border-border shadow-xs">
+                <Card key={pay.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
@@ -755,7 +755,7 @@ export const PayeTaxCalculations = () => {
 
           {/* Statutory Deductions Tab */}
           <TabsContent value="statutory" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary-500" /> NAPSA & NHIMA Statutory Deductions

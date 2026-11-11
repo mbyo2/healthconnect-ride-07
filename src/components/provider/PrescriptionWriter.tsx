@@ -220,7 +220,7 @@ export const PrescriptionWriter = () => {
   };
 
   return (
-    <Card className="p-6 rounded-2xl border border-border bg-card shadow-xs font-sans">
+    <Card className="p-6 rounded-2xl border border-border bg-card font-sans">
       <div className="flex items-center justify-between mb-6 pb-3 border-b border-border">
         <div>
           <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">

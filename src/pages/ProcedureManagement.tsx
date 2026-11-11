@@ -416,43 +416,43 @@ export const ProcedureManagement = () => {
       <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Procedures</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Total Procedures</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{totalProcedures}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{totalProcedures}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">In catalog</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Pricing</span>
-                <DollarSign className="h-4 w-4 text-success-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Active Pricing</span>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-success-500">{activePricing}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{activePricing}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured prices</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Recent Executions</span>
+                <span className="text-[13px] font-medium text-muted-foreground">Recent Executions</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-primary-500">{recentExecutions}</div>
+              <div className="text-2xl font-bold text-foreground tabular-nums">{recentExecutions}</div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Past 7 days</div>
             </CardContent>
           </Card>
-          <Card className="border-border shadow-xs">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Price</span>
-                <TrendingUp className="h-4 w-4 text-warning-500" />
+                <span className="text-[13px] font-medium text-muted-foreground">Avg Price</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-semibold font-mono text-warning-500">
+              <div className="text-2xl font-bold text-foreground tabular-nums">
                 {institution?.currency || "ZMW"} {avgProcedurePrice.toFixed(0)}
               </div>
               <div className="text-xs text-muted-foreground font-semibold mt-0.5">Per procedure</div>
@@ -501,7 +501,7 @@ export const ProcedureManagement = () => {
             </div>
 
             {procedures.length === 0 && (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-12 text-center space-y-3">
                   <Activity className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No procedures yet</p>
@@ -514,7 +514,7 @@ export const ProcedureManagement = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {procedures.map((procedure) => (
-                <Card key={procedure.id} className="border-border shadow-xs">
+                <Card key={procedure.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -571,7 +571,7 @@ export const ProcedureManagement = () => {
           {/* Institution Pricing Tab */}
           <TabsContent value="pricing" className="space-y-4">
             {!institution ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
@@ -601,7 +601,7 @@ export const ProcedureManagement = () => {
                   </Button>
                 </div>
 
-                <Card className="border-border shadow-xs overflow-hidden">
+                <Card className="border-border overflow-hidden">
                   <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                     <thead className="bg-muted/50">
                       <tr>
@@ -652,7 +652,7 @@ export const ProcedureManagement = () => {
           {/* Executions Tab */}
           <TabsContent value="executions" className="space-y-4">
             {!institution ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
@@ -685,7 +685,7 @@ export const ProcedureManagement = () => {
                 </div>
 
                 {executions.length === 0 && (
-                  <Card className="border-border shadow-xs">
+                  <Card className="border-border">
                     <CardContent className="p-12 text-center space-y-3">
                       <Calendar className="h-10 w-10 mx-auto text-muted-foreground" />
                       <p className="text-sm font-semibold">No procedure executions yet</p>
@@ -695,7 +695,7 @@ export const ProcedureManagement = () => {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {executions.map((execution) => (
-                    <Card key={execution.id} className="border-border shadow-xs">
+                    <Card key={execution.id} className="border-border">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
@@ -749,7 +749,7 @@ export const ProcedureManagement = () => {
 
           {/* Inventory Mapping Tab */}
           <TabsContent value="inventory" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Package className="h-4 w-4 text-primary-500" /> Procedure-Inventory Mapping

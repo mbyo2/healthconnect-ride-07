@@ -271,7 +271,7 @@ export const ZambiaCompliance = () => {
 
       <div className="px-4 sm:px-6 pt-6">
         {/* Compliance Overview */}
-        <Card className="border-border shadow-xs mb-6">
+        <Card className="border-border mb-6">
           <CardHeader>
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary-500" /> Overall Compliance Status
@@ -436,7 +436,7 @@ export const ZambiaCompliance = () => {
             </div>
 
             {nhimaConfig ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Current NHIMA Configuration</CardTitle>
                 </CardHeader>
@@ -467,7 +467,7 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <Globe className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">NHIMA Not Configured</h3>
@@ -540,7 +540,7 @@ export const ZambiaCompliance = () => {
             </div>
 
             {medicalCouncilConfig ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Council Compliance Status</CardTitle>
                 </CardHeader>
@@ -572,7 +572,7 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Medical Council Not Configured</h3>
@@ -683,7 +683,7 @@ export const ZambiaCompliance = () => {
             </div>
 
             {taxConfig ? (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold">Tax Compliance Status</CardTitle>
                 </CardHeader>
@@ -709,7 +709,7 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-border shadow-xs">
+              <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <BarChart3 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">ZRA Tax Not Configured</h3>
@@ -733,7 +733,7 @@ export const ZambiaCompliance = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {regulations.map((regulation) => (
-                <Card key={regulation.id} className="border-border shadow-xs">
+                <Card key={regulation.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>

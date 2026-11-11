@@ -266,7 +266,7 @@ export const MultiCenterManagement = () => {
           <TabsContent value="networks" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {networks.map((network) => (
-                <Card key={network.id} className="border-border shadow-xs hover:shadow-md transition-shadow">
+                <Card key={network.id} className="border-border hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -399,7 +399,7 @@ export const MultiCenterManagement = () => {
           <TabsContent value="countries" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {countries.map((country) => (
-                <Card key={country.id} className="border-border shadow-xs">
+                <Card key={country.id} className="border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
@@ -442,7 +442,7 @@ export const MultiCenterManagement = () => {
 
           {/* Cross-Billing Tab */}
           <TabsContent value="billing" className="space-y-4">
-            <Card className="border-border shadow-xs">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary-500" /> Cross-Institution Billing
@@ -455,7 +455,7 @@ export const MultiCenterManagement = () => {
                     {networks.filter((n) => n.cross_billing_enabled).map((network) => (
                       <div key={network.id} className="flex items-center justify-between p-3 bg-card rounded-lg">
                         <div className="flex items-center gap-3">
-                          <CheckCircle className="h-4 w-4 text-success-500" />
+                          <CheckCircle className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <div className="text-xs font-semibold">{network.network_name}</div>
                             <div className="text-xs text-muted-foreground">
