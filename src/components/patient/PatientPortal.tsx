@@ -8,6 +8,23 @@ import { Building2, Calendar, FileText, Pill } from "lucide-react";
 import { getAccessibleCategories } from "@/utils/provider-access-control";
 
 /**
+ * Human labels for the raw data-scope keys returned by
+ * getAccessibleCategories — the access card must never render camelCase
+ * data keys to patients.
+ */
+const CATEGORY_LABELS: Record<string, string> = {
+  demographics: "Demographics",
+  appointments: "Appointments",
+  vitals: "Vital signs",
+  labResults: "Lab results",
+  prescriptions: "Prescriptions",
+  allergies: "Allergies",
+  immunizations: "Immunizations",
+  clinicalNotes: "Clinical notes",
+  billing: "Billing",
+};
+
+/**
  * Patient Portal: Shows patient's linked institutions and what they can access.
  * Restricted permissions: patients see own data only, no admin functions.
  */
@@ -100,7 +117,7 @@ export function PatientPortal() {
           <div className="flex flex-wrap gap-2">
             {accessibleCategories.map((cat) => (
               <Badge key={cat} variant="secondary">
-                {cat}
+                {CATEGORY_LABELS[cat] ?? cat}
               </Badge>
             ))}
           </div>
