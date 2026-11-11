@@ -10,7 +10,7 @@ const Onboarding = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4 font-sans text-foreground">
       <div className="w-full max-w-2xl rounded-2xl bg-card border border-border shadow-md p-6 sm:p-8 space-y-6">
         <div className="text-center space-y-3">
-          <div className="h-12 w-12 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-semibold mx-auto shadow-xs">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-semibold mx-auto">
             <UserCheck className="h-6 w-6" />
           </div>
 

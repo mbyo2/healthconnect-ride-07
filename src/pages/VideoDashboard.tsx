@@ -65,10 +65,10 @@ const VideoDashboard: React.FC = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
               <Video className="h-5 w-5" />
             </div>
             <div>
@@ -117,7 +117,7 @@ const VideoDashboard: React.FC = () => {
         )}
         {/* KPI Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+          <div className="p-4 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[13px] font-medium text-muted-foreground">Upcoming Sessions (7d)</span>
               <Video className="h-5 w-5 text-primary-500" />
@@ -128,7 +128,7 @@ const VideoDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+          <div className="p-4 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[13px] font-medium text-muted-foreground">Today's Appointments</span>
               <Clock className="h-5 w-5 text-warning-500" />
@@ -139,7 +139,7 @@ const VideoDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+          <div className="p-4 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[13px] font-medium text-muted-foreground">Active Live Calls</span>
               <Radio className="h-5 w-5 text-success-500 animate-pulse" />
@@ -152,7 +152,7 @@ const VideoDashboard: React.FC = () => {
         </div>
 
         {/* Quick Launch Card */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="rounded-2xl border border-border bg-card p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-primary-500 text-white">
               <Phone className="w-6 h-6" />
@@ -180,7 +180,7 @@ const VideoDashboard: React.FC = () => {
 
         {/* Empty session list — no upcoming video sessions */}
         {!stats.loading && !stats.error && stats.upcoming === 0 && (
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-xs text-center">
+          <div className="rounded-2xl border border-border bg-card p-8 text-center">
             <div className="mx-auto h-12 w-12 rounded-xl bg-primary-500/10 text-primary-500 flex items-center justify-center mb-3">
               <Video className="h-6 w-6" />
             </div>

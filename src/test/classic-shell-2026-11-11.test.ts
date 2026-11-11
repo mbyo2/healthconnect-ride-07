@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { resolve } from "path";
 
 // CLASSIC PAYPAL SHELL (CEO decision 2026-11-11 17:12, via options tap
@@ -61,5 +61,52 @@ describe("classic shell: navy bars, white content, both modes", () => {
   it("header skeleton twins render the navy bar", () => {
     expect(skeletonKit).toContain("border-white/10 bg-navybar min-[1025px]:block");
     expect(skeletonKit).toContain("border-white/10 bg-navybar min-[1025px]:hidden");
+  });
+});
+
+// FULL-PAGE SWEEP LOCKS (2026-11-11): the old-dialect patterns the sweep
+// removed from every page must not creep back. Exceptions are deliberate
+// and listed per test.
+describe("sweep locks: old dialect stays out of the pages", () => {
+  const pageFiles = readdirSync(resolve(__dirname, "../pages"))
+    .filter((f) => f.endsWith(".tsx"))
+    .map((f) => [f, read(`../pages/${f}`)] as const);
+
+  it("no hard-coded blue primary buttons remain in any page", () => {
+    for (const [name, src] of pageFiles) {
+      expect(src, name).not.toContain("bg-primary-500 hover:bg-primary-600");
+    }
+  });
+
+  it("no rainbow/mono KPI numerals remain in any page", () => {
+    const kpi = /text-[23]xl font-(semibold|bold) font-mono text-(primary|purple|success|warning|error|emerald)-500/;
+    for (const [name, src] of pageFiles) {
+      expect(src, name).not.toMatch(kpi);
+    }
+  });
+
+  it("the uppercase KPI label dialect is gone from every page", () => {
+    // Carve-out (rollout wave-3 pin, 2026-11-11): DATA-TABLE header rows
+    // keep the uniform uppercase micro-label convention ("clinical
+    // density kept") — the ban applies to KPI / section / form labels,
+    // i.e. any occurrence NOT on a <tr> line.
+    for (const [name, src] of pageFiles) {
+      for (const line of src.split("\n")) {
+        if (line.includes("<tr")) continue;
+        expect(line, `${name}: ${line.trim().slice(0, 60)}`).not.toContain(
+          "text-xs font-semibold text-muted-foreground uppercase"
+        );
+        expect(line, `${name}: ${line.trim().slice(0, 60)}`).not.toContain(
+          "text-xs font-semibold uppercase text-muted-foreground"
+        );
+      }
+    }
+  });
+
+  it("no shadowed content cards remain in any page (ui primitives keep their own elevation)", () => {
+    for (const [name, src] of pageFiles) {
+      expect(src, name).not.toContain("shadow-xs");
+      expect(src, name).not.toContain("shadow-2xs");
+    }
   });
 });

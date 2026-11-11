@@ -108,10 +108,10 @@ const Symptoms = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs shrink-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shrink-0">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -155,7 +155,7 @@ const Symptoms = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Category Symptom Selector */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <div className="border-b border-border pb-3">
               <h2 className="font-semibold text-sm text-foreground">Select your symptoms</h2>
               <p className="text-xs text-muted-foreground font-medium mt-0.5">Tap a symptom to add it to your list.</p>
@@ -210,7 +210,7 @@ const Symptoms = () => {
 
           {/* Details & Submission */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="border-b border-border pb-3">
                 <h2 className="font-semibold text-sm text-foreground">Severity & details</h2>
               </div>
@@ -264,7 +264,7 @@ const Symptoms = () => {
             </div>
 
             {selectedSymptoms.length > 0 && (
-              <div className="rounded-2xl border border-primary-500/30 bg-card p-4 shadow-xs space-y-2">
+              <div className="rounded-2xl border border-primary-500/30 bg-card p-4 space-y-2">
                 <p className="font-semibold text-xs text-foreground">Your selected symptoms ({selectedSymptoms.length})</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedSymptoms.map((symptom) => (

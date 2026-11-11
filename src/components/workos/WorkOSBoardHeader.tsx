@@ -103,7 +103,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           {/* Automations Badge */}
           <button
             onClick={onOpenAutomationsModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-bold transition-all shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-bold transition-all"
           >
             <Zap className="h-4 w-4" />
             <span>Automate</span>
@@ -115,7 +115,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           {/* Integrations Badge */}
           <button
             onClick={onOpenIntegrationsModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all"
           >
             <Layers className="h-4 w-4" />
             <span>Integrate</span>

@@ -53,7 +53,7 @@ interface ProviderApp {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-xs font-semibold uppercase text-muted-foreground">{label}</span>
+    <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
     <span className="text-xs font-medium text-foreground">{value || "—"}</span>
   </div>
 );
@@ -352,7 +352,7 @@ export const ProviderApplications = () => {
                   <InfoRow label="Medical School" value={p?.medical_school} />
                   <InfoRow label="Graduation Year" value={p?.graduation_year} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Board Certifications</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Board Certifications</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.board_certifications || []).length > 0
                         ? (p!.board_certifications as string[]).map(c => (
@@ -365,7 +365,7 @@ export const ProviderApplications = () => {
                     </div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Subspecialties</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Subspecialties</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.subspecialties || []).length > 0
                         ? (p!.subspecialties as string[]).map(s => (
@@ -389,7 +389,7 @@ export const ProviderApplications = () => {
                   <InfoRow label="Practice Location" value={p?.primary_practice_location} />
                   <InfoRow label="Typical Wait Time" value={p?.typical_wait_time} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Affiliated Hospitals</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Affiliated Hospitals</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.affiliated_hospitals || []).length > 0
                         ? (p!.affiliated_hospitals as string[]).map(h => (
@@ -419,19 +419,19 @@ export const ProviderApplications = () => {
                     }
                   />
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Accepts Insurance</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Accepts Insurance</span>
                     <div className="mt-1"><BoolBadge value={p?.accepts_insurance ?? false} /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Telemedicine</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Telemedicine</span>
                     <div className="mt-1"><BoolBadge value={p?.telemedicine_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Home Visits</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Home Visits</span>
                     <div className="mt-1"><BoolBadge value={p?.home_visits_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Insurance Providers Accepted</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Insurance Providers Accepted</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.insurance_providers_accepted || []).length > 0
                         ? (p!.insurance_providers_accepted as string[]).map(ins => (

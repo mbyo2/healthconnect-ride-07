@@ -191,7 +191,7 @@ export const InstitutionModuleManager = () => {
       </div>
 
       {selectedId && (
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 className="font-semibold text-sm">{selected?.name}</h3>
             <span className="text-xs font-bold text-graphite-500">

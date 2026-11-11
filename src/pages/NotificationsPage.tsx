@@ -159,7 +159,7 @@ const NotificationsPage = () => {
                     <button
                 onClick={markAllAsRead}
                 aria-label={unreadCount > 0 ? `Mark all ${unreadCount} notifications as read` : 'Mark all as read'}
-                className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center gap-1.5"
               >
                 <CheckCheck className="h-4 w-4" />
                 <span>Mark All Read</span>
@@ -190,7 +190,7 @@ const NotificationsPage = () => {
       </div>
 
       <div className="pt-6">
-        <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
           {loading ? (
             <div className="p-6 space-y-3" role="status" aria-label="Loading notifications">
               {[0, 1, 2, 3].map((i) => (
@@ -221,7 +221,7 @@ const NotificationsPage = () => {
                   className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-background"}`}
                 >
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 rounded-xl bg-card border border-border shadow-2xs">
+                    <div className="p-2.5 rounded-xl bg-card border border-border">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">

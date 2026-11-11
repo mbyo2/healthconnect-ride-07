@@ -30,7 +30,7 @@ export const MessageBubble = ({ message, isMine = false }: MessageBubbleProps) =
     <div className={cn("flex w-full px-1", mine ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "max-w-[82%] sm:max-w-[75%] rounded-2xl px-3.5 py-2.5 shadow-xs",
+          "max-w-[82%] sm:max-w-[75%] rounded-2xl px-3.5 py-2.5",
           mine
             ? "rounded-br-md bg-primary-500 text-white"
             : "rounded-bl-md bg-muted text-midnight dark:text-slate-100 border border-border"

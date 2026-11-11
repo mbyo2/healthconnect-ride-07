@@ -182,7 +182,7 @@ const HealthcareProfessionals = () => {
         <link rel="canonical" href="https://doc0clock.online/healthcare-professionals" />
       </Helmet>
       {/* Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto">
           <h1 className="text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-3">
             <User className="h-8 w-8 text-primary-500" />

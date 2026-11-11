@@ -69,7 +69,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-border bg-card shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
+    <div className="p-5 rounded-2xl border border-border bg-card hover:border-primary-500 transition-all font-sans space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-11 w-11 border border-border">

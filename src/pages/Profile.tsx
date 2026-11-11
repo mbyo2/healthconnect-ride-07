@@ -450,7 +450,7 @@ const Profile = () => {
 
               {/* Education */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <GraduationCap className="h-4 w-4" /> Education
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -482,7 +482,7 @@ const Profile = () => {
 
               {/* Board Certifications */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Award className="h-4 w-4" /> Board Certifications
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -506,7 +506,7 @@ const Profile = () => {
 
               {/* Subspecialties */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Shield className="h-4 w-4" /> Subspecialties
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -530,7 +530,7 @@ const Profile = () => {
 
               {/* Practice */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> Practice Details
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -559,7 +559,7 @@ const Profile = () => {
 
               {/* Affiliated Hospitals */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Building2 className="h-4 w-4" /> Affiliated Hospitals
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -595,7 +595,7 @@ const Profile = () => {
 
               {/* Fees */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <DollarSign className="h-4 w-4" /> Consultation Fees (ZMW)
                 </h3>
                 <div className="grid grid-cols-2 gap-4 max-w-xs">
@@ -628,7 +628,7 @@ const Profile = () => {
 
               {/* Service toggles */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3">Service Delivery</h3>
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3">Service Delivery</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {([
                     { key: "telemedicine_available", icon: Video, label: "Telemedicine Available" },
@@ -653,7 +653,7 @@ const Profile = () => {
               {/* Insurance */}
               {provData.accepts_insurance && (
                 <section>
-                  <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                  <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                     <Shield className="h-4 w-4" /> Accepted Insurance Providers
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -678,7 +678,7 @@ const Profile = () => {
 
               {/* Languages */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
+                <h3 className="text-[13px] font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Languages className="h-4 w-4" /> Languages Spoken
                 </h3>
                 <div className="flex flex-wrap gap-2">

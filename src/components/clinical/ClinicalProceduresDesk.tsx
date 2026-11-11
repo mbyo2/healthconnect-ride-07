@@ -336,37 +336,37 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
 
       {/* Vital Signs Reference Ranges — normal ranges for quick checks, not live readings */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Heart Rate · ref</span>
           <div className="text-lg font-bold text-primary-500">{vitals.hr} bpm</div>
           <span className="text-xs font-bold text-slate-400">Resting adult range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Blood Pressure · ref</span>
           <div className="text-lg font-bold text-foreground">{vitals.bp} mmHg</div>
           <span className="text-xs font-bold text-slate-400">Normal adult range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">SpO2 Oxygen · ref</span>
           <div className="text-lg font-bold text-emerald-600">{vitals.spo2}%</div>
           <span className="text-xs font-bold text-slate-400">Healthy saturation</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Temperature · ref</span>
           <div className="text-lg font-bold text-foreground">{vitals.temp} °C</div>
           <span className="text-xs font-bold text-slate-400">Afebrile range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Blood Glucose · ref</span>
           <div className="text-lg font-bold text-foreground">{vitals.glucose} mmol/L</div>
           <span className="text-xs font-bold text-slate-400">Fasting range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs flex flex-col justify-center text-center">
+        <div className="p-3 rounded-2xl bg-card border border-border flex flex-col justify-center text-center">
           <Button
             variant="link"
             size="sm"
@@ -379,7 +379,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       </div>
 
       {/* Procedures Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">

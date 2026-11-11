@@ -235,7 +235,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                     </button>
                     <button
                       onClick={() => navigate(`/provider/${provider.id}`)}
-                      className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs flex items-center gap-1"
+                      className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold flex items-center gap-1"
                     >
                       <CalendarPlus className="h-3.5 w-3.5" /> Book Consultation
                     </button>

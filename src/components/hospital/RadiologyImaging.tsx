@@ -97,17 +97,17 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
 
       {/* Telemetry Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <Image className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{orders.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Total Studies</div>
         </div>
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <Clock className="h-5 w-5 mx-auto text-warning-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{pending}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">In Queue</div>
         </div>
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{reported}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Reports Signed</div>
@@ -133,7 +133,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       ) : orders.length === 0 ? (
         <EmptyState icon={Image} title="No imaging orders yet" description="Radiology requests from OPD, IPD or theatre appear here." actionLabel="Create New Order" onAction={() => setShowNewOrder(true)} />
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">

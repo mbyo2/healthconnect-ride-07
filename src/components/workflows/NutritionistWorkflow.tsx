@@ -137,7 +137,7 @@ export const NutritionistWorkflow = () => {
 
       <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <div key={index} className="group cursor-pointer rounded-2xl border border-border bg-card p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+          <div key={index} className="group cursor-pointer rounded-2xl border border-border bg-card p-4 hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
             onClick={() => step.action ? step.action() : handleNavigation(step.route!, step.title)}>
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-primary-500 group-hover:text-white transition-colors">{step.icon}</div>

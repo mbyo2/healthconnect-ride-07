@@ -85,7 +85,7 @@ export function AgendaTimeline({
   return (
     <section
       aria-label="Appointment agenda"
-      className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden"
+      className="rounded-2xl border border-border bg-card overflow-hidden"
     >
       {/* Day navigator */}
       <div className="px-3 py-2.5 bg-primary-50 dark:bg-blue-950/40 border-b border-border border-l-4 border-l-primary-500 flex items-center justify-between gap-2">

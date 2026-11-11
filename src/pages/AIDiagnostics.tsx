@@ -28,10 +28,10 @@ const AIDiagnostics = () => {
 
       <div className="pb-16">
         {/* Sticky Monday Top Header */}
-        <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+        <div className="doc-page-header px-4 sm:px-6 py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
                 <Brain className="h-5 w-5" />
               </div>
               <div>
@@ -99,7 +99,7 @@ const AIDiagnostics = () => {
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveTab(card.id); } }}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   activeTab === card.id
-                    ? "border-primary-500 bg-card shadow-xs ring-2 ring-primary-500/20"
+                    ? "border-primary-500 bg-card ring-2 ring-primary-500/20"
                     : "border-border bg-card hover:border-primary-500 "
                 }`}
               >
@@ -112,25 +112,25 @@ const AIDiagnostics = () => {
 
           {/* Main Active Tab Body */}
           {activeTab === "chat" && (
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-4">
               <DocOClockAIChat onActionClick={handleActionClick} />
             </div>
           )}
 
           {activeTab === "documents" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5">
               <DocumentAnalysisUploader />
             </div>
           )}
 
           {activeTab === "imaging" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5">
               <Imaging3DUploader />
             </div>
           )}
 
           {activeTab === "symptoms" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="border-b border-border pb-3">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-warning-500" />
@@ -145,7 +145,7 @@ const AIDiagnostics = () => {
           )}
 
           {activeTab === "history" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5">
               <AIDiagnosisHistory />
             </div>
           )}

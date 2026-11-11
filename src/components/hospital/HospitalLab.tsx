@@ -251,7 +251,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           { label: "Reports Ready", value: stats.completed, color: "#00c875", icon: <CheckCircle2 className="h-5 w-5" /> },
           { label: "STAT / Urgent", value: stats.urgent, color: "#e2445c", icon: <AlertCircle className="h-5 w-5" /> },
         ].map((card) => (
-          <div key={card.label} className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+          <div key={card.label} className="p-3.5 rounded-xl bg-card border border-border text-center">
             <div style={{ color: card.color }} className="flex justify-center mb-1">{card.icon}</div>
             <div className="text-2xl font-bold font-mono" style={{ color: card.color }}>{card.value}</div>
             <div className="text-xs text-muted-foreground font-bold uppercase">{card.label}</div>
@@ -294,7 +294,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           onAction={() => setShowOrderDialog(true)}
         />
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">

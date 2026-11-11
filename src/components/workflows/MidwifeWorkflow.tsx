@@ -155,7 +155,7 @@ export const MidwifeWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <div
             key={index}
-            className="group cursor-pointer rounded-2xl border border-border bg-card p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+            className="group cursor-pointer rounded-2xl border border-border bg-card p-4 hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
             onClick={() => step.action ? step.action() : handleNavigation(step.route!, step.title)}
           >
             <div className="flex items-center gap-3 mb-2">

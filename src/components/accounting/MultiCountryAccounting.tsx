@@ -320,7 +320,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
 
   const inputCls =
     "w-full min-h-[44px] p-2.5 rounded-xl border border-border text-sm font-semibold bg-card dark:text-slate-100";
-  const labelCls = "block text-xs font-semibold uppercase text-muted-foreground mb-1.5";
+  const labelCls = "block text-[13px] font-medium text-muted-foreground mb-1.5";
   const btnPrimary =
     "min-h-[44px] px-4 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm flex items-center justify-center gap-1.5 disabled:opacity-50";
 
@@ -433,28 +433,28 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+              <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-[13px] font-medium text-muted-foreground">Gross Revenue</div>
                 <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.revenue)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
-              <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+              <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-[13px] font-medium text-muted-foreground">Operating Expenses</div>
                 <div className="text-2xl font-bold text-error-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.expenses)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">From posted entries</div>
               </div>
-              <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+              <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-[13px] font-medium text-muted-foreground">Net Income</div>
                 <div className="text-2xl font-bold text-success-500 mt-1 tabular-nums">
                   {country.currency} {fmt(totals.netIncome)}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">Revenue − expenses</div>
               </div>
-              <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+              <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-[13px] font-medium text-muted-foreground">Est. VAT ({country.vatRate}%)</div>
                 <div className="text-2xl font-bold text-warning-500 mt-1 tabular-nums">
                   {country.currency} {fmt(estimatedVat)}
@@ -475,10 +475,10 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
           )}
 
           {/* Tax jurisdiction */}
-          <div className="p-4 rounded-2xl bg-card border border-border shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-card border border-border flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Globe className="h-5 w-5 text-primary-500" />
-              <span className="text-xs font-semibold uppercase text-muted-foreground">Tax Jurisdiction:</span>
+              <span className="text-[13px] font-medium text-muted-foreground">Tax Jurisdiction:</span>
               <select
                 value={country.countryCode}
                 onChange={(e) => handleCountryChange(e.target.value)}
@@ -506,7 +506,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 <Plus className="h-4 w-4" /> Add Account
               </button>
             </div>
-            <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+            <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-border bg-canvas dark:bg-slate-800/50 text-xs font-semibold uppercase text-muted-foreground">
@@ -543,7 +543,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 No journal entries posted yet.
               </p>
             ) : (
-              <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+              <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-border bg-canvas dark:bg-slate-800/50 text-xs font-semibold uppercase text-muted-foreground">

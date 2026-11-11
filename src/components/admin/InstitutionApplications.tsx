@@ -55,7 +55,7 @@ interface InstitutionDetail {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-xs font-semibold uppercase text-muted-foreground">{label}</span>
+    <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
     <span className="text-xs font-medium text-foreground">{value || "—"}</span>
   </div>
 );
@@ -308,7 +308,7 @@ export const InstitutionApplications = () => {
           No {filter} institution applications found.
         </div>
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -408,15 +408,15 @@ export const InstitutionApplications = () => {
                   <InfoRow label="Number of Beds" value={inst?.number_of_beds} />
                   <InfoRow label="Total Staff" value={inst?.number_of_staff} />
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Emergency Services</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Emergency Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.emergency_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Ambulance Services</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Ambulance Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.ambulance_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Open 24/7</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Open 24/7</span>
                     <div className="mt-1"><BoolBadge value={inst?.is_24_7} /></div>
                   </div>
                 </div>
@@ -429,19 +429,19 @@ export const InstitutionApplications = () => {
                 </h4>
                 <div className="space-y-3 p-4 rounded-xl bg-canvas border border-border">
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Services Offered</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Services Offered</span>
                     <TagList items={inst?.services_offered} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Equipment Available</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Equipment Available</span>
                     <TagList items={inst?.equipment_available} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Medical Specialties</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Medical Specialties</span>
                     <TagList items={inst?.specialties} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-muted-foreground">Languages Spoken</span>
+                    <span className="text-[13px] font-medium text-muted-foreground">Languages Spoken</span>
                     <TagList items={inst?.languages_spoken} emptyLabel="None listed" />
                   </div>
                 </div>

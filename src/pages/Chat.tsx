@@ -12,7 +12,7 @@ const Chat = () => {
         <link rel="canonical" href="https://doc0clock.online/chat" />
       </Helmet>
       <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
-        <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+        <div className="doc-page-header px-4 sm:px-6 py-5">
           <div className="max-w-content mx-auto flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
               <MessageCircle className="h-5 w-5" />

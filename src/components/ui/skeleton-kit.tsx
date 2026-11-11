@@ -42,7 +42,7 @@ export function SkeletonCard({
     <div
       aria-hidden
       className={cn(
-        "rounded-lg border border-border bg-card p-4 shadow-xs",
+        "rounded-lg border border-border bg-card p-4",
         className
       )}
     >
@@ -114,7 +114,7 @@ export function SkeletonStatCard({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "rounded-lg border border-border bg-card p-4 shadow-xs",
+        "rounded-lg border border-border bg-card p-4",
         className
       )}
     >
@@ -148,7 +148,7 @@ export function SkeletonProviderCard() {
   return (
     <div
       aria-hidden
-      className="rounded-lg border border-border bg-card p-4 shadow-xs"
+      className="rounded-lg border border-border bg-card p-4"
     >
       {/* Header: avatar + name / rating / specialty-fee */}
       <div className="mb-3 flex items-center gap-3">
@@ -659,7 +659,7 @@ export function SkeletonProviderDashboard() {
       </div>
 
       {/* Today's appointments */}
-      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 dark:bg-slate-900">
         <SkeletonLine className="mb-2 h-4 w-44" />
         <div className="divide-y divide-border">
           {[0, 1, 2].map((i) => (
@@ -697,7 +697,7 @@ export function SkeletonInstitutionDashboard() {
       <SkeletonStatGrid />
 
       {/* Quick-access modules card */}
-      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 dark:bg-slate-900">
         <SkeletonLine className="mb-3 h-3 w-44" />
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -713,7 +713,7 @@ export function SkeletonInstitutionDashboard() {
       </div>
 
       {/* Modules card */}
-      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 dark:bg-slate-900">
         <SkeletonLine className="mb-1.5 h-3 w-32" />
         <SkeletonLine className="mb-3 h-3 w-64 max-w-full" />
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">

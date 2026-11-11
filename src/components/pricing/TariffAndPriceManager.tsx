@@ -518,7 +518,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             <button
               onClick={loadStarterTariffs}
               disabled={seeding || !institutionId}
-              className="px-3.5 py-1.5 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-100 font-semibold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-100 font-semibold text-xs flex items-center gap-1 disabled:opacity-50"
             >
               <Tag className="h-4 w-4" />
               <span>{seeding ? 'Loading…' : 'Load Starter Tariffs'}</span>

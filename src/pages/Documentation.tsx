@@ -158,7 +158,7 @@ export default function Documentation() {
         <h2 className="text-3xl font-bold text-center">Platform Features</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+            <Card key={index} className="transition-colors">
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary-100 rounded-lg">
@@ -182,7 +182,7 @@ export default function Documentation() {
         <h2 className="text-3xl font-bold text-center">Documentation Sections</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {sections.map((section, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+            <Card key={index} className="transition-colors">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   {section.icon}

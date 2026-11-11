@@ -239,7 +239,7 @@ export default function HealthDashboard() {
         {/* Health Stats - Modern Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {healthStats.length > 0 ? healthStats.map((stat, index) => (
-            <div key={index} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3">
+            <div key={index} className="rounded-lg border border-border bg-card p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="p-2.5 rounded-lg bg-primary-500/10 text-primary-600 border border-primary-500/20">
                   {getIconComponent(stat.icon)}

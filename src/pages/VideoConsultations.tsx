@@ -29,7 +29,7 @@ const VideoConsultations = () => {
           </StatusBadge>
         </div>
 
-        <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs">
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
           <VideoConsultation />
         </div>
       </div>

@@ -113,7 +113,7 @@ export function ProviderSlotsPreview({
   if (days.length === 0) return null;
 
   return (
-    <div className="p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+    <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
       <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
         <CalendarClock className="h-4 w-4 text-primary-500" aria-hidden />
         Nearest available slots

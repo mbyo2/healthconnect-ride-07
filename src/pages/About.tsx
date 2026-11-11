@@ -38,7 +38,7 @@ const About = () => (
           { icon: Stethoscope, title: "For care teams", text: "Support independent professionals with scheduling, patient workflows, telehealth, records and practice operations." },
           { icon: Building2, title: "For organisations", text: "Connect clinics, pharmacies, laboratories, diagnostic centres and hospitals through operational healthcare tools." },
         ].map((item) => (
-          <article key={item.title} className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
+          <article key={item.title} className="rounded-2xl border border-border/50 bg-card p-6">
             <item.icon className="mb-4 h-7 w-7 text-primary" />
             <h2 className="mb-2 text-lg font-semibold">{item.title}</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>

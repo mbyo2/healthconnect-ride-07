@@ -225,7 +225,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
   const renderIndentCard = (indent: any, showActions: boolean) => {
     const its = itemsFor(indent.id);
     return (
-      <div key={indent.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-2">
+      <div key={indent.id} className="rounded-2xl border border-border bg-card p-4 space-y-2">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
             <p className="text-[15px] font-semibold">{indent.indent_number} <span className="font-medium text-muted-foreground">• {indent.department}</span></p>
@@ -290,7 +290,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       {/* Today at a glance */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {glance.map((g) => (
-          <div key={g.label} className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <div key={g.label} className="rounded-2xl border border-border bg-card p-4">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
             <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
             <p className="text-xs text-muted-foreground font-medium mt-1">{g.label}</p>
@@ -326,7 +326,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
 
       {/* RAISE INDENT */}
       {activeTab === "raise" && (
-        <form onSubmit={handleRaise} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs space-y-4">
+        <form onSubmit={handleRaise} className="rounded-2xl border border-border bg-card p-4 sm:p-5 space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <DepartmentSelect hospitalId={hospital?.id} value={department} onChange={setDepartment} departments={departments} label="Department *" required valueMode="name" />
             <div>

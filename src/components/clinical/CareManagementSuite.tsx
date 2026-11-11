@@ -290,7 +290,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                     key={b.id}
                     className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
                       isOccupied
-                        ? "bg-card border-primary-500/40 shadow-xs"
+                        ? "bg-card border-primary-500/40"
                         : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-border"
                     }`}
                   >

@@ -100,10 +100,10 @@ const BlockchainRecords = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
               <Database className="h-5 w-5" />
             </div>
             <div>
@@ -229,7 +229,7 @@ const BlockchainRecords = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Records List */}
-          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-5 shadow-xs">
+          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-5">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-primary-500" />
@@ -289,7 +289,7 @@ const BlockchainRecords = () => {
           </div>
 
           {/* Audit Trail */}
-          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Eye className="w-4 h-4 text-success-500" />
@@ -321,7 +321,7 @@ const BlockchainRecords = () => {
 
         {/* Record Details Panel */}
         {selectedRecord && (
-          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-lg border border-border bg-card p-5">
             <h2 className="font-semibold text-sm mb-4">Selected record</h2>
 
             <div className="flex items-center gap-2 mb-4 border-b border-border pb-3">

@@ -273,7 +273,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   return (
     <div className="space-y-4 font-sans text-foreground">
       {/* Monday Header Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-card border border-border shadow-xs">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-card border border-border">
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <Pill className="h-5 w-5 text-primary-500" /> In-Hospital Dispensary
@@ -305,7 +305,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           { label: "Expiry Alerts", value: expiredItems.length + nearExpiry.length, color: "#e2445c", icon: <AlertTriangle className="h-5 w-5" /> },
           { label: "Open Rx", value: pendingRx.length, color: "#a25ddc", icon: <Pill className="h-5 w-5" /> },
         ].map((c) => (
-          <div key={c.label} className="p-3 rounded-xl bg-card border border-border text-center shadow-xs">
+          <div key={c.label} className="p-3 rounded-xl bg-card border border-border text-center">
             <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
             <p className="text-xl font-bold font-mono" style={{ color: c.color }}>{c.value}</p>
             <p className="text-xs text-muted-foreground font-bold uppercase">{c.label}</p>
@@ -315,7 +315,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
       {/* Tabs */}
       <Tabs defaultValue="orders">
-        <div className="overflow-x-auto p-1 bg-card rounded-xl border border-border shadow-xs">
+        <div className="overflow-x-auto p-1 bg-card rounded-xl border border-border">
           <TabsList className="inline-flex w-auto min-w-full h-auto gap-1 bg-transparent p-1">
             {[
               { val: "orders", label: `Prescriptions (${pendingRx.length})` },

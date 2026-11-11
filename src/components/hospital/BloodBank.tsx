@@ -254,7 +254,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         loading ? <ListSkeleton count={4} variant="compact" /> :
         error ? <EmptyState icon={Droplets} title="Could not load blood stock" description={error} actionLabel="Retry" onAction={refresh} /> :
         tracked.length === 0 ? <EmptyState icon={Droplets} title="No blood stock recorded" description="Add blood component units to track live availability." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -288,7 +288,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "requests" && (
         reqLoading ? <ListSkeleton count={3} variant="row" /> :
         requests.length === 0 ? <EmptyState icon={Droplets} title="No transfusion requests" description="Blood requests from wards and theatre appear here." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -337,7 +337,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "donors" && (
         donorsLoading ? <ListSkeleton count={3} variant="row" /> :
         donors.length === 0 ? <EmptyState icon={Droplets} title="No donors registered" description="Register blood donors to track donations." actionLabel="Register Donor" onAction={() => setShowAddDonor(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -371,7 +371,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "donations" && (
         donationsLoading ? <ListSkeleton count={3} variant="row" /> :
         donations.length === 0 ? <EmptyState icon={Droplets} title="No donations recorded" description="Record blood donations to update inventory." actionLabel="Record Donation" onAction={() => setShowAddDonation(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -405,7 +405,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "compatibility" && (
         compatLoading ? <ListSkeleton count={3} variant="row" /> :
         compatTests.length === 0 ? <EmptyState icon={Droplets} title="No compatibility tests" description="Record crossmatch and compatibility tests here." actionLabel="New Test" onAction={() => setShowCompatTest(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -439,7 +439,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "audit" && (
         auditLoading ? <ListSkeleton count={3} variant="row" /> :
         auditLog.length === 0 ? <EmptyState icon={Droplets} title="No audit records" description="Blood issuance events will appear here with full traceability." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">

@@ -338,9 +338,9 @@ export default function TriageAssistant() {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Header — same chrome as the rest of the app */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shrink-0">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
@@ -368,7 +368,7 @@ export default function TriageAssistant() {
         )}
 
         {step === "intro" && (
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <h2 className="font-semibold text-base flex items-center gap-2">
               <Stethoscope className="h-5 w-5 text-primary-500" /> Before you start
             </h2>
@@ -401,7 +401,7 @@ export default function TriageAssistant() {
         )}
 
         {step === "intake" && (
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-6">
             {/* Danger signs FIRST — selecting one escalates on continue */}
             <div className="space-y-2">
               <h2 className="font-semibold text-sm flex items-center gap-2 text-error-600 dark:text-red-400">
@@ -556,7 +556,7 @@ export default function TriageAssistant() {
         )}
 
         {step === "followup" && (
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-5">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
             <div>
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary-500" /> A few more questions
@@ -607,7 +607,7 @@ export default function TriageAssistant() {
         {step === "emergency" && (
           <div
             role="alert"
-            className="rounded-2xl border-2 border-error-500 bg-error-50 dark:bg-red-950/40 p-5 shadow-xs space-y-4"
+            className="rounded-2xl border-2 border-error-500 bg-error-50 dark:bg-red-950/40 p-5 space-y-4"
           >
             <h2 className="font-bold text-lg text-error-700 dark:text-red-300 flex items-center gap-2">
               <Ambulance className="h-6 w-6" /> Get emergency help now
@@ -664,7 +664,7 @@ export default function TriageAssistant() {
 
         {step === "assessment" && assessment && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white ${

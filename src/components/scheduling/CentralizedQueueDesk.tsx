@@ -255,7 +255,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Waiting in Queue</span>
           <div className="text-3xl font-bold text-primary-500 mt-1">{loading ? "—" : `${waiting.length} Patients`}</div>
           <span className="text-xs font-bold text-slate-500">
@@ -263,13 +263,13 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Currently Serving</span>
           <div className="text-3xl font-bold text-amber-500 mt-1">{loading ? "—" : `${serving.length} Active`}</div>
           <span className="text-xs font-bold text-slate-500">Called to rooms</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border">
           <span className="text-xs font-semibold uppercase text-slate-400">Completed Today</span>
           <div className="text-3xl font-bold text-emerald-600 mt-1">{loading ? "—" : `${completed.length} Served`}</div>
           <span className="text-xs font-bold text-emerald-600">Live count</span>
@@ -290,7 +290,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
       </div>
 
       {/* Live Queue Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full min-w-[720px] text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">

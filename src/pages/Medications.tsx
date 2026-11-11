@@ -183,7 +183,7 @@ const Medications = () => {
 
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">

@@ -70,10 +70,10 @@ const Marketplace = () => {
     <ProtectedRoute>
       <div className="pb-16">
         {/* Sticky Monday Top Header */}
-        <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+        <div className="doc-page-header px-4 sm:px-6 py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gold hover:bg-gold-deep text-gold-ink flex items-center justify-center font-semibold text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-full bg-gold hover:bg-gold-deep text-gold-ink flex items-center justify-center font-semibold text-sm">
                 <Pill className="h-5 w-5" />
               </div>
               <div>
@@ -90,7 +90,7 @@ const Marketplace = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab("cart")}
-                className="px-4 py-2 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all flex items-center gap-2"
+                className="px-4 py-2 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Cart ({cart?.items?.length ?? 0})</span>
@@ -126,7 +126,7 @@ const Marketplace = () => {
           {activeTab === "products" && (
             <div className="space-y-6">
               {/* Search and Filters */}
-              <div className="flex flex-col md:flex-row gap-3 p-4 rounded-2xl border border-border bg-card shadow-xs">
+              <div className="flex flex-col md:flex-row gap-3 p-4 rounded-2xl border border-border bg-card">
                 <div className="relative flex-1">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <input
@@ -190,7 +190,7 @@ const Marketplace = () => {
           )}
 
           {activeTab === "cart" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5">
               <Cart
                 cart={cart}
                 onUpdateQuantity={updateCartQuantity}
@@ -202,7 +202,7 @@ const Marketplace = () => {
           )}
 
           {activeTab === "orders" && (
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <h2 className="font-semibold text-sm mb-4">Medication Fulfillment & Order History</h2>
               <div className="space-y-3" aria-label={ordersLoading ? "Loading orders" : "Order history"}>
                 {ordersLoading ? (

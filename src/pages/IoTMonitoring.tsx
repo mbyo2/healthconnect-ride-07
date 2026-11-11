@@ -63,10 +63,10 @@ const IoTMonitoring = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
               <Cpu className="h-5 w-5" />
             </div>
             <div>
@@ -126,7 +126,7 @@ const IoTMonitoring = () => {
 
       <div className="px-4 sm:px-6 pt-6 space-y-6">
         {/* Connected Devices Grid */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Watch className="h-4 w-4 text-primary-500" />
             Active Connected Devices ({devices.length})
@@ -141,7 +141,7 @@ const IoTMonitoring = () => {
                   onClick={() => setSelectedDevice(device.id)}
                   className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     selectedDevice === device.id
-                      ? "border-primary-500 bg-primary-50/50 shadow-xs"
+                      ? "border-primary-500 bg-primary-50/50"
                       : "border-border bg-background hover:border-primary-500"
                   }`}
                 >
@@ -194,7 +194,7 @@ const IoTMonitoring = () => {
         </div>
 
         {/* Current Vital Signs Bento Grid */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Heart className="w-4 h-4 text-error-500" />
             Real-Time Vital Telemetry
@@ -249,7 +249,7 @@ const IoTMonitoring = () => {
 
         {/* Charts & Alerts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-5">
             <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary-500" />
               24-Hour Continuous Heart Rate Telemetry
@@ -274,7 +274,7 @@ const IoTMonitoring = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-warning-500" />
               Device Alerts ({alerts.length})
@@ -302,7 +302,7 @@ const IoTMonitoring = () => {
         </div>
 
         {/* AI Insights Section */}
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-4">
           <AIInsightsWidget
             context="iot"
             data={{
@@ -324,7 +324,7 @@ const IoTMonitoring = () => {
               <p className="text-xs text-muted-foreground font-medium">Stream continuous EKG, pulse oximetry, and blood glucose directly to your medical team.</p>
             </div>
           </div>
-          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1 shadow-xs">
+          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1">
             <Bot className="w-4 h-4" /> AI Diagnostics
           </button>
         </div>

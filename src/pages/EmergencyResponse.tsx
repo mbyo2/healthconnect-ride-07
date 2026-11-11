@@ -141,10 +141,10 @@ const EmergencyResponse = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-semibold text-sm">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
@@ -193,7 +193,7 @@ const EmergencyResponse = () => {
         {/* Contacts & Medical Info Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Emergency Contacts */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <User className="w-4 h-4 text-primary-500" />
@@ -229,7 +229,7 @@ const EmergencyResponse = () => {
           </div>
 
           {/* Critical Medical Info */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-error-500" />
@@ -243,11 +243,11 @@ const EmergencyResponse = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-error-50 dark:bg-red-950/40 border border-error-500/30">
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Blood Type</p>
+                  <p className="text-[13px] font-medium text-muted-foreground">Blood Type</p>
                   <p className="text-2xl font-bold text-foreground tabular-nums mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
                 <div className="p-3 rounded-xl bg-canvas border border-border">
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Known Allergies</p>
+                  <p className="text-[13px] font-medium text-muted-foreground">Known Allergies</p>
                   <p className="text-xs font-semibold text-foreground mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
                 </div>
               </div>
@@ -278,7 +278,7 @@ const EmergencyResponse = () => {
         </div>
 
         {/* Nearby Hospitals Board */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary-500" />
@@ -322,7 +322,7 @@ const EmergencyResponse = () => {
           </div>
           <button
             onClick={handleShareLocation}
-            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs text-white shadow-xs transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
+            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs text-white transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
           >
             {locationSharing ? "Stop Location Telemetry" : "Activate GPS Telemetry Broadcast"}
           </button>

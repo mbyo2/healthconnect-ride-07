@@ -159,7 +159,7 @@ export const CostEstimator = () => {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5">
+    <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
       <div className="flex items-center gap-3 pb-3 border-b border-border">
         <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm">
           <Calculator className="h-5 w-5" />
@@ -207,7 +207,7 @@ export const CostEstimator = () => {
       )}
 
       <div>
-        <label htmlFor="cost-estimator-service" className="text-xs font-semibold uppercase text-muted-foreground block mb-1">
+        <label htmlFor="cost-estimator-service" className="text-[13px] font-medium text-muted-foreground block mb-1">
           Select Clinical Procedure or Consultation Type
         </label>
         <Select value={serviceType} onValueChange={setServiceType}>
@@ -237,7 +237,7 @@ export const CostEstimator = () => {
 
       {estimate && (
         <div className="p-4 rounded-xl bg-canvas border border-border space-y-3">
-          <div className="text-xs font-semibold uppercase text-muted-foreground">Financial Breakdown Summary</div>
+          <div className="text-[13px] font-medium text-muted-foreground">Financial Breakdown Summary</div>
           <div className="space-y-1.5 text-xs font-medium">
             <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>K{estimate.total.toFixed(2)}</span></div>
             <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-K{estimate.coverage.toFixed(2)}</span></div>

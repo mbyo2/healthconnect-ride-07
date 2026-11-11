@@ -324,7 +324,7 @@ export const SelfServiceKiosk: React.FC = () => {
         {mode !== "menu" && terminalState === "ready" && (
           <button
             onClick={() => goMode("menu")}
-            className="px-4 py-2 rounded-xl bg-card border border-border text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-xs hover:bg-muted"
+            className="px-4 py-2 rounded-xl bg-card border border-border text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 hover:bg-muted"
           >
             <Home className="h-4 w-4" /> Home Screen
           </button>
@@ -791,7 +791,7 @@ export const SelfServiceKiosk: React.FC = () => {
             <div className="space-y-3 pt-2">
               <button
                 onClick={handlePrintSlip}
-                className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs"
+                className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-xs flex items-center justify-center gap-2"
               >
                 <Printer className="h-4 w-4" /> Print Token Paper Slip
               </button>

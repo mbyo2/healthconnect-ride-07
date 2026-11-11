@@ -229,7 +229,7 @@ export const AppointmentDetails = () => {
   return (
     <div className="pb-16">
       {/* Sticky Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -305,7 +305,7 @@ export const AppointmentDetails = () => {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Appointment Information Card */}
-          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+          <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
             <h2 className="font-semibold text-base flex items-center gap-2 border-b border-border pb-3">
               <Calendar className="h-5 w-5 text-primary-500" />
               Appointment Information
@@ -381,7 +381,7 @@ export const AppointmentDetails = () => {
           </div>
 
           {/* Participant Info */}
-          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+          <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
             <h2 className="font-semibold text-base flex items-center gap-2 border-b border-border pb-3">
               <User className="h-5 w-5 text-primary-500" />
               Participant Details
@@ -410,7 +410,7 @@ export const AppointmentDetails = () => {
         </div>
 
         {/* Clinical Notes Section */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-3">
+        <div className="p-6 rounded-2xl bg-card border border-border space-y-3">
           <h2 className="font-semibold text-base flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-500" />
             Clinical Notes & Observations
@@ -424,7 +424,7 @@ export const AppointmentDetails = () => {
           />
           <button
             onClick={updateNotes}
-            className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all"
+            className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all"
           >
             Save Clinical Notes
           </button>

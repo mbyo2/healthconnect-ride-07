@@ -648,7 +648,7 @@ export const Prescriptions = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">

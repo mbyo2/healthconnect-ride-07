@@ -115,9 +115,9 @@ const AppointmentRemindersPage = () => {
     <ProtectedRoute>
       <div className="pb-16">
         {/* Sticky Monday Top Header */}
-        <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+        <div className="doc-page-header px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -134,7 +134,7 @@ const AppointmentRemindersPage = () => {
 
         <div className="px-4 sm:px-6 pt-6 space-y-6">
           {/* Reminder Channel Preferences */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
               <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
               {prefsLoading && <span className="text-xs font-medium text-muted-foreground">Loading…</span>}
@@ -192,7 +192,7 @@ const AppointmentRemindersPage = () => {
           </div>
 
           {/* Upcoming Visits & Calendar Sync */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
               <Calendar className="h-4 w-4 text-success-500" /> Upcoming Visits & iCal Export
             </h2>

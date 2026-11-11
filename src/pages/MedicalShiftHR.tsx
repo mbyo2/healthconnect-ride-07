@@ -276,10 +276,10 @@ export const MedicalShiftHR = () => {
   return (
     <div className="pb-16">
       {/* Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shrink-0">
               <Clock className="h-5 w-5" />
             </div>
             <div className="min-w-0">

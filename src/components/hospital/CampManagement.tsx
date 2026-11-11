@@ -235,7 +235,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {/* Today at a glance */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {glance.map((g) => (
-          <div key={g.label} className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <div key={g.label} className="rounded-2xl border border-border bg-card p-4">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
             <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
             <p className="text-xs text-muted-foreground font-medium mt-1">{g.label}</p>
@@ -276,7 +276,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             {camps.map((c) => {
               const regs = myRegs.filter((r) => r.camp_id === c.id);
               return (
-                <div key={c.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-2">
+                <div key={c.id} className="rounded-2xl border border-border bg-card p-4 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-[15px] font-semibold">{c.name}</p>
@@ -322,7 +322,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           </div>
           {regLoading ? <ListSkeleton count={4} variant="row" /> :
           visibleRegs.length === 0 ? <EmptyState icon={Users} title="No registrations" description="Walk-in registrations from camps appear here." actionLabel="Quick register" onAction={() => setShowRegister(true)} /> : (
-            <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+            <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -375,7 +375,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
         followupsDue.length === 0 ? <EmptyState icon={CalendarClock} title="No follow-ups due" description="Patients flagged for follow-up with a due date appear here." /> : (
           <div className="space-y-2">
             {followupsDue.map((r) => (
-              <div key={r.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs flex items-center justify-between gap-3 flex-wrap">
+              <div key={r.id} className="rounded-2xl border border-border bg-card p-4 flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <p className="text-[15px] font-semibold">{r.full_name}</p>
                   <p className="text-xs text-muted-foreground">
@@ -393,7 +393,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {/* REPORTS */}
       {activeTab === "reports" && (
         camps.length === 0 ? <EmptyState icon={BarChart3} title="No camp data" description="Reports appear once camps have registrations." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">

@@ -264,7 +264,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
   ]));
 
   return (
-    <div className="rounded-2xl bg-card border border-border shadow-xs hover:shadow-md hover:border-primary-500/50 transition-all flex flex-col">
+    <div className="rounded-2xl bg-card border border-border hover:shadow-md hover:border-primary-500/50 transition-all flex flex-col">
 
       {/* ── Card header ── */}
       <div className="p-5 space-y-3 flex-1">

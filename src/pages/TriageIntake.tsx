@@ -183,9 +183,9 @@ export default function TriageIntake() {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="max-w-[1500px] mx-auto flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm">
             <Activity className="h-5 w-5" />
           </div>
           <div>
@@ -205,7 +205,7 @@ export default function TriageIntake() {
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Symptom Intake Card */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+        <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
           <div className="border-b border-border pb-3">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <Stethoscope className="h-4 w-4 text-primary-500" /> Tell us your symptoms
@@ -301,7 +301,7 @@ export default function TriageIntake() {
 
         {/* Result Assessment Card */}
         {result && meta && (
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
                 <h2 className="font-semibold text-sm text-foreground">Your result</h2>

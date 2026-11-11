@@ -258,7 +258,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                     }}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-primary-500/10 border-primary-500 shadow-xs"
+                        ? "bg-primary-500/10 border-primary-500"
                         : "bg-card border-border hover:border-slate-300"
                     }`}
                   >
@@ -280,7 +280,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
         </div>
 
         {/* Right 7 Cols: Detailed Dossier */}
-        <div className="lg:col-span-7 p-6 rounded-2xl border border-border bg-card shadow-xs space-y-6 text-xs">
+        <div className="lg:col-span-7 p-6 rounded-2xl border border-border bg-card space-y-6 text-xs">
           {!selected ? (
             <div className="py-12 text-center">
               <Users className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />

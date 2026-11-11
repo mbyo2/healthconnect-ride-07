@@ -439,7 +439,7 @@ export const BillingStaffWorkflow = () => {
               <button
                 onClick={handleCreateInvoice}
                 disabled={creating || !invoiceForm.patient_name.trim()}
-                className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-xs shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-xs"
               >
                 {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Official Invoice"}
               </button>
@@ -488,7 +488,7 @@ export const BillingStaffWorkflow = () => {
             <button
               onClick={handleRecordPayment}
               disabled={creating || paymentForm.amount <= 0}
-              className="w-full py-2.5 rounded-xl bg-success-500 text-white font-semibold text-xs shadow-xs"
+              className="w-full py-2.5 rounded-xl bg-success-500 text-white font-semibold text-xs"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Record & Post Payment"}
             </button>
@@ -498,19 +498,19 @@ export const BillingStaffWorkflow = () => {
 
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
           <p className="text-2xl font-bold text-foreground tabular-nums">K{todayCollections.toLocaleString()}</p>
           <p className="text-xs font-bold text-muted-foreground">Today's Total Collections</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
           <p className="text-2xl font-bold text-foreground tabular-nums">{pendingInvoices.length}</p>
           <p className="text-xs font-bold text-muted-foreground">Pending Invoices</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
           <p className="text-2xl font-bold text-foreground tabular-nums">{pendingClaims.length}</p>
           <p className="text-xs font-bold text-muted-foreground">Pending Insurance Claims</p>

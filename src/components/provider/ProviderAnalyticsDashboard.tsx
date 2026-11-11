@@ -93,7 +93,7 @@ export const ProviderAnalyticsDashboard = () => {
       {/* 8 Bento Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="p-3.5 rounded-xl border border-border bg-card shadow-xs">
+          <div key={label} className="p-3.5 rounded-xl border border-border bg-card">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-xl bg-canvas border border-border">
                 <Icon className={`h-4 w-4 ${color}`} />
@@ -109,7 +109,7 @@ export const ProviderAnalyticsDashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Recent Appointments */}
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <h3 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-primary-500" /> Recent Patient Visits
@@ -139,7 +139,7 @@ export const ProviderAnalyticsDashboard = () => {
         </div>
 
         {/* Recent Reviews & Patient Satisfaction */}
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <h3 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <MessageSquareText className="h-4 w-4 text-muted-foreground" /> Patient Ratings & Feedback

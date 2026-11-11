@@ -309,7 +309,7 @@ export const HRManagerWorkflow = () => {
               <button
                 onClick={handleCreateLeave}
                 disabled={creating || !leaveForm.start_date || !leaveForm.end_date}
-                className="w-full py-2.5 rounded-md bg-primary-500 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-40"
+                className="w-full py-2.5 rounded-md bg-primary-500 text-white font-semibold text-xs transition-all disabled:opacity-40"
               >
                 Submit Request
               </button>
@@ -320,7 +320,7 @@ export const HRManagerWorkflow = () => {
 
       {/* Telemetry Telemetry Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="text-[13px] font-medium text-muted-foreground">Staff Present Today</div>
           <div className="text-3xl font-bold text-foreground tabular-nums mt-1">
             {todayAttendance.filter((a) => a.status === "present").length}
@@ -328,7 +328,7 @@ export const HRManagerWorkflow = () => {
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Biometric Clocked-In</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="text-[13px] font-medium text-muted-foreground">Late Arrivals</div>
           <div className="text-3xl font-bold text-foreground tabular-nums mt-1">
             {todayAttendance.filter((a) => a.status === "late").length}
@@ -336,13 +336,13 @@ export const HRManagerWorkflow = () => {
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Grace period exceeded</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="text-[13px] font-medium text-muted-foreground">Pending Leaves</div>
           <div className="text-3xl font-bold text-foreground tabular-nums mt-1">{pendingLeaves.length}</div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">Awaiting Approval</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="text-[13px] font-medium text-muted-foreground">Active Payroll Items</div>
           <div className="text-3xl font-bold text-foreground tabular-nums mt-1">{payroll.length}</div>
           <div className="text-xs text-primary-600 dark:text-primary-400 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
@@ -375,7 +375,7 @@ export const HRManagerWorkflow = () => {
 
       {/* Main Tab Views */}
       {activeTab === "employees" && (
-        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
           <div className="px-4 py-3 border-b border-border flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-sm">Employee Directory ({employees.length})</h3>
@@ -452,7 +452,7 @@ export const HRManagerWorkflow = () => {
       )}
 
       {activeTab === "leaves" && (
-        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
@@ -504,7 +504,7 @@ export const HRManagerWorkflow = () => {
       {activeTab === "attendance" && (
         <div className="space-y-4">
           <BulkAttendanceImport onComplete={refetch} />
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+          <div className="rounded-2xl border border-border bg-card overflow-hidden">
             <div className="px-4 py-3 border-b border-border">
               <h3 className="font-semibold text-sm">Today's Attendance ({todayAttendance.length})</h3>
               <p className="text-xs text-muted-foreground font-medium">Clock-in records for today</p>
@@ -552,7 +552,7 @@ export const HRManagerWorkflow = () => {
 
       {activeTab === "payroll" && (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="rounded-2xl border border-border bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-semibold text-sm">Payroll Runs</h3>
               <p className="text-xs text-muted-foreground font-medium">
@@ -567,7 +567,7 @@ export const HRManagerWorkflow = () => {
               Run Payroll
             </button>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
           {payroll.length === 0 && (
             <div className="p-8 text-center">
               <DollarSign className="h-8 w-8 mx-auto mb-2 opacity-40" />

@@ -23,7 +23,7 @@ import { ProviderSlotsPreview } from "@/components/booking/ProviderSlotsPreview"
 const Section = ({
   icon: Icon, title, children,
 }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
-  <div className="p-5 rounded-2xl bg-card border border-border shadow-xs space-y-3">
+  <div className="p-5 rounded-2xl bg-card border border-border space-y-3">
     <h3 className="text-lg font-medium flex items-center gap-2 text-foreground">
       <Icon className="h-4 w-4 text-primary-500" />
       {title}
@@ -415,7 +415,7 @@ export const ProviderDetail = () => {
                   )}
                   {certs.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Board Certifications</p>
+                      <p className="text-[13px] font-medium text-muted-foreground mb-1.5">Board Certifications</p>
                       <div className="flex flex-wrap gap-1.5">
                         {certs.map(c => (
                           <Badge key={c} variant="outline" className="gap-1 text-xs">
@@ -427,7 +427,7 @@ export const ProviderDetail = () => {
                   )}
                   {subs.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Subspecialties</p>
+                      <p className="text-[13px] font-medium text-muted-foreground mb-1.5">Subspecialties</p>
                       <div className="flex flex-wrap gap-1.5">
                         {subs.map(s => (
                           <Badge key={s} variant="secondary" className="text-xs">
@@ -445,7 +445,7 @@ export const ProviderDetail = () => {
                 <Section icon={Building2} title="Practice Details">
                   {hospitals.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Affiliated Hospitals</p>
+                      <p className="text-[13px] font-medium text-muted-foreground mb-1.5">Affiliated Hospitals</p>
                       <ul className="space-y-1">
                         {hospitals.map(h => (
                           <li key={h} className="flex items-center gap-1.5 text-sm">
@@ -457,7 +457,7 @@ export const ProviderDetail = () => {
                   )}
                   {apptTypes.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Appointment Types</p>
+                      <p className="text-[13px] font-medium text-muted-foreground mb-1.5">Appointment Types</p>
                       <div className="flex flex-wrap gap-1.5">
                         {apptTypes.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
                       </div>
@@ -512,7 +512,7 @@ export const ProviderDetail = () => {
               )}
 
               {/* Reviews */}
-              <div className="p-5 rounded-2xl bg-card border border-border shadow-xs">
+              <div className="p-5 rounded-2xl bg-card border border-border">
                 <h3 className="text-lg font-medium text-foreground mb-3 flex items-center gap-2">
                   <Star className="h-4 w-4 text-primary-500" /> Patient Reviews
                 </h3>
@@ -528,7 +528,7 @@ export const ProviderDetail = () => {
                   <InfoRow label="Consultation fee" value={feeLabel ? <span className="font-semibold text-primary-500">{feeLabel}</span> : feeDisplay} />
                   {insurances.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Accepted Insurance</p>
+                      <p className="text-[13px] font-medium text-muted-foreground mb-1.5">Accepted Insurance</p>
                       <div className="flex flex-wrap gap-1.5">
                         {insurances.map(ins => (
                           <Badge key={ins} variant="outline" className="text-xs gap-1">

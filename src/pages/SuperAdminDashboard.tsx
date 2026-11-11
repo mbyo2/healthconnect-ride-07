@@ -214,7 +214,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Top Bar */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-button">
@@ -280,7 +280,7 @@ const SuperAdminDashboard = () => {
             { label: "Access Controls", value: "Active", sub: "Role-based security enabled", icon: <Settings className="h-5 w-5" /> },
             { label: "Users Managed", value: "All", sub: "Full platform access", icon: <Users className="h-5 w-5" /> },
           ].map((card) => (
-            <div key={card.label} className="p-4 rounded-lg bg-card border border-border shadow-xs">
+            <div key={card.label} className="p-4 rounded-lg bg-card border border-border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground">{card.label}</span>
                 <span className="h-9 w-9 rounded-lg bg-primary-500/10 text-primary-600 flex items-center justify-center">{card.icon}</span>
@@ -292,7 +292,7 @@ const SuperAdminDashboard = () => {
         </div>
 
         {/* Admin Management Table */}
-        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5">
           <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary-500" /> Admin & superadmin management
           </h2>
@@ -300,12 +300,12 @@ const SuperAdminDashboard = () => {
         </div>
 
         {/* Subscription Pricing — superadmin editable */}
-        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5">
           <SubscriptionPricingAdmin />
         </div>
 
         {/* Module Add-on Pricing — superadmin editable */}
-        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5">
           <ModulePricingAdmin />
         </div>
 

@@ -111,19 +111,19 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
 
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <Package className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{supplies.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Total Stock Items</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <TrendingDown className="h-5 w-5 mx-auto text-warning-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{lowStock.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Need Reorder</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border text-center">
           <Package className="h-5 w-5 mx-auto text-error-500 mb-1" />
           <div className="text-2xl font-bold text-foreground tabular-nums">{expiringSoon.length}</div>
           <div className="text-xs text-muted-foreground font-bold uppercase">Expiring ≤ 90d</div>
@@ -163,7 +163,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
             />
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -237,7 +237,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
               <button type="button" onClick={() => setIsAddDialogOpen(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
                 Cancel
               </button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold shadow-xs">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">
                 {isSubmitting ? "Saving..." : "Add Stock Item"}
               </button>
             </DialogFooter>

@@ -512,7 +512,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         </h3>
         <button
           onClick={() => setShowDialog(true)}
-          className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center gap-1 shadow-xs"
+          className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center gap-1"
         >
           <Plus className="h-4 w-4" /> Generate Invoice
         </button>
