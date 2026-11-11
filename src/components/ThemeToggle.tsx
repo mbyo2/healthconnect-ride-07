@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const ThemeToggle = () => {
+export const ThemeToggle = ({ className }: { className?: string }) => {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -24,7 +24,10 @@ export const ThemeToggle = () => {
       onClick={toggleTheme}
       className={cn(
         "relative h-9 w-9 rounded-md transition-colors duration-200",
-        theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
+        theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground",
+        // Callers in the classic navy app bars pass an on-navy treatment
+        // (CEO decision 2026-11-11); other surfaces keep the default.
+        className
       )}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >

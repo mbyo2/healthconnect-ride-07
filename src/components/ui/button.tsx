@@ -5,14 +5,18 @@ import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
   // PayPal anatomy (fidelity rebuild 2026-11-11): every button in the
-  // signed-in product is a FULL PILL with no shadow — primary is the
-  // solid blue pill, secondary the pale blue-grey pill, outline a pill
-  // with a hairline outline.
+  // signed-in product is a FULL PILL with no shadow — secondary the pale
+  // blue-grey pill, outline a pill with a hairline outline.
+  // CLASSIC PayPal shell (CEO decision 2026-11-11 17:12): the PRIMARY
+  // (default) variant is the classic GOLD pill — #FFC439 with near-black
+  // ink text, hover deepening to #F2B705 (never blue). Action blue
+  // remains for links, active states and icon accents, not the primary
+  // button fill.
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 touch-manipulation",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-gold text-gold-ink font-semibold hover:bg-gold-deep",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-pill text-pill-foreground hover:bg-pill/80",

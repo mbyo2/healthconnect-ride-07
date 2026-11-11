@@ -38,10 +38,12 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button
-          className={`flex items-center gap-2 shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex items-center gap-2 shrink-0 whitespace-nowrap px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+            // Classic navy bar treatment (CEO decision 2026-11-11): this
+            // trigger lives only in DesktopNav.
             isActiveSecondaryPage
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              ? "bg-white/15 text-white"
+              : "text-white/75 hover:text-white hover:bg-white/10"
           }`}
         >
           <MoreHorizontal className="h-4 w-4" />

@@ -47,7 +47,12 @@ describe("paypal fidelity 2026-11-11: primitives", () => {
   });
 
   it("the desktop nav active item is a pale pill, never a solid block", () => {
-    expect(desktopNav).toContain("bg-accent text-accent-foreground");
+    // PIN MOVED (classic PayPal shell, CEO decision 2026-11-11 17:12):
+    // the bar is now classic navy, so the "pale pill" is the translucent
+    // white pill (bg-white/15) instead of the pale-blue accent pill. The
+    // invariant — a translucent pill, never a solid colour block — holds.
+    expect(desktopNav).toContain("bg-white/15 text-white");
+    expect(desktopNav).not.toContain("bg-accent text-accent-foreground");
     expect(desktopNav).not.toContain("bg-primary-500 text-white");
     expect(desktopNav).not.toContain("shadow-button");
   });
@@ -106,7 +111,13 @@ describe("paypal fidelity 2026-11-11: patient home anatomy", () => {
 
   it("the skeleton twin mirrors the band-free anatomy", () => {
     const twin = skeleton.slice(skeleton.indexOf("SkeletonPatientHome"));
-    expect(twin).not.toContain("bg-navy");
+    // PIN REFINED (classic PayPal shell, CEO decision 2026-11-11 17:12):
+    // the slice runs to end-of-file, which now includes the header
+    // skeleton twins wearing bg-navybar — the classic navy BAR, which is
+    // chrome, not a content band. The ban is on the old semantic navy
+    // band token (bg-navy as a standalone class), so the assertion now
+    // excludes the navybar bar token explicitly.
+    expect(twin).not.toMatch(/bg-navy(?![a-z])/);
     expect(twin).not.toContain("bg-primary-500 p-4");
     expect(twin).toContain("divide-y divide-border");
   });

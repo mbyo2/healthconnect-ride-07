@@ -14,7 +14,7 @@ import { useNotifications } from '@/hooks/use-notifications';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
-export const NotificationBell = () => {
+export const NotificationBell = ({ className }: { className?: string }) => {
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
     return (
@@ -23,7 +23,7 @@ export const NotificationBell = () => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="relative"
+                    className={className ? `relative ${className}` : "relative"}
                     aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
                 >
                     <Bell className="h-5 w-5" />

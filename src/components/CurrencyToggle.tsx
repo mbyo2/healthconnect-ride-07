@@ -17,8 +17,10 @@ export function CurrencyToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1 px-2 md:px-2.5 text-xs font-bold bg-background/80 hover:bg-muted border-border shadow-xs">
-          <Globe className="h-3.5 w-3.5 text-primary" />
+        {/* Ghost-on-navy treatment: the toggle lives only in the classic
+            navy app bars (CEO decision 2026-11-11). */}
+        <Button variant="outline" size="sm" className="h-8 gap-1 px-2 md:px-2.5 text-xs font-bold bg-white/10 hover:bg-white/20 border-white/30 text-white shadow-none">
+          <Globe className="h-3.5 w-3.5 text-white" />
           {/* Full "K (ZMW)" label from md up; below md the header cluster
               only has room for the symbol — the menu still names every
               currency in full. (Responsive shell fix, 2026-11-11.) */}

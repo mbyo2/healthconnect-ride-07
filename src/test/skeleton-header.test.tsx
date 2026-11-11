@@ -32,14 +32,14 @@ describe("SkeletonHeaderBar — desktop twin (DesktopNav)", () => {
     const { container } = render(<SkeletonHeaderBar variant="authed" />);
     const html = container.innerHTML;
     // Desktop shell: hidden below the JS breakpoint (1025px), sticky,
-    // same translucent fill + border as DesktopNav's <header>.
+    // same fill + border as DesktopNav's <header>.
+    // PIN MOVED (classic PayPal shell, CEO decision 2026-11-11 17:12):
+    // the real bar is now solid classic navy in both modes, and the
+    // skeleton twin mirrors it (bg-navybar + white/10 hairline).
     expect(html).toContain("min-[1025px]:block");
-    expect(html).toContain("bg-white/90");
-    expect(html).toContain("dark:bg-slate-900/90");
-    // Header chrome unified on the single border token (2026-11-11
-    // interior rebuild): the real DesktopNav bar is border-border,
-    // and the skeleton twin mirrors it.
-    expect(html).toContain("border-border");
+    expect(html).toContain("bg-navybar");
+    expect(html).not.toContain("bg-white/90");
+    expect(html).toContain("border-white/10");
     // Real bar height: h-16, lg:h-[4.25rem].
     expect(html).toContain("lg:h-[4.25rem]");
   });

@@ -1113,7 +1113,7 @@ function SkeletonDesktopHeader({ variant }: { variant: SkeletonChromeVariant }) 
       ? ["w-[74px]", "w-[82px]", "w-[112px]", "w-[66px]"]
       : ["w-[38px]", "w-[84px]", "w-[88px]", "w-[92px]", "w-[76px]"];
   return (
-    <div className="sticky top-0 z-50 hidden border-b border-border bg-white/90 backdrop-blur-xl dark:bg-slate-900/90 min-[1025px]:block">
+    <div className="sticky top-0 z-50 hidden border-b border-white/10 bg-navybar min-[1025px]:block">
       <div className="mx-auto flex h-16 min-w-0 max-w-content items-center justify-between px-4 md:px-6 lg:h-[4.25rem] lg:px-8 xl:px-12">
         <div className="flex min-w-0 items-center gap-4 lg:gap-8">
           <SkeletonLogoMark />
@@ -1154,7 +1154,7 @@ function SkeletonDesktopHeader({ variant }: { variant: SkeletonChromeVariant }) 
 
 function SkeletonMobileHeader({ variant }: { variant: SkeletonChromeVariant }) {
   return (
-    <div className="border-b border-border bg-white/90 backdrop-blur-xl dark:bg-slate-900/90 min-[1025px]:hidden">
+    <div className="border-b border-white/10 bg-navybar min-[1025px]:hidden">
       <div className="flex h-16 items-center justify-between px-3 sm:px-4">
         {/* Real mobile Header: wordmark hides below sm */}
         <SkeletonLogoMark wordmarkClassName="hidden sm:block" />

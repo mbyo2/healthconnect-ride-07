@@ -28,13 +28,15 @@ export const InstitutionSwitcher = () => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
+        {/* Ghost-on-navy: this switcher renders only in the classic navy
+            mobile app bar (CEO decision 2026-11-11). */}
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 gap-2 px-2 sm:px-3 rounded-pill border border-border hover:bg-canvas-bone "
+          className="h-9 gap-2 px-2 sm:px-3 rounded-pill border border-white/30 text-white hover:bg-white/10 hover:text-white"
           aria-label="Switch institution"
         >
-          <Building2 className="h-4 w-4 shrink-0 text-primary-500" />
+          <Building2 className="h-4 w-4 shrink-0 text-white" />
           {/* Name joins at md (capped tighter until 900px) and the chevron
               at sm, so the pill is icon-only on phones and the header
               cluster fits 360px. (Responsive shell fix, 2026-11-11.) */}

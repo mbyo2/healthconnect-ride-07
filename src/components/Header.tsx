@@ -49,8 +49,10 @@ export function Header() {
 
   if (isDesktop) return null;
 
+  // CLASSIC PayPal bar (CEO decision 2026-11-11 17:12): navy #003087
+  // with white content in both modes.
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-card border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-navybar text-white border-b border-white/10">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
@@ -64,31 +66,31 @@ export function Header() {
             width, so the wordmark only joins once sm gives it room. */}
         <AppLogo
           size="sm"
-          className="gap-1.5 sm:gap-2 shrink-0 [&_span]:hidden sm:[&_span]:inline"
+          className="gap-1.5 sm:gap-2 shrink-0 [&_span]:hidden sm:[&_span]:inline [&_span]:text-white"
         />
 
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {user && (
             <>
               <InstitutionSwitcher />
-              <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill shrink-0" onClick={() => navigate("/search")}>
+              <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill shrink-0 text-white hover:bg-white/10 hover:text-white" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
-              <NotificationBell />
+              <NotificationBell className="text-white hover:bg-white/10 hover:text-white" />
             </>
           )}
 
           <CurrencyToggle />
-          <ThemeToggle />
-          <LanguageSelector />
+          <ThemeToggle className="bg-white/10 text-white border-white/25 hover:bg-white/20" />
+          <LanguageSelector tone="onNavy" />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label={user ? "Account menu" : "Open menu"} className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill ml-1 sm:ml-2 shrink-0">
+              <Button variant="ghost" size="icon" aria-label={user ? "Account menu" : "Open menu"} className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill ml-1 sm:ml-2 shrink-0 text-white hover:bg-white/10 hover:text-white">
                 {user ? (
-                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-primary-500">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-gold">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
-                    <AvatarFallback className="bg-primary-50 text-primary-500 text-xs font-medium">
+                    <AvatarFallback className="bg-white/15 text-white text-xs font-medium">
                       {user?.email?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>

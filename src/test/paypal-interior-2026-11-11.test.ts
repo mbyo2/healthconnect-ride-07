@@ -86,7 +86,10 @@ describe("paypal interior 2026-11-11: shell + home arrangement", () => {
   });
 
   it("the top bar is a solid surface, not glass", () => {
-    expect(desktopNav).toContain("bg-card border-b border-border");
+    // PIN MOVED (classic PayPal shell, CEO decision 2026-11-11 17:12):
+    // the solid surface is now the classic navy bar. The invariant —
+    // solid, never glass/blur — is unchanged.
+    expect(desktopNav).toContain("bg-navybar text-white border-b border-white/10");
     expect(desktopNav).not.toContain("backdrop-blur");
   });
 

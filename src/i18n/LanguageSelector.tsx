@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export const LanguageSelector = () => {
+export const LanguageSelector = ({ tone = "default" }: { tone?: "default" | "onNavy" }) => {
   const { language, setLanguage } = useLanguage();
 
   return (
@@ -31,7 +31,11 @@ export const LanguageSelector = () => {
         the belt-and-braces: content can never paint outside the 36px box.
       */}
       <SelectTrigger
-        className="w-9 shrink-0 justify-center gap-0 px-0 overflow-hidden sm:w-[140px] sm:justify-between sm:gap-2 sm:px-3 [&>svg:last-of-type]:hidden sm:[&>svg:last-of-type]:block"
+        className={`w-9 shrink-0 justify-center gap-0 px-0 overflow-hidden sm:w-[140px] sm:justify-between sm:gap-2 sm:px-3 [&>svg:last-of-type]:hidden sm:[&>svg:last-of-type]:block ${
+          // On-navy treatment for the classic navy app bars (CEO decision
+          // 2026-11-11); the standalone InstitutionPortal keeps default.
+          tone === "onNavy" ? "border-white/30 bg-white/10 text-white hover:bg-white/20" : ""
+        }`}
         aria-label="Select language"
       >
         <Globe className="h-4 w-4 shrink-0" />

@@ -129,7 +129,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-          <Avatar className="h-9 w-9 ring-2 ring-border hover:ring-primary/40 transition-all">
+          <Avatar className="h-9 w-9 ring-2 ring-white/40 hover:ring-gold/70 transition-all">
             <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || ""} alt={user?.email || ""} />
             <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
               {user?.email?.[0]?.toUpperCase() || "U"}

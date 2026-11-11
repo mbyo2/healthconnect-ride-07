@@ -323,8 +323,10 @@ export function DesktopNav() {
     return filtered.length > 0 ? filtered : mainNavItems;
   }, [mainNavItems, availableRoles, isAuthenticated]);
 
+  // CLASSIC PayPal bar (CEO decision 2026-11-11 17:12): navy #003087
+  // with white content in BOTH modes — the brand bar does not flip.
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border" role="banner">
+    <header className="sticky top-0 z-50 bg-navybar text-white border-b border-white/10" role="banner">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
@@ -333,7 +335,7 @@ export function DesktopNav() {
       </a>
       <div className="mx-auto flex items-center justify-between h-16 lg:h-[4.25rem] px-4 md:px-6 lg:px-8 xl:px-12 max-w-content min-w-0">
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
-          <AppLogo size="sm" className="shrink-0" />
+          <AppLogo size="sm" className="shrink-0 [&_span]:text-white" />
 
           <nav className="relative hidden md:flex items-stretch min-w-0 max-w-full" role="navigation" aria-label="Main navigation">
             <div
@@ -345,12 +347,12 @@ export function DesktopNav() {
                   to={item.to}
                   aria-current={item.active ? "page" : undefined}
                   className={`flex items-center gap-2 shrink-0 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm tracking-wide transition-all duration-200 whitespace-nowrap ${
-                    // PayPal anatomy (fidelity rebuild 2026-11-11): the
-                    // active item is a PALE pill with bold blue text —
-                    // never a solid colour nav block.
+                    // Classic navy bar (CEO decision 2026-11-11): the
+                    // active item is a translucent white pill with white
+                    // text; inactive items are white at 75%.
                     item.active
-                      ? "bg-accent text-accent-foreground font-semibold"
-                      : "font-medium text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-muted"
+                      ? "bg-white/15 text-white font-semibold"
+                      : "font-medium text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {item.icon}
@@ -385,7 +387,7 @@ export function DesktopNav() {
                 variant="ghost"
                 size="icon"
                 aria-label="Search"
-                className="h-10 w-10 rounded-pill"
+                className="h-10 w-10 rounded-pill text-white hover:bg-white/10 hover:text-white"
                 onClick={() => setSearchFocused(true)}
               >
                 <Search className="h-5 w-5" />
@@ -394,17 +396,19 @@ export function DesktopNav() {
           </div>
 
           <CurrencyToggle />
-          <ThemeToggle />
-          {isAuthenticated && <NotificationBell />}
+          <ThemeToggle className="bg-white/10 text-white border-white/25 hover:bg-white/20" />
+          {isAuthenticated && <NotificationBell className="text-white hover:bg-white/10 hover:text-white" />}
 
           {isAuthenticated && user ? (
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium text-graphite-600 hover:text-primary-500 hover:bg-primary-50 rounded-pill">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium text-white hover:text-white hover:bg-white/10 rounded-pill">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm" asChild className="h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium rounded-pill bg-primary-500 hover:bg-primary-600">
+              {/* Get Started rides the shared primary variant — the
+                  classic gold pill (CEO decision 2026-11-11). */}
+              <Button size="sm" asChild className="h-10 lg:h-11 px-4 lg:px-6 text-sm rounded-pill">
                 <Link to="/auth?tab=signup">Get Started</Link>
               </Button>
             </div>
