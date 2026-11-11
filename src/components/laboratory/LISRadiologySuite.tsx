@@ -245,7 +245,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -268,7 +268,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                 ) : (
                   samples.map((s) => (
                     <tr key={s.id} className="hover:bg-muted/60">
-                      <td className="py-3 px-4 font-mono font-bold text-primary-500">{s.barcode}</td>
+                      <td className="py-3 px-4 font-semibold text-foreground tabular-nums">{s.barcode}</td>
                       <td className="py-3 px-3 font-bold text-foreground">{s.patientName}</td>
                       <td className="py-3 px-3">
                         <div className="font-semibold">{s.testName}</div>
@@ -297,7 +297,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                           <button
                             onClick={() => handleVerifySample(s.id)}
                             disabled={verifyingId === s.id}
-                            className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-xs shadow-xs"
+                            className="px-3 py-1 rounded-full bg-gold hover:bg-gold-deep disabled:opacity-50 text-gold-ink font-semibold text-xs"
                           >
                             {verifyingId === s.id ? "Verifying…" : "Verify & Sign"}
                           </button>
@@ -340,11 +340,11 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               {studies.map((st) => (
                 <div
                   key={st.id}
-                  className="p-5 rounded-2xl border border-border bg-card shadow-xs flex flex-col justify-between space-y-4"
+                  className="p-5 rounded-2xl border border-border bg-card flex flex-col justify-between space-y-4"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-mono font-bold text-xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-muted text-foreground font-semibold tabular-nums text-xs">
                         {st.modality}
                       </span>
                       <span className="text-xs font-bold text-slate-400">{st.studyDate}</span>
@@ -366,7 +366,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                         setSelectedStudy(st);
                         setActiveTab("dicom");
                       }}
-                      className="px-3.5 py-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                      className="px-3.5 py-1.5 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1"
                     >
                       <Eye className="h-3.5 w-3.5" /> View Study
                     </button>

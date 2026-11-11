@@ -182,7 +182,7 @@ export const PharmacySalesReport = () => {
             <TableBody>
               {sales?.slice(0, 20).map((sale: any) => (
                 <TableRow key={sale.id}>
-                  <TableCell className="font-mono text-xs">{sale.receipt_number}</TableCell>
+                  <TableCell className="tabular-nums text-xs">{sale.receipt_number}</TableCell>
                   <TableCell>{sale.customer_name || 'Walk-in'}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs capitalize">

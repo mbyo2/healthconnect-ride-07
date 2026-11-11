@@ -349,16 +349,16 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                       <tr key={b.id} className="hover:bg-muted/60">
                         <td className="py-3 px-4">
                           <div className="font-semibold text-foreground">{b.itemName}</div>
-                          <div className="text-xs text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
+                          <div className="text-xs text-slate-400 tabular-nums">{b.itemCode} • {b.category}</div>
                         </td>
-                        <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
+                        <td className="py-3 px-3 font-semibold text-foreground tabular-nums">{b.batchNo}</td>
                         <td className="py-3 px-3 font-semibold text-muted-foreground">{b.expiryDate}</td>
                         <td className="py-3 px-3 font-medium text-foreground">{b.warehouse}</td>
                         <td className="py-3 px-3 text-right font-bold text-foreground">
                           {b.quantity} units
                           <div className="text-xs text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
                         </td>
-                        <td className="py-3 px-3 text-right font-mono">
+                        <td className="py-3 px-3 text-right tabular-nums">
                           <div className="font-bold text-foreground">{formatPrice(b.unitPrice)}</div>
                           <div className="text-xs text-slate-400">Cost: {formatPrice(b.costPrice)}</div>
                         </td>
@@ -470,7 +470,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 ) : (
                   purchaseOrders.map((po) => (
                     <tr key={po.id} className="hover:bg-muted/60">
-                      <td className="py-3 px-4 font-mono font-bold text-primary-500">{po.poNumber}</td>
+                      <td className="py-3 px-4 font-semibold text-foreground tabular-nums">{po.poNumber}</td>
                       <td className="py-3 px-3 font-semibold">{po.supplier}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{formatPrice(po.totalAmount)}</td>
                       <td className="py-3 px-3 text-slate-500">{po.expectedDelivery}</td>
@@ -519,7 +519,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                       <td className="py-3 px-3 capitalize">{m.transaction_type.replace(/_/g, " ")}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{m.quantity}</td>
                       <td className="py-3 px-3 text-slate-500">{m.date}</td>
-                      <td className="py-3 px-3 font-mono text-slate-500">{m.reference || "—"}</td>
+                      <td className="py-3 px-3 tabular-nums text-slate-500">{m.reference || "—"}</td>
                     </tr>
                   ))
                 )}

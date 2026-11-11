@@ -14,13 +14,16 @@ interface StatsCardsProps {
 export const InstitutionStatsCards = ({
   personnel, appointments, patients, revenue, bedOccupancy, todayAppointments, currency = 'ZMW'
 }: StatsCardsProps) => {
+  // Anatomy (sweep 2026-11-11): stat icons take ONE muted treatment —
+  // no rainbow icon colours; the revenue (money-in) icon is the single
+  // green accent, matching the money-colour rule. Numerals stay ink.
   const stats = [
-    { title: 'Total Personnel', value: personnel, icon: Users, subtitle: 'Active staff members', color: 'text-blue-600 dark:text-blue-400' },
-    { title: "Today's Appointments", value: todayAppointments, icon: Calendar, subtitle: `${appointments} total all-time`, color: 'text-emerald-600 dark:text-emerald-400' },
-    { title: 'Active Patients', value: patients, icon: Activity, subtitle: 'Unique patients seen', color: 'text-purple-600 dark:text-purple-400' },
-    { title: 'Revenue (MTD)', value: `${currency} ${revenue.toLocaleString()}`, icon: DollarSign, subtitle: 'Month to date', color: 'text-amber-600 dark:text-amber-400' },
-    { title: 'Bed Occupancy', value: `${bedOccupancy}%`, icon: Bed, subtitle: 'Current utilization', color: 'text-rose-600 dark:text-rose-400' },
-    { title: 'Growth', value: '+12%', icon: TrendingUp, subtitle: 'vs last month', color: 'text-teal-600 dark:text-teal-400' },
+    { title: 'Total Personnel', value: personnel, icon: Users, subtitle: 'Active staff members', color: 'text-muted-foreground' },
+    { title: "Today's Appointments", value: todayAppointments, icon: Calendar, subtitle: `${appointments} total all-time`, color: 'text-muted-foreground' },
+    { title: 'Active Patients', value: patients, icon: Activity, subtitle: 'Unique patients seen', color: 'text-muted-foreground' },
+    { title: 'Revenue (MTD)', value: `${currency} ${revenue.toLocaleString()}`, icon: DollarSign, subtitle: 'Month to date', color: 'text-success-600' },
+    { title: 'Bed Occupancy', value: `${bedOccupancy}%`, icon: Bed, subtitle: 'Current utilization', color: 'text-muted-foreground' },
+    { title: 'Growth', value: '+12%', icon: TrendingUp, subtitle: 'vs last month', color: 'text-muted-foreground' },
   ];
 
   return (

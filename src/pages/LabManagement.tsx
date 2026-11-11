@@ -560,7 +560,7 @@ const LabManagement = () => {
                       className="mt-1"
                     />
                     {patientSearchTerm && !selectedPatientId && (
-                      <div className="max-h-32 overflow-y-auto border border-border rounded-md bg-card mt-1 shadow-xs">
+                      <div className="max-h-32 overflow-y-auto border border-border rounded-md bg-card mt-1">
                         {patients
                           ?.filter((p) => `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase()))
                           .map((p) => (

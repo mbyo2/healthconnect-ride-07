@@ -361,7 +361,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               {filteredStock.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl border border-border bg-card shadow-xs hover:border-primary-500 transition-all flex flex-col justify-between"
+                  className="p-4 rounded-2xl border border-border bg-card hover:border-primary-500 transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
@@ -391,7 +391,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                       onClick={() => addToCart(item)}
                       aria-label={`Dispense ${item.name}`}
                       size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 font-semibold text-xs active:scale-95"
+                      className="font-semibold text-xs active:scale-95"
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden /> Dispense
                     </Button>
@@ -522,13 +522,13 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           <div className="pt-3 border-t border-border space-y-3">
             <div className="flex justify-between text-sm font-bold">
               <span>Total Payable:</span>
-              <span className="text-emerald-600 text-base font-bold tabular-nums">{formatPrice(subtotal)}</span>
+              <span className="text-foreground text-base font-bold tabular-nums">{formatPrice(subtotal)}</span>
             </div>
 
             <Button
               onClick={handleCompleteDispensing}
               disabled={cart.length === 0 || processing}
-              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-semibold text-xs active:scale-95"
+              className="w-full py-3 font-semibold text-xs active:scale-95"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden />
               {processing ? "Recording Sale…" : "Complete Dispense & Print Slip"}

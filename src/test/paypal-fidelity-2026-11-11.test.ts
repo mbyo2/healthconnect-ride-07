@@ -230,9 +230,13 @@ describe("paypal fidelity 2026-11-11: rendered-verification follow-up fixes", ()
       expect(src).not.toContain("bg-primary-500 hover:bg-primary-600");
       expect(src).not.toContain("group-hover:bg-primary-600");
     }
-    // The named CTA: patient-home "Book Now" pill rides the token.
-    expect(patientHome).toContain("bg-primary text-primary-foreground group-hover:bg-primary/90");
-    expect(patientHome).toContain("'bg-primary text-primary-foreground hover:bg-primary/90'");
+    // PIN MOVED (classic PayPal shell, CEO decision 2026-11-11 17:12):
+    // the patient-home primary CTAs are now the GOLD pill, like the
+    // shared Button default — blue no longer fills primary buttons.
+    // The 500-step bans above still hold.
+    expect(patientHome).toContain("bg-gold text-gold-ink group-hover:bg-gold-deep");
+    expect(patientHome).toContain("'bg-gold text-gold-ink hover:bg-gold-deep'");
+    expect(patientHome).not.toContain("bg-primary text-primary-foreground");
   });
 
   it("auth + onboarding primaries are the product Button (full pill)", () => {

@@ -499,7 +499,7 @@ export function PrescriptionFulfillment() {
 
         <Dialog open={showNewRxDialog} onOpenChange={setShowNewRxDialog}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 self-start">
+            <button className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1.5 self-start">
               <Plus className="h-4 w-4" />
               <span>Prescribe &amp; Dispense (Multi-Drug)</span>
             </button>
@@ -667,7 +667,7 @@ export function PrescriptionFulfillment() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleCreateMultiRx}
-                className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {isSubmitting ? "Dispensing..." : `Dispense (${medicationItems.length} Meds)`}
@@ -677,7 +677,7 @@ export function PrescriptionFulfillment() {
         </Dialog>
       </div>
 
-      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
@@ -710,7 +710,7 @@ export function PrescriptionFulfillment() {
                 <td className="py-3 px-3 text-slate-600">
                   <div>{p.prescribed_by}</div>
                   {p.prescription_number && (
-                    <span className="text-xs font-mono text-slate-400">{p.prescription_number}</span>
+                    <span className="text-xs text-slate-400 tabular-nums">{p.prescription_number}</span>
                   )}
                 </td>
                 <td className="py-3 px-3 text-center">

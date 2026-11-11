@@ -372,7 +372,7 @@ export const PharmacyPOS = () => {
           <button
             onClick={() => saleMutation.mutate()}
             disabled={cart.length === 0 || saleMutation.isPending}
-            className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
+            className="w-full py-3 rounded-full bg-gold hover:bg-gold-deep disabled:opacity-50 text-gold-ink font-semibold text-sm flex items-center justify-center gap-2 transition-all"
           >
             <Receipt className="h-4 w-4" />
             {saleMutation.isPending ? "Processing..." : `Complete Sale — ${formatPrice(totalAmount)}`}

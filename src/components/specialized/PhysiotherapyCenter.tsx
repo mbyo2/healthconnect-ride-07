@@ -353,7 +353,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           )}
 
           {romList.length > 0 && (
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -373,10 +373,10 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                         <div className="font-semibold text-foreground">{r.joint}</div>
                         <div className="text-xs text-slate-400 font-medium">{r.movement}</div>
                       </td>
-                      <td className="py-3 px-3 font-mono font-bold text-foreground">
+                      <td className="py-3 px-3 font-bold text-foreground tabular-nums">
                         {r.leftDegrees}°
                       </td>
-                      <td className="py-3 px-3 font-mono font-bold text-foreground">
+                      <td className="py-3 px-3 font-bold text-foreground tabular-nums">
                         {r.rightDegrees}°
                       </td>
                       <td className="py-3 px-3 font-semibold text-slate-500">{r.normalRange}</td>
@@ -417,7 +417,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4 text-xs">
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4 text-xs">
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <Label className="font-bold text-sm">Visual Analog Scale (VAS): {painScore} / 10</Label>
@@ -596,7 +596,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             {exercises.map((ex) => (
               <div
                 key={ex.id}
-                className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-2"
+                className="p-4 rounded-2xl border border-border bg-card space-y-2"
               >
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-bold text-xs">
@@ -642,7 +642,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl border border-border bg-card shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-4 rounded-2xl border border-border bg-card grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className="space-y-1">
               <Label className="font-bold">Pre-treatment VAS (0–10) *</Label>
               <Input
@@ -685,7 +685,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">

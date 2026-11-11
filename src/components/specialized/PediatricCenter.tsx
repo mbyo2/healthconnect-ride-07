@@ -380,7 +380,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </div>
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Latest Weight (charted)</span>
               <div className="text-2xl font-bold text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
@@ -388,7 +388,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Latest Length / Height</span>
               <div className="text-2xl font-bold text-foreground mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
@@ -396,7 +396,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Head Circumference</span>
               <div className="text-2xl font-bold text-foreground mt-1">
                 {growthHistory[growthHistory.length - 1]?.head || "—"}{growthHistory[growthHistory.length - 1]?.head ? " cm" : ""}
@@ -407,7 +407,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           )}
 
           {/* Growth Table */}
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -484,7 +484,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               return (
               <div
                 key={v.id}
-                className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center justify-between"
+                className="p-4 rounded-2xl border border-border bg-card flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -539,7 +539,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             {DEVELOPMENTAL_MILESTONES.map((m, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-2xl border border-border bg-card shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-4 rounded-2xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -595,7 +595,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4 text-xs">
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4 text-xs">
               <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                 <Calculator className="h-4 w-4 text-primary-500" /> Dosage Input Parameters
               </h4>

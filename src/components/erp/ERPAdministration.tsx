@@ -402,7 +402,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 ) : (
                   invoices.map((inv) => (
                     <tr key={inv.id} className="hover:bg-muted/60">
-                      <td className="py-3 px-4 font-mono font-bold text-primary-500">{inv.invoice_number || inv.id.slice(0, 8)}</td>
+                      <td className="py-3 px-4 font-semibold text-foreground tabular-nums">{inv.invoice_number || inv.id.slice(0, 8)}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{formatPrice(inv.total_amount)}</td>
                       <td className="py-3 px-3 text-right tabular-nums">{formatPrice(inv.balance)}</td>
                       <td className="py-3 px-3 capitalize">{inv.payment_status || "pending"}</td>
@@ -514,10 +514,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <tr key={a.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4">
                         <div className="font-bold text-foreground">{a.asset_name}</div>
-                        <div className="text-xs font-mono text-slate-400">{a.asset_tag || a.id.slice(0, 8)}</div>
+                        <div className="text-xs tabular-nums text-slate-400">{a.asset_tag || a.id.slice(0, 8)}</div>
                       </td>
                       <td className="py-3 px-3">{a.assigned_department || "—"}</td>
-                      <td className="py-3 px-3 font-mono">{a.serial_number || "—"}</td>
+                      <td className="py-3 px-3 tabular-nums">{a.serial_number || "—"}</td>
                       <td className="py-3 px-3 text-slate-500">
                         {a.next_maintenance_date ? new Date(a.next_maintenance_date).toLocaleDateString() : "—"}
                       </td>

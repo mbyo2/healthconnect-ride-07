@@ -258,7 +258,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                       <button
                         onClick={() => handleFulfill(d)}
                         disabled={fulfillingId === d.id}
-                        className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs"
+                        className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep disabled:opacity-50 text-gold-ink text-xs font-semibold flex items-center gap-1.5"
                       >
                         {fulfillingId === d.id ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
