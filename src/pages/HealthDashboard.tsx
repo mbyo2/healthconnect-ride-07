@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Progress } from "@/components/ui/progress";
 import {
   Heart,
@@ -119,18 +120,18 @@ export default function HealthDashboard() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusTone = (status: string) => {
     switch (status) {
       case "Normal":
       case "Good":
       case "On Track":
-        return "bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200";
+        return "positive" as const;
       case "Warning":
-        return "bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200";
+        return "warning" as const;
       case "Alert":
-        return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
+        return "negative" as const;
       default:
-        return "bg-muted text-muted-foreground";
+        return "neutral" as const;
     }
   };
 
@@ -144,34 +145,27 @@ export default function HealthDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas p-6">
-        <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8 py-8">
-          <p className="sr-only">Loading your health dashboard…</p>
-          <DashboardSkeleton />
-        </div>
+      <div>
+        <p className="sr-only">Loading your health dashboard…</p>
+        <DashboardSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div>
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="vf-eyebrow mb-4">
-              <Heart className="h-3.5 w-3.5 text-accent-500" />
-              Your Health Journey
-            </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-medium text-midnight tracking-tight mb-3">Health Dashboard</h1>
-            <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide max-w-2xl">
+            <h1 className="text-2xl font-semibold text-foreground tracking-tight">Health dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Monitor your health metrics and track your wellness goals
             </p>
           </div>
-          <Button onClick={() => navigate('/ai-diagnostics')} className="vf-btn-primary mt-4 md:mt-0 gap-2 h-12 px-6">
-            <Bot className="h-5 w-5" />
-            AI Health Assistant
-            <Sparkles className="h-4 w-4" />
+          <Button onClick={() => navigate('/ai-diagnostics')} className="gap-2 shrink-0">
+            <Bot className="h-4 w-4" />
+            AI health assistant
           </Button>
         </div>
 
@@ -180,7 +174,7 @@ export default function HealthDashboard() {
 
         {/* AI Insights Widget */}
         {loadError && !loading && (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-sm font-medium text-destructive">
               We couldn&apos;t load your health data. Check your connection and try again.
             </p>
@@ -200,7 +194,7 @@ export default function HealthDashboard() {
         {/* Vitals strip — graphic tiles from recorded vitals history */}
         {vitalHistory && (
           <div>
-            <h2 className="font-display text-xl font-medium text-midnight tracking-tight mb-3">Latest Vitals</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">Latest vitals</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {vitalHistory.latest.heartRate != null && (
                 <StatsCard
@@ -225,7 +219,7 @@ export default function HealthDashboard() {
                   label="Oxygen Saturation"
                   value={`${vitalHistory.latest.spo2}%`}
                   icon={Droplets}
-                  color="#22C55E" /* theme: success-500 */
+                  color="#00A86B" /* theme: success-600 doc-green */
                   sparklineData={vitalHistory.spo2}
                 />
               )}
@@ -245,9 +239,9 @@ export default function HealthDashboard() {
         {/* Health Stats - Modern Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {healthStats.length > 0 ? healthStats.map((stat, index) => (
-            <div key={index} className="vf-card space-y-3 group">
+            <div key={index} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-2xl bg-primary-50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/30">
+                <div className="p-2.5 rounded-lg bg-primary-500/10 text-primary-600 border border-primary-500/20">
                   {getIconComponent(stat.icon)}
                 </div>
                 {getTrendIcon(stat.trend)}
@@ -255,19 +249,19 @@ export default function HealthDashboard() {
               <div className="space-y-3">
                 <h3 className="font-semibold text-base">{stat.title}</h3>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">{stat.value}</span>
+                  <span className="text-2xl font-semibold tnum">{stat.value}</span>
                   <span className="text-sm text-muted-foreground">{stat.unit}</span>
                 </div>
-                <Badge className={getStatusColor(stat.status)} variant="secondary">
+                <StatusBadge tone={getStatusTone(stat.status)}>
                   {stat.status}
-                </Badge>
+                </StatusBadge>
               </div>
             </div>
           )) : (
-            <div className="col-span-full rounded-2xl border border-dashed border-canvas-silk bg-white dark:bg-slate-900 p-10 text-center">
+            <div className="col-span-full rounded-lg border border-dashed border-border bg-card p-10 text-center">
               <Heart className="h-8 w-8 mx-auto text-primary-500 mb-3" />
-              <p className="font-medium text-midnight">No health metrics yet</p>
-              <p className="text-sm text-graphite-500 dark:text-slate-400 mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
+              <p className="font-medium text-foreground">No health metrics yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/iot-monitoring')}>Record vitals</Button>
                 <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/symptoms')}>Log symptoms</Button>
@@ -278,13 +272,13 @@ export default function HealthDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Health Goals */}
-        <Card className="vf-card !p-0 overflow-hidden">
+        <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Target className="h-6 w-6 text-primary" />
-              Daily Goals
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Daily goals
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription>
               Track your progress towards daily health targets
             </CardDescription>
           </CardHeader>
@@ -323,20 +317,20 @@ export default function HealthDashboard() {
         {/* Family members - book appointments for dependents */}
         <DependentManager />
 
-        {/* Upcoming Appointments */}
-        <Card className="vf-card !p-0 overflow-hidden">
+        {/* Upcoming appointments */}
+        <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Calendar className="h-6 w-6 text-primary" />
-              Upcoming Appointments
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              Upcoming appointments
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription>
               Your scheduled healthcare appointments
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingAppointments.length > 0 ? upcomingAppointments.map((appointment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border border-border/50 rounded-xl hover:border-primary/50 transition-colors">
+              <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-base truncate">{appointment.type}</h3>
                   <p className="text-sm text-muted-foreground mt-1 truncate">{appointment.provider}</p>
@@ -344,8 +338,8 @@ export default function HealthDashboard() {
                     {appointment.date} at {appointment.time}
                   </p>
                 </div>
-                <Button variant="outline" onClick={() => navigate(appointment.id ? `/appointments/${appointment.id}` : '/appointments')} className="ml-4 h-11 shrink-0">
-                  View Details
+                <Button variant="outline" onClick={() => navigate(appointment.id ? `/appointments/${appointment.id}` : '/appointments')} className="ml-4 shrink-0">
+                  View details
                 </Button>
               </div>
             )) : (
@@ -356,21 +350,21 @@ export default function HealthDashboard() {
               />
             )}
             <Button
-              className="w-full h-12 text-base"
+              className="w-full"
               variant="outline"
               onClick={() => navigate('/search')}
             >
-              Schedule New Appointment
+              Schedule new appointment
             </Button>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions - Responsive Grid */}
-      <Card className="vf-card !p-0 overflow-hidden">
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="text-xl">Quick Actions</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle>Quick actions</CardTitle>
+          <CardDescription>
             Common health management tasks
           </CardDescription>
         </CardHeader>
@@ -378,35 +372,35 @@ export default function HealthDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-3 h-12 text-base"
+              className="flex items-center justify-start gap-3 h-11"
               onClick={() => navigate('/symptoms')}
             >
               <Activity className="h-5 w-5 flex-shrink-0" />
-              <span className="text-left">Log Symptoms</span>
+              <span className="text-left">Log symptoms</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-3 h-12 text-base"
+              className="flex items-center justify-start gap-3 h-11"
               onClick={() => navigate('/iot-monitoring')}
             >
               <Heart className="h-5 w-5 flex-shrink-0" />
-              <span className="text-left">Record Vitals</span>
+              <span className="text-left">Record vitals</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-3 h-12 text-base"
+              className="flex items-center justify-start gap-3 h-11"
               onClick={() => navigate('/appointments')}
             >
               <Calendar className="h-5 w-5 flex-shrink-0" />
-              <span className="text-left">Book Appointment</span>
+              <span className="text-left">Book appointment</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-3 h-12 text-base"
+              className="flex items-center justify-start gap-3 h-11"
               onClick={() => navigate('/health-analytics')}
             >
               <Target className="h-5 w-5 flex-shrink-0" />
-              <span className="text-left">Set New Goal</span>
+              <span className="text-left">Set new goal</span>
             </Button>
           </div>
         </CardContent>
@@ -429,9 +423,9 @@ function GamificationSection() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[0, 1].map((i) => (
-          <div key={i} className="rounded-2xl border border-canvas-silk p-6 space-y-4">
-            <div className="h-6 w-40 animate-pulse rounded-lg bg-canvas dark:bg-slate-800" />
-            <div className="h-16 animate-pulse rounded-xl bg-canvas dark:bg-slate-800" />
+          <div key={i} className="rounded-lg border border-border p-6 space-y-4">
+            <div className="h-6 w-40 doc-shimmer rounded-md" />
+            <div className="h-16 doc-shimmer rounded-lg" />
           </div>
         ))}
       </div>
@@ -440,20 +434,20 @@ function GamificationSection() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="vf-card !p-0 overflow-hidden">
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />
-            Your Badges
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-primary" />
+            Your badges
           </CardTitle>
-          <CardDescription className="text-base">Earn badges by staying healthy</CardDescription>
+          <CardDescription>Earned by tracking your health</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {badges.length > 0 ? badges.map((userBadge) => (
-              <div key={userBadge.id} className="flex flex-col items-center p-3 border border-border rounded-xl bg-yellow-50/50 dark:bg-yellow-950/10 hover:border-yellow-500/50 transition-colors" title={userBadge.badge.description}>
-                <div className="p-3 bg-yellow-100 dark:bg-yellow-950/20 rounded-full mb-2">
-                  <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              <div key={userBadge.id} className="flex flex-col items-center p-3 border border-border rounded-lg bg-muted/40" title={userBadge.badge.description}>
+                <div className="p-3 bg-primary-500/10 rounded-full mb-2">
+                  <Award className="h-5 w-5 text-primary-600" />
                 </div>
                 <span className="text-xs font-semibold">{userBadge.badge.name}</span>
               </div>
@@ -464,13 +458,13 @@ function GamificationSection() {
         </CardContent>
       </Card>
 
-      <Card className="vf-card !p-0 overflow-hidden">
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Target className="h-6 w-6 text-primary" />
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-primary" />
             Achievements
           </CardTitle>
-          <CardDescription className="text-base">Progress towards milestones</CardDescription>
+          <CardDescription>Progress towards milestones</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {achievements.length > 0 ? achievements.map((achievement) => (
