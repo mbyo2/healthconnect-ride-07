@@ -267,7 +267,7 @@ export const HospitalManagement = () => {
         icon={<Building2 className="h-5 w-5" />}
         title={hospital.name}
         badges={
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pill text-pill-foreground">
             Live HMS Board
           </span>
         }
@@ -277,11 +277,11 @@ export const HospitalManagement = () => {
             {hospital.city ? ` • ${hospital.city}` : ""}
           </>
         }
-        subtitleClassName="text-xs text-muted-foreground font-medium"
+        subtitleClassName="text-[13px] text-muted-foreground"
         actions={
           <button
             onClick={refreshAll}
-            className="px-3 py-1.5 rounded-md bg-muted hover:bg-muted text-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
+            className="px-3 py-1.5 rounded-full bg-pill hover:bg-pill text-pill-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Sync Board Data</span>
@@ -292,8 +292,8 @@ export const HospitalManagement = () => {
       {/* Main Tabs Navigation & Body */}
       <div className="px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <div className="overflow-x-auto p-1 bg-card rounded-xl border border-border">
-            <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1.5 bg-transparent p-1">
+          <div className="overflow-x-auto">
+            <TabsList className="w-auto min-w-full flex-wrap h-auto">
               {MODULE_TABS.map((t) => {
                 const relevance = facilityProfile.modules[t.val];
                 return (
@@ -305,7 +305,7 @@ export const HospitalManagement = () => {
                         ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
                         : undefined
                     }
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border border-border bg-card text-muted-foreground shadow-none hover:bg-primary-100 hover:text-primary-500 data-[state=active]:bg-primary-500 data-[state=active]:text-white data-[state=active]:border-primary-500 data-[state=active]:shadow-xs ${
+                    className={`px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all hover:text-primary-500 ${
                       relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
                     }`}
                   >
@@ -317,7 +317,7 @@ export const HospitalManagement = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
             <TabsContent value="dashboard" className="space-y-6">
               {departments.length === 0 && (
                 <Card>

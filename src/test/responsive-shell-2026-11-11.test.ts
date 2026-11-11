@@ -89,7 +89,12 @@ describe("responsive shell 2026-11-11: institution tabs never clip", () => {
   });
 
   it("StaffDashboard tab bar sticks BELOW its own header card, not at the same offset", () => {
-    expect(staffDashboard).toContain("top-[calc(4.5rem+77px)]");
+    // PIN MOVED (anatomy rollout wave 2, 2026-11-11): the offset was 77px
+    // for the old text-xl header; the header now uses the greeting ramp
+    // (32px title line + 16px subline + 32px padding + 1px border = 81px),
+    // so the sticky offset grew to 82px with it. The invariant — tab bar
+    // sticks below its own header card — is unchanged.
+    expect(staffDashboard).toContain("top-[calc(4.5rem+82px)]");
   });
 
   it("institution name can shrink/wrap inside the header card (min-w-0)", () => {

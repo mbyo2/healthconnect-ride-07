@@ -171,25 +171,25 @@ export const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
+              <h1 className="text-greeting flex items-center gap-2">
                 Executive Admin Dashboard
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-sm text-graphite-500 font-medium tracking-wide">
+              <p className="text-[13px] text-muted-foreground mt-0.5">
                 System-wide governance, security audit logs, platform revenue & accreditation controls
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-pill text-xs font-medium text-white bg-success-500">
+            <span className="px-3 py-1 rounded-pill text-xs font-semibold bg-pill text-pill-foreground">
               Active System Governance
             </span>
           </div>
@@ -199,13 +199,13 @@ export const AdminDashboard = () => {
       {/* Main Board Content */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
-          <div className="overflow-x-auto p-1 bg-card rounded-xl border border-border">
-            <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
+          <div className="overflow-x-auto">
+            <TabsList className="w-auto min-w-full flex-wrap h-auto">
               {visibleTabs.map(({ value, label, icon: Icon }) => (
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="text-xs font-semibold px-3.5 py-1.5 min-h-[44px] rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
+                  className="text-xs font-semibold px-3.5 py-1.5 min-h-[44px] flex items-center gap-1.5 transition-all"
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{label}</span>
@@ -214,7 +214,7 @@ export const AdminDashboard = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
             <TabsContent value="overview">
               <div className="space-y-5">
                 {/* Header */}

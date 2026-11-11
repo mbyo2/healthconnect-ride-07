@@ -289,20 +289,20 @@ export default function StaffDashboard() {
             {config.icon}
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-foreground">{config.title}</h1>
-            <p className="text-xs text-muted-foreground font-medium">{config.subtitle}</p>
+            <h1 className="text-greeting text-foreground">{config.title}</h1>
+            <p className="text-[13px] leading-4 text-muted-foreground mt-0.5">{config.subtitle}</p>
           </div>
         </div>
       </div>
 
       {/* Sticky offset = global-header offset (4.5rem) + this page's own
-          sticky header card height (py-4 32px + title/subtitle lines 44px
-          + border 1px = 77px). At the old shared offset the tab bar stuck
+          sticky header card height (py-4 32px + greeting title line 32px
+          + 13px subline 16px + border 1px = 81px, offset rounds up). At the old shared offset the tab bar stuck
           at the same place as the header card and the two overlapped —
           the same clip defect fixed on InstitutionDashboard 2026-11-11. */}
-      <div className="bg-background border-b border-border sticky top-[calc(4.5rem+77px)] z-40 scroll-mt-20">
+      <div className="bg-background border-b border-border sticky top-[calc(4.5rem+82px)] z-40 scroll-mt-20">
         <div>
-          <div className="flex gap-1 overflow-x-auto">
+          <div className="flex gap-1 overflow-x-auto items-center py-2 px-1">
             {config.tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -326,10 +326,10 @@ export default function StaffDashboard() {
                     navigate("/medical-shift-hr");
                   }
                 }}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-full text-sm transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "bg-pill text-pill-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.icon}
@@ -354,11 +354,11 @@ export default function StaffDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 max-md:gap-0 max-md:rounded-2xl max-md:border max-md:border-border max-md:bg-card max-md:divide-y max-md:divide-border max-md:overflow-hidden">
           {config.metrics.map((metric, idx) => {
             const value = institutionId ? metrics[metric.metricKey] : null;
             return (
-              <div key={idx} className="bg-card border border-border rounded-lg p-6 shadow-xs">
+              <div key={idx} className="bg-card border border-border rounded-2xl p-6 max-md:rounded-none max-md:border-0 max-md:p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary-500/10 text-primary-600 rounded-lg">
                     {metric.icon}
@@ -395,7 +395,7 @@ export default function StaffDashboard() {
             <button
               key={idx}
               onClick={() => navigate(action.path)}
-              className="bg-card border border-border rounded-lg p-6 shadow-xs hover:shadow-md transition-shadow text-left"
+              className="bg-card border border-border rounded-2xl p-6 hover:border-primary-500 transition-colors text-left"
             >
               <div className="p-2 bg-primary-500/10 text-primary-600 rounded-lg w-fit mb-3">
                 {action.icon}

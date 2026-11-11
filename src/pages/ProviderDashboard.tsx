@@ -809,18 +809,18 @@ export const ProviderDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
               <Stethoscope className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
+              <h1 className="text-greeting flex items-center gap-2">
                 {dashboardMeta.title}
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-sm text-graphite-500 font-medium tracking-wide">
+              <p className="text-[13px] text-muted-foreground mt-0.5">
                 {dashboardMeta.subtitle} • {format(today, "EEEE, MMMM d, yyyy")}
               </p>
             </div>
@@ -840,8 +840,42 @@ export const ProviderDashboard = () => {
       </div>
 
       <div className="mx-auto w-full max-w-content px-4 sm:px-6 pt-6 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        {/* Stats — mobile: one hairline list (PayPal anatomy); sm+: module grid */}
+        <div className="sm:hidden rounded-2xl border border-border bg-card px-4 divide-y divide-border">
+          <div className="flex items-center justify-between gap-3 min-h-16 py-2">
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-foreground">Today's Consultations</p>
+              <p className="text-xs text-muted-foreground">{completedToday.length} Done • {scheduledToday.length} Pending</p>
+            </div>
+            <span className="text-xl font-extrabold tnum text-foreground">{todayAppointments.length}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 min-h-16 py-2">
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-foreground">Weekly Patient Volume</p>
+              <p className="text-xs text-muted-foreground">{weekStats?.completed || 0} Completed this week</p>
+            </div>
+            <span className="text-xl font-extrabold tnum text-foreground">{weekStats?.total || 0}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 min-h-16 py-2">
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-foreground">Active Queue Status</p>
+              <p className="text-xs text-muted-foreground">Awaiting Triage</p>
+            </div>
+            <span className="text-xl font-extrabold tnum text-foreground">{weekStats?.pending || 0}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 min-h-16 py-2">
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-foreground">Shift Earnings (ZMW)</p>
+              <p className="text-xs text-muted-foreground">
+                {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
+                  ? "Collected this week"
+                  : `${weekStats.revenueDeltaPct >= 0 ? "+" : ""}${weekStats.revenueDeltaPct}% vs last week`}
+              </p>
+            </div>
+            <span className="text-xl font-extrabold tnum text-success-500">{formatPrice(weekStats?.revenue || 0)}</span>
+          </div>
+        </div>
+        <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-5">
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Today's Consultations</div>
             <div className="text-3xl font-medium text-primary-500">{todayAppointments.length}</div>
@@ -886,7 +920,7 @@ export const ProviderDashboard = () => {
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
-              className="p-3.5 rounded-xl bg-card border border-border hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="p-3.5 rounded-xl bg-card border border-border hover:border-primary-500 transition-all flex items-center gap-2.5 text-xs font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <div className="p-2 rounded-lg bg-primary-50 dark:bg-blue-950 text-primary-500">
                 <act.icon className="h-4 w-4" />
@@ -899,7 +933,7 @@ export const ProviderDashboard = () => {
         {/* Modules chartered for this profession (DB-driven).
             Live modules open; planned modules are chartered but not built yet. */}
         {charter.length > 0 && (
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
               My Practice Modules
             </p>
@@ -958,7 +992,7 @@ export const ProviderDashboard = () => {
         {/* ── Detailed modules tabs (now includes My Practice) ── */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto">
-            <TabsList className="inline-flex items-center gap-1 p-1 bg-card border border-border rounded-xl w-auto min-w-full">
+            <TabsList className="w-auto min-w-full">
               {[
                 { value: "overview", label: "Overview" },
                 { value: "schedule", label: "Schedule" },
@@ -973,7 +1007,7 @@ export const ProviderDashboard = () => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="text-xs font-semibold px-4 py-1.5 min-h-[44px] rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
+                  className="text-xs font-semibold px-4 py-1.5 min-h-[44px] whitespace-nowrap"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -984,7 +1018,7 @@ export const ProviderDashboard = () => {
             Schedule shows your dated appointments. Weekly Hours sets your recurring availability that patients book into.
           </p>
 
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4">
             <TabsContent value="overview">
               <ProviderMetricsDashboard />
             </TabsContent>

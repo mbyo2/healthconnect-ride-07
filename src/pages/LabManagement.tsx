@@ -521,18 +521,18 @@ const LabManagement = () => {
   return (
     <div className="pb-16">
       {/* Sticky page header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary-500 text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
               <Microscope className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+              <h1 className="text-greeting flex items-center gap-2">
                 {labTitle}
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-[13px] text-muted-foreground mt-0.5">
                 {labSubtitle}
               </p>
             </div>
@@ -621,7 +621,7 @@ const LabManagement = () => {
         </div>
 
         {/* View Selection Bar */}
-        <div className="mt-4 flex items-center gap-2" role="tablist" aria-label="Laboratory views">
+        <div className="mt-4 inline-flex items-center gap-1 rounded-full bg-pill p-1" role="tablist" aria-label="Laboratory views">
           {[
             { id: "requests", label: "Lab Orders Queue" },
             { id: "results", label: "Results Entry" },
@@ -632,10 +632,10 @@ const LabManagement = () => {
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 min-h-[44px] rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 min-h-[44px] rounded-full text-sm transition-colors ${
                 activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-xs"
-                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                  ? "bg-card text-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {tab.label}
@@ -646,8 +646,8 @@ const LabManagement = () => {
 
       <div className="pt-6 space-y-6">
         {/* KPI Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-sm:gap-0 max-sm:rounded-2xl max-sm:border max-sm:border-border max-sm:bg-card max-sm:divide-y max-sm:divide-border max-sm:overflow-hidden">
+          <div className="p-4 rounded-2xl bg-card border border-border max-sm:rounded-none max-sm:border-0">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground">Pending orders</span>
               <Clock className="h-5 w-5 text-warning-500" />
@@ -656,7 +656,7 @@ const LabManagement = () => {
             <div className="text-xs text-muted-foreground mt-0.5">Awaiting sample processing</div>
           </div>
 
-          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
+          <div className="p-4 rounded-2xl bg-card border border-border max-sm:rounded-none max-sm:border-0">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground">In analysis</span>
               <FlaskConical className="h-5 w-5 text-primary-500" />
@@ -665,7 +665,7 @@ const LabManagement = () => {
             <div className="text-xs text-muted-foreground mt-0.5">Currently on bench</div>
           </div>
 
-          <div className="p-4 rounded-lg bg-card border border-border shadow-xs">
+          <div className="p-4 rounded-2xl bg-card border border-border max-sm:rounded-none max-sm:border-0">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground">Completed today</span>
               <CheckCircle2 className="h-5 w-5 text-success-500" />
@@ -679,7 +679,7 @@ const LabManagement = () => {
 
         {/* Requests Tab */}
         {activeTab === "requests" && (
-          <div className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FlaskConical className="h-4 w-4 text-primary-500" /> Active Pathology Orders
@@ -791,7 +791,7 @@ const LabManagement = () => {
 
         {/* Results Entry Tab */}
         {activeTab === "results" && (
-          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary-500" />
               {selectedRequest?.status === "completed" ? "Lab Results — Review & Verification" : "Pathologist Results Verification Entry"}
@@ -883,7 +883,7 @@ const LabManagement = () => {
 
         {/* Catalog Tab */}
         {activeTab === "catalog" && (
-          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Microscope className="h-4 w-4 text-primary-500" /> Diagnostic Test Catalog
