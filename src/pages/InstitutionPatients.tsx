@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, Search, FileText, Loader2 } from "lucide-react";
@@ -132,13 +133,13 @@ const InstitutionPatients = () => {
                 </TableHeader>
               <TableBody>
                 {filteredPatients.map((patient) => (
-                  <TableRow key={patient.id} className="cursor-pointer hover:bg-accent/50" onClick={() => setSelectedPatientId(patient.id)}>
+                  <TableRow key={patient.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedPatientId(patient.id)}>
                     <TableCell className="font-medium">
                       {patient.first_name} {patient.last_name}
                       <div className="text-xs text-muted-foreground">{patient.email}</div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={patient.status === 'Admitted' ? 'destructive' : 'secondary'}>{patient.status}</Badge>
+                      <StatusBadge status={patient.status} />
                       {patient.admission_status && (
                         <div className="text-xs text-muted-foreground mt-1 capitalize">{patient.admission_status}</div>
                       )}

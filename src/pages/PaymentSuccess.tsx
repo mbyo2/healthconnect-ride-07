@@ -199,7 +199,7 @@ const PaymentSuccess = () => {
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="w-full h-12 hover:bg-accent"
+              className="w-full h-12 hover:bg-muted"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home

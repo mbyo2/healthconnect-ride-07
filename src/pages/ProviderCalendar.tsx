@@ -326,7 +326,7 @@ const ProviderCalendar = () => {
                               : slot.is_available
                                 ? 'bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/30'
                                 : 'bg-red-50 dark:bg-red-950/20'
-                            : 'hover:bg-accent/50'
+                            : 'hover:bg-muted/50'
                             }`}
                         >
                           {slot ? (

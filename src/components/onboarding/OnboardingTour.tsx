@@ -143,7 +143,7 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
           {/* Close button */}
           <button
             onClick={handleSkip}
-            className="absolute right-4 top-4 rounded-full p-1 hover:bg-accent"
+            className="absolute right-4 top-4 rounded-full p-1 hover:bg-muted"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>

@@ -142,7 +142,7 @@ const NotificationsPage = () => {
             <div>
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 Notifications
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" aria-hidden />
+                <span className="w-2 h-2 rounded-full bg-success-500" aria-hidden />
                 <span className="sr-only">Live notifications</span>
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">

@@ -211,7 +211,7 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
               {filteredAdmissions.length > 0 ? (
                 <div className="space-y-3">
                   {filteredAdmissions.map((admission: any) => (
-                    <div key={admission.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors gap-3">
+                    <div key={admission.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="font-semibold text-sm">

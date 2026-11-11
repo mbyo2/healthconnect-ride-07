@@ -196,7 +196,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <Button
             key={item.to}
             variant="ghost"
-            className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+            className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-muted/50 transition-colors"
             onClick={() => navigateTo(item.to)}
           >
             {item.icon}
@@ -208,7 +208,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <div className="border-t pt-3 mt-3 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-muted/50 transition-colors"
               onClick={() => navigateTo("/profile")}
             >
               <User className="mr-2 h-5 w-5" />
@@ -216,7 +216,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-muted/50 transition-colors"
               onClick={() => navigateTo("/settings")}
             >
               <Settings className="mr-2 h-5 w-5" />
@@ -236,14 +236,14 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <div className="border-t pt-3 mt-3 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-muted/50 transition-colors"
               onClick={() => navigateTo("/auth")}
             >
               Sign In
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-muted/50 transition-colors"
               onClick={() => navigateTo("/auth?tab=signup")}
             >
               Sign Up

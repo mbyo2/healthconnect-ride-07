@@ -165,7 +165,7 @@ export default function MedicalRecords() {
               <div>
                 <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                   My Health Records
-                  <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">
                   Your visits, lab results, and prescriptions in one place

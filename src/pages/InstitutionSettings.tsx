@@ -859,7 +859,7 @@ const InstitutionSettings = () => {
           <CardContent>
             <div className="space-y-3">
               {DAYS.map(day => (
-                <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-3 p-2 rounded-lg hover:bg-accent/40">
+                <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                   <div className="w-24 font-medium text-sm">{day}</div>
                   <div className="flex items-center gap-2">
                     <Switch
@@ -901,7 +901,7 @@ const InstitutionSettings = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {SERVICE_OPTIONS.map(service => (
-                <div key={service} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-accent/50 transition-colors">
+                <div key={service} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/50 transition-colors">
                   <Checkbox
                     id={`svc-${service}`}
                     checked={formData.services_offered.includes(service)}
@@ -922,7 +922,7 @@ const InstitutionSettings = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {EQUIPMENT_OPTIONS.map(item => (
-                <div key={item} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-accent/50 transition-colors">
+                <div key={item} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/50 transition-colors">
                   <Checkbox
                     id={`eq-${item}`}
                     checked={formData.equipment_available.includes(item)}
@@ -943,7 +943,7 @@ const InstitutionSettings = () => {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {LANGUAGE_OPTIONS.map(lang => (
-                <div key={lang} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-accent/50 transition-colors">
+                <div key={lang} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/50 transition-colors">
                   <Checkbox
                     id={`lang-${lang}`}
                     checked={formData.languages_spoken.includes(lang)}
@@ -1009,7 +1009,7 @@ const InstitutionSettings = () => {
                 .map(provider => (
                   <div
                     key={provider}
-                    className="flex items-center space-x-2 p-2 border rounded-md hover:bg-accent/50 transition-colors"
+                    className="flex items-center space-x-2 p-2 border rounded-md hover:bg-muted/50 transition-colors"
                   >
                     <Checkbox
                       id={`ins-${provider}`}
@@ -1028,7 +1028,7 @@ const InstitutionSettings = () => {
         {institution?.id && <TaxTemplatesCard institutionId={institution.id} />}
 
         {/* ── Save ── */}
-        <Button type="submit" disabled={saving} className="w-full md:w-auto vf-btn-primary">
+        <Button type="submit" disabled={saving} className="w-full md:w-auto">
           {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Save Changes
         </Button>

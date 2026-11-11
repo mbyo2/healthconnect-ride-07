@@ -117,7 +117,7 @@ const Symptoms = () => {
             <div className="min-w-0">
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2 min-w-0">
                 <span className="truncate">Check your symptoms</span>
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-success-500 shrink-0" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
                 Log your symptoms to get AI-guided insights and share them with your clinician

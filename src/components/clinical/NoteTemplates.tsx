@@ -123,7 +123,7 @@ export function TemplatePicker({ onInsert, patientName, providerName }: Template
             <button
               key={t.id}
               onClick={() => handleInsert(t)}
-              className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
+              className="w-full text-left p-3 rounded-lg border hover:bg-muted transition-colors"
             >
               <div className="flex items-center justify-between">
                 <span className="font-mono text-sm font-semibold text-primary">{t.shortcut}</span>

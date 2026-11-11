@@ -775,7 +775,7 @@ export const ProviderDashboard = () => {
   if (!verificationChecked) {
     return (
       <div className="min-h-screen bg-canvas p-6">
-        <div className="mx-auto space-y-6 pt-8" style={{ maxWidth: "var(--max-content, 1280px)" }}>
+        <div className="mx-auto w-full max-w-content space-y-6 pt-8">
           <SkeletonProviderDashboard />
           <p className="text-sm font-medium text-center text-graphite-500 dark:text-slate-400">
             Checking your provider access…
@@ -818,7 +818,7 @@ export const ProviderDashboard = () => {
             <div>
               <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 {dashboardMeta.title}
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 {dashboardMeta.subtitle} • {format(today, "EEEE, MMMM d, yyyy")}
@@ -839,7 +839,7 @@ export const ProviderDashboard = () => {
         </div>
       </div>
 
-      <div className="max-content mx-auto px-4 sm:px-6 pt-6 space-y-6" style={{ maxWidth: "var(--max-content, 1280px)" }}>
+      <div className="mx-auto w-full max-w-content px-4 sm:px-6 pt-6 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           <div className="vf-card space-y-3">

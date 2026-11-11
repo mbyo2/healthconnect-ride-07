@@ -150,7 +150,7 @@ const EmergencyResponse = () => {
             <div>
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 24/7 Emergency Dispatch & Triage Board
-                <span className="w-2 h-2 rounded-full bg-error-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-error-500" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Immediate medical dispatch, live GPS location sharing, and critical profile access

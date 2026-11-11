@@ -298,7 +298,7 @@ const AdvancedDashboard = () => {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {upcomingAppointments.map((apt) => (
-                                <div key={apt.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-accent transition-colors gap-3">
+                                <div key={apt.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted transition-colors gap-3">
                                     <div className="flex-1">
                                         <h4 className="font-semibold">{apt.doctor}</h4>
                                         <p className="text-sm text-muted-foreground">{apt.specialty}</p>

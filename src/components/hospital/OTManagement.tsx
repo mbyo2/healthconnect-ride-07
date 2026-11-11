@@ -267,7 +267,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
               {schedules.map(schedule => {
                 const info = meta(schedule.notes);
                 return (
-                  <div key={schedule.id} className="p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                  <div key={schedule.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">

@@ -100,7 +100,7 @@ export const NotificationCenter = ({ hospitalId }: Props) => {
               const Icon = categoryIcons[n.category] || Info;
               return (
                 <div key={n.id}
-                  className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${!n.is_read ? 'bg-primary/5' : ''} ${severityStyles[n.severity] || severityStyles.info}`}
+                  className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-muted/50 ${!n.is_read ? 'bg-primary/5' : ''} ${severityStyles[n.severity] || severityStyles.info}`}
                   onClick={() => !n.is_read && markRead(n.id)}>
                   <div className="flex items-start gap-3">
                     <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${n.severity === 'critical' ? 'text-destructive' : n.severity === 'warning' ? 'text-amber-500' : 'text-primary'}`} />

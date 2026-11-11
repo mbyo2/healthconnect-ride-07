@@ -151,7 +151,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden h-10 w-10 hover:bg-accent transition-colors"
+        className="md:hidden h-10 w-10 hover:bg-muted transition-colors"
         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         aria-expanded={isMenuOpen}
         onClick={() => setIsMenuOpen(!isMenuOpen)}

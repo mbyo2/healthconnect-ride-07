@@ -142,7 +142,7 @@ export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplet
           const isChecked = !!checklist[item.key];
           return (
             <div key={item.key}
-              className={`flex items-center justify-between p-2.5 rounded-lg border transition-colors ${isChecked ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'hover:bg-accent/50'}`}
+              className={`flex items-center justify-between p-2.5 rounded-lg border transition-colors ${isChecked ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'hover:bg-muted/50'}`}
               onClick={() => toggleItem(item.key, item.clearedByField, item.clearedAtField)}
               role="button" tabIndex={0}>
               <div className="flex items-center gap-3">

@@ -358,7 +358,7 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
                 <button
                   key={inv.id}
                   onClick={() => raiseFromInvoice(inv)}
-                  className="w-full text-left p-3 rounded-lg border hover:bg-accent/50 transition-colors"
+                  className="w-full text-left p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">

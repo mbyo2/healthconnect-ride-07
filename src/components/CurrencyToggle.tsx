@@ -17,7 +17,7 @@ export function CurrencyToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs font-bold bg-background/80 hover:bg-accent border-border shadow-xs">
+        <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs font-bold bg-background/80 hover:bg-muted border-border shadow-xs">
           <Globe className="h-3.5 w-3.5 text-primary" />
           <span>{currency === 'ZMW' ? 'K (ZMW)' : currency === 'USD' ? '$ (USD)' : currency}</span>
         </Button>

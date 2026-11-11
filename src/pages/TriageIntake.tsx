@@ -191,7 +191,7 @@ export default function TriageIntake() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
               Symptom Check
-              <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
               Tell us how you feel — we'll suggest the right care and help you book a visit

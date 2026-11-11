@@ -44,7 +44,7 @@ export const RecentActivityFeed = ({ activities }: RecentActivityFeedProps) => {
                 const config = typeConfig[item.type];
                 const Icon = config.icon;
                 return (
-                  <div key={item.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                  <div key={item.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className={`mt-0.5 ${config.color}`}>
                       <Icon className="h-4 w-4" />
                     </div>

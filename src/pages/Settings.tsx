@@ -351,7 +351,7 @@ const Settings = () => {
           <div>
             <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
               Settings
-              <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>
             <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium tracking-wide">
               Your account, security, notifications, and region

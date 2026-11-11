@@ -123,7 +123,7 @@ const AppointmentRemindersPage = () => {
             <div>
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
                 Appointment Reminders & Calendar Sync
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Timed reminders follow the channels you enable below. Sync visits to iCal / Google Calendar.
