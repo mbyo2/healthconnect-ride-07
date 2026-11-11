@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Wallet, Plus, ArrowUpRight, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -92,29 +93,28 @@ export const WalletCard = () => {
     };
 
     return (
-        <Card className="group bg-primary-600 text-primary-foreground border-none shadow-lg overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500 group-hover:scale-110 transform">
-                <Wallet className="h-24 w-24" />
-            </div>
-
-            <CardHeader className="pb-2 relative z-10">
-                <CardTitle className="text-xs font-bold flex items-center gap-2 opacity-80 uppercase tracking-widest">
+        // PayPal anatomy (fidelity rebuild 2026-11-11): the wallet
+        // summary is a WHITE HAIRLINE module with blue pill actions —
+        // the solid blue band is retired.
+        <Card>
+            <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold flex items-center gap-2 text-muted-foreground uppercase tracking-widest">
                     <Wallet className="h-3.5 w-3.5" aria-hidden />
-                    {isEarner ? "Earnings Balance" : "My Wallet Balance"}
+                    {isEarner ? "Earnings Balance" : "Wallet balance"}
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="relative z-10">
+            <CardContent>
                 <div className="flex flex-col gap-5">
                     <div>
-                        <div className="text-4xl font-bold tracking-tight">
+                        <div className="text-4xl font-bold tracking-tight text-foreground">
                             {isLoading ? (
-                                <div className="h-10 w-32 bg-white/25 animate-pulse rounded-lg" />
+                                <Skeleton className="h-10 w-32 rounded-lg" />
                             ) : (
                                 formatPrice(balance ?? 0)
                             )}
                         </div>
-                        <p className="text-xs md:text-xs text-primary-foreground/80 mt-1.5 font-medium flex items-center gap-1">
+                        <p className="text-xs md:text-xs text-muted-foreground mt-1.5 font-medium flex items-center gap-1">
                             <ArrowUpRight className="h-3 w-3" />
                             {isEarner
                                 ? "Consultation earnings & payouts"
@@ -125,7 +125,7 @@ export const WalletCard = () => {
                     <div className="flex gap-3 mt-1">
                         <Button
                             size="sm"
-                            className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 flex-1 font-bold shadow-lg shadow-black/10 transition-all active:scale-95 h-11"
+                            className="flex-1 font-bold h-11"
                             onClick={() => scrollToWalletSection('wallet-topup')}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
@@ -133,8 +133,8 @@ export const WalletCard = () => {
                         </Button>
                         <Button
                             size="sm"
-                            variant="outline"
-                            className="bg-primary-foreground/10 backdrop-blur-md border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 flex-1 font-semibold transition-all active:scale-95 h-11"
+                            variant="secondary"
+                            className="flex-1 font-semibold h-11"
                             onClick={() => scrollToWalletSection('wallet-history')}
                         >
                             <History className="h-4 w-4 mr-1.5" />

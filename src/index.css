@@ -218,6 +218,11 @@ main {
     --navy:             223 100% 28%;     /* #002991 — PayPal navy: header/emphasis bands, dark surfaces */
     --secondary:        40 6% 96%;        /* #f5f5f4 — Bone */
     --secondary-foreground: 24 10% 10%;
+    /* PayPal secondary pill (fidelity rebuild 2026-11-11): pale
+       blue-grey #EBEFF5 with near-black text — the signed-in product's
+       secondary action surface. Dark counterpart below. */
+    --pill-secondary:   216 33% 94%;      /* #ebeff5 */
+    --pill-secondary-foreground: 24 10% 10%;
     --muted:            40 6% 96%;
     --muted-foreground: 24 10% 35%;       /* darker for better contrast - WCAG AA compliant */
     /* Skeleton placeholder tokens — deliberately MUCH darker than
@@ -289,6 +294,10 @@ main {
     --primary-foreground: 0 0% 100%;
     --secondary:        24 8% 14%;
     --secondary-foreground: 40 10% 98%;
+    /* Dark counterpart of the PayPal secondary pill: deep blue-grey
+       surface, near-white text (never the pale #EBEFF5 slab in dark). */
+    --pill-secondary:   217 28% 17%;
+    --pill-secondary-foreground: 40 10% 98%;
     --muted:            24 8% 14%;
     --muted-foreground: 25 5% 70%;        /* lighter in dark mode for better contrast */
     /* Skeleton placeholder tokens (dark) — ≥1.4:1 against --card and
@@ -380,10 +389,10 @@ main {
 
   /* ── Adaptive surfaces (canvas tokens flip in dark mode — no dark: pairs) ── */
   .surface-card {
-    @apply rounded-card border border-canvas-silk bg-canvas shadow-card;
+    @apply rounded-card border border-canvas-silk bg-canvas;
   }
   .surface-raised {
-    @apply rounded-card border border-canvas-silk bg-canvas shadow-card-hover;
+    @apply rounded-card border border-canvas-silk bg-canvas;
   }
   .surface-inset {
     @apply rounded-card bg-canvas-bone;
@@ -419,7 +428,7 @@ main {
 
   /* ── Trust card surface (used by search/video surfaces) ── */
   .trust-card {
-    @apply rounded-card border border-border bg-card shadow-xs;
+    @apply rounded-card border border-border bg-card;
   }
 }
 

@@ -666,34 +666,36 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               </div>
             </div>
 
-            {/* Calculated Result Card */}
-            <div className="p-6 rounded-lg bg-navy text-white flex flex-col justify-between space-y-4">
+            {/* Calculated Result Card — white hairline card (PayPal
+                anatomy, fidelity rebuild 2026-11-11: interior navy
+                bands are retired product-wide). */}
+            <div className="p-6 rounded-2xl bg-card text-foreground border border-border flex flex-col justify-between space-y-4">
               <div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-500 text-white uppercase tracking-wider">
                   Precise Calculated Dosage
                 </span>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold text-emerald-400 tracking-tight">
+                  <div className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight">
                     {singleDoseMl} mL
                   </div>
-                  <p className="text-xs text-slate-300 font-semibold mt-1">
-                    Equates to <span className="text-white font-bold">{singleDoseMg} mg</span> per individual dose
+                  <p className="text-xs text-muted-foreground font-semibold mt-1">
+                    Equates to <span className="text-foreground font-bold">{singleDoseMg} mg</span> per individual dose
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-xs space-y-1.5">
+              <div className="p-4 rounded-2xl bg-muted/50 border border-border text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Patient Weight:</span>
+                  <span className="text-muted-foreground">Patient Weight:</span>
                   <span className="font-bold">{calcWeight} kg</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Prescription Standard:</span>
+                  <span className="text-muted-foreground">Prescription Standard:</span>
                   <span className="font-bold">{calcMgPerKg} mg / kg</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Administration:</span>
-                  <span className="font-bold text-emerald-300">Oral Suspension via Syringe / Dropper</span>
+                  <span className="text-muted-foreground">Administration:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">Oral Suspension via Syringe / Dropper</span>
                 </div>
               </div>
 

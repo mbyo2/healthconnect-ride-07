@@ -103,6 +103,12 @@ export default {
           DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
           foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
         },
+        // PayPal secondary pill surface (#EBEFF5 family, token-driven so
+        // dark mode gets its deep blue-grey counterpart).
+        pill: {
+          DEFAULT: "hsl(var(--pill-secondary) / <alpha-value>)",
+          foreground: "hsl(var(--pill-secondary-foreground) / <alpha-value>)",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
           foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
@@ -216,7 +222,9 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         pill: "999px",
-        card: "8px",
+        // PayPal anatomy (fidelity rebuild 2026-11-11): product cards
+        // are ~16px radius with a hairline border and no shadow.
+        card: "16px",
         nav: "100px",
       },
       keyframes: {

@@ -35,7 +35,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
       <div className={cn(
         "p-2 rounded-full transition-all duration-200 flex items-center justify-center",
         active
-          ? "bg-primary-50 dark:bg-blue-950/60 text-primary-500 shadow-xs scale-105"
+          ? "bg-primary-50 dark:bg-blue-950/60 text-primary-500 scale-105"
           : "group-hover:bg-canvas-mist dark:group-hover:bg-slate-800"
       )}>
         {icon}

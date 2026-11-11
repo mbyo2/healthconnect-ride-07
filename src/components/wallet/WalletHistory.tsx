@@ -59,10 +59,10 @@ export const WalletHistory = () => {
 
     if (isLoading) {
         return (
-            <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm">
+            <Card>
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-500" />
+                        <Clock className="h-5 w-5 text-primary-500" />
                         Transaction History
                     </CardTitle>
                 </CardHeader>
@@ -78,11 +78,11 @@ export const WalletHistory = () => {
     }
 
     return (
-        <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden">
+        <Card className="overflow-hidden">
             <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-500" />
+                        <Clock className="h-5 w-5 text-primary-500" />
                         Transaction History
                     </CardTitle>
                     <div className="relative w-full md:w-64">
@@ -127,11 +127,13 @@ export const WalletHistory = () => {
                                     className="p-4 hover:bg-primary/5 transition-colors flex items-center justify-between group"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={`p-2.5 rounded-xl ${transaction.transaction_type === 'credit'
-                                            ? 'bg-green-100 text-green-600'
+                                        {/* PayPal row anatomy: round pale icon
+                                            circle; tints carry dark pairs. */}
+                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${transaction.transaction_type === 'credit'
+                                            ? 'bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400'
                                             : transaction.transaction_type === 'debit'
-                                                ? 'bg-red-100 text-red-600'
-                                                : 'bg-blue-100 text-blue-600'
+                                                ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400'
+                                                : 'bg-accent text-accent-foreground'
                                             }`}>
                                             {transaction.transaction_type === 'credit' ? (
                                                 <ArrowDownLeft className="h-5 w-5" />
@@ -140,7 +142,7 @@ export const WalletHistory = () => {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                                            <p className="font-semibold text-foreground">
                                                 {transaction.description || (transaction.transaction_type === 'credit' ? 'Top Up' : 'Payment')}
                                             </p>
                                             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -149,7 +151,9 @@ export const WalletHistory = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className={`font-bold text-lg tnum ${transaction.transaction_type === 'credit' ? 'text-green-600' : 'text-red-600'
+                                        {/* PayPal amount rule: money IN is
+                                            green, money OUT is plain black. */}
+                                        <p className={`font-bold text-lg tnum ${transaction.transaction_type === 'credit' ? 'text-green-600 dark:text-green-400' : 'text-foreground'
                                             }`}>
                                             {transaction.transaction_type === 'credit' ? '+' : '-'}{formatPrice(Math.abs(transaction.amount))}
                                         </p>

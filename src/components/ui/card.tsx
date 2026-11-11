@@ -9,7 +9,9 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-xs",
+      // PayPal anatomy (fidelity rebuild 2026-11-11): white surface,
+      // 1px hairline border, ~16px radius, ZERO shadow.
+      "rounded-2xl border border-border bg-card text-card-foreground",
       className
     )}
     {...props}

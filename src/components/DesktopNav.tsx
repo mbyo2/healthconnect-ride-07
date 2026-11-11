@@ -344,10 +344,13 @@ export function DesktopNav() {
                   key={item.to}
                   to={item.to}
                   aria-current={item.active ? "page" : undefined}
-                  className={`flex items-center gap-2 shrink-0 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm font-medium tracking-wide transition-all duration-200 whitespace-nowrap ${
+                  className={`flex items-center gap-2 shrink-0 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm tracking-wide transition-all duration-200 whitespace-nowrap ${
+                    // PayPal anatomy (fidelity rebuild 2026-11-11): the
+                    // active item is a PALE pill with bold blue text —
+                    // never a solid colour nav block.
                     item.active
-                      ? "bg-primary-500 text-white"
-                      : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-muted"
+                      ? "bg-accent text-accent-foreground font-semibold"
+                      : "font-medium text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-muted"
                   }`}
                 >
                   {item.icon}
@@ -401,7 +404,7 @@ export function DesktopNav() {
               <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium text-graphite-600 hover:text-primary-500 hover:bg-primary-50 rounded-pill">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm" asChild className="h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium rounded-pill bg-primary-500 hover:bg-primary-600 shadow-button">
+              <Button size="sm" asChild className="h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium rounded-pill bg-primary-500 hover:bg-primary-600">
                 <Link to="/auth?tab=signup">Get Started</Link>
               </Button>
             </div>

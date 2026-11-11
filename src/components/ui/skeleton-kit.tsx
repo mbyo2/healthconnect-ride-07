@@ -311,7 +311,7 @@ export function SkeletonDoctorRow() {
   return (
     <div
       aria-hidden
-      className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:bg-slate-900"
+      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-white p-3 dark:bg-slate-900"
     >
       <SkeletonCircle className="h-14 w-14" />
       <div className="min-w-0 flex-1 space-y-1.5">
@@ -330,33 +330,22 @@ export function SkeletonDoctorRow() {
 
 /**
  * Patient home dashboard — a structural twin of PatientWorkflow's loaded
- * layout, block for block: triage banner, date/bell header bar, care-mode
- * toggle, the DARK next-appointment banner, health metric cards,
- * specialties squircle grid, available-doctor rows and quick-access grid.
+ * layout, block for block (PayPal anatomy, fidelity rebuild 2026-11-11):
+ * greeting + bell row, care-mode toggle, the two white summary modules
+ * (next appointment | wallet), the white triage card, health metric
+ * cards, specialties grid, available-doctor rows, quick-action circles
+ * and the recent-activity hairline rows. No coloured bands, no shadows.
  */
 export function SkeletonPatientHome() {
   return (
     <div aria-hidden className="space-y-6 sm:space-y-8">
-      {/* AI triage entry banner (solid primary bar) */}
-      <div className="flex w-full items-center gap-4 rounded-lg bg-primary-500 p-4 sm:p-5">
-        <SkeletonOnDark className="h-[52px] w-[52px] shrink-0 rounded-lg" />
-        <div className="min-w-0 flex-1 space-y-2">
-          <SkeletonOnDark className="h-5 w-44 max-w-full rounded-md" />
-          <SkeletonOnDark className="h-3.5 w-72 max-w-full rounded-md" />
+      {/* Greeting + notification bell */}
+      <div className="flex items-start justify-between gap-4 px-1">
+        <div className="space-y-2">
+          <SkeletonLine className="h-8 w-56 max-w-full" />
+          <SkeletonLine className="h-4 w-40" />
         </div>
-        <SkeletonOnDark className="h-5 w-5 shrink-0 rounded-md" />
-      </div>
-
-      {/* Date + notification bell header bar */}
-      <div className="flex items-center justify-between rounded-lg border border-border bg-white p-4 shadow-xs dark:bg-slate-900 sm:p-5">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-lg" />
-          <div className="space-y-2">
-            <SkeletonLine className="h-3 w-10" />
-            <SkeletonLine className="h-5 w-36" />
-          </div>
-        </div>
-        <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-lg" />
+        <SkeletonCircle className="h-11 w-11 shrink-0" />
       </div>
 
       {/* Online / offline care-mode toggle */}
@@ -367,14 +356,33 @@ export function SkeletonPatientHome() {
         </div>
       </div>
 
-      {/* Next appointment banner (PayPal navy in both modes) */}
-      <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-navy bg-navy p-5 sm:flex-row sm:items-center sm:p-6">
-        <div className="space-y-2">
-          <SkeletonOnDark className="h-3 w-32 rounded-md" />
-          <SkeletonOnDark className="h-6 w-64 max-w-full rounded-md" />
-          <SkeletonOnDark className="h-3 w-48 rounded-md" />
+      {/* Summary modules: next appointment | wallet balance */}
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="space-y-2 rounded-2xl border border-border bg-white p-5 dark:bg-slate-900 sm:p-6">
+          <SkeletonLine className="h-3 w-32" />
+          <SkeletonLine className="h-6 w-64 max-w-full" />
+          <SkeletonLine className="h-3 w-48" />
+          <Skeleton className="h-10 w-36 rounded-full" />
         </div>
-        <SkeletonOnDark className="h-10 w-32 shrink-0 rounded-full" />
+        <div className="space-y-3 rounded-2xl border border-border bg-white p-5 dark:bg-slate-900 sm:p-6">
+          <SkeletonLine className="h-3 w-28" />
+          <SkeletonLine className="h-9 w-36" />
+          <SkeletonLine className="h-3 w-44" />
+          <div className="flex gap-3">
+            <Skeleton className="h-11 flex-1 rounded-full" />
+            <Skeleton className="h-11 flex-1 rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      {/* Triage card (white hairline, blue pill action) */}
+      <div className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 dark:bg-slate-900 sm:p-6">
+        <SkeletonCircle className="h-11 w-11 shrink-0" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <SkeletonLine className="h-5 w-44 max-w-full" />
+          <SkeletonLine className="h-3.5 w-72 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-28 shrink-0 rounded-full" />
       </div>
 
       {/* Health metric cards */}
@@ -390,7 +398,7 @@ export function SkeletonPatientHome() {
         </div>
       </div>
 
-      {/* Specialties squircle grid */}
+      {/* Specialties grid */}
       <div>
         <div className="mb-3.5 flex items-center justify-between px-1">
           <div className="space-y-1.5">
@@ -405,7 +413,7 @@ export function SkeletonPatientHome() {
               key={i}
               className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-white p-4 dark:bg-slate-900"
             >
-              <Skeleton className="h-12 w-12 rounded-2xl" />
+              <SkeletonCircle className="h-12 w-12" />
               <SkeletonLine className="h-3.5 w-16" />
               <SkeletonLine className="h-3 w-12" />
             </div>
@@ -426,17 +434,34 @@ export function SkeletonPatientHome() {
         </div>
       </div>
 
-      {/* Quick access grid */}
+      {/* Quick actions — pale circle buttons */}
       <div>
         <SkeletonLine className="mb-3.5 h-6 w-28 px-1" />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <div className="flex flex-wrap gap-x-5 gap-y-4 px-1 sm:gap-x-8">
           {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 dark:bg-slate-900"
-            >
-              <Skeleton className="h-11 w-11 shrink-0 rounded-xl" />
-              <SkeletonLine className="h-4 w-16" />
+            <div key={i} className="flex w-[4.5rem] flex-col items-center gap-2">
+              <SkeletonCircle className="h-12 w-12" />
+              <SkeletonLine className="h-3 w-14" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent activity — hairline rows */}
+      <div>
+        <div className="mb-1 flex items-center justify-between px-1">
+          <SkeletonLine className="h-6 w-36" />
+          <SkeletonLine className="h-3 w-14" />
+        </div>
+        <div className="divide-y divide-border">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 px-1 py-3.5">
+              <SkeletonCircle className="h-10 w-10 shrink-0" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <SkeletonLine className="h-4 w-48 max-w-full" />
+                <SkeletonLine className="h-3 w-32" />
+              </div>
+              <Skeleton className="h-6 w-20 shrink-0 rounded-full" />
             </div>
           ))}
         </div>

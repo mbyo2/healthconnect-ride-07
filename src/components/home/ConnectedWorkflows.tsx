@@ -74,7 +74,7 @@ export const ConnectedWorkflows: React.FC = () => {
 
       <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible">
         {workflows.map((workflow) => (
-          <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all border-border min-w-[200px] snap-start flex-shrink-0 sm:min-w-0">
+          <Card key={workflow.id} className="overflow-hidden group transition-all border-border min-w-[200px] snap-start flex-shrink-0 sm:min-w-0">
             {/* Single-primary tint system (same as the MetricCard family):
                 pale primary band + primary title for every workflow — no
                 per-card rainbow colours. */}

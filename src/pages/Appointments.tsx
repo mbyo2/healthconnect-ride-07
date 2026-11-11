@@ -388,7 +388,7 @@ export const AppointmentsPage = () => {
     return (
       <div
         key={app.id}
-        className="m-3 rounded-lg border border-border bg-card p-3 shadow-xs"
+        className="px-1 py-4"
       >
         <div className="flex items-start gap-3">
           <div className="h-9 w-9 rounded-full bg-muted text-muted-foreground font-semibold text-xs flex items-center justify-center flex-shrink-0 uppercase">
@@ -487,7 +487,7 @@ export const AppointmentsPage = () => {
     return (
       <div
         key={app.id}
-        className="m-3 rounded-lg border border-border bg-card p-3 shadow-xs"
+        className="px-1 py-4"
       >
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
@@ -547,10 +547,10 @@ export const AppointmentsPage = () => {
     <NetworkErrorBoundary>
       <div className="pb-16">
         {/* Top Header */}
-        <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+        <div className="doc-page-header px-4 sm:px-6 py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-lg bg-primary-500 text-white flex items-center justify-center shadow-button">
+              <div className="h-11 w-11 rounded-full bg-accent text-accent-foreground flex items-center justify-center">
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
@@ -626,8 +626,8 @@ export const AppointmentsPage = () => {
               )}
 
               {/* Upcoming Appointments Table Group */}
-              <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
-                <div className="px-5 py-4 bg-muted/50 border-b border-border flex items-center justify-between">
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-success-500" />
@@ -656,7 +656,7 @@ export const AppointmentsPage = () => {
                   </div>
                 ) : (
                   <>
-                  <div className="sm:hidden">
+                  <div className="sm:hidden divide-y divide-border px-4">
                     {upcoming.map((app) => renderUpcomingMobileCard(app))}
                   </div>
                   <div className="hidden sm:block w-full overflow-x-auto">
@@ -788,8 +788,8 @@ export const AppointmentsPage = () => {
               </div>
 
               {/* Past Appointments Group */}
-              <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
-                <div className="px-5 py-4 bg-muted/50 border-b border-border flex items-center justify-between">
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <h2 className="font-semibold text-sm text-foreground">
                       Past &amp; Completed
@@ -812,7 +812,7 @@ export const AppointmentsPage = () => {
                   </div>
                 ) : (
                   <>
-                  <div className="sm:hidden">
+                  <div className="sm:hidden divide-y divide-border px-4">
                     {past.map((app) => renderPastMobileCard(app))}
                   </div>
                   <div className="hidden sm:block w-full overflow-x-auto">

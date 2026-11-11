@@ -40,8 +40,10 @@ import {
   Clock,
   Stethoscope,
   ArrowRight,
-  FileText
+  FileText,
+  FlaskConical
 } from 'lucide-react';
+import { StatusBadge } from "@/components/ui/status-badge";
 import { SkeletonPatientHome } from "@/components/ui/skeleton-kit";
 import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
@@ -66,7 +68,7 @@ const SPECIALTIES_DATA = [
 
 export const PatientWorkflow = React.memo(() => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [careMode, setCareMode] = useState<'online' | 'offline'>('online');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('dentistry');
 
@@ -184,6 +186,109 @@ export const PatientWorkflow = React.memo(() => {
     staleTime: 60 * 1000,
   });
 
+  // "Recent activity" feed (PayPal anatomy, fidelity rebuild 2026-11-11):
+  // the patient's latest appointments, lab results and prescriptions
+  // merged into ONE hairline list. Every select mirrors the exact
+  // tables/columns the dedicated patient components already use
+  // (appointments + provider_directory for names; lab_tests status is
+  // 'resulted' with the dated row in lab_results — see PatientLabResults;
+  // comprehensive_prescriptions — see the count query above), so this
+  // adds no new data surface, only a new presentation of the same rows.
+  type ActivityItem = {
+    key: string;
+    kind: 'appointment' | 'lab' | 'prescription';
+    title: string;
+    date: Date;
+    status: string;
+    route: string;
+  };
+  const { data: recentActivity = [] } = useQuery<ActivityItem[]>({
+    queryKey: ['patient-recent-activity', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const [apptRes, labRes, rxRes] = await Promise.all([
+        supabase
+          .from('appointments')
+          .select('id, date, time, type, status, provider_id')
+          .eq('patient_id', user.id)
+          .order('date', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(4),
+        supabase
+          .from('lab_tests')
+          .select('id, test_name, status, created_at')
+          .eq('patient_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(4),
+        supabase
+          .from('comprehensive_prescriptions')
+          .select('id, medication_name, status, created_at')
+          .eq('patient_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(4),
+      ]);
+
+      const items: ActivityItem[] = [];
+
+      const appts = (apptRes.data as any[]) || [];
+      const providerIds = [...new Set(appts.map((a) => a.provider_id).filter(Boolean))];
+      const providerNames = new Map<string, string>();
+      if (providerIds.length > 0) {
+        const { data: providers } = await supabase
+          .from('provider_directory')
+          .select('id, first_name, last_name')
+          .in('id', providerIds);
+        (providers as any[] | null)?.forEach((p) => {
+          providerNames.set(p.id, `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim());
+        });
+      }
+      appts.forEach((a) => {
+        const name = a.provider_id ? providerNames.get(a.provider_id) : undefined;
+        items.push({
+          key: `appt-${a.id}`,
+          kind: 'appointment',
+          title: name ? `Appointment with Dr. ${name}` : 'Appointment',
+          date: new Date(a.date),
+          status: a.status,
+          route: '/appointments',
+        });
+      });
+
+      ((labRes.data as any[]) || []).forEach((t) => {
+        items.push({
+          key: `lab-${t.id}`,
+          kind: 'lab',
+          title: t.test_name || 'Lab test',
+          date: new Date(t.created_at),
+          status: t.status === 'resulted' ? 'Result ready' : t.status,
+          route: '/medical-records',
+        });
+      });
+
+      ((rxRes.data as any[]) || []).forEach((rx) => {
+        items.push({
+          key: `rx-${rx.id}`,
+          kind: 'prescription',
+          title: rx.medication_name || 'Prescription',
+          date: new Date(rx.created_at),
+          status: rx.status,
+          route: '/prescriptions',
+        });
+      });
+
+      return items
+        .sort((a, b) => b.date.getTime() - a.date.getTime())
+        .slice(0, 6);
+    },
+    enabled: !!user?.id && isProfileComplete,
+    staleTime: 60 * 1000,
+  });
+
+  // Time-of-day greeting (PayPal anatomy: bold, black, tight, left).
+  const greetingHour = new Date().getHours();
+  const greetingWord = greetingHour < 12 ? 'Good morning' : greetingHour < 18 ? 'Good afternoon' : 'Good evening';
+  const greetingName = profile?.first_name ? `, ${profile.first_name}` : '';
+
   // NOTE: the optional second arg is legacy (callers still pass a title);
   // navigation itself is the feedback — no toast spam.
   const handleNavigation = useCallback((route: string, _title?: string) => {
@@ -201,8 +306,8 @@ export const PatientWorkflow = React.memo(() => {
       <div className="w-full pb-12" role="status" aria-label="Loading your health dashboard">
         <p className="sr-only">Loading your health dashboard...</p>
         {/* Structural twin of the loaded dashboard below (same shell
-            column): triage banner, header bar, care toggle, navy
-            appointment banner, metric cards, specialties, doctors. */}
+            column): greeting, care toggle, summary modules, triage
+            card, metric cards, specialties, doctors. */}
         <SkeletonPatientHome />
       </div>
     );
@@ -242,14 +347,14 @@ export const PatientWorkflow = React.memo(() => {
             return (
               <div
                 key={step.id}
-                className={`p-5 rounded-lg bg-card border shadow-xs transition-colors ${
+                className={`p-5 rounded-2xl bg-card border transition-colors ${
                   isHighlighted
                     ? 'border-primary-500/60 ring-2 ring-primary-500/15'
                     : 'border-border'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2.5 rounded-lg ${
+                  <div className={`p-2.5 rounded-full ${
                     step.completed
                       ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600'
                       : isHighlighted
@@ -268,10 +373,10 @@ export const PatientWorkflow = React.memo(() => {
                 <p className="text-xs text-muted-foreground leading-relaxed mb-4">{step.description}</p>
                 <button
                   onClick={() => handleNavigation(step.route, step.title)}
-                  className={`w-full py-3 rounded-md font-semibold text-xs transition-colors ${
+                  className={`w-full py-3 rounded-full font-semibold text-xs transition-colors ${
                     step.completed
-                      ? 'bg-muted text-foreground hover:bg-muted/70'
-                      : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm'
+                      ? 'bg-pill text-pill-foreground hover:bg-pill/80'
+                      : 'bg-primary-500 text-white hover:bg-primary-600'
                   }`}
                 >
                   {step.id === 'profile' ? (isProfileComplete ? 'Edit Profile' : 'Complete Profile') : (step.completed ? 'View' : 'Start')}
@@ -300,51 +405,29 @@ export const PatientWorkflow = React.memo(() => {
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
 
-      {/* ─── AI Symptom Triage Entry — the page's one primary action,
-          a solid PayPal-blue band ─── */}
-      <button
-        type="button"
-        onClick={() => navigate('/triage')}
-        className="w-full text-left bg-primary-500 hover:bg-primary-600 text-white p-4 sm:p-5 rounded-lg transition-colors flex items-center gap-4"
-      >
-        <div className="p-2.5 rounded-lg bg-white/15 shrink-0">
-          <Sparkles className="h-6 w-6" />
+      {/* ─── Greeting (PayPal anatomy, fidelity rebuild 2026-11-11):
+          bold black greeting, tight and left, date as the grey subline,
+          notifications as a plain pale circle — no header card, no
+          coloured band anywhere on this page. ─── */}
+      <div className="flex items-start justify-between gap-4 px-1">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            {greetingWord}{greetingName}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {format(new Date(), 'EEEE, MMMM d, yyyy')}
+          </p>
         </div>
-        <div className="flex-1 min-w-0">
-          <span className="text-base sm:text-lg font-semibold block">Not feeling well?</span>
-          <span className="text-xs sm:text-sm text-white/85 font-medium block">
-            Check your symptoms in about a minute — we&apos;ll point you to the right care and help you book. Nothing you enter is saved.
-          </span>
-        </div>
-        <ChevronRight className="h-5 w-5 shrink-0" />
-      </button>
-
-      {/* ─── Top Header Bar (Date & Notification Bell) ─── */}
-      <div className="flex items-center justify-between bg-card p-4 sm:p-5 rounded-lg border border-border shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-primary-50 dark:bg-blue-950/60 border border-primary-500/20 text-primary-500">
-            <Calendar className="h-5 w-5" />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-muted-foreground block">Today</span>
-            <span className="text-base sm:text-lg font-semibold text-foreground">
-              {format(new Date(), 'MMMM d, yyyy')}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleNavigation('/notifications', 'Notifications')}
-            className="p-3 rounded-lg bg-muted border border-border hover:border-primary-500/40 text-foreground relative transition-colors"
-            aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
-          >
-            <Bell className="h-5 w-5" />
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
-            )}
-          </button>
-        </div>
+        <button
+          onClick={() => handleNavigation('/notifications', 'Notifications')}
+          className="h-11 w-11 shrink-0 rounded-full bg-muted border border-border hover:border-primary-500/40 text-foreground relative flex items-center justify-center transition-colors"
+          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+        >
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+          )}
+        </button>
       </div>
 
       {/* ─── Online / Offline Care Mode Toggle Switch ─── */}
@@ -355,7 +438,7 @@ export const PatientWorkflow = React.memo(() => {
             aria-pressed={careMode === 'online'}
             className={`flex-1 py-3 rounded-full text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'online'
-                ? 'bg-card text-primary-500 shadow-sm border border-border'
+                ? 'bg-card text-primary-500 border border-border'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -367,7 +450,7 @@ export const PatientWorkflow = React.memo(() => {
             aria-pressed={careMode === 'offline'}
             className={`flex-1 py-3 rounded-full text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'offline'
-                ? 'bg-card text-primary-500 shadow-sm border border-border'
+                ? 'bg-card text-primary-500 border border-border'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -377,59 +460,85 @@ export const PatientWorkflow = React.memo(() => {
         </div>
       </div>
 
-      {/* ─── Next Appointment — the page's one navy summary band ─── */}
-      <div
-        onClick={() => upcomingError ? refetchUpcoming() : handleNavigation('/appointments', 'Appointments')}
-        className="group p-5 sm:p-6 rounded-lg bg-navy text-white border border-navy flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer transition-colors"
-      >
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-white/70">
-              {upcomingError ? 'Appointments unavailable' : upcomingAppointment ? 'Your next appointment' : 'Quick Consultation'}
-            </span>
-            <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-          </div>
-          <div className="text-lg sm:text-xl font-semibold text-white flex items-center gap-2">
-            {upcomingError ? (
-              <span>Couldn&apos;t load your appointments — tap to retry</span>
-            ) : upcomingAppointment ? (
-              <>
-                <span>
-                  {(() => {
-                    const d = new Date(upcomingAppointment.date);
-                    return isNaN(d.getTime()) ? 'Date to be confirmed' : format(d, 'MMMM d');
-                  })()}, {upcomingAppointment.time || 'Time TBC'}
-                </span>
-                {upcomingAppointment.provider && (
-                  <span className="text-sm font-medium text-white/85">
-                    • {providerDisplayName({ first_name: upcomingAppointment.provider.first_name, last_name: upcomingAppointment.provider.last_name, role: (upcomingAppointment.provider as any)?.role })}
+      {/* ─── Summary modules (PayPal anatomy): Next appointment |
+          Wallet balance — two flat WHITE hairline cards side-by-side.
+          The navy band is retired; the appointment module keeps the
+          exact same data, states and tap behaviour. ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
+        <div
+          onClick={() => upcomingError ? refetchUpcoming() : handleNavigation('/appointments', 'Appointments')}
+          className="group p-5 sm:p-6 rounded-2xl bg-card text-foreground border border-border flex flex-col justify-between gap-4 cursor-pointer h-full"
+        >
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                {upcomingError ? 'Appointments unavailable' : upcomingAppointment ? 'Next appointment' : 'Quick Consultation'}
+              </span>
+              <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
+            </div>
+            <div className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
+              {upcomingError ? (
+                <span>Couldn&apos;t load your appointments — tap to retry</span>
+              ) : upcomingAppointment ? (
+                <>
+                  <span>
+                    {(() => {
+                      const d = new Date(upcomingAppointment.date);
+                      return isNaN(d.getTime()) ? 'Date to be confirmed' : format(d, 'MMMM d');
+                    })()}, {upcomingAppointment.time || 'Time TBC'}
                   </span>
-                )}
-              </>
-            ) : (
-              <span>No upcoming appointments — book your next visit</span>
-            )}
+                  {upcomingAppointment.provider && (
+                    <span className="text-sm font-medium text-muted-foreground">
+                      • {providerDisplayName({ first_name: upcomingAppointment.provider.first_name, last_name: upcomingAppointment.provider.last_name, role: (upcomingAppointment.provider as any)?.role })}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span>No upcoming appointments — book your next visit</span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {upcomingAppointment
+                ? `Mode: ${upcomingAppointment.type === 'video_consultation' ? 'Video Consult' : 'Clinic Visit'} — Tap to view details`
+                : 'Book an appointment with a verified doctor in under 2 minutes'}
+            </p>
           </div>
-          <p className="text-xs text-white/70">
-            {upcomingAppointment
-              ? `Mode: ${upcomingAppointment.type === 'video_consultation' ? 'Video Consult' : 'Clinic Visit'} — Tap to view details`
-              : 'Book an appointment with a verified doctor in under 2 minutes'}
-          </p>
+
+          <div className="flex items-center gap-2">
+            <span className="px-5 py-2.5 rounded-full bg-primary-500 text-white group-hover:bg-primary-600 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
+              <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="px-5 py-2.5 rounded-full bg-card text-foreground hover:bg-primary-50 hover:text-primary-600 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
-            <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
-            <ChevronRight className="h-4 w-4" />
-          </button>
+        <WalletCard />
+      </div>
+
+      {/* ─── AI Symptom Triage — the page's primary action, now a white
+          hairline card with a blue pill (the solid blue band is
+          retired). Same route, same copy, same privacy line. ─── */}
+      <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border flex items-center gap-4">
+        <div className="h-11 w-11 rounded-full bg-accent flex items-center justify-center shrink-0">
+          <Sparkles className="h-5 w-5 text-accent-foreground" />
         </div>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">Not feeling well?</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            Check your symptoms in about a minute — we&apos;ll point you to the right care and help you book. Nothing you enter is saved.
+          </p>
+        </div>
+        <Button onClick={() => navigate('/triage')} className="shrink-0 font-semibold">
+          Start check
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* ─── Digital Prescription Alert Card (if active) ─── */}
       {activePrescriptionsCount > 0 && (
-        <div className="p-4 sm:p-5 rounded-lg bg-card text-foreground border border-border flex items-center justify-between shadow-xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-card text-foreground border border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-primary-50 dark:bg-primary-500/15 text-primary-500">
+            <div className="h-10 w-10 rounded-full bg-primary-50 dark:bg-primary-500/15 text-primary-500 flex items-center justify-center shrink-0">
               <Pill className="h-5 w-5" />
             </div>
             <div>
@@ -441,7 +550,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
           <button
             onClick={() => handleNavigation('/prescriptions', 'Prescriptions')}
-            className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs transition-colors"
+            className="px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs transition-colors"
           >
             View
           </button>
@@ -479,13 +588,13 @@ export const PatientWorkflow = React.memo(() => {
                   setSelectedSpecialty(spec.id);
                   handleNavigation(spec.route, spec.name);
                 }}
-                className={`p-4 rounded-lg bg-card border transition-colors text-center flex flex-col items-center justify-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                className={`p-4 rounded-2xl bg-card border transition-colors text-center flex flex-col items-center justify-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-primary-500/50 bg-primary-50/40 dark:bg-blue-950/40 ring-2 ring-primary-500/20'
                     : 'border-border hover:border-primary-500/40'
                 }`}
               >
-                <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
                   <spec.icon className="h-6 w-6 text-primary-500" aria-hidden />
                 </div>
                 <div>
@@ -522,7 +631,7 @@ export const PatientWorkflow = React.memo(() => {
             />
           ))}
           {featuredProviders.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-6 bg-card rounded-lg border border-border">
+            <p className="text-sm text-muted-foreground text-center py-6 bg-card rounded-2xl border border-border">
               No doctors available right now. Try changing the care mode above.
             </p>
           )}
@@ -540,145 +649,202 @@ export const PatientWorkflow = React.memo(() => {
         ]}
       />
 
-      {/* ─── Quick Access Services Hub (Clean Blue, Black & White) ─── */}
+      {/* ─── Quick actions (PayPal anatomy): labelled PALE CIRCLE icon
+          buttons in a row — the boxed tile grid is retired. Same four
+          routes as before. ─── */}
       <div>
         <h2 className="text-lg sm:text-xl font-semibold mb-3.5 px-1 text-foreground tracking-tight">Quick Access</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="flex flex-wrap gap-x-5 gap-y-4 sm:gap-x-8 px-1">
           <button
             type="button"
             onClick={() => handleNavigation('/emergency', 'Emergency')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex flex-col items-center gap-2 w-[4.5rem] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl"
           >
-            <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 rounded-lg w-fit mb-2">
+            <span className="h-12 w-12 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-600 flex items-center justify-center group-hover:bg-rose-100 dark:group-hover:bg-rose-950/60 transition-colors">
               <AlertTriangle className="h-5 w-5" />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground">Emergency Help</h3>
-            <p className="text-xs text-muted-foreground">24/7 hotline & dispatch</p>
+            </span>
+            <span className="text-xs font-medium text-foreground text-center leading-tight">Emergency Help</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/marketplace', 'Buy Medicine')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex flex-col items-center gap-2 w-[4.5rem] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl"
           >
-            <div className="p-2.5 bg-muted text-foreground rounded-lg w-fit mb-2">
+            <span className="h-12 w-12 rounded-full bg-muted text-foreground flex items-center justify-center group-hover:bg-accent transition-colors">
               <Pill className="h-5 w-5" />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground">Buy Medicine</h3>
-            <p className="text-xs text-muted-foreground">Online pharmacy & refill</p>
+            </span>
+            <span className="text-xs font-medium text-foreground text-center leading-tight">Buy Medicine</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/search', 'Find Doctor')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex flex-col items-center gap-2 w-[4.5rem] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl"
           >
-            <div className="p-2.5 bg-muted text-foreground rounded-lg w-fit mb-2">
+            <span className="h-12 w-12 rounded-full bg-muted text-foreground flex items-center justify-center group-hover:bg-accent transition-colors">
               <Users className="h-5 w-5" />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground">Find Doctor</h3>
-            <p className="text-xs text-muted-foreground">Book clinic & video visits</p>
+            </span>
+            <span className="text-xs font-medium text-foreground text-center leading-tight">Find Doctor</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/healthcare-institutions', 'Hospitals')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex flex-col items-center gap-2 w-[4.5rem] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl"
           >
-            <div className="p-2.5 bg-muted text-foreground rounded-lg w-fit mb-2">
+            <span className="h-12 w-12 rounded-full bg-muted text-foreground flex items-center justify-center group-hover:bg-accent transition-colors">
               <Building2 className="h-5 w-5" />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground">Hospitals & Labs</h3>
-            <p className="text-xs text-muted-foreground">Find nearby facilities</p>
+            </span>
+            <span className="text-xs font-medium text-foreground text-center leading-tight">Hospitals &amp; Labs</span>
           </button>
         </div>
       </div>
 
-      {/* ─── Insurance, Cost Estimator & Waitlists ─── */}
+      {/* ─── Recent activity (PayPal anatomy): ONE hairline list —
+          round pale icon, bold title, grey "date · type" subline,
+          right-aligned status pill; rows navigate. Empty state speaks
+          the same list language. ─── */}
+      <div>
+        <div className="flex items-center justify-between mb-1 px-1">
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">Recent activity</h2>
+          <button
+            onClick={() => handleNavigation('/appointments', 'Appointments')}
+            className="text-xs font-semibold text-primary-500 hover:underline flex items-center gap-1"
+          >
+            <span>View all</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        <div className="divide-y divide-border">
+          {recentActivity.length === 0 ? (
+            <div className="py-8 text-center px-1">
+              <p className="text-sm font-medium text-foreground">No recent activity yet</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Your appointments, lab results and prescriptions will appear here.
+              </p>
+            </div>
+          ) : (
+            recentActivity.map((item) => {
+              const Icon = item.kind === 'appointment' ? Calendar : item.kind === 'lab' ? FlaskConical : Pill;
+              const kindLabel = item.kind === 'appointment' ? 'Appointment' : item.kind === 'lab' ? 'Lab result' : 'Prescription';
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => handleNavigation(item.route)}
+                  className="w-full flex items-center gap-3 py-3.5 px-1 text-left rounded-lg hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                  <span className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                    <Icon className="h-5 w-5 text-foreground" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-foreground truncate">{item.title}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {format(item.date, 'MMM d, yyyy')} · {kindLabel}
+                    </span>
+                  </span>
+                  <StatusBadge status={item.status} className="shrink-0 capitalize" />
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* ─── Insurance, Cost Estimator & Waitlists — hairline list
+          card (PayPal anatomy): divide-y rows, pale circle icon,
+          label + sub, trailing chevron. Same four routes. ─── */}
       <div>
         <h2 className="text-lg sm:text-xl font-semibold mb-3.5 px-1 text-foreground tracking-tight">Insurance & Scheduling</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
           <button
             type="button"
             onClick={() => handleNavigation('/insurance-cards', 'Insurance Cards')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           >
-            <div className="p-2 bg-muted text-foreground rounded-md w-fit mb-2">
-              <CreditCard className="h-4 w-4" />
-            </div>
-            <h4 className="text-xs font-semibold text-foreground">Insurance Card</h4>
-            <p className="text-xs text-muted-foreground">Upload & verify</p>
+            <span className="h-10 w-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
+              <CreditCard className="h-5 w-5" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-foreground">Insurance Card</span>
+              <span className="block text-xs text-muted-foreground">Upload &amp; verify</span>
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/cost-estimator', 'Cost Estimator')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           >
-            <div className="p-2 bg-muted text-foreground rounded-md w-fit mb-2">
-              <Shield className="h-4 w-4" />
-            </div>
-            <h4 className="text-xs font-semibold text-foreground">Cost Estimator</h4>
-            <p className="text-xs text-muted-foreground">Clear pricing</p>
+            <span className="h-10 w-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
+              <Shield className="h-5 w-5" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-foreground">Cost Estimator</span>
+              <span className="block text-xs text-muted-foreground">Clear pricing</span>
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/waitlist', 'Waitlist')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           >
-            <div className="p-2 bg-muted text-foreground rounded-md w-fit mb-2">
-              <Calendar className="h-4 w-4" />
-            </div>
-            <h4 className="text-xs font-semibold text-foreground">Early Slots</h4>
-            <p className="text-xs text-muted-foreground">Priority waitlist</p>
+            <span className="h-10 w-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
+              <Calendar className="h-5 w-5" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-foreground">Early Slots</span>
+              <span className="block text-xs text-muted-foreground">Priority waitlist</span>
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           </button>
 
           <button
             type="button"
             onClick={() => handleNavigation('/appointment-reminders', 'Reminders')}
-            className="p-4 rounded-lg bg-card border border-border shadow-xs hover:border-primary-500/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           >
-            <div className="p-2 bg-muted text-foreground rounded-md w-fit mb-2">
-              <Activity className="h-4 w-4" />
-            </div>
-            <h4 className="text-xs font-semibold text-foreground">Reminders</h4>
-            <p className="text-xs text-muted-foreground">Calendar alerts</p>
+            <span className="h-10 w-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
+              <Activity className="h-5 w-5" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-foreground">Reminders</span>
+              <span className="block text-xs text-muted-foreground">Calendar alerts</span>
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           </button>
         </div>
       </div>
 
-      {/* ─── Connected Workflows & Patient Wallet ─── */}
+      {/* ─── Connected Workflows (the wallet summary now lives in the
+          summary modules at the top of the page) ─── */}
       <ConnectedWorkflows />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2">
-          <div className="p-5 sm:p-6 rounded-lg bg-card border border-border shadow-xs space-y-3">
-            <h3 className="font-semibold text-base text-foreground">Health Support & Emergency Services</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Need immediate triage, symptom checks, or emergency ambulance dispatch? Our clinical emergency team is available 24/7.
-            </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button
-                onClick={() => handleNavigation('/emergency', 'Emergency')}
-                className="rounded-full bg-rose-600 hover:bg-rose-700 font-semibold text-xs"
-              >
-                <Phone className="h-3.5 w-3.5" />
-                <span>Call Emergency (116)</span>
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}
-                className="rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-semibold text-xs"
-              >
-                <Heart className="h-3.5 w-3.5" />
-                <span>Check Symptoms</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div className="lg:col-span-1">
-          <WalletCard />
+      <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border space-y-3">
+        <h3 className="font-semibold text-base text-foreground">Health Support & Emergency Services</h3>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Need immediate triage, symptom checks, or emergency ambulance dispatch? Our clinical emergency team is available 24/7.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Button
+            onClick={() => handleNavigation('/emergency', 'Emergency')}
+            className="bg-rose-600 hover:bg-rose-700 font-semibold text-xs"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            <span>Call Emergency (116)</span>
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}
+            className="font-semibold text-xs"
+          >
+            <Heart className="h-3.5 w-3.5" />
+            <span>Check Symptoms</span>
+          </Button>
         </div>
       </div>
     </div>

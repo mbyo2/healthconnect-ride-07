@@ -224,20 +224,21 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
 
   return (
     <div className="space-y-6 font-sans text-foreground">
-      {/* Header Banner */}
-      <div className="p-6 rounded-lg bg-navy text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header — white hairline card (PayPal anatomy, fidelity rebuild
+          2026-11-11: interior navy bands are retired product-wide). */}
+      <div className="p-6 rounded-2xl bg-card text-foreground border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center font-bold text-xl border border-white/20">
-            <Building className="h-6 w-6 text-white" />
+          <div className="h-12 w-12 rounded-full bg-accent flex items-center justify-center font-bold text-xl border border-border">
+            <Building className="h-6 w-6 text-accent-foreground" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold tracking-tight">ERP Administration &amp; Operations Suite</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-accent text-accent-foreground">
                 Live Data
               </span>
             </div>
-            <p className="text-xs text-slate-300 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               Personnel directory, invoicing journal &amp; medical asset register
             </p>
           </div>

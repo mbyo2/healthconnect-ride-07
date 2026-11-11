@@ -248,6 +248,14 @@ describe("eradicated white-on-white shapes stay eradicated", () => {
       resolve(__dirname, "../components/home/WalletCard.tsx"),
       "utf8"
     );
-    expect(wallet).toContain("bg-white/25");
+    // PIN MOVED 2026-11-11 (fidelity rebuild): this used to require
+    // "bg-white/25" in WalletCard — the translucent loading chip on its
+    // solid blue band. The rebuild retired the band (PayPal's current
+    // anatomy has no coloured summary surfaces), so WalletCard is no
+    // longer a "coloured header" surface at all; the pin now asserts
+    // the band and its chip stay gone, and the loading state uses the
+    // shared Skeleton primitive (see the pulse-slab pin above).
+    expect(wallet).not.toContain("bg-white/25");
+    expect(wallet).not.toContain("bg-primary-600");
   });
 });

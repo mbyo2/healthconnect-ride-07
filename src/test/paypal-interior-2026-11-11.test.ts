@@ -90,9 +90,15 @@ describe("paypal interior 2026-11-11: shell + home arrangement", () => {
     expect(desktopNav).not.toContain("backdrop-blur");
   });
 
-  it("patient home: slate-900 panels are gone, the summary band is navy", () => {
+  it("patient home: slate-900 panels are gone, and so is the navy band", () => {
     expect(patientHome).not.toContain("bg-slate-900");
-    expect(patientHome).toContain("bg-navy");
+    // PIN MOVED 2026-11-11 (fidelity rebuild): this assertion used to
+    // REQUIRE "bg-navy" — the navy next-appointment band. The CEO then
+    // ordered copying PayPal's CURRENT design, whose signed-in home has
+    // no coloured bands at all: the summary is two white hairline
+    // modules. The pin now forbids the band it once mandated; the full
+    // anatomy is pinned in paypal-fidelity-2026-11-11.test.ts.
+    expect(patientHome).not.toContain("bg-navy");
   });
 
   it("patient home: no hover lift/scale choreography on tiles", () => {
