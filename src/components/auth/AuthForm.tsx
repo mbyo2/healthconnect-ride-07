@@ -75,9 +75,15 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
       });
 
       if (error) throw error;
-      
+
       toast.success('Signed in');
     } catch (error: any) {
+      // Failed sign-ins are audit-logged (no session exists yet — the
+      // record_security_event RPC is the insert path that accepts them).
+      await logSecurityEvent(SecurityEvents.LOGIN_FAILURE, {
+        email,
+        reason: error?.message ?? 'sign_in_failed',
+      });
       toast.error(friendlyErrorMessage(error, 'Failed to sign in'));
     } finally {
       setLoading(false);

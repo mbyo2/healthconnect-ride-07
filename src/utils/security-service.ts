@@ -3,25 +3,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { createRateLimiter } from './input-validation';
 import { safeLocalGet, safeLocalSet } from './storage';
 
-// Enhanced security service with real audit logging
+// Enhanced security service with real audit logging.
+// Events are recorded through the record_security_event RPC (SECURITY
+// DEFINER, insert-only, execute-granted to anon + authenticated). A direct
+// client insert into security_audit_log is rejected by RLS for every
+// client event type, and the previous implementation also returned early
+// whenever there was no session — which is exactly the failed-sign-in
+// case. The RPC attributes the row server-side (auth.uid()) and accepts
+// an attempted email for unauthenticated events such as login failures.
 export const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    
-    const eventData = {
-      user_id: session.user.id,
-      event_type: action,
-      event_data: details ? JSON.stringify(details) : null,
-      ip_address: null, // Would be populated by server-side logging
-      user_agent: navigator.userAgent,
-    };
-    
-    // Insert into security audit log table
-    const { error } = await supabase
-      .from('security_audit_log')
-      .insert(eventData);
-    
+    const email = details?.email ?? details?.attempted_email ?? null;
+
+    const { error } = await (supabase as any).rpc('record_security_event', {
+      p_event_type: action,
+      p_event_data: details ?? null,
+      p_email: email,
+      p_user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+    });
+
     if (error) {
       console.error('Failed to log security event:', error);
     }
