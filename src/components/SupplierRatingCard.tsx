@@ -134,9 +134,9 @@ export const SupplierRatingCard = ({
   };
 
   return (
-    <Card className="border border-gray-200 dark:border-slate-800 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group transform-gpu hover:-translate-y-0.5">
+    <Card className="border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group transform-gpu hover:-translate-y-0.5">
       {/* Header with Rating */}
-      <CardHeader className="pb-4 bg-muted/50 border-b border-gray-200 dark:border-slate-700">
+      <CardHeader className="pb-4 bg-muted/50 border-b border-gray-200 ">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <CardTitle className="text-sm font-bold text-gray-900 dark:text-white mb-1">
@@ -159,7 +159,7 @@ export const SupplierRatingCard = ({
         </div>
 
         {/* Star Rating */}
-        <div className="mt-2 pt-3 border-t border-gray-200 dark:border-slate-700">
+        <div className="mt-2 pt-3 border-t border-gray-200 ">
           {renderStars(rating)}
         </div>
       </CardHeader>
@@ -189,7 +189,7 @@ export const SupplierRatingCard = ({
         </div>
 
         {/* Summary Stats */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between text-xs">
+        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-xs">
           <div className="flex gap-3">
             <div>
               <span className="text-gray-600 dark:text-gray-400">

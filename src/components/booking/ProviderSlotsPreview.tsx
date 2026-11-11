@@ -113,7 +113,7 @@ export function ProviderSlotsPreview({
   if (days.length === 0) return null;
 
   return (
-    <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
+    <div className="p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
       <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
         <CalendarClock className="h-4 w-4 text-primary-500" aria-hidden />
         Nearest available slots
@@ -121,7 +121,7 @@ export function ProviderSlotsPreview({
       <div className="space-y-3">
         {days.map(({ date, slots }) => (
           <div key={date.toISOString()}>
-            <p className="text-xs font-bold text-graphite-500 dark:text-slate-400 mb-1.5">
+            <p className="text-xs font-bold text-muted-foreground mb-1.5">
               {format(date, "EEE, MMM d")}
             </p>
             <div className="flex flex-wrap gap-2">

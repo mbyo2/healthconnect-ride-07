@@ -297,7 +297,7 @@ const EmergencyResponse = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{h.address || "Lusaka Medical District"}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold flex items-center justify-center gap-1">
+                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md border border-border bg-card text-xs font-semibold flex items-center justify-center gap-1">
                     <Navigation className="w-3.5 h-3.5" /> Directions
                   </button>
                   <button onClick={() => callNumber(h.phone)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center justify-center gap-1">

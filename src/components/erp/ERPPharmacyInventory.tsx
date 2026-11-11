@@ -239,7 +239,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -269,7 +269,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto" role="tablist" aria-label="Inventory views">
+      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Inventory views">
         {[
           { id: "stock", label: "Medicine Batches & Stock Ledger", icon: Package },
           { id: "po", label: "Purchase Orders & Procurement", icon: Truck },
@@ -286,7 +286,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -308,21 +308,21 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 placeholder="Search by drug name, batch #, warehouse, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-card text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <button
               onClick={handleExportValuation}
-              className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl border border-border bg-card text-xs font-bold hover:bg-muted flex items-center gap-1.5"
             >
               <FileSpreadsheet className="h-4 w-4" /> Export Valuation (CSV)
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Item &amp; Code</th>
                   <th className="py-3 px-3">Batch Number</th>
                   <th className="py-3 px-3">Expiry Date</th>
@@ -332,7 +332,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={7} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading stock">Loading stock…</td></tr>
                 ) : filteredBatches.length === 0 ? (
@@ -346,20 +346,20 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   filteredBatches.map((b) => {
                     const isLow = b.quantity <= b.reorderLevel;
                     return (
-                      <tr key={b.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                      <tr key={b.id} className="hover:bg-muted/60">
                         <td className="py-3 px-4">
-                          <div className="font-semibold text-slate-900 dark:text-slate-100">{b.itemName}</div>
+                          <div className="font-semibold text-foreground">{b.itemName}</div>
                           <div className="text-xs text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
                         </td>
                         <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
-                        <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{b.expiryDate}</td>
-                        <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{b.warehouse}</td>
-                        <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-slate-100">
+                        <td className="py-3 px-3 font-semibold text-muted-foreground">{b.expiryDate}</td>
+                        <td className="py-3 px-3 font-medium text-foreground">{b.warehouse}</td>
+                        <td className="py-3 px-3 text-right font-bold text-foreground">
                           {b.quantity} units
                           <div className="text-xs text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
                         </td>
                         <td className="py-3 px-3 text-right font-mono">
-                          <div className="font-bold text-slate-900 dark:text-slate-100">{formatPrice(b.unitPrice)}</div>
+                          <div className="font-bold text-foreground">{formatPrice(b.unitPrice)}</div>
                           <div className="text-xs text-slate-400">Cost: {formatPrice(b.costPrice)}</div>
                         </td>
                         <td className="py-3 px-3 text-center">
@@ -388,8 +388,8 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Purchase Orders &amp; Procurement Pipeline</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">{purchaseOrders.length} order{purchaseOrders.length === 1 ? "" : "s"} on record</p>
+              <h3 className="font-semibold text-sm text-foreground">Purchase Orders &amp; Procurement Pipeline</h3>
+              <p className="text-xs text-muted-foreground">{purchaseOrders.length} order{purchaseOrders.length === 1 ? "" : "s"} on record</p>
             </div>
 
             <Dialog open={showPOModal} onOpenChange={setShowPOModal}>
@@ -398,7 +398,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <Plus className="h-4 w-4" /> Raise Purchase Order
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
+              <DialogContent className="max-w-md bg-card rounded-2xl p-6">
                 <DialogHeader>
                   <DialogTitle className="font-bold text-lg">Raise Purchase Order</DialogTitle>
                 </DialogHeader>
@@ -407,7 +407,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <label htmlFor="erp-po-supplier" className="font-bold">Supplier *</label>
                     <select
                       id="erp-po-supplier"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-bold bg-card"
                       value={newPOSupplier}
                       onChange={(e) => setNewPOSupplier(e.target.value)}
                     >
@@ -422,7 +422,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                       id="erp-po-amount"
                       type="number"
                       min={0}
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-bold"
                       value={newPOAmount}
                       onChange={(e) => setNewPOAmount(parseFloat(e.target.value) || 0)}
                     />
@@ -432,7 +432,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <input
                       id="erp-po-expected"
                       type="date"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-bold"
                       value={newPOExpected}
                       onChange={(e) => setNewPOExpected(e.target.value)}
                     />
@@ -448,10 +448,10 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">PO Number</th>
                   <th className="py-3 px-3">Supplier</th>
                   <th className="py-3 px-3 text-right">Total</th>
@@ -459,7 +459,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading purchase orders">Loading orders…</td></tr>
                 ) : purchaseOrders.length === 0 ? (
@@ -469,7 +469,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   </td></tr>
                 ) : (
                   purchaseOrders.map((po) => (
-                    <tr key={po.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                    <tr key={po.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4 font-mono font-bold text-primary-500">{po.poNumber}</td>
                       <td className="py-3 px-3 font-semibold">{po.supplier}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{formatPrice(po.totalAmount)}</td>
@@ -488,15 +488,15 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       {activeTab === "transfers" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Stock Movement Log</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">
+            <h3 className="font-semibold text-sm text-foreground">Stock Movement Log</h3>
+            <p className="text-xs text-muted-foreground">
               Every recorded stock movement — dispenses, receipts and adjustments.
             </p>
           </div>
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Item</th>
                   <th className="py-3 px-3">Movement</th>
                   <th className="py-3 px-3 text-right">Quantity</th>
@@ -504,7 +504,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3">Reference</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading movements">Loading movements…</td></tr>
                 ) : movements.length === 0 ? (
@@ -514,7 +514,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   </td></tr>
                 ) : (
                   movements.map((m) => (
-                    <tr key={m.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                    <tr key={m.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4 font-bold">{m.item}</td>
                       <td className="py-3 px-3 capitalize">{m.transaction_type.replace(/_/g, " ")}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{m.quantity}</td>
@@ -533,8 +533,8 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       {activeTab === "reorder" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Reorder Queue</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">
+            <h3 className="font-semibold text-sm text-foreground">Reorder Queue</h3>
+            <p className="text-xs text-muted-foreground">
               Items at or below their minimum stock level, computed live.
             </p>
           </div>
@@ -555,7 +555,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               {lowStockItems.map((b) => (
                 <div
                   key={b.id}
-                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-4 rounded-2xl bg-card border border-amber-200 dark:border-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div>
                     <p className="font-bold text-sm">{b.itemName}</p>

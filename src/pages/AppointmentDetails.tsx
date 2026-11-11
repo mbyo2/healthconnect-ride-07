@@ -326,7 +326,7 @@ export const AppointmentDetails = () => {
                 <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
                   <div className="font-semibold text-muted-foreground uppercase">Time</div>
-                  <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                  <div className="font-mono font-semibold text-foreground">
                     {String(appointment.time).slice(0, 5)}
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export const AppointmentDetails = () => {
                 <Video className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
                   <div className="font-semibold text-muted-foreground uppercase">Consultation Type</div>
-                  <div className="font-semibold text-slate-800 dark:text-slate-200 capitalize">
+                  <div className="font-semibold text-foreground capitalize">
                     {appointment.type === "video_consultation" ? "Video Consultation" : "In-Person Visit"}
                   </div>
                 </div>
@@ -347,7 +347,7 @@ export const AppointmentDetails = () => {
                   <Wallet className="h-4 w-4 text-slate-400 mt-0.5" />
                   <div>
                     <div className="font-semibold text-muted-foreground uppercase">Consultation Fee</div>
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">
+                    <div className="font-semibold text-foreground">
                       K{appointment.consultation_fee}
                     </div>
                   </div>
@@ -359,7 +359,7 @@ export const AppointmentDetails = () => {
                   <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                   <div>
                     <div className="font-semibold text-muted-foreground uppercase">Duration</div>
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">
+                    <div className="font-semibold text-foreground">
                       {appointment.duration} minutes
                     </div>
                   </div>
@@ -370,7 +370,7 @@ export const AppointmentDetails = () => {
                 <MapPin className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
                   <div className="font-semibold text-muted-foreground uppercase">Location</div>
-                  <div className="font-semibold text-slate-800 dark:text-slate-200">
+                  <div className="font-semibold text-foreground">
                     {appointment.type === "video_consultation"
                       ? "Video Consultation"
                       : appointment.provider?.address || "In-Person Visit"}
@@ -444,7 +444,7 @@ export const AppointmentDetails = () => {
           <DialogFooter>
             <button
               onClick={() => setShowCancelDialog(false)}
-              className="px-4 py-2 rounded-md border border-border dark:border-slate-700 font-semibold text-xs"
+              className="px-4 py-2 rounded-md border border-border font-semibold text-xs"
             >
               Keep appointment
             </button>

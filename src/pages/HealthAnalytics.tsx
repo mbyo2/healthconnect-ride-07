@@ -73,7 +73,7 @@ const HealthAnalytics = () => {
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="px-3 py-2 rounded-md border border-border dark:border-slate-700 dark:border-slate-800 bg-card text-xs font-semibold focus:outline-none"
+              className="px-3 py-2 rounded-md border border-border bg-card text-xs font-semibold focus:outline-none"
               aria-label="Time range"
             >
               <option value="7days">Last 7 Days</option>
@@ -198,7 +198,7 @@ const HealthAnalytics = () => {
                       className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                         activeTab === tab.id
                           ? "bg-primary-500 text-white shadow-xs"
-                          : "text-muted-foreground hover:bg-white dark:hover:bg-slate-800"
+                          : "text-muted-foreground hover:bg-white "
                       }`}
                     >
                       {tab.label}
@@ -339,7 +339,7 @@ function VitalsTile({ title, value, accent, caption }: {
 function ChartEmptyState({ message }: { message: string }) {
   return (
     <div className="h-[280px] flex flex-col items-center justify-center text-center gap-2">
-      <Activity className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+      <Activity className="h-8 w-8 text-muted-foreground" />
       <p className="text-sm font-semibold text-muted-foreground max-w-xs">{message}</p>
     </div>
   );

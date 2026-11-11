@@ -134,13 +134,13 @@ const Marketplace = () => {
                     placeholder="Search medication name, generic compound, or brand..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-foreground text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full pl-10 pr-3 py-2 rounded-xl border border-border bg-card text-foreground text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-2 border border-border dark:border-slate-700 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-foreground"
+                  className="px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-card text-foreground"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((category) => (

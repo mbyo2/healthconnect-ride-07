@@ -92,7 +92,7 @@ const VideoDashboard: React.FC = () => {
             </button>
             <button
               onClick={() => navigate("/appointments")}
-              className="px-4 py-2.5 min-h-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs hover:bg-muted dark:hover:bg-slate-700 flex items-center gap-1.5"
+              className="px-4 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-foreground font-semibold text-xs hover:bg-muted dark:hover:bg-slate-700 flex items-center gap-1.5"
             >
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span>Schedule Call</span>
@@ -171,7 +171,7 @@ const VideoDashboard: React.FC = () => {
             </button>
             <button
               onClick={() => navigate("/appointments")}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs hover:bg-muted dark:hover:bg-slate-700 flex items-center justify-center gap-2"
+              className="w-full md:w-auto px-5 py-2.5 rounded-xl border border-border bg-card text-foreground font-semibold text-xs hover:bg-muted dark:hover:bg-slate-700 flex items-center justify-center gap-2"
             >
               <Calendar className="h-4 w-4 text-muted-foreground" /> Schedule Session
             </button>

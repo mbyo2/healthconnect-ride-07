@@ -41,7 +41,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
   );
 
   return (
-    <div className="mt-3 rounded-xl bg-white dark:bg-slate-950 border border-canvas-silk dark:border-slate-800 p-3">
+    <div className="mt-3 rounded-xl bg-card border border-border p-3">
       <ol className="flex items-center" aria-label="Delivery progress">
         {STAGES.map((stage, i) => {
           const Icon = stage.icon;

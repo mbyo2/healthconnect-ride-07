@@ -93,7 +93,7 @@ export function NextAvailableChip({
 
   if (next === null) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-graphite-500 dark:text-slate-400">
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
         <CalendarCheck2 className="h-3.5 w-3.5" aria-hidden />
         No open slots in the next 14 days
       </span>

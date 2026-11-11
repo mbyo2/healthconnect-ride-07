@@ -83,24 +83,24 @@ export const ProviderAnalyticsDashboard = () => {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="border-b border-canvas-silk pb-3">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+      <div className="border-b border-border pb-3">
+        <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
           <BarChart3 className="h-4 w-4 text-primary-500" /> Practice Analytics & Patient Engagement Telemetry
         </h2>
-        <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Track clinical throughput, patient satisfaction ratings, and appointment adherence metrics</p>
+        <p className="text-xs text-muted-foreground font-medium">Track clinical throughput, patient satisfaction ratings, and appointment adherence metrics</p>
       </div>
 
       {/* 8 Bento Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="p-3.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
+          <div key={label} className="p-3.5 rounded-xl border border-border bg-card shadow-xs">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+              <div className="p-2 rounded-xl bg-canvas border border-border">
                 <Icon className={`h-4 w-4 ${color}`} />
               </div>
               <div>
-                <p className="text-xl font-bold font-mono text-slate-900 dark:text-slate-100">{value}</p>
-                <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{label}</p>
+                <p className="text-xl font-bold font-mono text-foreground">{value}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase">{label}</p>
               </div>
             </div>
           </div>
@@ -109,23 +109,23 @@ export const ProviderAnalyticsDashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Recent Appointments */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-canvas-silk pb-2">
-            <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-border pb-2">
+            <h3 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-primary-500" /> Recent Patient Visits
             </h3>
-            <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{recentAppointments.length} visits</span>
+            <span className="text-xs font-bold text-muted-foreground">{recentAppointments.length} visits</span>
           </div>
 
           {recentAppointments.length === 0 ? (
-            <p className="text-graphite-500 dark:text-slate-400 text-xs font-medium py-6 text-center">No recent appointments recorded</p>
+            <p className="text-muted-foreground text-xs font-medium py-6 text-center">No recent appointments recorded</p>
           ) : (
             <div className="space-y-2 text-xs">
               {recentAppointments.map((apt: any) => (
-                <div key={apt.id} className="flex items-center justify-between p-2.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <div key={apt.id} className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background">
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-slate-100">{apt.patient?.first_name} {apt.patient?.last_name}</p>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{apt.date} at {apt.time}</p>
+                    <p className="font-semibold text-foreground">{apt.patient?.first_name} {apt.patient?.last_name}</p>
+                    <p className="text-xs text-muted-foreground font-medium">{apt.date} at {apt.time}</p>
                   </div>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                     apt.status === "completed" ? "bg-success-500" : apt.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
@@ -139,27 +139,27 @@ export const ProviderAnalyticsDashboard = () => {
         </div>
 
         {/* Recent Reviews & Patient Satisfaction */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-canvas-silk pb-2">
-            <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-border pb-2">
+            <h3 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <MessageSquareText className="h-4 w-4 text-warning-500" /> Patient Ratings & Feedback
             </h3>
-            <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
+            <span className="text-xs font-bold text-muted-foreground">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
           </div>
 
           {recentReviews.length === 0 ? (
-            <p className="text-graphite-500 dark:text-slate-400 text-xs font-medium py-6 text-center">No patient feedback submitted yet</p>
+            <p className="text-muted-foreground text-xs font-medium py-6 text-center">No patient feedback submitted yet</p>
           ) : (
             <div className="space-y-2 text-xs">
               {(recentReviews as any[]).map((review) => (
-                <div key={review.id} className="p-3 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <div key={review.id} className="p-3 rounded-xl border border-border bg-background">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star key={s} className={`h-3 w-3 ${s <= review.rating ? "text-warning-500 fill-warning-500" : "text-slate-300"}`} />
                       ))}
                     </div>
-                    <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{review.patient?.first_name}</span>
+                    <span className="text-xs font-bold text-muted-foreground">{review.patient?.first_name}</span>
                   </div>
                   {review.review_text && <p className="text-xs text-slate-700 font-medium mt-1.5 leading-relaxed">{review.review_text}</p>}
                 </div>

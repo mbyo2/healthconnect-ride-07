@@ -18,7 +18,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
     <div>
       <div className="flex items-center justify-between mb-3.5 px-1">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Available Providers</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Available Providers</h2>
           <p className="text-xs text-slate-400 font-medium">Verified providers — open a profile to see live slots</p>
         </div>
         <button
@@ -31,8 +31,8 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
       </div>
 
       {providers.length === 0 ? (
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-center">
-          <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No verified providers listed yet.</p>
+        <div className="p-6 rounded-2xl bg-card border border-border text-center">
+          <p className="text-sm font-bold text-foreground">No verified providers listed yet.</p>
           <p className="text-xs text-slate-500 mt-1">Search the full directory to find care near you.</p>
           <button
             onClick={onViewAll}
@@ -46,7 +46,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
           {providers.map((doc: any) => (
             <div
               key={doc.id}
-              className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+              className="p-5 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
             >
               <div className="flex items-start gap-3.5">
                 {doc.avatar_url ? (
@@ -61,7 +61,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                  <h3 className="text-sm font-bold text-foreground truncate">
                     {providerDisplayName({ first_name: doc.first_name, last_name: doc.last_name, role: doc.role })}
                   </h3>
                   <p className="text-xs text-primary-500 font-semibold">{doc.specialty || 'General Practice'}</p>
@@ -71,7 +71,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
                 </div>
               </div>
 
-              <div className="pt-1 border-t border-canvas-silk dark:border-slate-800">
+              <div className="pt-1 border-t border-border">
                 <button
                   onClick={() => onViewProvider(doc.id)}
                   className="w-full px-4 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95 min-h-[44px]"

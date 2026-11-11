@@ -27,7 +27,7 @@ export const DoctorCard = ({ provider, onSelect }: DoctorCardProps) => {
   return (
     <button
       onClick={onSelect}
-      className="w-full flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-left"
+      className="w-full flex items-center gap-3 p-3 bg-card rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-left"
     >
       <Avatar className="h-14 w-14 shrink-0">
         <AvatarImage src={provider.avatar_url} alt={name} />

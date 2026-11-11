@@ -29,7 +29,7 @@ export const QuickActions = ({ title = 'Quick Actions', actions }: QuickActionsP
             <button
               key={idx}
               onClick={action.onClick}
-              className="relative flex flex-col items-center gap-2 p-4 rounded-xl border border-canvas-silk hover:border-primary-200 hover:bg-primary-50 transition-all group"
+              className="relative flex flex-col items-center gap-2 p-4 rounded-xl border border-border hover:border-primary-200 hover:bg-primary-50 transition-all group"
             >
               {action.badge && (
                 <span className="absolute top-2 right-2 px-2 py-0.5 rounded-pill text-xs font-medium bg-error-500 text-white">

@@ -36,7 +36,10 @@ describe("SkeletonHeaderBar — desktop twin (DesktopNav)", () => {
     expect(html).toContain("min-[1025px]:block");
     expect(html).toContain("bg-white/90");
     expect(html).toContain("dark:bg-slate-900/90");
-    expect(html).toContain("border-canvas-silk");
+    // Header chrome unified on the single border token (2026-11-11
+    // interior rebuild): the real DesktopNav bar is border-border,
+    // and the skeleton twin mirrors it.
+    expect(html).toContain("border-border");
     // Real bar height: h-16, lg:h-[4.25rem].
     expect(html).toContain("lg:h-[4.25rem]");
   });

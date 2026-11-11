@@ -243,7 +243,7 @@ export const OptometristWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <div
             key={index}
-            className="group cursor-pointer rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+            className="group cursor-pointer rounded-2xl border border-border bg-card p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
             onClick={() => step.action ? step.action() : handleNavigation(step.route!, step.title)}
           >
             <div className="flex items-center gap-3 mb-2">
@@ -251,13 +251,13 @@ export const OptometristWorkflow = () => {
                 {step.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
+                <h3 className="text-xs font-bold text-foreground group-hover:text-primary-500 transition-colors truncate">{step.title}</h3>
                 <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
               </div>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-bold transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-muted text-foreground group-hover:bg-primary-500 group-hover:text-white text-xs font-bold transition-all"
             >
               Open Module
             </button>

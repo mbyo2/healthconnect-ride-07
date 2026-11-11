@@ -72,22 +72,22 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
   };
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-4 font-sans text-foreground">
       {/* Action Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-border pb-3">
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <Utensils className="h-5 w-5 text-primary-500" />
             Inpatient Clinical Diet & Nutrition WorkOS
           </h3>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+          <p className="text-xs text-muted-foreground font-medium">
             Manage prescribed nutrition plans, food allergies, and dietary restrictions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refresh}
-            className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 font-bold text-xs flex items-center gap-1"
+            className="px-3 py-1.5 rounded-md bg-muted hover:bg-muted font-bold text-xs flex items-center gap-1"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
@@ -102,30 +102,30 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
 
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <Utensils className="h-5 w-5 mx-auto text-primary-500 mb-1" />
           <div className="text-2xl font-bold font-mono text-primary-500">{activePlans.length}</div>
-          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Active Meal Plans</div>
+          <div className="text-xs text-muted-foreground font-bold uppercase">Active Meal Plans</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <AlertTriangle className="h-5 w-5 mx-auto text-error-500 mb-1" />
           <div className="text-2xl font-bold font-mono text-error-500">{withAllergies.length}</div>
-          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Known Allergies</div>
+          <div className="text-xs text-muted-foreground font-bold uppercase">Known Allergies</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+        <div className="p-3.5 rounded-xl bg-card border border-border shadow-xs text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
           <div className="text-2xl font-bold font-mono text-success-500">{plans.length}</div>
-          <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Plans Issued</div>
+          <div className="text-xs text-muted-foreground font-bold uppercase">Total Plans Issued</div>
         </div>
       </div>
 
       {/* Active Plans List */}
-      <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
               <th className="py-2.5 px-4">Patient Name</th>
               <th className="py-2.5 px-3">Diet Category</th>
               <th className="py-2.5 px-3 text-center">Status</th>
@@ -133,10 +133,10 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
               <th className="py-2.5 px-3">Known Allergies</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk">
+          <tbody className="divide-y divide-border">
             {plans.map((p) => (
-              <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{nameFor(p.patient_id) || "Inpatient Resident"}</td>
+              <tr key={p.id} className="hover:bg-muted transition-colors">
+                <td className="py-3 px-4 font-bold text-foreground">{nameFor(p.patient_id) || "Inpatient Resident"}</td>
                 <td className="py-3 px-3 font-semibold text-primary-500">{p.diet_type || "Regular"}</td>
                 <td className="py-3 px-3 text-center">
                   {!p.end_date || p.end_date >= today ? (
@@ -159,15 +159,15 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
 
       {/* Prescribe Diet Modal */}
       <Dialog open={showPrescribeDiet} onOpenChange={setShowPrescribeDiet}>
-        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[450px] bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Prescribe Inpatient Diet Plan</DialogTitle>
           </DialogHeader>
           <form onSubmit={handlePrescribeDiet} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Diet Type *</label>
+              <label className="font-semibold text-muted-foreground uppercase">Diet Type *</label>
               <select
-                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-border font-bold"
                 value={form.diet_type}
                 onChange={(e) => setForm({ ...form, diet_type: e.target.value })}
               >
@@ -178,23 +178,23 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Start Date *</label>
+                <label className="font-semibold text-muted-foreground uppercase">Start Date *</label>
                 <input
                   type="date"
                   value={form.start_date}
                   onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-border font-bold"
                   required
                 />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Calories / Day</label>
+                <label className="font-semibold text-muted-foreground uppercase">Calories / Day</label>
                 <input
                   type="number"
                   value={form.calories_per_day}
                   onChange={(e) => setForm({ ...form, calories_per_day: e.target.value })}
                   placeholder="1800"
-                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-border font-bold"
                 />
               </div>
             </div>

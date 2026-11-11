@@ -69,24 +69,24 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
+    <div className="p-5 rounded-2xl border border-border bg-card shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
-          <Avatar className="h-11 w-11 border border-canvas-silk dark:border-slate-800">
+          <Avatar className="h-11 w-11 border border-border">
             <AvatarImage src={user.avatar_url} />
             <AvatarFallback className="bg-primary-50 text-primary-500 font-semibold text-xs">
               {user.first_name?.[0]}{user.last_name?.[0]}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-sm font-semibold text-foreground">
               {user.first_name} {user.last_name}
             </h3>
             {user.specialty && (
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{user.specialty}</p>
+              <p className="text-xs text-muted-foreground font-medium">{user.specialty}</p>
             )}
             {user.city && user.state && (
-              <div className="flex items-center gap-1 text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium mt-0.5">
                 <MapPin className="h-3 w-3 text-primary-500" />
                 {user.city}, {user.state}
               </div>
@@ -100,7 +100,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       </div>
 
       {user.bio && (
-        <p className="text-xs text-graphite-500 dark:text-slate-400 line-clamp-2 font-medium">
+        <p className="text-xs text-muted-foreground line-clamp-2 font-medium">
           {user.bio}
         </p>
       )}
@@ -112,24 +112,24 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
             <Building className="h-3.5 w-3.5" />
             <span>{user.institution.name}</span>
           </div>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">{user.institution.type}</p>
+          <p className="text-xs text-muted-foreground font-medium mt-0.5">{user.institution.type}</p>
         </div>
       )}
 
       {/* Services */}
       {user.services && user.services.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
+          <h4 className="font-semibold text-muted-foreground uppercase text-xs flex items-center gap-1">
             <Stethoscope className="h-3 w-3 text-primary-500" /> Services Offered
           </h4>
           <div className="space-y-1">
             {user.services.slice(0, 3).map((service) => (
-              <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
-                <span className="font-bold text-slate-900 dark:text-slate-100">{service.name}</span>
+              <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-background">
+                <span className="font-bold text-foreground">{service.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-success-500 font-bold">K{service.price}</span>
                   {service.duration && (
-                    <span className="text-graphite-500 dark:text-slate-400 text-xs flex items-center gap-0.5">
+                    <span className="text-muted-foreground text-xs flex items-center gap-0.5">
                       <Clock className="h-3 w-3" /> {service.duration}m
                     </span>
                   )}
@@ -143,13 +143,13 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Products */}
       {user.products && user.products.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs flex items-center gap-1">
+          <h4 className="font-semibold text-muted-foreground uppercase text-xs flex items-center gap-1">
             <Pill className="h-3 w-3 text-purple-500" /> Available Products
           </h4>
           <div className="space-y-1">
             {user.products.slice(0, 3).map((product) => (
-              <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
-                <span className="font-bold text-slate-900 dark:text-slate-100">{product.medication_name}</span>
+              <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-background">
+                <span className="font-bold text-foreground">{product.medication_name}</span>
                 <span className="text-success-500 font-bold">K{product.price}</span>
               </div>
             ))}
@@ -158,7 +158,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       )}
 
       {/* Contact Info */}
-      <div className="flex flex-wrap gap-3 text-xs text-graphite-500 dark:text-slate-400 font-medium pt-1 border-t border-canvas-silk dark:border-slate-800">
+      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground font-medium pt-1 border-t border-border">
         {user.email && (
           <div className="flex items-center gap-1">
             <Mail className="h-3 w-3 text-primary-500" /> {user.email}
@@ -182,14 +182,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         </button>
         <button
           onClick={() => navigate(`/chat?receiver=${user.id}`)}
-          className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
+          className="px-3.5 py-2 rounded-xl border border-border bg-card text-foreground font-bold text-xs hover:bg-muted flex items-center gap-1"
         >
           <MessageCircle className="h-3.5 w-3.5 text-primary-500" /> Chat
         </button>
         {isClinicianRole(user.role) && (
           <button
             onClick={() => navigate(`/provider/${user.id}`)}
-            className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
+            className="px-3.5 py-2 rounded-xl border border-border bg-card text-foreground font-bold text-xs hover:bg-muted flex items-center gap-1"
           >
             <Calendar className="h-3.5 w-3.5 text-success-500" /> Book
           </button>

@@ -35,7 +35,7 @@ const Section = ({
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex items-start gap-2 text-sm">
     <span className="text-muted-foreground font-semibold w-36 shrink-0">{label}</span>
-    <span className="text-slate-800 dark:text-slate-200 font-medium">{value}</span>
+    <span className="text-foreground font-medium">{value}</span>
   </div>
 );
 
@@ -475,7 +475,7 @@ export const ProviderDetail = () => {
                       const info = (schedule as Record<string, { available: boolean; hours: string[] }>)[day];
                       return (
                         <div key={day} className="p-2 rounded-lg border border-border bg-canvas dark:bg-slate-800">
-                          <p className="text-sm font-semibold capitalize text-graphite-700 dark:text-slate-200">{day}</p>
+                          <p className="text-sm font-semibold capitalize text-foreground">{day}</p>
                           {info?.available ? (
                             <div className="space-y-0.5 mt-1">
                               {(info.hours || []).map(h => (
@@ -553,14 +553,14 @@ export const ProviderDetail = () => {
                   </button>
                   <button
                     onClick={() => setIsWaitlistOpen(true)}
-                    className="w-full py-3 min-h-[44px] rounded-2xl border border-border hover:bg-muted text-graphite-700 dark:text-slate-200 font-medium text-sm transition-all"
+                    className="w-full py-3 min-h-[44px] rounded-2xl border border-border hover:bg-muted text-foreground font-medium text-sm transition-all"
                   >
                     Join Waitlist
                   </button>
                 </div>
               ) : (
                 <div className="p-3 rounded-2xl border border-border bg-muted/60">
-                  <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium">
+                  <p className="text-sm text-foreground font-medium">
                     This professional works through a health facility — appointments are arranged via the institution, not direct booking.
                   </p>
                 </div>

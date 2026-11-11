@@ -248,7 +248,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
   const singleDoseMl = calcConcentrationMgMl > 0 ? (Number(singleDoseMg) / calcConcentrationMgMl).toFixed(2) : "0";
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -271,7 +271,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         {/* Patient Selection dropdown */}
         <div className="flex items-center gap-2">
           <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
-            <SelectTrigger className="w-64 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-bold border-white/30">
+            <SelectTrigger className="w-64 bg-card text-foreground text-xs font-bold border-white/30">
               <SelectValue placeholder="Select child patient" />
             </SelectTrigger>
             <SelectContent>
@@ -300,10 +300,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+              <h3 className="font-semibold text-sm text-foreground">
                 Child Anthropometry &amp; Growth Trajectory
               </h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 Patient: <span className="font-bold text-primary-500">{activePatient?.first_name} {activePatient?.last_name}</span> (Age: {calculateAgeMonths(activePatient?.date_of_birth)} months)
               </p>
             </div>
@@ -314,13 +314,13 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   <Plus className="h-4 w-4" /> Log Measurement
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
+              <DialogContent className="max-w-md bg-card rounded-2xl p-6">
                 <DialogHeader>
                   <DialogTitle className="font-bold text-lg">Log Pediatric Growth Vitals</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div className="space-y-1">
-                    <Label className="font-bold text-slate-700 dark:text-slate-300">Weight (kg) *</Label>
+                    <Label className="font-bold text-foreground">Weight (kg) *</Label>
                     <Input
                       type="number"
                       step="0.05"
@@ -331,7 +331,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
-                      <Label className="font-bold text-slate-700 dark:text-slate-300">Height / Length (cm) *</Label>
+                      <Label className="font-bold text-foreground">Height / Length (cm) *</Label>
                       <Input
                         type="number"
                         step="0.1"
@@ -341,7 +341,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="font-bold text-slate-700 dark:text-slate-300">Head Circ. (cm)</Label>
+                      <Label className="font-bold text-foreground">Head Circ. (cm)</Label>
                       <Input
                         type="number"
                         step="0.1"
@@ -352,7 +352,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="font-bold text-slate-700 dark:text-slate-300">Clinical Notes</Label>
+                    <Label className="font-bold text-foreground">Clinical Notes</Label>
                     <Textarea
                       rows={2}
                       className="font-medium"
@@ -380,7 +380,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </div>
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Latest Weight (charted)</span>
               <div className="text-2xl font-bold text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
@@ -388,17 +388,17 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Latest Length / Height</span>
-              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+              <div className="text-2xl font-bold text-foreground mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
               </div>
               <span className="text-xs font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Head Circumference</span>
-              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+              <div className="text-2xl font-bold text-foreground mt-1">
                 {growthHistory[growthHistory.length - 1]?.head || "—"}{growthHistory[growthHistory.length - 1]?.head ? " cm" : ""}
               </div>
               <span className="text-xs font-bold text-slate-500">Clinical screening still required</span>
@@ -407,10 +407,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           )}
 
           {/* Growth Table */}
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Visit Date</th>
                   <th className="py-3 px-3">Age (Months)</th>
                   <th className="py-3 px-3">Weight</th>
@@ -418,12 +418,12 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   <th className="py-3 px-3">Head Circ.</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {growthHistory.map((row, i) => (
-                  <tr key={i} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                  <tr key={i} className="hover:bg-muted/60">
                     <td className="py-3 px-4 font-bold text-primary-500">{row.date}</td>
                     <td className="py-3 px-3 font-semibold">{row.ageMonths} mo</td>
-                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{row.weight} kg</td>
+                    <td className="py-3 px-3 font-bold text-foreground">{row.weight} kg</td>
                     <td className="py-3 px-3 font-semibold">{row.height} cm</td>
                     <td className="py-3 px-3 font-semibold">{row.head ? `${row.head} cm` : "—"}</td>
                   </tr>
@@ -439,8 +439,8 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">National Immunization Schedule (EPI)</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">
+              <h3 className="font-semibold text-sm text-foreground">National Immunization Schedule (EPI)</h3>
+              <p className="text-xs text-muted-foreground">
                 Tracking completed doses, upcoming shots, and batch serial numbers
               </p>
             </div>
@@ -484,7 +484,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               return (
               <div
                 key={v.id}
-                className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex items-center justify-between"
+                className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -499,7 +499,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     <ShieldCheck className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{v.name}</h4>
+                    <h4 className="font-semibold text-xs text-foreground">{v.name}</h4>
                     <p className="text-xs text-slate-400 font-medium">Recommended Age: {v.due}</p>
                   </div>
                 </div>
@@ -531,15 +531,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       {activeSubTab === "milestones" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Pediatric Developmental Milestones (Ages 0 - 24 Months)</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Screening motor, speech, and social progression</p>
+            <h3 className="font-semibold text-sm text-foreground">Pediatric Developmental Milestones (Ages 0 - 24 Months)</h3>
+            <p className="text-xs text-muted-foreground">Screening motor, speech, and social progression</p>
           </div>
 
           <div className="space-y-3">
             {DEVELOPMENTAL_MILESTONES.map((m, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-4 rounded-2xl border border-border bg-card shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -548,7 +548,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     </span>
                     <span className="text-xs font-bold text-slate-400 uppercase">{m.category}</span>
                   </div>
-                  <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.milestone}</p>
+                  <p className="text-xs font-semibold text-foreground">{m.milestone}</p>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -588,20 +588,20 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       {activeSubTab === "calculator" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Weight-Based Pediatric Dosage Calculator</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">
+            <h3 className="font-semibold text-sm text-foreground">Weight-Based Pediatric Dosage Calculator</h3>
+            <p className="text-xs text-muted-foreground">
               Calculate exact single and daily doses (mg and mL) from child weight and liquid concentration
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4 text-xs">
+              <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                 <Calculator className="h-4 w-4 text-primary-500" /> Dosage Input Parameters
               </h4>
 
               <div className="space-y-1">
-                <Label className="font-bold text-slate-700 dark:text-slate-300">Medication Preset</Label>
+                <Label className="font-bold text-foreground">Medication Preset</Label>
                 <Select
                   value={calcDrug}
                   onValueChange={(v) => {
@@ -632,7 +632,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="font-bold text-slate-700 dark:text-slate-300">Child Weight (kg) *</Label>
+                  <Label className="font-bold text-foreground">Child Weight (kg) *</Label>
                   <Input
                     type="number"
                     step="0.5"
@@ -642,7 +642,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="font-bold text-slate-700 dark:text-slate-300">Dose (mg / kg / dose) *</Label>
+                  <Label className="font-bold text-foreground">Dose (mg / kg / dose) *</Label>
                   <Input
                     type="number"
                     step="1"
@@ -654,7 +654,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               </div>
 
               <div className="space-y-1">
-                <Label className="font-bold text-slate-700 dark:text-slate-300">Liquid Concentration (mg / mL)</Label>
+                <Label className="font-bold text-foreground">Liquid Concentration (mg / mL)</Label>
                 <Input
                   type="number"
                   step="1"

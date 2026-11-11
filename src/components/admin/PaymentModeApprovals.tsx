@@ -240,7 +240,7 @@ export const PaymentModeApprovals = () => {
           &quot;own&quot; removes the institution from marketplace payment flows.
         </p>
         {loading ? (
-          <div aria-hidden className="divide-y divide-canvas-silk dark:divide-slate-800">
+          <div aria-hidden className="divide-y divide-border">
             {[0, 1, 2].map((i) => (
               <SkeletonListRow key={i} action />
             ))}

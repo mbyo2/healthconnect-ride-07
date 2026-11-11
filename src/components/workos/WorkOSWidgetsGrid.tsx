@@ -43,7 +43,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
             <span className="text-3xl font-bold font-mono text-rose-500">{stats.icuOccupancyPercent}%</span>
             <span className="text-xs font-semibold text-rose-400">Full (18/20 Beds)</span>
           </div>
-          <div className="mt-3 w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div className="mt-3 w-full bg-muted h-2 rounded-full overflow-hidden">
             <div className="bg-rose-500 h-full rounded-full transition-all duration-500" style={{ width: `${stats.icuOccupancyPercent}%` }} />
           </div>
         </div>
@@ -106,7 +106,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
         <div className={`lg:col-span-2 p-5 rounded-2xl border space-y-4 ${
           isDarkMode ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200 shadow-sm"
         }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-500" />
               <h3 className="font-semibold text-base tracking-tight">Clinical Stage Throughput Breakdown</h3>
@@ -119,40 +119,40 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-700 dark:text-slate-300">Emergency Triage (Code Red/Yellow)</span>
+                <span className="text-foreground">Emergency Triage (Code Red/Yellow)</span>
                 <span className="font-mono text-rose-500">85% Capacity (Critical)</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
                 <div className="bg-rose-500 h-full rounded-full w-[85%]" />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-700 dark:text-slate-300">ICU & Surgical Wards</span>
+                <span className="text-foreground">ICU & Surgical Wards</span>
                 <span className="font-mono text-purple-500">90% Occupancy</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
                 <div className="bg-purple-500 h-full rounded-full w-[90%]" />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-700 dark:text-slate-300">Outpatient Consultations & Telehealth</span>
+                <span className="text-foreground">Outpatient Consultations & Telehealth</span>
                 <span className="font-mono text-emerald-500">62% Active</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
                 <div className="bg-emerald-500 h-full rounded-full w-[62%]" />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-700 dark:text-slate-300">Pharmacy Medication Fulfillment</span>
+                <span className="text-foreground">Pharmacy Medication Fulfillment</span>
                 <span className="font-mono text-amber-500">94% Dispatched</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full w-[94%]" />
               </div>
             </div>
@@ -163,7 +163,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
         <div className={`p-5 rounded-2xl border space-y-4 ${
           isDarkMode ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200 shadow-sm"
         }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-emerald-500" />
               <h3 className="font-semibold text-base tracking-tight">On-Call Specialists</h3>
@@ -178,14 +178,14 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
               { name: "Dr. Chisamba Banda", role: "Neurologist", status: "On Duty", avatar: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=100&auto=format&fit=crop&q=85" },
               { name: "Dr. Aisha Nkomo", role: "Pediatric Specialist", status: "In Teleconsult", avatar: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85" },
             ].map((doc) => (
-              <div key={doc.name} className="flex items-center justify-between p-2 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div key={doc.name} className="flex items-center justify-between p-2 rounded-xl border border-border hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="relative">
                     <img src={doc.avatar} alt={doc.name} className="h-8 w-8 rounded-full object-cover border border-emerald-500/30" />
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
                   </div>
                   <div>
-                    <div className="font-bold text-xs text-slate-900 dark:text-slate-100">{doc.name}</div>
+                    <div className="font-bold text-xs text-foreground">{doc.name}</div>
                     <div className="text-xs text-slate-400">{doc.role}</div>
                   </div>
                 </div>

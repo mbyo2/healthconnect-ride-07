@@ -173,7 +173,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 py-8 justify-center">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground py-8 justify-center">
         <Loader2 className="h-4 w-4 animate-spin" /> Loading procedure prices...
       </div>
     );
@@ -182,7 +182,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
   return (
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-muted-foreground">
           Set your institution's prices for each clinical procedure. Leave blank to use the system default.
           These prices appear on patient bills.
         </p>
@@ -196,7 +196,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       {showAdd && (
         <div className="p-3 rounded-xl border border-primary-500/20 bg-primary-50 dark:bg-primary-950/20 flex flex-col sm:flex-row gap-2 items-end">
           <div className="flex-1 w-full">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Procedure name</label>
+            <label className="text-xs font-bold text-muted-foreground">Procedure name</label>
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -205,7 +205,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
             />
           </div>
           <div className="w-full sm:w-32">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Price (K)</label>
+            <label className="text-xs font-bold text-muted-foreground">Price (K)</label>
             <input
               type="number"
               min="0"
@@ -228,7 +228,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       <div className="rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 dark:bg-slate-800 text-left">
+            <tr className="bg-muted/50 text-left">
               <th className="py-2 px-3 font-bold">Procedure</th>
               <th className="py-2 px-3 font-bold text-right">Default</th>
               <th className="py-2 px-3 font-bold text-right">Your Price (K)</th>
@@ -239,7 +239,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
             {procedures.map((p) => {
               const effective = p.custom_price ?? p.default_price;
               return (
-                <tr key={p.procedure_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <tr key={p.procedure_id} className="hover:bg-muted/50">
                   <td className="py-2 px-3 font-medium">
                     {p.procedure_name}
                     {p.is_custom && (
@@ -248,7 +248,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
                       </span>
                     )}
                   </td>
-                  <td className="py-2 px-3 text-right text-slate-500 dark:text-slate-400">K{p.default_price.toLocaleString()}</td>
+                  <td className="py-2 px-3 text-right text-muted-foreground">K{p.default_price.toLocaleString()}</td>
                   <td className="py-2 px-3">
                     <input
                       type="number"
@@ -286,7 +286,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
                             if (el) el.value = "";
                             savePrice(p, null);
                           }}
-                          className="px-2 py-1 rounded-lg border text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100"
+                          className="px-2 py-1 rounded-lg border text-xs font-bold text-muted-foreground hover:bg-slate-100"
                           title="Revert to default price"
                         >
                           Reset

@@ -194,7 +194,7 @@ const Symptoms = () => {
                           className={`min-h-[44px] min-w-0 max-w-full break-words text-left px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                             isSelected
                               ? "bg-primary-500 text-white shadow-xs"
-                              : "bg-canvas dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-border hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                              : "bg-canvas dark:bg-slate-800 text-foreground border border-border hover:bg-muted dark:hover:bg-slate-700"
                           }`}
                         >
                           {symptom} {isSelected ? "✓" : "+"}
@@ -228,7 +228,7 @@ const Symptoms = () => {
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
                     placeholder="Rate severity from 1 (mild) to 10 (severe)"
-                    className="w-full mt-1 p-2.5 min-h-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold placeholder:text-slate-400"
+                    className="w-full mt-1 p-2.5 min-h-[44px] rounded-md border border-border bg-card font-semibold placeholder:text-slate-400"
                   />
                 </div>
 
@@ -240,7 +240,7 @@ const Symptoms = () => {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe onset, triggers, pain quality, and affected body regions..."
                     rows={4}
-                    className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-slate-400"
+                    className="w-full mt-1 p-2.5 rounded-md border border-border bg-card font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-slate-400"
                   />
                 </div>
 
@@ -255,7 +255,7 @@ const Symptoms = () => {
                   <button
                     onClick={handleAIAnalysis}
                     disabled={selectedSymptoms.length === 0}
-                    className="py-3 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
+                    className="py-3 rounded-xl border border-primary-500 dark:border-primary-500 text-primary-500 hover:bg-muted dark:hover:bg-blue-950/30 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
                   >
                     <Bot className="h-4 w-4" /> AI Differential
                   </button>

@@ -37,7 +37,7 @@ export const RatingDisplay = ({
 
   if (value === null) {
     return (
-      <span className={`inline-flex items-center text-xs font-medium text-graphite-500 dark:text-slate-400 ${className}`}>
+      <span className={`inline-flex items-center text-xs font-medium text-muted-foreground ${className}`}>
         New provider
       </span>
     );
@@ -75,7 +75,7 @@ export const RatingDisplay = ({
         {value.toFixed(1)}
       </span>
       {reviewCount != null && reviewCount > 0 && (
-        <span className={`${textSize} font-medium text-graphite-500 dark:text-slate-400`}>
+        <span className={`${textSize} font-medium text-muted-foreground`}>
           ({reviewCount} review{reviewCount === 1 ? "" : "s"})
         </span>
       )}

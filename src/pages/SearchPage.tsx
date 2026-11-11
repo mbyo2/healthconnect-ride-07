@@ -115,7 +115,7 @@ const SearchPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="w-full pl-11 pr-28 py-3 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
+                className="w-full pl-11 pr-28 py-3 rounded-pill border border-border bg-card text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
                 aria-label="Search providers"
               />
               <Button
@@ -135,7 +135,7 @@ const SearchPage = () => {
           <SpecialtyTiles />
 
           <div className="vf-card">
-            <div className="flex items-center gap-2 border-b border-canvas-silk pb-3 mb-4">
+            <div className="flex items-center gap-2 border-b border-border pb-3 mb-4">
               <SlidersHorizontal className="h-4 w-4 text-primary-500" />
               <h2 className="font-medium text-base text-midnight">Provider Filters</h2>
             </div>

@@ -190,15 +190,15 @@ export const HealthPersonnelApplicationForm = () => {
   };
 
   const inputCls = (hasError?: string) =>
-    `w-full p-2.5 rounded-md border ${hasError ? "border-error-500" : "border-graphite-300 dark:border-slate-700"} text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500`;
+    `w-full p-2.5 rounded-md border ${hasError ? "border-error-500" : "border-border"} text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500`;
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto p-6 space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto p-6 space-y-6 font-sans text-foreground">
       {/* Section 1: Account */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
           <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 text-white text-xs font-bold">1</span>
-          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Account Information</h3>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Account Information</h3>
         </div>
 
         {[
@@ -207,7 +207,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "phone_number", label: "Phone Number", type: "tel", placeholder: "+260 97 123 4567", field: "phone_number" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} {f.field !== "phone_number" && <span className="text-error-500">*</span>}</label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-muted-foreground uppercase">{f.label} {f.field !== "phone_number" && <span className="text-error-500">*</span>}</label>
             <input
               id={f.id} type={f.type} placeholder={f.placeholder}
               value={String(formData[f.field])}
@@ -225,7 +225,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "confirmPassword", label: "Confirm Password", show: showConfirmPassword, toggle: () => setShowConfirmPassword(v => !v), field: "confirmPassword" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-muted-foreground uppercase">{f.label} <span className="text-error-500">*</span></label>
             <div className="relative mt-1">
               <input
                 id={f.id} type={f.show ? "text" : "password"}
@@ -235,7 +235,7 @@ export const HealthPersonnelApplicationForm = () => {
                 disabled={isSubmitting} required
                 className={`pr-10 ${inputCls(errors[f.field])}`}
               />
-              <button type="button" aria-label={f.show ? `Hide ${f.label.toLowerCase()}` : `Show ${f.label.toLowerCase()}`} onClick={f.toggle} disabled={isSubmitting} className="absolute right-2.5 top-2.5 text-graphite-500 dark:text-slate-400">
+              <button type="button" aria-label={f.show ? `Hide ${f.label.toLowerCase()}` : `Show ${f.label.toLowerCase()}`} onClick={f.toggle} disabled={isSubmitting} className="absolute right-2.5 top-2.5 text-muted-foreground">
                 {f.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
@@ -246,17 +246,17 @@ export const HealthPersonnelApplicationForm = () => {
 
       {/* Section 2: Professional */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
           <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white text-xs font-bold">2</span>
-          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Professional Information</h3>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Professional Information</h3>
         </div>
 
         {/* Profession — the exact provider role the applicant is applying for */}
         <div>
-          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Profession <span className="text-error-500">*</span></label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase">Profession <span className="text-error-500">*</span></label>
           <div className="mt-1">
             <Select value={formData.profession} onValueChange={handleProfessionChange} disabled={isSubmitting}>
-              <SelectTrigger className={`border ${errors.profession ? "border-error-500" : "border-graphite-300 dark:border-slate-700"} text-xs font-bold`}>
+              <SelectTrigger className={`border ${errors.profession ? "border-error-500" : "border-border"} text-xs font-bold`}>
                 <SelectValue placeholder="Select your profession" />
               </SelectTrigger>
               <SelectContent>
@@ -270,10 +270,10 @@ export const HealthPersonnelApplicationForm = () => {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Country of Practice <span className="text-error-500">*</span></label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase">Country of Practice <span className="text-error-500">*</span></label>
           <div className="mt-1">
             <Select value={selectedCountry} onValueChange={(v) => { setSelectedCountry(v); setUploadedDocuments({}); }} disabled={isSubmitting}>
-              <SelectTrigger className="border border-graphite-300 dark:border-slate-700 text-xs font-bold">
+              <SelectTrigger className="border border-border text-xs font-bold">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
               <SelectContent>
@@ -288,7 +288,7 @@ export const HealthPersonnelApplicationForm = () => {
         {/* Licence — required only for regulated professions */}
         {selectedProfession?.requiresLicense !== false && (
           <div>
-            <label htmlFor="license_number" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">License Number <span className="text-error-500">*</span></label>
+            <label htmlFor="license_number" className="text-xs font-semibold text-muted-foreground uppercase">License Number <span className="text-error-500">*</span></label>
             <input
               id="license_number" type="text" placeholder="e.g. MD123456"
               value={formData.license_number || ""}
@@ -307,7 +307,7 @@ export const HealthPersonnelApplicationForm = () => {
           { id: "specialty", label: "Specialty", placeholder: "e.g. Cardiology, General Practice", field: "specialty" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>
-            <label htmlFor={f.id} className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{f.label} <span className="text-error-500">*</span></label>
+            <label htmlFor={f.id} className="text-xs font-semibold text-muted-foreground uppercase">{f.label} <span className="text-error-500">*</span></label>
             <input
               id={f.id} type="text" placeholder={f.placeholder}
               value={String(formData[f.field])}
@@ -320,7 +320,7 @@ export const HealthPersonnelApplicationForm = () => {
         ))}
 
         <div>
-          <label htmlFor="years_of_experience" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Years of Experience <span className="text-error-500">*</span></label>
+          <label htmlFor="years_of_experience" className="text-xs font-semibold text-muted-foreground uppercase">Years of Experience <span className="text-error-500">*</span></label>
           <input
             id="years_of_experience" type="number" placeholder="e.g. 5" min="0"
             value={formData.years_of_experience}
@@ -334,25 +334,25 @@ export const HealthPersonnelApplicationForm = () => {
 
       {/* Section 3: Documents */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
           <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-success-500 text-white text-xs font-bold">3</span>
-          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Regulatory Documents</h3>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Regulatory Documents</h3>
         </div>
-        <p className="text-xs text-graphite-500 dark:text-slate-400">
+        <p className="text-xs text-muted-foreground">
           Upload required documents for <strong>{REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}</strong>. All required docs must be uploaded before submission.
         </p>
 
         <div className="space-y-3">
           {getCountryRequirements(selectedCountry, "healthcareProfessionals").map((requirement) => (
-            <div key={requirement.id} className="p-3 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+            <div key={requirement.id} className="p-3 rounded-xl border border-border bg-background">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <p className="font-semibold text-xs flex items-center gap-1">
                     {requirement.name}
                     {requirement.required && <span className="text-error-500">*</span>}
                   </p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{requirement.description}</p>
-                  {requirement.maxSizeMB && <p className="text-xs text-graphite-500 dark:text-slate-400">Max: {requirement.maxSizeMB}MB</p>}
+                  <p className="text-xs text-muted-foreground mt-0.5">{requirement.description}</p>
+                  {requirement.maxSizeMB && <p className="text-xs text-muted-foreground">Max: {requirement.maxSizeMB}MB</p>}
                 </div>
                 {uploadedDocuments[requirement.id] ? (
                   <div className="flex items-center gap-1">
@@ -377,7 +377,7 @@ export const HealthPersonnelApplicationForm = () => {
                     type="button"
                     onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
                     disabled={isSubmitting}
-                    className="w-full py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center justify-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-700"
+                    className="w-full py-1.5 rounded-md border border-border bg-card text-xs font-bold flex items-center justify-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-700"
                   >
                     <Upload className="h-3.5 w-3.5" /> Upload Document
                   </button>
@@ -399,26 +399,26 @@ export const HealthPersonnelApplicationForm = () => {
 
       {/* Section 4: Practice Details (optional but recommended) */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-canvas-silk pb-2">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
           <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-500 text-white text-xs font-bold">4</span>
-          <h3 className="font-semibold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
         </div>
 
         {/* Medical School & Graduation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Medical School</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase">Medical School</label>
             <input
               type="text"
               placeholder="e.g. UNZA School of Medicine"
               value={(formData as any).medical_school || ""}
               onChange={e => setFormData(prev => ({ ...prev, medical_school: e.target.value }))}
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Graduation Year</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase">Graduation Year</label>
             <input
               type="number"
               min="1960"
@@ -427,28 +427,28 @@ export const HealthPersonnelApplicationForm = () => {
               value={(formData as any).graduation_year || ""}
               onChange={e => setFormData(prev => ({ ...prev, graduation_year: parseInt(e.target.value) || undefined }))}
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </div>
 
         {/* Practice Location */}
         <div>
-          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Primary Practice Location</label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase">Primary Practice Location</label>
           <input
             type="text"
             placeholder="e.g. Woodlands Clinic, Lusaka"
             value={(formData as any).primary_practice_location || ""}
             onChange={e => setFormData(prev => ({ ...prev, primary_practice_location: e.target.value }))}
             disabled={isSubmitting}
-            className="mt-1 w-full px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="mt-1 w-full px-3 py-2 rounded-xl border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
 
         {/* Consultation Fees */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Min Consultation Fee (ZMW)</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase">Min Consultation Fee (ZMW)</label>
             <input
               type="number"
               min="0"
@@ -456,11 +456,11 @@ export const HealthPersonnelApplicationForm = () => {
               value={(formData as any).consultation_fee_min || ""}
               onChange={e => setFormData(prev => ({ ...prev, consultation_fee_min: parseFloat(e.target.value) || undefined }))}
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Max Consultation Fee (ZMW)</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase">Max Consultation Fee (ZMW)</label>
             <input
               type="number"
               min="0"
@@ -468,20 +468,20 @@ export const HealthPersonnelApplicationForm = () => {
               value={(formData as any).consultation_fee_max || ""}
               onChange={e => setFormData(prev => ({ ...prev, consultation_fee_max: parseFloat(e.target.value) || undefined }))}
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </div>
 
         {/* Typical Wait Time */}
         <div>
-          <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Typical Wait Time</label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase">Typical Wait Time</label>
           <Select
             value={(formData as any).typical_wait_time || ""}
             onValueChange={v => setFormData(prev => ({ ...prev, typical_wait_time: v }))}
             disabled={isSubmitting}
           >
-            <SelectTrigger className="mt-1 border-graphite-300 dark:border-slate-700 text-xs font-bold">
+            <SelectTrigger className="mt-1 border-border text-xs font-bold">
               <SelectValue placeholder="Select typical wait time" />
             </SelectTrigger>
             <SelectContent>
@@ -501,7 +501,7 @@ export const HealthPersonnelApplicationForm = () => {
             { key: "home_visits_available", label: "Home Visits Available" },
             { key: "accepts_insurance", label: "Accepts Insurance" },
           ] as const).map(item => (
-            <div key={item.key} className="flex items-center justify-between p-3 border border-canvas-silk rounded-xl">
+            <div key={item.key} className="flex items-center justify-between p-3 border border-border rounded-xl">
               <label className="text-xs font-bold text-slate-700">{item.label}</label>
               <div
                 role="checkbox"

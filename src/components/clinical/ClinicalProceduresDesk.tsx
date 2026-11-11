@@ -211,7 +211,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -234,11 +234,11 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         <div className="flex items-center gap-2">
           <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs">
+              <Button size="sm" className="bg-card text-foreground hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs">
                 <Plus className="h-4 w-4" /> Log Clinical Procedure
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg bg-white dark:bg-slate-900 rounded-2xl p-6">
+            <DialogContent className="max-w-lg bg-card rounded-2xl p-6">
               <DialogHeader>
                 <DialogTitle className="font-bold text-lg">Record Procedure &amp; Medical Codes</DialogTitle>
               </DialogHeader>
@@ -336,37 +336,37 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
 
       {/* Vital Signs Reference Ranges — normal ranges for quick checks, not live readings */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Heart Rate · ref</span>
           <div className="text-lg font-bold text-primary-500">{vitals.hr} bpm</div>
           <span className="text-xs font-bold text-slate-400">Resting adult range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Blood Pressure · ref</span>
-          <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{vitals.bp} mmHg</div>
+          <div className="text-lg font-bold text-foreground">{vitals.bp} mmHg</div>
           <span className="text-xs font-bold text-slate-400">Normal adult range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">SpO2 Oxygen · ref</span>
           <div className="text-lg font-bold text-emerald-600">{vitals.spo2}%</div>
           <span className="text-xs font-bold text-slate-400">Healthy saturation</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Temperature · ref</span>
-          <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{vitals.temp} °C</div>
+          <div className="text-lg font-bold text-foreground">{vitals.temp} °C</div>
           <span className="text-xs font-bold text-slate-400">Afebrile range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Blood Glucose · ref</span>
-          <div className="text-lg font-bold text-slate-900 dark:text-slate-100">{vitals.glucose} mmol/L</div>
+          <div className="text-lg font-bold text-foreground">{vitals.glucose} mmol/L</div>
           <span className="text-xs font-bold text-slate-400">Fasting range</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col justify-center text-center">
+        <div className="p-3 rounded-2xl bg-card border border-border shadow-xs flex flex-col justify-center text-center">
           <Button
             variant="link"
             size="sm"
@@ -379,10 +379,10 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       </div>
 
       {/* Procedures Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
               <th className="py-3 px-4">Procedure (CPT)</th>
               <th className="py-3 px-3">Patient Name</th>
               <th className="py-3 px-3">Diagnosis (ICD-10)</th>
@@ -392,11 +392,11 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               <th className="py-3 px-3 text-center">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+          <tbody className="divide-y divide-border">
             {filteredProcedures.length === 0 && (
               <tr>
                 <td colSpan={7} className="py-10 px-4 text-center">
-                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                  <p className="text-sm font-bold text-foreground">
                     {searchQuery ? 'No procedures match your search.' : loading ? 'Loading recorded procedures…' : 'No procedures recorded yet.'}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
@@ -408,13 +408,13 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               </tr>
             )}
             {filteredProcedures.map((proc) => (
-              <tr key={proc.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+              <tr key={proc.id} className="hover:bg-muted/60">
                 <td className="py-3 px-4">
-                  <div className="font-semibold text-slate-900 dark:text-slate-100">{proc.procedureName}</div>
+                  <div className="font-semibold text-foreground">{proc.procedureName}</div>
                   <div className="text-xs font-mono text-primary-500">{proc.procedureCode}</div>
                 </td>
-                <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{proc.patientName}</td>
-                <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300 max-w-xs truncate">
+                <td className="py-3 px-3 font-bold text-foreground">{proc.patientName}</td>
+                <td className="py-3 px-3 font-medium text-foreground max-w-xs truncate">
                   {proc.diagnosisIcd}
                 </td>
                 <td className="py-3 px-3 text-slate-600">{proc.performer}</td>

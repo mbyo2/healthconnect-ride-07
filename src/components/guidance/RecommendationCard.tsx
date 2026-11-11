@@ -39,7 +39,7 @@ export const RecommendationCard = ({
     <div className={`rounded-card border ${priorityColors[priority]} p-4 hover:shadow-md transition-shadow`}>
       <div className="flex items-start gap-3">
         {Icon && (
-          <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="h-10 w-10 rounded-xl bg-card flex items-center justify-center flex-shrink-0 shadow-sm">
             <Icon className="h-5 w-5 text-primary-600" />
           </div>
         )}
@@ -72,7 +72,7 @@ export const RecommendationCard = ({
               {tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-xs px-2 py-0.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-600"
+                  className="text-xs px-2 py-0.5 rounded-pill bg-card border border-border text-graphite-600"
                 >
                   {tag}
                 </span>

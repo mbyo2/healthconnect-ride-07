@@ -101,12 +101,12 @@ export const SearchResults = () => {
         
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex bg-canvas-bone border border-canvas-silk rounded-lg p-1">
+          <div className="flex bg-canvas-bone border border-border rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-900 text-midnight shadow-sm'
+                  ? 'bg-card text-midnight shadow-sm'
                   : 'text-graphite-500 hover:text-midnight'
               }`}
             >
@@ -117,7 +117,7 @@ export const SearchResults = () => {
               onClick={() => setViewMode('map')}
               className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'map'
-                  ? 'bg-white dark:bg-slate-900 text-midnight shadow-sm'
+                  ? 'bg-card text-midnight shadow-sm'
                   : 'text-graphite-500 hover:text-midnight'
               }`}
             >
@@ -133,7 +133,7 @@ export const SearchResults = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="h-11 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 px-3 text-sm font-medium text-midnight focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                className="h-11 rounded-pill border border-border bg-card px-3 text-sm font-medium text-midnight focus:outline-none focus:ring-2 focus:ring-primary-500/30"
               >
                 <option value="recommended">Recommended</option>
                 <option value="rating">Highest rated</option>

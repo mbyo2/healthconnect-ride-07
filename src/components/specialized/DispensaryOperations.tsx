@@ -279,7 +279,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -361,11 +361,11 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               {filteredStock.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-primary-500 transition-all flex flex-col justify-between"
+                  className="p-4 rounded-2xl border border-border bg-card shadow-xs hover:border-primary-500 transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      <span className="text-xs font-bold uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">
                         {item.category}
                       </span>
                       <span className={`text-xs font-semibold ${item.stock <= 10 ? "text-amber-600" : "text-emerald-600"}`}>
@@ -373,7 +373,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                       </span>
                     </div>
 
-                    <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{item.name}</h4>
+                    <h4 className="font-semibold text-sm text-foreground">{item.name}</h4>
                     <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                       <span className="flex items-center gap-1"><Barcode className="h-3 w-3" aria-hidden />Batch: {item.batchNo}</span>
                       <span>•</span>
@@ -381,9 +381,9 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-canvas-silk dark:border-slate-800">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                     <div>
-                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatPrice(item.unitPrice)}</span>
+                      <span className="text-xs font-bold text-foreground">{formatPrice(item.unitPrice)}</span>
                       <span className="text-xs text-slate-400 block">{item.stock} in stock</span>
                     </div>
 
@@ -403,9 +403,9 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         </div>
 
         {/* Right Column: POS Dispensing Cart */}
-        <div className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs h-fit sticky top-24">
-          <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3">
-            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4 text-xs h-fit sticky top-24">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-emerald-600" aria-hidden /> Dispensing Order Cart
             </h3>
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">
@@ -416,7 +416,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           {/* Customer info */}
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label htmlFor="dsp-customer-name" className="font-bold text-slate-700 dark:text-slate-300">Customer / Patient Name</Label>
+              <Label htmlFor="dsp-customer-name" className="font-bold text-foreground">Customer / Patient Name</Label>
               <Input
                 id="dsp-customer-name"
                 className="font-medium"
@@ -426,7 +426,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="dsp-customer-phone" className="font-bold text-slate-700 dark:text-slate-300">Customer Phone (optional)</Label>
+              <Label htmlFor="dsp-customer-phone" className="font-bold text-foreground">Customer Phone (optional)</Label>
               <Input
                 id="dsp-customer-phone"
                 type="tel"
@@ -437,12 +437,12 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="dsp-prescription" className="font-bold text-slate-700 dark:text-slate-300">Prescription (optional)</Label>
+              <Label htmlFor="dsp-prescription" className="font-bold text-foreground">Prescription (optional)</Label>
               <select
                 id="dsp-prescription"
                 value={selectedPrescriptionId}
                 onChange={(e) => setSelectedPrescriptionId(e.target.value)}
-                className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-900"
+                className="w-full p-2 rounded-md border border-border text-sm font-medium bg-card"
               >
                 <option value="">Walk-in sale — no prescription</option>
                 {prescriptions.map((rx) => (
@@ -450,13 +450,13 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 ))}
               </select>
               {selectedPrescriptionId && (
-                <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+                <p className="text-[11px] text-muted-foreground">
                   This payment is recorded against the prescription, so the same medicine is not charged again on the patient's hospital bill.
                 </p>
               )}
             </div>
             <div className="space-y-1">
-              <Label htmlFor="dsp-pay-method" className="font-bold text-slate-700 dark:text-slate-300">Payment Method</Label>
+              <Label htmlFor="dsp-pay-method" className="font-bold text-foreground">Payment Method</Label>
               <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
                 <SelectTrigger id="dsp-pay-method" className="font-bold">
                   <SelectValue />
@@ -478,7 +478,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               </div>
             ) : (
               cart.map((c) => (
-                <div key={c.item.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk flex items-center justify-between">
+                <div key={c.item.id} className="p-2.5 rounded-xl bg-muted/50/60 border border-border flex items-center justify-between">
                   <div className="max-w-[130px]">
                     <div className="font-bold truncate">{c.item.name}</div>
                     <div className="text-xs text-slate-400">{formatPrice(c.item.unitPrice)} each</div>
@@ -515,7 +515,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           </div>
 
           {/* Subtotal & Checkout button */}
-          <div className="pt-3 border-t border-canvas-silk dark:border-slate-800 space-y-3">
+          <div className="pt-3 border-t border-border space-y-3">
             <div className="flex justify-between text-sm font-bold">
               <span>Total Payable:</span>
               <span className="text-emerald-600 text-base font-bold tabular-nums">{formatPrice(subtotal)}</span>

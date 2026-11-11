@@ -62,7 +62,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                 <button
                   aria-label="Add new item"
                   onClick={onAddNewItem}
-                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                  className="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -71,7 +71,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
               {/* Column Cards Container */}
               <div className="p-3 overflow-y-auto space-y-3 flex-1 custom-scrollbar">
                 {columnPatients.length === 0 ? (
-                  <div className="py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 text-xs">
+                  <div className="py-8 text-center border-2 border-dashed border-border rounded-xl text-slate-400 text-xs">
                     No patients in this stage
                   </div>
                 ) : (
@@ -101,7 +101,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                               <span className="text-slate-300 dark:text-slate-700">•</span>
                               <span className="text-blue-400 font-bold">{patient.id}</span>
                             </div>
-                            <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-500 transition-colors">
+                            <h4 className="font-semibold text-sm text-foreground group-hover:text-blue-500 transition-colors">
                               {patient.name}
                             </h4>
                           </div>
@@ -114,7 +114,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                         </div>
 
                         {/* Symptoms */}
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-2">
+                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
                           {patient.symptoms}
                         </p>
 
@@ -125,19 +125,19 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                         </div>
 
                         {/* Doctor & Location */}
-                        <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+                        <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <img
                               src={patient.doctor.avatarUrl}
                               alt={patient.doctor.name}
                               className="h-5 w-5 rounded-full object-cover"
                             />
-                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate max-w-[110px]">
+                            <span className="text-xs font-medium text-foreground truncate max-w-[110px]">
                               {patient.doctor.name}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1 font-mono text-xs text-slate-500 dark:text-slate-400">
+                          <div className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
                             <HeartPulse className="h-3 w-3 text-rose-500" />
                             <span>{patient.vitalScore.split(' ')[0]}</span>
                           </div>
@@ -150,7 +150,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                               e.stopPropagation();
                               onStatusChange(patient.id, getNextStatus(status));
                             }}
-                            className="mt-2.5 w-full py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                            className="mt-2.5 w-full py-1.5 rounded-lg bg-muted hover:bg-blue-600 hover:text-white text-foreground text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
                           >
                             <span>Move to {getNextStatus(status)}</span>
                             <ArrowRight className="h-3 w-3" />

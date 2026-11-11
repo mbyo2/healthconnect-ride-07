@@ -192,30 +192,30 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   };
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-4 font-sans text-foreground">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-border pb-3">
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <Droplets className="h-5 w-5 text-error-500" />
             Blood Bank & Transfusion Management
           </h3>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Live blood component inventory and transfusion request tracking</p>
+          <p className="text-xs text-muted-foreground font-medium">Live blood component inventory and transfusion request tracking</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => { refresh(); refreshRequests(); refreshDonors(); refreshDonations(); refreshCompat(); refreshAudit(); }} className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => { refresh(); refreshRequests(); refreshDonors(); refreshDonations(); refreshCompat(); refreshAudit(); }} className="px-3 py-1.5 rounded-md bg-muted font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setShowAddDonor(true)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => setShowAddDonor(true)} className="px-3 py-1.5 rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <Plus className="h-3.5 w-3.5" /> Donor
           </button>
-          <button onClick={() => setShowAddDonation(true)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => setShowAddDonation(true)} className="px-3 py-1.5 rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <Plus className="h-3.5 w-3.5" /> Donation
           </button>
-          <button onClick={() => setShowCompatTest(true)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => setShowCompatTest(true)} className="px-3 py-1.5 rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <Plus className="h-3.5 w-3.5" /> Compat. Test
           </button>
-          <button onClick={() => setShowAddStock(true)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => setShowAddStock(true)} className="px-3 py-1.5 rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <Plus className="h-3.5 w-3.5" /> Add Stock
           </button>
           <button onClick={() => setShowNewRequest(true)} className="px-3.5 py-1.5 rounded-md bg-error-500 hover:bg-error-500 text-white font-semibold text-xs flex items-center gap-1">
@@ -231,7 +231,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       )}
 
       {/* View Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl overflow-x-auto">
         {([
           { key: "inventory", label: `Blood Inventory (${tracked.length})` },
           { key: "requests", label: `Transfusion Requests (${requests.length})` },
@@ -243,7 +243,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"}`}
           >
             {tab.label}
           </button>
@@ -254,10 +254,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         loading ? <ListSkeleton count={4} variant="compact" /> :
         error ? <EmptyState icon={Droplets} title="Could not load blood stock" description={error} actionLabel="Retry" onAction={refresh} /> :
         tracked.length === 0 ? <EmptyState icon={Droplets} title="No blood stock recorded" description="Add blood component units to track live availability." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Blood Type</th>
                   <th className="py-2.5 px-3 text-center">Status</th>
                   <th className="py-2.5 px-3 text-right">Whole Blood</th>
@@ -267,9 +267,9 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-right font-semibold">Total Units</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {tracked.map((t) => (
-                  <tr key={t.type} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={t.type} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4 text-2xl font-bold font-mono text-error-500">{t.type}</td>
                     <td className="py-3 px-3 text-center">{getStockPill(t.status)}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{t.whole}</td>
@@ -288,10 +288,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "requests" && (
         reqLoading ? <ListSkeleton count={3} variant="row" /> :
         requests.length === 0 ? <EmptyState icon={Droplets} title="No transfusion requests" description="Blood requests from wards and theatre appear here." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Request #</th>
                   <th className="py-2.5 px-3">Patient</th>
                   <th className="py-2.5 px-3">Blood Type</th>
@@ -302,13 +302,13 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {requests.map((r) => (
-                  <tr key={r.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={r.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4 font-mono font-bold">{r.request_number}</td>
                     <td className="py-3 px-3 font-bold text-primary-500">{nameFor(r.patient_id) || "Patient"}</td>
                     <td className="py-3 px-3 font-bold text-error-500 text-base">{r.blood_type}</td>
-                    <td className="py-3 px-3 uppercase text-graphite-500 dark:text-slate-400">{r.component_type}</td>
+                    <td className="py-3 px-3 uppercase text-muted-foreground">{r.component_type}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{r.units_required}</td>
                     <td className="py-3 px-3 text-center">{getRequestPill(r.urgency)}</td>
                     <td className="py-3 px-3 text-center">
@@ -337,10 +337,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "donors" && (
         donorsLoading ? <ListSkeleton count={3} variant="row" /> :
         donors.length === 0 ? <EmptyState icon={Droplets} title="No donors registered" description="Register blood donors to track donations." actionLabel="Register Donor" onAction={() => setShowAddDonor(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Donor</th>
                   <th className="py-2.5 px-3">Blood Type</th>
                   <th className="py-2.5 px-3">Phone</th>
@@ -348,9 +348,9 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {donors.map((d) => (
-                  <tr key={d.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={d.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4 font-bold">{d.full_name}</td>
                     <td className="py-3 px-3 font-mono font-bold text-error-500">{d.blood_type}</td>
                     <td className="py-3 px-3">{d.phone || "—"}</td>
@@ -371,10 +371,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "donations" && (
         donationsLoading ? <ListSkeleton count={3} variant="row" /> :
         donations.length === 0 ? <EmptyState icon={Droplets} title="No donations recorded" description="Record blood donations to update inventory." actionLabel="Record Donation" onAction={() => setShowAddDonation(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Date</th>
                   <th className="py-2.5 px-3">Blood Type</th>
                   <th className="py-2.5 px-3">Component</th>
@@ -382,9 +382,9 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-center">Screening</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {donations.map((d) => (
-                  <tr key={d.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={d.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4">{new Date(d.donation_date).toLocaleDateString()}</td>
                     <td className="py-3 px-3 font-mono font-bold text-error-500">{d.blood_type}</td>
                     <td className="py-3 px-3 capitalize">{(d.component_type || "").replace(/_/g, " ")}</td>
@@ -405,10 +405,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "compatibility" && (
         compatLoading ? <ListSkeleton count={3} variant="row" /> :
         compatTests.length === 0 ? <EmptyState icon={Droplets} title="No compatibility tests" description="Record crossmatch and compatibility tests here." actionLabel="New Test" onAction={() => setShowCompatTest(true)} /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Date</th>
                   <th className="py-2.5 px-3">Donor Type</th>
                   <th className="py-2.5 px-3">Recipient Type</th>
@@ -416,9 +416,9 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-center">Result</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {compatTests.map((t) => (
-                  <tr key={t.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={t.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4">{new Date(t.created_at).toLocaleDateString()}</td>
                     <td className="py-3 px-3 font-mono font-bold">{t.donor_blood_type}</td>
                     <td className="py-3 px-3 font-mono font-bold">{t.recipient_blood_type}</td>
@@ -439,10 +439,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
       {activeTab === "audit" && (
         auditLoading ? <ListSkeleton count={3} variant="row" /> :
         auditLog.length === 0 ? <EmptyState icon={Droplets} title="No audit records" description="Blood issuance events will appear here with full traceability." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Issued At</th>
                   <th className="py-2.5 px-3">Patient</th>
                   <th className="py-2.5 px-3">Blood</th>
@@ -451,9 +451,9 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {auditLog.map((a) => (
-                  <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                  <tr key={a.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 px-4">{new Date(a.issued_at).toLocaleString()}</td>
                     <td className="py-3 px-3 font-bold">{nameFor(a.patient_id) || "—"}</td>
                     <td className="py-3 px-3 font-mono font-bold">{a.blood_type}</td>
@@ -470,19 +470,19 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Add Stock Dialog */}
       <Dialog open={showAddStock} onOpenChange={setShowAddStock}>
-        <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[380px] bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">Add Blood Stock</DialogTitle></DialogHeader>
           <form onSubmit={handleAddStock} className="space-y-3 py-2 text-xs">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={stockForm.blood_type} onChange={(e) => setStockForm({ ...stockForm, blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={stockForm.blood_type} onChange={(e) => setStockForm({ ...stockForm, blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Component</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={stockForm.component_type} onChange={(e) => setStockForm({ ...stockForm, component_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Component</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={stockForm.component_type} onChange={(e) => setStockForm({ ...stockForm, component_type: e.target.value })}>
                   <option value="whole_blood">Whole Blood</option>
                   <option value="prbc">PRBC</option>
                   <option value="ffp">FFP</option>
@@ -492,12 +492,12 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Units</label>
-                <input type="number" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={stockForm.units_available} onChange={(e) => setStockForm({ ...stockForm, units_available: Number(e.target.value) })} />
+                <label className="font-semibold text-muted-foreground uppercase">Units</label>
+                <input type="number" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={stockForm.units_available} onChange={(e) => setStockForm({ ...stockForm, units_available: Number(e.target.value) })} />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Expiry Date</label>
-                <input type="date" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700" value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} />
+                <label className="font-semibold text-muted-foreground uppercase">Expiry Date</label>
+                <input type="date" className="w-full mt-1 p-2 rounded-md border border-border" value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} />
               </div>
             </div>
             <DialogFooter>
@@ -510,26 +510,26 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* New Request Dialog */}
       <Dialog open={showNewRequest} onOpenChange={setShowNewRequest}>
-        <DialogContent className="sm:max-w-[380px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[380px] bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">New Blood Transfusion Request</DialogTitle></DialogHeader>
           <form onSubmit={handleNewRequest} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient *</label>
-              <select required className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.patient_id} onChange={(e) => setReqForm({ ...reqForm, patient_id: e.target.value })}>
+              <label className="font-semibold text-muted-foreground uppercase">Patient *</label>
+              <select required className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.patient_id} onChange={(e) => setReqForm({ ...reqForm, patient_id: e.target.value })}>
                 <option value="">— Select patient —</option>
                 {patients.map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.blood_type} onChange={(e) => setReqForm({ ...reqForm, blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.blood_type} onChange={(e) => setReqForm({ ...reqForm, blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Component</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.component_type} onChange={(e) => setReqForm({ ...reqForm, component_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Component</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.component_type} onChange={(e) => setReqForm({ ...reqForm, component_type: e.target.value })}>
                   <option value="prbc">PRBC</option>
                   <option value="ffp">FFP</option>
                   <option value="platelets">Platelets</option>
@@ -539,12 +539,12 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Units Required</label>
-                <input type="number" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.units_required} onChange={(e) => setReqForm({ ...reqForm, units_required: Number(e.target.value) })} />
+                <label className="font-semibold text-muted-foreground uppercase">Units Required</label>
+                <input type="number" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.units_required} onChange={(e) => setReqForm({ ...reqForm, units_required: Number(e.target.value) })} />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Urgency</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.urgency} onChange={(e) => setReqForm({ ...reqForm, urgency: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Urgency</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.urgency} onChange={(e) => setReqForm({ ...reqForm, urgency: e.target.value })}>
                   <option value="routine">Routine</option>
                   <option value="urgent">Urgent</option>
                   <option value="emergency">Emergency</option>
@@ -561,35 +561,35 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Add Donor Dialog */}
       <Dialog open={showAddDonor} onOpenChange={setShowAddDonor}>
-        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Register Blood Donor</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddDonor} className="space-y-3 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Full Name *</label>
-              <input required type="text" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donorForm.full_name} onChange={(e) => setDonorForm({ ...donorForm, full_name: e.target.value })} placeholder="Donor name" />
+              <label className="font-semibold text-muted-foreground uppercase">Full Name *</label>
+              <input required type="text" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donorForm.full_name} onChange={(e) => setDonorForm({ ...donorForm, full_name: e.target.value })} placeholder="Donor name" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donorForm.blood_type} onChange={(e) => setDonorForm({ ...donorForm, blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donorForm.blood_type} onChange={(e) => setDonorForm({ ...donorForm, blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Phone</label>
-                <input type="tel" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donorForm.phone} onChange={(e) => setDonorForm({ ...donorForm, phone: e.target.value })} placeholder="+260..." />
+                <label className="font-semibold text-muted-foreground uppercase">Phone</label>
+                <input type="tel" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donorForm.phone} onChange={(e) => setDonorForm({ ...donorForm, phone: e.target.value })} placeholder="+260..." />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date of Birth</label>
-                <input type="date" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donorForm.date_of_birth} onChange={(e) => setDonorForm({ ...donorForm, date_of_birth: e.target.value })} />
+                <label className="font-semibold text-muted-foreground uppercase">Date of Birth</label>
+                <input type="date" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donorForm.date_of_birth} onChange={(e) => setDonorForm({ ...donorForm, date_of_birth: e.target.value })} />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Gender</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donorForm.gender} onChange={(e) => setDonorForm({ ...donorForm, gender: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Gender</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donorForm.gender} onChange={(e) => setDonorForm({ ...donorForm, gender: e.target.value })}>
                   <option value="">—</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -607,28 +607,28 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Record Donation Dialog */}
       <Dialog open={showAddDonation} onOpenChange={setShowAddDonation}>
-        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Record Blood Donation</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddDonation} className="space-y-3 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Donor</label>
-              <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.donor_id} onChange={(e) => setDonationForm({ ...donationForm, donor_id: e.target.value })}>
+              <label className="font-semibold text-muted-foreground uppercase">Donor</label>
+              <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.donor_id} onChange={(e) => setDonationForm({ ...donationForm, donor_id: e.target.value })}>
                 <option value="">Walk-in / Anonymous</option>
                 {donors.map((d) => <option key={d.id} value={d.id}>{d.full_name} ({d.blood_type})</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.blood_type} onChange={(e) => setDonationForm({ ...donationForm, blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.blood_type} onChange={(e) => setDonationForm({ ...donationForm, blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Component</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.component_type} onChange={(e) => setDonationForm({ ...donationForm, component_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Component</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.component_type} onChange={(e) => setDonationForm({ ...donationForm, component_type: e.target.value })}>
                   <option value="whole_blood">Whole Blood</option>
                   <option value="prbc">PRBC</option>
                   <option value="ffp">FFP</option>
@@ -638,17 +638,17 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Units</label>
-                <input type="number" min="0.5" step="0.5" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.units_collected} onChange={(e) => setDonationForm({ ...donationForm, units_collected: Number(e.target.value) })} />
+                <label className="font-semibold text-muted-foreground uppercase">Units</label>
+                <input type="number" min="0.5" step="0.5" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.units_collected} onChange={(e) => setDonationForm({ ...donationForm, units_collected: Number(e.target.value) })} />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Expiry Date</label>
-                <input type="date" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.expiry_date} onChange={(e) => setDonationForm({ ...donationForm, expiry_date: e.target.value })} />
+                <label className="font-semibold text-muted-foreground uppercase">Expiry Date</label>
+                <input type="date" className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.expiry_date} onChange={(e) => setDonationForm({ ...donationForm, expiry_date: e.target.value })} />
               </div>
             </div>
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Screening Status</label>
-              <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={donationForm.screening_status} onChange={(e) => setDonationForm({ ...donationForm, screening_status: e.target.value })}>
+              <label className="font-semibold text-muted-foreground uppercase">Screening Status</label>
+              <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={donationForm.screening_status} onChange={(e) => setDonationForm({ ...donationForm, screening_status: e.target.value })}>
                 <option value="pending">Pending</option>
                 <option value="passed">Passed — add to inventory</option>
                 <option value="failed">Failed — discard</option>
@@ -664,44 +664,44 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
       {/* Compatibility Test Dialog */}
       <Dialog open={showCompatTest} onOpenChange={setShowCompatTest}>
-        <DialogContent className="sm:max-w-[420px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[420px] bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Compatibility / Crossmatch Test</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCompatTest} className="space-y-3 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Related Request</label>
-              <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={compatForm.request_id} onChange={(e) => setCompatForm({ ...compatForm, request_id: e.target.value })}>
+              <label className="font-semibold text-muted-foreground uppercase">Related Request</label>
+              <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={compatForm.request_id} onChange={(e) => setCompatForm({ ...compatForm, request_id: e.target.value })}>
                 <option value="">None</option>
                 {requests.map((r) => <option key={r.id} value={r.id}>{r.request_number} — {r.blood_type}</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Donor Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={compatForm.donor_blood_type} onChange={(e) => setCompatForm({ ...compatForm, donor_blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Donor Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={compatForm.donor_blood_type} onChange={(e) => setCompatForm({ ...compatForm, donor_blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Recipient Blood Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={compatForm.recipient_blood_type} onChange={(e) => setCompatForm({ ...compatForm, recipient_blood_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Recipient Blood Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={compatForm.recipient_blood_type} onChange={(e) => setCompatForm({ ...compatForm, recipient_blood_type: e.target.value })}>
                   {BLOOD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Test Type</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={compatForm.test_type} onChange={(e) => setCompatForm({ ...compatForm, test_type: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Test Type</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={compatForm.test_type} onChange={(e) => setCompatForm({ ...compatForm, test_type: e.target.value })}>
                   <option value="crossmatch">Crossmatch</option>
                   <option value="antibody_screen">Antibody Screen</option>
                   <option value="abo_rh">ABO/Rh Confirm</option>
                 </select>
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Result</label>
-                <select className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={compatForm.result} onChange={(e) => setCompatForm({ ...compatForm, result: e.target.value })}>
+                <label className="font-semibold text-muted-foreground uppercase">Result</label>
+                <select className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={compatForm.result} onChange={(e) => setCompatForm({ ...compatForm, result: e.target.value })}>
                   <option value="pending">Pending</option>
                   <option value="compatible">Compatible</option>
                   <option value="incompatible">Incompatible</option>

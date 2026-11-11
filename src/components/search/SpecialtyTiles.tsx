@@ -71,7 +71,7 @@ export function SpecialtyTiles() {
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 isActive
                   ? "border-primary-500 bg-primary-500/10 shadow-sm"
-                  : "border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-primary-500/50 hover:bg-primary-500/5"
+                  : "border-border bg-card hover:border-primary-500/50 hover:bg-primary-500/5"
               )}
             >
               <span
@@ -87,7 +87,7 @@ export function SpecialtyTiles() {
               <span
                 className={cn(
                   "text-xs sm:text-xs font-bold text-center leading-tight",
-                  isActive ? "text-primary-700 dark:text-primary-300" : "text-graphite-600 dark:text-slate-300"
+                  isActive ? "text-primary-700 dark:text-primary-300" : "text-foreground"
                 )}
               >
                 {tile.label}

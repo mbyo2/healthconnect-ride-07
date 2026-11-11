@@ -171,10 +171,10 @@ export const InstitutionModuleManager = () => {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setSelectedId(""); }}
           placeholder="Search institution by name…"
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-canvas-silk text-sm font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border text-sm font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
         />
         {institutions.length > 0 && !selectedId && (
-          <div className="absolute z-20 mt-1 w-full rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-lg overflow-hidden">
+          <div className="absolute z-20 mt-1 w-full rounded-xl border border-border bg-card shadow-lg overflow-hidden">
             {institutions.map((i) => (
               <button
                 key={i.id}
@@ -191,7 +191,7 @@ export const InstitutionModuleManager = () => {
       </div>
 
       {selectedId && (
-        <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 className="font-semibold text-sm">{selected?.name}</h3>
             <span className="text-xs font-bold text-graphite-500">
@@ -219,7 +219,7 @@ export const InstitutionModuleManager = () => {
                     <div
                       key={m.module_key}
                       className={`rounded-xl border p-3 flex items-start gap-2.5 ${
-                        isLive ? "border-success-200 bg-success-50/40" : isPlanned ? "border-canvas-silk bg-canvas-mist/40" : "border-error-200 bg-error-50/40"
+                        isLive ? "border-success-200 bg-success-50/40" : isPlanned ? "border-border bg-canvas-mist/40" : "border-error-200 bg-error-50/40"
                       }`}
                     >
                       <div className="mt-0.5 shrink-0">
@@ -262,13 +262,13 @@ export const InstitutionModuleManager = () => {
               </div>
 
               {/* Grant an off-plan module */}
-              <div className="mt-4 pt-4 border-t border-canvas-silk">
+              <div className="mt-4 pt-4 border-t border-border">
                 <p className="text-xs font-semibold mb-2 flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> Grant a module outside this tier</p>
                 <div className="flex gap-2 max-w-xl">
                   <select
                     value={grantKey}
                     onChange={(e) => setGrantKey(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl border border-canvas-silk text-sm font-medium"
+                    className="flex-1 px-3 py-2 rounded-xl border border-border text-sm font-medium"
                   >
                     <option value="">Choose module…</option>
                     {offPlanOptions.map((c) => (

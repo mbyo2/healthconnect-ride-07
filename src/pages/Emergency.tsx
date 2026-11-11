@@ -263,7 +263,7 @@ const Emergency = () => {
                 </div>
 
                 {sendCountdown !== null && !isEmergencyActive ? (
-                  <div className="rounded-xl border-2 border-red-500 bg-white dark:bg-slate-900 p-4 text-center space-y-3" role="alert">
+                  <div className="rounded-xl border-2 border-red-500 bg-card p-4 text-center space-y-3" role="alert">
                     <p className="text-sm font-bold text-red-700 dark:text-red-300">
                       Sending emergency alert in
                     </p>

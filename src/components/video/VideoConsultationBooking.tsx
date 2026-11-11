@@ -418,7 +418,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
               type="button"
               aria-pressed={payMethod === 'lenco'}
               onClick={() => { setLencoReference(null); setPayMethod('lenco'); }}
-              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'lenco' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'lenco' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-border text-graphite-500'}`}
             >
               <Smartphone className="h-4 w-4" /> Mobile Money
             </button>
@@ -426,7 +426,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
               type="button"
               aria-pressed={payMethod === 'wallet'}
               onClick={() => { setLencoReference(null); setPayMethod('wallet'); }}
-              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-border text-graphite-500'}`}
             >
               <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})
             </button>

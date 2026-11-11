@@ -193,7 +193,7 @@ export const SearchFilters = () => {
 
             {/* Row 5: Service toggles */}
             <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 p-3 border rounded-xl border-canvas-silk min-w-[180px]">
+              <div className="flex items-center gap-2 p-3 border rounded-xl border-border min-w-[180px]">
                 <Video className="h-4 w-4 text-primary-500" />
                 <Label className="cursor-pointer flex-1 text-sm">Telemedicine available</Label>
                 <Switch
@@ -201,7 +201,7 @@ export const SearchFilters = () => {
                   onCheckedChange={v => { setTelemedicineOnly(v); applyFilters(); }}
                 />
               </div>
-              <div className="flex items-center gap-2 p-3 border rounded-xl border-canvas-silk min-w-[180px]">
+              <div className="flex items-center gap-2 p-3 border rounded-xl border-border min-w-[180px]">
                 <Home className="h-4 w-4 text-success-500" />
                 <Label className="cursor-pointer flex-1 text-sm">Home visits available</Label>
                 <Switch
@@ -217,7 +217,7 @@ export const SearchFilters = () => {
                 Clear all filters
               </Button>
               {activeCount > 0 && (
-                <span className="text-xs text-graphite-500 dark:text-slate-400">{activeCount} filter{activeCount > 1 ? 's' : ''} active</span>
+                <span className="text-xs text-muted-foreground">{activeCount} filter{activeCount > 1 ? 's' : ''} active</span>
               )}
             </div>
           </CardContent>

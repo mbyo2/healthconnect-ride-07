@@ -17,7 +17,7 @@ export const StatusBadge = ({ status, variant = "default" }: StatusBadgeProps) =
       case "info":
         return "bg-primary-500 text-white";
       default:
-        return "bg-graphite-500 dark:bg-slate-600 text-white";
+        return "bg-muted-foreground text-white";
     }
   };
 

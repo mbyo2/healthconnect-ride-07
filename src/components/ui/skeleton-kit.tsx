@@ -42,7 +42,7 @@ export function SkeletonCard({
     <div
       aria-hidden
       className={cn(
-        "rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900",
+        "rounded-lg border border-border bg-card p-4 shadow-xs",
         className
       )}
     >
@@ -114,7 +114,7 @@ export function SkeletonStatCard({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900",
+        "rounded-lg border border-border bg-card p-4 shadow-xs",
         className
       )}
     >
@@ -148,7 +148,7 @@ export function SkeletonProviderCard() {
   return (
     <div
       aria-hidden
-      className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+      className="rounded-lg border border-border bg-card p-4 shadow-xs"
     >
       {/* Header: avatar + name / rating / specialty-fee */}
       <div className="mb-3 flex items-center gap-3">
@@ -179,7 +179,7 @@ export function SkeletonProviderCard() {
       {/* Practice location */}
       <SkeletonLine className="mb-2.5 h-3 w-44" />
       {/* Footer: availability chip + Estimate / Profile / Book buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-canvas-silk pt-2.5 dark:border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2.5 ">
         <Skeleton className="h-6 w-28 rounded-full" />
         <div className="flex items-center gap-2">
           <Skeleton className="h-11 w-[104px] rounded-md" />
@@ -201,7 +201,7 @@ export function SkeletonSearchHeader() {
         <SkeletonLine className="h-4 w-40" />
       </div>
       <div className="flex items-center gap-3">
-        <div className="flex gap-1 rounded-lg border border-canvas-silk bg-canvas-bone p-1 dark:border-slate-800 dark:bg-slate-800/60">
+        <div className="flex gap-1 rounded-lg border border-border bg-muted p-1">
           <Skeleton className="h-11 w-20 rounded-md" />
           <Skeleton className="h-11 w-20 rounded-md" />
         </div>
@@ -219,7 +219,7 @@ export function SkeletonProviderProfile() {
         <SkeletonLine className="h-10 w-24 rounded-md" />
         <Skeleton className="h-10 w-32 rounded-md" />
       </div>
-      <div className="flex flex-col gap-5 rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row">
+      <div className="flex flex-col gap-5 rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900 sm:flex-row">
         <Skeleton className="h-28 w-28 shrink-0 rounded-2xl" />
         <div className="min-w-0 flex-1 space-y-3">
           <SkeletonLine className="h-6 w-64 max-w-full" />
@@ -256,7 +256,7 @@ export function SkeletonDashboardBody({ statCount = 4 }: { statCount?: number })
         <SkeletonLine className="mb-4 h-5 w-36" />
         <SkeletonBlock className="h-48" />
       </SkeletonCard>
-      <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+      <div className="divide-y divide-border rounded-2xl border border-border bg-white px-4 dark:divide-slate-800 dark:bg-slate-900">
         {[0, 1, 2].map((i) => (
           <SkeletonListRow key={i} action />
         ))}
@@ -293,7 +293,7 @@ export function SkeletonMetricCard() {
   return (
     <div
       aria-hidden
-      className="flex min-h-[112px] flex-col justify-center rounded-2xl border border-canvas-silk bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+      className="flex min-h-[112px] flex-col justify-center rounded-2xl border border-border bg-white p-4 dark:bg-slate-900"
     >
       <div className="flex items-center gap-3">
         <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
@@ -311,7 +311,7 @@ export function SkeletonDoctorRow() {
   return (
     <div
       aria-hidden
-      className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:bg-slate-900"
     >
       <SkeletonCircle className="h-14 w-14" />
       <div className="min-w-0 flex-1 space-y-1.5">
@@ -348,7 +348,7 @@ export function SkeletonPatientHome() {
       </div>
 
       {/* Date + notification bell header bar */}
-      <div className="flex items-center justify-between rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 sm:p-5">
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900 sm:p-5">
         <div className="flex items-center gap-3">
           <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-2xl" />
           <div className="space-y-2">
@@ -361,7 +361,7 @@ export function SkeletonPatientHome() {
 
       {/* Online / offline care-mode toggle */}
       <div className="flex justify-center">
-        <div className="flex w-full max-w-md gap-1 rounded-2xl border border-canvas-silk bg-canvas-mist p-1 shadow-xs dark:border-slate-700 dark:bg-slate-800/80">
+        <div className="flex w-full max-w-md gap-1 rounded-2xl border border-border bg-canvas-mist p-1 shadow-xs dark:bg-slate-800/80">
           <Skeleton className="h-[46px] flex-1 rounded-xl" />
           <Skeleton className="h-[46px] flex-1 rounded-xl" />
         </div>
@@ -403,7 +403,7 @@ export function SkeletonPatientHome() {
           {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
             <div
               key={i}
-              className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-canvas-silk bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+              className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-white p-4 dark:bg-slate-900"
             >
               <Skeleton className="h-12 w-12 rounded-2xl" />
               <SkeletonLine className="h-3.5 w-16" />
@@ -433,7 +433,7 @@ export function SkeletonPatientHome() {
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="flex items-center gap-3 rounded-2xl border border-canvas-silk bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+              className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 dark:bg-slate-900"
             >
               <Skeleton className="h-11 w-11 shrink-0 rounded-xl" />
               <SkeletonLine className="h-4 w-16" />
@@ -454,7 +454,7 @@ export function SkeletonAppointmentCard() {
   return (
     <div
       aria-hidden
-      className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900"
     >
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div className="min-w-0">
@@ -489,7 +489,7 @@ export function SkeletonAppointmentsBoard() {
   return (
     <div
       aria-hidden
-      className="overflow-hidden rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900"
     >
       {/* Group header — dark in both modes, like the real one */}
       <div className="flex items-center gap-3 bg-slate-900 px-5 py-4">
@@ -502,7 +502,7 @@ export function SkeletonAppointmentsBoard() {
       <div className="hidden overflow-x-auto sm:block">
         <table className="w-full min-w-[900px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas dark:border-slate-800 dark:bg-slate-950">
+            <tr className="border-b border-border bg-canvas dark:bg-slate-950">
               <th className="w-[240px] px-6 py-3"><SkeletonLine className="h-3 w-20" /></th>
               <th className="w-[140px] px-3 py-3"><SkeletonLine className="mx-auto h-3 w-12" /></th>
               <th className="w-[150px] px-3 py-3"><SkeletonLine className="h-3 w-20" /></th>
@@ -511,7 +511,7 @@ export function SkeletonAppointmentsBoard() {
               <th className="w-[150px] px-3 py-3"><SkeletonLine className="mx-auto h-3 w-14" /></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+          <tbody className="divide-y divide-border">
             {[0, 1, 2, 3].map((r) => (
               <tr key={r}>
                 <td className="px-6 py-4">
@@ -556,7 +556,7 @@ export function SkeletonAppointmentsBoard() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="m-3 rounded-2xl border border-canvas-silk bg-canvas p-3 dark:border-slate-800 dark:bg-slate-800/60"
+            className="m-3 rounded-2xl border border-border bg-canvas p-3 dark:bg-slate-800/60"
           >
             <div className="flex items-start gap-3">
               <SkeletonCircle className="h-9 w-9" />
@@ -618,7 +618,7 @@ export function SkeletonProviderDashboard() {
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
-            className="flex items-center gap-2.5 rounded-xl border border-canvas-silk bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900"
+            className="flex items-center gap-2.5 rounded-xl border border-border bg-white p-3.5 dark:bg-slate-900"
           >
             <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
             <SkeletonLine className="h-3.5 w-12" />
@@ -627,16 +627,16 @@ export function SkeletonProviderDashboard() {
       </div>
 
       {/* Tab bar */}
-      <div className="inline-flex gap-1 rounded-xl border border-canvas-silk bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+      <div className="inline-flex gap-1 rounded-xl border border-border bg-white p-1 dark:bg-slate-900">
         {[0, 1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-9 w-24 rounded-lg" />
         ))}
       </div>
 
       {/* Today's appointments */}
-      <div className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
         <SkeletonLine className="mb-2 h-4 w-44" />
-        <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+        <div className="divide-y divide-border">
           {[0, 1, 2].map((i) => (
             <SkeletonListRow key={i} action />
           ))}
@@ -662,7 +662,7 @@ export function SkeletonInstitutionDashboard() {
       </div>
 
       {/* Module tab chips */}
-      <div className="flex gap-1.5 overflow-hidden border-b border-canvas-silk pb-2 dark:border-slate-800">
+      <div className="flex gap-1.5 overflow-hidden border-b border-border pb-2 ">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <Skeleton key={i} className="h-9 w-32 shrink-0 rounded-xl" />
         ))}
@@ -672,13 +672,13 @@ export function SkeletonInstitutionDashboard() {
       <SkeletonStatGrid />
 
       {/* Quick-access modules card */}
-      <div className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
         <SkeletonLine className="mb-3 h-3 w-44" />
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="flex flex-col items-center gap-2 rounded-xl border border-canvas-silk p-3 dark:border-slate-700"
+              className="flex flex-col items-center gap-2 rounded-xl border border-border p-3 "
             >
               <Skeleton className="h-8 w-8 rounded-lg" />
               <SkeletonLine className="h-3 w-12" />
@@ -688,7 +688,7 @@ export function SkeletonInstitutionDashboard() {
       </div>
 
       {/* Modules card */}
-      <div className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900">
         <SkeletonLine className="mb-1.5 h-3 w-32" />
         <SkeletonLine className="mb-3 h-3 w-64 max-w-full" />
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
@@ -720,7 +720,7 @@ export function SkeletonProductCard() {
   return (
     <div
       aria-hidden
-      className="flex h-full flex-col rounded-xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="flex h-full flex-col rounded-xl border border-border bg-white shadow-sm dark:bg-slate-900"
     >
       <div className="px-6 pb-3 pt-6">
         <div className="flex items-start justify-between gap-2">
@@ -754,7 +754,7 @@ export function SkeletonProductCard() {
             <SkeletonLine className="h-3.5 w-3/4" />
           </div>
         </div>
-        <div className="mt-4 border-t border-canvas-silk pt-4 dark:border-slate-800">
+        <div className="mt-4 border-t border-border pt-4 ">
           <Skeleton className="h-10 w-full rounded-md" />
         </div>
       </div>
@@ -768,7 +768,7 @@ export function SkeletonOrderCard() {
   return (
     <div
       aria-hidden
-      className="rounded-xl border border-canvas-silk bg-canvas p-4 dark:border-slate-800"
+      className="rounded-xl border border-border bg-canvas p-4 "
     >
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div className="min-w-0">
@@ -811,10 +811,10 @@ export function SkeletonTablePage({ rows = 6, cells = 5 }: { rows?: number; cell
           <Skeleton key={i} className="h-9 w-24 rounded-full" />
         ))}
       </div>
-      <div className="overflow-hidden rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas dark:border-slate-800 dark:bg-slate-950">
+            <tr className="border-b border-border bg-canvas dark:bg-slate-950">
               {Array.from({ length: cells }).map((_, c) => (
                 <th key={c} className="px-4 py-3">
                   <SkeletonLine className="h-3 w-16" />
@@ -822,7 +822,7 @@ export function SkeletonTablePage({ rows = 6, cells = 5 }: { rows?: number; cell
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+          <tbody className="divide-y divide-border">
             <SkeletonTableRows rows={rows} cells={cells} />
           </tbody>
         </table>
@@ -839,7 +839,7 @@ export function SkeletonListPage({ rows = 5 }: { rows?: number }) {
         <SkeletonLine className="h-7 w-52 max-w-full" />
         <SkeletonLine className="h-4 w-72 max-w-full" />
       </div>
-      <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+      <div className="divide-y divide-border rounded-2xl border border-border bg-white px-4 dark:divide-slate-800 dark:bg-slate-900">
         {Array.from({ length: rows }).map((_, i) => (
           <SkeletonListRow key={i} action />
         ))}
@@ -879,14 +879,14 @@ export function SkeletonSplitShell() {
     <div aria-hidden className="flex gap-5">
       <div className="hidden w-80 shrink-0 space-y-3 md:block">
         <Skeleton className="h-11 w-full rounded-pill" />
-        <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+        <div className="divide-y divide-border rounded-2xl border border-border bg-white px-4 dark:divide-slate-800 dark:bg-slate-900">
           {[0, 1, 2, 3].map((i) => (
             <SkeletonListRow key={i} />
           ))}
         </div>
       </div>
-      <div className="min-w-0 flex-1 space-y-4 rounded-2xl border border-canvas-silk bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-center gap-3 border-b border-canvas-silk pb-4 dark:border-slate-800">
+      <div className="min-w-0 flex-1 space-y-4 rounded-2xl border border-border bg-white p-5 dark:bg-slate-900">
+        <div className="flex items-center gap-3 border-b border-border pb-4 ">
           <SkeletonCircle className="h-10 w-10" />
           <div className="space-y-2">
             <SkeletonLine className="h-4 w-36" />
@@ -909,10 +909,10 @@ export function SkeletonFormPage() {
         <SkeletonLine className="h-7 w-52 max-w-full" />
         <SkeletonLine className="h-4 w-80 max-w-full" />
       </div>
-      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900">
         <SkeletonForm rows={4} />
       </div>
-      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900">
         <SkeletonForm rows={2} />
       </div>
     </div>
@@ -949,7 +949,7 @@ export function SkeletonAuthCard() {
         <SkeletonLine className="h-6 w-48" />
         <SkeletonLine className="h-4 w-64 max-w-full" />
       </div>
-      <div className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900">
         <SkeletonForm rows={3} />
       </div>
     </div>
@@ -981,7 +981,7 @@ export function SkeletonArticlePage() {
 export function SkeletonKioskMenu() {
   return (
     <div aria-hidden className="flex min-h-screen flex-col bg-canvas-bone p-6 font-sans dark:bg-slate-950 sm:p-10">
-      <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-b border-canvas-silk pb-4 dark:border-slate-800">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-b border-border pb-4 ">
         <div className="flex items-center gap-3">
           <Skeleton className="h-12 w-12 rounded-2xl" />
           <div className="space-y-2">
@@ -995,7 +995,7 @@ export function SkeletonKioskMenu() {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex min-h-[150px] flex-col justify-center gap-3 rounded-2xl border border-canvas-silk bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            className="flex min-h-[150px] flex-col justify-center gap-3 rounded-2xl border border-border bg-white p-6 dark:bg-slate-900"
           >
             <Skeleton className="h-12 w-12 rounded-2xl" />
             <SkeletonLine className="h-5 w-32" />
@@ -1087,12 +1087,12 @@ function SkeletonDesktopHeader({ variant }: { variant: SkeletonChromeVariant }) 
       ? ["w-[74px]", "w-[82px]", "w-[112px]", "w-[66px]"]
       : ["w-[38px]", "w-[84px]", "w-[88px]", "w-[92px]", "w-[76px]"];
   return (
-    <div className="sticky top-0 z-50 hidden border-b border-canvas-silk bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 min-[1025px]:block">
+    <div className="sticky top-0 z-50 hidden border-b border-border bg-white/90 backdrop-blur-xl dark:bg-slate-900/90 min-[1025px]:block">
       <div className="mx-auto flex h-16 min-w-0 max-w-content items-center justify-between px-4 md:px-6 lg:h-[4.25rem] lg:px-8 xl:px-12">
         <div className="flex min-w-0 items-center gap-4 lg:gap-8">
           <SkeletonLogoMark />
           {/* Pill nav container — same border/fill/padding as DesktopNav */}
-          <div className="hidden items-center gap-0.5 rounded-nav border border-canvas-silk bg-canvas-mist/60 p-1 dark:border-slate-700 dark:bg-slate-800/50 md:flex">
+          <div className="hidden items-center gap-0.5 rounded-nav border border-border bg-canvas-mist/60 p-1 dark:bg-slate-800/50 md:flex">
             {navLabelWidths.map((w, i) => (
               <div key={i} className="flex shrink-0 items-center gap-2 px-3 py-2 lg:px-4">
                 <Skeleton className="h-4 w-4 shrink-0 rounded" />
@@ -1128,7 +1128,7 @@ function SkeletonDesktopHeader({ variant }: { variant: SkeletonChromeVariant }) 
 
 function SkeletonMobileHeader({ variant }: { variant: SkeletonChromeVariant }) {
   return (
-    <div className="border-b border-canvas-silk bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 min-[1025px]:hidden">
+    <div className="border-b border-border bg-white/90 backdrop-blur-xl dark:bg-slate-900/90 min-[1025px]:hidden">
       <div className="flex h-16 items-center justify-between px-3 sm:px-4">
         {/* Real mobile Header: wordmark hides below 420px */}
         <SkeletonLogoMark wordmarkClassName="hidden min-[420px]:block" />
@@ -1183,7 +1183,7 @@ export function SkeletonBottomNav() {
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 min-[1025px]:hidden"
     >
       <div className="relative mx-auto mb-3 max-w-md px-4">
-        <div className="flex items-center justify-evenly rounded-pill border border-canvas-silk bg-white/95 px-2 py-1.5 shadow-pill-nav backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-900/95">
+        <div className="flex items-center justify-evenly rounded-pill border border-border bg-white/95 px-2 py-1.5 shadow-pill-nav backdrop-blur-2xl dark:bg-slate-900/95">
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -1229,7 +1229,7 @@ export function SkeletonAppFrame({
               <SkeletonCard className="h-56 lg:col-span-2" />
               <SkeletonCard className="h-56" />
             </div>
-            <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+            <div className="divide-y divide-border rounded-2xl border border-border bg-white px-4 dark:divide-slate-800 dark:bg-slate-900">
               {[0, 1, 2].map((i) => (
                 <SkeletonListRow key={i} action />
               ))}

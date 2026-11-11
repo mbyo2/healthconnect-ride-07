@@ -136,7 +136,7 @@ export const DentistWorkflow = () => {
               key={tooth}
               onClick={() => setSelectedTooth(tooth)}
               className={`min-w-[44px] min-h-[44px] w-11 h-12 rounded-lg border flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-slate-200 dark:border-slate-700'
+                selectedTooth === tooth ? 'border-primary-500 ring-2 ring-primary-200' : 'border-border'
               } ${condInfo?.color} text-white hover:scale-105`}
               title={`Tooth ${tooth} - ${condInfo?.label}`}
             >
@@ -204,7 +204,7 @@ export const DentistWorkflow = () => {
                 aria-label="Patient for this chart"
                 value={chartPatientId}
                 onChange={(e) => setChartPatientId(e.target.value)}
-                className="flex-1 min-h-[44px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-medium text-slate-900 dark:text-slate-100"
+                className="flex-1 min-h-[44px] rounded-xl border border-border bg-card px-3 text-sm font-medium text-foreground"
               >
                 <option value="">Select a patient to chart…</option>
                 {chartPatients.map(p => (
@@ -216,14 +216,14 @@ export const DentistWorkflow = () => {
                 value={chartNotes}
                 onChange={(e) => setChartNotes(e.target.value)}
                 placeholder="Chart notes (optional)"
-                className="flex-1 min-h-[44px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-medium text-slate-900 dark:text-slate-100"
+                className="flex-1 min-h-[44px] rounded-xl border border-border bg-card px-3 text-sm font-medium text-foreground"
               />
               <Button onClick={saveChart} disabled={chartSaving || !chartPatientId} className="min-h-[44px]">
                 {chartSaving ? 'Saving…' : 'Save Chart'}
               </Button>
             </div>
             {chartPatients.length === 0 && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              <p className="text-xs text-muted-foreground mb-4">
                 Charts are saved against a patient from your bookings — once a patient books with you, they appear here and their saved chart loads automatically.
               </p>
             )}
@@ -254,7 +254,7 @@ export const DentistWorkflow = () => {
                     ))}
                   </div>
                 )}
-                <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                <div className="mt-4 p-3 bg-muted/50 rounded-lg">
                   <div className="text-xs font-bold mb-2">Legend</div>
                   <div className="flex flex-wrap gap-2">
                     {TOOTH_CONDITIONS.map(cond => (
@@ -275,7 +275,7 @@ export const DentistWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <div
             key={index}
-            className="group cursor-pointer rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+            className="group cursor-pointer rounded-2xl border border-border bg-card p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
             onClick={() => step.action ? step.action() : handleNavigation(step.route!, step.title)}
           >
             <div>
@@ -284,7 +284,7 @@ export const DentistWorkflow = () => {
                   {step.icon}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">
+                  <h3 className="text-xs font-bold text-foreground group-hover:text-primary-500 transition-colors truncate">
                     {step.title}
                   </h3>
                   <p className="text-xs text-slate-400 font-medium line-clamp-1">{step.description}</p>
@@ -293,7 +293,7 @@ export const DentistWorkflow = () => {
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); step.action ? step.action() : handleNavigation(step.route!, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-xs font-bold transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-muted text-foreground group-hover:bg-primary-500 group-hover:text-white text-xs font-bold transition-all"
             >
               Open Module
             </button>

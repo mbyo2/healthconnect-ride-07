@@ -55,8 +55,8 @@ interface InstitutionDetail {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
-    <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{value || "—"}</span>
+    <span className="text-xs font-semibold uppercase text-muted-foreground">{label}</span>
+    <span className="text-xs font-medium text-foreground">{value || "—"}</span>
   </div>
 );
 
@@ -65,14 +65,14 @@ const BoolBadge = ({
 }: { value: boolean | null | undefined; trueLabel?: string; falseLabel?: string }) => (
   value
     ? <Badge className="bg-success-500/15 text-success-500 border-0 text-xs">{trueLabel}</Badge>
-    : <Badge variant="outline" className="text-xs text-graphite-500 dark:text-slate-400">{falseLabel}</Badge>
+    : <Badge variant="outline" className="text-xs text-muted-foreground">{falseLabel}</Badge>
 );
 
 const TagList = ({ items, emptyLabel = "None listed" }: { items: string[] | null | undefined; emptyLabel?: string }) => (
   <div className="flex flex-wrap gap-1.5 mt-1">
     {(items || []).length > 0
       ? (items as string[]).map(item => <Badge key={item} variant="secondary" className="text-xs">{item}</Badge>)
-      : <span className="text-xs text-graphite-500 dark:text-slate-400">{emptyLabel}</span>
+      : <span className="text-xs text-muted-foreground">{emptyLabel}</span>
     }
   </div>
 );
@@ -275,14 +275,14 @@ export const InstitutionApplications = () => {
   const app = selected;
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-4 font-sans text-foreground">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-canvas-silk pb-3">
+      <div className="flex items-center gap-3 border-b border-border pb-3">
         <h2 className="text-base font-semibold flex items-center gap-2 mr-auto">
           <Building2 className="h-5 w-5 text-primary-500" />
           Institution Accreditation Applications
         </h2>
-        <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl">
+        <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-xl">
           {(["pending", "approved", "rejected"] as const).map(f => (
             <button
               key={f}
@@ -292,7 +292,7 @@ export const InstitutionApplications = () => {
                   ? f === "approved" ? "bg-success-500 text-white"
                     : f === "rejected" ? "bg-error-500 text-white"
                     : "bg-primary-500 text-white"
-                  : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  : "text-muted-foreground hover:bg-muted"
               }`}
             >
               {f}
@@ -304,14 +304,14 @@ export const InstitutionApplications = () => {
       {loading ? (
         <div className="flex justify-center p-8"><Loader2 className="animate-spin text-primary-500" /></div>
       ) : apps.length === 0 ? (
-        <div className="text-center py-8 text-xs text-graphite-500 dark:text-slate-400 font-bold">
+        <div className="text-center py-8 text-xs text-muted-foreground font-bold">
           No {filter} institution applications found.
         </div>
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                 <th className="py-2.5 px-4">Institution</th>
                 <th className="py-2.5 px-3">Type</th>
                 <th className="py-2.5 px-3">Applicant</th>
@@ -322,11 +322,11 @@ export const InstitutionApplications = () => {
                 <th className="py-2.5 px-3 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-canvas-silk">
+            <tbody className="divide-y divide-border">
               {apps.map(a => (
-                <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">{a.institution_name}</td>
-                  <td className="py-3 px-3 text-graphite-500 dark:text-slate-400 capitalize">{a.institution_type}</td>
+                <tr key={a.id} className="hover:bg-muted transition-colors">
+                  <td className="py-3 px-4 font-semibold text-foreground">{a.institution_name}</td>
+                  <td className="py-3 px-3 text-muted-foreground capitalize">{a.institution_type}</td>
                   <td className="py-3 px-3">
                     <div className="font-bold">{a.applicant?.first_name} {a.applicant?.last_name}</div>
                     <div className="text-xs text-slate-400">{a.applicant?.email}</div>
@@ -336,7 +336,7 @@ export const InstitutionApplications = () => {
                   <td className="py-3 px-3 text-center">
                     {a.institution?.list_in_marketplace
                       ? <Badge className="bg-primary-500/10 text-primary-500 border-0 text-xs">Listed</Badge>
-                      : <Badge variant="outline" className="text-xs text-graphite-500 dark:text-slate-400">HMS Only</Badge>
+                      : <Badge variant="outline" className="text-xs text-muted-foreground">HMS Only</Badge>
                     }
                   </td>
                   <td className="py-3 px-3 text-slate-500">{new Date(a.submitted_at).toLocaleDateString()}</td>
@@ -357,7 +357,7 @@ export const InstitutionApplications = () => {
 
       {/* ── Review Modal ── */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">
               Review — {app?.institution_name}
@@ -368,7 +368,7 @@ export const InstitutionApplications = () => {
             <div className="space-y-5 text-xs">
 
               {/* Basic info */}
-              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                 <InfoRow label="Applicant" value={`${app?.applicant?.first_name || ""} ${app?.applicant?.last_name || ""}`.trim()} />
                 <InfoRow label="Email" value={app?.applicant?.email} />
                 <InfoRow label="Phone" value={inst?.phone} />
@@ -392,7 +392,7 @@ export const InstitutionApplications = () => {
                     : <Badge variant="outline" className="border-primary-500 text-primary-500">HMS Internal Use Only</Badge>
                   }
                 </div>
-                <p className="text-graphite-500 dark:text-slate-400 mt-1.5 text-xs">
+                <p className="text-muted-foreground mt-1.5 text-xs">
                   {inst?.list_in_marketplace
                     ? "This institution wants to be discoverable by patients in public searches."
                     : "This institution will only use the platform for internal HMS operations — it should not appear in public listings."}
@@ -401,22 +401,22 @@ export const InstitutionApplications = () => {
 
               {/* Operational details */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                   <Activity className="h-4 w-4" /> Operational Details
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                   <InfoRow label="Number of Beds" value={inst?.number_of_beds} />
                   <InfoRow label="Total Staff" value={inst?.number_of_staff} />
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Emergency Services</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Emergency Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.emergency_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Ambulance Services</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Ambulance Services</span>
                     <div className="mt-1"><BoolBadge value={inst?.ambulance_services} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Open 24/7</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Open 24/7</span>
                     <div className="mt-1"><BoolBadge value={inst?.is_24_7} /></div>
                   </div>
                 </div>
@@ -424,24 +424,24 @@ export const InstitutionApplications = () => {
 
               {/* Services & equipment */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                   <ShieldCheck className="h-4 w-4" /> Services & Equipment
                 </h4>
-                <div className="space-y-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                <div className="space-y-3 p-4 rounded-xl bg-canvas border border-border">
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Services Offered</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Services Offered</span>
                     <TagList items={inst?.services_offered} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Equipment Available</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Equipment Available</span>
                     <TagList items={inst?.equipment_available} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Medical Specialties</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Medical Specialties</span>
                     <TagList items={inst?.specialties} emptyLabel="None listed" />
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Languages Spoken</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Languages Spoken</span>
                     <TagList items={inst?.languages_spoken} emptyLabel="None listed" />
                   </div>
                 </div>
@@ -450,10 +450,10 @@ export const InstitutionApplications = () => {
               {/* Accreditation */}
               {(inst?.accreditation_body || inst?.accreditation_number) && (
                 <section>
-                  <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                  <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                     <CheckCircle className="h-4 w-4" /> Accreditation
                   </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                     <InfoRow label="Accrediting Body" value={inst?.accreditation_body} />
                     <InfoRow label="Accreditation Number" value={inst?.accreditation_number} />
                     <InfoRow label="Expiry Date" value={inst?.accreditation_expiry_date} />
@@ -463,7 +463,7 @@ export const InstitutionApplications = () => {
 
               {/* Document checklist */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground mb-2">
                   Document Verification Checklist
                 </h4>
                 <div className="space-y-2">
@@ -471,7 +471,7 @@ export const InstitutionApplications = () => {
                     const country = inst?.country || app?.applicant?.country || "ZM";
                     const isPharmacy = app?.institution_type?.toLowerCase().includes("pharm");
                     return getCountryRequirements(country, isPharmacy ? "pharmacies" : "institutions").map(req => (
-                      <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-800">
+                      <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-border bg-card">
                         <Checkbox
                           id={`chk-${req.id}`}
                           checked={documentChecks[req.id] || false}
@@ -484,7 +484,7 @@ export const InstitutionApplications = () => {
                           <label htmlFor={`chk-${req.id}`} className="font-bold cursor-pointer flex items-center gap-1">
                             {req.name} {req.required && <span className="text-error-500">*</span>}
                           </label>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{req.description}</p>
                         </div>
                         {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />}
                       </div>
@@ -496,12 +496,12 @@ export const InstitutionApplications = () => {
               {/* Uploaded documents */}
               {docUrls.length > 0 && (
                 <section>
-                  <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-2">
+                  <h4 className="font-semibold uppercase text-muted-foreground mb-2">
                     Uploaded Documents ({docUrls.length})
                   </h4>
                   <ul className="space-y-1">
                     {docUrls.map(d => (
-                      <li key={d.name} className="flex items-center justify-between p-2 border border-canvas-silk rounded-md">
+                      <li key={d.name} className="flex items-center justify-between p-2 border border-border rounded-md">
                         <span className="truncate flex-1 font-medium text-xs">{d.name}</span>
                         <a href={d.url} target="_blank" rel="noopener noreferrer"
                           className="text-primary-500 font-bold flex items-center gap-1 ml-2 text-xs shrink-0">
@@ -514,18 +514,18 @@ export const InstitutionApplications = () => {
               )}
 
               {docUrls.length === 0 && (
-                <p className="text-xs text-graphite-500 dark:text-slate-400 italic">No documents uploaded yet.</p>
+                <p className="text-xs text-muted-foreground italic">No documents uploaded yet.</p>
               )}
 
               {/* Review notes */}
               <section>
-                <label className="font-semibold uppercase text-graphite-500 dark:text-slate-400">Review Notes</label>
+                <label className="font-semibold uppercase text-muted-foreground">Review Notes</label>
                 <textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Reason / notes (required for rejection)"
-                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-medium text-xs"
+                  className="w-full mt-1 p-2 rounded-md border border-border font-medium text-xs"
                 />
               </section>
             </div>

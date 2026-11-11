@@ -17,7 +17,7 @@ export const QuickActions = () => {
     { label: 'Create Invoice', icon: DollarSign, route: '/hospital-management?tab=billing', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
     { label: 'Schedule OT', icon: Scissors, route: '/hospital-management?tab=ot', color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
     { label: 'Discharge', icon: ClipboardList, route: '/hospital-management?tab=discharge', color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
-    { label: 'View Reports', icon: BarChart3, route: '/hospital-management?tab=mis', color: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+    { label: 'View Reports', icon: BarChart3, route: '/hospital-management?tab=mis', color: 'bg-slate-500/10 text-muted-foreground' },
     { label: 'Inventory', icon: Package, route: '/hospital-management?tab=inventory', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
     { label: 'IoT Devices', icon: Wifi, route: '/institution/devices', color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
     { label: 'Patient Records', icon: FileText, route: '/institution/patients', color: 'bg-pink-500/10 text-pink-600 dark:text-pink-400' },

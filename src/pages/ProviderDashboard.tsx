@@ -181,7 +181,7 @@ const MyPracticeEditor = () => {
   if (!loaded) {
     return (
       <div className="space-y-4 py-6">
-        <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading your practice details…</p>
+        <p className="text-sm font-medium text-muted-foreground">Loading your practice details…</p>
         <SkeletonForm rows={3} />
       </div>
     );
@@ -189,7 +189,7 @@ const MyPracticeEditor = () => {
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 border-b border-canvas-mist dark:border-slate-800 pb-2">
+      <h3 className="text-xs font-semibold uppercase text-muted-foreground flex items-center gap-1.5 border-b border-canvas-mist pb-2">
         <Icon className="h-4 w-4" /> {title}
       </h3>
       {children}
@@ -212,7 +212,7 @@ const MyPracticeEditor = () => {
           className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
             data[field].includes(opt)
               ? `${activeColor} text-white border-transparent`
-              : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-current"
+              : "bg-card border-border text-muted-foreground hover:border-current"
           }`}
         >
           {opt}
@@ -228,22 +228,22 @@ const MyPracticeEditor = () => {
       <Section icon={GraduationCap} title="Education">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Medical School</Label>
             <Input
               value={data.medical_school}
               onChange={e => setData(p => ({ ...p, medical_school: e.target.value }))}
               placeholder="e.g. UNZA School of Medicine"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Graduation Year</Label>
             <Input
               type="number" min="1960" max="2030"
               value={data.graduation_year}
               onChange={e => setData(p => ({ ...p, graduation_year: e.target.value }))}
               placeholder="e.g. 2015"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
         </div>
@@ -263,21 +263,21 @@ const MyPracticeEditor = () => {
       <Section icon={MapPin} title="Practice Details">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Primary Practice Location</Label>
             <Input
               value={data.primary_practice_location}
               onChange={e => setData(p => ({ ...p, primary_practice_location: e.target.value }))}
               placeholder="e.g. Woodlands Clinic, Lusaka"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Avg. Wait Time</Label>
             <Input
               value={data.typical_wait_time}
               onChange={e => setData(p => ({ ...p, typical_wait_time: e.target.value }))}
               placeholder="e.g. 15 mins"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
         </div>
@@ -287,7 +287,7 @@ const MyPracticeEditor = () => {
       <Section icon={Building2} title="Affiliated Hospitals">
         <div className="flex flex-wrap gap-2 mb-2 min-h-[28px]">
           {data.affiliated_hospitals.length === 0
-            ? <span className="text-xs text-graphite-500 dark:text-slate-400">None added yet</span>
+            ? <span className="text-xs text-muted-foreground">None added yet</span>
             : data.affiliated_hospitals.map(h => (
               <Badge key={h} variant="secondary" className="gap-1 pr-1">
                 {h}
@@ -304,7 +304,7 @@ const MyPracticeEditor = () => {
             onChange={e => setData(p => ({ ...p, newHospital: e.target.value }))}
             onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addHospital())}
             placeholder="Add hospital name…"
-            className="h-9 rounded-xl border-canvas-silk text-xs"
+            className="h-9 rounded-xl border-border text-xs"
           />
           <Button type="button" size="sm" onClick={addHospital} aria-label="Add affiliated hospital" className="rounded-xl h-9 px-3 bg-primary-500 hover:bg-primary-600">
             <Plus className="h-4 w-4" />
@@ -316,24 +316,24 @@ const MyPracticeEditor = () => {
       <Section icon={DollarSign} title="Consultation Fees (ZMW)">
         <div className="flex items-center gap-3 max-w-xs">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Min</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_min}
               onChange={e => setData(p => ({ ...p, consultation_fee_min: e.target.value }))}
               placeholder="200"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
-          <span className="mt-6 text-graphite-500 dark:text-slate-400 font-bold text-sm">–</span>
+          <span className="mt-6 text-muted-foreground font-bold text-sm">–</span>
           <div className="flex-1 space-y-1.5">
-            <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
+            <Label className="text-xs font-semibold uppercase text-muted-foreground">Max</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_max}
               onChange={e => setData(p => ({ ...p, consultation_fee_max: e.target.value }))}
               placeholder="500"
-              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
+              className="h-10 rounded-xl border-border text-xs font-medium"
             />
           </div>
         </div>
@@ -347,8 +347,8 @@ const MyPracticeEditor = () => {
             { key: "home_visits_available" as const, icon: Home, label: "Home Visits" },
             { key: "accepts_insurance" as const, icon: Shield, label: "Accepts Insurance" },
           ]).map(item => (
-            <div key={item.key} className="flex items-center justify-between p-3 border border-canvas-silk rounded-xl bg-white dark:bg-slate-900">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <div key={item.key} className="flex items-center justify-between p-3 border border-border rounded-xl bg-card">
+              <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
                 <item.icon className="h-4 w-4 text-primary-500" />
                 {item.label}
               </div>
@@ -428,8 +428,8 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <p className="text-sm font-medium text-graphite-500 dark:text-slate-400">Loading patient records…</p>
-        <div className="divide-y divide-canvas-silk rounded-2xl border border-canvas-silk bg-white px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
+        <p className="text-sm font-medium text-muted-foreground">Loading patient records…</p>
+        <div className="divide-y divide-border rounded-2xl border border-border bg-white px-4 dark:divide-slate-800 dark:bg-slate-900" aria-hidden>
           {[0, 1, 2].map((i) => (
             <SkeletonListRow key={i} action />
           ))}
@@ -440,7 +440,7 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
 
   if (patients.length === 0) {
     return (
-      <p className="text-sm text-graphite-500 dark:text-slate-400 text-center py-10">
+      <p className="text-sm text-muted-foreground text-center py-10">
         No patients yet — patients from your appointments will appear here so you can open their clinical record.
       </p>
     );
@@ -449,7 +449,7 @@ const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) =
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Label className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 shrink-0">
+        <Label className="text-xs font-semibold uppercase text-muted-foreground shrink-0">
           Patient
         </Label>
         <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
@@ -777,7 +777,7 @@ export const ProviderDashboard = () => {
       <div className="min-h-screen bg-canvas p-6">
         <div className="mx-auto w-full max-w-content space-y-6 pt-8">
           <SkeletonProviderDashboard />
-          <p className="text-sm font-medium text-center text-graphite-500 dark:text-slate-400">
+          <p className="text-sm font-medium text-center text-muted-foreground">
             Checking your provider access…
           </p>
         </div>
@@ -886,7 +886,7 @@ export const ProviderDashboard = () => {
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
-              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="p-3.5 rounded-xl bg-card border border-border hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <div className="p-2 rounded-lg bg-primary-50 dark:bg-blue-950 text-primary-500">
                 <act.icon className="h-4 w-4" />
@@ -899,8 +899,8 @@ export const ProviderDashboard = () => {
         {/* Modules chartered for this profession (DB-driven).
             Live modules open; planned modules are chartered but not built yet. */}
         {charter.length > 0 && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-            <p className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase mb-1">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+            <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
               My Practice Modules
             </p>
             <p className="text-xs text-graphite-400 dark:text-slate-500 mb-3">
@@ -913,7 +913,7 @@ export const ProviderDashboard = () => {
                 const path = PROVIDER_MODULE_PATHS[m.module_key];
                 const inner = (
                   <>
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                       {m.status === "live" ? (
                         <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
                       ) : (
@@ -929,8 +929,8 @@ export const ProviderDashboard = () => {
                 const cls =
                   "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
                   (openable
-                    ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
-                    : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
+                    ? "border-border hover:border-primary-500 hover:bg-primary-100 "
+                    : "border-border bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
                 return openable && path ? (
                   <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={m.description || m.module_name}>
                     {inner}
@@ -958,7 +958,7 @@ export const ProviderDashboard = () => {
         {/* ── Detailed modules tabs (now includes My Practice) ── */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto">
-            <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
+            <TabsList className="inline-flex items-center gap-1 p-1 bg-card border border-border rounded-xl w-auto min-w-full">
               {[
                 { value: "overview", label: "Overview" },
                 { value: "schedule", label: "Schedule" },
@@ -980,11 +980,11 @@ export const ProviderDashboard = () => {
               ))}
             </TabsList>
           </div>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 px-1">
+          <p className="text-xs text-muted-foreground px-1">
             Schedule shows your dated appointments. Weekly Hours sets your recurring availability that patients book into.
           </p>
 
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <TabsContent value="overview">
               <ProviderMetricsDashboard />
             </TabsContent>
@@ -997,11 +997,11 @@ export const ProviderDashboard = () => {
             {hasSpecialtyTools && <TabsContent value="specialty"><SpecialtyTools /></TabsContent>}
             <TabsContent value="my_practice">
               <div className="mb-4">
-                <h2 className="font-semibold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h2 className="font-semibold text-base text-foreground flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice Profile
                 </h2>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   These details appear on your public provider listing and help patients choose the right care.
                 </p>
               </div>

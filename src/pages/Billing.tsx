@@ -290,9 +290,9 @@ export const Billing = () => {
           </div>
           <Skeleton className="h-10 w-32 rounded-md" />
         </div>
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden" aria-hidden>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden" aria-hidden>
           <table className="w-full">
-            <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+            <tbody className="divide-y divide-border">
               <SkeletonTableRows rows={6} cells={4} />
             </tbody>
           </table>
@@ -443,7 +443,7 @@ export const Billing = () => {
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
           {showReceipt && (
-            <div className="bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
+            <div className="bg-card rounded-lg overflow-hidden">
               {/* Header with Doc'O Clock branding */}
               <div className="bg-primary-600 text-white p-6">
                 <div className="flex items-center justify-between">
@@ -463,11 +463,11 @@ export const Billing = () => {
 
               {/* Institution info */}
               {institution && (
-                <div className="bg-blue-50 dark:bg-blue-950/40 px-6 py-4 border-b dark:border-slate-700">
+                <div className="bg-blue-50 dark:bg-blue-950/40 px-6 py-4 border-b ">
                   <p className="font-semibold text-gray-900 dark:text-slate-100">{institution.name}</p>
-                  {institution.address && <p className="text-sm text-gray-600 dark:text-slate-400">{institution.address}</p>}
+                  {institution.address && <p className="text-sm text-muted-foreground">{institution.address}</p>}
                   {(institution.city || institution.phone) && (
-                    <p className="text-sm text-gray-600 dark:text-slate-400">
+                    <p className="text-sm text-muted-foreground">
                       {[institution.city, institution.phone].filter(Boolean).join(" • ")}
                     </p>
                   )}
@@ -503,9 +503,9 @@ export const Billing = () => {
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 dark:bg-slate-800">
                       <tr>
-                        <th className="text-left px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Description</th>
-                        <th className="text-center px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Qty</th>
-                        <th className="text-right px-4 py-2 font-medium text-gray-600 dark:text-slate-400">Amount</th>
+                        <th className="text-left px-4 py-2 font-medium text-muted-foreground">Description</th>
+                        <th className="text-center px-4 py-2 font-medium text-muted-foreground">Qty</th>
+                        <th className="text-right px-4 py-2 font-medium text-muted-foreground">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -522,9 +522,9 @@ export const Billing = () => {
 
                 {/* Totals */}
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-slate-400">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
                   <div className="flex justify-between font-bold text-base pt-2 border-t">
                     <span>Total:</span><span>{formatPrice(showReceipt.total_amount)}</span>
                   </div>
@@ -533,7 +533,7 @@ export const Billing = () => {
                 </div>
 
                 {showReceipt.notes && (
-                  <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded text-sm text-gray-600 dark:text-slate-400 italic">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded text-sm text-muted-foreground italic">
                     {showReceipt.notes}
                   </div>
                 )}

@@ -485,8 +485,8 @@ export function PrescriptionFulfillment() {
   }
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk pb-3">
+    <div className="space-y-4 font-sans text-foreground">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div className="flex items-center gap-2">
           <Pill className="h-5 w-5 text-primary-500" />
           <h2 className="text-base font-semibold">Pharmacy Prescription &amp; Dispensing Queue</h2>
@@ -504,7 +504,7 @@ export function PrescriptionFulfillment() {
               <span>Prescribe &amp; Dispense (Multi-Drug)</span>
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-2xl p-6">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border rounded-2xl p-6">
             <DialogHeader>
               <DialogTitle className="font-bold text-xl flex items-center gap-2">
                 <Pill className="h-6 w-6 text-primary-500" />
@@ -515,20 +515,20 @@ export function PrescriptionFulfillment() {
             <div className="space-y-4 py-2 text-xs">
               {/* Patient Selection */}
               <div>
-                <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Patient / Customer *</label>
+                <label className="font-bold text-muted-foreground uppercase">Patient / Customer *</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 font-medium"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                   placeholder="Search customer by name or email..."
                   value={patientSearch}
                   onChange={(e) => searchPatients(e.target.value)}
                 />
                 {patientList.length > 0 && !selectedPatient && (
-                  <div className="mt-1 border rounded-xl max-h-36 overflow-y-auto bg-white dark:bg-slate-900 shadow-sm">
+                  <div className="mt-1 border rounded-xl max-h-36 overflow-y-auto bg-card shadow-sm">
                     {patientList.map((p) => (
                       <button
                         key={p.id}
                         type="button"
-                        className="w-full text-left px-3 py-2 text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
+                        className="w-full text-left px-3 py-2 text-xs hover:bg-muted flex items-center justify-between border-b last:border-b-0"
                         onClick={() => {
                           setSelectedPatient(p);
                           setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email);
@@ -557,7 +557,7 @@ export function PrescriptionFulfillment() {
               {/* Medication Items */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">
+                  <label className="font-bold text-muted-foreground uppercase">
                     Medications ({medicationItems.length} item{medicationItems.length > 1 ? 's' : ''})
                   </label>
                   <button
@@ -570,7 +570,7 @@ export function PrescriptionFulfillment() {
                 </div>
 
                 {medicationItems.map((item, idx) => (
-                  <div key={item.id} className="p-3.5 rounded-2xl border border-canvas-silk bg-canvas-bone dark:bg-slate-950 space-y-2 relative">
+                  <div key={item.id} className="p-3.5 rounded-2xl border border-border bg-background space-y-2 relative">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                         Item #{idx + 1}
@@ -587,9 +587,9 @@ export function PrescriptionFulfillment() {
                     </div>
 
                     <div>
-                      <label className="font-bold text-slate-700 dark:text-slate-300">Medication Name *</label>
+                      <label className="font-bold text-foreground">Medication Name *</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                         placeholder="e.g. Amoxicillin 500mg"
                         value={item.medication_name}
                         onChange={(e) => handleUpdateMed(item.id, "medication_name", e.target.value)}
@@ -598,9 +598,9 @@ export function PrescriptionFulfillment() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <label className="font-bold text-slate-700 dark:text-slate-300">Dosage *</label>
+                        <label className="font-bold text-foreground">Dosage *</label>
                         <input
-                          className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                          className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                           placeholder="e.g. 1 tab 3x daily"
                           value={item.dosage}
                           onChange={(e) => handleUpdateMed(item.id, "dosage", e.target.value)}
@@ -608,21 +608,21 @@ export function PrescriptionFulfillment() {
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="font-bold text-slate-700 dark:text-slate-300">Quantity</label>
+                          <label className="font-bold text-foreground">Quantity</label>
                           <input
                             type="number"
                             min={1}
-                            className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                            className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                             value={item.quantity}
                             onChange={(e) => handleUpdateMed(item.id, "quantity", parseInt(e.target.value) || 1)}
                           />
                         </div>
                         <div>
-                          <label className="font-bold text-slate-700 dark:text-slate-300">Days</label>
+                          <label className="font-bold text-foreground">Days</label>
                           <input
                             type="number"
                             min={1}
-                            className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                            className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                             value={item.duration_days}
                             onChange={(e) => handleUpdateMed(item.id, "duration_days", parseInt(e.target.value) || 1)}
                           />
@@ -631,9 +631,9 @@ export function PrescriptionFulfillment() {
                     </div>
 
                     <div>
-                      <label className="font-bold text-slate-700 dark:text-slate-300">Instructions</label>
+                      <label className="font-bold text-foreground">Instructions</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                         placeholder="Take after meals"
                         value={item.instructions}
                         onChange={(e) => handleUpdateMed(item.id, "instructions", e.target.value)}
@@ -644,10 +644,10 @@ export function PrescriptionFulfillment() {
               </div>
 
               <div>
-                <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Dispensing Notes</label>
+                <label className="font-bold text-muted-foreground uppercase">Dispensing Notes</label>
                 <textarea
                   rows={2}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-medium"
                   placeholder="Notes, pharmacist remarks, batch IDs..."
                   value={rxNotes}
                   onChange={(e) => setRxNotes(e.target.value)}
@@ -659,7 +659,7 @@ export function PrescriptionFulfillment() {
               <button
                 type="button"
                 onClick={() => setShowNewRxDialog(false)}
-                className="px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                className="px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-muted"
               >
                 Cancel
               </button>
@@ -677,10 +677,10 @@ export function PrescriptionFulfillment() {
         </Dialog>
       </div>
 
-      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
               <th className="py-2.5 px-4">Medication Name</th>
               <th className="py-2.5 px-3">Patient</th>
               <th className="py-2.5 px-3 text-center">Fulfillment Status</th>
@@ -689,10 +689,10 @@ export function PrescriptionFulfillment() {
               <th className="py-2.5 px-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk">
+          <tbody className="divide-y divide-border">
             {prescriptions.map((p) => (
-              <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">
+              <tr key={p.id} className="hover:bg-muted transition-colors">
+                <td className="py-3 px-4 font-semibold text-foreground">
                   <div className="flex items-center gap-1.5">
                     <Pill className="h-3.5 w-3.5 text-primary-500" />
                     <span>{p.medication_name}</span>
@@ -718,7 +718,7 @@ export function PrescriptionFulfillment() {
                     <select
                       value={p.fulfillment_status || "pending"}
                       onChange={(e) => updateFulfillmentStatus(p.id, e.target.value)}
-                      className="p-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white dark:bg-slate-800"
+                      className="p-1 rounded-lg border border-border text-xs font-bold bg-card"
                     >
                       <option value="pending">Pending</option>
                       <option value="partially_filled">Partially Filled</option>
@@ -727,7 +727,7 @@ export function PrescriptionFulfillment() {
                     </select>
                     <button
                       onClick={() => handlePrintSlip(p)}
-                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg border border-border hover:bg-primary-500 hover:text-white transition-colors"
                       title="Print Dispensing Slip"
                     >
                       <Printer className="h-3.5 w-3.5" />
@@ -753,7 +753,7 @@ export function PrescriptionFulfillment() {
                           servedBy: p.dispensed_by || undefined,
                         })
                       }
-                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg border border-border hover:bg-primary-500 hover:text-white transition-colors"
                       title="Download PDF Receipt"
                     >
                       <Receipt className="h-3.5 w-3.5" />

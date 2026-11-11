@@ -100,7 +100,7 @@ const AIDiagnostics = () => {
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   activeTab === card.id
                     ? "border-primary-500 bg-card shadow-xs ring-2 ring-primary-500/20"
-                    : "border-border bg-card hover:border-primary-500 dark:hover:bg-slate-800"
+                    : "border-border bg-card hover:border-primary-500 "
                 }`}
               >
                 <div style={{ color: card.color }} className="mb-2">{card.icon}</div>

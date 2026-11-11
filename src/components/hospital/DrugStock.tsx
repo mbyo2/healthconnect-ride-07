@@ -156,7 +156,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
           <h2 className="text-lg font-semibold">Drug Stock Management</h2>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => { refresh(); refreshMovements(); }} className="p-2 rounded-xl border border-canvas-silk hover:bg-canvas-mist" title="Refresh">
+          <button onClick={() => { refresh(); refreshMovements(); }} className="p-2 rounded-xl border border-border hover:bg-canvas-mist" title="Refresh">
             <RefreshCw className="h-4 w-4" />
           </button>
           <button onClick={() => setShowAddStock(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-500 text-white text-xs font-bold hover:bg-primary-600">
@@ -179,7 +179,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
           <button
             key={t.key}
             onClick={() => setActiveTab(t.key)}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${activeTab === t.key ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-600 dark:text-slate-300"}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${activeTab === t.key ? "bg-primary-500 text-white" : "bg-muted text-foreground"}`}
           >
             {t.label}
           </button>
@@ -195,14 +195,14 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search drug name, generic, batch…"
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 text-sm"
+                className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-card text-sm"
               />
             </div>
             {(["all", "low", "expiring", "expired"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-2 rounded-xl text-xs font-bold capitalize ${filter === f ? "bg-graphite-800 text-white dark:bg-slate-700" : "bg-canvas-mist dark:bg-slate-800 text-graphite-600 dark:text-slate-300"}`}
+                className={`px-3 py-2 rounded-xl text-xs font-bold capitalize ${filter === f ? "bg-graphite-800 text-white dark:bg-slate-700" : "bg-muted text-foreground"}`}
               >
                 {f === "all" ? "All" : f}
                 {f === "low" && alertCounts.low > 0 && ` (${alertCounts.low})`}
@@ -217,10 +217,10 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
           ) : filtered.length === 0 ? (
             <EmptyState title="No drug stock items" description={items.length === 0 ? "Add your first batch to start tracking institutional drug stock." : "No items match the current search/filter."} />
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
+            <div className="overflow-x-auto rounded-xl border border-border">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-canvas-mist dark:bg-slate-800 text-left text-xs uppercase tracking-wide text-graphite-500 dark:text-slate-400">
+                  <tr className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-3 py-2">Drug</th>
                     <th className="px-3 py-2">Batch</th>
                     <th className="px-3 py-2 text-right">Qty</th>
@@ -231,7 +231,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
                 </thead>
                 <tbody>
                   {filtered.map((i) => (
-                    <tr key={i.id} className="border-t border-canvas-silk dark:border-slate-800">
+                    <tr key={i.id} className="border-t border-border">
                       <td className="px-3 py-2">
                         <div className="font-bold">{i.drug_name}{i.strength ? ` ${i.strength}` : ""}</div>
                         <div className="text-xs text-graphite-500">{[i.generic_name, i.dosage_form].filter(Boolean).join(" · ")}</div>
@@ -260,10 +260,10 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
         movLoading ? <ListSkeleton /> : movements.length === 0 ? (
           <EmptyState title="No stock movements" description="Every receive, issue, adjustment, expiry and damage is recorded here." />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
+          <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-canvas-mist dark:bg-slate-800 text-left text-xs uppercase tracking-wide text-graphite-500 dark:text-slate-400">
+                <tr className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Date</th>
                   <th className="px-3 py-2">Item</th>
                   <th className="px-3 py-2">Type</th>
@@ -274,7 +274,7 @@ export const DrugStock = ({ hospital }: { hospital: any }) => {
               </thead>
               <tbody>
                 {movements.map((m) => (
-                  <tr key={m.id} className="border-t border-canvas-silk dark:border-slate-800">
+                  <tr key={m.id} className="border-t border-border">
                     <td className="px-3 py-2 text-xs whitespace-nowrap">{new Date(m.created_at).toLocaleString()}</td>
                     <td className="px-3 py-2 font-semibold text-xs">{itemNames.get(m.drug_stock_item_id) || m.drug_stock_item_id?.slice(0, 8)}</td>
                     <td className="px-3 py-2">{getMovementPill(m.movement_type)}</td>

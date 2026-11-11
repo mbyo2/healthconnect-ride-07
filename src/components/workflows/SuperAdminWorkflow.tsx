@@ -43,15 +43,15 @@ export const SuperAdminWorkflow = () => {
   const { formatPrice } = useCurrency();
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 font-sans">
+    <div className="space-y-6 text-foreground font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-canvas-silk pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-border pb-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
             <Crown className="h-5 w-5 text-amber-500" />
             SuperAdmin Platform Console
           </h1>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+          <p className="text-xs text-muted-foreground font-medium">
             Platform-owner view — every institution, user, subscription, and country on Doc&apos;O Clock
           </p>
         </div>

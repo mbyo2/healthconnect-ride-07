@@ -148,7 +148,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
   })();
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -180,11 +180,11 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
           </Link>
           <Dialog open={showNewTokenModal} onOpenChange={setShowNewTokenModal}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
+              <button className="px-4 py-2 rounded-xl bg-card text-foreground font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
                 <Plus className="h-4 w-4" /> Issue Walk-in Token
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
+            <DialogContent className="max-w-md bg-card rounded-2xl p-6">
               <DialogHeader>
                 <DialogTitle className="font-bold text-lg">Generate Queue Token</DialogTitle>
               </DialogHeader>
@@ -200,7 +200,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                   <label htmlFor="queue-patient-name" className="font-bold">Patient Name *</label>
                   <input
                     id="queue-patient-name"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-border"
                     placeholder="Enter full name"
                     value={newTokenPatient}
                     onChange={(e) => {
@@ -216,7 +216,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                   <label htmlFor="queue-department" className="font-bold">Target Department</label>
                   <select
                     id="queue-department"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-bold bg-card"
                     value={newTokenDept}
                     onChange={(e) => setNewTokenDept(e.target.value)}
                   >
@@ -232,7 +232,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                   <label htmlFor="queue-priority" className="font-bold">Triage Priority</label>
                   <select
                     id="queue-priority"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-border font-bold bg-card"
                     value={newTokenPriority}
                     onChange={(e) => setNewTokenPriority(e.target.value as any)}
                   >
@@ -255,7 +255,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Waiting in Queue</span>
           <div className="text-3xl font-bold text-primary-500 mt-1">{loading ? "—" : `${waiting.length} Patients`}</div>
           <span className="text-xs font-bold text-slate-500">
@@ -263,13 +263,13 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Currently Serving</span>
           <div className="text-3xl font-bold text-amber-500 mt-1">{loading ? "—" : `${serving.length} Active`}</div>
           <span className="text-xs font-bold text-slate-500">Called to rooms</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
           <span className="text-xs font-semibold uppercase text-slate-400">Completed Today</span>
           <div className="text-3xl font-bold text-emerald-600 mt-1">{loading ? "—" : `${completed.length} Served`}</div>
           <span className="text-xs font-bold text-emerald-600">Live count</span>
@@ -285,15 +285,15 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
           placeholder="Search queue…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full pl-9 pr-3 py-1.5 rounded-md border border-border bg-card text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
       </div>
 
       {/* Live Queue Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
         <table className="w-full min-w-[720px] text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+            <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
               <th className="py-3 px-4">Token #</th>
               <th className="py-3 px-3">Patient Name</th>
               <th className="py-3 px-3">Department</th>
@@ -303,7 +303,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
               <th className="py-3 px-3 text-center">Calling Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+          <tbody className="divide-y divide-border">
             {loading ? (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading queue">
@@ -323,7 +323,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
               visible.map((tok) => {
                 const meta = STATUS_META[tok.status];
                 return (
-                  <tr key={tok.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                  <tr key={tok.id} className="hover:bg-muted/60">
                     <td className="py-3 px-4">
                       <div className="font-bold font-mono text-sm text-primary-500">{tok.token_number}</div>
                       {(tok.priority === "urgent" || tok.priority === "emergency") && (
@@ -332,8 +332,8 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{tok.patient_name}</td>
-                    <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">{tok.department}</td>
+                    <td className="py-3 px-3 font-bold text-foreground">{tok.patient_name}</td>
+                    <td className="py-3 px-3 font-semibold text-foreground">{tok.department}</td>
                     <td className="py-3 px-3 text-slate-500 capitalize">{tok.priority}</td>
                     <td className="py-3 px-3 text-slate-500">
                       {tok.check_in_time ? new Date(tok.check_in_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}
@@ -358,7 +358,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                           value={tok.status}
                           aria-label={`Change status of token ${tok.token_number}`}
                           onChange={(e) => updateTokenStatus(tok.id, e.target.value as LiveQueueToken["status"])}
-                          className="p-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white dark:bg-slate-800"
+                          className="p-1 rounded-lg border border-border text-xs font-bold bg-card"
                         >
                           <option value="waiting">Waiting</option>
                           <option value="serving">Serving</option>

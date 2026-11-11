@@ -501,15 +501,15 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
   });
 
   return (
-    <div className="space-y-4 text-slate-900 dark:text-slate-100 font-sans">
+    <div className="space-y-4 text-foreground font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-canvas-silk pb-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-border pb-3">
         <div>
           <h2 className="text-base font-semibold flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-primary-500" />
             Universal Hospital Service Tariff & Pricing Matrix
           </h2>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+          <p className="text-xs text-muted-foreground font-medium">
             Configure consultation fees, laboratory panels, radiology rates, and ward bed prices
           </p>
         </div>
@@ -535,12 +535,12 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       </div>
 
       {loading ? (
-        <p className="text-xs text-graphite-500 dark:text-slate-400 py-8 text-center">Loading charge book…</p>
+        <p className="text-xs text-muted-foreground py-8 text-center">Loading charge book…</p>
       ) : tariffs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-graphite-300 dark:border-slate-700 p-8 text-center space-y-2">
+        <div className="rounded-xl border border-dashed border-border p-8 text-center space-y-2">
           <Tag className="h-8 w-8 mx-auto text-slate-300" />
           <p className="text-sm font-semibold">No tariffs yet</p>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
+          <p className="text-xs text-muted-foreground">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
         </div>
       ) : null}
 
@@ -553,14 +553,14 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             placeholder="Search procedure name, code, or department..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full pl-9 pr-3 py-1.5 rounded-md border border-border bg-card text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
 
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700"
+          className="px-3 py-1.5 rounded-md border border-border bg-card text-xs font-bold text-slate-700"
         >
           <option value="all">All Categories ({tariffs.length})</option>
           <option value="opd">OPD & Consultation</option>
@@ -577,10 +577,10 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
       {/* Main Tariff Table — grouped list style, hairline dividers */}
       {!loading && tariffs.length > 0 && (
-      <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+      <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 bg-card shadow-sm">
         <table className="w-full text-left border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-200/60 dark:border-slate-800 text-xs font-medium text-slate-500 dark:text-slate-400">
+            <tr className="border-b border-slate-200/60 text-xs font-medium text-muted-foreground">
               <th className="py-3 px-4 font-medium">Code / Category</th>
               <th className="py-3 px-3 font-medium">Service Name</th>
               <th className="py-3 px-3 font-medium">Department</th>
@@ -599,10 +599,10 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               const margin = price > 0 ? Math.round(((price - cost) / price) * 100) : 0;
 
               return (
-                <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">{t.code}</td>
-                  <td className="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">{t.name}</td>
-                  <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{t.department}</td>
+                <tr key={t.id} className="hover:bg-muted/50 transition-colors">
+                  <td className="py-3 px-4 font-mono font-bold text-foreground">{t.code}</td>
+                  <td className="py-3 px-3 font-semibold text-foreground">{t.name}</td>
+                  <td className="py-3 px-3 text-muted-foreground">{t.department}</td>
                   <td className="py-3 px-3 text-right font-mono">
                     {isEditing ? (
                       <input
@@ -670,39 +670,39 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
       {/* Add Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="sm:max-w-[450px] bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Add Service Price</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddService} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Service Name *</label>
+              <label className="font-semibold text-muted-foreground uppercase">Service Name *</label>
               <input
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
                 placeholder="e.g. Dental Crown Fitting"
-                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-border font-bold"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Selling Price ({currency}) *</label>
+                <label className="font-semibold text-muted-foreground uppercase">Selling Price ({currency}) *</label>
                 <input
                   type="number"
                   value={newService.basePrice}
                   onChange={(e) => setNewService({ ...newService, basePrice: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-primary-500"
+                  className="w-full mt-1 p-2 rounded-md border border-border font-bold text-primary-500"
                   required
                 />
               </div>
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Cost Price ({currency})</label>
+                <label className="font-semibold text-muted-foreground uppercase">Cost Price ({currency})</label>
                 <input
                   type="number"
                   value={newService.costPrice}
                   onChange={(e) => setNewService({ ...newService, costPrice: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
+                  className="w-full mt-1 p-2 rounded-md border border-border"
                 />
               </div>
             </div>

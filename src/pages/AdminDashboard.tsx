@@ -199,7 +199,7 @@ export const AdminDashboard = () => {
       {/* Main Board Content */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
-          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk dark:border-slate-800">
+          <div className="overflow-x-auto p-1 bg-card rounded-xl border border-border">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
               {visibleTabs.map(({ value, label, icon: Icon }) => (
                 <TabsTrigger
@@ -214,7 +214,7 @@ export const AdminDashboard = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
             <TabsContent value="overview">
               <div className="space-y-5">
                 {/* Header */}

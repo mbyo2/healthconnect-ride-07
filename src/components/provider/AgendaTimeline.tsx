@@ -24,7 +24,7 @@ const STATUS_PILL: Record<string, string> = {
   scheduled: "bg-primary-500/15 text-primary-600 dark:text-primary-400",
   confirmed: "bg-primary-500/15 text-primary-600 dark:text-primary-400",
   completed: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  cancelled: "bg-slate-500/15 text-slate-500 dark:text-slate-400",
+  cancelled: "bg-slate-500/15 text-muted-foreground",
   no_show: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
 };
 
@@ -85,10 +85,10 @@ export function AgendaTimeline({
   return (
     <section
       aria-label="Appointment agenda"
-      className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden"
+      className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden"
     >
       {/* Day navigator */}
-      <div className="px-3 py-2.5 bg-primary-50 dark:bg-blue-950/40 border-b border-canvas-silk dark:border-slate-800 border-l-4 border-l-primary-500 flex items-center justify-between gap-2">
+      <div className="px-3 py-2.5 bg-primary-50 dark:bg-blue-950/40 border-b border-border border-l-4 border-l-primary-500 flex items-center justify-between gap-2">
         <button
           onClick={() => go(-1)}
           aria-label="Previous day"
@@ -131,7 +131,7 @@ export function AgendaTimeline({
             <div key={i} className="flex items-start gap-3" aria-hidden>
               <SkeletonLine className="h-4 w-12 shrink-0" />
               <SkeletonCircle className="h-3 w-3 mt-1" />
-              <div className="flex-1 space-y-2 rounded-2xl border border-canvas-silk dark:border-slate-800 p-3">
+              <div className="flex-1 space-y-2 rounded-2xl border border-border p-3">
                 <SkeletonLine className="h-4 w-1/2" />
                 <SkeletonLine className="h-3 w-1/3" />
               </div>
@@ -140,11 +140,11 @@ export function AgendaTimeline({
         </div>
       ) : appointments.length === 0 ? (
         <div className="p-8 text-center">
-          <CalendarX2 className="h-8 w-8 mx-auto mb-3 text-slate-300 dark:text-slate-600" aria-hidden />
+          <CalendarX2 className="h-8 w-8 mx-auto mb-3 text-muted-foreground" aria-hidden />
           <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
             No appointments on {format(selectedDate, "EEEE, MMM d")}
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
             Your schedule is clear. New bookings will appear here.
           </p>
           <button
@@ -172,7 +172,7 @@ export function AgendaTimeline({
               <li key={app.id} className="relative flex gap-3 items-stretch">
                 {/* time gutter */}
                 <div className="w-14 shrink-0 pt-3 text-right">
-                  <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                  <span className="text-xs font-mono font-bold text-foreground">
                     {shortTime(app.time)}
                   </span>
                 </div>
@@ -184,14 +184,14 @@ export function AgendaTimeline({
                 <div
                   className={cn(
                     "flex-1 mb-3 rounded-2xl border p-3 flex items-center gap-3",
-                    "border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-800/60",
+                    "border-border bg-canvas dark:bg-slate-800/60",
                     isUpNext && "border-primary-500 ring-1 ring-primary-500",
                     past && "opacity-60"
                   )}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                      <p className="text-sm font-semibold text-foreground truncate">
                         {patientName(app)}
                       </p>
                       {isUpNext && (
@@ -201,7 +201,7 @@ export function AgendaTimeline({
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-500/10 text-slate-600 dark:text-slate-300">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-500/10 text-muted-foreground">
                         {isVideo(app) ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
                         {isVideo(app) ? "Video" : "In-person"}
                       </span>
@@ -225,7 +225,7 @@ export function AgendaTimeline({
       )}
 
       {/* footer */}
-      <div className="px-4 py-2 border-t border-canvas-silk dark:border-slate-800 flex justify-end">
+      <div className="px-4 py-2 border-t border-border flex justify-end">
         <button
           onClick={onViewAll}
           className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1 min-h-[44px] px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"

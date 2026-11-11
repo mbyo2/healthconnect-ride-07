@@ -419,7 +419,7 @@ export function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb pointer-events-none">
       <div className="relative mx-auto mb-3 px-4 max-w-md pointer-events-auto">
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-pill-nav border border-canvas-silk dark:border-slate-800 rounded-pill px-2 py-1.5 flex items-center justify-evenly">
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-pill-nav border border-border rounded-pill px-2 py-1.5 flex items-center justify-evenly">
           {filteredNavItems.map((item, index) => (
             <BottomNavItem key={index} {...item} />
           ))}

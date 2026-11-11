@@ -718,7 +718,7 @@ const InstitutionSettings = () => {
                       m.effective === "live"
                         ? "border-success-200 bg-success-50/40"
                         : m.effective === "planned"
-                        ? "border-canvas-silk bg-muted/30"
+                        ? "border-border bg-muted/30"
                         : "border-error-200 bg-error-50/40"
                     }`}
                     title={m.description || m.module_name}

@@ -136,7 +136,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
             >
               {/* Group Header */}
               <div
-                className="flex items-center justify-between px-4 py-3 cursor-pointer select-none rounded-t-2xl border-b border-slate-200 dark:border-slate-800"
+                className="flex items-center justify-between px-4 py-3 cursor-pointer select-none rounded-t-2xl border-b border-border"
                 style={{ borderLeft: `6px solid ${groupColor}` }}
                 onClick={() => toggleGroup(groupName)}
               >
@@ -158,7 +158,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                       e.stopPropagation();
                       onAddNewPatientInGroup(groupName);
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-500 hover:text-white text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1 bg-muted hover:bg-blue-500 hover:text-white text-foreground rounded-lg text-xs font-semibold transition-all"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Add Item</span>
@@ -208,7 +208,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                   {patient.name.charAt(0)}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="font-bold text-sm tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors flex items-center justify-between">
+                                  <div className="font-bold text-sm tracking-tight text-foreground group-hover:text-blue-600 transition-colors flex items-center justify-between">
                                     <div className="flex items-center gap-1.5 truncate">
                                       <span>{patient.name}</span>
                                       <span className="text-xs font-mono text-slate-400 font-normal">({patient.ageGender})</span>
@@ -227,7 +227,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                       <span>2</span>
                                     </button>
                                   </div>
-                                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[190px]">
+                                  <div className="text-xs text-muted-foreground truncate max-w-[190px]">
                                     {patient.symptoms}
                                   </div>
                                 </div>
@@ -306,7 +306,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                   className="h-6 w-6 rounded-full object-cover border border-blue-500/30"
                                 />
                                 <div className="min-w-0">
-                                  <div className="font-semibold text-xs truncate text-slate-800 dark:text-slate-200">{patient.doctor.name}</div>
+                                  <div className="font-semibold text-xs truncate text-foreground">{patient.doctor.name}</div>
                                   <div className="text-xs text-slate-400 truncate">{patient.doctor.specialty}</div>
                                 </div>
                               </div>
@@ -336,7 +336,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                   <span>{patient.dateAdded}</span>
                                   <span>{patient.timelineDays}%</span>
                                 </div>
-                                <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
                                   <div
                                     className="bg-primary-500 h-full rounded-full transition-all duration-500"
                                     style={{ width: `${patient.timelineDays}%` }}
@@ -362,7 +362,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                             <td className="py-3 px-2 text-center" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={() => onSelectPatient(patient)}
-                                className="p-1 rounded-md text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-1 rounded-md text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors"
                               >
                                 <ExternalLink className="h-3.5 w-3.5" />
                               </button>
@@ -383,7 +383,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                       {/* Iconic Monday Status Battery Bar */}
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-mono text-slate-400 font-bold">Status Battery:</span>
-                        <div className="h-4 w-44 rounded-md overflow-hidden bg-slate-200 dark:bg-slate-800 flex p-0.5 shadow-inner">
+                        <div className="h-4 w-44 rounded-md overflow-hidden bg-muted flex p-0.5 shadow-inner">
                           {doneCount > 0 && (
                             <div
                               style={{ width: `${(doneCount / groupPatients.length) * 100}%` }}

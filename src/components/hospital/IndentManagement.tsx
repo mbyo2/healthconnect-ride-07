@@ -225,11 +225,11 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
   const renderIndentCard = (indent: any, showActions: boolean) => {
     const its = itemsFor(indent.id);
     return (
-      <div key={indent.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
+      <div key={indent.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-2">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
-            <p className="text-[15px] font-semibold">{indent.indent_number} <span className="font-medium text-graphite-500 dark:text-slate-400">• {indent.department}</span></p>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Raised {fmtDate(indent.created_at)}{indent.notes ? ` • ${indent.notes}` : ""}</p>
+            <p className="text-[15px] font-semibold">{indent.indent_number} <span className="font-medium text-muted-foreground">• {indent.department}</span></p>
+            <p className="text-xs text-muted-foreground">Raised {fmtDate(indent.created_at)}{indent.notes ? ` • ${indent.notes}` : ""}</p>
           </div>
           <div className="flex gap-1.5 items-center flex-wrap">{getPriorityPill(indent.priority)}{getStatusPill(indent.status)}</div>
         </div>
@@ -237,7 +237,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           {its.map((it) => (
             <div key={it.id} className="flex justify-between gap-2 text-xs">
               <span className="font-bold">{it.item_name}</span>
-              <span className="text-graphite-500 dark:text-slate-400 tabular-nums">
+              <span className="text-muted-foreground tabular-nums">
                 req {it.quantity_requested} {it.unit} • appr {it.quantity_approved} • issued {it.quantity_issued}
               </span>
             </div>
@@ -251,8 +251,8 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
             {indent.status === "pending" && (
               <>
                 <button onClick={() => openApprove(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-bold">Approve</button>
-                <button onClick={() => openReject(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold text-error-500">Reject</button>
-                <button onClick={() => { setSelected(indent); setShowCancelConfirm(true); }} className="px-3 py-2 min-h-[44px] rounded-md text-xs font-bold text-graphite-500 dark:text-slate-400">Cancel</button>
+                <button onClick={() => openReject(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md border border-border text-xs font-bold text-error-500">Reject</button>
+                <button onClick={() => { setSelected(indent); setShowCancelConfirm(true); }} className="px-3 py-2 min-h-[44px] rounded-md text-xs font-bold text-muted-foreground">Cancel</button>
               </>
             )}
             {(indent.status === "approved" || indent.status === "partially_fulfilled") && (
@@ -267,18 +267,18 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
   };
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-4 font-sans text-foreground">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-border pb-3">
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <ClipboardList className="h-5 w-5 text-primary-500" />
             Indent Management
           </h3>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Department supply requests — pharmacy/store approval and fulfillment</p>
+          <p className="text-xs text-muted-foreground font-medium">Department supply requests — pharmacy/store approval and fulfillment</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
+          <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-muted font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button onClick={() => setActiveTab("raise")} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
@@ -290,16 +290,16 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       {/* Today at a glance */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {glance.map((g) => (
-          <div key={g.label} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div key={g.label} className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
             <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">{g.label}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-1">{g.label}</p>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl overflow-x-auto">
         {([
           { key: "queue", label: `Approval queue (${pending.length + partial.length})`, icon: Hourglass },
           { key: "raise", label: "Raise indent", icon: Plus },
@@ -308,7 +308,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"}`}
           >
             {tab.label}
           </button>
@@ -326,12 +326,12 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
 
       {/* RAISE INDENT */}
       {activeTab === "raise" && (
-        <form onSubmit={handleRaise} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-xs space-y-4">
+        <form onSubmit={handleRaise} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <DepartmentSelect hospitalId={hospital?.id} value={department} onChange={setDepartment} departments={departments} label="Department *" required valueMode="name" />
             <div>
               <label className="text-xs font-bold">Priority</label>
-              <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
+              <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm">
                 <option value="routine">Routine</option>
                 <option value="urgent">Urgent</option>
                 <option value="emergency">Emergency</option>
@@ -341,17 +341,17 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-bold">Items *</label>
-              <button type="button" onClick={addItemRow} className="px-3 py-1.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1">
+              <button type="button" onClick={addItemRow} className="px-3 py-1.5 min-h-[44px] rounded-md border border-border text-xs font-bold flex items-center gap-1">
                 <Plus className="h-3.5 w-3.5" /> Add item
               </button>
             </div>
             <div className="space-y-2">
               {items.map((it, idx) => (
                 <div key={idx} className="grid grid-cols-12 gap-2 items-center">
-                  <input value={it.item_name} onChange={(e) => setItem(idx, { item_name: e.target.value })} placeholder="Item name" className="col-span-5 px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
-                  <input type="number" min={1} value={it.quantity_requested} onChange={(e) => setItem(idx, { quantity_requested: e.target.value })} placeholder="Qty" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm tabular-nums" />
-                  <input value={it.unit} onChange={(e) => setItem(idx, { unit: e.target.value })} placeholder="Unit" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
-                  <input value={it.notes} onChange={(e) => setItem(idx, { notes: e.target.value })} placeholder="Note" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                  <input value={it.item_name} onChange={(e) => setItem(idx, { item_name: e.target.value })} placeholder="Item name" className="col-span-5 px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
+                  <input type="number" min={1} value={it.quantity_requested} onChange={(e) => setItem(idx, { quantity_requested: e.target.value })} placeholder="Qty" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm tabular-nums" />
+                  <input value={it.unit} onChange={(e) => setItem(idx, { unit: e.target.value })} placeholder="Unit" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
+                  <input value={it.notes} onChange={(e) => setItem(idx, { notes: e.target.value })} placeholder="Note" className="col-span-2 px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
                   <button type="button" onClick={() => removeItemRow(idx)} disabled={items.length === 1} className="col-span-1 min-h-[44px] rounded-md text-error-500 text-xs font-bold disabled:opacity-30">✕</button>
                 </div>
               ))}
@@ -359,7 +359,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <div>
             <label className="text-xs font-bold">Notes (optional)</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Why is this needed?" className="mt-1 w-full px-3 py-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Why is this needed?" className="mt-1 w-full px-3 py-2.5 rounded-md border border-border bg-card text-sm" />
           </div>
           <button type="submit" disabled={isSubmitting} className="px-5 py-3 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold disabled:opacity-50 flex items-center gap-2">
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} Submit indent request
@@ -378,20 +378,20 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       <Dialog open={showApprove} onOpenChange={setShowApprove}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Approve {selected?.indent_number}</DialogTitle></DialogHeader>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">Adjust approved quantities if needed — approving less than requested is normal.</p>
+          <p className="text-xs text-muted-foreground">Adjust approved quantities if needed — approving less than requested is normal.</p>
           <div className="space-y-2">
             {selected && itemsFor(selected.id).map((it) => (
               <div key={it.id} className="flex items-center justify-between gap-2 rounded-xl bg-canvas dark:bg-slate-800/60 p-3">
                 <div>
                   <p className="text-sm font-bold">{it.item_name}</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Requested {it.quantity_requested} {it.unit}</p>
+                  <p className="text-xs text-muted-foreground">Requested {it.quantity_requested} {it.unit}</p>
                 </div>
-                <input type="number" min={0} max={it.quantity_requested} value={approveQtys[it.id] ?? ""} onChange={(e) => setApproveQtys({ ...approveQtys, [it.id]: e.target.value })} className="w-20 px-2 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm tabular-nums text-center" />
+                <input type="number" min={0} max={it.quantity_requested} value={approveQtys[it.id] ?? ""} onChange={(e) => setApproveQtys({ ...approveQtys, [it.id]: e.target.value })} className="w-20 px-2 py-2 min-h-[44px] rounded-md border border-border bg-card text-sm tabular-nums text-center" />
               </div>
             ))}
           </div>
           <DialogFooter>
-            <button onClick={() => setShowApprove(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
+            <button onClick={() => setShowApprove(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
             <button onClick={handleApprove} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Approve indent
             </button>
@@ -405,10 +405,10 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <DialogHeader><DialogTitle>Reject {selected?.indent_number}?</DialogTitle></DialogHeader>
           <div>
             <label className="text-xs font-bold">Reason *</label>
-            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} placeholder="e.g. Item not stocked — suggest alternative" className="mt-1 w-full px-3 py-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} placeholder="e.g. Item not stocked — suggest alternative" className="mt-1 w-full px-3 py-2.5 rounded-md border border-border bg-card text-sm" />
           </div>
           <DialogFooter>
-            <button onClick={() => setShowReject(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep</button>
+            <button onClick={() => setShowReject(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep</button>
             <button onClick={handleReject} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} <XCircle className="h-3.5 w-3.5" /> Reject indent
             </button>
@@ -420,7 +420,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       <Dialog open={showFulfill} onOpenChange={setShowFulfill}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Issue stock — {selected?.indent_number}</DialogTitle></DialogHeader>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">Enter quantities being issued now. Partial issues are allowed — the indent stays open until fully issued.</p>
+          <p className="text-xs text-muted-foreground">Enter quantities being issued now. Partial issues are allowed — the indent stays open until fully issued.</p>
           <div className="space-y-2">
             {selected && itemsFor(selected.id).map((it) => {
               const remaining = Math.max(0, (it.quantity_approved || 0) - (it.quantity_issued || 0));
@@ -428,15 +428,15 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
                 <div key={it.id} className="flex items-center justify-between gap-2 rounded-xl bg-canvas dark:bg-slate-800/60 p-3">
                   <div>
                     <p className="text-sm font-bold">{it.item_name}</p>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400">Approved {it.quantity_approved} • already issued {it.quantity_issued} • remaining {remaining}</p>
+                    <p className="text-xs text-muted-foreground">Approved {it.quantity_approved} • already issued {it.quantity_issued} • remaining {remaining}</p>
                   </div>
-                  <input type="number" min={0} max={remaining} value={issueQtys[it.id] ?? ""} onChange={(e) => setIssueQtys({ ...issueQtys, [it.id]: e.target.value })} className="w-20 px-2 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm tabular-nums text-center" />
+                  <input type="number" min={0} max={remaining} value={issueQtys[it.id] ?? ""} onChange={(e) => setIssueQtys({ ...issueQtys, [it.id]: e.target.value })} className="w-20 px-2 py-2 min-h-[44px] rounded-md border border-border bg-card text-sm tabular-nums text-center" />
                 </div>
               );
             })}
           </div>
           <DialogFooter>
-            <button onClick={() => setShowFulfill(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
+            <button onClick={() => setShowFulfill(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
             <button onClick={handleFulfill} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} <Truck className="h-3.5 w-3.5" /> Record issue
             </button>
@@ -448,9 +448,9 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
       <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Cancel this indent?</DialogTitle></DialogHeader>
-          <p className="text-sm text-graphite-500 dark:text-slate-400"><strong className="text-slate-900 dark:text-slate-100">{selected?.indent_number}</strong> will be withdrawn. This cannot be undone.</p>
+          <p className="text-sm text-muted-foreground"><strong className="text-foreground">{selected?.indent_number}</strong> will be withdrawn. This cannot be undone.</p>
           <DialogFooter>
-            <button onClick={() => setShowCancelConfirm(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep</button>
+            <button onClick={() => setShowCancelConfirm(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep</button>
             <button onClick={handleCancel} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>

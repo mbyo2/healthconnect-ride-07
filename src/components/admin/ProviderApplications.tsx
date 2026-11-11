@@ -53,15 +53,15 @@ interface ProviderApp {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
-    <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{value || "—"}</span>
+    <span className="text-xs font-semibold uppercase text-muted-foreground">{label}</span>
+    <span className="text-xs font-medium text-foreground">{value || "—"}</span>
   </div>
 );
 
 const BoolBadge = ({ value, trueLabel = "Yes", falseLabel = "No" }: { value: boolean | null; trueLabel?: string; falseLabel?: string }) => (
   value
     ? <Badge className="bg-success-500/15 text-success-500 border-0 text-xs">{trueLabel}</Badge>
-    : <Badge variant="outline" className="text-xs text-graphite-500 dark:text-slate-400">{falseLabel}</Badge>
+    : <Badge variant="outline" className="text-xs text-muted-foreground">{falseLabel}</Badge>
 );
 
 export const ProviderApplications = () => {
@@ -241,7 +241,7 @@ export const ProviderApplications = () => {
   return (
     <div className="space-y-4">
       {/* Filter bar */}
-      <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
+      <div className="flex items-center justify-between border-b border-border pb-3">
         <h2 className="text-base font-semibold flex items-center gap-2 mr-auto">
           <ShieldCheck className="h-5 w-5 text-primary-500" />
           Practitioner Accreditation Applications
@@ -254,7 +254,7 @@ export const ProviderApplications = () => {
               className={`px-3 py-1 rounded-md text-xs font-semibold capitalize transition-all ${
                 filter === f
                   ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-slate-800"
+                  : "bg-muted text-foreground hover:bg-muted"
               }`}
             >
               {f}
@@ -266,14 +266,14 @@ export const ProviderApplications = () => {
       {loading ? (
         <div className="flex justify-center p-8"><Loader2 className="animate-spin text-primary-500" /></div>
       ) : apps.length === 0 ? (
-        <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-canvas rounded-xl border border-canvas-silk dark:border-slate-800">
+        <div className="p-8 text-center text-xs text-muted-foreground bg-canvas rounded-xl border border-border">
           No {filter} provider accreditation applications found.
         </div>
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
+        <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+              <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                 <th className="py-2.5 px-4">Applicant</th>
                 <th className="py-2.5 px-3">Specialty</th>
                 <th className="py-2.5 px-3">Medical School</th>
@@ -283,17 +283,17 @@ export const ProviderApplications = () => {
                 <th className="py-2.5 px-3 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-canvas-silk">
+            <tbody className="divide-y divide-border">
               {apps.map(app => (
-                <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                <tr key={app.id} className="hover:bg-muted transition-colors">
                   <td className="py-3 px-4">
-                    <div className="font-bold text-slate-900 dark:text-slate-100">
+                    <div className="font-bold text-foreground">
                       {app.profile?.first_name} {app.profile?.last_name}
                     </div>
                     <div className="text-xs text-slate-400">{app.profile?.email}</div>
                   </td>
                   <td className="py-3 px-3 font-semibold text-primary-500">{app.specialty || "General Medicine"}</td>
-                  <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{app.profile?.medical_school || "—"}</td>
+                  <td className="py-3 px-3 text-muted-foreground">{app.profile?.medical_school || "—"}</td>
                   <td className="py-3 px-3 font-mono">{app.license_number || "—"}</td>
                   <td className="py-3 px-3 font-bold">{app.years_of_experience} yrs</td>
                   <td className="py-3 px-3 text-center">
@@ -323,7 +323,7 @@ export const ProviderApplications = () => {
 
       {/* ── Review Modal ── */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">
               Review — {p?.first_name} {p?.last_name}
@@ -334,7 +334,7 @@ export const ProviderApplications = () => {
             <div className="space-y-5 text-xs">
 
               {/* Basic info */}
-              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                 <InfoRow label="Email" value={p?.email} />
                 <InfoRow label="Phone" value={p?.phone} />
                 <InfoRow label="License #" value={selected.license_number} />
@@ -345,14 +345,14 @@ export const ProviderApplications = () => {
 
               {/* Education & credentials */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                   <GraduationCap className="h-4 w-4" /> Education & Credentials
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                   <InfoRow label="Medical School" value={p?.medical_school} />
                   <InfoRow label="Graduation Year" value={p?.graduation_year} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Board Certifications</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Board Certifications</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.board_certifications || []).length > 0
                         ? (p!.board_certifications as string[]).map(c => (
@@ -360,12 +360,12 @@ export const ProviderApplications = () => {
                               <Award className="h-3 w-3 text-primary-500" /> {c}
                             </Badge>
                           ))
-                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
+                        : <span className="text-muted-foreground">None listed</span>
                       }
                     </div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Subspecialties</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Subspecialties</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.subspecialties || []).length > 0
                         ? (p!.subspecialties as string[]).map(s => (
@@ -373,7 +373,7 @@ export const ProviderApplications = () => {
                               <Stethoscope className="h-3 w-3 mr-1" /> {s}
                             </Badge>
                           ))
-                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
+                        : <span className="text-muted-foreground">None listed</span>
                       }
                     </div>
                   </div>
@@ -382,20 +382,20 @@ export const ProviderApplications = () => {
 
               {/* Practice details */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                   <Building2 className="h-4 w-4" /> Practice Details
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                   <InfoRow label="Practice Location" value={p?.primary_practice_location} />
                   <InfoRow label="Typical Wait Time" value={p?.typical_wait_time} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Affiliated Hospitals</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Affiliated Hospitals</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.affiliated_hospitals || []).length > 0
                         ? (p!.affiliated_hospitals as string[]).map(h => (
                             <Badge key={h} variant="outline" className="text-xs">{h}</Badge>
                           ))
-                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
+                        : <span className="text-muted-foreground">None listed</span>
                       }
                     </div>
                   </div>
@@ -404,10 +404,10 @@ export const ProviderApplications = () => {
 
               {/* Fees & capabilities */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                   <DollarSign className="h-4 w-4" /> Fees & Capabilities
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-border">
                   <InfoRow
                     label="Consultation Fee"
                     value={
@@ -419,25 +419,25 @@ export const ProviderApplications = () => {
                     }
                   />
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Accepts Insurance</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Accepts Insurance</span>
                     <div className="mt-1"><BoolBadge value={p?.accepts_insurance ?? false} /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Telemedicine</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Telemedicine</span>
                     <div className="mt-1"><BoolBadge value={p?.telemedicine_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Home Visits</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Home Visits</span>
                     <div className="mt-1"><BoolBadge value={p?.home_visits_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Insurance Providers Accepted</span>
+                    <span className="text-xs font-semibold uppercase text-muted-foreground">Insurance Providers Accepted</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.insurance_providers_accepted || []).length > 0
                         ? (p!.insurance_providers_accepted as string[]).map(ins => (
                             <Badge key={ins} variant="outline" className="text-xs">{ins}</Badge>
                           ))
-                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
+                        : <span className="text-muted-foreground">None listed</span>
                       }
                     </div>
                   </div>
@@ -447,7 +447,7 @@ export const ProviderApplications = () => {
               {/* Languages */}
               {(p?.languages_spoken || []).length > 0 && (
                 <section>
-                  <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                  <h4 className="font-semibold uppercase text-muted-foreground flex items-center gap-1.5 mb-2">
                     <Languages className="h-4 w-4" /> Languages Spoken
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
@@ -460,10 +460,10 @@ export const ProviderApplications = () => {
 
               {/* Document checklist */}
               <section>
-                <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-2">Document Verification Checklist</h4>
+                <h4 className="font-semibold uppercase text-muted-foreground mb-2">Document Verification Checklist</h4>
                 <div className="space-y-2">
                   {getCountryRequirements(p?.country || "ZM", "healthcareProfessionals").map(req => (
-                    <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-canvas-silk bg-canvas dark:bg-slate-950">
+                    <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-border bg-background">
                       <Checkbox
                         id={`chk-${req.id}`}
                         checked={documentChecks[req.id] || false}
@@ -476,7 +476,7 @@ export const ProviderApplications = () => {
                         <label htmlFor={`chk-${req.id}`} className="font-bold cursor-pointer flex items-center gap-1">
                           {req.name} {req.required && <span className="text-error-500">*</span>}
                         </label>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{req.description}</p>
                       </div>
                       {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />}
                     </div>
@@ -487,12 +487,12 @@ export const ProviderApplications = () => {
               {/* Uploaded documents */}
               {Object.keys(docUrls).length > 0 && (
                 <section>
-                  <h4 className="font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-2">
+                  <h4 className="font-semibold uppercase text-muted-foreground mb-2">
                     Uploaded Documents ({Object.keys(docUrls).length})
                   </h4>
                   <ul className="space-y-1">
                     {Object.entries(docUrls).map(([path, url]) => (
-                      <li key={path} className="flex items-center justify-between p-2 border border-canvas-silk rounded-md">
+                      <li key={path} className="flex items-center justify-between p-2 border border-border rounded-md">
                         <span className="truncate flex-1 font-medium text-xs">{path.split("/").pop()}</span>
                         <a href={url} target="_blank" rel="noopener noreferrer"
                           className="text-primary-500 font-bold flex items-center gap-1 ml-2 text-xs shrink-0">
@@ -506,10 +506,10 @@ export const ProviderApplications = () => {
 
               {/* Review notes */}
               <section>
-                <label className="font-semibold uppercase text-graphite-500 dark:text-slate-400">Review Notes</label>
+                <label className="font-semibold uppercase text-muted-foreground">Review Notes</label>
                 <textarea
                   rows={2}
-                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-canvas text-xs font-medium"
+                  className="w-full mt-1 p-2.5 rounded-md border border-border bg-canvas text-xs font-medium"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="Notes (required for rejection)…"

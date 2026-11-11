@@ -36,14 +36,14 @@ const getResultStatusPill = (status?: string | null) => {
   switch (status) {
     case "final": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Final report</span>;
     case "preliminary": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Preliminary</span>;
-    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">Draft</span>;
+    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-muted-foreground">Draft</span>;
   }
 };
 
 const getPriorityPill = (priority: string) => {
   if (priority === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Emergency</span>;
   if (priority === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Urgent</span>;
-  return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-graphite-500 dark:bg-slate-600">Routine</span>;
+  return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-muted-foreground">Routine</span>;
 };
 
 export const Imaging = ({ hospital }: { hospital: any }) => {

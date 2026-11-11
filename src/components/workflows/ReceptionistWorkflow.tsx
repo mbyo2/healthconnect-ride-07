@@ -148,14 +148,14 @@ export const ReceptionistWorkflow = () => {
           <Users className="h-7 w-7" />
         </div>
         <div>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Front Office Workspace</p>
-          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Reception Dashboard</h1>
+          <p className="text-[13px] font-medium text-muted-foreground">Front Office Workspace</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-foreground">Reception Dashboard</h1>
         </div>
       </div>
 
       {/* Today at a Glance */}
       <section>
-        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <h2 className="mb-4 text-[18px] font-semibold text-foreground">Today at a glance</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-primary-500 p-5 text-left text-white shadow-sm">
             <div className="flex items-center justify-between">
@@ -166,22 +166,22 @@ export const ReceptionistWorkflow = () => {
             <p className="text-[13px] opacity-80">Patients checked in</p>
           </div>
 
-          <div className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <Play className="h-5 w-5 text-blue-500" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{loading ? '–' : serving.length}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Now serving</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">With clinicians</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{loading ? '–' : serving.length}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Now serving</p>
+            <p className="text-[13px] text-muted-foreground">With clinicians</p>
           </div>
 
-          <div className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{loading ? '–' : emergencyCount}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Emergency</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">Priority patients waiting</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{loading ? '–' : emergencyCount}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Emergency</p>
+            <p className="text-[13px] text-muted-foreground">Priority patients waiting</p>
           </div>
         </div>
       </section>
@@ -189,37 +189,37 @@ export const ReceptionistWorkflow = () => {
       {/* Grouped Actions */}
       {groups.map((group) => (
         <section key={group.title}>
-          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
-          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-4 text-[18px] font-semibold text-foreground">{group.title}</h2>
+          <div className="rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900">
             <button
               onClick={group.primary.action}
-              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+              className="flex w-full items-center gap-4 border-b border-border p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted "
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
                 {group.primary.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
-                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+                <p className="text-[15px] font-medium text-foreground">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-muted-foreground">{group.primary.description}</p>
               </div>
               <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
             </button>
             {group.secondary.length > 0 && (
-              <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <div className="divide-y divide-border">
                 {group.secondary.map((item) => (
                   <button
                     key={item.title}
                     onClick={item.action}
-                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted/50"
                   >
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       {item.icon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
-                      <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                      <p className="text-[15px] font-medium text-foreground">{item.title}</p>
+                      <p className="truncate text-[13px] text-muted-foreground">{item.description}</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                    <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                   </button>
                 ))}
               </div>
@@ -230,7 +230,7 @@ export const ReceptionistWorkflow = () => {
 
       {/* Queue Workspace */}
       <section>
-        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Live Queue</h2>
+        <h2 className="mb-4 text-[18px] font-semibold text-foreground">Live Queue</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>

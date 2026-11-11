@@ -159,14 +159,14 @@ export const CostEstimator = () => {
   };
 
   return (
-    <div className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-6 shadow-xs space-y-5">
-      <div className="flex items-center gap-3 pb-3 border-b border-canvas-silk dark:border-slate-800">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5">
+      <div className="flex items-center gap-3 pb-3 border-b border-border">
         <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm">
           <Calculator className="h-5 w-5" />
         </div>
         <div>
           <h2 className="text-base font-semibold tracking-tight">Healthcare Out-of-Pocket Estimator</h2>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+          <p className="text-xs text-muted-foreground font-medium">
             Calculate accurate consultation and procedure copays based on active insurance policies
           </p>
         </div>
@@ -177,8 +177,8 @@ export const CostEstimator = () => {
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="h-5 w-5 text-primary-500" />
             <div>
-              <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">{insuranceInfo.provider_name}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400">Policy: {insuranceInfo.policy_number}</div>
+              <div className="text-xs font-semibold text-foreground">{insuranceInfo.provider_name}</div>
+              <div className="text-xs text-muted-foreground">Policy: {insuranceInfo.policy_number}</div>
             </div>
           </div>
           {verification && (verification.verification_status === 'verified' || verification.status === 'verified') ? (
@@ -192,10 +192,10 @@ export const CostEstimator = () => {
           )}
         </div>
       ) : (
-        <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
+        <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-border">
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-warning-500" />
-            <span className="text-xs text-graphite-500 dark:text-slate-400">No insurance linked. Displaying standard self-pay rates.</span>
+            <span className="text-xs text-muted-foreground">No insurance linked. Displaying standard self-pay rates.</span>
           </div>
           <button
             onClick={() => navigate("/insurance-cards")}
@@ -207,11 +207,11 @@ export const CostEstimator = () => {
       )}
 
       <div>
-        <label htmlFor="cost-estimator-service" className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 block mb-1">
+        <label htmlFor="cost-estimator-service" className="text-xs font-semibold uppercase text-muted-foreground block mb-1">
           Select Clinical Procedure or Consultation Type
         </label>
         <Select value={serviceType} onValueChange={setServiceType}>
-          <SelectTrigger id="cost-estimator-service" className="w-full text-xs font-medium border-graphite-300 dark:border-slate-700">
+          <SelectTrigger id="cost-estimator-service" className="w-full text-xs font-medium border-border">
             <SelectValue placeholder="Choose a medical procedure..." />
           </SelectTrigger>
           <SelectContent>
@@ -236,16 +236,16 @@ export const CostEstimator = () => {
       </button>
 
       {estimate && (
-        <div className="p-4 rounded-xl bg-canvas border border-canvas-silk space-y-3">
-          <div className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Financial Breakdown Summary</div>
+        <div className="p-4 rounded-xl bg-canvas border border-border space-y-3">
+          <div className="text-xs font-semibold uppercase text-muted-foreground">Financial Breakdown Summary</div>
           <div className="space-y-1.5 text-xs font-medium">
             <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>K{estimate.total.toFixed(2)}</span></div>
             <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-K{estimate.coverage.toFixed(2)}</span></div>
-            <div className="flex justify-between text-slate-900 dark:text-slate-100 font-bold border-t border-canvas-silk pt-2 text-sm">
+            <div className="flex justify-between text-foreground font-bold border-t border-border pt-2 text-sm">
               <span>Estimated Copay Due</span><span className="font-mono text-primary-500">K{estimate.outOfPocket.toFixed(2)}</span>
             </div>
           </div>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Estimate only — the actual amount can change depending on the provider&apos;s confirmed fee and your plan&apos;s final decision.
           </p>
         </div>

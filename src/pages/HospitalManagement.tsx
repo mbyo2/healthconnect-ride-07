@@ -281,7 +281,7 @@ export const HospitalManagement = () => {
         actions={
           <button
             onClick={refreshAll}
-            className="px-3 py-1.5 rounded-md bg-muted hover:bg-primary-50 dark:hover:bg-slate-800 text-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
+            className="px-3 py-1.5 rounded-md bg-muted hover:bg-muted text-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Sync Board Data</span>

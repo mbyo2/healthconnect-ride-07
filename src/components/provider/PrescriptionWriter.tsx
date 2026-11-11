@@ -220,10 +220,10 @@ export const PrescriptionWriter = () => {
   };
 
   return (
-    <Card className="p-6 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs font-sans">
-      <div className="flex items-center justify-between mb-6 pb-3 border-b border-canvas-silk dark:border-slate-800">
+    <Card className="p-6 rounded-2xl border border-border bg-card shadow-xs font-sans">
+      <div className="flex items-center justify-between mb-6 pb-3 border-b border-border">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
             <Pill className="h-5 w-5 text-primary-500" />
             Write E-Prescription (Multi-Medication)
           </h2>
@@ -234,7 +234,7 @@ export const PrescriptionWriter = () => {
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Patient Selection */}
         <div>
-          <Label className="font-bold text-slate-700 dark:text-slate-300">Select Patient *</Label>
+          <Label className="font-bold text-foreground">Select Patient *</Label>
           <Input
             value={patientSearch}
             onChange={(e) => setPatientSearch(e.target.value)}
@@ -242,12 +242,12 @@ export const PrescriptionWriter = () => {
             className="mt-1 rounded-xl"
           />
           {patientResults.length > 0 && !selectedPatient && (
-            <div className="mt-1 border rounded-xl max-h-36 overflow-y-auto bg-white dark:bg-slate-950 shadow-sm">
+            <div className="mt-1 border rounded-xl max-h-36 overflow-y-auto bg-card shadow-sm">
               {patientResults.map((p: any) => (
                 <button
                   key={p.id}
                   type="button"
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted flex items-center justify-between border-b last:border-b-0"
                   onClick={() => {
                     setSelectedPatient({ id: p.id, name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email, email: p.email });
                     setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email);
@@ -276,7 +276,7 @@ export const PrescriptionWriter = () => {
         {/* Medication Rows */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <Label className="font-bold text-slate-700 dark:text-slate-300 uppercase">
+            <Label className="font-bold text-foreground uppercase">
               Medications ({medications.length} item{medications.length > 1 ? 's' : ''})
             </Label>
             <Button
@@ -291,7 +291,7 @@ export const PrescriptionWriter = () => {
           </div>
 
           {medications.map((m, idx) => (
-            <div key={m.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 space-y-3 relative">
+            <div key={m.id} className="p-4 rounded-2xl border border-border bg-background space-y-3 relative">
               <div className="flex items-center justify-between">
                 <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                   Medication #{idx + 1}
@@ -313,7 +313,7 @@ export const PrescriptionWriter = () => {
                   value={m.medication_name}
                   onChange={(e) => handleUpdateMed(m.id, "medication_name", e.target.value)}
                   placeholder="e.g. Amoxicillin 500mg"
-                  className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                  className="mt-1 rounded-xl bg-card"
                 />
               </div>
 
@@ -324,7 +324,7 @@ export const PrescriptionWriter = () => {
                     value={m.dosage}
                     onChange={(e) => handleUpdateMed(m.id, "dosage", e.target.value)}
                     placeholder="e.g. 500mg / 1 tab"
-                    className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                    className="mt-1 rounded-xl bg-card"
                   />
                 </div>
                 <div>
@@ -333,7 +333,7 @@ export const PrescriptionWriter = () => {
                     value={m.frequency}
                     onChange={(e) => handleUpdateMed(m.id, "frequency", e.target.value)}
                     placeholder="e.g. Twice daily"
-                    className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                    className="mt-1 rounded-xl bg-card"
                   />
                 </div>
               </div>
@@ -363,7 +363,7 @@ export const PrescriptionWriter = () => {
                         Dose check: {check.message}
                       </p>
                       {check.range?.notes && (
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {check.range.notes}
                         </p>
                       )}
@@ -380,7 +380,7 @@ export const PrescriptionWriter = () => {
                     onChange={(e) => handleUpdateMed(m.id, "duration", e.target.value)}
                     placeholder="7"
                     type="number"
-                    className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                    className="mt-1 rounded-xl bg-card"
                   />
                 </div>
                 <div>
@@ -390,7 +390,7 @@ export const PrescriptionWriter = () => {
                     onChange={(e) => handleUpdateMed(m.id, "quantity", e.target.value)}
                     placeholder="14"
                     type="number"
-                    className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                    className="mt-1 rounded-xl bg-card"
                   />
                 </div>
               </div>
@@ -401,7 +401,7 @@ export const PrescriptionWriter = () => {
                   value={m.notes}
                   onChange={(e) => handleUpdateMed(m.id, "notes", e.target.value)}
                   placeholder="e.g. Take after meals with plenty of water"
-                  className="mt-1 rounded-xl bg-white dark:bg-slate-900"
+                  className="mt-1 rounded-xl bg-card"
                 />
               </div>
             </div>
@@ -410,7 +410,7 @@ export const PrescriptionWriter = () => {
 
         {/* General Notes */}
         <div>
-          <Label className="font-bold text-slate-700 dark:text-slate-300">Clinical Diagnosis &amp; General Remarks</Label>
+          <Label className="font-bold text-foreground">Clinical Diagnosis &amp; General Remarks</Label>
           <Textarea
             value={generalNotes}
             onChange={(e) => setGeneralNotes(e.target.value)}

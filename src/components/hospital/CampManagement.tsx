@@ -209,21 +209,21 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
   ];
 
   return (
-    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-4 font-sans text-foreground">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-border pb-3">
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <Tent className="h-5 w-5 text-primary-500" />
             Health Camp Outreach
           </h3>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Community camps: fast on-site registration, screening, referrals and follow-up</p>
+          <p className="text-xs text-muted-foreground font-medium">Community camps: fast on-site registration, screening, referrals and follow-up</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
+          <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-muted font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setShowRegister(true)} className="px-3 py-1.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => setShowRegister(true)} className="px-3 py-1.5 min-h-[44px] rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <UserPlus className="h-3.5 w-3.5" /> Quick Register
           </button>
           <button onClick={() => setShowNewCamp(true)} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
@@ -235,10 +235,10 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {/* Today at a glance */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {glance.map((g) => (
-          <div key={g.label} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div key={g.label} className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <g.icon className={`h-5 w-5 ${g.tone} mb-2`} />
             <p className="text-[28px] leading-8 font-semibold tabular-nums">{g.value}</p>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">{g.label}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-1">{g.label}</p>
           </div>
         ))}
       </div>
@@ -250,7 +250,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       )}
 
       {/* Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl overflow-x-auto">
         {([
           { key: "camps", label: `Camps (${camps.length})` },
           { key: "registrations", label: `Registrations (${myRegs.length})` },
@@ -260,7 +260,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 min-h-[44px] rounded-md text-xs font-semibold transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"}`}
           >
             {tab.label}
           </button>
@@ -276,18 +276,18 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             {camps.map((c) => {
               const regs = myRegs.filter((r) => r.camp_id === c.id);
               return (
-                <div key={c.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
+                <div key={c.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-[15px] font-semibold">{c.name}</p>
-                      <p className="text-xs text-graphite-500 dark:text-slate-400">{c.location} • {fmtDate(c.camp_date)} • {campTypeLabel(c.camp_type)}</p>
+                      <p className="text-xs text-muted-foreground">{c.location} • {fmtDate(c.camp_date)} • {campTypeLabel(c.camp_type)}</p>
                     </div>
                     {getStatusPill(c.status)}
                   </div>
-                  <div className="flex gap-4 text-xs text-graphite-500 dark:text-slate-400">
-                    <span><strong className="text-slate-900 dark:text-slate-100 tabular-nums">{regs.length}</strong> registered</span>
-                    {c.target_population ? <span>Target: <strong className="text-slate-900 dark:text-slate-100 tabular-nums">{c.target_population}</strong></span> : null}
-                    <span><strong className="text-slate-900 dark:text-slate-100 tabular-nums">{regs.filter((r) => r.referral_needed).length}</strong> referrals</span>
+                  <div className="flex gap-4 text-xs text-muted-foreground">
+                    <span><strong className="text-foreground tabular-nums">{regs.length}</strong> registered</span>
+                    {c.target_population ? <span>Target: <strong className="text-foreground tabular-nums">{c.target_population}</strong></span> : null}
+                    <span><strong className="text-foreground tabular-nums">{regs.filter((r) => r.referral_needed).length}</strong> referrals</span>
                   </div>
                   <div className="flex gap-2 flex-wrap pt-1">
                     {c.status === "planned" && (
@@ -296,7 +296,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                     {c.status === "active" && (
                       <>
                         <button onClick={() => { setRegForm((f) => ({ ...f, camp_id: c.id })); setShowRegister(true); }} className="px-3 py-1.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-bold">Register walk-in</button>
-                        <button onClick={() => updateCampStatus(c, "completed")} className="px-3 py-1.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Complete</button>
+                        <button onClick={() => updateCampStatus(c, "completed")} className="px-3 py-1.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Complete</button>
                       </>
                     )}
                     {(c.status === "planned" || c.status === "active") && (
@@ -314,18 +314,18 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {activeTab === "registrations" && (
         <div className="space-y-3">
           <div className="flex gap-2 items-center flex-wrap">
-            <label className="text-xs font-bold text-graphite-500 dark:text-slate-400">Camp:</label>
-            <select value={filterCampId} onChange={(e) => setFilterCampId(e.target.value)} className="px-3 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold">
+            <label className="text-xs font-bold text-muted-foreground">Camp:</label>
+            <select value={filterCampId} onChange={(e) => setFilterCampId(e.target.value)} className="px-3 py-2 min-h-[44px] rounded-md border border-border bg-card text-xs font-bold">
               <option value="all">All camps</option>
               {camps.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           {regLoading ? <ListSkeleton count={4} variant="row" /> :
           visibleRegs.length === 0 ? <EmptyState icon={Users} title="No registrations" description="Walk-in registrations from camps appear here." actionLabel="Quick register" onAction={() => setShowRegister(true)} /> : (
-            <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+            <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                  <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                     <th className="py-2.5 px-4">Name</th>
                     <th className="py-2.5 px-3">Phone</th>
                     <th className="py-2.5 px-3 text-center">Age</th>
@@ -335,22 +335,22 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                     <th className="py-2.5 px-3 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-canvas-silk">
+                <tbody className="divide-y divide-border">
                   {visibleRegs.map((r) => (
-                    <tr key={r.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                    <tr key={r.id} className="hover:bg-muted transition-colors">
                       <td className="py-3 px-4 font-bold">{r.full_name}</td>
                       <td className="py-3 px-3">{r.phone || "—"}</td>
                       <td className="py-3 px-3 text-center tabular-nums">{r.age ?? "—"}</td>
-                      <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{campById(r.camp_id)?.name || "—"}</td>
+                      <td className="py-3 px-3 text-muted-foreground">{campById(r.camp_id)?.name || "—"}</td>
                       <td className="py-3 px-3 text-center">
                         {r.referral_needed
                           ? <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Referred</span>
-                          : <span className="text-graphite-500 dark:text-slate-400">—</span>}
+                          : <span className="text-muted-foreground">—</span>}
                       </td>
                       <td className="py-3 px-3 text-center">
                         {r.synced_to_ehr
                           ? <span className="inline-flex items-center gap-1 text-success-500 font-bold"><CheckCircle2 className="h-3.5 w-3.5" /> Synced</span>
-                          : <span className="text-graphite-500 dark:text-slate-400">Pending</span>}
+                          : <span className="text-muted-foreground">Pending</span>}
                       </td>
                       <td className="py-3 px-3 text-center">
                         <div className="flex gap-1 justify-center flex-wrap">
@@ -375,10 +375,10 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
         followupsDue.length === 0 ? <EmptyState icon={CalendarClock} title="No follow-ups due" description="Patients flagged for follow-up with a due date appear here." /> : (
           <div className="space-y-2">
             {followupsDue.map((r) => (
-              <div key={r.id} className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs flex items-center justify-between gap-3 flex-wrap">
+              <div key={r.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <p className="text-[15px] font-semibold">{r.full_name}</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     {r.phone || "No phone"} • Due {fmtDate(r.follow_up_date)} • {campById(r.camp_id)?.name}
                     {r.referral_needed && r.referred_to ? ` • Referred to ${r.referred_to}` : ""}
                   </p>
@@ -393,10 +393,10 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       {/* REPORTS */}
       {activeTab === "reports" && (
         camps.length === 0 ? <EmptyState icon={BarChart3} title="No camp data" description="Reports appear once camps have registrations." /> : (
-          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk bg-canvas text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-canvas text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-2.5 px-4">Camp</th>
                   <th className="py-2.5 px-3">Date</th>
                   <th className="py-2.5 px-3 text-right">Registered</th>
@@ -405,12 +405,12 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                   <th className="py-2.5 px-3 text-right">Synced to EHR</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk">
+              <tbody className="divide-y divide-border">
                 {camps.map((c) => {
                   const regs = myRegs.filter((r) => r.camp_id === c.id);
                   const screened = regs.filter((r) => r.screening_results && Object.keys(r.screening_results).length > 0);
                   return (
-                    <tr key={c.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                    <tr key={c.id} className="hover:bg-muted transition-colors">
                       <td className="py-3 px-4 font-bold">{c.name}</td>
                       <td className="py-3 px-3">{fmtDate(c.camp_date)}</td>
                       <td className="py-3 px-3 text-right tabular-nums font-bold">{regs.length}</td>
@@ -433,34 +433,34 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <form onSubmit={handleCreateCamp} className="space-y-3">
             <div>
               <label className="text-xs font-bold">Camp name *</label>
-              <input value={campForm.name} onChange={(e) => setCampForm({ ...campForm, name: e.target.value })} placeholder="e.g. Matero Screening Camp" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <input value={campForm.name} onChange={(e) => setCampForm({ ...campForm, name: e.target.value })} placeholder="e.g. Matero Screening Camp" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
             </div>
             <div>
               <label className="text-xs font-bold">Location *</label>
-              <input value={campForm.location} onChange={(e) => setCampForm({ ...campForm, location: e.target.value })} placeholder="e.g. Matero Community Hall" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <input value={campForm.location} onChange={(e) => setCampForm({ ...campForm, location: e.target.value })} placeholder="e.g. Matero Community Hall" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-bold">Date *</label>
-                <input type="date" value={campForm.camp_date} onChange={(e) => setCampForm({ ...campForm, camp_date: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input type="date" value={campForm.camp_date} onChange={(e) => setCampForm({ ...campForm, camp_date: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
               <div>
                 <label className="text-xs font-bold">Type</label>
-                <select value={campForm.camp_type} onChange={(e) => setCampForm({ ...campForm, camp_type: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
+                <select value={campForm.camp_type} onChange={(e) => setCampForm({ ...campForm, camp_type: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm">
                   {CAMP_TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
                 </select>
               </div>
             </div>
             <div>
               <label className="text-xs font-bold">Target population (optional)</label>
-              <input type="number" min={1} value={campForm.target_population} onChange={(e) => setCampForm({ ...campForm, target_population: e.target.value })} placeholder="e.g. 200" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <input type="number" min={1} value={campForm.target_population} onChange={(e) => setCampForm({ ...campForm, target_population: e.target.value })} placeholder="e.g. 200" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
             </div>
             <div>
               <label className="text-xs font-bold">Notes (optional)</label>
-              <textarea value={campForm.notes} onChange={(e) => setCampForm({ ...campForm, notes: e.target.value })} rows={2} className="mt-1 w-full px-3 py-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <textarea value={campForm.notes} onChange={(e) => setCampForm({ ...campForm, notes: e.target.value })} rows={2} className="mt-1 w-full px-3 py-2.5 rounded-md border border-border bg-card text-sm" />
             </div>
             <DialogFooter>
-              <button type="button" onClick={() => setShowNewCamp(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowNewCamp(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Create camp
               </button>
@@ -476,28 +476,28 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <form onSubmit={handleRegister} className="space-y-3">
             <div>
               <label className="text-xs font-bold">Camp *</label>
-              <select value={regForm.camp_id} onChange={(e) => setRegForm({ ...regForm, camp_id: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
+              <select value={regForm.camp_id} onChange={(e) => setRegForm({ ...regForm, camp_id: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm">
                 <option value="">Select camp</option>
                 {camps.filter((c) => c.status === "active" || c.status === "planned").map((c) => <option key={c.id} value={c.id}>{c.name} — {fmtDate(c.camp_date)}</option>)}
               </select>
             </div>
             <div>
               <label className="text-xs font-bold">Full name *</label>
-              <input value={regForm.full_name} onChange={(e) => setRegForm({ ...regForm, full_name: e.target.value })} placeholder="Patient name" autoFocus className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <input value={regForm.full_name} onChange={(e) => setRegForm({ ...regForm, full_name: e.target.value })} placeholder="Patient name" autoFocus className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-bold">Phone</label>
-                <input value={regForm.phone} onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })} placeholder="097XXXXXXX" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input value={regForm.phone} onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })} placeholder="097XXXXXXX" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
               <div>
                 <label className="text-xs font-bold">Age</label>
-                <input type="number" min={0} max={130} value={regForm.age} onChange={(e) => setRegForm({ ...regForm, age: e.target.value })} placeholder="Years" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input type="number" min={0} max={130} value={regForm.age} onChange={(e) => setRegForm({ ...regForm, age: e.target.value })} placeholder="Years" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
             </div>
             <div>
               <label className="text-xs font-bold">Gender (optional)</label>
-              <select value={regForm.gender} onChange={(e) => setRegForm({ ...regForm, gender: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
+              <select value={regForm.gender} onChange={(e) => setRegForm({ ...regForm, gender: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm">
                 <option value="">Not specified</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -505,7 +505,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
               </select>
             </div>
             <DialogFooter>
-              <button type="button" onClick={() => setShowRegister(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowRegister(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Register
               </button>
@@ -522,24 +522,24 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-bold">Blood pressure</label>
-                <input value={screenForm.blood_pressure} onChange={(e) => setScreenForm({ ...screenForm, blood_pressure: e.target.value })} placeholder="120/80" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input value={screenForm.blood_pressure} onChange={(e) => setScreenForm({ ...screenForm, blood_pressure: e.target.value })} placeholder="120/80" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
               <div>
                 <label className="text-xs font-bold">Blood sugar (mmol/L)</label>
-                <input value={screenForm.blood_sugar} onChange={(e) => setScreenForm({ ...screenForm, blood_sugar: e.target.value })} placeholder="5.4" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input value={screenForm.blood_sugar} onChange={(e) => setScreenForm({ ...screenForm, blood_sugar: e.target.value })} placeholder="5.4" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
               <div>
                 <label className="text-xs font-bold">Weight (kg)</label>
-                <input value={screenForm.weight_kg} onChange={(e) => setScreenForm({ ...screenForm, weight_kg: e.target.value })} placeholder="68" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input value={screenForm.weight_kg} onChange={(e) => setScreenForm({ ...screenForm, weight_kg: e.target.value })} placeholder="68" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
               <div>
                 <label className="text-xs font-bold">Temperature (°C)</label>
-                <input value={screenForm.temperature_c} onChange={(e) => setScreenForm({ ...screenForm, temperature_c: e.target.value })} placeholder="36.6" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                <input value={screenForm.temperature_c} onChange={(e) => setScreenForm({ ...screenForm, temperature_c: e.target.value })} placeholder="36.6" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
               </div>
             </div>
             <div>
               <label className="text-xs font-bold">HIV test result</label>
-              <select value={screenForm.hiv_result} onChange={(e) => setScreenForm({ ...screenForm, hiv_result: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm">
+              <select value={screenForm.hiv_result} onChange={(e) => setScreenForm({ ...screenForm, hiv_result: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm">
                 <option value="">Not tested</option>
                 <option value="negative">Negative</option>
                 <option value="positive">Positive</option>
@@ -548,7 +548,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
             </div>
             <div>
               <label className="text-xs font-bold">Clinical notes</label>
-              <textarea value={screenForm.notes} onChange={(e) => setScreenForm({ ...screenForm, notes: e.target.value })} rows={2} className="mt-1 w-full px-3 py-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+              <textarea value={screenForm.notes} onChange={(e) => setScreenForm({ ...screenForm, notes: e.target.value })} rows={2} className="mt-1 w-full px-3 py-2.5 rounded-md border border-border bg-card text-sm" />
             </div>
             <label className="flex items-center gap-2 text-sm font-bold min-h-[44px] cursor-pointer">
               <input type="checkbox" checked={screenForm.referral_needed} onChange={(e) => setScreenForm({ ...screenForm, referral_needed: e.target.checked })} className="h-5 w-5 accent-primary-500" />
@@ -558,16 +558,16 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold">Referred to</label>
-                  <input value={screenForm.referred_to} onChange={(e) => setScreenForm({ ...screenForm, referred_to: e.target.value })} placeholder="e.g. UTH Cardiology" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                  <input value={screenForm.referred_to} onChange={(e) => setScreenForm({ ...screenForm, referred_to: e.target.value })} placeholder="e.g. UTH Cardiology" className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
                 </div>
                 <div>
                   <label className="text-xs font-bold">Follow-up date</label>
-                  <input type="date" value={screenForm.follow_up_date} onChange={(e) => setScreenForm({ ...screenForm, follow_up_date: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm" />
+                  <input type="date" value={screenForm.follow_up_date} onChange={(e) => setScreenForm({ ...screenForm, follow_up_date: e.target.value })} className="mt-1 w-full px-3 py-2.5 min-h-[44px] rounded-md border border-border bg-card text-sm" />
                 </div>
               </div>
             )}
             <DialogFooter>
-              <button type="button" onClick={() => setShowScreening(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowScreening(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
                 {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Save screening
               </button>
@@ -580,11 +580,11 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
       <Dialog open={!!cancelTarget} onOpenChange={(o) => !o && setCancelTarget(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Cancel this camp?</DialogTitle></DialogHeader>
-          <p className="text-sm text-graphite-500 dark:text-slate-400">
-            <strong className="text-slate-900 dark:text-slate-100">{cancelTarget?.name}</strong> will be marked cancelled. Registrations already captured are kept.
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">{cancelTarget?.name}</strong> will be marked cancelled. Registrations already captured are kept.
           </p>
           <DialogFooter>
-            <button onClick={() => setCancelTarget(null)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">Keep camp</button>
+            <button onClick={() => setCancelTarget(null)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep camp</button>
             <button onClick={() => updateCampStatus(cancelTarget, "cancelled")} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>

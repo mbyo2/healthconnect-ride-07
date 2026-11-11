@@ -356,7 +356,7 @@ export function DesktopNav() {
   }, [mainNavItems, availableRoles, isAuthenticated]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800" role="banner">
+    <header className="sticky top-0 z-50 bg-card/90 backdrop-blur-xl border-b border-border" role="banner">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
@@ -367,7 +367,7 @@ export function DesktopNav() {
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
           <AppLogo size="sm" className="shrink-0" />
 
-          <nav className="relative hidden md:flex items-stretch min-w-0 max-w-full rounded-nav border border-canvas-silk dark:border-slate-700 bg-canvas-mist/60 dark:bg-slate-800/50 p-1" role="navigation" aria-label="Main navigation">
+          <nav className="relative hidden md:flex items-stretch min-w-0 max-w-full rounded-nav border border-border bg-muted/60 p-1" role="navigation" aria-label="Main navigation">
             <div
               ref={navScrollRef}
               className="flex items-center gap-0.5 min-w-0 max-w-full overflow-x-auto scrollbar-hide scroll-smooth"
@@ -380,7 +380,7 @@ export function DesktopNav() {
                   className={`flex items-center gap-2 shrink-0 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm font-medium tracking-wide transition-all duration-200 whitespace-nowrap ${
                     item.active
                       ? "bg-primary-500 text-white shadow-button"
-                      : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
+                      : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-white "
                   }`}
                 >
                   {item.icon}
@@ -411,7 +411,7 @@ export function DesktopNav() {
                   type="search"
                   autoFocus
                   placeholder={isHealthPersonnel ? "Search patients, records..." : "Search doctors, specialties..."}
-                  className="w-44 lg:w-56 xl:w-64 pl-9 h-10 rounded-pill bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all duration-200 text-sm font-medium placeholder:text-graphite-400"
+                  className="w-44 lg:w-56 xl:w-64 pl-9 h-10 rounded-pill bg-muted/60 border border-border focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all duration-200 text-sm font-medium placeholder:text-graphite-400"
                   value={searchTerm}
                   onChange={handleSearchChange}
                   onBlur={() => { if (!searchTerm) setSearchFocused(false); }}

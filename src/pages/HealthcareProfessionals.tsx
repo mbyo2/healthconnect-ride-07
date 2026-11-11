@@ -197,7 +197,7 @@ const HealthcareProfessionals = () => {
       <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
 
       {/* Filters */}
-      <Card className="border-canvas-silk bg-white dark:bg-slate-900 shadow-card">
+      <Card className="border-border bg-card shadow-card">
         <CardContent className="pt-6 space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
             <div className="relative">
@@ -206,7 +206,7 @@ const HealthcareProfessionals = () => {
                 placeholder="Search name, specialty, medical school..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-canvas-silk bg-white dark:bg-slate-900 text-midnight focus-visible:ring-primary-500/30"
+                className="pl-10 border-border bg-card text-midnight focus-visible:ring-primary-500/30"
               />
             </div>
 
@@ -242,7 +242,7 @@ const HealthcareProfessionals = () => {
         {loading ? (
           <>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 p-5 space-y-3">
+              <div key={i} className="rounded-2xl border border-border bg-card p-5 space-y-3">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-12 w-12 rounded-2xl" />
                   <div className="flex-1 space-y-2">
@@ -257,7 +257,7 @@ const HealthcareProfessionals = () => {
             ))}
           </>
         ) : filteredProfessionals.length === 0 ? (
-          <Card className="col-span-full border-canvas-silk bg-white dark:bg-slate-900">
+          <Card className="col-span-full border-border bg-card">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <User className="h-16 w-16 text-graphite-400 mb-4" />
               <p className="text-graphite-500">No professionals found</p>
@@ -273,7 +273,7 @@ const HealthcareProfessionals = () => {
           </Card>
         ) : (
           filteredProfessionals.map((prof) => (
-            <Card key={prof.id} className="border-canvas-silk bg-white dark:bg-slate-900 hover:shadow-card-hover transition-shadow">
+            <Card key={prof.id} className="border-border bg-card hover:shadow-card-hover transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
@@ -339,7 +339,7 @@ const HealthcareProfessionals = () => {
                 {/* Subspecialties + capability badges */}
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
                   {(prof.subspecialties || []).slice(0, 2).map((sub, i) => (
-                    <Badge key={i} variant="outline" className="text-xs border-canvas-silk text-graphite-600">{sub}</Badge>
+                    <Badge key={i} variant="outline" className="text-xs border-border text-graphite-600">{sub}</Badge>
                   ))}
                   {prof.telemedicine_available && (
                     <Badge variant="secondary" className="text-xs gap-1 bg-primary-50 text-primary-600 border border-primary-100 hover:bg-primary-50">

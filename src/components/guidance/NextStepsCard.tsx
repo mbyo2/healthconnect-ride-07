@@ -54,7 +54,7 @@ export const NextStepsCard = ({
             className={`w-full flex items-start gap-3 p-3 rounded-lg border transition-all ${
               step.completed
                 ? 'border-success-200 bg-success-50 cursor-default'
-                : 'border-canvas-silk hover:border-primary-200 hover:bg-primary-50 cursor-pointer'
+                : 'border-border hover:border-primary-200 hover:bg-primary-50 cursor-pointer'
             }`}
           >
             <div className="flex-shrink-0 mt-0.5">

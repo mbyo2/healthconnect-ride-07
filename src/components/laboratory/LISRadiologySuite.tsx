@@ -179,7 +179,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
   const criticalCount = samples.filter((s) => s.isUrgent && s.status !== "completed").length;
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -207,7 +207,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto" role="tablist" aria-label="Laboratory views">
+      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Laboratory views">
         {[
           { id: "lis", label: "LIS Specimen Accessioning & Validation", icon: TestTube2 },
           { id: "ris", label: "RIS Radiology Orders & Worklist", icon: Scan },
@@ -223,7 +223,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -238,17 +238,17 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Laboratory Specimens &amp; Pathologist Worklist</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">
+              <h3 className="font-semibold text-sm text-foreground">Laboratory Specimens &amp; Pathologist Worklist</h3>
+              <p className="text-xs text-muted-foreground">
                 {samples.length} order{samples.length === 1 ? "" : "s"} on record
               </p>
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Sample Barcode</th>
                   <th className="py-3 px-3">Patient Name</th>
                   <th className="py-3 px-3">Test Panel &amp; Specimen</th>
@@ -257,7 +257,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={6} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading specimens">Loading specimens…</td></tr>
                 ) : samples.length === 0 ? (
@@ -267,15 +267,15 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                   </td></tr>
                 ) : (
                   samples.map((s) => (
-                    <tr key={s.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                    <tr key={s.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4 font-mono font-bold text-primary-500">{s.barcode}</td>
-                      <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{s.patientName}</td>
+                      <td className="py-3 px-3 font-bold text-foreground">{s.patientName}</td>
                       <td className="py-3 px-3">
                         <div className="font-semibold">{s.testName}</div>
                         <div className="text-xs text-slate-400">{s.specimenType} • Coll: {s.collectionTime}</div>
                       </td>
                       <td className="py-3 px-3 font-bold">
-                        <span className={s.isUrgent ? "text-rose-600 font-bold" : "text-slate-900 dark:text-slate-100"}>
+                        <span className={s.isUrgent ? "text-rose-600 font-bold" : "text-foreground"}>
                           {s.analyzerResult}
                         </span>
                       </td>
@@ -318,8 +318,8 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       {activeTab === "ris" && (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Radiology Information System (RIS) Worklist</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">
+            <h3 className="font-semibold text-sm text-foreground">Radiology Information System (RIS) Worklist</h3>
+            <p className="text-xs text-muted-foreground">
               {studies.length} imaging order{studies.length === 1 ? "" : "s"} on record
             </p>
           </div>
@@ -340,7 +340,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               {studies.map((st) => (
                 <div
                   key={st.id}
-                  className="p-5 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4"
+                  className="p-5 rounded-2xl border border-border bg-card shadow-xs flex flex-col justify-between space-y-4"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -350,16 +350,16 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                       <span className="text-xs font-bold text-slate-400">{st.studyDate}</span>
                     </div>
 
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{st.bodyPart}</h4>
+                    <h4 className="font-bold text-sm text-foreground">{st.bodyPart}</h4>
                     <p className="text-xs text-primary-500 font-bold mt-0.5">{st.patientName}</p>
 
-                    <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk text-xs text-slate-600 dark:text-slate-300">
-                      <span className="font-bold text-slate-900 dark:text-slate-100 block mb-1">Radiology Findings:</span>
+                    <div className="mt-3 p-2.5 rounded-xl bg-muted/50/60 border border-border text-xs text-muted-foreground">
+                      <span className="font-bold text-foreground block mb-1">Radiology Findings:</span>
                       {st.radiologistReport}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
                     <span className="text-xs font-bold text-slate-400 capitalize">{st.status}</span>
                     <button
                       onClick={() => {
@@ -390,10 +390,10 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
             <>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+                  <h3 className="font-semibold text-sm text-foreground">
                     Study Viewer • {selectedStudy.modality}: {selectedStudy.bodyPart}
                   </h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     Patient: <span className="font-bold text-primary-500">{selectedStudy.patientName}</span> • Acc: {selectedStudy.accessionNumber}
                   </p>
                 </div>
@@ -402,14 +402,14 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                   <button
                     onClick={() => setZoomLevel((z) => Math.max(50, z - 25))}
                     aria-label="Zoom out"
-                    className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+                    className="p-2 rounded-xl bg-card border border-border text-xs font-bold hover:bg-muted"
                   >
                     <ZoomOut className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setZoomLevel((z) => Math.min(250, z + 25))}
                     aria-label="Zoom in"
-                    className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+                    className="p-2 rounded-xl bg-card border border-border text-xs font-bold hover:bg-muted"
                   >
                     <ZoomIn className="h-4 w-4" />
                   </button>
@@ -417,7 +417,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                     onClick={() => setInverted((inv) => !inv)}
                     aria-pressed={inverted}
                     className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 ${
-                      inverted ? "bg-primary-500 text-white" : "bg-white dark:bg-slate-900"
+                      inverted ? "bg-primary-500 text-white" : "bg-card"
                     }`}
                   >
                     Invert
@@ -426,7 +426,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                     value={preset}
                     aria-label="Image display preset"
                     onChange={(e) => setPreset(e.target.value as any)}
-                    className="px-3 py-1.5 rounded-xl border text-xs font-bold bg-white dark:bg-slate-900"
+                    className="px-3 py-1.5 rounded-xl border text-xs font-bold bg-card"
                   >
                     <option value="soft">Window: Soft Tissue</option>
                     <option value="bone">Window: Bone High-Contrast</option>

@@ -171,7 +171,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
                   </div>
                 </div>
 
-                <div className="w-full bg-slate-200 dark:bg-slate-800/80 h-9 rounded-xl overflow-hidden p-1 flex items-center">
+                <div className="w-full bg-muted/80 h-9 rounded-xl overflow-hidden p-1 flex items-center">
                   <div
                     className={`h-full rounded-lg bg-gradient-to-r ${stage.color} flex items-center justify-end px-3 text-white text-xs font-bold transition-all duration-700 shadow-sm`}
                     style={{ width: `${Math.max(8, stage.percent)}%` }}

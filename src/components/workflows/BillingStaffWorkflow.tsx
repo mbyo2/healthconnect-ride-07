@@ -31,12 +31,12 @@ import {
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; pillColor: string }> = {
-  draft: { label: "Draft", pillColor: "bg-graphite-500 dark:bg-slate-600 text-white" },
+  draft: { label: "Draft", pillColor: "bg-muted-foreground text-white" },
   sent: { label: "Sent", pillColor: "bg-primary-400 text-white" },
   paid: { label: "Paid", pillColor: "bg-success-500 text-white" },
   partial: { label: "Partial", pillColor: "bg-warning-500 text-white" },
   overdue: { label: "Overdue", pillColor: "bg-error-500 text-white" },
-  cancelled: { label: "Cancelled", pillColor: "bg-graphite-500 dark:bg-slate-600 text-white" },
+  cancelled: { label: "Cancelled", pillColor: "bg-muted-foreground text-white" },
   refunded: { label: "Refunded", pillColor: "bg-purple-500 text-white" },
 };
 
@@ -269,10 +269,10 @@ export const BillingStaffWorkflow = () => {
   const InvoiceCard = ({ invoice }: { invoice: BillingInvoice }) => {
     const status = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
     return (
-      <div className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 font-sans space-y-2">
+      <div className="p-4 rounded-xl border border-border bg-card font-sans space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">{invoice.invoice_number}</span>
+            <span className="font-mono font-bold text-foreground text-xs">{invoice.invoice_number}</span>
             <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${status.pillColor}`}>
               {status.label}
             </span>
@@ -308,7 +308,7 @@ export const BillingStaffWorkflow = () => {
                   }
                 )
               }
-              className="px-2.5 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800"
+              className="px-2.5 py-1 rounded-md border border-border text-xs font-bold flex items-center gap-1 hover:bg-muted"
             >
               <Printer className="h-3 w-3" /> PDF
             </button>
@@ -319,8 +319,8 @@ export const BillingStaffWorkflow = () => {
             )}
           </div>
         </div>
-        <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{invoice.patient_name}</p>
-        <div className="flex items-center gap-4 text-xs font-bold text-graphite-500 dark:text-slate-400">
+        <p className="font-semibold text-xs text-foreground">{invoice.patient_name}</p>
+        <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground">
           <span>Total: K{invoice.total_amount?.toLocaleString()}</span>
           <span>Paid: K{invoice.paid_amount?.toLocaleString()}</span>
           {invoice.balance > 0 && <span className="text-error-500">Balance: K{invoice.balance?.toLocaleString()}</span>}
@@ -339,7 +339,7 @@ export const BillingStaffWorkflow = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Billing & Accounts Dashboard</h1>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Invoicing, payments, insurance claims & financial reconciliation</p>
+          <p className="text-xs text-muted-foreground font-medium">Invoicing, payments, insurance claims & financial reconciliation</p>
         </div>
         <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
           <DialogTrigger asChild>
@@ -347,13 +347,13 @@ export const BillingStaffWorkflow = () => {
               <Plus className="h-4 w-4" /> New Invoice
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border">
             <DialogHeader><DialogTitle className="font-semibold text-base">Create Hospital Invoice</DialogTitle></DialogHeader>
             <div className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Patient Name *</label>
+                    <label className="font-semibold text-muted-foreground uppercase">Patient Name *</label>
                     {invoiceForm.patient_name.trim().length >= 2 && (
                       <button
                         type="button"
@@ -370,23 +370,23 @@ export const BillingStaffWorkflow = () => {
                     value={invoiceForm.patient_name}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, patient_name: e.target.value }))}
                     placeholder="Enter or search patient name..."
-                    className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                    className="w-full p-2 rounded-md border border-border font-bold"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Insurance Provider</label>
+                  <label className="font-semibold text-muted-foreground uppercase">Insurance Provider</label>
                   <input
                     value={invoiceForm.insurance_provider}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, insurance_provider: e.target.value }))}
                     placeholder="Optional insurance scheme"
-                    className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                    className="w-full p-2 rounded-md border border-border font-bold"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Invoice Line Items (priced services)</label>
+                  <label className="font-semibold text-muted-foreground uppercase">Invoice Line Items (priced services)</label>
                 </div>
                 <ServiceLineEditor
                   lines={invoiceForm.items}
@@ -401,39 +401,39 @@ export const BillingStaffWorkflow = () => {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Tax Amount</label>
+                  <label className="font-semibold text-muted-foreground uppercase">Tax Amount</label>
                   <input
                     type="number"
                     value={invoiceForm.tax}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, tax: parseFloat(e.target.value) || 0 }))}
-                    className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                    className="w-full p-2 rounded-md border border-border font-bold"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Discount</label>
+                  <label className="font-semibold text-muted-foreground uppercase">Discount</label>
                   <input
                     type="number"
                     value={invoiceForm.discount}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, discount: parseFloat(e.target.value) || 0 }))}
-                    className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                    className="w-full p-2 rounded-md border border-border font-bold"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Due Date</label>
+                  <label className="font-semibold text-muted-foreground uppercase">Due Date</label>
                   <input
                     type="date"
                     value={invoiceForm.due_date}
                     onChange={(e) => setInvoiceForm((prev) => ({ ...prev, due_date: e.target.value }))}
-                    className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                    className="w-full p-2 rounded-md border border-border font-bold"
                   />
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-canvas dark:bg-slate-950 border border-canvas-silk dark:border-slate-800 space-y-1">
-                <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>K{subtotal.toLocaleString()}</span></div>
-                {invoiceForm.tax > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Tax</span><span>K{invoiceForm.tax.toLocaleString()}</span></div>}
-                {invoiceForm.discount > 0 && <div className="flex justify-between font-bold text-graphite-500 dark:text-slate-400"><span>Discount</span><span>-K{invoiceForm.discount.toLocaleString()}</span></div>}
-                <div className="flex justify-between font-bold text-sm text-primary-500 pt-1 border-t border-canvas-silk dark:border-slate-800"><span>Grand Total</span><span>K{totalAmount.toLocaleString()}</span></div>
+              <div className="p-3 rounded-xl bg-background border border-border space-y-1">
+                <div className="flex justify-between font-bold text-muted-foreground"><span>Subtotal</span><span>K{subtotal.toLocaleString()}</span></div>
+                {invoiceForm.tax > 0 && <div className="flex justify-between font-bold text-muted-foreground"><span>Tax</span><span>K{invoiceForm.tax.toLocaleString()}</span></div>}
+                {invoiceForm.discount > 0 && <div className="flex justify-between font-bold text-muted-foreground"><span>Discount</span><span>-K{invoiceForm.discount.toLocaleString()}</span></div>}
+                <div className="flex justify-between font-bold text-sm text-primary-500 pt-1 border-t border-border"><span>Grand Total</span><span>K{totalAmount.toLocaleString()}</span></div>
               </div>
 
               <button
@@ -450,22 +450,22 @@ export const BillingStaffWorkflow = () => {
 
       {/* Payment Dialog */}
       <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">Record Payment — {selectedInvoice?.invoice_number}</DialogTitle></DialogHeader>
           <div className="space-y-4 text-xs">
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Payment Amount (Balance: K{selectedInvoice?.balance?.toLocaleString()})</label>
+              <label className="font-semibold text-muted-foreground uppercase">Payment Amount (Balance: K{selectedInvoice?.balance?.toLocaleString()})</label>
               <input
                 type="number"
                 value={paymentForm.amount}
                 onChange={(e) => setPaymentForm((prev) => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-border font-bold"
               />
             </div>
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Payment Mode</label>
+              <label className="font-semibold text-muted-foreground uppercase">Payment Mode</label>
               <Select value={paymentForm.payment_mode} onValueChange={(v) => setPaymentForm((prev) => ({ ...prev, payment_mode: v as any }))}>
-                <SelectTrigger className="mt-1 border-graphite-300 dark:border-slate-700 font-bold text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1 border-border font-bold text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cash">Cash</SelectItem>
                   <SelectItem value="card">Credit / Debit Card</SelectItem>
@@ -477,12 +477,12 @@ export const BillingStaffWorkflow = () => {
               </Select>
             </div>
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Reference Number</label>
+              <label className="font-semibold text-muted-foreground uppercase">Reference Number</label>
               <input
                 value={paymentForm.reference_number}
                 onChange={(e) => setPaymentForm((prev) => ({ ...prev, reference_number: e.target.value }))}
                 placeholder="Transaction or receipt reference"
-                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-border font-bold"
               />
             </div>
             <button
@@ -498,28 +498,28 @@ export const BillingStaffWorkflow = () => {
 
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <DollarSign className="h-5 w-5 text-success-500 mx-auto mb-1" />
           <p className="text-2xl font-bold font-mono text-success-500">K{todayCollections.toLocaleString()}</p>
-          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Today's Total Collections</p>
+          <p className="text-xs font-bold text-muted-foreground">Today's Total Collections</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <CreditCard className="h-5 w-5 text-primary-500 mx-auto mb-1" />
           <p className="text-2xl font-bold font-mono text-primary-500">{pendingInvoices.length}</p>
-          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Invoices</p>
+          <p className="text-xs font-bold text-muted-foreground">Pending Invoices</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs text-center">
+        <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-center">
           <Shield className="h-5 w-5 text-error-500 mx-auto mb-1" />
           <p className="text-2xl font-bold font-mono text-error-500">{pendingClaims.length}</p>
-          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">Pending Insurance Claims</p>
+          <p className="text-xs font-bold text-muted-foreground">Pending Insurance Claims</p>
         </div>
       </div>
 
       {/* Module Tabs */}
       <Tabs defaultValue="invoices">
-        <TabsList className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl">
+        <TabsList className="flex items-center gap-1 p-1 bg-card border border-border rounded-xl">
           <TabsTrigger value="invoices" className="text-xs font-semibold px-4 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Invoices ({invoices.length})
           </TabsTrigger>
@@ -539,9 +539,9 @@ export const BillingStaffWorkflow = () => {
 
         <TabsContent value="invoices" className="space-y-3 mt-4">
           {loading ? (
-            <div className="p-8 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">Loading invoices...</div>
+            <div className="p-8 text-center text-xs font-bold text-muted-foreground">Loading invoices...</div>
           ) : invoices.length === 0 ? (
-            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800">
+            <div className="p-8 text-center text-xs text-muted-foreground bg-card rounded-2xl border border-border">
               No invoices yet. Click "New Invoice" to create one.
             </div>
           ) : (
@@ -555,23 +555,23 @@ export const BillingStaffWorkflow = () => {
 
         <TabsContent value="claims" className="space-y-3 mt-4">
           {loading ? (
-            <div className="p-8 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">Loading claims...</div>
+            <div className="p-8 text-center text-xs font-bold text-muted-foreground">Loading claims...</div>
           ) : claims.length === 0 ? (
-            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800">
+            <div className="p-8 text-center text-xs text-muted-foreground bg-card rounded-2xl border border-border">
               No insurance claims submitted yet.
             </div>
           ) : (
             claims.map((claim) => (
-              <div key={claim.id} className="p-4 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1 text-xs">
+              <div key={claim.id} className="p-4 rounded-xl border border-border bg-card space-y-1 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100">{claim.patient_name}</span>
+                  <span className="font-semibold text-foreground">{claim.patient_name}</span>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
                     claim.status === "approved" ? "bg-success-500" : claim.status === "rejected" ? "bg-error-500" : "bg-warning-500"
                   }`}>
                     {claim.status}
                   </span>
                 </div>
-                <p className="text-graphite-500 dark:text-slate-400">
+                <p className="text-muted-foreground">
                   {claim.insurance_provider} • Policy: {claim.policy_number} • K{claim.claim_amount.toLocaleString()}
                 </p>
               </div>

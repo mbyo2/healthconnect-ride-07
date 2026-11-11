@@ -307,14 +307,14 @@ export const NurseWorkflow = () => {
           <Heart className="h-7 w-7" />
         </div>
         <div>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Nurse Clinical Workspace</p>
-          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Nurse Dashboard</h1>
+          <p className="text-[13px] font-medium text-muted-foreground">Nurse Clinical Workspace</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-foreground">Nurse Dashboard</h1>
         </div>
       </div>
 
       {/* Today at a Glance */}
       <section>
-        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <h2 className="mb-4 text-[18px] font-semibold text-foreground">Today at a glance</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <button
             onClick={() => handleItemClick({ title: 'Patient Appointments', route: '/appointments' })}
@@ -331,28 +331,28 @@ export const NurseWorkflow = () => {
 
           <button
             onClick={() => { setShowVitals(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:bg-slate-900"
           >
             <div className="flex items-center justify-between">
               <Thermometer className="h-5 w-5 text-emerald-500" />
               <ChevronRight className="h-4 w-4 text-slate-400" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{vitalsToday ?? '–'}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Vitals recorded today</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">Tap to record new vitals</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{vitalsToday ?? '–'}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Vitals recorded today</p>
+            <p className="text-[13px] text-muted-foreground">Tap to record new vitals</p>
           </button>
 
           <button
             onClick={() => handleItemClick({ title: 'Pending Actions', route: '/appointments' })}
-            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:bg-slate-900"
           >
             <div className="flex items-center justify-between">
               <Bell className="h-5 w-5 text-amber-500" />
               <ChevronRight className="h-4 w-4 text-slate-400" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{pendingActions ?? '–'}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Pending actions</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">Bookings awaiting confirmation</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{pendingActions ?? '–'}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Pending actions</p>
+            <p className="text-[13px] text-muted-foreground">Bookings awaiting confirmation</p>
           </button>
         </div>
       </section>
@@ -380,49 +380,49 @@ export const NurseWorkflow = () => {
                 <Label className="text-[13px] font-medium">BP Systolic (mmHg)</Label>
                 <input type="number" min={50} max={300} value={vitals.sys}
                   onChange={e => setVitals({ ...vitals, sys: e.target.value })}
-                  placeholder="120" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="120" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">BP Diastolic (mmHg)</Label>
                 <input type="number" min={30} max={200} value={vitals.dia}
                   onChange={e => setVitals({ ...vitals, dia: e.target.value })}
-                  placeholder="80" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="80" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">Heart Rate (bpm)</Label>
                 <input type="number" min={20} max={250} value={vitals.hr}
                   onChange={e => setVitals({ ...vitals, hr: e.target.value })}
-                  placeholder="72" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="72" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">Temperature (°C)</Label>
                 <input type="number" step="0.1" min={30} max={45} value={vitals.temp}
                   onChange={e => setVitals({ ...vitals, temp: e.target.value })}
-                  placeholder="36.6" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="36.6" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">SpO₂ (%)</Label>
                 <input type="number" min={50} max={100} value={vitals.spo2}
                   onChange={e => setVitals({ ...vitals, spo2: e.target.value })}
-                  placeholder="98" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="98" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">Resp. Rate (/min)</Label>
                 <input type="number" min={5} max={60} value={vitals.rr}
                   onChange={e => setVitals({ ...vitals, rr: e.target.value })}
-                  placeholder="16" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="16" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">Glucose (mmol/L)</Label>
                 <input type="number" step="0.1" min={1} max={40} value={vitals.glucose}
                   onChange={e => setVitals({ ...vitals, glucose: e.target.value })}
-                  placeholder="5.5" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="5.5" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
               <div>
                 <Label className="text-[13px] font-medium">Weight (kg)</Label>
                 <input type="number" step="0.1" min={1} max={400} value={vitals.weight}
                   onChange={e => setVitals({ ...vitals, weight: e.target.value })}
-                  placeholder="70" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:border-slate-700 dark:bg-slate-900" />
+                  placeholder="70" className="mt-1 w-full min-h-[44px] rounded-xl border border-slate-300 p-3 text-[16px] dark:bg-slate-900" />
               </div>
             </div>
             <div>
@@ -470,38 +470,38 @@ export const NurseWorkflow = () => {
       {/* Grouped Actions */}
       {groups.map((group) => (
         <section key={group.title}>
-          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
-          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-4 text-[18px] font-semibold text-foreground">{group.title}</h2>
+          <div className="rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900">
             {/* Primary action */}
             <button
               onClick={() => handleItemClick(group.primary)}
-              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+              className="flex w-full items-center gap-4 border-b border-border p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted "
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
                 {group.primary.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
-                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+                <p className="text-[15px] font-medium text-foreground">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-muted-foreground">{group.primary.description}</p>
               </div>
               <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
             </button>
             {/* Secondary actions */}
-            <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+            <div className="divide-y divide-border">
               {group.secondary.map((item) => (
                 <button
                   key={item.title}
                   onClick={() => handleItemClick(item)}
-                  className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                  className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted/50"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     {item.icon}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
-                    <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                    <p className="text-[15px] font-medium text-foreground">{item.title}</p>
+                    <p className="truncate text-[13px] text-muted-foreground">{item.description}</p>
                   </div>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                  <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                 </button>
               ))}
             </div>

@@ -353,7 +353,7 @@ const Settings = () => {
               Settings
               <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>
-            <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium tracking-wide">
+            <p className="text-sm text-foreground font-medium tracking-wide">
               Your account, security, notifications, and region
             </p>
           </div>
@@ -366,7 +366,7 @@ const Settings = () => {
           <div className="space-y-6">
             {/* Account Settings */}
             <div className="vf-card space-y-4">
-              <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <h2 className="font-medium text-base flex items-center gap-2 border-b border-border pb-3">
                 <User className="h-4 w-4 text-primary-500" /> Account Preferences
               </h2>
               <div className="flex items-center justify-between gap-3">
@@ -376,7 +376,7 @@ const Settings = () => {
                 </div>
                 <button
                   onClick={handleTwoFactorToggle}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border text-xs font-semibold hover:bg-canvas transition-colors flex-shrink-0"
                 >
                   Manage · {twoFactor ? 'On' : 'Off'}
                 </button>
@@ -385,34 +385,34 @@ const Settings = () => {
 
             {/* Appearance Settings */}
             <div className="vf-card space-y-4">
-              <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <h2 className="font-medium text-base flex items-center gap-2 border-b border-border pb-3">
                 <Palette className="h-4 w-4 text-graphite-500" /> Theme & Accessibility
               </h2>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm text-midnight">Dark / Light Interface Theme</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Toggle dark mode styling</p>
+                  <p className="text-xs text-foreground">Toggle dark mode styling</p>
                 </div>
                 <ThemeToggle />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div>
                   <p className="font-bold text-xs">Accessibility Easy Reading</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Wider spacing and enlarged touch targets, saved to your account</p>
+                  <p className="text-xs text-foreground">Wider spacing and enlarged touch targets, saved to your account</p>
                 </div>
                 <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} aria-label="Accessibility easy reading"  className="scale-125" />
               </div>
             </div>
 
             {/* Privacy & Data */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3">
-              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-3">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Shield className="h-4 w-4 text-success-500" /> Privacy & Data Rights
               </h2>
               <button
                 onClick={handleExportRequest}
                 disabled={exporting}
-                className="w-full py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
+                className="w-full py-2.5 min-h-[44px] rounded-xl border border-border bg-card font-bold text-xs text-foreground hover:bg-canvas-mist dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
               >
                 {exporting ? 'Submitting request…' : 'Request Export of All Personal Data'}
               </button>
@@ -428,20 +428,20 @@ const Settings = () => {
           {/* Column 2 */}
           <div className="space-y-6">
             {/* Notification Controls */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Bell className="h-4 w-4 text-warning-500" /> Notifications
               </h2>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bold text-xs">Browser Push Notifications</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Instant alerts for messages, calls & lab updates</p>
+                  <p className="text-xs text-foreground">Instant alerts for messages, calls & lab updates</p>
                   <p className="text-xs mt-1 font-semibold" role="status">
-                    {pushState === "checking" && <span className="text-graphite-500 dark:text-slate-400">Checking this device…</span>}
+                    {pushState === "checking" && <span className="text-muted-foreground">Checking this device…</span>}
                     {pushState === "enabled" && <span className="text-success-600 dark:text-success-400">Enabled on this device</span>}
-                    {pushState === "disabled" && <span className="text-graphite-500 dark:text-slate-400">Not enabled on this device — switch on to receive push alerts here</span>}
+                    {pushState === "disabled" && <span className="text-muted-foreground">Not enabled on this device — switch on to receive push alerts here</span>}
                     {pushState === "blocked" && <span className="text-error-500">Blocked in your browser settings — allow notifications for this site, then switch on</span>}
-                    {pushState === "unsupported" && <span className="text-graphite-500 dark:text-slate-400">Not supported in this browser/app — in-app, WhatsApp and SMS alerts still work</span>}
+                    {pushState === "unsupported" && <span className="text-muted-foreground">Not supported in this browser/app — in-app, WhatsApp and SMS alerts still work</span>}
                   </p>
                 </div>
                 <Switch
@@ -452,30 +452,30 @@ const Settings = () => {
                   className="scale-125 shrink-0"
                 />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div>
                   <p className="font-bold text-xs">Email Broadcasts</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Consultation receipts and appointment confirmations</p>
+                  <p className="text-xs text-foreground">Consultation receipts and appointment confirmations</p>
                 </div>
                 <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} aria-label="Email broadcasts"  className="scale-125" />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div>
                   <p className="font-bold text-xs">Health campaigns & tips</p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Screening reminders and health tips from your facility</p>
+                  <p className="text-xs text-foreground">Screening reminders and health tips from your facility</p>
                 </div>
                 <Switch checked={!marketingOptOut} onCheckedChange={handleMarketingToggle} aria-label="Health campaigns and tips" className="scale-125" />
               </div>
-              <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
+              <div className="pt-2 border-t border-border">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-bold text-xs">SMS &amp; WhatsApp Reminders</p>
-                    <p className="text-xs text-graphite-600 dark:text-slate-300">Appointment, lab-result and refill reminders by text — works on any phone</p>
+                    <p className="text-xs text-foreground">Appointment, lab-result and refill reminders by text — works on any phone</p>
                   </div>
                   <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} aria-label="SMS and WhatsApp reminders" className="scale-125" />
                 </div>
                 {smsReminders && (
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Manage channels, timing and your reminder phone number in{" "}
                     <button
                       onClick={() => navigate("/health-records")}
@@ -490,18 +490,18 @@ const Settings = () => {
             </div>
 
             {/* Regional Localization */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+              <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Globe className="h-4 w-4 text-primary-500" /> Language & Region
               </h2>
               <div className="space-y-1.5">
-                <label htmlFor="settings-language" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>
+                <label htmlFor="settings-language" className="text-xs font-semibold text-muted-foreground uppercase">Display Language</label>
                 <Select value={i18nLang} onValueChange={(val) => {
                   setI18nLang(val as any);
                   setLanguage(val);
                   showSuccess({ message: `Language updated` });
                 }}>
-                  <SelectTrigger id="settings-language" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-language" className="border-border text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {SUPPORTED_LANGUAGES.map((lang) => (
                       <SelectItem key={lang.code} value={lang.code}>{lang.nativeName}</SelectItem>
@@ -511,9 +511,9 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-timezone" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">System Timezone</label>
+                <label htmlFor="settings-timezone" className="text-xs font-semibold text-muted-foreground uppercase">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
-                  <SelectTrigger id="settings-timezone" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-timezone" className="border-border text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="UTC">UTC</SelectItem>
                     <SelectItem value="CAT">Central Africa Time (CAT / Lusaka)</SelectItem>
@@ -524,9 +524,9 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="settings-date-format" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date Display Format</label>
+                <label htmlFor="settings-date-format" className="text-xs font-semibold text-muted-foreground uppercase">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                  <SelectTrigger id="settings-date-format" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-date-format" className="border-border text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
                     <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>

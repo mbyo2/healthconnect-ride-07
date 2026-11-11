@@ -158,7 +158,7 @@ export const HealthcareInstitutions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-20">
+    <div className="min-h-screen bg-background text-foreground font-sans pb-20">
       <Helmet>
         <title>Hospitals, Clinics & Pharmacies in Zambia | Doc' O Clock</title>
         <meta
@@ -178,13 +178,13 @@ export const HealthcareInstitutions = () => {
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
             Healthcare Institutions &amp; Clinics
           </h1>
-          <p className="text-slate-400 dark:text-slate-300 text-sm sm:text-base max-w-2xl font-medium">
+          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl font-medium">
             Explore accredited hospitals, pharmacies, laboratories, and specialised medical clinics. Book appointments and manage your care.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 max-w-2xl">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400 dark:text-slate-300" />
+              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by facility name, city, specialty or service…"
                 value={searchTerm}
@@ -213,7 +213,7 @@ export const HealthcareInstitutions = () => {
               className={`px-4 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all ${
                 typeFilter === tab.key
                   ? 'bg-primary-500 text-white shadow-xs'
-                  : 'bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500'
+                  : 'bg-card border border-border text-muted-foreground hover:bg-primary-100 hover:text-primary-500'
               }`}
             >
               {tab.label}
@@ -223,7 +223,7 @@ export const HealthcareInstitutions = () => {
 
         {/* ── Results count ── */}
         {!loading && (
-          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">
+          <p className="text-xs font-bold text-muted-foreground">
             {filtered.length} {filtered.length === 1 ? 'facility' : 'facilities'} found
             {typeFilter !== 'all' && ` · ${FILTER_TABS.find(t => t.key === typeFilter)?.label}`}
             {searchTerm && ` · "${searchTerm}"`}
@@ -237,10 +237,10 @@ export const HealthcareInstitutions = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 space-y-3">
-              <Building2 className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600" />
+            <div className="col-span-full p-12 text-center rounded-2xl bg-card border border-border space-y-3">
+              <Building2 className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="font-semibold text-base">No institutions found</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">Try clearing your search filters or choose another category.</p>
+              <p className="text-xs text-muted-foreground">Try clearing your search filters or choose another category.</p>
               <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); setTypeFilter('all'); }}>
                 Reset Filters
               </Button>
@@ -264,19 +264,19 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
   ]));
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs hover:shadow-md hover:border-primary-500/50 transition-all flex flex-col">
+    <div className="rounded-2xl bg-card border border-border shadow-xs hover:shadow-md hover:border-primary-500/50 transition-all flex flex-col">
 
       {/* ── Card header ── */}
       <div className="p-5 space-y-3 flex-1">
         {/* Name row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-primary-200 dark:border-slate-700">
+            <div className="h-11 w-11 rounded-xl bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-primary-200 ">
               {TYPE_ICONS[inst.institution_type] || <Building2 className="h-5 w-5 text-primary-500" />}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">{inst.name}</h3>
-              <p className="text-xs font-bold text-graphite-500 dark:text-slate-400 capitalize mt-0.5">
+              <h3 className="font-bold text-sm text-foreground leading-snug line-clamp-2">{inst.name}</h3>
+              <p className="text-xs font-bold text-muted-foreground capitalize mt-0.5">
                 {inst.institution_type?.replace(/_/g, ' ')}
               </p>
             </div>
@@ -290,7 +290,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
 
         {/* Location */}
         {inst.location && (
-          <div className="flex items-center gap-1.5 text-xs text-graphite-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <MapPin className="h-3.5 w-3.5 text-primary-500 shrink-0" />
             <span className="truncate">{inst.location}</span>
           </div>
@@ -298,7 +298,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
 
         {/* Phone */}
         {inst.phone && (
-          <div className="flex items-center gap-1.5 text-xs text-graphite-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Phone className="h-3.5 w-3.5 text-success-500 shrink-0" />
             <span>{inst.phone}</span>
           </div>
@@ -327,7 +327,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
             </span>
           )}
           {inst.number_of_beds && inst.number_of_beds > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-muted text-muted-foreground">
               <BedDouble className="h-3 w-3" /> {inst.number_of_beds} beds
             </span>
           )}
@@ -347,7 +347,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
               </span>
             ))}
             {allServices.length > 4 && (
-              <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-500">
+              <span className="px-1.5 py-0.5 rounded-md bg-muted text-xs font-bold text-slate-500">
                 +{allServices.length - 4} more
               </span>
             )}
@@ -358,12 +358,12 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
         {(inst.equipment_available || []).length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {(inst.equipment_available || []).slice(0, 3).map((eq, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-md bg-canvas dark:bg-slate-800 text-xs font-bold text-slate-500 border border-canvas-silk dark:border-slate-700">
+              <span key={i} className="px-2 py-0.5 rounded-md bg-canvas dark:bg-slate-800 text-xs font-bold text-slate-500 border border-border">
                 {eq}
               </span>
             ))}
             {(inst.equipment_available || []).length > 3 && (
-              <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-500">
+              <span className="px-1.5 py-0.5 rounded-md bg-muted text-xs font-bold text-slate-500">
                 +{(inst.equipment_available || []).length - 3}
               </span>
             )}
@@ -372,7 +372,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
 
         {/* ── Languages (shown if more than just English) ── */}
         {(inst.languages_spoken || []).length > 1 && (
-          <div className="flex items-center gap-1.5 text-xs text-graphite-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Languages className="h-3.5 w-3.5 shrink-0" />
             <span>{(inst.languages_spoken || []).join(' · ')}</span>
           </div>
@@ -380,7 +380,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
       </div>
 
       {/* ── Card footer ── */}
-      <div className="px-5 pb-5 pt-3 border-t border-canvas-mist dark:border-slate-800 flex items-center gap-2">
+      <div className="px-5 pb-5 pt-3 border-t border-canvas-mist flex items-center gap-2">
         <Button
           size="sm"
           className="flex-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold rounded-xl h-9"
@@ -392,7 +392,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
           <Button
             size="sm"
             variant="outline"
-            className="h-9 px-3 rounded-xl border-canvas-silk text-xs font-bold hover:bg-primary-50"
+            className="h-9 px-3 rounded-xl border-border text-xs font-bold hover:bg-primary-50"
             onClick={() => window.open(`tel:${inst.phone}`)}
             title="Call"
           >
@@ -403,7 +403,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
           <Button
             size="sm"
             variant="outline"
-            className="h-9 px-3 rounded-xl border-canvas-silk text-xs font-bold hover:bg-primary-50"
+            className="h-9 px-3 rounded-xl border-border text-xs font-bold hover:bg-primary-50"
             onClick={() => window.open(inst.website, '_blank')}
             title="Website"
           >

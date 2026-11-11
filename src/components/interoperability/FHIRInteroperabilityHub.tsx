@@ -150,7 +150,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -184,7 +184,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
             onClick={handleDownload}
             disabled={!profile}
             size="sm"
-            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs"
+            className="bg-card text-foreground hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs"
           >
             <Download className="h-4 w-4" /> Download FHIR Bundle
           </Button>
@@ -192,8 +192,8 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
       </div>
 
       {/* Real patient selector */}
-      <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <Label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+      <div className="rounded-2xl border border-border bg-card p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <Label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
           <Users className="h-4 w-4 text-primary-500" /> Source patient (admitted to this facility)
         </Label>
         {loading ? (
@@ -231,7 +231,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
       </Tabs>
 
       {/* Live FHIR JSON Display */}
-      <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
+      <div className="rounded-2xl border border-border bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 text-slate-400">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />

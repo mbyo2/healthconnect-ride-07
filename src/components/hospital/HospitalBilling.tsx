@@ -503,7 +503,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header — single clear title, deference to content */}
       <div className="flex items-center justify-between pb-1">
         <h3 className="text-xl font-bold tracking-tight flex items-center gap-2">
@@ -528,10 +528,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           { label: "Collected", value: formatPrice(paidAmount), color: "#00c875", icon: <CheckCircle className="h-5 w-5" /> },
           { label: "Outstanding", value: formatPrice(pendingAmount), color: "#e2445c", icon: <AlertCircle className="h-5 w-5" /> },
         ].map((c) => (
-          <div key={c.label} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 shadow-sm text-center">
+          <div key={c.label} className="p-4 rounded-2xl bg-card border border-slate-200/60 shadow-sm text-center">
             <div style={{ color: c.color }} className="flex justify-center mb-1.5">{c.icon}</div>
             <div className="text-2xl font-bold tracking-tight font-mono" style={{ color: c.color }}>{c.value}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{c.label}</div>
+            <div className="text-xs text-muted-foreground font-medium mt-0.5">{c.label}</div>
           </div>
         ))}
       </div>
@@ -564,10 +564,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
         </div>
       </div>
       {filteredInvoices.length > 0 ? (
-        <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 bg-card shadow-sm">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200/60 dark:border-slate-800 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <tr className="border-b border-slate-200/60 text-xs font-medium text-muted-foreground">
                 <th className="py-3 px-4 font-medium">Invoice #</th>
                 <th className="py-3 px-3 font-medium">Patient</th>
                 <th className="py-3 px-3 font-medium">Date</th>
@@ -579,11 +579,11 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredInvoices.map((inv: any) => (
-                <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100">{inv.invoice_number}</td>
+                <tr key={inv.id} className="hover:bg-muted/50 transition-colors">
+                  <td className="py-3 px-4 font-mono font-semibold text-foreground">{inv.invoice_number}</td>
                   <td className="py-3 px-3 font-medium text-primary-600 dark:text-primary-400">{inv.patient?.first_name} {inv.patient?.last_name}</td>
-                  <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
-                  <td className="py-3 px-3 text-right font-semibold text-slate-900 dark:text-slate-100">{formatPrice(inv.total_amount)}</td>
+                  <td className="py-3 px-3 text-muted-foreground">{new Date(inv.created_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-3 text-right font-semibold text-foreground">{formatPrice(inv.total_amount)}</td>
                   <td className="py-3 px-3 text-right">
                     {inv.balance > 0 ? <span className="font-semibold text-red-500">{formatPrice(inv.balance)}</span> : <span className="text-slate-400">—</span>}
                   </td>
@@ -610,7 +610,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                           notes: inv.notes || undefined,
                         })
                       }
-                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg border border-border hover:bg-primary-500 hover:text-white transition-colors"
                       title="Download PDF Receipt"
                     >
                       <Receipt className="h-3.5 w-3.5" />
@@ -622,7 +622,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
+        <div className="text-center py-12 text-xs text-muted-foreground">
           <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
           <p className="font-bold">No invoices yet. Generate your first invoice above.</p>
         </div>
@@ -630,10 +630,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
 
       {/* Generate Invoice Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk max-w-md">
+        <DialogContent className="bg-card border border-border max-w-md">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base">Generate Invoice</DialogTitle>
-            <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Charges are priced from the hospital price list and any insurance split is calculated on the server when the bill is generated.</DialogDescription>
+            <DialogDescription className="text-xs text-muted-foreground">Charges are priced from the hospital price list and any insurance split is calculated on the server when the bill is generated.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2 text-xs">
             <InstitutionPatientPicker
@@ -653,10 +653,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             )}
 
             {pendingPatientCharges.length > 0 && (
-              <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-1">
-                <p className="font-semibold text-slate-700 dark:text-slate-300 text-xs mb-2">Charges — untick to exclude from this bill</p>
+              <div className="p-4 rounded-2xl border border-slate-200/60 bg-muted/50 space-y-1">
+                <p className="font-semibold text-foreground text-xs mb-2">Charges — untick to exclude from this bill</p>
                 {pendingPatientCharges.map((c, i) => (
-                  <label key={c.key} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-2 py-2 transition-colors">
+                  <label key={c.key} className="flex items-center gap-3 text-foreground cursor-pointer hover:bg-slate-100 rounded-xl px-2 py-2 transition-colors">
                     <input
                       type="checkbox"
                       checked={!!c.service && c.selected !== false}
@@ -666,7 +666,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     />
                     <span className={`flex-1 text-sm ${c.selected === false ? "line-through opacity-50" : ""}`}>
                       {c.description}
-                      <span className="block text-xs text-slate-500 dark:text-slate-400">
+                      <span className="block text-xs text-muted-foreground">
                         {c.date ? `${new Date(c.date).toLocaleDateString()} · ` : ""}{c.category}
                         {c.service ? ` · ${c.service.service_label}${c.quantity > 1 ? ` × ${c.quantity}` : ""}` : ""}
                       </span>
@@ -689,12 +689,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     )}
                   </label>
                 ))}
-                <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-700 flex items-center justify-between">
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">Bill total (from price list)</span>
+                <div className="pt-2 mt-1 border-t border-slate-200/60 flex items-center justify-between">
+                  <span className="font-semibold text-foreground">Bill total (from price list)</span>
                   <span className="font-mono font-bold text-sm">{formatPrice(previewTotal)}</span>
                 </div>
                 {notOnPriceList.length > 0 && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     {notOnPriceList.length} charge{notOnPriceList.length > 1 ? "s are" : " is"} not on the price list and will not be billed.
                     {canCreatePricing
                       ? " Use “Add to price list” next to a charge to price it now, without leaving this bill."
@@ -705,15 +705,15 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             )}
 
             {selectedPatientId && !isLoadingCharges && pendingPatientCharges.length === 0 && (
-              <p className="text-xs text-slate-500 dark:text-slate-400">No pending charges were found for this patient.</p>
+              <p className="text-xs text-muted-foreground">No pending charges were found for this patient.</p>
             )}
 
             {selectedPatientId && (
               <div>
-                <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Insurance</label>
+                <label className="font-semibold text-muted-foreground uppercase">Insurance</label>
                 {policies.length > 0 ? (
                   <Select value={selectedPolicyId || "none"} onValueChange={(v) => setSelectedPolicyId(v === "none" ? "" : v)}>
-                    <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Patient pays in full" /></SelectTrigger>
+                    <SelectTrigger className="mt-1 border border-border text-xs font-bold"><SelectValue placeholder="Patient pays in full" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">No insurance — patient pays in full</SelectItem>
                       {policies.map((p) => (
@@ -725,10 +725,10 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">No insurance on file — the patient pays in full.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">No insurance on file — the patient pays in full.</p>
                 )}
                 {selectedPolicyId && (
-                  <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-1.5 text-xs text-muted-foreground">
                     The split between the insurer and the patient is calculated on the server from this policy's coverage terms when the bill is generated, and a claim is filed automatically.
                   </p>
                 )}

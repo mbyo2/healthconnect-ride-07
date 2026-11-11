@@ -46,7 +46,7 @@ const PharmacyPortal = () => {
   return (
     <ProtectedRoute>
       <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'pharmacy_technologist', 'wholesale_pharmacy', 'institution_admin', 'institution_staff', 'inventory_manager', 'billing_staff', 'admin', 'super_admin']}>
-        <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+        <div className="min-h-screen bg-background py-8 px-4 sm:px-6 font-sans">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header Banner */}
             <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -79,7 +79,7 @@ const PharmacyPortal = () => {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="flex flex-wrap h-auto gap-1.5 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-canvas-silk dark:border-slate-800 shadow-xs">
+              <TabsList className="flex flex-wrap h-auto gap-1.5 bg-card p-2 rounded-2xl border border-border shadow-xs">
                 <TabsTrigger value="dashboard" className="gap-1.5 text-xs font-bold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                   <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
                 </TabsTrigger>
@@ -127,7 +127,7 @@ const PharmacyPortal = () => {
                   {pharmacyId ? (
                     <PharmacyDeliveryTracking pharmacyId={pharmacyId} />
                   ) : (
-                    <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-xs text-slate-400 font-medium">
+                    <div className="rounded-2xl border border-border bg-card p-8 text-center text-xs text-slate-400 font-medium">
                       No pharmacy branch linked to this account
                     </div>
                   )}

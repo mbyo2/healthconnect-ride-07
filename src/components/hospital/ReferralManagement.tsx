@@ -350,7 +350,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                   onChange={(e) => searchPatients(e.target.value)}
                   placeholder="Type patient name..."
                 />
-                {searching && <p className="text-xs text-slate-500 dark:text-slate-400">Searching...</p>}
+                {searching && <p className="text-xs text-muted-foreground">Searching...</p>}
                 {searchResults.length > 0 && (
                   <div className="rounded-lg border max-h-40 overflow-y-auto">
                     {searchResults.map((p: any) => (
@@ -363,7 +363,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                           setPatientSearch(name);
                           setSelectedPatientName(name);
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-slate-50 text-sm"
+                        className="w-full text-left px-3 py-2 hover:bg-muted/60 text-sm"
                       >
                         {p.first_name} {p.last_name}
                         {form.patient_id === p.id && <span className="ml-2 text-primary-500">✓</span>}

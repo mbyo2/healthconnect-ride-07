@@ -113,7 +113,7 @@ const InstitutionPatients = () => {
       <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
 
       <div className="vf-card !p-0 overflow-hidden">
-        <div className="px-5 py-4 border-b border-canvas-silk flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="font-medium text-base flex items-center gap-2"><Users className="h-4 w-4 text-primary-500" /> Patient List ({patients.length})</h2>
         </div>
         <div className="p-5">

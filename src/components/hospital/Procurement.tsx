@@ -238,7 +238,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
         <div className="flex gap-2">
           <button
             onClick={() => { refreshOrders(); refreshSuppliers(); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-canvas-silk text-xs font-bold hover:bg-canvas-mist"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border text-xs font-bold hover:bg-canvas-mist"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
@@ -303,7 +303,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               description={statusFilter === "all" ? "Create your first purchase order." : `No orders with status "${statusFilter}".`}
             />
           ) : (
-            <div className="rounded-2xl border border-canvas-silk overflow-hidden">
+            <div className="rounded-2xl border border-border overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">
@@ -318,7 +318,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 </thead>
                 <tbody>
                   {filteredOrders.map((o) => (
-                    <tr key={o.id} className="border-t border-canvas-silk hover:bg-canvas-mist/50">
+                    <tr key={o.id} className="border-t border-border hover:bg-canvas-mist/50">
                       <td className="px-4 py-2.5 font-bold">{o.order_number}</td>
                       <td className="px-4 py-2.5">{supplierName(o.supplier_id)}</td>
                       <td className="px-4 py-2.5 text-xs">{o.order_date}</td>
@@ -378,7 +378,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               {suppliers.map((s) => (
                 <div
                   key={s.id}
-                  className={`rounded-2xl border p-4 ${s.is_active ? "border-canvas-silk" : "border-canvas-silk opacity-60"}`}
+                  className={`rounded-2xl border p-4 ${s.is_active ? "border-border" : "border-border opacity-60"}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -433,7 +433,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 <select
                   value={poForm.supplier_id}
                   onChange={(e) => setPOForm({ ...poForm, supplier_id: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                   required
                 >
                   <option value="">Select supplier…</option>
@@ -448,7 +448,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                   type="date"
                   value={poForm.expected_delivery_date}
                   onChange={(e) => setPOForm({ ...poForm, expected_delivery_date: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -457,7 +457,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               <textarea
                 value={poForm.notes}
                 onChange={(e) => setPOForm({ ...poForm, notes: e.target.value })}
-                className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                 rows={2}
                 placeholder="Delivery instructions, reference numbers…"
               />
@@ -490,7 +490,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Item name"
-                      className="rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                      className="rounded-xl border border-border px-3 py-2 text-sm"
                       required={idx === 0}
                     />
                     <input
@@ -504,7 +504,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Qty"
-                      className="rounded-xl border border-canvas-silk px-2 py-2 text-sm"
+                      className="rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <input
                       value={item.unit}
@@ -514,7 +514,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Unit"
-                      className="rounded-xl border border-canvas-silk px-2 py-2 text-sm"
+                      className="rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <input
                       type="number"
@@ -527,7 +527,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         setPOForm({ ...poForm, items });
                       }}
                       placeholder="Unit price"
-                      className="rounded-xl border border-canvas-silk px-2 py-2 text-sm"
+                      className="rounded-xl border border-border px-2 py-2 text-sm"
                     />
                     <button
                       type="button"
@@ -547,7 +547,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               <button
                 type="button"
                 onClick={() => { setShowNewPO(false); resetPOForm(); }}
-                className="px-4 py-2 rounded-xl border border-canvas-silk text-sm font-bold"
+                className="px-4 py-2 rounded-xl border border-border text-sm font-bold"
               >
                 Cancel
               </button>
@@ -575,7 +575,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               <input
                 value={supplierForm.supplier_name}
                 onChange={(e) => setSupplierForm({ ...supplierForm, supplier_name: e.target.value })}
-                className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -585,7 +585,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 <input
                   value={supplierForm.contact_person}
                   onChange={(e) => setSupplierForm({ ...supplierForm, contact_person: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -593,7 +593,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 <input
                   value={supplierForm.phone}
                   onChange={(e) => setSupplierForm({ ...supplierForm, phone: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -603,7 +603,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 type="email"
                 value={supplierForm.email}
                 onChange={(e) => setSupplierForm({ ...supplierForm, email: e.target.value })}
-                className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -611,7 +611,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
               <input
                 value={supplierForm.address}
                 onChange={(e) => setSupplierForm({ ...supplierForm, address: e.target.value })}
-                className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -620,14 +620,14 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 value={supplierForm.payment_terms}
                 onChange={(e) => setSupplierForm({ ...supplierForm, payment_terms: e.target.value })}
                 placeholder="e.g. Net 30, COD"
-                className="mt-1 w-full rounded-xl border border-canvas-silk px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm"
               />
             </div>
             <DialogFooter>
               <button
                 type="button"
                 onClick={() => { setShowNewSupplier(false); setEditingSupplier(null); resetSupplierForm(); }}
-                className="px-4 py-2 rounded-xl border border-canvas-silk text-sm font-bold"
+                className="px-4 py-2 rounded-xl border border-border text-sm font-bold"
               >
                 Cancel
               </button>
@@ -680,7 +680,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 ) : viewingItems.length === 0 ? (
                   <p className="text-xs text-graphite-400">No line items found.</p>
                 ) : (
-                  <div className="rounded-xl border border-canvas-silk overflow-hidden">
+                  <div className="rounded-xl border border-border overflow-hidden">
                     <table className="w-full text-xs">
                       <thead>
                         <tr className="bg-canvas-mist text-left text-xs uppercase text-graphite-500">
@@ -692,7 +692,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                       </thead>
                       <tbody>
                         {viewingItems.map((i) => (
-                          <tr key={i.id} className="border-t border-canvas-silk">
+                          <tr key={i.id} className="border-t border-border">
                             <td className="px-3 py-2 font-bold">{i.item_name}</td>
                             <td className="px-3 py-2 text-right">{i.quantity_ordered} {i.unit}</td>
                             <td className="px-3 py-2 text-right">{fmtMoney(i.unit_price)}</td>

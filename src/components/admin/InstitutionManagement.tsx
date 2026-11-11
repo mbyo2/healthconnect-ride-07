@@ -193,7 +193,7 @@ export const InstitutionManagement = () => {
       {loading ? (
         <p className="text-sm text-graphite-500 py-8 text-center">Loading institutions…</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-canvas-silk">
+        <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-canvas-silk/50 text-left">
@@ -207,7 +207,7 @@ export const InstitutionManagement = () => {
               {filtered.map((inst) => {
                 const suspended = !!inst.is_suspended;
                 return (
-                  <tr key={inst.id} className="border-t border-canvas-silk">
+                  <tr key={inst.id} className="border-t border-border">
                     <td className="px-4 py-3">
                       <div className="font-medium">{inst.name}</div>
                       <div className="text-xs text-graphite-500 capitalize">

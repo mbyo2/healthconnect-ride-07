@@ -300,14 +300,14 @@ export const OpticianWorkflow = () => {
           <Glasses className="h-7 w-7" />
         </div>
         <div>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Optical Services</p>
-          <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">Optician Dashboard</h1>
+          <p className="text-[13px] font-medium text-muted-foreground">Optical Services</p>
+          <h1 className="text-[28px] font-bold tracking-tight text-foreground">Optician Dashboard</h1>
         </div>
       </div>
 
       {/* Today at a Glance */}
       <section>
-        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Today at a glance</h2>
+        <h2 className="mb-4 text-[18px] font-semibold text-foreground">Today at a glance</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <button
             onClick={() => goToTab('dispensing', 'Dispensing')}
@@ -324,28 +324,28 @@ export const OpticianWorkflow = () => {
 
           <button
             onClick={() => goToTab('orders', 'Lens Orders')}
-            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:bg-slate-900"
           >
             <div className="flex items-center justify-between">
               <Clock className="h-5 w-5 text-amber-500" />
               <ChevronRight className="h-4 w-4 text-slate-400" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{ordersPending}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Orders pending</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">In production queue</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{ordersPending}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Orders pending</p>
+            <p className="text-[13px] text-muted-foreground">In production queue</p>
           </button>
 
           <button
             onClick={() => goToTab('prescriptions', 'Prescriptions')}
-            className="rounded-2xl border border-canvas-silk bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-2xl border border-border bg-white p-5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] dark:bg-slate-900"
           >
             <div className="flex items-center justify-between">
               <FileText className="h-5 w-5 text-blue-500" />
               <ChevronRight className="h-4 w-4 text-slate-400" />
             </div>
-            <p className="mt-3 text-[28px] font-bold leading-none text-slate-900 dark:text-white">{rxToday}</p>
-            <p className="mt-1 text-[15px] font-medium text-slate-900 dark:text-white">Prescriptions today</p>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">{dispensedTotal} dispensed total</p>
+            <p className="mt-3 text-[28px] font-bold leading-none text-foreground">{rxToday}</p>
+            <p className="mt-1 text-[15px] font-medium text-foreground">Prescriptions today</p>
+            <p className="text-[13px] text-muted-foreground">{dispensedTotal} dispensed total</p>
           </button>
         </div>
       </section>
@@ -353,37 +353,37 @@ export const OpticianWorkflow = () => {
       {/* Grouped Actions */}
       {groups.map((group) => (
         <section key={group.title}>
-          <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">{group.title}</h2>
-          <div className="rounded-2xl border border-canvas-silk bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-4 text-[18px] font-semibold text-foreground">{group.title}</h2>
+          <div className="rounded-2xl border border-border bg-white shadow-sm dark:bg-slate-900">
             <button
               onClick={group.primary.action}
-              className="flex w-full items-center gap-4 border-b border-canvas-silk p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50"
+              className="flex w-full items-center gap-4 border-b border-border p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted "
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white">
                 {group.primary.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-medium text-slate-900 dark:text-white">{group.primary.title}</p>
-                <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{group.primary.description}</p>
+                <p className="text-[15px] font-medium text-foreground">{group.primary.title}</p>
+                <p className="truncate text-[13px] text-muted-foreground">{group.primary.description}</p>
               </div>
               <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
             </button>
             {group.secondary.length > 0 && (
-              <div className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <div className="divide-y divide-border">
                 {group.secondary.map((item) => (
                   <button
                     key={item.title}
                     onClick={item.action}
-                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/50"
+                    className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-muted/60 active:bg-muted/50"
                   >
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       {item.icon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-medium text-slate-900 dark:text-white">{item.title}</p>
-                      <p className="truncate text-[13px] text-slate-500 dark:text-slate-400">{item.description}</p>
+                      <p className="text-[15px] font-medium text-foreground">{item.title}</p>
+                      <p className="truncate text-[13px] text-muted-foreground">{item.description}</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 dark:text-slate-600" />
+                    <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                   </button>
                 ))}
               </div>
@@ -394,7 +394,7 @@ export const OpticianWorkflow = () => {
 
       {/* Workspace */}
       <section id="optician-workspace" className="scroll-mt-6">
-        <h2 className="mb-4 text-[18px] font-semibold text-slate-900 dark:text-white">Workspace</h2>
+        <h2 className="mb-4 text-[18px] font-semibold text-foreground">Workspace</h2>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="prescriptions" className="gap-1.5 min-h-[44px]">

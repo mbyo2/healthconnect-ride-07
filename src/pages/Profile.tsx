@@ -339,13 +339,13 @@ const Profile = () => {
         </div>
 
         {/* ── Personal Info Form ── */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="border-b border-canvas-silk dark:border-slate-800 pb-4">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <User className="h-5 w-5 text-primary-500" />
               Personal &amp; Clinical Information
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Manage your personal information, emergency contact details, and clinical identity.
             </p>
           </div>
@@ -357,53 +357,53 @@ const Profile = () => {
                 { id: "lastName", label: "Last Name" },
               ].map(f => (
                 <div key={f.id} className="space-y-1.5">
-                  <Label htmlFor={f.id} className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">{f.label}</Label>
+                  <Label htmlFor={f.id} className="text-xs font-semibold text-muted-foreground uppercase">{f.label}</Label>
                   <Input
                     id={f.id}
                     value={(formData as any)[f.id]}
                     onChange={e => handleInputChange(f.id, e.target.value)}
                     disabled={!isEditing}
-                    className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                    className="h-11 rounded-2xl border border-border bg-background font-medium text-xs"
                   />
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label htmlFor="profile-email" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
-                <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
+                <Label htmlFor="profile-email" className="text-xs font-semibold text-muted-foreground uppercase">Email Address</Label>
+                <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border border-border bg-background font-medium text-xs opacity-75" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>
+                <Label htmlFor="phone" className="text-xs font-semibold text-muted-foreground uppercase">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={e => handleInputChange("phone", e.target.value)}
                   disabled={!isEditing}
-                  className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                  className="h-11 rounded-2xl border border-border bg-background font-medium text-xs"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="location" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Address / Location</Label>
+              <Label htmlFor="location" className="text-xs font-semibold text-muted-foreground uppercase">Address / Location</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={e => handleInputChange("location", e.target.value)}
                 disabled={!isEditing}
-                className="h-11 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs"
+                className="h-11 rounded-2xl border border-border bg-background font-medium text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="bio" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">Bio / Clinical Background</Label>
+              <Label htmlFor="bio" className="text-xs font-semibold text-muted-foreground uppercase">Bio / Clinical Background</Label>
               <Textarea
                 id="bio"
                 value={formData.bio}
                 onChange={e => handleInputChange("bio", e.target.value)}
                 disabled={!isEditing}
                 rows={3}
-                className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs resize-none"
+                className="rounded-2xl border border-border bg-background font-medium text-xs resize-none"
               />
             </div>
 
@@ -422,14 +422,14 @@ const Profile = () => {
 
         {/* ── Provider Professional Details (health_personnel only) ── */}
         {isProvider && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex items-start justify-between border-b border-canvas-silk dark:border-slate-800 pb-4">
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-start justify-between border-b border-border pb-4">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice &amp; Professional Details
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Visible to patients on your public provider profile.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Visible to patients on your public provider profile.</p>
               </div>
               <Button
                 size="sm"
@@ -450,22 +450,22 @@ const Profile = () => {
 
               {/* Education */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <GraduationCap className="h-4 w-4" /> Education
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Medical School</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Medical School</Label>
                     <Input
                       value={provData.medical_school}
                       onChange={e => setProvData(p => ({ ...p, medical_school: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. UNZA School of Medicine"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Graduation Year</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Graduation Year</Label>
                     <Input
                       type="number"
                       min="1960"
@@ -474,7 +474,7 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, graduation_year: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 2015"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -482,7 +482,7 @@ const Profile = () => {
 
               {/* Board Certifications */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Award className="h-4 w-4" /> Board Certifications
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -495,7 +495,7 @@ const Profile = () => {
                       className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.board_certifications.includes(cert)
                           ? "bg-primary-500 text-white border-primary-500"
-                          : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-primary-500 hover:text-primary-500"
+                          : "bg-card border-border text-muted-foreground hover:border-primary-500 hover:text-primary-500"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
                       {cert}
@@ -506,7 +506,7 @@ const Profile = () => {
 
               {/* Subspecialties */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Shield className="h-4 w-4" /> Subspecialties
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -519,7 +519,7 @@ const Profile = () => {
                       className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.subspecialties.includes(sub)
                           ? "bg-purple-500 text-white border-purple-500"
-                          : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-purple-500 hover:text-purple-500"
+                          : "bg-card border-border text-muted-foreground hover:border-purple-500 hover:text-purple-500"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
                       {sub}
@@ -530,28 +530,28 @@ const Profile = () => {
 
               {/* Practice */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> Practice Details
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2 space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Primary Practice Location</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Primary Practice Location</Label>
                     <Input
                       value={provData.primary_practice_location}
                       onChange={e => setProvData(p => ({ ...p, primary_practice_location: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. Woodlands Clinic, Lusaka"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Avg. Wait Time</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Avg. Wait Time</Label>
                     <Input
                       value={provData.typical_wait_time}
                       onChange={e => setProvData(p => ({ ...p, typical_wait_time: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 15 mins"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -559,7 +559,7 @@ const Profile = () => {
 
               {/* Affiliated Hospitals */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Building2 className="h-4 w-4" /> Affiliated Hospitals
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -574,7 +574,7 @@ const Profile = () => {
                     </Badge>
                   ))}
                   {provData.affiliated_hospitals.length === 0 && (
-                    <span className="text-xs text-graphite-500 dark:text-slate-400">None added yet</span>
+                    <span className="text-xs text-muted-foreground">None added yet</span>
                   )}
                 </div>
                 {provEditing && (
@@ -584,7 +584,7 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, newHospital: e.target.value }))}
                       onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addHospital())}
                       placeholder="Hospital name…"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs"
+                      className="h-11 rounded-xl border border-border text-xs"
                     />
                     <Button type="button" size="sm" onClick={addHospital} className="rounded-xl min-h-[44px] px-3" aria-label="Add hospital">
                       <Plus className="h-4 w-4" />
@@ -595,12 +595,12 @@ const Profile = () => {
 
               {/* Fees */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <DollarSign className="h-4 w-4" /> Consultation Fees (ZMW)
                 </h3>
                 <div className="grid grid-cols-2 gap-4 max-w-xs">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Min</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Min</Label>
                     <Input
                       type="number"
                       min="0"
@@ -608,11 +608,11 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, consultation_fee_min: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 200"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Max</Label>
+                    <Label className="text-xs font-bold text-muted-foreground uppercase">Max</Label>
                     <Input
                       type="number"
                       min="0"
@@ -620,7 +620,7 @@ const Profile = () => {
                       onChange={e => setProvData(p => ({ ...p, consultation_fee_max: e.target.value }))}
                       disabled={!provEditing}
                       placeholder="e.g. 500"
-                      className="h-11 rounded-xl border border-canvas-silk text-xs font-medium"
+                      className="h-11 rounded-xl border border-border text-xs font-medium"
                     />
                   </div>
                 </div>
@@ -628,14 +628,14 @@ const Profile = () => {
 
               {/* Service toggles */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3">Service Delivery</h3>
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3">Service Delivery</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {([
                     { key: "telemedicine_available", icon: Video, label: "Telemedicine Available" },
                     { key: "home_visits_available", icon: Home, label: "Home Visits Available" },
                     { key: "accepts_insurance", icon: Shield, label: "Accepts Insurance" },
                   ] as const).map(item => (
-                    <div key={item.key} className="flex items-center justify-between p-3 border border-canvas-silk rounded-xl">
+                    <div key={item.key} className="flex items-center justify-between p-3 border border-border rounded-xl">
                       <div className="flex items-center gap-2 text-xs font-semibold">
                         <item.icon className="h-4 w-4 text-primary-500" />
                         {item.label}
@@ -653,7 +653,7 @@ const Profile = () => {
               {/* Insurance */}
               {provData.accepts_insurance && (
                 <section>
-                  <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                     <Shield className="h-4 w-4" /> Accepted Insurance Providers
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -666,7 +666,7 @@ const Profile = () => {
                         className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                           provData.insurance_providers_accepted.includes(ins)
                             ? "bg-success-500 text-white border-success-500"
-                            : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-success-500 hover:text-success-500"
+                            : "bg-card border-border text-muted-foreground hover:border-success-500 hover:text-success-500"
                         } disabled:opacity-60 disabled:cursor-not-allowed`}
                       >
                         {ins}
@@ -678,7 +678,7 @@ const Profile = () => {
 
               {/* Languages */}
               <section>
-                <h3 className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 flex items-center gap-1.5">
                   <Languages className="h-4 w-4" /> Languages Spoken
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -691,7 +691,7 @@ const Profile = () => {
                       className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.languages_spoken.includes(lang)
                           ? "bg-warning-500 text-white border-warning-500"
-                          : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-warning-500 hover:text-warning-500"
+                          : "bg-card border-border text-muted-foreground hover:border-warning-500 hover:text-warning-500"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
                       {lang}
@@ -715,7 +715,7 @@ const Profile = () => {
         )}
 
         {/* ── Stats Widget ── */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <ProfileStats userId={user?.id} />
         </div>
       </div>

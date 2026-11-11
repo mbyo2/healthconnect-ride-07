@@ -186,13 +186,13 @@ export const PharmacyPOS = () => {
   if (!activeSession && pharmacyId) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-full max-w-md p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 shadow-md text-center font-sans">
+        <div className="w-full max-w-md p-8 rounded-2xl bg-card border border-border shadow-md text-center font-sans">
           <Package className="h-12 w-12 text-primary-500 mx-auto mb-3" />
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Open Cash Register</h2>
-          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1 mb-4">Start your cashier shift by entering the opening float</p>
+          <h2 className="text-xl font-semibold text-foreground">Open Cash Register</h2>
+          <p className="text-xs text-muted-foreground font-medium mt-1 mb-4">Start your cashier shift by entering the opening float</p>
           <div className="text-left mb-4">
-            <label className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Opening Cash Balance ({getSymbol()})</label>
-            <input type="number" value={openingBalanceInput} onChange={(e) => setOpeningBalanceInput(e.target.value)} className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 text-sm font-bold" />
+            <label className="text-xs font-semibold text-muted-foreground uppercase">Opening Cash Balance ({getSymbol()})</label>
+            <input type="number" value={openingBalanceInput} onChange={(e) => setOpeningBalanceInput(e.target.value)} className="w-full mt-1 p-2.5 rounded-md border border-border text-sm font-bold" />
           </div>
           <button onClick={() => openRegister.mutate(parseFloat(openingBalanceInput) || 0)} className="w-full py-2.5 rounded-md bg-primary-500 text-white font-semibold text-sm">
             Open Register
@@ -205,16 +205,16 @@ export const PharmacyPOS = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-12rem)] font-sans">
       {/* ─── Left Panel: Product Search ─── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 bg-card rounded-xl border border-border overflow-hidden">
         {/* Search Bar + Actions */}
-        <div className="flex items-center gap-2 p-3 border-b border-canvas-silk bg-canvas dark:bg-slate-950">
+        <div className="flex items-center gap-2 p-3 border-b border-border bg-background">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-graphite-500 dark:text-slate-400" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Search medication by name or generic..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-border text-xs font-medium"
             />
           </div>
           <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-500 text-white text-xs font-semibold">
@@ -240,10 +240,10 @@ export const PharmacyPOS = () => {
               <div
                 key={item.id}
                 onClick={() => addToCart(item)}
-                className="p-3 rounded-xl border border-canvas-silk cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
+                className="p-3 rounded-xl border border-border cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
               >
-                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">{item.medication_name}</p>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{item.dosage} · {item.medication_type}</p>
+                <p className="font-semibold text-xs text-foreground truncate">{item.medication_name}</p>
+                <p className="text-xs text-muted-foreground font-medium">{item.dosage} · {item.medication_type}</p>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-bold text-primary-500">{formatPrice(item.unit_price || 0)}</span>
                   <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${item.quantity_available <= 5 ? "bg-error-500" : "bg-success-500"}`}>
@@ -253,7 +253,7 @@ export const PharmacyPOS = () => {
               </div>
             ))}
             {(!inventory || inventory.length === 0) && (
-              <div className="col-span-full text-center py-10 text-graphite-500 dark:text-slate-400 text-xs font-bold">
+              <div className="col-span-full text-center py-10 text-muted-foreground text-xs font-bold">
                 <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" />
                 {searchQuery ? "No results found" : "Type to search medications..."}
               </div>
@@ -263,24 +263,24 @@ export const PharmacyPOS = () => {
       </div>
 
       {/* ─── Right Panel: Cart & Checkout ─── */}
-      <div className="w-full lg:w-96 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk overflow-hidden">
+      <div className="w-full lg:w-96 flex flex-col bg-card rounded-xl border border-border overflow-hidden">
         {/* Cart Header */}
-        <div className="p-3 border-b border-canvas-silk bg-canvas flex items-center gap-2">
+        <div className="p-3 border-b border-border bg-canvas flex items-center gap-2">
           <ShoppingCart className="h-4 w-4 text-primary-500" />
-          <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">Cart</span>
+          <span className="font-semibold text-sm text-foreground">Cart</span>
           {cart.length > 0 && <span className="ml-auto inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{cart.length}</span>}
         </div>
 
         {/* Customer Info */}
-        <div className="p-3 border-b border-canvas-silk space-y-2">
+        <div className="p-3 border-b border-border space-y-2">
           <div className="flex gap-2">
-            <input placeholder="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="flex-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium" />
-            <input placeholder="Phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-28 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs" />
+            <input placeholder="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="flex-1 p-2 rounded-md border border-border text-xs font-medium" />
+            <input placeholder="Phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-28 p-2 rounded-md border border-border text-xs" />
           </div>
           <select
             value={prescriptionId}
             onChange={(e) => setPrescriptionId(e.target.value)}
-            className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-900"
+            className="w-full p-2 rounded-md border border-border text-xs font-medium bg-card"
             aria-label="Prescription this sale fulfils (optional)"
           >
             <option value="">Prescription (optional) — walk-in sale</option>
@@ -291,7 +291,7 @@ export const PharmacyPOS = () => {
             ))}
           </select>
           {prescriptionId && (
-            <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+            <p className="text-[11px] text-muted-foreground">
               This payment is recorded against the prescription, so the same medicine is not charged again on the patient's hospital bill.
             </p>
           )}
@@ -303,15 +303,15 @@ export const PharmacyPOS = () => {
             {cart.map((item, index) => (
               <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-canvas text-xs">
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-slate-900 dark:text-slate-100 truncate">{item.item_name}</p>
-                  <p className="text-graphite-500 dark:text-slate-400">{formatPrice(item.unit_price)} each</p>
+                  <p className="font-bold text-foreground truncate">{item.item_name}</p>
+                  <p className="text-muted-foreground">{formatPrice(item.unit_price)} each</p>
                 </div>
                 <div className="flex items-center gap-0.5">
-                  <button aria-label={`Decrease quantity of ${item.item_name}`} onClick={() => updateQuantity(index, -1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
+                  <button aria-label={`Decrease quantity of ${item.item_name}`} onClick={() => updateQuantity(index, -1)} className="h-6 w-6 rounded flex items-center justify-center bg-card border border-border hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Minus className="h-3 w-3" />
                   </button>
                   <span className="w-7 text-center font-semibold">{item.quantity}</span>
-                  <button aria-label={`Increase quantity of ${item.item_name}`} onClick={() => updateQuantity(index, 1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
+                  <button aria-label={`Increase quantity of ${item.item_name}`} onClick={() => updateQuantity(index, 1)} className="h-6 w-6 rounded flex items-center justify-center bg-card border border-border hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
@@ -322,7 +322,7 @@ export const PharmacyPOS = () => {
               </div>
             ))}
             {cart.length === 0 && (
-              <div className="text-center py-8 text-graphite-500 dark:text-slate-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" />
                 <p className="text-xs font-bold">Click items to add to cart</p>
               </div>
@@ -331,13 +331,13 @@ export const PharmacyPOS = () => {
         </ScrollArea>
 
         {/* Totals + Payment */}
-        <div className="border-t border-canvas-silk p-3 space-y-3">
+        <div className="border-t border-border p-3 space-y-3">
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between font-medium"><span className="text-graphite-500 dark:text-slate-400">Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            <div className="flex justify-between font-medium"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(subtotal)}</span></div>
             {discountPercent > 0 && (
               <div className="flex justify-between font-medium text-success-500"><span>Discount ({discountPercent}%)</span><span>-{formatPrice(discountAmount)}</span></div>
             )}
-            <div className="flex justify-between font-bold text-base pt-1 border-t border-canvas-silk dark:border-slate-800">
+            <div className="flex justify-between font-bold text-base pt-1 border-t border-border">
               <span>Total</span><span className="text-primary-500">{formatPrice(totalAmount)}</span>
             </div>
           </div>
@@ -345,7 +345,7 @@ export const PharmacyPOS = () => {
           {/* Discount Selector */}
           <div className="flex gap-1">
             {POS_DISCOUNT_BANDS.map((d) => (
-              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-semibold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
+              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-xs font-semibold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-muted text-muted-foreground hover:bg-canvas-silk"}`}>
                 {d === 0 ? "No Disc" : `${d}%`}
               </button>
             ))}
@@ -359,14 +359,14 @@ export const PharmacyPOS = () => {
               { value: "card", icon: <CreditCard className="h-3.5 w-3.5" />, label: "Card" },
               { value: "insurance", icon: <Shield className="h-3.5 w-3.5" />, label: "Insurance" },
             ].map((pm) => (
-              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
+              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-muted text-muted-foreground"}`}>
                 {pm.icon}{pm.label}
               </button>
             ))}
           </div>
 
           {paymentMethod !== "cash" && (
-            <input placeholder="Reference / Transaction ID" value={paymentRef} onChange={(e) => setPaymentRef(e.target.value)} className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs" />
+            <input placeholder="Reference / Transaction ID" value={paymentRef} onChange={(e) => setPaymentRef(e.target.value)} className="w-full p-2 rounded-md border border-border text-xs" />
           )}
 
           <button
@@ -382,20 +382,20 @@ export const PharmacyPOS = () => {
 
       {/* Close Register Dialog */}
       <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>
-        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-sm bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">Close Register</DialogTitle></DialogHeader>
           <div className="space-y-3 text-xs py-2">
             {activeSession && (
               <div className="p-3 rounded-xl bg-canvas space-y-1">
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Opening Balance:</span><span className="font-semibold">{formatPrice(activeSession.opening_balance)}</span></div>
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Total Sales:</span><span className="font-semibold text-success-500">{formatPrice(activeSession.total_sales)}</span></div>
-                <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Transactions:</span><span className="font-semibold">{activeSession.transaction_count}</span></div>
-                <div className="flex justify-between border-t border-canvas-silk pt-1"><span className="font-semibold">Expected Cash:</span><span className="font-bold text-primary-500">{formatPrice(Number(activeSession.opening_balance || 0) + Number(activeSession.cash_sales || 0))}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground font-bold">Opening Balance:</span><span className="font-semibold">{formatPrice(activeSession.opening_balance)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground font-bold">Total Sales:</span><span className="font-semibold text-success-500">{formatPrice(activeSession.total_sales)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground font-bold">Transactions:</span><span className="font-semibold">{activeSession.transaction_count}</span></div>
+                <div className="flex justify-between border-t border-border pt-1"><span className="font-semibold">Expected Cash:</span><span className="font-bold text-primary-500">{formatPrice(Number(activeSession.opening_balance || 0) + Number(activeSession.cash_sales || 0))}</span></div>
               </div>
             )}
             <div>
-              <label className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Actual Closing Balance ({getSymbol()})</label>
-              <input type="number" value={closingBalanceInput} onChange={(e) => setClosingBalanceInput(e.target.value)} className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              <label className="font-semibold text-muted-foreground uppercase">Actual Closing Balance ({getSymbol()})</label>
+              <input type="number" value={closingBalanceInput} onChange={(e) => setClosingBalanceInput(e.target.value)} className="w-full mt-1 p-2 rounded-md border border-border font-bold" />
             </div>
           </div>
           <DialogFooter>
@@ -407,7 +407,7 @@ export const PharmacyPOS = () => {
 
       {/* Receipt Dialog */}
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
-        <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
+        <DialogContent className="max-w-sm bg-card border border-border">
           <DialogHeader>
             <DialogTitle className="font-semibold text-base flex items-center gap-2">
               <Receipt className="h-5 w-5 text-success-500" /> Sale Receipt
@@ -415,13 +415,13 @@ export const PharmacyPOS = () => {
           </DialogHeader>
           {lastSale && (
             <div className="space-y-2 text-xs font-mono py-2">
-              <div className="text-center pb-2 border-b border-dashed border-graphite-300 dark:border-slate-700">
+              <div className="text-center pb-2 border-b border-dashed border-border">
                 <p className="font-semibold text-sm">Doc'O Clock Pharmacy</p>
-                <p className="text-graphite-500 dark:text-slate-400">{lastSale.receipt_number}</p>
-                <p className="text-graphite-500 dark:text-slate-400">{new Date(lastSale.created_at).toLocaleString()}</p>
+                <p className="text-muted-foreground">{lastSale.receipt_number}</p>
+                <p className="text-muted-foreground">{new Date(lastSale.created_at).toLocaleString()}</p>
               </div>
               {lastSale.customer_name && <p className="font-bold">Customer: {lastSale.customer_name}</p>}
-              <div className="space-y-1 border-b border-dashed border-graphite-300 dark:border-slate-700 pb-2">
+              <div className="space-y-1 border-b border-dashed border-border pb-2">
                 {lastSale.items?.map((item: CartItem, i: number) => (
                   <div key={i} className="flex justify-between">
                     <span>{item.quantity}x {item.item_name}</span>
@@ -429,15 +429,15 @@ export const PharmacyPOS = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400">Subtotal:</span><span>{formatPrice(lastSale.subtotal)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span>{formatPrice(lastSale.subtotal)}</span></div>
               {lastSale.discount_amount > 0 && <div className="flex justify-between text-success-500"><span>Discount:</span><span>-{formatPrice(lastSale.discount_amount)}</span></div>}
-              <div className="flex justify-between font-bold text-sm border-t border-canvas-silk pt-1"><span>TOTAL:</span><span className="text-primary-500">{formatPrice(lastSale.total_amount)}</span></div>
-              <p className="capitalize text-graphite-500 dark:text-slate-400">Paid by: {lastSale.payment_method?.replace("_", " ")}</p>
-              <p className="text-center text-graphite-500 dark:text-slate-400 pt-1 border-t border-dashed border-graphite-300 dark:border-slate-700">Thank you for your purchase!</p>
+              <div className="flex justify-between font-bold text-sm border-t border-border pt-1"><span>TOTAL:</span><span className="text-primary-500">{formatPrice(lastSale.total_amount)}</span></div>
+              <p className="capitalize text-muted-foreground">Paid by: {lastSale.payment_method?.replace("_", " ")}</p>
+              <p className="text-center text-muted-foreground pt-1 border-t border-dashed border-border">Thank you for your purchase!</p>
             </div>
           )}
           <DialogFooter>
-            <button onClick={() => window.print()} className="px-3 py-1.5 text-xs font-bold border border-graphite-300 dark:border-slate-700 rounded-md flex items-center gap-1">
+            <button onClick={() => window.print()} className="px-3 py-1.5 text-xs font-bold border border-border rounded-md flex items-center gap-1">
               <Printer className="h-3.5 w-3.5" /> Print
             </button>
             {lastSale && (

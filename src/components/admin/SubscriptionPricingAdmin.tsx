@@ -127,7 +127,7 @@ export function SubscriptionPricingAdmin() {
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
         </Button>
       </div>
-      <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">
+      <p className="text-xs text-muted-foreground mb-4">
         Edit any plan's monthly and annual Kwacha prices. Saving updates the live pricing page
         immediately — no code deploy needed. Use the ×12 button to set the annual price from the monthly one.
       </p>

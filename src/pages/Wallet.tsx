@@ -69,7 +69,7 @@ const Wallet = () => {
                                     <ShieldCheck className="h-3 w-3" /> {currency} · {getSymbol()} · Live FX
                                 </span>
                             </h1>
-                            <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
+                            <p className="text-sm text-muted-foreground font-medium tracking-wide">
                                 {isEarner
                                     ? "Your earnings, top-ups, and transaction history — settlement is always ZMW"
                                     : "Balances, top-ups, and transaction history — display converts at live bank rates, settlement is always ZMW"}

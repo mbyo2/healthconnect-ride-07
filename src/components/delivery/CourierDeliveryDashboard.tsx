@@ -141,7 +141,7 @@ export function CourierDeliveryDashboard() {
       <div className="space-y-4" role="status" aria-label="Loading deliveries">
         <Skeleton className="h-9 w-full rounded-lg" />
         {[0, 1].map((i) => (
-          <div key={i} className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-3" aria-hidden>
+          <div key={i} className="rounded-2xl border border-border bg-white p-4 shadow-sm dark:bg-slate-900 space-y-3" aria-hidden>
             <div className="flex items-center justify-between">
               <SkeletonLine className="h-5 w-36" />
               <Skeleton className="h-6 w-20 rounded-full" />
@@ -185,7 +185,7 @@ export function CourierDeliveryDashboard() {
         className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
           gpsError
             ? 'border-error-500/30 bg-error-500/5 text-error-600 dark:text-error-400'
-            : 'border-success-500/30 bg-success-500/5 text-graphite-700 dark:text-slate-200'
+            : 'border-success-500/30 bg-success-500/5 text-foreground'
         }`}
         role="status"
       >

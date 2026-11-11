@@ -71,7 +71,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
         className={`absolute -right-3 top-6 z-40 h-6 w-6 rounded-full border shadow-md flex items-center justify-center transition-transform hover:scale-110 ${
           isDarkMode
             ? "bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700"
-            : "bg-white dark:bg-slate-900 border-slate-200 text-slate-700 hover:bg-slate-100"
+            : "bg-card border-slate-200 text-slate-700 hover:bg-slate-100"
         }`}
         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
       >

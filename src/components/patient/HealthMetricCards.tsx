@@ -122,8 +122,8 @@ export function HealthMetricCards() {
             <div
               key={m.key}
               className={cn(
-                "rounded-2xl border border-canvas-silk dark:border-slate-800 p-4 min-h-[112px]",
-                "flex flex-col justify-between bg-white dark:bg-slate-900"
+                "rounded-2xl border border-border p-4 min-h-[112px]",
+                "flex flex-col justify-between bg-card"
               )}
             >
               <span
@@ -135,7 +135,7 @@ export function HealthMetricCards() {
                 <Icon className="h-5 w-5" aria-hidden />
               </span>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-graphite-500 dark:text-slate-400">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   {m.label}
                 </p>
                 <p className="text-2xl font-semibold text-midnight dark:text-white leading-tight">

@@ -42,7 +42,7 @@ export const InstitutionPageHeader = ({
   badges,
   actions,
   titleClassName = "font-display text-2xl font-medium tracking-tight text-midnight",
-  subtitleClassName = "text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide",
+  subtitleClassName = "text-sm text-muted-foreground font-medium tracking-wide",
   className = "py-4 shadow-2xs",
 }: InstitutionPageHeaderProps) => {
   return (

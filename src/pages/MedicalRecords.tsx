@@ -115,9 +115,9 @@ export default function MedicalRecords() {
         <div className="max-w-content mx-auto space-y-4" role="status" aria-label="Loading your health records">
           <Skeleton className="h-10 w-64 rounded-xl" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 rounded-2xl border border-border bg-white px-5 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
+            <div className="lg:col-span-2 rounded-2xl border border-border bg-card px-5" aria-hidden>
               {[0, 1, 2, 3].map((i) => (
-                <SkeletonListRow key={i} className="border-b border-border py-4 last:border-0 dark:border-slate-800" />
+                <SkeletonListRow key={i} className="border-b border-border py-4 last:border-0 " />
               ))}
             </div>
             <SkeletonCard className="h-64">
@@ -252,7 +252,7 @@ export default function MedicalRecords() {
                   records.map((record) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors"
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background hover:bg-muted/80 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-card rounded-lg border border-border">
@@ -271,7 +271,7 @@ export default function MedicalRecords() {
                           onClick={() => downloadRecord(record)}
                           aria-label={`Download record: ${record.title}`}
                           title="Download record (JSON)"
-                          className="p-3 min-h-[44px] min-w-[44px] rounded-lg border border-border dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
+                          className="p-3 min-h-[44px] min-w-[44px] rounded-lg border border-border text-muted-foreground hover:bg-white transition-colors flex items-center justify-center"
                         >
                           <Download className="h-3.5 w-3.5" />
                         </button>
@@ -285,7 +285,7 @@ export default function MedicalRecords() {
                     </p>
                     <button
                       onClick={() => navigate('/ai-diagnostics')}
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border text-xs font-semibold hover:bg-canvas transition-colors"
                     >
                       Scan your first document
                     </button>
@@ -361,7 +361,7 @@ export default function MedicalRecords() {
                       </p>
                       <button
                         onClick={() => navigate('/iot-monitoring')}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border text-xs font-semibold hover:bg-canvas transition-colors"
                       >
                         Record vitals
                       </button>
@@ -396,20 +396,20 @@ export default function MedicalRecords() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <button
                 onClick={() => navigate('/appointments')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-muted transition-colors text-xs font-semibold"
               >
                 <Calendar className="h-4 w-4 text-primary-500" />
                 <span>Schedule Checkup</span>
               </button>
               <button
                 onClick={() => toast.info("Records from your providers appear here automatically after each visit.")}
-                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-muted transition-colors text-xs font-semibold">
                 <FileText className="h-4 w-4 text-purple-500" />
                 <span>Request Records</span>
               </button>
               <button
                 onClick={() => navigate('/health-dashboard')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-muted transition-colors text-xs font-semibold"
               >
                 <Heart className="h-4 w-4 text-error-500" />
                 <span>Health Summary</span>

@@ -188,7 +188,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
     return (
       <Card>
         <CardContent className="py-6" role="status" aria-label="Loading deliveries">
-          <div className="divide-y divide-canvas-silk dark:divide-slate-800" aria-hidden>
+          <div className="divide-y divide-border" aria-hidden>
             {[0, 1, 2].map((i) => (
               <SkeletonListRow key={i} avatar={false} action />
             ))}
@@ -233,7 +233,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                   )}
                   <div className="mt-3 flex items-center justify-end gap-2">
                     {d.courierDelivery ? (
-                      <span className="mr-auto text-xs font-semibold text-graphite-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <span className="mr-auto text-xs font-semibold text-foreground flex items-center gap-1.5">
                         <Truck className="h-3.5 w-3.5" />
                         Courier delivery: {String(d.courierDelivery.status).replace(/_/g, " ")}
                         {d.courierDelivery.courier_id ? " · courier assigned" : " · awaiting courier"}
@@ -287,7 +287,7 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                   </div>
                   {/* Courier dispatch + live map (Yango-level, CEO 2026-10-10) */}
                   {d.status === "pending" && !d.courier_id && (
-                    <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border">
+                    <div className="mt-3 p-3 rounded-xl bg-muted/50 border border-border">
                       <AutoDispatch
                         deliveryId={d.id}
                         pickupLat={d.pickup_lat}

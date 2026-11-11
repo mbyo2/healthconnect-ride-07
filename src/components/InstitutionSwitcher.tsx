@@ -31,7 +31,7 @@ export const InstitutionSwitcher = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 gap-2 px-3 rounded-pill border border-canvas-silk dark:border-slate-700 hover:bg-canvas-bone dark:hover:bg-slate-800"
+          className="h-9 gap-2 px-3 rounded-pill border border-border hover:bg-canvas-bone "
           aria-label="Switch institution"
         >
           <Building2 className="h-4 w-4 text-primary-500" />

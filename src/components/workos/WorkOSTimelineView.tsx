@@ -24,7 +24,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
         isDarkMode ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200 shadow-sm"
       }`}>
         {/* Timeline Header Bar */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-blue-500" />
             <h3 className="font-semibold text-base tracking-tight">Today's Clinical Shift & Treatment Timeline</h3>
@@ -46,7 +46,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
 
         {/* Timeline Grid Table */}
         <div className="mt-4">
-          <div className="grid grid-cols-12 gap-2 text-xs font-mono font-bold uppercase text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div className="grid grid-cols-12 gap-2 text-xs font-mono font-bold uppercase text-slate-400 pb-2 border-b border-border">
             <div className="col-span-4">Patient / Ward Unit</div>
             <div className="col-span-8 grid grid-cols-8 text-center">
               {TIME_SLOTS.map((slot) => (
@@ -77,7 +77,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
                       className="h-7 w-7 rounded-full object-cover border border-blue-500/30 flex-shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="font-bold text-xs truncate text-slate-900 dark:text-slate-100">{patient.name}</div>
+                      <div className="font-bold text-xs truncate text-foreground">{patient.name}</div>
                       <div className="text-xs text-slate-400 truncate flex items-center gap-1">
                         <span className="font-mono text-blue-500">{patient.location}</span>
                         <span>•</span>

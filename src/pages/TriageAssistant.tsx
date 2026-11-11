@@ -133,7 +133,7 @@ function Chip({
       : "bg-error-50 dark:bg-red-950/30 border-error-200 dark:border-red-900 text-error-700 dark:text-red-300 hover:border-error-400"
     : selected
       ? "bg-primary-500 border-primary-500 text-white"
-      : "bg-white dark:bg-slate-800 border-border dark:border-slate-700 text-graphite-700 dark:text-slate-200 hover:border-primary-400";
+      : "bg-card border-border text-foreground hover:border-primary-400";
   return (
     <button type="button" aria-pressed={selected} onClick={onClick} className={`${base} ${styles}`}>
       {children}
@@ -345,7 +345,7 @@ export default function TriageAssistant() {
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">AI Symptom Triage</h1>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               {triageMode === "patient"
                 ? "Tell us how you feel — we'll point you to the right care and help you book"
                 : "Tell us how you feel — we'll point you to the right care"}
@@ -368,7 +368,7 @@ export default function TriageAssistant() {
         )}
 
         {step === "intro" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
             <h2 className="font-semibold text-base flex items-center gap-2">
               <Stethoscope className="h-5 w-5 text-primary-500" /> Before you start
             </h2>
@@ -378,7 +378,7 @@ export default function TriageAssistant() {
               If you are in an emergency right now, call <strong>116</strong> immediately
               instead of using this tool.
             </div>
-            <div className="rounded-xl bg-primary-50 dark:bg-blue-950/40 border border-primary-100 dark:border-blue-900 px-4 py-3 text-sm text-graphite-700 dark:text-slate-200 flex gap-3">
+            <div className="rounded-xl bg-primary-50 dark:bg-blue-950/40 border border-primary-100 dark:border-blue-900 px-4 py-3 text-sm text-foreground flex gap-3">
               <ShieldCheck className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
               <p>
                 <strong>Private by design.</strong> We only ask about your symptoms —
@@ -387,7 +387,7 @@ export default function TriageAssistant() {
                 anonymous symptom summary used by the AI step.
               </p>
             </div>
-            <p className="text-sm font-medium text-graphite-700 dark:text-slate-200">
+            <p className="text-sm font-medium text-foreground">
               {TRIAGE_MODE_INTRO[triageMode]}
             </p>
             <button
@@ -401,13 +401,13 @@ export default function TriageAssistant() {
         )}
 
         {step === "intake" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-6">
             {/* Danger signs FIRST — selecting one escalates on continue */}
             <div className="space-y-2">
               <h2 className="font-semibold text-sm flex items-center gap-2 text-error-600 dark:text-red-400">
                 <AlertTriangle className="h-4 w-4" /> Are you experiencing any of these right now?
               </h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 If yes, tap them — we will tell you to get emergency help straight away.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -458,7 +458,7 @@ export default function TriageAssistant() {
                 placeholder="Describe how you feel in your own words — e.g. 'Sharp pain in my lower right belly since this morning'"
                 rows={3}
                 maxLength={500}
-                className="w-full mt-1 p-3 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-3 rounded-xl border border-border bg-card text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -496,7 +496,7 @@ export default function TriageAssistant() {
 
             <div className="space-y-2">
               <h2 className="font-semibold text-sm">Who is this for?</h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Age group only — some danger signs depend on age, like fever in a young baby.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -514,7 +514,7 @@ export default function TriageAssistant() {
 
             <div className="space-y-2">
               <h2 className="font-semibold text-sm">Are you pregnant?</h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Asked only because some pregnancy symptoms need urgent care.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -534,7 +534,7 @@ export default function TriageAssistant() {
               <button
                 type="button"
                 onClick={() => setStep("intro")}
-                className="px-4 py-3 rounded-xl border border-border dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
+                className="px-4 py-3 rounded-xl border border-border font-semibold text-sm flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
@@ -556,12 +556,12 @@ export default function TriageAssistant() {
         )}
 
         {step === "followup" && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-5">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-5">
             <div>
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary-500" /> A few more questions
               </h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-muted-foreground font-medium mt-0.5">
                 {aiMode === "meta"
                   ? "Asked by Meta AI to understand your symptoms better."
                   : "From Doc'O Clock's built-in safety rules."}{" "}
@@ -588,7 +588,7 @@ export default function TriageAssistant() {
               <button
                 type="button"
                 onClick={() => setStep("intake")}
-                className="px-4 py-3 rounded-xl border border-border dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
+                className="px-4 py-3 rounded-xl border border-border font-semibold text-sm flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
@@ -618,7 +618,7 @@ export default function TriageAssistant() {
                 These can be signs of an emergency.
               </div>
             )}
-            <p className="text-sm font-medium text-graphite-700 dark:text-slate-200">
+            <p className="text-sm font-medium text-foreground">
               Do not wait for an online consultation. Call an ambulance now, or go to
               the nearest hospital immediately. If someone is with you, ask them to
               stay with you until help arrives.
@@ -639,12 +639,12 @@ export default function TriageAssistant() {
               </a>
               <a
                 href="tel:999"
-                className="py-3.5 rounded-xl bg-white dark:bg-slate-900 border-2 border-error-500 text-error-600 dark:text-red-400 font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                className="py-3.5 rounded-xl bg-card border-2 border-error-500 text-error-600 dark:text-red-400 font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
               >
                 <Phone className="h-5 w-5" /> Call 999 — Police
               </a>
             </div>
-            <p className="text-xs font-medium text-graphite-500 dark:text-slate-400">
+            <p className="text-xs font-medium text-muted-foreground">
               Zambia emergency numbers: ambulance 116 · police 999 · fire 993. You can
               also open the{" "}
               <button type="button" onClick={() => navigate("/emergency")} className="underline font-semibold">
@@ -655,7 +655,7 @@ export default function TriageAssistant() {
             <button
               type="button"
               onClick={restart}
-              className="text-xs font-semibold text-graphite-500 dark:text-slate-400 underline"
+              className="text-xs font-semibold text-muted-foreground underline"
             >
               Start again
             </button>
@@ -664,7 +664,7 @@ export default function TriageAssistant() {
 
         {step === "assessment" && assessment && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white ${
@@ -677,7 +677,7 @@ export default function TriageAssistant() {
                     <><CheckCircle2 className="h-3.5 w-3.5" /> Routine — book a visit</>
                   )}
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-canvas-bone dark:bg-slate-800 text-graphite-600 dark:text-slate-300">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-muted text-foreground">
                   <Clock className="h-3.5 w-3.5" /> {assessment.timeframe}
                 </span>
               </div>
@@ -687,13 +687,13 @@ export default function TriageAssistant() {
                 <p className="text-lg font-semibold mt-1 flex items-center gap-2">
                   <Stethoscope className="h-5 w-5 text-primary-500" /> {assessment.profession.label}
                 </p>
-                <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium mt-1">
+                <p className="text-sm text-foreground font-medium mt-1">
                   {assessment.summary}
                 </p>
               </div>
 
               {assessment.source === "meta-ai" ? (
-                <p className="text-xs font-medium text-graphite-500 dark:text-slate-400 flex items-center gap-1.5">
+                <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5 text-primary-500" />
                   Guided by Meta AI (Llama), checked against Doc&apos;O Clock&apos;s safety rules —
                   the rules always win if the two disagree.
@@ -718,7 +718,7 @@ export default function TriageAssistant() {
                 ) : (
                   <p
                     key={`${stepDef.label}-${idx}`}
-                    className="text-sm font-medium text-graphite-600 dark:text-slate-300"
+                    className="text-sm font-medium text-foreground"
                   >
                     {stepDef.label}
                     {stepDef.description ? <> {stepDef.description}</> : null}
@@ -734,7 +734,7 @@ export default function TriageAssistant() {
             <button
               type="button"
               onClick={restart}
-              className="text-xs font-semibold text-graphite-500 dark:text-slate-400 underline flex items-center gap-1.5"
+              className="text-xs font-semibold text-muted-foreground underline flex items-center gap-1.5"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Start again
             </button>

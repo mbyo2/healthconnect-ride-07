@@ -193,7 +193,7 @@ export default function TriageIntake() {
               Symptom Check
               <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               Tell us how you feel — we'll suggest the right care and help you book a visit
             </p>
             <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2 mt-2 font-medium">
@@ -205,54 +205,54 @@ export default function TriageIntake() {
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Symptom Intake Card */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-          <div className="border-b border-canvas-silk pb-3">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="border-b border-border pb-3">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <Stethoscope className="h-4 w-4 text-primary-500" /> Tell us your symptoms
             </h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">
               Your answers are private and saved to your health record.
             </p>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <label htmlFor="cc" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Main symptom or problem *</label>
+              <label htmlFor="cc" className="font-semibold text-muted-foreground uppercase">Main symptom or problem *</label>
               <input
                 id="cc"
                 placeholder="e.g. Sharp chest tightness for 2 hours, radiating to left shoulder"
                 value={chiefComplaint}
                 onChange={(e) => setChiefComplaint(e.target.value)}
                 maxLength={500}
-                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border bg-card font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
             <div>
-              <label htmlFor="sy" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Other symptoms (separate with commas)</label>
+              <label htmlFor="sy" className="font-semibold text-muted-foreground uppercase">Other symptoms (separate with commas)</label>
               <input
                 id="sy"
                 placeholder="shortness of breath, sweating, mild nausea"
                 value={symptomsText}
                 onChange={(e) => setSymptomsText(e.target.value)}
-                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border bg-card font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="dur" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">How long has this been going on?</label>
+                <label htmlFor="dur" className="font-semibold text-muted-foreground uppercase">How long has this been going on?</label>
                 <input
                   id="dur"
                   placeholder="e.g. 3 hours / 2 days"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
-                  className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full mt-1 p-2.5 rounded-md border border-border bg-card font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label id="severity-label" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">How bad is it?</label>
+                  <label id="severity-label" className="font-semibold text-muted-foreground uppercase">How bad is it?</label>
                   <span className="font-mono font-bold text-sm text-primary-500" aria-hidden="true">{severity}/10</span>
                 </div>
                 <Slider
@@ -270,7 +270,7 @@ export default function TriageIntake() {
             </div>
 
             <div>
-              <label htmlFor="notes" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Your medical background (optional)</label>
+              <label htmlFor="notes" className="font-semibold text-muted-foreground uppercase">Your medical background (optional)</label>
               <textarea
                 id="notes"
                 placeholder="Medicines you take, allergies, ongoing conditions..."
@@ -278,7 +278,7 @@ export default function TriageIntake() {
                 onChange={(e) => setExtraNotes(e.target.value)}
                 maxLength={2000}
                 rows={3}
-                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border bg-card font-medium text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -301,11 +301,11 @@ export default function TriageIntake() {
 
         {/* Result Assessment Card */}
         {result && meta && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Your result</h2>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">Best doctor type for you: <strong className="text-slate-900 dark:text-slate-100">{result.recommended_specialty}</strong></p>
+                <h2 className="font-semibold text-sm text-foreground">Your result</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Best doctor type for you: <strong className="text-foreground">{result.recommended_specialty}</strong></p>
               </div>
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${meta.pillColor}`}>
                 {meta.icon} {meta.label}
@@ -317,7 +317,7 @@ export default function TriageIntake() {
                 <AlertTriangle className="h-5 w-5 text-error-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-sm text-error-500">Get emergency help now</h3>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">
+                  <p className="text-xs text-foreground mt-1">
                     {result.recommended_action} Call local emergency services (116 / 112) immediately.
                   </p>
                 </div>
@@ -327,7 +327,7 @@ export default function TriageIntake() {
             {result.red_flags.length > 0 && (
               <div className="p-3.5 rounded-xl border border-warning-500/30 bg-warning-500/5 text-xs">
                 <p className="font-semibold text-warning-500 mb-1">Warning signs to watch:</p>
-                <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-0.5">
+                <ul className="list-disc list-inside text-foreground space-y-0.5">
                   {result.red_flags.map((rf, i) => (
                     <li key={i}>{rf}</li>
                   ))}
@@ -336,25 +336,25 @@ export default function TriageIntake() {
             )}
 
             <div className="text-xs space-y-1">
-              <p className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">What we recommend</p>
-              <p className="text-slate-800 dark:text-slate-200 font-medium">{result.recommended_action}</p>
+              <p className="font-semibold text-muted-foreground uppercase">What we recommend</p>
+              <p className="text-foreground font-medium">{result.recommended_action}</p>
             </div>
 
             {result.reasoning && (
-              <p className="text-xs text-graphite-500 dark:text-slate-400 italic bg-canvas dark:bg-slate-800 p-3 rounded-xl border border-canvas-silk dark:border-slate-700">
+              <p className="text-xs text-muted-foreground italic bg-canvas dark:bg-slate-800 p-3 rounded-xl border border-border">
                 Why we think this: {result.reasoning}
               </p>
             )}
 
             {result.urgency !== "emergency" && (
               <div className="pt-2 space-y-3">
-                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase">
+                <p className="text-xs font-semibold text-foreground uppercase">
                   {result.providers.length > 0 ? "Doctors we recommend for you" : "No matching doctors available right now"}
                 </p>
                 {result.providers.length === 0 && (
                   <button
                     onClick={() => navigate("/search")}
-                    className="w-full py-2.5 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-primary-500 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                    className="w-full py-2.5 rounded-xl border border-border bg-card font-bold text-xs text-primary-500 hover:bg-muted dark:hover:bg-slate-700"
                   >
                     Browse all doctors
                   </button>
@@ -362,11 +362,11 @@ export default function TriageIntake() {
                 {result.providers.map((p) => {
                   const name = providerDisplayName({ first_name: p.first_name, last_name: p.last_name, role: (p as any)?.role });
                   return (
-                    <div key={p.id} className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
+                    <div key={p.id} className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-canvas dark:bg-slate-800">
                       <div className="flex-1">
                         <p className="font-semibold text-xs text-primary-500">{name}</p>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <p className="text-xs text-graphite-500 dark:text-slate-400">
+                          <p className="text-xs text-muted-foreground">
                             {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""}
                           </p>
                           {p.rating && (

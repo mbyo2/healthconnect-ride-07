@@ -177,7 +177,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
   const selected = patients.find((p) => p.id === selectedId) || null;
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -199,7 +199,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
 
         <button
           onClick={() => setRegisterOpen(true)}
-          className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+          className="px-4 py-2 rounded-xl bg-card text-foreground font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
         >
           <UserPlus className="h-4 w-4" /> Register New Patient
         </button>
@@ -217,7 +217,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               placeholder="Search by name, email, phone…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-border bg-card text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
@@ -259,7 +259,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                     className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                       isSelected
                         ? "bg-primary-500/10 border-primary-500 shadow-xs"
-                        : "bg-white dark:bg-slate-900 border-canvas-silk dark:border-slate-800 hover:border-slate-300"
+                        : "bg-card border-border hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -268,7 +268,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                         Last visit: {p.lastVisit ? new Date(p.lastVisit).toLocaleDateString() : "—"}
                       </span>
                     </div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 mt-1">{p.name}</h4>
+                    <h4 className="font-bold text-sm text-foreground mt-1">{p.name}</h4>
                     <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                       <span className="truncate">{p.condition}</span>
                     </div>
@@ -280,7 +280,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
         </div>
 
         {/* Right 7 Cols: Detailed Dossier */}
-        <div className="lg:col-span-7 p-6 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-6 text-xs">
+        <div className="lg:col-span-7 p-6 rounded-2xl border border-border bg-card shadow-xs space-y-6 text-xs">
           {!selected ? (
             <div className="py-12 text-center">
               <Users className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />
@@ -289,9 +289,9 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-border pb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{selected.name}</h3>
+                  <h3 className="text-xl font-bold text-foreground mt-0.5">{selected.name}</h3>
                   <p className="text-slate-400">
                     {selected.status}
                     {selected.email ? ` · ${selected.email}` : ""}
@@ -317,7 +317,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                   <span className="text-xs font-bold uppercase text-primary-500 flex items-center gap-1">
                     <HeartPulse className="h-3.5 w-3.5" aria-hidden /> Current Context
                   </span>
-                  <div className="mt-1 font-bold text-slate-900 dark:text-slate-100">
+                  <div className="mt-1 font-bold text-foreground">
                     {selected.condition || "—"}
                   </div>
                 </div>
@@ -326,12 +326,12 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               {/* Documents */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 uppercase text-xs">
+                  <span className="font-semibold text-foreground uppercase text-xs">
                     Clinical Documents
                   </span>
                   <button
                     onClick={() => navigate("/medical-records")}
-                    className="px-3 py-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
+                    className="px-3 py-1 rounded-lg border border-border text-xs font-bold hover:bg-muted flex items-center gap-1"
                   >
                     <FileText className="h-3 w-3" aria-hidden /> Open Medical Records
                   </button>

@@ -33,7 +33,7 @@ export const MessageBubble = ({ message, isMine = false }: MessageBubbleProps) =
           "max-w-[82%] sm:max-w-[75%] rounded-2xl px-3.5 py-2.5 shadow-xs",
           mine
             ? "rounded-br-md bg-primary-500 text-white"
-            : "rounded-bl-md bg-canvas-bone dark:bg-slate-800 text-midnight dark:text-slate-100 border border-canvas-silk dark:border-slate-700"
+            : "rounded-bl-md bg-muted text-midnight dark:text-slate-100 border border-border"
         )}
       >
         <div className="break-words text-sm leading-relaxed whitespace-pre-wrap">

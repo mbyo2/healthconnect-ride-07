@@ -210,14 +210,14 @@ const NotificationsPage = () => {
               />
             </div>
           ) : (
-            <div className="divide-y divide-canvas-silk">
+            <div className="divide-y divide-border">
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
                   className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-background"}`}
                 >
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-border shadow-2xs">
+                    <div className="p-2.5 rounded-xl bg-card border border-border shadow-2xs">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -243,7 +243,7 @@ const NotificationsPage = () => {
                     <button
                       onClick={() => markAsRead(notification.id)}
                       aria-label={`Mark as read: ${notification.title}`}
-                      className="px-3 py-1 min-h-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold flex items-center gap-1 hover:bg-muted dark:hover:bg-slate-700"
+                      className="px-3 py-1 min-h-[44px] rounded-md border border-border bg-card text-xs font-semibold flex items-center gap-1 hover:bg-muted dark:hover:bg-slate-700"
                     >
                       <Check className="h-3.5 w-3.5 text-success-500" /> Mark Read
                     </button>

@@ -74,7 +74,7 @@ const ProviderProfile = () => {
         <Header />
         <main className="container mx-auto px-4 pt-20 pb-24" role="status" aria-label="Loading provider profile">
           <div className="grid lg:grid-cols-3 gap-6">
-            <div aria-hidden className="rounded-2xl border border-canvas-silk bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:col-span-1 space-y-5">
+            <div aria-hidden className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:bg-slate-900 lg:col-span-1 space-y-5">
               <div className="flex flex-col items-center text-center space-y-3">
                 <SkeletonCircle className="h-28 w-28" />
                 <SkeletonLine className="h-5 w-40" />

@@ -194,7 +194,7 @@ const Medications = () => {
                 My Medications
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{activeMedications.length} active</span>
               </h1>
-              <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
+              <p className="text-sm text-muted-foreground font-medium tracking-wide">
                 {activeMedications.length} active medication{activeMedications.length !== 1 ? 's' : ''} · reminders & refills
               </p>
             </div>
@@ -331,7 +331,7 @@ const Medications = () => {
       {loading ? (
         <div className="space-y-4">
           {[0, 1].map((i) => (
-            <div key={i} className="h-32 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 animate-pulse" />
+            <div key={i} className="h-32 rounded-xl bg-card border border-border animate-pulse" />
           ))}
         </div>
       ) : loadError ? (
@@ -360,7 +360,7 @@ const Medications = () => {
 
       {/* Medication Lists */}
       <Tabs defaultValue="active">
-        <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+        <TabsList className="bg-card border border-border p-1">
           <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white min-h-[44px] px-4">
             Active ({activeMedications.length})
           </TabsTrigger>
@@ -414,7 +414,7 @@ const Medications = () => {
                     {extendedSchema && (
                       <button
                         onClick={() => toggleMedicationStatus(med.id, med.is_active)}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border bg-card text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
                       >
                         Mark Inactive
                       </button>
@@ -450,7 +450,7 @@ const Medications = () => {
                   {extendedSchema && (
                   <button
                     onClick={() => toggleMedicationStatus(med.id, med.is_active)}
-                    className="px-4 py-2.5 min-h-[44px] rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
+                    className="px-4 py-2.5 min-h-[44px] rounded-xl border border-primary-500 text-primary-500 hover:bg-muted dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
                   >
                     Reactivate
                   </button>

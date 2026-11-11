@@ -79,7 +79,7 @@ export const Testimonials = () => {
   }, [testimonials.length, paused]);
 
   return (
-    <section className="vf-section bg-canvas-bone border-t border-canvas-silk">
+    <section className="vf-section bg-canvas-bone border-t border-border">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">

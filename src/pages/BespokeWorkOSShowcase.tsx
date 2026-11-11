@@ -406,14 +406,14 @@ export const BespokeWorkOSShowcase = () => {
             <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
               isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
             }`}>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div className="flex items-center gap-2 text-amber-500">
                   <Zap className="h-5 w-5" />
                   <h3 className="font-semibold text-lg">Clinical Automations Center</h3>
                 </div>
                 <button
                   onClick={() => setIsAutomationsModalOpen(false)}
-                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                  className={`p-1 rounded-lg hover:bg-slate-200  ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -469,14 +469,14 @@ export const BespokeWorkOSShowcase = () => {
             <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
               isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
             }`}>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div className="flex items-center gap-2 text-indigo-400">
                   <Layers className="h-5 w-5" />
                   <h3 className="font-semibold text-lg">Clinical Integrations Hub</h3>
                 </div>
                 <button
                   onClick={() => setIsIntegrationsModalOpen(false)}
-                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                  className={`p-1 rounded-lg hover:bg-slate-200  ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -511,14 +511,14 @@ export const BespokeWorkOSShowcase = () => {
             <div className={`w-full max-w-lg rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
               isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
             }`}>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-blue-500" />
                   <h3 className="font-semibold text-lg">New Patient Intake ({targetAddGroup})</h3>
                 </div>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className={`p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                  className={`p-1 rounded-lg hover:bg-slate-200  ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -587,7 +587,7 @@ export const BespokeWorkOSShowcase = () => {
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 "
                   >
                     Cancel
                   </button>
@@ -609,7 +609,7 @@ export const BespokeWorkOSShowcase = () => {
             <div className={`w-full max-w-xl h-full border-l p-6 shadow-2xl overflow-y-auto animate-in slide-in-from-right-8 ${
               isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
             }`}>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-500">
                     {selectedPatient.id}
@@ -618,7 +618,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
                 <button
                   onClick={() => setSelectedPatient(null)}
-                  className={`p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                  className={`p-1.5 rounded-lg hover:bg-slate-200  ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -649,7 +649,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
 
                 {/* Assigned Clinical Lead */}
-                <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-border">
                   <img
                     src={selectedPatient.doctor.avatarUrl}
                     alt={selectedPatient.doctor.name}
@@ -671,7 +671,7 @@ export const BespokeWorkOSShowcase = () => {
                 </div>
 
                 {/* Billing Summary */}
-                <div className="flex justify-between items-center p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="flex justify-between items-center p-4 rounded-xl border border-border">
                   <span className={`text-xs font-bold ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Total Billing (ZMW):</span>
                   <span className="text-lg font-mono font-bold text-emerald-500">ZMW K{selectedPatient.billingZMW.toLocaleString()}</span>
                 </div>

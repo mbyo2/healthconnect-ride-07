@@ -678,7 +678,7 @@ export const Prescriptions = () => {
                     <span>Write e-prescription</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card p-6">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border rounded-card p-6">
                   <DialogHeader>
                     <DialogTitle className="font-display text-xl font-medium text-midnight flex items-center gap-2">
                       <Pill className="h-6 w-6 text-primary-500" />
@@ -691,13 +691,13 @@ export const Prescriptions = () => {
                     <div>
                       <label className="font-medium text-graphite-600 uppercase text-xs">1. Select Patient *</label>
                       <input
-                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-950 font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-card font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         placeholder="Search patient by name or email..."
                         value={searchPatient}
                         onChange={(e) => setSearchPatient(e.target.value)}
                       />
                       {patients.length > 0 && !selectedPatient && (
-                        <div className="mt-2 border rounded-xl max-h-36 overflow-y-auto bg-white dark:bg-slate-950 shadow-card">
+                        <div className="mt-2 border rounded-xl max-h-36 overflow-y-auto bg-card shadow-card">
                           {patients.map((p: any) => (
                             <button
                               key={p.id}
@@ -740,7 +740,7 @@ export const Prescriptions = () => {
                     {/* Prescribed Medication Items */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">
+                        <label className="font-bold text-muted-foreground uppercase">
                           2. Medications to Prescribe ({medicationItems.length} item{medicationItems.length > 1 ? 's' : ''})
                         </label>
                         <button
@@ -753,7 +753,7 @@ export const Prescriptions = () => {
                       </div>
 
                       {medicationItems.map((item, idx) => (
-                        <div key={item.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950/60 space-y-3 relative">
+                        <div key={item.id} className="p-4 rounded-2xl border border-border bg-background/60 space-y-3 relative">
                           <div className="flex items-center justify-between">
                             <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                               Medication #{idx + 1}
@@ -771,9 +771,9 @@ export const Prescriptions = () => {
                           </div>
 
                           <div>
-                            <label className="font-bold text-slate-700 dark:text-slate-300">Medication Name *</label>
+                            <label className="font-bold text-foreground">Medication Name *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                               placeholder="e.g. Amoxicillin 500mg"
                               value={item.medication_name}
                               onChange={(e) => {
@@ -791,9 +791,9 @@ export const Prescriptions = () => {
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                              <label className="font-bold text-slate-700 dark:text-slate-300">Dosage / Frequency *</label>
+                              <label className="font-bold text-foreground">Dosage / Frequency *</label>
                               <input
-                                className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                                 placeholder="1 tablet 2x daily"
                                 value={item.dosage}
                                 onChange={(e) => handleUpdateMedication(item.id, "dosage", e.target.value)}
@@ -808,21 +808,21 @@ export const Prescriptions = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="font-bold text-slate-700 dark:text-slate-300">Quantity</label>
+                                <label className="font-bold text-foreground">Quantity</label>
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                                   value={item.quantity}
                                   onChange={(e) => handleUpdateMedication(item.id, "quantity", parseInt(e.target.value) || 1)}
                                 />
                               </div>
                               <div>
-                                <label className="font-bold text-slate-700 dark:text-slate-300">Days</label>
+                                <label className="font-bold text-foreground">Days</label>
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                                   value={item.duration_days}
                                   onChange={(e) => handleUpdateMedication(item.id, "duration_days", parseInt(e.target.value) || 1)}
                                 />
@@ -831,9 +831,9 @@ export const Prescriptions = () => {
                           </div>
 
                           <div>
-                            <label className="font-bold text-slate-700 dark:text-slate-300">Instructions *</label>
+                            <label className="font-bold text-foreground">Instructions *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                               placeholder="e.g. Take with a glass of water after food"
                               value={item.instructions}
                               onChange={(e) => handleUpdateMedication(item.id, "instructions", e.target.value)}
@@ -941,7 +941,7 @@ export const Prescriptions = () => {
                     {/* Overall Notes */}
                     <div>
                       <div className="flex items-center justify-between">
-                        <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">3. Clinical Notes / Remarks</label>
+                        <label className="font-bold text-muted-foreground uppercase">3. Clinical Notes / Remarks</label>
                         <TemplatePicker
                           patientName={selectedPatient?.name}
                           onInsert={(text) =>
@@ -951,7 +951,7 @@ export const Prescriptions = () => {
                       </div>
                       <textarea
                         rows={2}
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card font-medium"
                         placeholder="Additional notes, diagnosis or patient instructions..."
                         value={rxNotes}
                         onChange={(e) => setRxNotes(e.target.value)}
@@ -963,7 +963,7 @@ export const Prescriptions = () => {
                     <button
                       type="button"
                       onClick={() => setShowNewPrescription(false)}
-                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-muted"
                     >
                       Cancel
                     </button>
@@ -993,7 +993,7 @@ export const Prescriptions = () => {
               aria-label="Search prescriptions"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2.5 min-h-[44px] rounded-full border border-border bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
             />
           </div>
 
@@ -1001,7 +1001,7 @@ export const Prescriptions = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             aria-label="Filter by prescription status"
-            className="px-4 py-2.5 min-h-[44px] rounded-full border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
+            className="px-4 py-2.5 min-h-[44px] rounded-full border border-border bg-card text-xs font-bold text-foreground focus:outline-none focus:border-primary-500"
           >
             <option value="all">All Prescriptions</option>
             <option value="active">Active / Filled</option>
@@ -1083,10 +1083,10 @@ export const Prescriptions = () => {
               />
             )}
 
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
             {/* Refill requests queue for prescribers */}
             {isPrescriber && (
-              <div className="p-4 border-b border-canvas-silk dark:border-slate-800">
+              <div className="p-4 border-b border-border">
                 <RefillRequestsQueue />
               </div>
             )}
@@ -1126,7 +1126,7 @@ export const Prescriptions = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[950px]">
                   <thead>
-                    <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-background">
+                    <tr className="text-xs font-semibold uppercase text-muted-foreground border-b border-border bg-background">
                       <th className="py-2.5 px-4 w-[240px]">Medication Profile</th>
                       <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                       <th className="py-2.5 px-3 w-[180px]">Dosage &amp; Frequency</th>
@@ -1136,22 +1136,22 @@ export const Prescriptions = () => {
                       <th className="py-2.5 px-3 w-[140px] text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
+                  <tbody className="divide-y divide-border text-xs">
                     {filteredPrescriptions.map((p: any) => (
-                      <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
+                      <tr key={p.id} className="hover:bg-muted/60 transition-colors">
                         {/* Medication */}
                         <td className="py-3 px-4">
-                          <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <div className="font-semibold text-sm text-foreground flex items-center gap-1.5">
                             <Pill className="h-4 w-4 text-primary-500 flex-shrink-0" />
                             <span>{p.medication_name}</span>
                           </div>
                           {p.prescription_number && (
-                            <span className="inline-block px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 font-mono text-xs text-slate-500 mt-0.5">
+                            <span className="inline-block px-1.5 py-0.2 rounded bg-muted font-mono text-xs text-slate-500 mt-0.5">
                               {p.prescription_number}
                             </span>
                           )}
                           {p.instructions && (
-                            <div className="text-xs text-graphite-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
+                            <div className="text-xs text-muted-foreground truncate max-w-[220px] mt-0.5">
                               {p.instructions}
                             </div>
                           )}
@@ -1163,14 +1163,14 @@ export const Prescriptions = () => {
                         </td>
 
                         {/* Dosage */}
-                        <td className="py-3 px-3 font-semibold text-sm text-slate-800 dark:text-slate-200">
+                        <td className="py-3 px-3 font-semibold text-sm text-foreground">
                           <div>{p.dosage}</div>
                           <div className="text-xs text-slate-400">Qty: {p.quantity || 1} • {p.duration_days ? `${p.duration_days} days` : "As directed"}</div>
                         </td>
 
                         {/* Prescriber/Patient */}
                         <td className="py-3 px-3">
-                          <div className="font-bold text-xs text-slate-800 dark:text-slate-200">
+                          <div className="font-bold text-xs text-foreground">
                             {isProvider
                               ? `${p.patient?.first_name || ""} ${p.patient?.last_name || ""}`.trim() || "Patient"
                               : (p.provider?.first_name || p.provider?.last_name
@@ -1182,7 +1182,7 @@ export const Prescriptions = () => {
 
                         {/* Refills */}
                         <td className="py-3 px-3 font-mono font-bold text-center">
-                          <span className="px-2 py-0.5 rounded bg-canvas-mist dark:bg-slate-800">
+                          <span className="px-2 py-0.5 rounded bg-muted">
                             {p.refills_remaining || 0} left
                           </span>
                         </td>

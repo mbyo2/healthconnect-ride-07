@@ -28,7 +28,7 @@ export default function HelpSupport() {
           </div>
           <div>
             <h1 className="font-display text-2xl font-medium tracking-tight">Help & Support</h1>
-            <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium tracking-wide">
+            <p className="text-sm text-foreground font-medium tracking-wide">
               Search help articles or talk to our support team
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function HelpSupport() {
             </p>
             <Link
               to="/contact"
-              className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl border border-border text-xs font-semibold hover:bg-canvas transition-colors"
             >
               Contact Us
             </Link>

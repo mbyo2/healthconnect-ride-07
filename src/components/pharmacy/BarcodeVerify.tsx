@@ -285,10 +285,10 @@ export function BarcodeVerify() {
             <ScanLine className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-[28px] font-bold tracking-tight text-foreground">
               Medication Verification
             </h1>
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">
+            <p className="text-[13px] text-muted-foreground">
               Scan-to-verify before dispensing — every scan is logged for safety audit.
             </p>
           </div>
@@ -356,7 +356,7 @@ export function BarcodeVerify() {
               <button
                 key={p.id}
                 onClick={() => pickPatient(p)}
-                className="flex min-h-[52px] w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-primary hover:bg-primary/5 dark:border-slate-700 dark:bg-slate-900"
+                className="flex min-h-[52px] w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-primary hover:bg-primary/5 dark:bg-slate-900"
               >
                 <div>
                   <p className="text-[16px] font-medium">{patientName(p)}</p>
@@ -407,7 +407,7 @@ export function BarcodeVerify() {
               <button
                 key={rx.id}
                 onClick={() => pickPrescription(rx)}
-                className="flex min-h-[52px] w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-primary hover:bg-primary/5 dark:border-slate-700 dark:bg-slate-900"
+                className="flex min-h-[52px] w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-primary hover:bg-primary/5 dark:bg-slate-900"
               >
                 <div className="min-w-0">
                   <p className="truncate text-[16px] font-medium">{rx.medication_name}</p>
@@ -581,10 +581,10 @@ export function BarcodeVerify() {
             <h2 className="mt-3 text-[28px] font-bold tracking-tight text-red-700 dark:text-red-400">
               BARCODE MISMATCH
             </h2>
-            <p className="mt-1 text-[18px] font-bold text-slate-900 dark:text-white">
+            <p className="mt-1 text-[18px] font-bold text-foreground">
               DO NOT DISPENSE · DO NOT ADMINISTER
             </p>
-            <p className="mt-2 text-[14px] text-slate-600 dark:text-slate-300">
+            <p className="mt-2 text-[14px] text-muted-foreground">
               The scanned medication does not match the prescription. This event has been
               logged to the safety audit trail.
             </p>
@@ -634,7 +634,7 @@ export function BarcodeVerify() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-[14px] text-slate-600 dark:text-slate-300">
+            <p className="text-[14px] text-muted-foreground">
               You are overriding a barcode <strong>mismatch</strong>. This is a patient-safety
               event and will be permanently logged with your identity, the scanned and
               expected barcodes, and the reason below.

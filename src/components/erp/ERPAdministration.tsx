@@ -223,7 +223,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -251,7 +251,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto" role="tablist" aria-label="Administration sections">
+      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Administration sections">
         {[
           { id: "hr", label: "Human Resources", icon: Users },
           { id: "finance", label: "Invoicing Journal", icon: DollarSign },
@@ -267,7 +267,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
               className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -282,8 +282,8 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Personnel Directory &amp; Shifts</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">
+              <h3 className="font-semibold text-sm text-foreground">Personnel Directory &amp; Shifts</h3>
+              <p className="text-xs text-muted-foreground">
                 {staff.length} staff member{staff.length === 1 ? "" : "s"} · manage roles on the Personnel page
               </p>
             </div>
@@ -295,10 +295,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Employee Name</th>
                   <th className="py-3 px-3">Designation &amp; Department</th>
                   <th className="py-3 px-3">Contact</th>
@@ -307,7 +307,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Payslip</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={6} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading staff">Loading personnel…</td></tr>
                 ) : staff.length === 0 ? (
@@ -317,13 +317,13 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   </td></tr>
                 ) : (
                   staff.map((emp) => (
-                    <tr key={emp.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
-                      <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{emp.name}</td>
+                    <tr key={emp.id} className="hover:bg-muted/60">
+                      <td className="py-3 px-4 font-bold text-foreground">{emp.name}</td>
                       <td className="py-3 px-3">
                         <div className="font-bold text-primary-500">{emp.role}</div>
                         <div className="text-xs text-slate-400">{emp.department}</div>
                       </td>
-                      <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
+                      <td className="py-3 px-3 text-muted-foreground">
                         <div>{emp.phone || "—"}</div>
                         <div className="text-xs text-slate-400">{emp.email || ""}</div>
                       </td>
@@ -355,19 +355,19 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       {activeTab === "finance" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Total Invoiced</span>
               <div className="text-2xl font-bold text-emerald-600 mt-1 tabular-nums">{formatPrice(totalInvoiced)}</div>
               <span className="text-xs font-bold text-slate-500">All billing invoices</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Outstanding</span>
               <div className="text-2xl font-bold text-rose-600 mt-1 tabular-nums">{formatPrice(totalOutstanding)}</div>
               <span className="text-xs font-bold text-slate-500">Awaiting collection</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
               <span className="text-xs font-semibold uppercase text-slate-400">Collected</span>
               <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">{formatPrice(totalCollected)}</div>
               <span className="text-xs font-bold text-slate-500">Invoiced minus outstanding</span>
@@ -375,14 +375,14 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Invoice Journal</h3>
+            <h3 className="font-semibold text-sm text-foreground">Invoice Journal</h3>
             <p className="text-xs text-muted-foreground">New invoices are raised in Hospital Management → Billing.</p>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-3 text-right">Total</th>
                   <th className="py-3 px-3 text-right">Balance</th>
@@ -390,7 +390,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading invoices">Loading invoices…</td></tr>
                 ) : invoices.length === 0 ? (
@@ -400,7 +400,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   </td></tr>
                 ) : (
                   invoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                    <tr key={inv.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4 font-mono font-bold text-primary-500">{inv.invoice_number || inv.id.slice(0, 8)}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{formatPrice(inv.total_amount)}</td>
                       <td className="py-3 px-3 text-right tabular-nums">{formatPrice(inv.balance)}</td>
@@ -422,8 +422,8 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Medical Asset Register</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">{assets.length} asset{assets.length === 1 ? "" : "s"} tracked</p>
+              <h3 className="font-semibold text-sm text-foreground">Medical Asset Register</h3>
+              <p className="text-xs text-muted-foreground">{assets.length} asset{assets.length === 1 ? "" : "s"} tracked</p>
             </div>
 
             <Dialog open={showAssetModal} onOpenChange={setShowAssetModal}>
@@ -432,7 +432,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <Plus className="h-4 w-4" /> Log Asset
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6">
+              <DialogContent className="max-w-md bg-card rounded-2xl p-6">
                 <DialogHeader>
                   <DialogTitle className="font-bold text-lg">Log Medical Asset</DialogTitle>
                 </DialogHeader>
@@ -441,7 +441,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <label htmlFor="erp-asset-name" className="font-bold">Asset Name *</label>
                     <input
                       id="erp-asset-name"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-border"
                       placeholder="e.g. Digital X-Ray System"
                       value={newAsset.name}
                       onChange={(e) => setNewAsset({ ...newAsset, name: e.target.value })}
@@ -452,7 +452,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                       <label htmlFor="erp-asset-dept" className="font-bold">Department</label>
                       <input
                         id="erp-asset-dept"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border"
                         placeholder="Radiology"
                         value={newAsset.department}
                         onChange={(e) => setNewAsset({ ...newAsset, department: e.target.value })}
@@ -462,7 +462,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                       <label htmlFor="erp-asset-serial" className="font-bold">Serial Number</label>
                       <input
                         id="erp-asset-serial"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border"
                         value={newAsset.serialNumber}
                         onChange={(e) => setNewAsset({ ...newAsset, serialNumber: e.target.value })}
                       />
@@ -473,7 +473,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <input
                       id="erp-asset-date"
                       type="date"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-border"
                       value={newAsset.purchaseDate}
                       onChange={(e) => setNewAsset({ ...newAsset, purchaseDate: e.target.value })}
                     />
@@ -489,10 +489,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">
+                <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
                   <th className="py-3 px-4">Asset</th>
                   <th className="py-3 px-3">Department</th>
                   <th className="py-3 px-3">Serial #</th>
@@ -500,7 +500,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading assets">Loading assets…</td></tr>
                 ) : assets.length === 0 ? (
@@ -510,9 +510,9 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   </td></tr>
                 ) : (
                   assets.map((a) => (
-                    <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                    <tr key={a.id} className="hover:bg-muted/60">
                       <td className="py-3 px-4">
-                        <div className="font-bold text-slate-900 dark:text-slate-100">{a.asset_name}</div>
+                        <div className="font-bold text-foreground">{a.asset_name}</div>
                         <div className="text-xs font-mono text-slate-400">{a.asset_tag || a.id.slice(0, 8)}</div>
                       </td>
                       <td className="py-3 px-3">{a.assigned_department || "—"}</td>

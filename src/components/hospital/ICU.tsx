@@ -163,14 +163,14 @@ export const ICU = ({ hospital }: { hospital: any }) => {
           <h2 className="text-lg font-semibold text-graphite-800 dark:text-white flex items-center gap-2">
             <BedDouble className="h-5 w-5 text-primary-500" /> ICU Management
           </h2>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             {beds.length} beds · {occupiedBeds.length} occupied · {availableCount} available · {maintenanceCount} in maintenance
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => { refresh(); refreshObs(); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-card text-xs font-bold hover:bg-muted"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
@@ -190,7 +190,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       )}
 
       {/* View Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl overflow-x-auto">
         {([
           { key: "beds", label: `Bed Grid (${beds.length})` },
           { key: "observations", label: `Vitals Timeline (${myObs.length})` },
@@ -198,7 +198,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"}`}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"}`}
           >
             {tab.label}
           </button>
@@ -213,7 +213,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
             {beds.map((bed) => {
               const latest = latestFor(bed.id);
               return (
-                <div key={bed.id} className={`rounded-xl border p-4 space-y-2 ${STATUS_BG[bed.status] || "bg-white dark:bg-slate-900 border-canvas-silk dark:border-slate-700"}`}>
+                <div key={bed.id} className={`rounded-xl border p-4 space-y-2 ${STATUS_BG[bed.status] || "bg-card border-border"}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`h-3 w-3 rounded-full ${STATUS_COLORS[bed.status] || "bg-slate-400"}`} />
@@ -221,17 +221,17 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                     </div>
                     {getStatusPill(bed.status)}
                   </div>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">{bed.ward_name}</p>
+                  <p className="text-xs text-muted-foreground">{bed.ward_name}</p>
                   {bed.status === "occupied" && (
                     <div className="text-xs space-y-1">
                       <p className="font-bold text-graphite-800 dark:text-white">{nameFor(bed.patient_id)}</p>
                       {bed.admitted_at && (
-                        <p className="text-graphite-500 dark:text-slate-400">
+                        <p className="text-muted-foreground">
                           Admitted {new Date(bed.admitted_at).toLocaleDateString()}
                         </p>
                       )}
                       {latest && (
-                        <p className="text-graphite-500 dark:text-slate-400">
+                        <p className="text-muted-foreground">
                           HR {latest.heart_rate ?? "—"} · SpO₂ {latest.spo2 ?? "—"}% · GCS {latest.gcs_score ?? "—"}
                         </p>
                       )}
@@ -256,7 +256,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                         </button>
                         <button
                           onClick={() => { setTimelinePatientId(bed.patient_id); setActiveTab("observations"); }}
-                          className="px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+                          className="px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-bold hover:bg-muted"
                         >
                           Timeline
                         </button>
@@ -273,7 +273,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                       <button
                         onClick={() => handleMaintenance(bed)}
                         disabled={isSubmitting}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 disabled:opacity-50"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-bold hover:bg-muted disabled:opacity-50"
                       >
                         <Wrench className="h-3 w-3" /> {bed.status === "maintenance" ? "Restore" : "Maintenance"}
                       </button>
@@ -289,11 +289,11 @@ export const ICU = ({ hospital }: { hospital: any }) => {
       {activeTab === "observations" && (
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-xs font-bold text-graphite-600 dark:text-slate-300">Patient:</label>
+            <label className="text-xs font-bold text-foreground">Patient:</label>
             <select
               value={timelinePatientId}
               onChange={(e) => setTimelinePatientId(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-xs font-bold"
+              className="px-3 py-2 rounded-lg border border-border bg-card text-xs font-bold"
             >
               <option value="">Select an admitted patient…</option>
               {occupiedBeds.map((b) => (
@@ -309,9 +309,9 @@ export const ICU = ({ hospital }: { hospital: any }) => {
           timeline.length === 0 ? (
             <EmptyState icon={Activity} title="No observations yet" description="Chart observations from the bed card to start the timeline." />
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-canvas-silk">
+            <div className="overflow-x-auto rounded-xl border border-border">
               <table className="w-full text-xs">
-                <thead className="bg-canvas-mist dark:bg-slate-800 text-left">
+                <thead className="bg-muted text-left">
                   <tr>
                     {["Time", "HR", "BP", "SpO₂", "Temp °C", "GCS", "Notes"].map((h) => (
                       <th key={h} className="px-3 py-2 font-semibold">{h}</th>
@@ -320,7 +320,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                 </thead>
                 <tbody>
                   {timeline.map((o) => (
-                    <tr key={o.id} className="border-t border-canvas-silk dark:border-slate-700">
+                    <tr key={o.id} className="border-t border-border">
                       <td className="px-3 py-2 whitespace-nowrap">{new Date(o.recorded_at).toLocaleString()}</td>
                       <td className="px-3 py-2">{o.heart_rate ?? "—"}</td>
                       <td className="px-3 py-2">{o.bp_systolic && o.bp_diastolic ? `${o.bp_systolic}/${o.bp_diastolic}` : "—"}</td>
@@ -345,15 +345,15 @@ export const ICU = ({ hospital }: { hospital: any }) => {
             <div>
               <label className="text-xs font-bold">Bed Number</label>
               <input value={bedForm.bed_number} onChange={(e) => setBedForm({ ...bedForm, bed_number: e.target.value })}
-                className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="e.g. ICU-01" required />
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-border bg-card text-sm" placeholder="e.g. ICU-01" required />
             </div>
             <div>
               <label className="text-xs font-bold">Ward Name</label>
               <input value={bedForm.ward_name} onChange={(e) => setBedForm({ ...bedForm, ward_name: e.target.value })}
-                className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="ICU" />
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-border bg-card text-sm" placeholder="ICU" />
             </div>
             <DialogFooter>
-              <button type="button" onClick={() => setShowAddBed(false)} className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowAddBed(false)} className="px-4 py-2 rounded-lg border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 disabled:opacity-50">
                 {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Add Bed"}
               </button>
@@ -378,7 +378,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
               createSource="admission"
             />
             <DialogFooter>
-              <button type="button" onClick={() => setShowAdmit(false)} className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowAdmit(false)} className="px-4 py-2 rounded-lg border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting || !admitPatientId} className="px-4 py-2 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 disabled:opacity-50">
                 {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Admit"}
               </button>
@@ -404,17 +404,17 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                 <div key={f.key}>
                   <label className="text-xs font-bold">{f.label}</label>
                   <input type="number" step="any" value={obsForm[f.key]} onChange={(e) => setObsForm({ ...obsForm, [f.key]: e.target.value })}
-                    className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="—" />
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-border bg-card text-sm" placeholder="—" />
                 </div>
               ))}
             </div>
             <div>
               <label className="text-xs font-bold">Notes</label>
               <textarea value={obsForm.notes} onChange={(e) => setObsForm({ ...obsForm, notes: e.target.value })} rows={2}
-                className="mt-1 w-full px-3 py-2 rounded-lg border border-canvas-silk bg-white dark:bg-slate-900 text-sm" placeholder="Clinical notes…" />
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-border bg-card text-sm" placeholder="Clinical notes…" />
             </div>
             <DialogFooter>
-              <button type="button" onClick={() => setShowObsForm(false)} className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold">Cancel</button>
+              <button type="button" onClick={() => setShowObsForm(false)} className="px-4 py-2 rounded-lg border border-border text-xs font-bold">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 disabled:opacity-50">
                 {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save Observations"}
               </button>

@@ -113,7 +113,7 @@ export function ModulePricingAdmin() {
             return (
               <div
                 key={row.module_key}
-                className="flex flex-wrap items-center gap-3 p-3 rounded-xl border border-canvas-silk bg-canvas-mist/30"
+                className="flex flex-wrap items-center gap-3 p-3 rounded-xl border border-border bg-canvas-mist/30"
               >
                 <div className="min-w-0 flex-1 basis-48">
                   <p className="text-xs font-semibold truncate" title={row.module_name}>{row.module_name}</p>

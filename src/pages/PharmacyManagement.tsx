@@ -194,7 +194,7 @@ export const PharmacyManagement = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetchInventory()}
-              className="px-3 py-1.5 rounded-md bg-muted hover:bg-primary-50 dark:hover:bg-slate-800 text-foreground font-semibold text-xs flex items-center gap-1"
+              className="px-3 py-1.5 rounded-md bg-muted hover:bg-muted text-foreground font-semibold text-xs flex items-center gap-1"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               <span>Refresh Inventory</span>
@@ -259,7 +259,7 @@ export const PharmacyManagement = () => {
                 placeholder="Search medication name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-md border border-border dark:border-slate-700 dark:border-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-9 pr-3 py-1.5 rounded-md border border-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -271,7 +271,7 @@ export const PharmacyManagement = () => {
                 <div
                   key={item.id}
                   onClick={() => item.quantity > 0 && addToCart(item)}
-                  className="p-3.5 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors cursor-pointer flex justify-between items-center group"
+                  className="p-3.5 rounded-xl border border-border bg-background hover:bg-muted/80 transition-colors cursor-pointer flex justify-between items-center group"
                 >
                   <div>
                     <div className="font-semibold text-sm text-foreground group-hover:text-primary-500 transition-colors">
@@ -351,7 +351,7 @@ export const PharmacyManagement = () => {
                 id="pm-prescription"
                 value={selectedPrescriptionId}
                 onChange={(e) => setSelectedPrescriptionId(e.target.value)}
-                className="w-full p-2 rounded-md border border-border dark:border-slate-700 text-xs font-medium bg-card"
+                className="w-full p-2 rounded-md border border-border text-xs font-medium bg-card"
               >
                 <option value="">Walk-in sale — no prescription</option>
                 {(pendingPharmacyPrescriptions || []).map((rx: any) => (

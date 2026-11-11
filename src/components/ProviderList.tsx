@@ -41,18 +41,18 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
   if (providers.length === 0) {
     return (
-      <div className="p-8 text-center bg-canvas dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800 font-sans">
+      <div className="p-8 text-center bg-background rounded-2xl border border-border font-sans">
         <div className="max-w-md mx-auto space-y-2">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 flex items-center justify-center">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-card border border-border flex items-center justify-center">
             <MapPin className="h-6 w-6 text-primary-500" />
           </div>
           <h3 className="text-base font-semibold text-midnight">No providers found</h3>
-          <p className="text-graphite-500 dark:text-slate-400 text-sm font-medium">
+          <p className="text-muted-foreground text-sm font-medium">
             Try adjusting your specialty filters, location radius, or insurance criteria — or clear all filters to start over.
           </p>
           <button
             onClick={clearAllFilters}
-            className="mt-3 px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-sm font-medium text-graphite-700 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors"
+            className="mt-3 px-4 py-2.5 min-h-[44px] rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors"
           >
             Clear all filters
           </button>
@@ -82,10 +82,10 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
         return (
           <article
             key={provider.id}
-            className={`p-4 rounded-2xl border bg-white dark:bg-slate-900 transition-all shadow-sm hover:shadow-md ${
+            className={`p-4 rounded-2xl border bg-card transition-all shadow-sm hover:shadow-md ${
               selectedProvider?.id === provider.id
                 ? "border-primary-500 ring-2 ring-primary-500/20"
-                : "border-canvas-silk dark:border-slate-700 hover:border-primary-300"
+                : "border-border hover:border-primary-300"
             }`}
           >
             {/* Header: photo + name are a real link; the card itself is not a click target */}
@@ -118,7 +118,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   </span>
                   <span className="block text-xs text-graphite-500 truncate mt-0.5">
                     {provider.specialty || "General Practitioner"}
-                    {feeLabel ? <span className="text-primary-600 font-medium"> · {feeLabel}</span> : <span className="text-graphite-500 dark:text-slate-400"> · Fee confirmed at booking</span>}
+                    {feeLabel ? <span className="text-primary-600 font-medium"> · {feeLabel}</span> : <span className="text-muted-foreground"> · Fee confirmed at booking</span>}
                   </span>
                 </span>
               </Link>
@@ -137,7 +137,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   )}
 
                   {provider.home_visits_available && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas-bone border border-canvas-silk">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas-bone border border-border">
                       <Home className="h-3 w-3 text-primary-500" /> Home Visits
                     </span>
                   )}
@@ -149,13 +149,13 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   )}
 
                   {provider.typical_wait_time && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas border border-canvas-silk dark:border-slate-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas border border-border">
                       <Clock className="h-3 w-3 text-primary-500" /> Wait: {provider.typical_wait_time}
                     </span>
                   )}
 
                   {provider.distance !== undefined && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas border border-canvas-silk dark:border-slate-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-graphite-700 bg-canvas border border-border">
                       <MapPin className="h-3 w-3 text-primary-500" /> {provider.distance.toFixed(1)} km
                     </span>
                   )}
@@ -163,7 +163,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Bio preview */}
                 {provider.bio && (
-                  <p className="text-sm text-graphite-500 dark:text-slate-400 line-clamp-2 mb-2.5 font-medium leading-relaxed">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2.5 font-medium leading-relaxed">
                     {provider.bio}
                   </p>
                 )}
@@ -177,7 +177,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                       </span>
                     ))}
                     {extraSubs > 0 && (
-                      <span className="text-xs font-medium text-graphite-500 dark:text-slate-400 px-1 py-0.5">
+                      <span className="text-xs font-medium text-muted-foreground px-1 py-0.5">
                         +{extraSubs} more
                       </span>
                     )}
@@ -186,7 +186,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Practice location */}
                 {provider.primary_practice_location && (
-                  <p className="flex items-center gap-1 text-xs text-graphite-500 dark:text-slate-400 mb-2.5">
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground mb-2.5">
                     <MapPin className="h-3 w-3 text-primary-500 shrink-0" />
                     {provider.primary_practice_location}
                   </p>
@@ -196,12 +196,12 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                 {(provider.insurance_providers_accepted || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2.5">
                     {(provider.insurance_providers_accepted || []).slice(0, 3).map(ins => (
-                      <span key={ins} className="text-xs font-medium bg-canvas border border-canvas-silk text-graphite-600 px-1.5 py-0.5 rounded-md">
+                      <span key={ins} className="text-xs font-medium bg-canvas border border-border text-graphite-600 px-1.5 py-0.5 rounded-md">
                         {ins}
                       </span>
                     ))}
                     {(provider.insurance_providers_accepted || []).length > 3 && (
-                      <span className="text-xs font-medium text-graphite-500 dark:text-slate-400 px-1">
+                      <span className="text-xs font-medium text-muted-foreground px-1">
                         +{(provider.insurance_providers_accepted || []).length - 3} more
                       </span>
                     )}
@@ -209,11 +209,11 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                 )}
 
                 {/* Actions footer */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-canvas-silk dark:border-slate-800">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-border">
                   <div className="flex items-center gap-2">
                     <NextAvailableChip provider={provider} booked={bookedByProvider.get(provider.id)} />
                     {provider.typical_wait_time && (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-graphite-500 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
                         <Clock className="h-3.5 w-3.5 text-primary-500" aria-hidden />
                         Avg. wait: {provider.typical_wait_time}
                       </span>
@@ -223,13 +223,13 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => navigate("/cost-estimator")}
-                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium flex items-center gap-1 hover:bg-primary-50 dark:hover:bg-slate-800"
+                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-medium flex items-center gap-1 hover:bg-muted"
                     >
                       <Calculator className="h-3.5 w-3.5 text-primary-500" /> Estimate Copay
                     </button>
                     <button
                       onClick={() => navigate(`/provider/${provider.id}`)}
-                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium text-midnight dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                      className="px-3 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-medium text-midnight dark:text-slate-200 hover:bg-muted"
                     >
                       View Profile
                     </button>

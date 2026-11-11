@@ -179,7 +179,7 @@ const LabOrders = () => {
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-foreground">Order Lab Tests</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Place test orders for your patients at verified laboratories</p>
+            <p className="text-xs text-muted-foreground">Place test orders for your patients at verified laboratories</p>
           </div>
         </div>
 
@@ -398,7 +398,7 @@ const LabOrders = () => {
             ) : (
               <div className="space-y-3">
                 {myOrders.map((o: any) => (
-                  <div key={o.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div key={o.id} className="p-3 rounded-xl border border-border">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div>
                         <p className="text-sm font-semibold text-foreground">
@@ -434,7 +434,7 @@ const LabOrders = () => {
                               notes: o.sample_type ? `Sample: ${o.sample_type}` : undefined,
                             })
                           }
-                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-primary-500 hover:text-white transition-colors"
+                          className="p-1.5 rounded-lg border border-border hover:bg-primary-500 hover:text-white transition-colors"
                           title="Download PDF Receipt"
                         >
                           <Receipt className="h-3.5 w-3.5" />
@@ -442,7 +442,7 @@ const LabOrders = () => {
                       </div>
                     </div>
                     {o.result_summary && (
-                      <p className="mt-2 text-xs bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                      <p className="mt-2 text-xs bg-muted/50 rounded-lg p-2">
                         <span className="font-semibold">Result: </span>{o.result_summary}
                       </p>
                     )}

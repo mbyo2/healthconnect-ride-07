@@ -68,7 +68,7 @@ export const ConnectionsDashboard = () => {
   const myProviders = getMyProviders();
 
   return (
-    <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header Banner */}
         <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -97,7 +97,7 @@ export const ConnectionsDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-          <TabsList className="grid w-full grid-cols-5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-2xl shadow-xs">
+          <TabsList className="grid w-full grid-cols-5 p-1 bg-card border border-border rounded-2xl shadow-xs">
             <TabsTrigger value="overview" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Overview</TabsTrigger>
             <TabsTrigger value="connections" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Network</TabsTrigger>
             <TabsTrigger value="requests" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Requests</TabsTrigger>
@@ -107,63 +107,63 @@ export const ConnectionsDashboard = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Connections</span>
                   <div className="p-2 rounded-xl bg-primary-50 dark:bg-blue-950 text-primary-500">
                     <Users className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{approvedConnections.length}</div>
+                <div className="text-3xl font-bold text-foreground">{approvedConnections.length}</div>
                 <p className="text-xs text-slate-400 font-medium mt-1">Active verified connections</p>
               </div>
 
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Requests</span>
                   <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600">
                     <Clock className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{pendingRequests.length}</div>
+                <div className="text-3xl font-bold text-foreground">{pendingRequests.length}</div>
                 <p className="text-xs text-slate-400 font-medium mt-1">Awaiting confirmation</p>
               </div>
 
               {isClinician && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">My Patients</span>
                     <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
                       <UserPlus className="h-4 w-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{myPatients.length}</div>
+                  <div className="text-3xl font-bold text-foreground">{myPatients.length}</div>
                   <p className="text-xs text-slate-400 font-medium mt-1">Direct patient roster</p>
                 </div>
               )}
 
               {isPatient && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">My Providers</span>
                     <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
                       <CheckCircle className="h-4 w-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{myProviders.length}</div>
+                  <div className="text-3xl font-bold text-foreground">{myProviders.length}</div>
                   <p className="text-xs text-slate-400 font-medium mt-1">Approved doctors &amp; specialists</p>
                 </div>
               )}
 
               {isPatient && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Primary Care</span>
                     <div className="p-2 rounded-xl bg-primary-50 dark:bg-blue-950 text-primary-500">
                       <Star className="h-4 w-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{primaryProvider ? '1' : '0'}</div>
+                  <div className="text-3xl font-bold text-foreground">{primaryProvider ? '1' : '0'}</div>
                   <p className="text-xs text-slate-400 font-medium mt-1">
                     {primaryProvider ? 'Primary Physician Assigned' : 'Not yet selected'}
                   </p>
@@ -172,9 +172,9 @@ export const ConnectionsDashboard = () => {
             </div>
 
           {/* Recent Activity */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-            <div className="border-b border-canvas-silk dark:border-slate-800 pb-4 mb-4">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Recent Connections</h2>
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="border-b border-border pb-4 mb-4">
+              <h2 className="text-lg font-bold text-foreground">Recent Connections</h2>
               <p className="text-xs text-slate-400 font-medium">Your latest verified medical connections</p>
             </div>
               {approvedConnections.length === 0 ? (

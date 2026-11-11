@@ -81,7 +81,7 @@ const IoTMonitoring = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 rounded-md border border-border dark:border-slate-700 bg-card font-semibold text-xs flex items-center gap-1.5 hover:bg-background">
+            <button className="px-3.5 py-2 rounded-md border border-border bg-card font-semibold text-xs flex items-center gap-1.5 hover:bg-background">
               <Settings className="w-4 h-4 text-muted-foreground" />
               <span>Device Settings</span>
             </button>
