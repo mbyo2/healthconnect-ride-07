@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FlaskConical, Loader2, ShieldCheck } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { format } from 'date-fns';
 
 interface LabResultRow {
@@ -94,7 +95,11 @@ export default function PatientLabResults() {
             <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>Try again</Button>
           </div>
         ) : !data || data.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">No lab results yet.</p>
+          <EmptyState
+            icon={FlaskConical}
+            title="No lab results yet"
+            description="Results from your providers appear here once a test has been completed and verified."
+          />
         ) : (
           <div className="space-y-3">
             {data.map(r => {

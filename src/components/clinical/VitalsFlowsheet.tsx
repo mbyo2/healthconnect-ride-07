@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Activity } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { format } from "date-fns";
 
 /**
@@ -72,9 +73,12 @@ export function VitalsFlowsheet({ patientId }: { patientId: string }) {
   if (!vitals || vitals.length === 0) {
     return (
       <Card>
-        <CardContent className="pt-6 text-center">
-          <Activity className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground">No vital signs recorded yet.</p>
+        <CardContent>
+          <EmptyState
+            icon={Activity}
+            title="No vital signs recorded yet"
+            description="Readings recorded by your care team will appear here."
+          />
         </CardContent>
       </Card>
     );

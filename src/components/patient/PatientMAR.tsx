@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Pill, Loader2, CheckCircle2, Clock, AlertTriangle, XCircle } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { format } from 'date-fns';
 
 interface MARRow {
@@ -72,7 +73,11 @@ export default function PatientMAR() {
             <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>Try again</Button>
           </div>
         ) : !data || data.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">No medication records yet.</p>
+          <EmptyState
+            icon={Pill}
+            title="No medication records yet"
+            description="Medicines given during your care will be listed here as your team records them."
+          />
         ) : (
           <div className="space-y-3">
             {data.map(r => {

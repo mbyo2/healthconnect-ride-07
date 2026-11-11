@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, MessageSquare } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
@@ -20,6 +21,7 @@ interface ChatContact {
 }
 
 export const ChatList = () => {
+  const navigate = useNavigate();
   const [contacts, setContacts] = useState<ChatContact[]>([]);
   const [selectedContact, setSelectedContact] = useState<ChatContact | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,14 +164,13 @@ export const ChatList = () => {
         <ScrollArea className="md:h-full">
           <div className="p-4 space-y-2">
             {contacts.length === 0 && (
-              <div className="text-center py-8 space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  No conversations yet — book an appointment to message your provider.
-                </p>
-                <Link to="/search">
-                  <Button variant="outline" className="min-h-[44px]">Find a provider</Button>
-                </Link>
-              </div>
+              <EmptyState
+                icon={MessageSquare}
+                title="No conversations yet"
+                description="Book an appointment to message your provider."
+                actionLabel="Find a provider"
+                onAction={() => navigate('/search')}
+              />
             )}
             {contacts.map((contact) => (
               <button
@@ -219,8 +220,12 @@ export const ChatList = () => {
             </div>
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-muted-foreground">
-            Select a contact to start chatting
+          <div className="h-full flex items-center justify-center">
+            <EmptyState
+              icon={MessageSquare}
+              title="Select a contact to start chatting"
+              description="Choose a conversation from the list and your messages will appear here."
+            />
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Loader2, HeartHandshake } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { format } from 'date-fns';
 
 interface PHQ9Row {
@@ -56,9 +57,11 @@ export default function PatientPHQ9History() {
         ) : error ? (
           <p className="text-xs text-destructive">Could not load your screening history. Please try again later.</p>
         ) : !data || data.length === 0 ? (
-          <p className="text-xs text-muted-foreground py-4 text-center">
-            No mood screenings yet. If your clinician does one with you, the result will appear here.
-          </p>
+          <EmptyState
+            icon={Brain}
+            title="No mood screenings yet"
+            description="If your clinician does one with you, the result will appear here."
+          />
         ) : (
           <>
             {latestRisk && (

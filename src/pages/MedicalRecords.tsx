@@ -26,6 +26,7 @@ import { SkeletonCard, SkeletonLine, SkeletonListRow } from "@/components/ui/ske
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
 import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 export default function MedicalRecords() {
   const { user } = useAuth();
@@ -164,7 +165,7 @@ export default function MedicalRecords() {
                 <FolderHeart className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+                <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
                   My Health Records
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
@@ -355,17 +356,13 @@ export default function MedicalRecords() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-6 space-y-3">
-                      <p className="text-xs text-muted-foreground">
-                        No health metrics recorded yet.
-                      </p>
-                      <button
-                        onClick={() => navigate('/iot-monitoring')}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border text-xs font-semibold hover:bg-canvas transition-colors"
-                      >
-                        Record vitals
-                      </button>
-                    </div>
+                    <EmptyState
+                      icon={Activity}
+                      title="No health metrics recorded yet"
+                      description="Metrics from your visits and connected devices will appear here."
+                      actionLabel="Record vitals"
+                      onAction={() => navigate('/iot-monitoring')}
+                    />
                   )}
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { EmptyState } from "@/components/ui/empty-state";
+import { useNavigate } from "react-router-dom";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Bell, Check, CheckCheck, Trash2, Calendar, MessageSquare, AlertCircle, FileText, Pill, Users } from "lucide-react";
@@ -20,6 +21,7 @@ interface Notification {
 
 const NotificationsPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -207,6 +209,8 @@ const NotificationsPage = () => {
                 icon={Bell}
                 title="No notifications found"
                 description="You're all caught up. New notifications will appear here."
+                actionLabel={filter === "unread" ? "Show all notifications" : "Browse Doctors"}
+                onAction={filter === "unread" ? () => setFilter("all") : () => navigate('/search')}
               />
             </div>
           ) : (

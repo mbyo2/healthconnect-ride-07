@@ -578,11 +578,11 @@ export const AppointmentsPage = () => {
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-border">
             {/* Filter inputs */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="relative min-w-[220px]">
+              <div className="relative min-w-[220px] sm:min-w-[300px]">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
                 <Input
                   type="text"
-                  placeholder="Search name, specialty, or notes..."
+                  placeholder="Search name, specialty, notes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 h-9"
@@ -806,6 +806,8 @@ export const AppointmentsPage = () => {
                       icon={Clock}
                       title="No past appointments"
                       description="Your appointment history will appear here once you complete visits."
+                      actionLabel={isProvider ? undefined : "Browse Doctors"}
+                      onAction={isProvider ? undefined : () => navigate('/search')}
                     />
                   </div>
                 ) : (
