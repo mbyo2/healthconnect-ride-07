@@ -50,7 +50,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
       const key = a.department?.name || 'General';
       groups.set(key, (groups.get(key) || 0) + 1);
     });
-    const palette = ['#397dff', '#EF4444', '#22C55E', '#f55c15', '#a25ddc', '#eab308'];
+    const palette = ['#0066f5', '#EF4444', '#22C55E', '#f55c15', '#a25ddc', '#eab308'];
     const entries = [...groups.entries()].slice(0, 6);
     if (entries.length === 0) return [{ name: 'No admissions yet', value: 0, color: '#cbd5e1' }];
     return entries.map(([name, value], i) => ({ name, value, color: palette[i % palette.length] }));
@@ -182,7 +182,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
           <SimpleBarChart
             data={weeklyFlow}
             bars={[
-              { dataKey: 'admissions', name: 'Admissions', color: '#397dff' },
+              { dataKey: 'admissions', name: 'Admissions', color: '#0066f5' },
               { dataKey: 'discharges', name: 'Discharges', color: '#22C55E' },
             ]}
             height={250}

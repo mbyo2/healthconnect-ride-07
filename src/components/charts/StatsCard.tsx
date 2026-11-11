@@ -18,7 +18,7 @@ export const StatsCard = ({
   value, 
   change, 
   icon: Icon,
-  color = '#397dff',
+  color = '#0066f5',
   sparklineData
 }: StatsCardProps) => {
   return (

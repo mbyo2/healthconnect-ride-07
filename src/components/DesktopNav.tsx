@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSearch } from "@/context/SearchContext";
 import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import {
@@ -21,37 +21,6 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 
-/**
- * Detects whether a horizontal scroll container has hidden content on its
- * left/right edges, so edge-fade affordances can show only when scrolling
- * is actually possible (and disappear when scrolled to an end).
- */
-function useScrollEdges<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
-  const [edges, setEdges] = useState({ left: false, right: false });
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      setEdges({
-        left: scrollLeft > 4,
-        right: scrollLeft + clientWidth < scrollWidth - 4,
-      });
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
-  return { ref, edges };
-}
-
 export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
@@ -63,7 +32,6 @@ export function DesktopNav() {
   const [searchFocused, setSearchFocused] = useState(false);
   const { setSearchQuery } = useSearch();
   const navigate = useNavigate();
-  const { ref: navScrollRef, edges: navEdges } = useScrollEdges<HTMLDivElement>();
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -356,7 +324,7 @@ export function DesktopNav() {
   }, [mainNavItems, availableRoles, isAuthenticated]);
 
   return (
-    <header className="sticky top-0 z-50 bg-card/90 backdrop-blur-xl border-b border-border" role="banner">
+    <header className="sticky top-0 z-50 bg-card border-b border-border" role="banner">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
@@ -367,9 +335,8 @@ export function DesktopNav() {
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
           <AppLogo size="sm" className="shrink-0" />
 
-          <nav className="relative hidden md:flex items-stretch min-w-0 max-w-full rounded-nav border border-border bg-muted/60 p-1" role="navigation" aria-label="Main navigation">
+          <nav className="relative hidden md:flex items-stretch min-w-0 max-w-full" role="navigation" aria-label="Main navigation">
             <div
-              ref={navScrollRef}
               className="flex items-center gap-0.5 min-w-0 max-w-full overflow-x-auto scrollbar-hide scroll-smooth"
             >
               {filteredMainNavItems.map((item) => (
@@ -379,8 +346,8 @@ export function DesktopNav() {
                   aria-current={item.active ? "page" : undefined}
                   className={`flex items-center gap-2 shrink-0 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm font-medium tracking-wide transition-all duration-200 whitespace-nowrap ${
                     item.active
-                      ? "bg-primary-500 text-white shadow-button"
-                      : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-white "
+                      ? "bg-primary-500 text-white"
+                      : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-muted"
                   }`}
                 >
                   {item.icon}
@@ -390,14 +357,6 @@ export function DesktopNav() {
 
               {isAuthenticated && <DesktopNavMenu secondaryNavItems={filteredSecondaryNavItems} />}
             </div>
-
-            {/* Scroll affordances: edge fades appear only while hidden items exist */}
-            {navEdges.left && (
-              <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-8 rounded-l-nav bg-gradient-to-r from-canvas-mist via-canvas-mist/70 to-transparent dark:from-slate-800 dark:via-slate-800/70 dark:to-transparent" />
-            )}
-            {navEdges.right && (
-              <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-8 rounded-r-nav bg-gradient-to-l from-canvas-mist via-canvas-mist/70 to-transparent dark:from-slate-800 dark:via-slate-800/70 dark:to-transparent" />
-            )}
           </nav>
         </div>
 

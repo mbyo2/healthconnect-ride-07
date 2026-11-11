@@ -667,7 +667,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </div>
 
             {/* Calculated Result Card */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md flex flex-col justify-between space-y-4">
+            <div className="p-6 rounded-lg bg-navy text-white flex flex-col justify-between space-y-4">
               <div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-500 text-white uppercase tracking-wider">
                   Precise Calculated Dosage

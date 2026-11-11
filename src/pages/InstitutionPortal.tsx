@@ -16,7 +16,7 @@ import { friendlyErrorMessage } from "@/utils/friendly-error";
 /**
  * ONE shared Supabase Auth appearance for both sign-in and sign-up,
  * built from the design tokens: border radius from --radius (1.25rem),
- * the Signal Blue primary (#397dff, via the --primary token) and the
+ * the Signal Blue primary (#0066f5, via the --primary token) and the
  * token surface/text colours (foreground / border / destructive vars),
  * so dark mode is carried by the tokens.
  */

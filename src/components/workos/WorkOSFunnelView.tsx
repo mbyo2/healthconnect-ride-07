@@ -25,7 +25,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "1. Intake & Emergency Triage",
       count: triageCount,
       percent: Math.round((triageCount / totalPatients) * 100),
-      color: "from-blue-600 to-indigo-600",
+      color: "bg-blue-600",
       textColor: "text-blue-500",
       borderColor: "border-blue-500/30",
       description: "Initial clinical triage & emergency score assessment",
@@ -38,7 +38,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
           totalPatients) *
           100
       ),
-      color: "from-primary-500 to-primary-400",
+      color: "bg-primary-500",
       textColor: "text-primary-500",
       borderColor: "border-primary-500/30",
       description: "Diagnostic workup, labs, radiology & specialist consults",
@@ -47,7 +47,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "3. ICU & High Dependency",
       count: icuCount,
       percent: Math.round((icuCount / totalPatients) * 100),
-      color: "from-primary-700 to-primary-600",
+      color: "bg-primary-700",
       textColor: "text-primary-600",
       borderColor: "border-primary-500/30",
       description: "Intensive care monitoring & critical life-support",
@@ -56,7 +56,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "4. Outpatient Telehealth & Recovery",
       count: outpatientCount,
       percent: Math.round((outpatientCount / totalPatients) * 100),
-      color: "from-primary-400 to-primary-300",
+      color: "bg-primary-400",
       textColor: "text-primary-500",
       borderColor: "border-primary-500/30",
       description: "Remote monitoring, chronic disease management & therapy",
@@ -65,7 +65,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "5. Discharge & Clearance",
       count: dischargeCount,
       percent: Math.round((dischargeCount / totalPatients) * 100),
-      color: "from-graphite-500 to-graphite-400",
+      color: "bg-graphite-500",
       textColor: "text-graphite-500",
       borderColor: "border-graphite-500/30",
       description: "Final billing settlement, medication release & discharge",
@@ -173,7 +173,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
 
                 <div className="w-full bg-muted/80 h-9 rounded-xl overflow-hidden p-1 flex items-center">
                   <div
-                    className={`h-full rounded-lg bg-gradient-to-r ${stage.color} flex items-center justify-end px-3 text-white text-xs font-bold transition-all duration-700 shadow-sm`}
+                    className={`h-full rounded-lg ${stage.color} flex items-center justify-end px-3 text-white text-xs font-bold transition-all duration-700 shadow-sm`}
                     style={{ width: `${Math.max(8, stage.percent)}%` }}
                   >
                     <span>{stage.percent}%</span>

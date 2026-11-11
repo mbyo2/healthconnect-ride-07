@@ -58,7 +58,7 @@ export const OptimizedImage = ({
       style={{ width, height }}
     >
       {blur && !isLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-canvas-silk via-canvas-bone to-canvas-silk animate-pulse" />
+        <div className="absolute inset-0 bg-canvas-bone animate-pulse" />
       )}
       {isInView && (
         <img

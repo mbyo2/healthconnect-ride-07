@@ -30,7 +30,7 @@ function LocationPicker({
     html: `<div style="
       width: 36px; height: 36px; border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
-      background: #2563eb; border: 3px solid white;
+      background: #0066f5; border: 3px solid white;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>`,
     iconSize: [36, 36],
     iconAnchor: [18, 32],

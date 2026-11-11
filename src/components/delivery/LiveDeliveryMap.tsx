@@ -18,7 +18,7 @@ const courierIcon = new L.Icon({
     "data:image/svg+xml;base64," +
     btoa(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36">
-      <circle cx="12" cy="12" r="10" fill="#2563eb" stroke="white" stroke-width="2"/>
+      <circle cx="12" cy="12" r="10" fill="#0066f5" stroke="white" stroke-width="2"/>
       <path d="M8 16 L10 8 L14 8 L16 16 M9 12 L15 12" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/>
       <circle cx="9" cy="17.5" r="1.6" fill="white"/>
       <circle cx="15" cy="17.5" r="1.6" fill="white"/>
@@ -172,7 +172,7 @@ export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapPro
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapFollower position={courierPos} />
-        {trail.length > 1 && <Polyline positions={trail} color="#2563eb" weight={3} opacity={0.7} />}
+        {trail.length > 1 && <Polyline positions={trail} color="#0066f5" weight={3} opacity={0.7} />}
         {pickup && (
           <Marker position={pickup} icon={pickupIcon}>
             <Popup>Pickup — pharmacy</Popup>

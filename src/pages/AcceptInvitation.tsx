@@ -148,7 +148,7 @@ const AcceptInvitation = () => {
   const emailMismatch = user && invitation && user.email?.toLowerCase() !== invitation.email.toLowerCase();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-3 p-3 bg-primary/10 rounded-full w-fit">

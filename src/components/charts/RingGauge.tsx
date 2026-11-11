@@ -21,7 +21,7 @@ export const RingGauge = ({
   value,
   size = 120,
   strokeWidth = 12,
-  color = '#397dff',
+  color = '#0066f5',
   trackColor = 'hsl(var(--canvas-mist))',
   centerValue,
   centerLabel,

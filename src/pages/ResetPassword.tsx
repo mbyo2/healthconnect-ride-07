@@ -79,7 +79,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center space-y-2">
           <img src="/d0c-icon.svg" className="h-16 w-16 mx-auto mb-2" alt="Logo" />

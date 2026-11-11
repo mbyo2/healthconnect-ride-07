@@ -54,38 +54,50 @@ export default {
         ring: "hsl(var(--ring) / <alpha-value>)",
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
-        // Signal Blue — primary actions. DEFAULT follows the --primary
-        // token so dark mode (65% lightness) is real, not decorative.
+        // PayPal blue — the single interior accent (CEO order 2026-11-11:
+        // PayPal inside). Ramp anchored on the official PayPal theme
+        // values: 500 #0066f5 (action/link blue), 600 #0038ba (its
+        // documented hover), 700 #002991 (PayPal navy). DEFAULT follows
+        // the --primary token so dark mode (66% lightness) is real.
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
-          50: "#f0f5ff",
-          100: "#e0ebff",
-          200: "#c2d7ff",
-          300: "#94bfff",
-          400: "#5da3ff",
-          500: "#397dff",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
+          50: "#f0f6ff",
+          100: "#dbeaff",
+          200: "#b7d1fe",
+          300: "#88b8fc",
+          400: "#418ffb",
+          500: "#0066f5",
+          600: "#0038ba",
+          700: "#002991",
+          800: "#002070",
+          900: "#001752",
         },
-        // Ember Stroke — brand accent only (primary actions, links,
-        // selected states). DEFAULT follows the --accent token; hover
-        // surfaces must use `muted`, never accent (see button.tsx).
+        // PayPal navy — header/emphasis bands and dark surfaces.
+        navy: {
+          DEFAULT: "hsl(var(--navy) / <alpha-value>)",
+          500: "#0066f5",
+          600: "#0038ba",
+          700: "#002991",
+          800: "#002070",
+          900: "#001752",
+        },
+        // Accent = the same PayPal-blue family (pale tint surfaces via
+        // the --accent token; numeric steps mirror the primary ramp).
+        // There is no second brand hue in the product.
         accent: {
           DEFAULT: "hsl(var(--accent) / <alpha-value>)",
           foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
-          50: "#fff0eb",
-          100: "#ffe0d4",
-          200: "#ffc0a9",
-          300: "#ff9a7e",
-          400: "#ff7453",
-          500: "#f55c15",
-          600: "#d94a0e",
-          700: "#b83d0c",
-          800: "#97310a",
-          900: "#7b2509",
+          50: "#f0f6ff",
+          100: "#dbeaff",
+          200: "#b7d1fe",
+          300: "#88b8fc",
+          400: "#418ffb",
+          500: "#0066f5",
+          600: "#0038ba",
+          700: "#002991",
+          800: "#002070",
+          900: "#001752",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
@@ -249,10 +261,9 @@ export default {
         "hero-rise": "heroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "soft-pulse": "softPulse 3.5s ease-in-out infinite",
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.07), transparent 60%)',
-      },
+      // No gradient background utilities exist in this design system
+      // (CEO order 2026-11-11: gradients read as vibe-coded; surfaces
+      // are flat — white, token tint, solid PayPal blue or navy).
       boxShadow: {
         // v3 has no xs/2xs scale — define them so the hundreds of
         // `shadow-xs` usages across the app actually render.

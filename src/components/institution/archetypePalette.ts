@@ -10,17 +10,17 @@
  * don't change; the values are deliberately uniform.
  */
 export const archetypePalette: Record<string, string> = {
-  solo_practice: "#397dff",
-  pharmacy: "#397dff",
-  wholesale_pharmacy: "#397dff",
-  diagnostics: "#397dff",
-  general_hospital: "#397dff",
-  clinic: "#397dff",
-  specialty_hospital: "#397dff",
-  long_term_care: "#397dff",
-  dialysis_centre: "#397dff",
-  dental_clinic: "#397dff",
-  trauma_centre: "#397dff",
+  solo_practice: "#0066f5",
+  pharmacy: "#0066f5",
+  wholesale_pharmacy: "#0066f5",
+  diagnostics: "#0066f5",
+  general_hospital: "#0066f5",
+  clinic: "#0066f5",
+  specialty_hospital: "#0066f5",
+  long_term_care: "#0066f5",
+  dialysis_centre: "#0066f5",
+  dental_clinic: "#0066f5",
+  trauma_centre: "#0066f5",
 };
 
 export default archetypePalette;

@@ -47,7 +47,11 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         <div className="flex flex-col min-h-screen bg-background w-full">
           <DesktopNav />
           <main id="main-content" className="flex-1 overflow-auto">
-            <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+            {/* One content column for the whole signed-in product:
+                1200px (max-w-content), matching the header — the
+                PayPal/Stripe anatomy of a calm top bar over a single
+                centred column. */}
+            <div className="mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
               {children}
             </div>
           </main>
@@ -72,7 +76,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
           "min-h-0"
         )}
       >
-        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-6">
+        <div className="mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8 py-6">
           {children}
         </div>
       </main>

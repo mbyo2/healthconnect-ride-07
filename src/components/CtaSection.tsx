@@ -15,12 +15,10 @@ export const CtaSection = () => {
 
   return (
     <section className="py-16 md:py-24 bg-primary text-primary-foreground relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1),transparent)]" />
-
       <div className="doc-container relative">
         <div className="text-center max-w-3xl mx-auto">
           <div className="flex justify-center mb-6">
-            <div className="p-3 bg-primary-foreground/15 rounded-2xl backdrop-blur-sm">
+            <div className="p-3 bg-primary-foreground/15 rounded-lg">
               <Shield className="h-8 w-8" />
             </div>
           </div>

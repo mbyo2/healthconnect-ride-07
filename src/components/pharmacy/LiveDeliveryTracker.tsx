@@ -14,7 +14,7 @@ const riderIcon = L.divIcon({
   className: "dococlock-rider-marker",
   html: `<div style="
     width: 36px; height: 36px; border-radius: 50%;
-    background: #2563eb; border: 3px solid white;
+    background: #0066f5; border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center;
     "><svg width="18" height="18" viewBox="0 0 24 24" fill="white" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>`,
@@ -181,13 +181,13 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {positions.length > 1 && (
-              <Polyline positions={positions} color="#2563eb" weight={4} />
+              <Polyline positions={positions} color="#0066f5" weight={4} />
             )}
             {latestPos && (
               <Marker position={latestPos} icon={riderIcon}>
                 <Popup>
                   <div style={{ textAlign: "center" }}>
-                    <strong style={{ color: "#2563eb" }}>Doc'O Clock Rider</strong>
+                    <strong style={{ color: "#0066f5" }}>Doc'O Clock Rider</strong>
                     <br />
                     {delivery.courier?.full_name || "Your rider"}
                     <br />

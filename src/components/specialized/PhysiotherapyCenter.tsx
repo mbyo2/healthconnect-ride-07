@@ -211,9 +211,9 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
   return (
     <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-lg bg-navy text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center font-bold text-xl border border-white/20">
             <Activity className="h-6 w-6 text-white" />
           </div>
           <div>

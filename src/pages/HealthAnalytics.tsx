@@ -223,7 +223,7 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Line type="monotone" dataKey="avg" stroke="#397dff" strokeWidth={3} name="Average" />
+                          <Line type="monotone" dataKey="avg" stroke="#0066f5" strokeWidth={3} name="Average" />
                           <Line type="monotone" dataKey="min" stroke="#00a86b" strokeWidth={2} name="Min" />
                           <Line type="monotone" dataKey="max" stroke="#e2445c" strokeWidth={2} name="Max" />
                         </LineChart>
@@ -247,7 +247,7 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="steps" fill="#397dff" name="Steps" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="steps" fill="#0066f5" name="Steps" radius={[4, 4, 0, 0]} />
                           <Bar dataKey="calories" fill="#00a86b" name="Calories" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>

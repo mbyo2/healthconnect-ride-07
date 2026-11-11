@@ -61,7 +61,7 @@ const Landing = () => {
         <meta name="author" content="Doc' O Clock" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow" />
-        <meta name="theme-color" content="#397dff" />
+        <meta name="theme-color" content="#0066f5" />
         <meta name="geo.region" content="ZM" />
         <meta name="geo.placename" content="Zambia" />
         <link rel="canonical" href={`${SITE_URL}/`} />

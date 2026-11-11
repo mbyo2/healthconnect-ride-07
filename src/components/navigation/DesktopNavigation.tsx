@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
   Stethoscope, Package, Pill, Shield, Building2, Activity, Brain,
@@ -14,37 +14,6 @@ import {
   Navigation, Headphones
 } from "lucide-react";
 
-/**
- * Detects whether a horizontal scroll container has hidden content on its
- * left/right edges, so edge-fade affordances can show only when scrolling
- * is actually possible (and disappear when scrolled to an end).
- */
-function useScrollEdges<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
-  const [edges, setEdges] = useState({ left: false, right: false });
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      setEdges({
-        left: scrollLeft > 4,
-        right: scrollLeft + clientWidth < scrollWidth - 4,
-      });
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
-  return { ref, edges };
-}
-
 export const DesktopNavigation = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
@@ -52,7 +21,6 @@ export const DesktopNavigation = () => {
   // Only the five legal prescribing professions get prescription-write links.
   const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
-  const { ref: navScrollRef, edges: navEdges } = useScrollEdges<HTMLDivElement>();
 
   const navItems = useMemo(() => {
     if (!isAuthenticated) {
@@ -285,7 +253,6 @@ export const DesktopNavigation = () => {
   return (
     <div className="relative hidden md:flex min-w-0 max-w-full" role="navigation" aria-label="Main navigation">
       <div
-        ref={navScrollRef}
         className="flex items-center gap-1.5 lg:gap-2 min-w-0 max-w-full overflow-x-auto scrollbar-hide scroll-smooth py-1"
       >
         {navItems.map((item, index) => (
@@ -303,14 +270,6 @@ export const DesktopNavigation = () => {
           </Button>
         ))}
       </div>
-
-      {/* Scroll affordances: edge fades appear only while hidden items exist */}
-      {navEdges.left && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background via-background/70 to-transparent" />
-      )}
-      {navEdges.right && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background via-background/70 to-transparent" />
-      )}
     </div>
   );
 };

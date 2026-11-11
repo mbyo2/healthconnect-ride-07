@@ -9,7 +9,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const CHART_COLORS = [
-  "#0ea5e9", "#8b5cf6", "#10b981", "#f59e0b",
+  // Series 1 is always the PayPal-blue accent; the rest are categorical
+  // data colours — series identity is carried by colour, so they stay
+  // hues (data-viz semantics), never UI chrome.
+  "#0066f5", "#8b5cf6", "#10b981", "#f59e0b",
   "#ef4444", "#06b6d4", "#ec4899", "#84cc16",
 ];
 
@@ -49,19 +52,13 @@ export function TrendAreaChart({ data, dataKey, xKey = "name", color = CHART_COL
   return (
     <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
-        <defs>
-          <linearGradient id={`grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={color} stopOpacity={0} />
-          </linearGradient>
-        </defs>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey={xKey} tick={{ fontSize: 11 }} className="fill-muted-foreground" />
         <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" />
         <Tooltip
           contentStyle={{ borderRadius: 8, fontSize: 12 }}
         />
-        <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#grad-${dataKey})`} />
+        <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={color} fillOpacity={0.1} />
       </AreaChart>
     </ResponsiveContainer>
   );

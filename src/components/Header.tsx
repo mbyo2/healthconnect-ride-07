@@ -50,7 +50,7 @@ export function Header() {
   if (isDesktop) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-card/90 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-card border-b border-border">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"

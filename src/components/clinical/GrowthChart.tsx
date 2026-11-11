@@ -164,9 +164,9 @@ export default function GrowthChart({ patientId }: { patientId: string }) {
                   <Line
                     type="monotone"
                     dataKey="child"
-                    stroke="#2563eb"
+                    stroke="#0066f5"
                     strokeWidth={0}
-                    dot={{ r: 4, fill: '#2563eb' }}
+                    dot={{ r: 4, fill: '#0066f5' }}
                     name="Child"
                     connectNulls
                   />

@@ -24,7 +24,7 @@ export const SimpleBarChart = ({
   title, 
   subtitle, 
   height = 200,
-  defaultColor = '#397dff'
+  defaultColor = '#0066f5'
 }: SimpleBarChartProps) => {
   const rows = (data || []).map((d) => ({
     ...d,

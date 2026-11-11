@@ -21,7 +21,7 @@ export const DonutChart = ({
     ...d,
     label: d.label ?? d.name ?? '',
     value: typeof d.value === 'number' ? d.value : 0,
-    color: d.color || '#397dff',
+    color: d.color || '#0066f5',
   }));
   const total = rows.reduce((sum, item) => sum + item.value, 0) || 1;
 

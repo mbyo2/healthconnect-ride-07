@@ -24,7 +24,7 @@ function MetricCardBody({
   subtitle,
   icon: Icon,
   trend,
-  color = '#397dff',
+  color = '#0066f5',
 }: Omit<MetricCardProps, 'onClick'> & { icon?: LucideIcon }) {
   return (
     <>
@@ -67,7 +67,7 @@ export const MetricCard = ({
   subtitle,
   icon: Icon,
   trend,
-  color = '#397dff',
+  color = '#0066f5',
   onClick
 }: MetricCardProps) => {
   if (onClick) {
@@ -112,7 +112,7 @@ interface SimpleMetricProps {
   color?: string;
 }
 
-export const SimpleMetric = ({ label, value, icon: Icon, color = '#397dff' }: SimpleMetricProps) => {
+export const SimpleMetric = ({ label, value, icon: Icon, color = '#0066f5' }: SimpleMetricProps) => {
   return (
     <div className="flex items-center gap-3 p-3 vf-card">
       {Icon && (

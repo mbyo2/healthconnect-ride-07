@@ -31,7 +31,7 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="bg-hero-wash bg-canvas relative overflow-hidden">
+    <div className="bg-canvas relative overflow-hidden">
       <div className="doc-container py-12 md:py-20 relative z-10">
         {/* Trust bar */}
         <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10 text-sm text-graphite-500 opacity-0 animate-hero-rise" style={{ animationDelay: "0.1s" }}>

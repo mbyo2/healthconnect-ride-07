@@ -31,13 +31,13 @@ main {
 /* Google-grade interaction defaults: visible keyboard focus everywhere,
    calm motion for users who request it, tabular figures for money/data. */
 :focus-visible {
-  outline: 2px solid #397dff;
+  outline: 2px solid #0066f5;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 ::selection {
-  background: rgba(57, 125, 255, 0.22);
+  background: rgba(0, 102, 245, 0.22);
 }
 
 .tnum, .font-mono {
@@ -213,8 +213,9 @@ main {
     --card-foreground:  24 10% 10%;
     --popover:          0 0% 100%;
     --popover-foreground: 24 10% 10%;
-    --primary:          219 100% 61%;     /* #397dff — Signal Blue */
+    --primary:          215 100% 48%;     /* #0066f5 — PayPal blue (official PayPal theme link/action blue) */
     --primary-foreground: 0 0% 100%;
+    --navy:             223 100% 28%;     /* #002991 — PayPal navy: header/emphasis bands, dark surfaces */
     --secondary:        40 6% 96%;        /* #f5f5f4 — Bone */
     --secondary-foreground: 24 10% 10%;
     --muted:            40 6% 96%;
@@ -226,20 +227,20 @@ main {
        src/test/skeleton-coverage.test.tsx — do not lighten. */
     --skeleton:         40 10% 83%;
     --skeleton-sweep:   rgb(255 255 255 / 0.55);
-    --accent:           18 91% 52%;       /* #f55c15 — Ember */
-    --accent-foreground: 0 0% 100%;
+    --accent:           214 100% 96%;     /* pale PayPal-blue tint — hover/selected surface only */
+    --accent-foreground: 223 100% 28%;    /* PayPal navy text on the tint */
     --destructive:      0 100% 50%;
     --destructive-foreground: 0 0% 100%;
     --border:           0 0% 90%;         /* #e5e5e5 silk */
     --input:            0 0% 90%;
-    --ring:             219 100% 61%;
+    --ring:             215 100% 48%;     /* #0066f5 — PayPal blue focus ring */
     --radius:           0.5rem;           /* 8px — radius ladder: controls 6px (rounded-md), cards 8px (rounded-lg), overlays 12px (rounded-xl) */
 
     /* ── Brand Color Tokens ── */
-    --doc-blue:         #397dff;
-    --doc-blue-light:   #e0ebff;
-    --doc-blue-mid:     #c2d7ff;
-    --doc-blue-dark:    #2563eb;
+    --doc-blue:         #0066f5;
+    --doc-blue-light:   #dbeaff;
+    --doc-blue-mid:     #b7d1fe;
+    --doc-blue-dark:    #0038ba;
     --doc-ember:        #f55c15;
     --doc-green:        #00a86b;
     --doc-red:          #e2445c;
@@ -264,17 +265,17 @@ main {
     --midnight: 0 0% 9%;
     --charcoal: 0 0% 15%;
 
-    /* ── Trust scale (doc-blue ramp, space-separated for rgb() use) ── */
-    --trust-50: 240 249 255;
-    --trust-100: 224 235 255;
-    --trust-200: 194 215 255;
-    --trust-300: 148 191 255;
-    --trust-400: 93 163 255;
-    --trust-500: 57 125 255;
-    --trust-600: 37 99 235;
-    --trust-700: 29 78 216;
-    --trust-800: 30 64 175;
-    --trust-900: 30 58 138;
+    /* ── Trust scale (PayPal-blue ramp, space-separated for rgb() use) ── */
+    --trust-50: 240 246 255;
+    --trust-100: 219 234 255;
+    --trust-200: 183 209 254;
+    --trust-300: 136 184 252;
+    --trust-400: 65 143 251;
+    --trust-500: 0 102 245;
+    --trust-600: 0 56 186;
+    --trust-700: 0 41 145;
+    --trust-800: 0 32 112;
+    --trust-900: 0 23 82;
   }
 
   .dark {
@@ -284,7 +285,7 @@ main {
     --card-foreground:  40 10% 98%;
     --popover:          24 8% 10%;
     --popover-foreground: 40 10% 98%;
-    --primary:          219 100% 65%;
+    --primary:          215 100% 66%;     /* #529aff — PayPal blue lifted for dark surfaces */
     --primary-foreground: 0 0% 100%;
     --secondary:        24 8% 14%;
     --secondary-foreground: 40 10% 98%;
@@ -294,13 +295,13 @@ main {
        slate-900 shells; see the light-mode note. Pinned by test. */
     --skeleton:         24 8% 24%;
     --skeleton-sweep:   rgb(255 255 255 / 0.10);
-    --accent:           18 91% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent:           215 55% 20%;      /* deep PayPal-blue tint — hover/selected surface in dark */
+    --accent-foreground: 214 100% 88%;
     --destructive:      0 72% 51%;
     --destructive-foreground: 40 10% 98%;
     --border:           24 8% 18%;
     --input:            24 8% 18%;
-    --ring:             219 100% 65%;
+    --ring:             215 100% 66%;
 
     /* ── Adaptive canvas + ink (dark mode values) ── */
     --canvas: 24 10% 6%;

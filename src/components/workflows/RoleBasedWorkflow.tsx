@@ -206,7 +206,10 @@ export const RoleBasedWorkflow = () => {
 
   return (
     <AccountApprovalGate>
-      <div className="container mx-auto p-6">
+      {/* The shell (MobileLayout) owns page geometry — workflows render
+          into its single 1200px column and must not re-wrap themselves
+          in a second container with its own padding. */}
+      <div className="w-full">
         {getCurrentWorkflow()}
       </div>
     </AccountApprovalGate>

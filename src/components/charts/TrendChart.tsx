@@ -18,7 +18,7 @@ export const TrendChart = ({
   lines,
   title, 
   subtitle, 
-  color = '#397dff',
+  color = '#0066f5',
   height = 200,
   showArea = true,
   prefix = '',
@@ -40,13 +40,7 @@ export const TrendChart = ({
       </div>
       <ResponsiveContainer width="100%" height={height}>
         <ChartComponent data={rows}>
-          <defs>
-            <linearGradient id={`gradient-${color}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
-              <stop offset="95%" stopColor={color} stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <XAxis 
+          <XAxis
             dataKey="label" 
             stroke="#94a3b8"
             fontSize={11}
@@ -91,7 +85,8 @@ export const TrendChart = ({
               dataKey="value" 
               stroke={color}
               strokeWidth={2}
-              fill={showArea ? `url(#gradient-${color})` : 'none'}
+              fill={showArea ? color : 'none'}
+              fillOpacity={showArea ? 0.1 : 0}
               dot={{ fill: color, strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
             />

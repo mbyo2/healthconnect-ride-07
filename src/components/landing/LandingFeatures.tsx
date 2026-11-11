@@ -100,7 +100,6 @@ export const PlatformScale = () => {
         decoding="async"
       />
       <div className="absolute inset-0 bg-slate-950/70" />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/40" />
     </div>
     <div className="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
       <h2 className="mx-auto max-w-3xl text-center font-display text-3xl sm:text-4xl font-medium tracking-tight text-white">
@@ -176,7 +175,7 @@ export const CareExperience = () => {
                 width={1200}
                 height={800}
               />
-              <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-midnight/80 to-transparent">
+              <div className="absolute inset-x-0 bottom-0 p-4 bg-midnight/80">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="font-medium text-base text-white">Video consultations</div>

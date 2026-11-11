@@ -338,8 +338,8 @@ export function SkeletonPatientHome() {
   return (
     <div aria-hidden className="space-y-6 sm:space-y-8">
       {/* AI triage entry banner (solid primary bar) */}
-      <div className="flex w-full items-center gap-4 rounded-2xl bg-primary-500 p-4 shadow-xs sm:p-5">
-        <SkeletonOnDark className="h-[52px] w-[52px] shrink-0 rounded-2xl" />
+      <div className="flex w-full items-center gap-4 rounded-lg bg-primary-500 p-4 sm:p-5">
+        <SkeletonOnDark className="h-[52px] w-[52px] shrink-0 rounded-lg" />
         <div className="min-w-0 flex-1 space-y-2">
           <SkeletonOnDark className="h-5 w-44 max-w-full rounded-md" />
           <SkeletonOnDark className="h-3.5 w-72 max-w-full rounded-md" />
@@ -348,27 +348,27 @@ export function SkeletonPatientHome() {
       </div>
 
       {/* Date + notification bell header bar */}
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-white p-4 shadow-xs dark:bg-slate-900 sm:p-5">
+      <div className="flex items-center justify-between rounded-lg border border-border bg-white p-4 shadow-xs dark:bg-slate-900 sm:p-5">
         <div className="flex items-center gap-3">
-          <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-2xl" />
+          <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-lg" />
           <div className="space-y-2">
             <SkeletonLine className="h-3 w-10" />
             <SkeletonLine className="h-5 w-36" />
           </div>
         </div>
-        <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-2xl" />
+        <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-lg" />
       </div>
 
       {/* Online / offline care-mode toggle */}
       <div className="flex justify-center">
-        <div className="flex w-full max-w-md gap-1 rounded-2xl border border-border bg-canvas-mist p-1 shadow-xs dark:bg-slate-800/80">
-          <Skeleton className="h-[46px] flex-1 rounded-xl" />
-          <Skeleton className="h-[46px] flex-1 rounded-xl" />
+        <div className="flex w-full max-w-md gap-1 rounded-full border border-border bg-canvas-mist p-1 dark:bg-slate-800/80">
+          <Skeleton className="h-[46px] flex-1 rounded-full" />
+          <Skeleton className="h-[46px] flex-1 rounded-full" />
         </div>
       </div>
 
-      {/* Next appointment banner (dark slate in both modes) */}
-      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl sm:flex-row sm:items-center sm:p-6">
+      {/* Next appointment banner (PayPal navy in both modes) */}
+      <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-navy bg-navy p-5 sm:flex-row sm:items-center sm:p-6">
         <div className="space-y-2">
           <SkeletonOnDark className="h-3 w-32 rounded-md" />
           <SkeletonOnDark className="h-6 w-64 max-w-full rounded-md" />

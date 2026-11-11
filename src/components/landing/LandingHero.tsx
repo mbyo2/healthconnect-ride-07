@@ -42,7 +42,7 @@ export const LandingHero = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-hero-wash bg-canvas">
+    <section className="relative overflow-hidden bg-canvas">
       <div className="relative z-10 mx-auto max-w-content px-4 pt-28 text-center sm:px-6 sm:pt-32 lg:px-8">
         <h1 className="mx-auto max-w-5xl font-display text-[2.75rem] font-medium leading-[1.05] tracking-tight text-midnight opacity-0 animate-hero-rise sm:text-6xl lg:text-[5rem]">
           Book a verified doctor in Zambia — in person or by video.

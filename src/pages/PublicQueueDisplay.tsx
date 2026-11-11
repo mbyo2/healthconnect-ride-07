@@ -110,7 +110,7 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Main Focus: Big Screen Now Calling Hero */}
       <div className="my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left 7 cols: Current Active Called Token */}
-        <div className="lg:col-span-7 p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-primary-500/40 border-2 border-primary-500 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-7 p-8 sm:p-12 rounded-lg bg-navy border border-navy flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-10">
             <Bell className="h-48 w-48 text-primary-500" />
           </div>

@@ -13,7 +13,7 @@ interface BottomNavItemProps {
 
 export function BottomNavItem({ to, label, icon, active, description }: BottomNavItemProps) {
   const touchFeedbackProps = useTouchFeedback({
-    rippleColor: '#397dff',
+    rippleColor: '#0066f5',
     rippleOpacity: 0.12
   });
 

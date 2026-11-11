@@ -389,7 +389,7 @@ export const InstitutionDashboard = () => {
             typeBuckets.set(t, (typeBuckets.get(t) || 0) + 1);
           });
           setWeeklyFlow([1, 2, 3, 4, 5, 6, 0].map((i) => ({ name: dayNames[i], visits: weekBuckets[i] })));
-          const TYPE_COLORS = ["#397dff", "#00a86b", "#f59e0b", "#f55c15", "#737373", "#94bfff"];
+          const TYPE_COLORS = ["#0066f5", "#00a86b", "#f59e0b", "#f55c15", "#737373", "#88b8fc"];
           setVisitMix(
             [...typeBuckets.entries()]
               .sort((a, b) => b[1] - a[1])
@@ -842,7 +842,7 @@ export const InstitutionDashboard = () => {
                 <SimpleBarChart
                   data={weeklyFlow}
                   bars={[
-                    { dataKey: 'visits', name: 'Patient Visits', color: '#397dff' },
+                    { dataKey: 'visits', name: 'Patient Visits', color: '#0066f5' },
                   ]}
                   height={250}
                 />

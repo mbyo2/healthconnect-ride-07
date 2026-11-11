@@ -583,8 +583,8 @@ export const Prescriptions = () => {
           <title>Prescription Slip - ${rxNo}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; color: #0f172a; max-width: 800px; margin: auto; }
-            .header { border-bottom: 3px solid #397dff; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-            .logo { font-size: 22px; font-weight: 900; color: #397dff; }
+            .header { border-bottom: 3px solid #0066f5; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+            .logo { font-size: 22px; font-weight: 900; color: #0066f5; }
             .rx-title { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
             .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 25px; padding: 15px; background: #f8fafc; border-radius: 8px; }
             table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; margin-bottom: 30px; }
@@ -601,7 +601,7 @@ export const Prescriptions = () => {
             </div>
             <div style="text-align: right;">
               <div class="rx-title">Official E-Prescription</div>
-              <div style="font-family: monospace; font-weight: bold; color: #397dff;">${rxNo}</div>
+              <div style="font-family: monospace; font-weight: bold; color: #0066f5;">${rxNo}</div>
             </div>
           </div>
 

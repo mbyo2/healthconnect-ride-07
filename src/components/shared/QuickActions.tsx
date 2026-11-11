@@ -23,7 +23,7 @@ export const QuickActions = ({ title = 'Quick Actions', actions }: QuickActionsP
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {actions.map((action, idx) => {
           const Icon = action.icon;
-          const color = action.color || '#397dff';
+          const color = action.color || '#0066f5';
           
           return (
             <button
