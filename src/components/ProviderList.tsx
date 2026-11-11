@@ -82,7 +82,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
         return (
           <article
             key={provider.id}
-            className={`p-4 rounded-2xl border bg-card transition-all shadow-sm hover:shadow-md ${
+            className={`p-4 rounded-2xl border bg-card transition-all ${
               selectedProvider?.id === provider.id
                 ? "border-primary-500 ring-2 ring-primary-500/20"
                 : "border-border hover:border-primary-300"

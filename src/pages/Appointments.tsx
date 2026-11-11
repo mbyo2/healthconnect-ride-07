@@ -556,11 +556,11 @@ export const AppointmentsPage = () => {
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2.5 text-foreground">
+                <h1 className="text-greeting flex items-center gap-2.5 text-foreground">
                   {isProvider ? "Appointment Workspace" : "My Appointments"}
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[13px] text-muted-foreground mt-0.5">
                   {isProvider ? "Manage clinic visits, video consultations & e-intake" : "Upcoming visits, video links & prescription notes"}
                 </p>
               </div>

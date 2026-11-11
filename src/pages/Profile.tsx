@@ -268,7 +268,7 @@ const Profile = () => {
         <div className="vf-card !p-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
             <div className="relative">
-              <Avatar className="h-28 w-28 ring-4 ring-primary-500/20 shadow-card">
+              <Avatar className="h-28 w-28 ring-4 ring-primary-500/20">
                 <AvatarImage src={profile?.avatar_url || ""} />
                 <AvatarFallback className="bg-primary-50 text-primary-500 text-2xl font-medium">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
@@ -279,7 +279,7 @@ const Profile = () => {
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={avatarUploading}
                 aria-label="Change profile photo"
-                className="absolute -bottom-1 -right-1 h-11 w-11 min-h-[44px] min-w-[44px] rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95 disabled:opacity-60"
+                className="absolute -bottom-1 -right-1 h-11 w-11 min-h-[44px] min-w-[44px] rounded-full bg-primary-500 text-white flex items-center justify-center hover:bg-primary-600 transition-transform active:scale-95 disabled:opacity-60"
                 title="Change Photo"
               >
                 <Camera className="h-5 w-5" />
@@ -296,7 +296,7 @@ const Profile = () => {
 
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-3xl font-medium text-midnight tracking-tight">
+                <h1 className="text-greeting text-midnight">
                   {[formData.firstName, formData.lastName].filter(Boolean).join(" ") || "Your Account"}
                 </h1>
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">
@@ -326,7 +326,7 @@ const Profile = () => {
 
             <Button
               onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-              className={`rounded-full px-6 h-11 text-xs font-semibold shadow-sm transition-all ${
+              className={`rounded-full px-6 h-11 text-xs font-semibold transition-all ${
                 isEditing
                   ? "bg-slate-900 hover:bg-black text-white"
                   : "bg-primary-500 hover:bg-primary-600 text-white"
@@ -339,7 +339,7 @@ const Profile = () => {
         </div>
 
         {/* ── Personal Info Form ── */}
-        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <User className="h-5 w-5 text-primary-500" />
@@ -422,7 +422,7 @@ const Profile = () => {
 
         {/* ── Provider Professional Details (health_personnel only) ── */}
         {isProvider && (
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-6">
             <div className="flex items-start justify-between border-b border-border pb-4">
               <div>
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -715,7 +715,7 @@ const Profile = () => {
         )}
 
         {/* ── Stats Widget ── */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6">
           <ProfileStats userId={user?.id} />
         </div>
       </div>

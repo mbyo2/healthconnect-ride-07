@@ -165,11 +165,11 @@ export default function MedicalRecords() {
                 <FolderHeart className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
+                <h1 className="text-greeting flex items-center gap-2">
                   My Health Records
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-sm text-muted-foreground font-medium tracking-wide">
+                <p className="text-[13px] text-muted-foreground mt-0.5">
                   Your visits, lab results, and prescriptions in one place
                 </p>
               </div>

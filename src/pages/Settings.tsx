@@ -322,7 +322,7 @@ const Settings = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
-        <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+        <div className="doc-page-header px-4 sm:px-6 py-5">
           <div className="max-w-content mx-auto flex items-center gap-3" aria-hidden>
             <Skeleton className="h-10 w-10 rounded-xl" />
             <div className="space-y-2">
@@ -343,17 +343,17 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5">
         <div className="max-w-content mx-auto flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
             <SettingsIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
+            <h1 className="text-greeting flex items-center gap-2">
               Settings
               <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>
-            <p className="text-sm text-foreground font-medium tracking-wide">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               Your account, security, notifications, and region
             </p>
           </div>
@@ -405,7 +405,7 @@ const Settings = () => {
             </div>
 
             {/* Privacy & Data */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-3">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
               <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Shield className="h-4 w-4 text-success-500" /> Privacy & Data Rights
               </h2>
@@ -428,7 +428,7 @@ const Settings = () => {
           {/* Column 2 */}
           <div className="space-y-6">
             {/* Notification Controls */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Bell className="h-4 w-4 text-warning-500" /> Notifications
               </h2>
@@ -490,7 +490,7 @@ const Settings = () => {
             </div>
 
             {/* Regional Localization */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
                 <Globe className="h-4 w-4 text-primary-500" /> Language & Region
               </h2>

@@ -452,5 +452,13 @@ main {
 .dark .text-graphite-500 { color: #a8a29e; } /* graphite-400 */
 .dark .text-graphite-600 { color: #d6d3d1; } /* graphite-300 */
 
+/* ── PayPal anatomy rollout (2026-11-11) ─────────────────────────────
+   Every page-header title takes the greeting treatment — 800 weight,
+   tight -0.02em tracking — whatever size/weight utilities the ~50
+   doc-page-header call sites still carry (font-medium titles were the
+   last "AI slop" tell the CEO flagged). Unlayered for the same reason
+   as the graphite remap above: it must beat layered utilities. */
+.doc-page-header h1 { font-weight: 800; letter-spacing: -0.02em; }
+
 /* ── Alive UI: Uber/Duolingo micro-interactions ────────────────────── */
 

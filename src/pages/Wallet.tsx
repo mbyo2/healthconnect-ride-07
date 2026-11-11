@@ -63,13 +63,13 @@ const Wallet = () => {
                             <WalletIcon className="h-5 w-5" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
+                            <h1 className="text-greeting flex items-center gap-2">
                                 {isEarner ? "Earnings & Wallet" : "Healthcare Wallet"}
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-white bg-success-500 dark:bg-emerald-600">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-pill text-pill-foreground">
                                     <ShieldCheck className="h-3 w-3" /> {currency} · {getSymbol()} · Live FX
                                 </span>
                             </h1>
-                            <p className="text-sm text-muted-foreground font-medium tracking-wide">
+                            <p className="text-[13px] text-muted-foreground mt-0.5">
                                 {isEarner
                                     ? "Your earnings, top-ups, and transaction history — settlement is always ZMW"
                                     : "Balances, top-ups, and transaction history — display converts at live bank rates, settlement is always ZMW"}

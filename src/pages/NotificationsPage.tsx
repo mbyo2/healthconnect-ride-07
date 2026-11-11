@@ -136,19 +136,19 @@ const NotificationsPage = () => {
   return (
     <div className="pb-16">
       {/* Sticky Monday Header */}
-      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
               <Bell className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+              <h1 className="text-greeting flex items-center gap-2">
                 Notifications
                 <span className="w-2 h-2 rounded-full bg-success-500" aria-hidden />
                 <span className="sr-only">Live notifications</span>
               </h1>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-[13px] text-muted-foreground mt-0.5">
                 {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}` : "All notifications read"}
               </p>
             </div>

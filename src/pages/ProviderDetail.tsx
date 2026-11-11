@@ -151,14 +151,14 @@ export const ProviderDetail = () => {
             {isFetchError && (
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary text-primary-foreground font-semibold text-xs"
+                className="px-4 py-2.5 min-h-[44px] rounded-full bg-primary text-primary-foreground font-semibold text-xs"
               >
                 Try again
               </button>
             )}
             <button
               onClick={() => navigate("/search")}
-              className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-slate-700 font-semibold text-xs"
+              className="px-4 py-2.5 min-h-[44px] rounded-full border border-border text-slate-700 font-semibold text-xs"
             >
               Browse Verified Doctors
             </button>
@@ -276,7 +276,7 @@ export const ProviderDetail = () => {
 
       <div className="pb-16">
         {/* Sticky top bar */}
-        <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
+        <div className="doc-page-header px-4 sm:px-6 py-4">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
               <h1 className="text-base font-medium tracking-tight truncate">{providerName}</h1>
@@ -285,13 +285,13 @@ export const ProviderDetail = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsWaitlistOpen(true)}
-                className="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-medium text-graphite-600 hover:bg-muted"
+                className="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-full border border-border text-xs font-medium text-graphite-600 hover:bg-muted"
               >
                 Join Waitlist
               </button>
               <button
                 onClick={() => setIsBookingOpen(true)}
-                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-xs flex items-center gap-1.5"
+                className="px-4 py-2.5 min-h-[44px] rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs flex items-center gap-1.5"
               >
                 <CalendarPlus className="h-4 w-4" /> Book Appointment
               </button>
@@ -302,7 +302,7 @@ export const ProviderDetail = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-5">
 
           {/* ── Hero ── */}
-          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs flex flex-col sm:flex-row gap-5">
+          <div className="p-6 rounded-2xl bg-card border border-border flex flex-col sm:flex-row gap-5">
             {/* Avatar */}
             <div className="shrink-0">
               {provider.avatar_url ? (
@@ -320,7 +320,7 @@ export const ProviderDetail = () => {
 
             <div className="flex-1 space-y-3 min-w-0">
               <div>
-                <h2 className="text-3xl font-medium tracking-tight text-foreground">{providerName}</h2>
+                <h2 className="text-greeting text-foreground">{providerName}</h2>
                 <p className="text-sm text-primary-500 font-semibold mt-1">{providerSpecialty}</p>
                 <div className="mt-2">
                   <RatingDisplay rating={rating} reviewCount={reviewCount} size="md" />
@@ -330,7 +330,7 @@ export const ProviderDetail = () => {
               {/* Capability badges */}
               <div className="flex flex-wrap gap-1.5">
                 {provider.is_verified && (
-                  <Badge className="bg-success-500 text-white border-0 gap-1">
+                  <Badge className="bg-success-50 text-success-600 border border-success-100 gap-1">
                     <CheckCircle className="h-3 w-3" /> Verified
                   </Badge>
                 )}
