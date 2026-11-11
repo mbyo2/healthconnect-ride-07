@@ -7,6 +7,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuditEntry {
@@ -96,21 +99,21 @@ const BlockchainRecords = () => {
   }, [user?.id]);
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Top Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
               <Database className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
-                Blockchain Medical Ledger & Verification Board
+                Medical Record Ledger
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                Immutable SHA-256 encrypted cryptographic health audit trail and record verification
+              <p className="text-xs text-muted-foreground font-medium">
+                A tamper-evident audit trail for medical records — verify any record has not been altered.
               </p>
             </div>
           </div>
@@ -118,57 +121,57 @@ const BlockchainRecords = () => {
           <div className="flex items-center gap-2">
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <Button className="gap-1.5">
                   <Plus className="w-4 h-4" />
-                  <span>Add Record</span>
-                </button>
+                  <span>Add record</span>
+                </Button>
               </DialogTrigger>
-              <DialogContent className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 sm:max-w-[450px]">
+              <DialogContent className="sm:max-w-[450px]">
                 <DialogHeader>
                   <DialogTitle className="font-semibold text-base">Add New Medical Record</DialogTitle>
-                  <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">
-                    This record will be encrypted and committed to the immutable blockchain ledger.
+                  <DialogDescription>
+                    This record will be encrypted and added to the tamper-evident ledger.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div>
-                    <label htmlFor="title" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Title</label>
-                    <input
+                    <label htmlFor="title" className="text-xs font-medium text-muted-foreground">Title</label>
+                    <Input
                       id="title"
                       value={newRecord.title}
                       onChange={(e) => setNewRecord({ ...newRecord, title: e.target.value })}
                       placeholder="e.g. Annual Cardiovascular Audit"
-                      className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold placeholder:text-slate-400"
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <label htmlFor="provider" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Provider</label>
-                    <input
+                    <label htmlFor="provider" className="text-xs font-medium text-muted-foreground">Provider</label>
+                    <Input
                       id="provider"
                       value={newRecord.provider}
                       onChange={(e) => setNewRecord({ ...newRecord, provider: e.target.value })}
                       placeholder="Dr. Smith / Lusaka General"
-                      className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold placeholder:text-slate-400"
+                      className="mt-1"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label htmlFor="date" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date</label>
-                      <input
+                      <label htmlFor="date" className="text-xs font-medium text-muted-foreground">Date</label>
+                      <Input
                         id="date"
                         type="date"
                         value={newRecord.date}
                         onChange={(e) => setNewRecord({ ...newRecord, date: e.target.value })}
-                        className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold"
+                        className="mt-1"
                       />
                     </div>
                     <div>
-                      <label htmlFor="category" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
+                      <label htmlFor="category" className="text-xs font-medium text-muted-foreground">Category</label>
                       <Select
                         value={newRecord.category}
                         onValueChange={(val) => setNewRecord({ ...newRecord, category: val })}
                       >
-                        <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 font-bold text-xs">
+                        <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
@@ -182,42 +185,42 @@ const BlockchainRecords = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <button onClick={handleAddRecord} className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs">
-                    Commit to Blockchain
-                  </button>
+                  <Button onClick={handleAddRecord}>
+                    Add to ledger
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
-            <button className="px-4 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1.5">
-              <Download className="w-4 h-4 text-graphite-500 dark:text-slate-400" />
-              <span>Export All</span>
-            </button>
+            <Button variant="outline" className="gap-1.5">
+              <Download className="w-4 h-4" />
+              <span>Export all</span>
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="pt-6 space-y-6">
         {/* Security Info Banner */}
-        <div className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-purple-500 text-white">
+        <div className="rounded-lg border border-primary-500/30 bg-primary-500/5 p-5 flex items-start gap-4">
+          <div className="p-3 rounded-lg bg-primary text-primary-foreground">
             <Lock className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-sm text-purple-500">End-to-End Cryptographic Ledger Security</h3>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+            <h3 className="font-semibold text-sm text-foreground">How record security works</h3>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">
               All health records are encrypted via AES-256 and committed to a distributed cryptographic ledger. Access grants are fully auditable.
             </p>
             <div className="flex flex-wrap gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
                 <CheckCircle2 className="w-4 h-4 text-success-500" />
                 <span>256-bit AES Encryption</span>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
                 <CheckCircle2 className="w-4 h-4 text-success-500" />
                 <span>Immutable Block Hashes</span>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
                 <CheckCircle2 className="w-4 h-4 text-success-500" />
                 <span>Real-Time Audit Telemetry</span>
               </div>
@@ -227,59 +230,59 @@ const BlockchainRecords = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Records List */}
-          <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-5 shadow-xs">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-primary-500" />
-                Blockchain-Verified Health Records
+                Verified health records
               </h2>
-              <span className="text-xs font-bold text-graphite-500 dark:text-slate-400">{medicalRecords.length} blocks</span>
+              <span className="text-xs font-medium text-muted-foreground tnum">{medicalRecords.length} records</span>
             </div>
 
             <div className="space-y-3">
               {loading ? (
-                <div className="text-center py-6 text-xs text-graphite-500 dark:text-slate-400">Loading blockchain ledger...</div>
+                <div className="text-center py-6 text-sm text-muted-foreground">Loading blockchain ledger...</div>
               ) : medicalRecords.length > 0 ? (
                 medicalRecords.map((record) => (
                   <div
                     key={record.id}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                    className={`p-4 rounded-lg border transition-colors cursor-pointer ${
                       selectedRecord === record.id
-                        ? "border-purple-500 bg-purple-500/10"
-                        : "border-canvas-silk bg-canvas hover:border-purple-500"
+                        ? "border-primary-500 bg-primary-500/5"
+                        : "border-border bg-card hover:bg-muted/50"
                     }`}
                     onClick={() => setSelectedRecord(record.id)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <FileText className="w-4 h-4 text-purple-500 shrink-0" />
-                          <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">{record.title}</h4>
+                          <FileText className="w-4 h-4 text-primary-500 shrink-0" />
+                          <h4 className="font-semibold text-sm text-foreground truncate">{record.title}</h4>
                           {record.verified && (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500 flex items-center gap-1">
+                            <StatusBadge tone="positive" className="gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Verified
-                            </span>
+                            </StatusBadge>
                           )}
                         </div>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400">Provider: <strong>{record.provider}</strong> • Date: {record.date}</p>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400 font-mono truncate mt-1 bg-white dark:bg-slate-800 p-1 rounded border border-canvas-silk dark:border-slate-700">
+                        <p className="text-xs text-muted-foreground">Provider: <strong>{record.provider}</strong> • Date: {record.date}</p>
+                        <p className="text-xs text-muted-foreground font-mono truncate mt-1 bg-muted/50 p-1.5 rounded-md border border-border">
                           Hash: {record.hash}
                         </p>
                         {record.shared_with && record.shared_with.length > 0 && (
-                          <div className="mt-2 flex items-center gap-1 text-xs font-bold text-primary-500">
+                          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-primary-600 dark:text-primary-400">
                             <Share2 className="w-3 h-3" />
                             <span>Shared with: {record.shared_with.join(", ")}</span>
                           </div>
                         )}
                       </div>
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">
+                      <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
                         {record.category}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-xs text-graphite-500 dark:text-slate-400">
+                <div className="text-center py-8 text-sm text-muted-foreground">
                   No records committed to the ledger yet. Add your first medical record.
                 </div>
               )}
@@ -287,29 +290,29 @@ const BlockchainRecords = () => {
           </div>
 
           {/* Audit Trail */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <Eye className="w-4 h-4 text-success-500" />
-                Cryptographic Audit Log
+                Audit log
               </h2>
             </div>
 
             <div className="space-y-3">
               {auditTrail.map((entry, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 rounded-xl border border-canvas-silk bg-canvas text-xs">
-                  <div className={`p-1 rounded-full text-white ${entry.verified ? "bg-success-500" : "bg-warning-500"}`}>
+                <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card text-xs">
+                  <div className={`p-1 rounded-md ${entry.verified ? "bg-success-500/15 text-success-600 dark:text-success-400" : "bg-warning-500/15 text-warning-600 dark:text-warning-400"}`}>
                     {entry.verified ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-slate-100">{entry.action}</p>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400">Actor: {entry.user}</p>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{entry.timestamp}</p>
+                    <p className="font-medium text-foreground">{entry.action}</p>
+                    <p className="text-xs text-muted-foreground">Actor: {entry.user}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{entry.timestamp}</p>
                   </div>
                 </div>
               ))}
               {auditTrail.length === 0 && (
-                <div className="text-center py-6 text-xs text-graphite-500 dark:text-slate-400">
+                <div className="text-center py-6 text-sm text-muted-foreground">
                   No audit log entries available.
                 </div>
               )}
@@ -319,22 +322,22 @@ const BlockchainRecords = () => {
 
         {/* Record Details Panel */}
         {selectedRecord && (
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-semibold text-sm mb-4">Selected Record Ledger Telemetry</h2>
+          <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
+            <h2 className="font-semibold text-sm mb-4">Selected record</h2>
 
-            <div className="flex items-center gap-2 mb-4 border-b border-canvas-silk pb-3">
+            <div className="flex items-center gap-2 mb-4 border-b border-border pb-3">
               {[
-                { id: "details", label: "Record Details" },
-                { id: "blockchain", label: "Blockchain Hash Verification" },
-                { id: "sharing", label: "Permission Access Grants" },
+                { id: "details", label: "Details" },
+                { id: "blockchain", label: "Hash verification" },
+                { id: "sharing", label: "Access grants" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveDetailsTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
+                  className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
                     activeDetailsTab === tab.id
-                      ? "bg-primary-500 text-white shadow-xs"
-                      : "bg-canvas dark:bg-slate-800 text-graphite-500 dark:text-slate-400"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
@@ -344,53 +347,59 @@ const BlockchainRecords = () => {
 
             {activeDetailsTab === "details" && (
               <div className="space-y-3 text-xs">
-                <p className="text-graphite-500 dark:text-slate-400">
-                  View full record payload, download cryptographically signed PDF, or request modifications.
+                <p className="text-muted-foreground">
+                  View the full record, download a signed PDF, or request changes.
                 </p>
                 <div className="flex gap-2 flex-wrap">
-                  <button
+                  <Button
                     onClick={() => setShowPayload((v) => !v)}
-                    className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs"
                     aria-expanded={showPayload}
                   >
-                    {showPayload ? 'Hide Record Payload' : 'View Full Record Payload'}
-                  </button>
-                  <button
+                    {showPayload ? 'Hide record details' : 'View full record'}
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => printRecordPayload()}
-                    className="px-4 py-2 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs"
                   >
-                    Download Signed PDF
-                  </button>
+                    Download signed PDF
+                  </Button>
                 </div>
                 {showPayload && (
-                  <pre className="p-3 rounded-xl bg-canvas dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">
-                    {JSON.stringify(medicalRecords.find((r) => r.id === selectedRecord), null, 2)}
-                  </pre>
+                  <dl className="rounded-lg border border-border bg-muted/30 p-4 space-y-1.5">
+                    {Object.entries(medicalRecords.find((r) => r.id === selectedRecord) ?? {}).map(([key, value]) => (
+                      <div key={key} className="flex items-baseline justify-between gap-4">
+                        <dt className="text-xs text-muted-foreground capitalize">{key.replace(/_/g, " ")}</dt>
+                        <dd className="text-xs font-medium text-foreground text-right break-all">
+                          {Array.isArray(value) ? value.join(", ") : typeof value === "boolean" ? (value ? "Yes" : "No") : String(value ?? "—")}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 )}
               </div>
             )}
 
             {activeDetailsTab === "blockchain" && (
               <div className="space-y-2 text-xs">
-                <p className="font-bold text-graphite-500 dark:text-slate-400">SHA-256 Ledger Hash</p>
-                <p className="text-xs font-mono font-bold bg-canvas p-3 rounded-xl border border-canvas-silk text-purple-500">
+                <p className="font-medium text-muted-foreground">SHA-256 ledger hash</p>
+                <p className="text-xs font-mono bg-muted/50 p-3 rounded-lg border border-border text-foreground break-all">
                   {medicalRecords.find((r) => r.id === selectedRecord)?.hash}
                 </p>
-                <div className="flex items-center gap-1.5 text-xs text-success-500 font-bold">
+                <div className="flex items-center gap-1.5 text-xs text-success-600 dark:text-success-400 font-medium">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Cryptographically verified & un-tampered</span>
+                  <span>Verified — this record has not been tampered with</span>
                 </div>
               </div>
             )}
 
             {activeDetailsTab === "sharing" && (
               <div className="space-y-3 text-xs">
-                <p className="text-graphite-500 dark:text-slate-400">
-                  Manage patient access grants. Every permission change emits a signed transaction to the audit trail.
+                <p className="text-muted-foreground">
+                  Manage who can access this record. Every change is written to the audit log.
                 </p>
-                <button className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs flex items-center gap-1">
-                  <Share2 className="w-4 h-4" /> Grant Provider Access
-                </button>
+                <Button className="gap-1.5">
+                  <Share2 className="w-4 h-4" /> Grant provider access
+                </Button>
               </div>
             )}
           </div>
