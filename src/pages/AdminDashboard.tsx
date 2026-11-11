@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SecurityAuditLogs } from "@/components/admin/SecurityAuditLogs";
+import { PatientAccessAudit } from "@/components/admin/PatientAccessAudit";
 import { RevenueAnalyticsDashboard } from "@/components/admin/RevenueAnalyticsDashboard";
 import { InstitutionApplications } from "@/components/admin/InstitutionApplications";
 import { InstitutionManagement } from "@/components/admin/InstitutionManagement";
@@ -18,7 +19,8 @@ import { SuggestionBanner, RecommendationCard } from "@/components/guidance";
 import {
   Shield, ShieldCheck, Users, Activity, DollarSign, Building2, Stethoscope,
   UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw, TrendingUp,
-  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote, Trash2, ArrowLeftRight
+  AlertTriangle, CheckCircle, Clock, LayoutGrid, Banknote, Trash2, ArrowLeftRight,
+  Eye
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -48,6 +50,7 @@ const TABS = [
   { value: "promos", label: "Promos", icon: Ticket },
   { value: "security", label: "Security", icon: Lock },
   { value: "audit", label: "Audit Logs", icon: Activity },
+  { value: "patient-access", label: "Patient Access", icon: Eye },
   { value: "delete-user", label: "Delete User", icon: Trash2 },
 ];
 
@@ -442,6 +445,7 @@ export const AdminDashboard = () => {
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>
             <TabsContent value="security"><SecurityDashboard /></TabsContent>
             <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
+            <TabsContent value="patient-access"><PatientAccessAudit /></TabsContent>
             {isSuperAdmin && <TabsContent value="delete-user"><UserDeletionPanel /></TabsContent>}
           </div>
         </Tabs>

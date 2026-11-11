@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { usePatientAccessLog } from '@/hooks/usePatientAccessLog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,10 @@ interface LabResultRow {
 
 export default function PatientLabResults() {
   const { user } = useAuth();
+  // Audit trail (2026-11-11): this is the canonical lab-results reader;
+  // opening it is a logged view ('self_view' for the patient's own
+  // results, recorded server-side). Fire-and-forget.
+  usePatientAccessLog(user?.id, 'lab_results');
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['patient-lab-results', user?.id],
     enabled: !!user?.id,

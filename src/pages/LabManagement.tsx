@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2, Pencil, Trash2
@@ -49,6 +50,9 @@ const LabManagement = () => {
   const { formatPrice } = useCurrency();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
+  // Audit trail (2026-11-11): opening a patient's lab request/results is
+  // a logged third-party 'view' of their lab results. Fire-and-forget.
+  usePatientAccessLog(selectedRequest?.patient_id, "lab_results");
   const [resultSummary, setResultSummary] = useState("");
   const [isCritical, setIsCritical] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

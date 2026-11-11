@@ -18,6 +18,7 @@ import { BreakGlassDialog } from "@/components/clinical/BreakGlassDialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { isPatientRecordAccessible } from "@/utils/patientRecordAccess";
+import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface PatientRecord {
@@ -47,6 +48,9 @@ export const PatientRecords = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  // Audit trail (2026-11-11): selecting a patient here opens their
+  // record in this surface — a logged third-party 'view'. Fire-and-forget.
+  usePatientAccessLog(selectedPatientId, "medical_records");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 

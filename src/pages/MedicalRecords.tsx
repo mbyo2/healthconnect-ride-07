@@ -24,12 +24,17 @@ import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SkeletonCard, SkeletonLine, SkeletonListRow } from "@/components/ui/skeleton-kit";
 import PatientLabResults from "@/components/patient/PatientLabResults";
+import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import PatientMAR from "@/components/patient/PatientMAR";
 import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
 import { EmptyState } from "@/components/shared/EmptyState";
 
 export default function MedicalRecords() {
   const { user } = useAuth();
+  // Audit trail (2026-11-11): opening the record chart is a logged view.
+  // This page renders the signed-in user's own chart, so the server RPC
+  // records it as 'self_view'; the write is fire-and-forget.
+  usePatientAccessLog(user?.id, "medical_records");
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [healthMetrics, setHealthMetrics] = useState<HealthMetric[]>([]);
   const [loading, setLoading] = useState(true);

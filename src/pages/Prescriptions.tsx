@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { PHARMACY_SIDE_ROLES, PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -140,6 +141,16 @@ export const Prescriptions = () => {
       (PHARMACY_SIDE_ROLES as readonly string[]).includes(r) ||
       r === 'institution_admin'
     );
+
+  // Audit trail (2026-11-11): the prescription list actually on screen
+  // is a logged view — a patient selecting a patient in the composer
+  // opens that patient's prescriptions ('view'); a non-provider user
+  // sees exactly their own list ('self_view', derived server-side).
+  // Mirrors the query branch below; fire-and-forget.
+  usePatientAccessLog(
+    selectedPatient?.id ?? (!isProvider ? user?.id : null),
+    "prescriptions"
+  );
 
   const { data: prescriptions = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["prescriptions", user?.id, isProvider, institutionId, pharmacyAffiliationIds.join(",")],
