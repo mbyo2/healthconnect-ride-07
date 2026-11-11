@@ -256,9 +256,9 @@ export default function StaffDashboard() {
 
   if (rolesLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div>
         <div className="px-6 py-8">
-          <div className="max-w-7xl mx-auto flex items-center gap-4" aria-hidden>
+          <div className="flex items-center gap-4" aria-hidden>
             <Skeleton className="h-12 w-12 rounded-lg" />
             <div className="flex-1 space-y-2">
               <SkeletonLine className="h-6 w-56 max-w-full" />
@@ -266,7 +266,7 @@ export default function StaffDashboard() {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 pb-10" role="status" aria-label="Loading staff dashboard">
+        <div className="pb-10" role="status" aria-label="Loading staff dashboard">
           <SkeletonDashboardBody />
         </div>
       </div>
@@ -282,23 +282,21 @@ export default function StaffDashboard() {
   const metricsBusy = instLoading || metricsLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className={`${ACCENT} text-white px-6 py-8`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-white/20 rounded-lg">
-              {config.icon}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{config.title}</h1>
-              <p className="text-white/80">{config.subtitle}</p>
-            </div>
+    <div>
+      <div className="doc-page-header px-4 sm:px-6 py-4">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            {config.icon}
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">{config.title}</h1>
+            <p className="text-xs text-muted-foreground font-medium">{config.subtitle}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border-b sticky top-[64px] z-40 scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="bg-background border-b border-border sticky top-[4.5rem] z-40 scroll-mt-20">
+        <div>
           <div className="flex gap-1 overflow-x-auto">
             {config.tabs.map((tab) => (
               <button
@@ -325,8 +323,8 @@ export default function StaffDashboard() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-primary-500 text-primary-600 dark:text-primary-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.icon}
@@ -337,12 +335,12 @@ export default function StaffDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="py-6">
         {!instLoading && !institutionId && (
-          <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3">
-            <Building className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-3 rounded-lg border border-warning-500/30 bg-warning-500/10 px-4 py-3">
+            <Building className="h-5 w-5 text-warning-600 dark:text-warning-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-bold text-amber-800 dark:text-amber-200">No institution linked</p>
+              <p className="text-sm font-semibold text-warning-700 dark:text-warning-300">No institution linked</p>
               <p className="text-sm text-amber-700 dark:text-amber-300">
                 Your account is not linked to an institution yet, so live metrics are unavailable.
                 Ask your administrator to link your account to see real numbers here.
@@ -355,25 +353,25 @@ export default function StaffDashboard() {
           {config.metrics.map((metric, idx) => {
             const value = institutionId ? metrics[metric.metricKey] : null;
             return (
-              <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+              <div key={idx} className="bg-card border border-border rounded-lg p-6 shadow-xs">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 ${ACCENT} text-white rounded-lg`}>
+                  <div className="p-2 bg-primary-500/10 text-primary-600 rounded-lg">
                     {metric.icon}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm text-gray-500">{metric.label}</p>
+                    <p className="text-sm text-muted-foreground">{metric.label}</p>
                     {metricsBusy ? (
                       <SkeletonLine className="h-8 w-20 mt-1" />
                     ) : (
                       <>
                         <p
-                          className={`text-2xl font-bold ${value === null ? "text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"}`}
+                          className={`text-2xl font-semibold ${value === null ? "text-muted-foreground dark:text-muted-foreground" : "text-foreground dark:text-white"}`}
                           title={value === null ? "Live tracking for this metric is not available yet" : undefined}
                         >
                           {formatMetric(value, metric.format)}
                         </p>
                         {value === null && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                          <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">
                             {!institutionId ? "No institution linked" : "Not tracked yet"}
                           </p>
                         )}
@@ -386,19 +384,19 @@ export default function StaffDashboard() {
           })}
         </div>
 
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Quick Actions</h2>
+        <h2 className="text-lg font-semibold mb-4 text-foreground dark:text-white">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {config.quickActions.map((action, idx) => (
             <button
               key={idx}
               onClick={() => navigate(action.path)}
-              className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow hover:shadow-md transition-shadow text-left"
+              className="bg-card border border-border rounded-lg p-6 shadow-xs hover:shadow-md transition-shadow text-left"
             >
-              <div className={`p-2 ${ACCENT} text-white rounded-lg w-fit mb-3`}>
+              <div className="p-2 bg-primary-500/10 text-primary-600 rounded-lg w-fit mb-3">
                 {action.icon}
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">{action.label}</h3>
-              <p className="text-sm text-gray-500 mt-1">{action.description}</p>
+              <h3 className="font-semibold text-foreground dark:text-white">{action.label}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
             </button>
           ))}
         </div>
