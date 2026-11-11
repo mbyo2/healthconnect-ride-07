@@ -101,7 +101,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
           </button>
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
             Add Stock Item

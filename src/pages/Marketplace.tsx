@@ -73,7 +73,7 @@ const Marketplace = () => {
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-full bg-gold hover:bg-gold-deep text-gold-ink flex items-center justify-center font-semibold text-sm shadow-xs">
                 <Pill className="h-5 w-5" />
               </div>
               <div>
@@ -90,7 +90,7 @@ const Marketplace = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab("cart")}
-                className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-2"
+                className="px-4 py-2 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Cart ({cart?.items?.length ?? 0})</span>
@@ -160,7 +160,7 @@ const Marketplace = () => {
                   <button
                     onClick={() => refetchProducts()}
                     aria-label="Retry loading medications"
-                    className="px-6 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold transition-all"
+                    className="px-6 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold transition-all"
                   >
                     Try again
                   </button>

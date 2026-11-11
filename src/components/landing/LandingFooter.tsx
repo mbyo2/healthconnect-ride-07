@@ -96,7 +96,7 @@ export const CTASection = () => {
             <div className="flex flex-col gap-3 shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => navigate("/search")}
-                className="flex items-center justify-center gap-2 px-8 py-4 rounded-pill bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm shadow-button transition-all"
+                className="flex items-center justify-center gap-2 px-8 py-4 rounded-pill bg-gold hover:bg-gold-deep text-gold-ink font-medium text-sm shadow-button transition-all"
               >
                 <Calendar className="h-5 w-5" />
                 Find Doctors & Book Now

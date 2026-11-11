@@ -139,7 +139,7 @@ const NotificationsPage = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm">
+            <div className="h-10 w-10 rounded-full bg-gold hover:bg-gold-deep text-gold-ink flex items-center justify-center font-semibold text-sm">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -159,7 +159,7 @@ const NotificationsPage = () => {
                     <button
                 onClick={markAllAsRead}
                 aria-label={unreadCount > 0 ? `Mark all ${unreadCount} notifications as read` : 'Mark all as read'}
-                className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
               >
                 <CheckCheck className="h-4 w-4" />
                 <span>Mark All Read</span>

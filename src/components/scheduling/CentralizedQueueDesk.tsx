@@ -349,7 +349,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                           <button
                             onClick={() => handleCallToken(tok)}
                             aria-label={`Call token ${tok.token_number}`}
-                            className="px-3 py-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                            className="px-3 py-1 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1"
                           >
                             <Volume2 className="h-3.5 w-3.5" aria-hidden /> Call
                           </button>

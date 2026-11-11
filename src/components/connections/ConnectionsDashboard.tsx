@@ -89,7 +89,7 @@ export const ConnectionsDashboard = () => {
           </div>
           <button
             onClick={() => navigate('/marketplace-users')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-all active:scale-95 shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold hover:bg-gold-deep text-gold-ink text-xs font-bold transition-all active:scale-95 shrink-0"
           >
             <Search className="h-4 w-4" />
             Browse User Marketplace

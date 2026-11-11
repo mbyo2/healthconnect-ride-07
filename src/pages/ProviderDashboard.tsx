@@ -306,7 +306,7 @@ const MyPracticeEditor = () => {
             placeholder="Add hospital name…"
             className="h-9 rounded-xl border-border text-xs"
           />
-          <Button type="button" size="sm" onClick={addHospital} aria-label="Add affiliated hospital" className="rounded-xl h-9 px-3 bg-primary-500 hover:bg-primary-600">
+          <Button type="button" size="sm" onClick={addHospital} aria-label="Add affiliated hospital" className="rounded-xl h-9 px-3 bg-gold hover:bg-gold-deep text-gold-ink">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -378,7 +378,7 @@ const MyPracticeEditor = () => {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-xl h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs"
+          className="rounded-xl h-11 px-8 bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs"
         >
           {saving
             ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>

@@ -285,7 +285,7 @@ export default function TriageIntake() {
             <button
               onClick={runAssessment}
               disabled={assessing}
-              className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center justify-center gap-2"
             >
               {assessing ? (
                 <>
@@ -377,7 +377,7 @@ export default function TriageIntake() {
                       <button
                         onClick={() => bookProvider(p.id)}
                         disabled={booking === p.id}
-                        className="ml-3 px-4 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold flex items-center gap-1 shadow-xs"
+                        className="ml-3 px-4 py-1.5 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold flex items-center gap-1"
                       >
                         {booking === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Book visit"}
                       </button>

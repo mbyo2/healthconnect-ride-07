@@ -36,7 +36,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
           <p className="text-xs text-slate-500 mt-1">Search the full directory to find care near you.</p>
           <button
             onClick={onViewAll}
-            className="mt-3 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs transition-all"
+            className="mt-3 px-4 py-2 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-bold text-xs transition-all"
           >
             Search doctors
           </button>
@@ -74,7 +74,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
               <div className="pt-1 border-t border-border">
                 <button
                   onClick={() => onViewProvider(doc.id)}
-                  className="w-full px-4 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95 min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-bold text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95 min-h-[44px]"
                 >
                   <span>View &amp; book</span>
                   <ChevronRight className="h-3.5 w-3.5" />

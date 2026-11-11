@@ -176,7 +176,7 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         <button
           onClick={() => onConnect(user.id, user.role)}
           disabled={isConnecting}
-          className="flex-1 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all"
+          className="flex-1 py-2 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all"
         >
           Connect
         </button>

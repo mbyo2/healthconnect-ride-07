@@ -236,7 +236,7 @@ export const ZambiaCompliance = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access Zambia compliance.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -338,7 +338,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">National Health Insurance Scheme Configuration</h3>
               <Dialog open={showNhimaDialog} onOpenChange={setShowNhimaDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                  <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure NHIMA
                   </Button>
                 </DialogTrigger>
@@ -427,7 +427,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveNhima} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                    <Button onClick={handleSaveNhima} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                       Save NHIMA Configuration
                     </Button>
                   </div>
@@ -472,7 +472,7 @@ export const ZambiaCompliance = () => {
                   <Globe className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">NHIMA Not Configured</h3>
                   <p className="text-xs text-muted-foreground mb-4">Configure your NHIMA settings to enable insurance claims</p>
-                  <Button onClick={() => setShowNhimaDialog(true)} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => setShowNhimaDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Configure NHIMA
                   </Button>
                 </CardContent>
@@ -486,7 +486,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">Medical Council Compliance</h3>
               <Dialog open={showCouncilDialog} onOpenChange={setShowCouncilDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                  <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Council
                   </Button>
                 </DialogTrigger>
@@ -531,7 +531,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveCouncil} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                    <Button onClick={handleSaveCouncil} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                       Save Council Configuration
                     </Button>
                   </div>
@@ -577,7 +577,7 @@ export const ZambiaCompliance = () => {
                   <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Medical Council Not Configured</h3>
                   <p className="text-xs text-muted-foreground mb-4">Configure your medical council compliance settings</p>
-                  <Button onClick={() => setShowCouncilDialog(true)} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => setShowCouncilDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Configure Council
                   </Button>
                 </CardContent>
@@ -591,7 +591,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-semibold">Zambia Revenue Authority Tax Configuration</h3>
               <Dialog open={showTaxDialog} onOpenChange={setShowTaxDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                  <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Tax
                   </Button>
                 </DialogTrigger>
@@ -674,7 +674,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveTax} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                    <Button onClick={handleSaveTax} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                       Save Tax Configuration
                     </Button>
                   </div>
@@ -714,7 +714,7 @@ export const ZambiaCompliance = () => {
                   <BarChart3 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">ZRA Tax Not Configured</h3>
                   <p className="text-xs text-muted-foreground mb-4">Configure your tax compliance settings</p>
-                  <Button onClick={() => setShowTaxDialog(true)} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => setShowTaxDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Configure Tax
                   </Button>
                 </CardContent>

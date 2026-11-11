@@ -149,7 +149,7 @@ export function AgendaTimeline({
           </p>
           <button
             onClick={onViewAll}
-            className="px-4 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="px-4 min-h-[44px] rounded-xl bg-gold hover:bg-gold-deep text-gold-ink text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             View all appointments
           </button>

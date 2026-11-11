@@ -136,7 +136,7 @@ const Landing = () => {
               </div>
               <Link
                 to="/triage"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-all active:scale-[0.99]"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm transition-all active:scale-[0.99]"
               >
                 Check my symptoms <ArrowRight className="h-4 w-4" />
               </Link>

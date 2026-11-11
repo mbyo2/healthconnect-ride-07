@@ -198,7 +198,7 @@ export const EnhancedInventory = () => {
             <Warehouse className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access enhanced inventory.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -232,7 +232,7 @@ export const EnhancedInventory = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Purchase Order
                 </Button>
               </DialogTrigger>
@@ -295,7 +295,7 @@ export const EnhancedInventory = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateOrder} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create Purchase Order
                   </Button>
                 </div>
@@ -321,7 +321,7 @@ export const EnhancedInventory = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateReconciliation} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Start Reconciliation
                   </Button>
                 </div>
@@ -523,7 +523,7 @@ export const EnhancedInventory = () => {
                           <ShoppingCart className="h-10 w-10 mx-auto text-muted-foreground" />
                           <p className="text-sm font-semibold">No purchase orders yet</p>
                           <p className="text-xs text-muted-foreground">Create your first purchase order to restock supplies from a supplier.</p>
-                          <Button onClick={() => setShowOrderDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                          <Button onClick={() => setShowOrderDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                             <Plus className="h-4 w-4 mr-1" /> New Purchase Order
                           </Button>
                         </div>
@@ -560,7 +560,7 @@ export const EnhancedInventory = () => {
                   <Package className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No stock reconciliations yet</p>
                   <p className="text-xs text-muted-foreground">Run your first stock count to compare physical inventory against system records.</p>
-                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                   </Button>
                 </CardContent>

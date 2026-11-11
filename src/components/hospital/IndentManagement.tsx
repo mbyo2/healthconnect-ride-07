@@ -281,7 +281,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <button onClick={refreshAll} className="px-3 py-1.5 min-h-[44px] rounded-md bg-muted font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setActiveTab("raise")} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
+          <button onClick={() => setActiveTab("raise")} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> Raise indent
           </button>
         </div>
@@ -361,7 +361,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
             <label className="text-xs font-bold">Notes (optional)</label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Why is this needed?" className="mt-1 w-full px-3 py-2.5 rounded-md border border-border bg-card text-sm" />
           </div>
-          <button type="submit" disabled={isSubmitting} className="px-5 py-3 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold disabled:opacity-50 flex items-center gap-2">
+          <button type="submit" disabled={isSubmitting} className="px-5 py-3 min-h-[44px] rounded-xl bg-gold hover:bg-gold-deep text-gold-ink text-sm font-semibold disabled:opacity-50 flex items-center gap-2">
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} Submit indent request
           </button>
         </form>

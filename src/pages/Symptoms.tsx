@@ -248,7 +248,7 @@ const Symptoms = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={saving}
-                    className="py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-60"
+                    className="py-3 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all disabled:opacity-60"
                   >
                     {saving ? "Saving…" : "Save to Medical Log"}
                   </button>
@@ -273,7 +273,7 @@ const Symptoms = () => {
                       onClick={() => toggleSymptom(symptom)}
                       title="Remove symptom"
                       aria-label={`Remove ${symptom}`}
-                      className="inline-flex items-center gap-1 min-h-[44px] px-4 py-2 rounded-full text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 transition-colors break-words min-w-0 max-w-full text-left"
+                      className="inline-flex items-center gap-1 min-h-[44px] px-4 py-2 rounded-full text-xs font-semibold text-white bg-gold hover:bg-gold-deep text-gold-ink transition-colors break-words min-w-0 max-w-full text-left"
                     >
                       {symptom} <span aria-hidden>×</span>
                     </button>

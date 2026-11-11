@@ -328,8 +328,8 @@ const Profile = () => {
               onClick={() => isEditing ? handleSave() : setIsEditing(true)}
               className={`rounded-full px-6 h-11 text-xs font-semibold transition-all ${
                 isEditing
-                  ? "bg-slate-900 hover:bg-black text-white"
-                  : "bg-primary-500 hover:bg-primary-600 text-white"
+                  ? "bg-gold hover:bg-gold-deep text-gold-ink"
+                  : "bg-gold hover:bg-gold-deep text-gold-ink"
               }`}
             >
               {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
@@ -409,7 +409,7 @@ const Profile = () => {
 
             {isEditing && (
               <div className="flex gap-3 pt-4">
-                <Button onClick={handleSave} className="flex-1 rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                <Button onClick={handleSave} className="flex-1 rounded-full h-11 bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                   <Save className="h-4 w-4 mr-2" /> Save Changes
                 </Button>
                 <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 rounded-full h-11 border font-semibold text-xs">
@@ -436,7 +436,7 @@ const Profile = () => {
                 onClick={() => provEditing ? handleProvSave() : setProvEditing(true)}
                 disabled={provSaving}
                 className={`rounded-full px-5 min-h-[44px] text-xs font-semibold ${
-                  provEditing ? "bg-slate-900 hover:bg-black text-white" : "bg-primary-500 hover:bg-primary-600 text-white"
+                  provEditing ? "bg-gold hover:bg-gold-deep text-gold-ink" : "bg-gold hover:bg-gold-deep text-gold-ink"
                 }`}
               >
                 {provEditing
@@ -702,7 +702,7 @@ const Profile = () => {
 
               {provEditing && (
                 <div className="flex gap-3 pt-2">
-                  <Button onClick={handleProvSave} disabled={provSaving} className="rounded-full h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                  <Button onClick={handleProvSave} disabled={provSaving} className="rounded-full h-11 px-8 bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                     <Save className="h-4 w-4 mr-2" />{provSaving ? "Saving…" : "Save Practice Details"}
                   </Button>
                   <Button variant="outline" onClick={() => setProvEditing(false)} className="rounded-full h-11 px-6 font-semibold text-xs">

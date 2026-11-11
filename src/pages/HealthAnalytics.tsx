@@ -85,7 +85,7 @@ const HealthAnalytics = () => {
             <button
               onClick={exportReport}
               disabled={!hasAnyData || loading}
-              className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2 min-h-[44px] rounded-md bg-gold hover:bg-gold-deep text-gold-ink disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all flex items-center gap-1.5"
             >
               <Download className="h-4 w-4" />
               <span>Export Report</span>
@@ -124,7 +124,7 @@ const HealthAnalytics = () => {
             </p>
             <button
               onClick={() => navigate("/iot-monitoring")}
-              className="px-6 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-xs transition-all min-h-[44px]"
+              className="px-6 py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm transition-all min-h-[44px]"
             >
               Record vitals
             </button>

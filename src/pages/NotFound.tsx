@@ -45,7 +45,7 @@ const NotFound = () => {
           </Button>
           <Button
             onClick={handleReturnHome}
-            className="rounded-full h-11 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold shadow-sm"
+            className="rounded-full h-11 bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold shadow-sm"
           >
             <Home className="h-4 w-4 mr-2" />
             Return to Workspace

@@ -217,7 +217,7 @@ export const AppointmentDetails = () => {
           <h3 className="text-lg font-semibold">Appointment Record Not Found</h3>
           <button
             onClick={() => navigate("/appointments")}
-            className="px-4 py-2 rounded-md bg-primary-500 text-white font-semibold text-xs"
+            className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs"
           >
             Return to Appointments Board
           </button>
@@ -424,7 +424,7 @@ export const AppointmentDetails = () => {
           />
           <button
             onClick={updateNotes}
-            className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all"
+            className="px-4 py-2 rounded-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs shadow-xs transition-all"
           >
             Save Clinical Notes
           </button>

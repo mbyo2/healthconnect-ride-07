@@ -245,7 +245,7 @@ export const PayeTaxCalculations = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access PAYE calculations.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -276,7 +276,7 @@ export const PayeTaxCalculations = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showSlabDialog} onOpenChange={setShowSlabDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Add Tax Slab
                 </Button>
               </DialogTrigger>
@@ -353,7 +353,7 @@ export const PayeTaxCalculations = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateSlab} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateSlab} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Add Tax Slab
                   </Button>
                 </div>
@@ -416,7 +416,7 @@ export const PayeTaxCalculations = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCalculatePaye} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCalculatePaye} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Calculate PAYE
                   </Button>
                 </div>
@@ -504,7 +504,7 @@ export const PayeTaxCalculations = () => {
                   <Calculator className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No tax slabs yet</p>
                   <p className="text-xs text-muted-foreground">Configure PAYE tax bands, or the ZRA 2024/25 statutory bands apply automatically.</p>
-                  <Button onClick={() => setShowSlabDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowSlabDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Tax Slab
                   </Button>
                 </CardContent>
@@ -638,7 +638,7 @@ export const PayeTaxCalculations = () => {
                           <Calculator className="h-10 w-10 mx-auto text-muted-foreground" />
                           <p className="text-sm font-semibold">No PAYE calculations yet</p>
                           <p className="text-xs text-muted-foreground">Run your first PAYE calculation for an employee payroll period.</p>
-                          <Button onClick={() => setShowCalcDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                          <Button onClick={() => setShowCalcDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                             <Calculator className="h-4 w-4 mr-1" /> Calculate PAYE
                           </Button>
                         </div>
@@ -682,7 +682,7 @@ export const PayeTaxCalculations = () => {
                   <Users className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No payroll runs yet</p>
                   <p className="text-xs text-muted-foreground">Calculate PAYE for an employee to generate their first payroll record.</p>
-                  <Button onClick={() => setShowCalcDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowCalcDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Calculator className="h-4 w-4 mr-1" /> Calculate PAYE
                   </Button>
                 </CardContent>

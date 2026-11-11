@@ -892,7 +892,7 @@ export const PatientRegistration = () => {
               <Button
                 onClick={handleClaimAccount}
                 disabled={claimSending}
-                className="mt-3 bg-primary-500 hover:bg-primary-600 text-sm min-h-[44px]"
+                className="mt-3 text-sm min-h-[44px]"
               >
                 {claimSending ? "Sending…" : "Email me a link to claim my record"}
               </Button>
@@ -913,14 +913,14 @@ export const PatientRegistration = () => {
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="bg-primary-500 hover:bg-primary-600 text-sm min-h-[44px]"
+                className="text-sm min-h-[44px]"
               >
                 {loading ? "Creating Account..." : "Complete Registration"} <CheckCircle className="h-3.5 w-3.5 ml-1" />
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className="bg-primary-500 hover:bg-primary-600 text-sm min-h-[44px]"
+                className="text-sm min-h-[44px]"
               >
                 Next <ArrowRight className="h-4 w-4 ml-1" />
               </Button>

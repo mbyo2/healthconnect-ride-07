@@ -194,7 +194,7 @@ export const HealthcareInstitutions = () => {
             </div>
             <Button
               onClick={() => navigate('/institution-portal')}
-              className="w-full sm:w-auto h-11 px-5 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl shrink-0 text-xs"
+              className="w-full sm:w-auto h-11 px-5 bg-gold hover:bg-gold-deep text-gold-ink font-bold rounded-xl shrink-0 text-xs"
             >
               Register Facility
             </Button>
@@ -383,7 +383,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
       <div className="px-5 pb-5 pt-3 border-t border-canvas-mist flex items-center gap-2">
         <Button
           size="sm"
-          className="flex-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold rounded-xl h-9"
+          className="flex-1 bg-gold hover:bg-gold-deep text-gold-ink text-xs font-bold rounded-xl h-9"
           onClick={onBook}
         >
           <Calendar className="h-3.5 w-3.5 mr-1.5" /> Book / Order

@@ -381,7 +381,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   <button
                     onClick={() => handleDischarge(a)}
                     disabled={dischargingId === a.id}
-                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-1.5 transition-all"
+                    className="px-4 py-2 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-1.5 transition-all"
                   >
                     {dischargingId === a.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

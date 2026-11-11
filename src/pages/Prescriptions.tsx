@@ -971,7 +971,7 @@ export const Prescriptions = () => {
                       type="button"
                       disabled={isSubmitting}
                       onClick={handleCreatePrescription}
-                      className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       {isSubmitting ? "Processing..." : `Issue E-Prescription (${medicationItems.length} Meds)`}

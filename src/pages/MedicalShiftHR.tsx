@@ -259,7 +259,7 @@ export const MedicalShiftHR = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access shift HR.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -290,7 +290,7 @@ export const MedicalShiftHR = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showShiftDialog} onOpenChange={setShowShiftDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Shift
                 </Button>
               </DialogTrigger>
@@ -396,7 +396,7 @@ export const MedicalShiftHR = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateShift} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateShift} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create Shift
                   </Button>
                 </div>
@@ -550,7 +550,7 @@ export const MedicalShiftHR = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                    <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Assign Staff
                     </Button>
                   </DialogTrigger>
@@ -609,7 +609,7 @@ export const MedicalShiftHR = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAssignment} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                      <Button onClick={handleCreateAssignment} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                         Create Assignment
                       </Button>
                     </div>

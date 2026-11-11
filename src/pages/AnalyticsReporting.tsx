@@ -595,7 +595,7 @@ const AnalyticsReporting = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <FileText className="h-4 w-4" /> Generate Report
                 </Button>
               </DialogTrigger>
@@ -700,7 +700,7 @@ const AnalyticsReporting = () => {
                       </div>
                     )}
                   </div>
-                  <Button onClick={handleGenerateReport} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleGenerateReport} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Generate Report
                   </Button>
                 </div>
@@ -919,7 +919,7 @@ const AnalyticsReporting = () => {
                   </p>
                   <Button
                     onClick={() => setShowReportDialog(true)}
-                    className="mt-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs min-h-[44px]"
+                    className="mt-2 bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs min-h-[44px]"
                   >
                     <FileText className="h-4 w-4 mr-1.5" /> Generate report
                   </Button>

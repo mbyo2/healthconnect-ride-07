@@ -144,7 +144,7 @@ export default function MedicalRecords() {
             <p className="text-xs text-muted-foreground">Check your connection and try again.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-5 py-2.5 min-h-[44px] rounded-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold"
+              className="px-5 py-2.5 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold"
             >
               Try again
             </button>

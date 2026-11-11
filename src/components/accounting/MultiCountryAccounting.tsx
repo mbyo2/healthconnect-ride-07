@@ -322,7 +322,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     "w-full min-h-[44px] p-2.5 rounded-xl border border-border text-sm font-semibold bg-card dark:text-slate-100";
   const labelCls = "block text-xs font-semibold uppercase text-muted-foreground mb-1.5";
   const btnPrimary =
-    "min-h-[44px] px-4 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50";
+    "min-h-[44px] px-4 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm flex items-center justify-center gap-1.5 disabled:opacity-50";
 
   if (!institutionId) {
     return (

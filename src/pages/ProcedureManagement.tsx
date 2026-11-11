@@ -319,7 +319,7 @@ export const ProcedureManagement = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateProcedure} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateProcedure} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create Procedure
                   </Button>
                 </div>
@@ -402,7 +402,7 @@ export const ProcedureManagement = () => {
                         />
                       </div>
                     </div>
-                    <Button onClick={handleSetPricing} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                    <Button onClick={handleSetPricing} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                       Set Pricing
                     </Button>
                   </div>
@@ -506,7 +506,7 @@ export const ProcedureManagement = () => {
                   <Activity className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No procedures yet</p>
                   <p className="text-xs text-muted-foreground">Add clinical procedures with pricing to make them bookable and billable.</p>
-                  <Button onClick={() => setShowProcedureDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowProcedureDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Procedure
                   </Button>
                 </CardContent>
@@ -576,7 +576,7 @@ export const ProcedureManagement = () => {
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
                   <p className="text-xs text-muted-foreground mb-4">Select an institution to manage pricing</p>
-                  <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Go to Institution Portal
                   </Button>
                 </CardContent>
@@ -657,7 +657,7 @@ export const ProcedureManagement = () => {
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
                   <p className="text-xs text-muted-foreground mb-4">Select an institution to view executions</p>
-                  <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Go to Institution Portal
                   </Button>
                 </CardContent>

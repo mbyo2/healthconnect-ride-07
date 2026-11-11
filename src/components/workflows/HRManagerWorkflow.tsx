@@ -252,7 +252,7 @@ export const HRManagerWorkflow = () => {
 
         <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <button className="px-4 py-2 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center gap-1.5">
               <Plus className="h-4 w-4" />
               <span>Submit Leave Request</span>
             </button>
@@ -383,7 +383,7 @@ export const HRManagerWorkflow = () => {
             </div>
             <button
               onClick={openNewEmployeeDialog}
-              className="px-4 py-2.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1.5 min-h-[44px]"
+              className="px-4 py-2.5 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1.5 min-h-[44px]"
             >
               <UserPlus className="h-4 w-4" />
               Add Employee
@@ -561,7 +561,7 @@ export const HRManagerWorkflow = () => {
             </div>
             <button
               onClick={() => { setPayrollPreview(null); setPayrollPreviewError(null); setPayrollDialogOpen(true); }}
-              className="px-4 py-2.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1.5 min-h-[44px] whitespace-nowrap"
+              className="px-4 py-2.5 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1.5 min-h-[44px] whitespace-nowrap"
             >
               <PlayCircle className="h-4 w-4" />
               Run Payroll

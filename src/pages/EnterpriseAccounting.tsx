@@ -254,7 +254,7 @@ export const EnterpriseAccounting = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access enterprise accounting.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -285,7 +285,7 @@ export const EnterpriseAccounting = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showGlDialog} onOpenChange={setShowGlDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New GL Entry
                 </Button>
               </DialogTrigger>
@@ -396,7 +396,7 @@ export const EnterpriseAccounting = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateGlEntry} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateGlEntry} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create GL Entry
                   </Button>
                 </div>
@@ -567,7 +567,7 @@ export const EnterpriseAccounting = () => {
                           <BookOpen className="h-10 w-10 mx-auto text-muted-foreground" />
                           <p className="text-sm font-semibold">No GL entries yet</p>
                           <p className="text-xs text-muted-foreground">Record your first journal, receipt, payment or adjustment entry.</p>
-                          <Button onClick={() => setShowGlDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                          <Button onClick={() => setShowGlDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                             <Plus className="h-4 w-4 mr-1" /> New GL Entry
                           </Button>
                         </div>
@@ -600,7 +600,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssetDialog} onOpenChange={setShowAssetDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                    <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Add Asset
                     </Button>
                   </DialogTrigger>
@@ -703,7 +703,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAsset} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                      <Button onClick={handleCreateAsset} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                         Add Asset
                       </Button>
                     </div>
@@ -721,7 +721,7 @@ export const EnterpriseAccounting = () => {
                   <FileText className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No fixed assets yet</p>
                   <p className="text-xs text-muted-foreground">Register medical equipment, vehicles, buildings and IT assets to track depreciation.</p>
-                  <Button onClick={() => setShowAssetDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowAssetDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Asset
                   </Button>
                 </CardContent>
@@ -792,7 +792,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showReconciliationDialog} onOpenChange={setShowReconciliationDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                    <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                     </Button>
                   </DialogTrigger>
@@ -864,7 +864,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                      <Button onClick={handleCreateReconciliation} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                         Start Reconciliation
                       </Button>
                     </div>
@@ -882,7 +882,7 @@ export const EnterpriseAccounting = () => {
                   <RefreshCw className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No bank reconciliations yet</p>
                   <p className="text-xs text-muted-foreground">Start your first reconciliation to match statement and book balances.</p>
-                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowReconciliationDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                   </Button>
                 </CardContent>

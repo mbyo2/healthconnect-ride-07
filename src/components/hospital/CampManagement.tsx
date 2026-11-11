@@ -226,7 +226,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           <button onClick={() => setShowRegister(true)} className="px-3 py-1.5 min-h-[44px] rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <UserPlus className="h-3.5 w-3.5" /> Quick Register
           </button>
-          <button onClick={() => setShowNewCamp(true)} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
+          <button onClick={() => setShowNewCamp(true)} className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> New Camp
           </button>
         </div>

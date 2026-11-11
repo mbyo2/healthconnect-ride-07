@@ -471,7 +471,7 @@ export const SelfServiceKiosk: React.FC = () => {
             <button
               onClick={handleLookupCheckin}
               disabled={lookupState === "searching"}
-              className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-2xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {lookupState === "searching" ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> Searching…</>
@@ -533,7 +533,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 <button
                   onClick={() => handleConfirmCheckin(selectedMatch)}
                   disabled={isCheckingIn}
-                  className="w-full py-3 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isCheckingIn ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Checking in…</>
@@ -743,7 +743,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <button
                 onClick={handleProcessPayment}
                 disabled={isProcessingPay}
-                className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
+                className="w-full py-3.5 rounded-2xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
               >
                 {isProcessingPay ? "Preparing Bill Slip..." : `Get Bill Slip (K${billAmount.toFixed(2)})`}
               </button>

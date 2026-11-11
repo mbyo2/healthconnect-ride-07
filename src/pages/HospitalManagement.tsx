@@ -329,7 +329,7 @@ export const HospitalManagement = () => {
                     </p>
                     <button
                       onClick={() => setActiveTab("departments")}
-                      className="px-5 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold transition-colors"
+                      className="px-5 py-2.5 min-h-[44px] rounded-full bg-gold hover:bg-gold-deep text-gold-ink text-xs font-semibold transition-colors"
                     >
                       Set up departments
                     </button>

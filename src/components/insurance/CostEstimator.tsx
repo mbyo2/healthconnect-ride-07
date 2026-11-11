@@ -230,7 +230,7 @@ export const CostEstimator = () => {
       <button
         onClick={calculateEstimate}
         disabled={!serviceType || estimating}
-        className="w-full py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-40"
+        className="w-full py-2.5 min-h-[44px] rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all disabled:opacity-40"
       >
         {estimating ? "Working out your cost..." : "Calculate What You'll Pay"}
       </button>

@@ -213,7 +213,7 @@ export const PatientFlowManagement = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access patient flow management.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -318,7 +318,7 @@ export const PatientFlowManagement = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateStage} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateStage} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create Stage
                   </Button>
                 </div>
@@ -376,7 +376,7 @@ export const PatientFlowManagement = () => {
                       onCheckedChange={(checked) => setCapacityForm({ ...capacityForm, overbooking_allowed: checked })}
                     />
                   </div>
-                  <Button onClick={handleUpdateCapacity} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleUpdateCapacity} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Update Capacity
                   </Button>
                 </div>

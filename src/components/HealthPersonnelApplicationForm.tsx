@@ -522,7 +522,7 @@ export const HealthPersonnelApplicationForm = () => {
       <button
         type="submit"
         disabled={isSubmitting || !isFormValid()}
-        className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-40 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
+        className="w-full py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink disabled:opacity-40 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
       >
         {isSubmitting ? (
           <><Loader2 className="h-4 w-4 animate-spin" />{registrationStage || "Creating Account..."}</>

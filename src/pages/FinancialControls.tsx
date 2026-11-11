@@ -213,7 +213,7 @@ export const FinancialControls = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access financial controls.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -243,7 +243,7 @@ export const FinancialControls = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Settings className="h-4 w-4" /> Configure Controls
                 </Button>
               </DialogTrigger>
@@ -325,7 +325,7 @@ export const FinancialControls = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleSaveControls} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleSaveControls} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Save Settings
                   </Button>
                 </div>
@@ -415,7 +415,7 @@ export const FinancialControls = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAuditDialog} onOpenChange={setShowAuditDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                    <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Manual Audit
                     </Button>
                   </DialogTrigger>
@@ -470,7 +470,7 @@ export const FinancialControls = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAudit} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                      <Button onClick={handleCreateAudit} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                         Create Audit Entry
                       </Button>
                     </div>
@@ -547,7 +547,7 @@ export const FinancialControls = () => {
                           <ShieldCheck className="h-10 w-10 mx-auto text-muted-foreground" />
                           <p className="text-sm font-semibold">No audit entries yet</p>
                           <p className="text-xs text-muted-foreground">Flagged transactions and manual audits will appear here for review.</p>
-                          <Button onClick={() => setShowAuditDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                          <Button onClick={() => setShowAuditDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                             <Plus className="h-4 w-4 mr-1" /> Manual Audit
                           </Button>
                         </div>

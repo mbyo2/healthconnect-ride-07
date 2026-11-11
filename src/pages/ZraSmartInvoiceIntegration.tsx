@@ -344,7 +344,7 @@ export const ZraSmartInvoiceIntegration = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access ZRA Smart Invoice integration.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -375,7 +375,7 @@ export const ZraSmartInvoiceIntegration = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showConfigDialog} onOpenChange={setShowConfigDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Settings className="h-4 w-4" /> Configure Smart Invoice
                 </Button>
               </DialogTrigger>
@@ -475,7 +475,7 @@ export const ZraSmartInvoiceIntegration = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleSaveConfig} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleSaveConfig} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Save Configuration
                   </Button>
                 </div>
@@ -562,7 +562,7 @@ export const ZraSmartInvoiceIntegration = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {settings.status === "pending_setup" && (
-                      <Button onClick={handleInitializeVSDC} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs">
+                      <Button onClick={handleInitializeVSDC} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs">
                         <Play className="h-4 w-4 mr-1" /> Initialize VSDC
                       </Button>
                     )}
@@ -619,7 +619,7 @@ export const ZraSmartInvoiceIntegration = () => {
                   <p className="text-xs text-muted-foreground mb-4">
                     Configure ZRA Smart Invoice to enable automatic fiscalization of invoices with the Zambia Revenue Authority.
                   </p>
-                  <Button onClick={() => setShowConfigDialog(true)} className="bg-primary-500 hover:bg-primary-600">
+                  <Button onClick={() => setShowConfigDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink">
                     Configure Smart Invoice
                   </Button>
                 </CardContent>
@@ -708,7 +708,7 @@ export const ZraSmartInvoiceIntegration = () => {
                           <FileText className="h-10 w-10 mx-auto text-muted-foreground" />
                           <p className="text-sm font-semibold">No fiscal submissions yet</p>
                           <p className="text-xs text-muted-foreground">Connect your VSDC device and submitted invoices will be fiscalized here.</p>
-                          <Button onClick={() => setShowConfigDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                          <Button onClick={() => setShowConfigDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                             <Settings className="h-4 w-4 mr-1" /> Configure VSDC
                           </Button>
                         </div>
@@ -740,7 +740,7 @@ export const ZraSmartInvoiceIntegration = () => {
                   <Link2 className="h-10 w-10 mx-auto text-muted-foreground" />
                   <p className="text-sm font-semibold">No item mappings yet</p>
                   <p className="text-xs text-muted-foreground">Map your catalog items to ZRA item codes, or sync them from the ZRA portal.</p>
-                  <Button onClick={() => setShowMappingDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
+                  <Button onClick={() => setShowMappingDialog(true)} className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Mapping
                   </Button>
                 </CardContent>

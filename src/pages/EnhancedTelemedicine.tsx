@@ -264,7 +264,7 @@ export const EnhancedTelemedicine = () => {
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
             <p className="text-xs text-muted-foreground">Please select an institution to access enhanced telemedicine.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
+            <Button onClick={() => navigate("/institution-portal")} className="bg-gold hover:bg-gold-deep text-gold-ink">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -357,7 +357,7 @@ export const EnhancedTelemedicine = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateWorkflow} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateWorkflow} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Start Workflow
                   </Button>
                 </div>

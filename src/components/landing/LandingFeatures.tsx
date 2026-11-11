@@ -183,7 +183,7 @@ export const CareExperience = () => {
                   </div>
                   <button
                     onClick={() => navigate("/video-dashboard")}
-                    className="px-5 py-3 rounded-pill text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 shrink-0"
+                    className="px-5 py-3 rounded-pill text-sm font-medium text-white bg-gold hover:bg-gold-deep text-gold-ink shrink-0"
                   >
                     Start a visit
                   </button>

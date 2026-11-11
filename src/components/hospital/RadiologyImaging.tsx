@@ -89,7 +89,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
           <button onClick={refresh} className="px-3 py-1.5 rounded-md bg-muted font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button onClick={() => setShowNewOrder(true)} className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1">
+          <button onClick={() => setShowNewOrder(true)} className="px-3.5 py-1.5 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> New Imaging Order
           </button>
         </div>

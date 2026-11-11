@@ -393,7 +393,7 @@ export default function TriageAssistant() {
             <button
               type="button"
               onClick={() => setStep("intake")}
-              className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+              className="w-full py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
               Start symptom check <ArrowRight className="h-4 w-4" />
             </button>
@@ -542,7 +542,7 @@ export default function TriageAssistant() {
                 type="button"
                 disabled={!canContinue || busy}
                 onClick={submitIntake}
-                className="flex-1 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                className="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
               >
                 {busy ? "Checking…" : <>Continue <ArrowRight className="h-4 w-4" /></>}
               </button>
@@ -596,7 +596,7 @@ export default function TriageAssistant() {
                 type="button"
                 disabled={busy}
                 onClick={submitFollowUps}
-                className="flex-1 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                className="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
               >
                 {busy ? "Checking…" : <>See my guidance <ArrowRight className="h-4 w-4" /></>}
               </button>
@@ -711,7 +711,7 @@ export default function TriageAssistant() {
                     key={`${stepDef.route ?? stepDef.label}-${idx}`}
                     type="button"
                     onClick={() => goToNextStep(stepDef.route)}
-                    className="w-full py-3.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                    className="w-full py-3.5 rounded-xl bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
                   >
                     {stepDef.label} <ArrowRight className="h-4 w-4" />
                   </button>

@@ -181,7 +181,7 @@ export const MultiCenterManagement = () => {
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-2">
+                <Button className="bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Create Network
                 </Button>
               </DialogTrigger>
@@ -235,7 +235,7 @@ export const MultiCenterManagement = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateNetwork} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+                  <Button onClick={handleCreateNetwork} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
                     Create Network
                   </Button>
                 </div>
@@ -570,7 +570,7 @@ export const MultiCenterManagement = () => {
                 className="mt-1"
               />
             </div>
-            <Button onClick={handleAddMember} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
+            <Button onClick={handleAddMember} className="w-full bg-gold hover:bg-gold-deep text-gold-ink font-semibold">
               Add Institution
             </Button>
           </div>

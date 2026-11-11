@@ -436,7 +436,7 @@ export const PrescriptionWriter = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl"
+          className="w-full h-11 bg-gold hover:bg-gold-deep text-gold-ink font-semibold rounded-xl"
         >
           <CheckCircle2 className="h-4 w-4 mr-2" />
           {isSubmitting ? "Issuing Prescription..." : `Issue Multi-Medication E-Prescription (${medications.length} Meds)`}

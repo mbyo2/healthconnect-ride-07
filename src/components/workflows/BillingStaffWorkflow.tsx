@@ -343,7 +343,7 @@ export const BillingStaffWorkflow = () => {
         </div>
         <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <button className="px-4 py-2 rounded-md bg-gold hover:bg-gold-deep text-gold-ink font-semibold text-xs transition-all flex items-center gap-1.5">
               <Plus className="h-4 w-4" /> New Invoice
             </button>
           </DialogTrigger>
