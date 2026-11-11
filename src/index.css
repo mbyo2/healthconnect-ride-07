@@ -184,9 +184,8 @@ main {
   line-height: 1.65;
 }
 
-html {
-  font-size: clamp(16px, 0.8vw + 12px, 18px);
-}
+/* Root font size is fixed at the browser default (16px): product UI must
+   render identically at 1280px and 1920px — no viewport-scaled rem. */
 
 #root {
   height: 100%;
@@ -234,7 +233,7 @@ html {
     --border:           0 0% 90%;         /* #e5e5e5 silk */
     --input:            0 0% 90%;
     --ring:             219 100% 61%;
-    --radius:           0.75rem;          /* 12px — skill radii: buttons 10-12, cards 12-16 */
+    --radius:           0.5rem;           /* 8px — radius ladder: controls 6px (rounded-md), cards 8px (rounded-lg), overlays 12px (rounded-xl) */
 
     /* ── Brand Color Tokens ── */
     --doc-blue:         #397dff;
@@ -343,7 +342,14 @@ html {
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, .font-display {
+  /* Product UI is sans everywhere (Figtree via body). The editorial
+     serif survives ONLY where a surface opts in with .font-display —
+     public/marketing pages — never as a global heading default. */
+  h1, h2, h3 {
+    letter-spacing: -0.01em;
+  }
+
+  .font-display {
     font-family: 'Fraunces', Georgia, serif;
     font-weight: 400;
     letter-spacing: -0.02em;
@@ -353,22 +359,22 @@ html {
 /* ─── Landing / marketing utilities (Voiceflow-inspired) ─── */
 @layer components {
   .vf-pill-nav {
-    @apply rounded-nav border border-canvas-silk bg-white/90 shadow-pill-nav backdrop-blur-xl;
+    @apply rounded-nav border border-border bg-card/90 shadow-pill-nav backdrop-blur-xl;
   }
   .vf-btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-pill bg-primary-500 px-6 py-3 text-sm font-medium tracking-wide text-white shadow-button transition-all hover:bg-primary-600 hover:shadow-button-hover;
   }
   .vf-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-3 text-sm font-medium tracking-wide text-charcoal dark:text-slate-200 transition-all hover:border-graphite-400 hover:bg-graphite-50 dark:hover:bg-slate-700;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-border bg-card px-6 py-3 text-sm font-medium tracking-wide text-foreground transition-colors hover:bg-muted;
   }
   .vf-card {
-    @apply rounded-card border border-canvas-silk bg-white p-6 shadow-card transition-all hover:shadow-card-hover dark:border-slate-800 dark:bg-slate-900;
+    @apply rounded-card border border-border bg-card p-6 shadow-xs;
   }
   .vf-section {
     @apply py-section lg:py-section-lg;
   }
   .vf-eyebrow {
-    @apply inline-flex items-center gap-2 rounded-pill border border-canvas-silk bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-graphite-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300;
+    @apply inline-flex items-center gap-2 rounded-pill border border-border bg-card px-4 py-1.5 text-xs font-medium tracking-wide text-muted-foreground;
   }
 
   /* ── Adaptive surfaces (canvas tokens flip in dark mode — no dark: pairs) ── */
@@ -383,129 +389,17 @@ html {
   }
 }
 
-/* ─── Global Doc' O Clock Component Classes ─── */
+/* ─── Global Doc' O Clock Component Classes ───
+   Only the classes with live usages survive. The retired doc-* class
+   system (per-class cards, buttons, pills, headings, inputs and the
+   legacy monday aliases) had zero usages and was deleted 2026-11-11:
+   interior surfaces use the shared ui/* primitives + tokens, never
+   per-class dialects. */
 @layer components {
 
-  /* ── App-wide white card with blue border and subtle shadow ── */
-  .doc-card {
-    @apply bg-white dark:bg-slate-900 rounded-2xl border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
-  }
-
-  /* ── High-contrast Dark Highlight Banner (Screen 2 & 3: Next Appointment, Prescriptions) ── */
-  .doc-dark-banner {
-    @apply bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-xl shadow-slate-900/10 border border-slate-800 relative overflow-hidden transition-all;
-  }
-
-  /* ── Care Mode Toggle Switch (Online / Offline) ── */
-  .doc-mode-toggle {
-    @apply p-1 rounded-2xl bg-canvas-bone dark:bg-slate-800/80 border border-canvas-silk dark:border-slate-700 inline-flex items-center;
-  }
-  .doc-mode-toggle-btn {
-    @apply px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all;
-  }
-  .doc-mode-toggle-btn-active {
-    @apply bg-white dark:bg-slate-900 text-primary-600 shadow-sm border border-canvas-silk dark:border-slate-700;
-  }
-  .doc-mode-toggle-btn-inactive {
-    @apply text-slate-500 hover:text-slate-800 dark:hover:text-slate-200;
-  }
-
-  /* ── Specialty Squircle Card (Screen 2: Dentistry, Cardiology, etc.) ── */
-  .doc-specialty-card {
-    @apply p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 hover:-translate-y-0.5 active:scale-95 transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer;
-  }
-  .doc-specialty-card-active {
-    @apply bg-primary-100 dark:bg-primary-900/40 border-primary-500/50 ring-2 ring-primary-500/20;
-  }
-
-  /* ── Doctor Card with Selectable Time Slots ── */
-  .doc-doctor-box {
-    @apply p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
-  }
-
-  /* ── Time Slot Pills (Screen 2: 8:00 a.m., 9:00 a.m. [active dark], 10:00 a.m.) ── */
-  .doc-time-slot {
-    @apply px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-xs font-bold transition-all cursor-pointer text-center border;
-  }
-  .doc-time-slot-idle {
-    @apply bg-canvas dark:bg-slate-800/60 border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary-500/40 hover:bg-white;
-  }
-  .doc-time-slot-active {
-    @apply bg-slate-900 text-white border-slate-900 shadow-sm;
-  }
-  .doc-time-slot-blue {
-    @apply bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-500/25;
-  }
-
-  /* ── Appointment Card (Screen 3) ── */
-  .doc-appt-card {
-    @apply p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all space-y-3;
-  }
-
-  /* ── Section container ── */
-  .doc-section {
-    @apply py-12 sm:py-16 bg-canvas-bone dark:bg-slate-950;
-  }
-  .doc-section-white {
-    @apply py-12 sm:py-16 bg-white dark:bg-slate-900 border-t border-canvas-silk dark:border-slate-800;
-  }
-
-  /* ── Max-width page wrapper ── */
+  /* ── Max-width page wrapper (marketing surfaces) ── */
   .doc-container {
     @apply max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* ── Primary blue button ── */
-  .doc-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm shadow-md hover:shadow-lg active:scale-95 transition-all;
-  }
-  .doc-btn-dark {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md active:scale-95 transition-all;
-  }
-  .doc-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl sm:rounded-full bg-white dark:bg-slate-900 border-2 border-primary-500 text-primary-600 font-bold text-sm hover:bg-primary-100 dark:hover:bg-slate-800 active:scale-95 transition-all;
-  }
-  .doc-btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:border-primary-500/40 hover:text-primary-600 active:scale-95 transition-all;
-  }
-  .doc-btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-all;
-  }
-
-  /* ── Status Pill Badges ── */
-  .doc-pill {
-    @apply px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1;
-  }
-  .doc-pill-blue {
-    @apply doc-pill bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400;
-  }
-  .doc-pill-dark {
-    @apply doc-pill bg-slate-900 text-white;
-  }
-  .doc-pill-green {
-    @apply doc-pill bg-green-100 dark:bg-emerald-950/40 text-green-700 dark:text-emerald-400;
-  }
-  .doc-pill-red {
-    @apply doc-pill bg-red-100 dark:bg-rose-950/40 text-red-600 dark:text-rose-400;
-  }
-  .doc-pill-amber {
-    @apply doc-pill bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400;
-  }
-  .doc-pill-solid-blue {
-    @apply doc-pill bg-primary-500 text-white;
-  }
-
-  /* ── Nav Active State ── */
-  .doc-nav-active {
-    @apply bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 font-semibold;
-  }
-  .doc-nav-inactive {
-    @apply text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-canvas-bone dark:hover:bg-slate-800 font-medium;
-  }
-
-  /* ── Page header (sticky white bar) ── */
-  .doc-header {
-    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800 shadow-xs;
   }
 
   /* ── Page-level sticky sub-header ──
@@ -519,105 +413,13 @@ html {
        could slide under the header and eat clicks meant for them (QA 2026-10-09:
        "Book Appointment" intercepted by the theme toggle). Stays below the
        header's z-50 so dropdowns/menus always win. */
-    @apply sticky top-[4.5rem] z-40 bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800;
-  }
-
-  /* ── Section heading styles ── */
-  .doc-badge {
-    @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs font-bold;
-  }
-  .doc-h1 {
-    @apply text-3xl sm:text-5xl lg:text-6xl font-display font-medium tracking-tight text-midnight leading-[1.1];
-  }
-  .doc-h2 {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-display font-medium tracking-tight text-midnight;
-  }
-  .doc-h3 {
-    @apply text-lg sm:text-xl font-display font-medium text-midnight;
-  }
-  .doc-body {
-    @apply text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed;
-  }
-  .doc-body-sm {
-    @apply text-xs sm:text-sm text-slate-400 dark:text-slate-500 leading-relaxed;
-  }
-
-  /* ── Blue gradient text ── */
-  .doc-gradient-text {
-    color: hsl(var(--primary));
-  }
-
-  /* ── Doctor / specialty card ── */
-  .doc-doctor-card {
-    @apply doc-card p-4 flex items-start gap-3 cursor-pointer hover:border-primary-500/40 transition-all;
-  }
-
-  /* ── Appointment card pill ── */
-  .doc-appointment-row {
-    @apply flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500/40 hover:shadow-md transition-all cursor-pointer;
-  }
-
-  /* ── Bottom nav floating pill ── */
-  .doc-bottom-nav {
-    @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-1 px-4 py-2 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-canvas-silk dark:border-slate-800 shadow-xl shadow-slate-900/10;
-  }
-
-  /* ── Mobile phone frame (for showcase) ── */
-  .doc-phone-frame {
-    @apply bg-white dark:bg-slate-900 rounded-[44px] border-[5px] border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden;
-  }
-
-  /* ── Input field ── */
-  .doc-input {
-    @apply w-full px-4 py-3 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 text-sm placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500/20 transition-all;
-  }
-
-  /* ── Search bar pill ── */
-  .doc-search {
-    @apply flex items-center gap-2 px-4 py-2.5 rounded-full bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 hover:bg-white dark:hover:bg-slate-900 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/15 transition-all;
-  }
-
-  /* ── Metric / KPI card ── */
-  .doc-metric-card {
-    @apply doc-card p-5 sm:p-6 flex flex-col gap-2;
-  }
-
-  /* ── Avatar with blue ring ── */
-  .doc-avatar-ring {
-    @apply ring-2 ring-primary-500/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900;
-  }
-
-  /* ── Responsive grid layouts ── */
-  .doc-grid-2 { @apply grid grid-cols-1 sm:grid-cols-2 gap-4; }
-  .doc-grid-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4; }
-  .doc-grid-4 { @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4; }
-
-  /* ── Animations ── */
-  .doc-fade-up {
-    @apply animate-in fade-in slide-in-from-bottom-4 duration-500;
-  }
-  .doc-fade-in {
-    @apply animate-in fade-in duration-300;
+    @apply sticky top-[4.5rem] z-40 bg-card border-b border-border;
   }
 
   /* ── Trust card surface (used by search/video surfaces) ── */
   .trust-card {
-    @apply rounded-card border border-canvas-silk bg-white shadow-card;
+    @apply rounded-card border border-border bg-card shadow-xs;
   }
-  .dark .trust-card {
-    background-color: hsl(24 8% 10%);
-    border-color: hsl(24 8% 18%);
-  }
-
-  /* ── Legacy monday-pill compatibility ── */
-  .monday-pill-done    { @apply doc-pill bg-green-100 text-green-700; }
-  .monday-pill-working { @apply doc-pill bg-amber-100 text-amber-600; }
-  .monday-pill-stuck   { @apply doc-pill bg-red-100 text-red-600; }
-  .monday-pill-scheduled { @apply doc-pill bg-primary-100 text-primary-700; }
-  .monday-pill-review  { @apply doc-pill bg-amber-100 text-amber-700; }
-  .monday-row-hover    { @apply hover:bg-primary-50 transition-colors cursor-pointer; }
-  .modern-header       { @apply doc-header; }
-  .container-modern    { @apply doc-container; }
 }
 
 /* ── Dark-mode graphite text remap ──────────────────────────────────────

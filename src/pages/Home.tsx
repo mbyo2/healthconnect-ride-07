@@ -46,7 +46,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       <Hero />
-      <div className="container-modern py-12 bg-background">
+      <div className="doc-container py-12 bg-background">
         <h2 className="text-2xl font-bold mb-6 text-foreground">Specialized Care</h2>
         <SpecializedHelp />
       </div>

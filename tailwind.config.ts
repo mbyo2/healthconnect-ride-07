@@ -54,10 +54,11 @@ export default {
         ring: "hsl(var(--ring) / <alpha-value>)",
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
-        // Signal Blue — primary actions (Voiceflow-inspired)
+        // Signal Blue — primary actions. DEFAULT follows the --primary
+        // token so dark mode (65% lightness) is real, not decorative.
         primary: {
-          DEFAULT: "#397dff",
-          foreground: "#ffffff",
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
           50: "#f0f5ff",
           100: "#e0ebff",
           200: "#c2d7ff",
@@ -69,10 +70,12 @@ export default {
           800: "#1e40af",
           900: "#1e3a8a",
         },
-        // Ember Stroke — accents (Voiceflow-inspired)
+        // Ember Stroke — brand accent only (primary actions, links,
+        // selected states). DEFAULT follows the --accent token; hover
+        // surfaces must use `muted`, never accent (see button.tsx).
         accent: {
-          DEFAULT: "#f55c15",
-          foreground: "#ffffff",
+          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
+          foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
           50: "#fff0eb",
           100: "#ffe0d4",
           200: "#ffc0a9",
@@ -195,19 +198,13 @@ export default {
           800: "rgb(var(--trust-800))",
           900: "rgb(var(--trust-900))",
         },
-        amazon: {
-          orange: "rgb(255, 153, 0)",
-          blue: "rgb(35, 47, 62)",
-          lightBlue: "rgb(0, 113, 227)",
-          gray: "rgb(248, 248, 248)",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         pill: "999px",
-        card: "16px",
+        card: "8px",
         nav: "100px",
       },
       keyframes: {
@@ -253,7 +250,6 @@ export default {
         "soft-pulse": "softPulse 3.5s ease-in-out infinite",
       },
       backgroundImage: {
-        'grid-pattern': "linear-gradient(to right, #f3f4f6 1px, transparent 1px), linear-gradient(to bottom, #f3f4f6 1px, transparent 1px)",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.07), transparent 60%)',
       },
