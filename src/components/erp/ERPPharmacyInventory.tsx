@@ -241,19 +241,19 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
   return (
     <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-[24px] bg-card border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-xl">
             <Boxes className="h-6 w-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold tracking-tight">ERP Stock &amp; Buying Procurement Hub</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400 text-slate-950">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success-50 text-success-600 border border-success-100">
                 Live Stock
               </span>
             </div>
-            <p className="text-xs text-blue-100 font-medium">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               Medicine batch management, expiration monitoring, reordering, movements &amp; purchase workflows
             </p>
           </div>
@@ -261,7 +261,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
 
         <div className="flex items-center gap-2">
           {lowStockItems.length > 0 && (
-            <span className="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-xs animate-pulse">
+            <span className="px-3 py-1.5 rounded-full bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 animate-pulse">
               <AlertTriangle className="h-4 w-4" /> {lowStockItems.length} Low Stock Alerts
             </span>
           )}
@@ -269,7 +269,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Inventory views">
+      <div className="inline-flex items-center gap-1 rounded-full bg-pill p-1 overflow-x-auto max-w-full" role="tablist" aria-label="Inventory views">
         {[
           { id: "stock", label: "Medicine Batches & Stock Ledger", icon: Package },
           { id: "po", label: "Purchase Orders & Procurement", icon: Truck },
@@ -283,10 +283,10 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                  ? "bg-card text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -319,7 +319,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -394,7 +394,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
 
             <Dialog open={showPOModal} onOpenChange={setShowPOModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-full bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5">
                   <Plus className="h-4 w-4" /> Raise Purchase Order
                 </button>
               </DialogTrigger>
@@ -448,7 +448,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -493,7 +493,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               Every recorded stock movement — dispenses, receipts and adjustments.
             </p>
           </div>
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">

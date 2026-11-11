@@ -350,7 +350,7 @@ export const HRManagerWorkflow = () => {
       </div>
 
       {/* Tabs bar */}
-      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-pill rounded-full overflow-x-auto">
         {[
           { id: "employees", label: `Employees (${employees.length})`, icon: Users },
           { id: "leaves", label: `Leave Requests (${leaveRequests.length})`, icon: ClipboardCheck },
@@ -361,9 +361,9 @@ export const HRManagerWorkflow = () => {
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
               activeTab === t.id
-                ? "bg-primary-500 text-white shadow-xs"
+                ? "bg-card text-foreground"
                 : "text-muted-foreground hover:bg-muted"
             }`}
           >

@@ -253,7 +253,7 @@ export const ProviderApplications = () => {
               onClick={() => setFilter(f)}
               className={`px-3 py-1 rounded-md text-xs font-semibold capitalize transition-all ${
                 filter === f
-                  ? "bg-primary-500 text-white shadow-xs"
+                  ? "bg-slate-950 text-white"
                   : "bg-muted text-foreground hover:bg-muted"
               }`}
             >

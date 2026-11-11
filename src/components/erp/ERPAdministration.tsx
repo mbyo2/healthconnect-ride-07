@@ -238,21 +238,21 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 Live Data
               </span>
             </div>
-            <p className="text-xs text-muted-foreground font-medium">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               Personnel directory, invoicing journal &amp; medical asset register
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-success-50 text-success-600 border border-success-100">
             Collected: {formatPrice(totalCollected)}
           </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Administration sections">
+      <div className="inline-flex items-center gap-1 rounded-full bg-pill p-1 overflow-x-auto max-w-full" role="tablist" aria-label="Administration sections">
         {[
           { id: "hr", label: "Human Resources", icon: Users },
           { id: "finance", label: "Invoicing Journal", icon: DollarSign },
@@ -265,10 +265,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                  ? "bg-card text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -290,13 +290,13 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
             </div>
             <button
               onClick={() => navigate("/institution/personnel")}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2 rounded-full bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5"
             >
               <Users className="h-4 w-4" /> Manage Personnel
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -356,19 +356,19 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       {activeTab === "finance" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Total Invoiced</span>
               <div className="text-2xl font-bold text-emerald-600 mt-1 tabular-nums">{formatPrice(totalInvoiced)}</div>
               <span className="text-xs font-bold text-slate-500">All billing invoices</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Outstanding</span>
               <div className="text-2xl font-bold text-rose-600 mt-1 tabular-nums">{formatPrice(totalOutstanding)}</div>
               <span className="text-xs font-bold text-slate-500">Awaiting collection</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
+            <div className="p-4 rounded-2xl bg-card border border-border">
               <span className="text-xs font-semibold uppercase text-slate-400">Collected</span>
               <div className="text-2xl font-bold text-primary-500 mt-1 tabular-nums">{formatPrice(totalCollected)}</div>
               <span className="text-xs font-bold text-slate-500">Invoiced minus outstanding</span>
@@ -380,7 +380,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
             <p className="text-xs text-muted-foreground">New invoices are raised in Hospital Management → Billing.</p>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">
@@ -429,7 +429,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
 
             <Dialog open={showAssetModal} onOpenChange={setShowAssetModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-full bg-primary-500 text-white text-xs font-semibold flex items-center gap-1.5">
                   <Plus className="h-4 w-4" /> Log Asset
                 </button>
               </DialogTrigger>
@@ -490,7 +490,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-border bg-card">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-background text-xs font-semibold uppercase text-muted-foreground">

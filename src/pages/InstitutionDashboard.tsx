@@ -595,9 +595,9 @@ export const InstitutionDashboard = () => {
       <div className="sticky top-[4.5rem] z-40 bg-background">
       {/* Header */}
       <InstitutionPageHeader
-        className="py-5 shadow-sm [position:static] max-md:hidden"
+        className="py-5 [position:static] max-md:hidden"
         icon={cfg.icon}
-        iconClassName="shadow-button"
+        iconClassName="bg-primary-500"
         iconStyle={{ background: cfg.color }}
         title={institution.name}
         badges={

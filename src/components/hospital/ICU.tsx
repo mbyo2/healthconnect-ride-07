@@ -198,7 +198,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"}`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold capitalize transition-all whitespace-nowrap ${activeTab === tab.key ? "bg-pill text-pill-foreground" : "text-muted-foreground hover:bg-muted"}`}
           >
             {tab.label}
           </button>

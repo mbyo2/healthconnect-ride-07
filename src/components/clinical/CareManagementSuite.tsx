@@ -189,9 +189,9 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
   return (
     <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-[24px] bg-card border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-xl">
             <BedDouble className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -201,14 +201,14 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                 Live ADT Data
               </span>
             </div>
-            <p className="text-xs text-blue-100 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               Admission/discharge/transfer (ADT), ward bed occupancy &amp; discharge summaries
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-white/20 text-white font-bold text-xs">
+          <span className="px-3 py-1.5 rounded-xl bg-pill text-pill-foreground font-bold text-xs">
             Occupancy: {loading ? "…" : `${occupiedCount} / ${beds.length} Beds`}
             {!loading && beds.length > 0 ? ` (${Math.round((occupiedCount / beds.length) * 100)}%)` : ""}
           </span>
@@ -216,7 +216,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto" role="tablist" aria-label="Care management views">
+      <div className="inline-flex items-center gap-1 rounded-full bg-pill p-1 overflow-x-auto max-w-full" role="tablist" aria-label="Care management views">
         {[
           { id: "ipd", label: "IPD Wards & Bed Grid", icon: BedDouble },
           { id: "transfers", label: "Bed Movements & Transfers", icon: ArrowRightLeft },
@@ -229,10 +229,10 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                  ? "bg-card text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon className="h-4 w-4" />

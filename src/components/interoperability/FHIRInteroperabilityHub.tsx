@@ -152,9 +152,9 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
   return (
     <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-[24px] bg-card border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-xl">
             <Share2 className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -164,7 +164,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
                 HL7 FHIR R4 / R5
               </span>
             </div>
-            <p className="text-xs text-blue-100 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               Converts live patient records and recorded vitals to FHIR using LOINC-coded observations
             </p>
           </div>
@@ -175,7 +175,7 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
             onClick={handleCopy}
             variant="secondary"
             size="sm"
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs"
+            className="bg-card hover:bg-muted text-foreground border border-border font-semibold text-xs"
           >
             {copied ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
             <span>{copied ? "Copied" : "Copy JSON"}</span>

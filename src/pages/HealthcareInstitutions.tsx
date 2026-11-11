@@ -169,13 +169,13 @@ export const HealthcareInstitutions = () => {
       </Helmet>
 
       {/* ── Hero Banner ── */}
-      <div className="bg-slate-900 text-white border-b border-slate-800 px-4 sm:px-6 py-10 sm:py-14">
+      <div className="bg-canvas border-b border-border px-4 sm:px-6 py-10 sm:py-14">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/40 text-primary-500 text-xs font-bold uppercase tracking-wider">
             <Building2 className="h-3.5 w-3.5" />
             Verified Healthcare Facilities
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
             Healthcare Institutions &amp; Clinics
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-2xl font-medium">
@@ -189,7 +189,7 @@ export const HealthcareInstitutions = () => {
                 placeholder="Search by facility name, city, specialty or service…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-400 rounded-xl text-sm focus-visible:ring-primary-500"
+                className="pl-10 h-11 bg-card border-border placeholder:text-muted-foreground rounded-full text-sm focus-visible:ring-primary-500"
               />
             </div>
             <Button
@@ -210,9 +210,9 @@ export const HealthcareInstitutions = () => {
             <button
               key={tab.key}
               onClick={() => setTypeFilter(tab.key)}
-              className={`px-4 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-full font-semibold text-xs whitespace-nowrap transition-all ${
                 typeFilter === tab.key
-                  ? 'bg-primary-500 text-white shadow-xs'
+                  ? 'bg-pill text-pill-foreground'
                   : 'bg-card border border-border text-muted-foreground hover:bg-primary-100 hover:text-primary-500'
               }`}
             >

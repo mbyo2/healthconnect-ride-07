@@ -71,25 +71,25 @@ export const ConnectionsDashboard = () => {
     <div className="min-h-screen bg-background py-8 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header Banner */}
-        <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-bold shadow-md">
+            <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-bold">
               <Users className="h-7 w-7" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Care Network</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Care Network</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-0.5">Healthcare Connections</h1>
-              <p className="text-xs text-slate-400 font-medium">
+              <h1 className="text-greeting mt-0.5">Healthcare Connections</h1>
+              <p className="text-[13px] text-muted-foreground mt-0.5">
                 Manage your network of verified doctors, clinics, patients and primary care providers
               </p>
             </div>
           </div>
           <button
             onClick={() => navigate('/marketplace-users')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold shadow-sm shadow-primary-500/30 transition-all active:scale-95 shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-all active:scale-95 shrink-0"
           >
             <Search className="h-4 w-4" />
             Browse User Marketplace
@@ -97,12 +97,12 @@ export const ConnectionsDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-          <TabsList className="grid w-full grid-cols-5 p-1 bg-card border border-border rounded-2xl shadow-xs">
-            <TabsTrigger value="overview" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Overview</TabsTrigger>
-            <TabsTrigger value="connections" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Network</TabsTrigger>
-            <TabsTrigger value="requests" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Requests</TabsTrigger>
-            <TabsTrigger value="search" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Find</TabsTrigger>
-            <TabsTrigger value="primary" className="text-xs font-semibold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Primary Care</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview" className="text-xs font-semibold transition-all">Overview</TabsTrigger>
+            <TabsTrigger value="connections" className="text-xs font-semibold transition-all">Network</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs font-semibold transition-all">Requests</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs font-semibold transition-all">Find</TabsTrigger>
+            <TabsTrigger value="primary" className="text-xs font-semibold transition-all">Primary Care</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -175,7 +175,7 @@ export const ConnectionsDashboard = () => {
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="border-b border-border pb-4 mb-4">
               <h2 className="text-lg font-bold text-foreground">Recent Connections</h2>
-              <p className="text-xs text-slate-400 font-medium">Your latest verified medical connections</p>
+              <p className="text-[13px] text-muted-foreground mt-0.5">Your latest verified medical connections</p>
             </div>
               {approvedConnections.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">

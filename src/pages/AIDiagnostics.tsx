@@ -66,10 +66,10 @@ const AIDiagnostics = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
+                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-full text-xs font-semibold transition-all ${
                   activeTab === tab.id
-                    ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                    ? "bg-pill text-pill-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.icon}

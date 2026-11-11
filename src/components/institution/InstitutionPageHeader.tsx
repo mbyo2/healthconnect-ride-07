@@ -37,13 +37,13 @@ export const InstitutionPageHeader = ({
   title,
   subtitle,
   icon,
-  iconClassName = "bg-primary-500 shadow-xs",
+  iconClassName = "bg-primary-500",
   iconStyle,
   badges,
   actions,
-  titleClassName = "text-2xl font-medium tracking-tight text-midnight",
-  subtitleClassName = "text-sm text-muted-foreground font-medium tracking-wide",
-  className = "py-4 shadow-2xs",
+  titleClassName = "text-greeting text-midnight",
+  subtitleClassName = "text-[13px] text-muted-foreground",
+  className = "py-4",
 }: InstitutionPageHeaderProps) => {
   return (
     <div className={`doc-page-header px-4 sm:px-6 ${className}`}>

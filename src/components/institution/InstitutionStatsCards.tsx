@@ -26,7 +26,7 @@ export const InstitutionStatsCards = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {stats.map((stat) => (
-        <Card key={stat.title} className="hover:shadow-md transition-shadow">
+        <Card key={stat.title} className="transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
             <CardTitle className="text-xs font-medium text-muted-foreground truncate">{stat.title}</CardTitle>
             <stat.icon className={`h-3.5 w-3.5 ${stat.color} shrink-0`} />

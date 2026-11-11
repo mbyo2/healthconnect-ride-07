@@ -110,10 +110,10 @@ const Marketplace = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-full text-xs font-semibold transition-all ${
                   activeTab === tab.id
-                    ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                    ? "bg-pill text-pill-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}

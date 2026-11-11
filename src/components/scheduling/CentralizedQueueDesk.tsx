@@ -150,9 +150,9 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
   return (
     <div className="space-y-6 font-sans text-foreground">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-[24px] bg-card border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-xl border border-white/20">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-xl">
             <Ticket className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -162,7 +162,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
                 Live TV Synced
               </span>
             </div>
-            <p className="text-xs text-blue-100 font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               Real-time patient tokens, audio chime announcements &amp; public waiting room displays
             </p>
           </div>
@@ -173,7 +173,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = () => 
             to="/queue-display"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center gap-1.5 border border-white/20 transition-all"
+            className="px-4 py-2 rounded-xl bg-card hover:bg-muted text-foreground font-semibold text-xs flex items-center gap-1.5 border border-border transition-all"
           >
             <Tv className="h-4 w-4" />
             <span>Open Public TV Display</span>

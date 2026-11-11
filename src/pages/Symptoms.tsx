@@ -193,7 +193,7 @@ const Symptoms = () => {
                           title={isSelected ? 'Remove symptom' : 'Add symptom'}
                           className={`min-h-[44px] min-w-0 max-w-full break-words text-left px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                             isSelected
-                              ? "bg-primary-500 text-white shadow-xs"
+                              ? "bg-slate-950 text-white"
                               : "bg-canvas dark:bg-slate-800 text-foreground border border-border hover:bg-muted dark:hover:bg-slate-700"
                           }`}
                         >

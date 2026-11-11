@@ -482,7 +482,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </div>
 
               {/* Pain Trend Summary — derived from filed sessions for this patient */}
-            <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-md flex flex-col justify-between space-y-4">
+            <div className="p-6 rounded-[24px] bg-card border border-border flex flex-col justify-between space-y-4">
               <div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-400 text-slate-950 uppercase">
                   Filed Chart
@@ -490,17 +490,17 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 <div className="mt-4">
                   {persistedSessions.length === 0 ? (
                     <>
-                      <div className="text-3xl font-bold text-slate-300">No sessions yet</div>
-                      <p className="text-xs text-slate-300 mt-1">
+                      <div className="text-3xl font-bold text-muted-foreground">No sessions yet</div>
+                      <p className="text-xs text-muted-foreground mt-1">
                         File sessions below to track pre/post pain on this patient&apos;s chart.
                       </p>
                     </>
                   ) : (
                     <>
-                      <div className="text-3xl font-bold text-emerald-400">
+                      <div className="text-3xl font-bold text-success-500">
                         {persistedSessions.length} session{persistedSessions.length === 1 ? "" : "s"} filed
                       </div>
-                      <p className="text-xs text-slate-300 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         Latest: VAS {persistedSessions[0].painPre ?? "—"}/10 →{" "}
                         {persistedSessions[0].painPost ?? "—"}/10 post-treatment.
                       </p>
@@ -509,18 +509,18 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/10 border border-white/10 space-y-2 text-xs">
+              <div className="p-4 rounded-2xl bg-muted/50 border border-border space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Current VAS setting:</span>
-                  <span className="font-bold text-white">{painScore}/10</span>
+                  <span className="text-muted-foreground">Current VAS setting:</span>
+                  <span className="font-bold text-foreground">{painScore}/10</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Location:</span>
-                  <span className="font-bold text-emerald-300">{painLocation || "—"}</span>
+                  <span className="text-muted-foreground">Location:</span>
+                  <span className="font-bold text-success-600">{painLocation || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Record status:</span>
-                  <span className="font-bold text-blue-300">Assessment aid — file via Sessions tab</span>
+                  <span className="text-muted-foreground">Record status:</span>
+                  <span className="font-bold text-primary-500">Assessment aid — file via Sessions tab</span>
                 </div>
               </div>
 
@@ -551,7 +551,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   printWin.document.close();
                   toast.success("Summary sent to printer");
                 }}
-                className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20"
+                className="w-full bg-card hover:bg-muted text-foreground font-semibold text-xs border border-border"
               >
                 Print Session Summary
               </Button>

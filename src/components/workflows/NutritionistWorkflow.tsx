@@ -92,18 +92,18 @@ export const NutritionistWorkflow = () => {
     <div className="space-y-6 px-4 py-8 max-w-7xl mx-auto font-sans">
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
-      <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm">
+      <div className="rounded-2xl bg-card border border-border p-6 sm:p-8">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-bold shadow-md">
+          <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-bold">
             <Apple className="h-7 w-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Nutritionist Workspace</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nutritionist Workspace</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-0.5">Nutrition Dashboard</h1>
-            <p className="text-xs text-slate-400 font-medium">Diet plans, nutritional assessments & patient counseling</p>
+            <h1 className="text-greeting mt-0.5">Nutrition Dashboard</h1>
+            <p className="text-[13px] text-muted-foreground mt-0.5">Diet plans, nutritional assessments & patient counseling</p>
           </div>
         </div>
       </div>

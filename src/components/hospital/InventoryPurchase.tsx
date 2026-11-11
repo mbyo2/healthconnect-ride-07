@@ -131,19 +131,19 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
       </div>
 
       {/* Views Bar */}
-      <div className="flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-1.5 p-1 bg-pill rounded-full">
         <button
           onClick={() => setActiveTab("stock")}
-          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-            activeTab === "stock" ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            activeTab === "stock" ? "bg-card text-foreground" : "text-muted-foreground hover:bg-muted"
           }`}
         >
           Stock Register ({supplies.length})
         </button>
         <button
           onClick={() => setActiveTab("reorder")}
-          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-            activeTab === "reorder" ? "bg-primary-500 text-white shadow-xs" : "text-muted-foreground hover:bg-muted"
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            activeTab === "reorder" ? "bg-card text-foreground" : "text-muted-foreground hover:bg-muted"
           }`}
         >
           Reorder Alert Queue ({lowStock.length})

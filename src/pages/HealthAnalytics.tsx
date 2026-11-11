@@ -195,9 +195,9 @@ const HealthAnalytics = () => {
                       role="tab"
                       aria-selected={activeTab === tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                         activeTab === tab.id
-                          ? "bg-primary-500 text-white shadow-xs"
+                          ? "bg-card text-foreground"
                           : "text-muted-foreground hover:bg-white "
                       }`}
                     >
