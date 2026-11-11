@@ -232,7 +232,7 @@ export const WalletTopUp = () => {
                                 <Input
                                     id="lenco-phone"
                                     type="tel"
-                                    placeholder="0971234567"
+                                    placeholder="Enter your MoMo number"
                                     className="h-11"
                                     value={lencoPhone}
                                     onChange={(e) => setLencoPhone(e.target.value)}
@@ -347,9 +347,19 @@ export const WalletTopUp = () => {
                     )}
                 </Button>
 
-                <div className="flex justify-center gap-4 opacity-40 grayscale">
-                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" className="h-6" />
-                    <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/cc-badges-ppmcvdam.png" alt="Cards" className="h-6" />
+                {/* Accepted-method marks: local token-styled chips, not remote
+                    badge images (the old PayPal-hosted <img> badges failed to
+                    load and read as broken, especially in dark mode). They
+                    name the three methods this form actually offers above. */}
+                <div className="flex justify-center gap-2" aria-label="Accepted payment methods">
+                    {['Mobile Money', 'Card', 'PayPal'].map((method) => (
+                        <span
+                            key={method}
+                            className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-muted-foreground"
+                        >
+                            {method}
+                        </span>
+                    ))}
                 </div>
             </CardContent>
         </Card>
