@@ -5,6 +5,7 @@ import { Eye, EyeOff, ArrowLeft, Building2, User, Stethoscope, ChevronRight, Shi
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -494,9 +495,9 @@ export const Auth = () => {
                       <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
-                  <button type="submit" disabled={localLoading} className="vf-btn-primary w-full h-12 text-sm">
+                  <Button type="submit" disabled={localLoading} className="w-full h-12 text-sm">
                     {localLoading ? "Signing In..." : "Sign In"}
-                  </button>
+                  </Button>
                 </form>
               </Form>
             </TabsContent>
@@ -540,9 +541,9 @@ export const Auth = () => {
                         <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
-                      <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
+                      <Button type="submit" disabled={localLoading} className="w-full h-12">
                         Quick Sign Up
-                      </button>
+                      </Button>
                     </form>
                   </Form>
                   <p className="text-center text-xs text-graphite-500 dark:text-slate-400">
@@ -618,9 +619,9 @@ export const Auth = () => {
                       <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={providerForm.watch("termsAccepted")} onChange={(checked) => providerForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={providerForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
+                    <Button type="submit" disabled={localLoading} className="w-full h-12">
                       Create Professional Account
-                    </button>
+                    </Button>
                   </form>
                 </Form>
               )}
@@ -681,9 +682,9 @@ export const Auth = () => {
                       <FormItem><FormLabel className="text-sm font-medium text-graphite-600 dark:text-slate-300">Confirm Password</FormLabel><FormControl><PasswordInput autoComplete="new-password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={businessForm.watch("termsAccepted")} onChange={(checked) => businessForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={businessForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="vf-btn-primary w-full">
+                    <Button type="submit" disabled={localLoading} className="w-full h-12">
                       Register Business
-                    </button>
+                    </Button>
                   </form>
                 </Form>
               )}

@@ -151,7 +151,7 @@ export const ProviderDetail = () => {
             {isFetchError && (
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs"
+                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary text-primary-foreground font-semibold text-xs"
               >
                 Try again
               </button>
@@ -291,7 +291,7 @@ export const ProviderDetail = () => {
               </button>
               <button
                 onClick={() => setIsBookingOpen(true)}
-                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5"
+                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-xs flex items-center gap-1.5"
               >
                 <CalendarPlus className="h-4 w-4" /> Book Appointment
               </button>
@@ -546,7 +546,7 @@ export const ProviderDetail = () => {
                 <div className="space-y-2">
                   <button
                     onClick={() => setIsBookingOpen(true)}
-                    className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-all"
+                    className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-all"
                   >
                     <CalendarPlus className="h-4 w-4 inline mr-2" />
                     Book Appointment

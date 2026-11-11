@@ -136,3 +136,48 @@ describe("paypal fidelity 2026-11-11: list conversions", () => {
     expect(medicalRecords).not.toContain("p-3.5 rounded-xl border border-border bg-background");
   });
 });
+
+describe("paypal fidelity 2026-11-11: rendered-verification follow-up fixes", () => {
+  const walletTopUp = read("../components/wallet/WalletTopUp.tsx");
+  const providerList = read("../components/ProviderList.tsx");
+  const providerDetail = read("../pages/ProviderDetail.tsx");
+  const auth = read("../pages/Auth.tsx");
+  const profileSetup = read("../components/auth/ProfileSetup.tsx");
+
+  it("wallet top-up is flat: no shadow utilities anywhere in the component", () => {
+    // The Pay with Mobile Money CTA carried shadow-xl + shadow-primary/20
+    // (a soft coloured glow, worst in dark mode) and the card shadow-lg.
+    expect(walletTopUp).not.toContain("shadow");
+    expect(walletTopUp).toContain("Pay with {paymentMethod");
+  });
+
+  it("booking CTAs use the --primary token so the dark-mode lift applies", () => {
+    // Literal bg-primary-500 is a fixed palette step (#0066F5 in BOTH
+    // modes); bg-primary resolves through the token, which lifts to
+    // #529AFF in dark mode like every other primary.
+    for (const src of [patientHome, providerList, providerDetail]) {
+      expect(src).not.toContain("bg-primary-500 text-white");
+      expect(src).not.toContain("bg-primary-500 hover:bg-primary-600");
+      expect(src).not.toContain("group-hover:bg-primary-600");
+    }
+    // The named CTA: patient-home "Book Now" pill rides the token.
+    expect(patientHome).toContain("bg-primary text-primary-foreground group-hover:bg-primary/90");
+    expect(patientHome).toContain("'bg-primary text-primary-foreground hover:bg-primary/90'");
+  });
+
+  it("auth + onboarding primaries are the product Button (full pill)", () => {
+    // Auth previously styled its submits with the marketing utility
+    // vf-btn-primary (bg-primary-500 + shadow-button, rounded-rect in
+    // effect); the front door now uses the same primitive as the
+    // product, whose base class is rounded-full.
+    expect(auth).not.toContain("vf-btn-primary");
+    expect(auth).toContain('import { Button } from "@/components/ui/button"');
+    expect(auth).toContain("<Button type=\"submit\"");
+    expect(auth).toContain("Sign In");
+    // Onboarding's Complete Profile submit is the same primitive.
+    expect(profileSetup).toContain('from "@/components/ui/button"');
+    expect(profileSetup).toContain("<Button type=\"submit\"");
+    expect(profileSetup).toContain("Complete Profile");
+    expect(button).toContain("rounded-full");
+  });
+});

@@ -376,7 +376,7 @@ export const PatientWorkflow = React.memo(() => {
                   className={`w-full py-3 rounded-full font-semibold text-xs transition-colors ${
                     step.completed
                       ? 'bg-pill text-pill-foreground hover:bg-pill/80'
-                      : 'bg-primary-500 text-white hover:bg-primary-600'
+                      : 'bg-primary text-primary-foreground hover:bg-primary/90'
                   }`}
                 >
                   {step.id === 'profile' ? (isProfileComplete ? 'Edit Profile' : 'Complete Profile') : (step.completed ? 'View' : 'Start')}
@@ -505,7 +505,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-5 py-2.5 rounded-full bg-primary-500 text-white group-hover:bg-primary-600 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
+            <span className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground group-hover:bg-primary/90 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
               <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
               <ChevronRight className="h-4 w-4" />
             </span>
@@ -550,7 +550,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
           <button
             onClick={() => handleNavigation('/prescriptions', 'Prescriptions')}
-            className="px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs transition-colors"
+            className="px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs transition-colors"
           >
             View
           </button>

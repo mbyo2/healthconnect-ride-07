@@ -169,7 +169,7 @@ export const WalletTopUp = () => {
     const quickAmounts = ['10', '20', '50', '100', '200', '500'];
 
     return (
-        <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm">
+        <Card className="border border-border bg-card/50 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2 text-foreground">
                     <CreditCard className="h-5 w-5 text-primary" />
@@ -289,7 +289,7 @@ export const WalletTopUp = () => {
                                 key={q}
                                 variant={amount === q ? "default" : "outline"}
                                 className={`h-12 font-bold transition-all ${amount === q
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                                     : 'bg-secondary hover:bg-secondary/80 border-border'
                                     }`}
                                 onClick={() => setAmount(q)}
@@ -331,7 +331,7 @@ export const WalletTopUp = () => {
                 </div>
 
                 <Button
-                    className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
+                    className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98]"
                     onClick={handleTopUp}
                     disabled={isLoading}
                 >
