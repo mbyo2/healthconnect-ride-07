@@ -1,5 +1,6 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import React, { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -247,12 +248,12 @@ export const HospitalManagement = () => {
             ask your institution administrator to send you a staff invitation.
           </p>
           <div className="flex items-center justify-center gap-2 flex-wrap">
-            <button onClick={() => window.location.reload()} className="vf-btn-primary">
+            <Button onClick={() => window.location.reload()}>
               Refresh
-            </button>
-            <button onClick={() => navigate("/institution-dashboard")} className="vf-btn-secondary">
-              Go to Institution Dashboard
-            </button>
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/institution-dashboard")}>
+              Go to institution dashboard
+            </Button>
           </div>
         </div>
       </div>

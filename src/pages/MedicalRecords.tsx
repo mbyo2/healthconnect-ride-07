@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   FileText, Download, Upload, Calendar, User, Heart, Activity,
   ClipboardList, Pill, Bot, Sparkles, FolderHeart
@@ -174,26 +175,30 @@ export default function MedicalRecords() {
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <button
+              <Button
+                variant="outline"
                 onClick={() => navigate('/ai-diagnostics')}
-                className="vf-btn-secondary gap-2 text-sm min-h-[44px]"
+                className="gap-2 min-h-[44px]"
               >
                 <Bot className="h-4 w-4" />
-                <span>AI Diagnostics</span>
-              </button>
-              <button
+                <span>AI diagnostics</span>
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => navigate('/ai-diagnostics')}
                 title="Scan documents with AI"
-                className="px-3.5 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
-                <Upload className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
-                <span>Scan Document</span>
-              </button>
-              <button
+                className="gap-1.5 min-h-[44px]"
+              >
+                <Upload className="h-4 w-4" />
+                <span>Scan document</span>
+              </Button>
+              <Button
                 onClick={exportAllRecords}
-                className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+                className="gap-1.5 min-h-[44px]"
+              >
                 <Download className="h-4 w-4" />
-                <span>Export EHR Data</span>
-              </button>
+                <span>Export EHR data</span>
+              </Button>
             </div>
           </div>
         </div>

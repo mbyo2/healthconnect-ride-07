@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { toast } from "sonner";
@@ -238,10 +240,12 @@ export const InstitutionManagement = () => {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => setSuspended(inst, !suspended)}
                           disabled={processing === inst.id}
-                          className="vf-btn-secondary gap-1.5 text-xs"
+                          className="gap-1.5"
                           title={suspended ? "Unsuspend institution" : "Suspend institution"}
                         >
                           {suspended ? (
@@ -249,34 +253,36 @@ export const InstitutionManagement = () => {
                           ) : (
                             <><Ban className="h-3.5 w-3.5" /> Suspend</>
                           )}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => {
                             setTransferTarget(transferTarget === inst.id ? null : inst.id);
                             setTransferEmail("");
                           }}
-                          className="vf-btn-secondary gap-1.5 text-xs"
+                          className="gap-1.5"
                           title="Transfer superadmin to another user"
                         >
                           <UserCog className="h-3.5 w-3.5" /> Transfer
-                        </button>
+                        </Button>
                       </div>
                       {transferTarget === inst.id && (
                         <div className="mt-2 flex items-center justify-end gap-2">
-                          <input
+                          <Input
                             value={transferEmail}
                             onChange={(e) => setTransferEmail(e.target.value)}
                             placeholder="new.superadmin@email.com"
-                            className="vf-input text-xs w-56"
+                            className="h-9 w-56 text-xs"
                             type="email"
                           />
-                          <button
+                          <Button
+                            size="sm"
                             onClick={() => transferSuperadmin(inst)}
                             disabled={processing === inst.id}
-                            className="vf-btn-primary text-xs"
                           >
                             Confirm
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </td>

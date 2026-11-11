@@ -147,7 +147,7 @@ export function ModulePricingAdmin() {
                   size="sm"
                   onClick={() => save(row)}
                   disabled={!dirty || savingKey === row.module_key}
-                  className="vf-btn-primary text-xs h-9"
+                  className="text-xs"
                 >
                   {savingKey === row.module_key ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

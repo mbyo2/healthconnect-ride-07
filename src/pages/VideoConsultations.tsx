@@ -1,4 +1,5 @@
 import { VideoConsultation } from "@/components/video/VideoConsultation";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Helmet } from "react-helmet-async";
 import { Video, ShieldCheck } from "lucide-react";
 
@@ -9,33 +10,27 @@ const VideoConsultations = () => {
         <title>Video Consultations | Doc&apos; O Clock</title>
         <meta name="description" content="Connect with healthcare providers through secure telehealth video consultations" />
       </Helmet>
-      <div className="min-h-screen bg-canvas py-8 px-4 sm:px-6 font-sans">
-        <div className="max-w-content mx-auto space-y-6">
-          <div className="vf-card !p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
-                <Video className="h-7 w-7" />
-              </div>
-              <div>
-                <div className="vf-eyebrow mb-2">
-                  <Video className="h-3.5 w-3.5 text-accent-500" />
-                  Telehealth Suite
-                </div>
-                <h1 className="font-display text-3xl font-medium tracking-tight text-midnight">Video Consultations</h1>
-                <p className="text-sm text-graphite-500 font-medium tracking-wide">
-                  Encrypted virtual doctor visits &amp; telemedicine calls
-                </p>
-              </div>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <Video className="h-5 w-5" />
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-pill bg-success-50 border border-success-100 text-xs font-medium text-success-500">
-              <ShieldCheck className="h-4 w-4" />
-              Secure &amp; Private
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Video consultations</h1>
+              <p className="text-sm text-muted-foreground">
+                Encrypted virtual doctor visits &amp; telemedicine calls
+              </p>
             </div>
           </div>
+          <StatusBadge tone="positive" className="gap-1.5 px-2.5 py-1">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Secure &amp; private
+          </StatusBadge>
+        </div>
 
-          <div className="vf-card overflow-hidden">
-            <VideoConsultation />
-          </div>
+        <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs">
+          <VideoConsultation />
         </div>
       </div>
     </>

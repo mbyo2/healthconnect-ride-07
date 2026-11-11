@@ -1,4 +1,5 @@
 import { LucideIcon, X, ChevronRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 
 interface SuggestionBannerProps {
@@ -82,18 +83,15 @@ export const SuggestionBanner = ({
           {actions && actions.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
               {actions.map((action, idx) => (
-                <button
+                <Button
                   key={idx}
+                  size="sm"
+                  variant={action.variant === 'primary' ? 'default' : 'outline'}
                   onClick={action.onClick}
-                  className={
-                    action.variant === 'primary'
-                      ? 'vf-btn-primary text-xs px-3 py-1.5'
-                      : 'vf-btn-secondary text-xs px-3 py-1.5'
-                  }
                 >
                   {action.label}
                   <ChevronRight className="h-3 w-3 ml-1" />
-                </button>
+                </Button>
               ))}
             </div>
           )}

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { Search, Stethoscope, SlidersHorizontal } from "lucide-react";
 import { useLocation } from "react-router-dom";
@@ -117,15 +118,15 @@ const SearchPage = () => {
                 className="w-full pl-11 pr-28 py-3 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
                 aria-label="Search providers"
               />
-              <button
+              <Button
                 onClick={handleSearch}
                 disabled={!searchQuery.trim()}
                 title={searchQuery.trim() ? "Search providers" : "Type a doctor name, specialty, or city to search"}
                 aria-label={searchQuery.trim() ? "Search providers" : "Search (type something first)"}
-                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm min-h-[44px] disabled:opacity-50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px]"
               >
                 Search
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { AmbulanceStaffWorkflow } from "./AmbulanceStaffWorkflow";
+import { Button } from "@/components/ui/button";
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserRoles } from '@/context/UserRolesContext';
@@ -191,13 +192,13 @@ export const RoleBasedWorkflow = () => {
               If you already finished setup, refresh the page.
             </AlertDescription>
           </Alert>
-          <button
+          <Button
             type="button"
             onClick={() => navigate('/onboarding')}
-            className="vf-btn-primary w-full mt-4 min-h-[44px]"
+            className="w-full mt-4 min-h-[44px]"
           >
             Complete profile setup
-          </button>
+          </Button>
         </CardContent>
       </Card>
     );

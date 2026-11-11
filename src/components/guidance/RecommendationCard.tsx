@@ -1,4 +1,5 @@
 import { LucideIcon, Sparkles, ArrowRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 interface RecommendationCardProps {
   title: string;
@@ -79,13 +80,14 @@ export const RecommendationCard = ({
             </div>
           )}
 
-          <button
+          <Button
+            size="sm"
             onClick={action.onClick}
-            className="vf-btn-primary text-xs px-3 py-1.5 inline-flex items-center gap-1"
+            className="gap-1"
           >
             {action.label}
             <ArrowRight className="h-3 w-3" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

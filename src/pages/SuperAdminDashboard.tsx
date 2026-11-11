@@ -169,8 +169,8 @@ const SuperAdminDashboard = () => {
       cell: ({ row }) => {
         const level = row.getValue("admin_level") as AdminLevel;
         return level === "superadmin"
-          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Super Admin</span>
-          : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">Admin</span>;
+          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-primary-500">Super Admin</span>
+          : <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-primary-500">Admin</span>;
       },
     },
     {
@@ -190,15 +190,15 @@ const SuperAdminDashboard = () => {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border border-canvas-silk dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900">
-              <DropdownMenuLabel className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-bold">
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase">Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-semibold">
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => removeAdminAccess(admin.id, admin.email)}
-                className="text-xs font-bold text-error-500"
+                className="text-xs font-semibold text-error-500"
               >
                 Remove Admin Access
               </DropdownMenuItem>
@@ -225,23 +225,23 @@ const SuperAdminDashboard = () => {
                 Super Admin Dashboard
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-sm text-graphite-500 font-medium tracking-wide">Root-level governance, admin provisioning, and platform payments oversight</p>
+              <p className="text-sm text-muted-foreground font-medium">Root-level governance, admin provisioning, and platform payments oversight</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/admin-dashboard")} className="vf-btn-secondary text-sm">
-              Admin Dashboard
-            </button>
+            <Button variant="outline" onClick={() => navigate("/admin-dashboard")}>
+              Admin dashboard
+            </Button>
             <Dialog open={isAddAdminOpen} onOpenChange={setIsAddAdminOpen}>
               <DialogTrigger asChild>
-                <button className="vf-btn-primary gap-1.5 text-sm">
-                  <UserPlus className="h-3.5 w-3.5" /> Add Admin
-                </button>
+                <Button className="gap-1.5">
+                  <UserPlus className="h-3.5 w-3.5" /> Add admin
+                </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card">
+              <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle className="font-medium text-lg text-midnight dark:text-slate-100">Create New Admin</DialogTitle>
-                  <DialogDescription className="text-sm text-graphite-500 dark:text-slate-400">Create an admin user with access to the Admin Dashboard.</DialogDescription>
+                  <DialogTitle>Create new admin</DialogTitle>
+                  <DialogDescription>Create an admin user with access to the Admin Dashboard.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2 text-sm">
                   {[
@@ -251,20 +251,20 @@ const SuperAdminDashboard = () => {
                     { id: "lastName", label: "Last Name", type: "text", val: newAdminLastName, set: setNewAdminLastName, ph: "Doe" },
                   ].map(f => (
                     <div key={f.id}>
-                      <label className="font-medium text-graphite-600 dark:text-slate-400 text-xs uppercase">{f.label}</label>
-                      <input
+                      <label className="font-medium text-muted-foreground text-xs">{f.label}</label>
+                      <Input
                         id={f.id} type={f.type} value={f.val} placeholder={f.ph}
                         onChange={(e) => f.set(e.target.value)}
-                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-graphite-400 dark:placeholder:text-slate-500 font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                        className="mt-2"
                       />
                     </div>
                   ))}
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-graphite-500 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100">Cancel</button>
-                  <button onClick={handleCreateAdmin} disabled={isSubmitting || !newAdminEmail || !newAdminPassword} className="vf-btn-primary text-sm">
-                    {isSubmitting ? "Creating..." : "Create Admin"}
-                  </button>
+                  <Button variant="outline" onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting}>Cancel</Button>
+                  <Button onClick={handleCreateAdmin} disabled={isSubmitting || !newAdminEmail || !newAdminPassword}>
+                    {isSubmitting ? "Creating..." : "Create admin"}
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -272,40 +272,40 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="pt-6 space-y-6">
         {/* KPI Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: "Admin Users", value: admins.length, sub: `${admins.filter(a => a.admin_level === "superadmin").length} superadmins`, color: "#397DFF", icon: <ShieldAlert className="h-5 w-5" /> },
-            { label: "Access Controls", value: "Active", sub: "Role-based security enabled", color: "#22C55E", icon: <Settings className="h-5 w-5" /> },
-            { label: "Users Managed", value: "All", sub: "Full platform access", color: "#F59E0B", icon: <Users className="h-5 w-5" /> },
+            { label: "Admin Users", value: admins.length, sub: `${admins.filter(a => a.admin_level === "superadmin").length} superadmins`, icon: <ShieldAlert className="h-5 w-5" /> },
+            { label: "Access Controls", value: "Active", sub: "Role-based security enabled", icon: <Settings className="h-5 w-5" /> },
+            { label: "Users Managed", value: "All", sub: "Full platform access", icon: <Users className="h-5 w-5" /> },
           ].map((card) => (
-            <div key={card.label} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
+            <div key={card.label} className="p-4 rounded-lg bg-card border border-border shadow-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{card.label}</span>
-                <span style={{ color: card.color }}>{card.icon}</span>
+                <span className="text-xs font-medium text-muted-foreground">{card.label}</span>
+                <span className="h-9 w-9 rounded-lg bg-primary-500/10 text-primary-600 flex items-center justify-center">{card.icon}</span>
               </div>
-              <div className="text-2xl font-bold" style={{ color: card.color }}>{card.value}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
+              <div className="text-2xl font-semibold tnum text-foreground">{card.value}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{card.sub}</div>
             </div>
           ))}
         </div>
 
         {/* Admin Management Table */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <h2 className="font-semibold text-sm mb-4 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-primary-500" /> Admin & Superadmin Management
+            <Shield className="h-4 w-4 text-primary-500" /> Admin & superadmin management
           </h2>
           <DataTable columns={adminColumns} data={admins} searchColumn="email" />
         </div>
 
         {/* Subscription Pricing — superadmin editable */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <SubscriptionPricingAdmin />
         </div>
 
         {/* Module Add-on Pricing — superadmin editable */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <ModulePricingAdmin />
         </div>
 

@@ -1,5 +1,7 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { safeDocumentWrite } from "@/utils/safePrint";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Button } from "@/components/ui/button";
 import React, { useState, useMemo } from "react";
 import {
   Pill, Calendar, User, Clock, Download, Plus, FileText, Search,
@@ -528,17 +530,17 @@ export const Prescriptions = () => {
     switch (status) {
       case "active":
       case "filled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">✓ Active / Filled</span>;
+        return <StatusBadge tone="positive">Active / Filled</StatusBadge>;
       case "expired":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Expired</span>;
+        return <StatusBadge tone="negative">Expired</StatusBadge>;
       case "pending":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● Pending Rx</span>;
+        return <StatusBadge tone="warning">Pending Rx</StatusBadge>;
       case "partially_filled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-900/40">◐ Partially Filled</span>;
+        return <StatusBadge tone="info">Partially filled</StatusBadge>;
       case "cancelled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">✕ Cancelled</span>;
+        return <StatusBadge tone="neutral">Cancelled</StatusBadge>;
       default:
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-primary-50 dark:bg-blue-950/50 text-primary-500 dark:text-blue-400 border border-primary-500/20">{status || "Dispatched"}</span>;
+        return <StatusBadge tone="info">{status || "Dispatched"}</StatusBadge>;
     }
   };
 
@@ -581,8 +583,8 @@ export const Prescriptions = () => {
           <title>Prescription Slip - ${rxNo}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; color: #0f172a; max-width: 800px; margin: auto; }
-            .header { border-bottom: 3px solid #0073ea; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-            .logo { font-size: 22px; font-weight: 900; color: #0073ea; }
+            .header { border-bottom: 3px solid #397dff; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+            .logo { font-size: 22px; font-weight: 900; color: #397dff; }
             .rx-title { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
             .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 25px; padding: 15px; background: #f8fafc; border-radius: 8px; }
             table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; margin-bottom: 30px; }
@@ -599,7 +601,7 @@ export const Prescriptions = () => {
             </div>
             <div style="text-align: right;">
               <div class="rx-title">Official E-Prescription</div>
-              <div style="font-family: monospace; font-weight: bold; color: #0073ea;">${rxNo}</div>
+              <div style="font-family: monospace; font-weight: bold; color: #397dff;">${rxNo}</div>
             </div>
           </div>
 
@@ -671,10 +673,10 @@ export const Prescriptions = () => {
             {isPrescriber && (
               <Dialog open={showNewPrescription} onOpenChange={setShowNewPrescription}>
                 <DialogTrigger asChild>
-                  <button className="vf-btn-primary gap-2 text-sm active:scale-95">
+                  <Button className="gap-2">
                     <Plus className="h-4 w-4" />
-                    <span>Write E-Prescription</span>
-                  </button>
+                    <span>Write e-prescription</span>
+                  </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-card p-6">
                   <DialogHeader>

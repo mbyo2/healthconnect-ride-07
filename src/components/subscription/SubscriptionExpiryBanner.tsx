@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import type { SubscriptionGateState } from "@/services/subscriptionStatus";
 
@@ -58,12 +59,12 @@ export function SubscriptionExpiryBanner({
         </div>
       </div>
       {isAdmin && (
-        <button
+        <Button
           onClick={() => navigate("/pricing")}
-          className="vf-btn-primary text-sm shrink-0"
+          className="shrink-0"
         >
           Renew subscription
-        </button>
+        </Button>
       )}
     </div>
   );

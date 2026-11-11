@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Building2, CheckCircle2, Hourglass, Ban, RotateCcw, Plus, Search, Loader2, Sparkles } from "lucide-react";
@@ -274,13 +275,12 @@ export const InstitutionModuleManager = () => {
                       <option key={c.module_key} value={c.module_key}>{c.module_name} ({c.module_key})</option>
                     ))}
                   </select>
-                  <button
+                  <Button
                     onClick={grantOffPlan}
                     disabled={!grantKey || !!saving}
-                    className="vf-btn-primary text-sm px-4"
                   >
                     {saving ? "…" : "Grant"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </>

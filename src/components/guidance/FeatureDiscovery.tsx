@@ -1,4 +1,5 @@
 import { X, Sparkles } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from 'react';
 
 interface FeatureDiscoveryProps {
@@ -86,15 +87,15 @@ export const FeatureDiscovery = ({
 
             <div className="flex items-center gap-2">
               {feature.action && (
-                <button
+                <Button
+                  size="sm"
                   onClick={() => {
                     feature.action!.onClick();
                     handleDismiss();
                   }}
-                  className="vf-btn-primary text-xs px-3 py-1.5"
                 >
                   {feature.action.label}
-                </button>
+                </Button>
               )}
               <button
                 onClick={handleDismiss}

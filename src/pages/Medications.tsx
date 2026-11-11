@@ -201,7 +201,7 @@ const Medications = () => {
           </div>
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button className="vf-btn-primary">
+            <Button>
               <Plus className="h-4 w-4" />
               Add Medication
             </Button>

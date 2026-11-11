@@ -828,13 +828,13 @@ export const ProviderDashboard = () => {
 
           <div className="flex items-center gap-2 flex-wrap">
             {hasRoutePermission(availableRoles, "/ai-diagnostics") && (
-              <button onClick={() => navigate("/ai-diagnostics")} className="vf-btn-secondary gap-2 text-sm">
+              <Button variant="outline" onClick={() => navigate("/ai-diagnostics")} className="gap-2">
                 <Bot className="h-3.5 w-3.5" /> Doc'O Clock AI
-              </button>
+              </Button>
             )}
-            <button onClick={() => navigate("/provider-calendar")} className="vf-btn-primary gap-2 text-sm">
+            <Button onClick={() => navigate("/provider-calendar")} className="gap-2">
               <Calendar className="h-3.5 w-3.5" /> Calendar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
