@@ -253,7 +253,7 @@ export default function TriageIntake() {
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label id="severity-label" className="font-semibold text-muted-foreground uppercase">How bad is it?</label>
-                  <span className="font-mono font-bold text-sm text-primary-500" aria-hidden="true">{severity}/10</span>
+                  <span className="font-bold tabular-nums text-sm text-foreground" aria-hidden="true">{severity}/10</span>
                 </div>
                 <Slider
                   value={[severity]}

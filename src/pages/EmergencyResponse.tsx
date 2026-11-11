@@ -210,7 +210,7 @@ const EmergencyResponse = () => {
                   <div>
                     <h4 className="font-semibold text-xs text-foreground">{contact.name}</h4>
                     <p className="text-xs text-muted-foreground">{contact.relationship || contact.relation}</p>
-                    <p className="text-xs font-mono font-semibold text-primary-500 mt-0.5">{contact.phone}</p>
+                    <p className="text-xs font-semibold tabular-nums text-foreground mt-0.5">{contact.phone}</p>
                   </div>
                   <button
                     onClick={() => callNumber(contact.phone)}

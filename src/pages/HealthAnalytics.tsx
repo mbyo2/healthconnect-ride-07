@@ -301,13 +301,17 @@ function KpiCard({ label, icon, value, caption, accent }: {
   caption: string | null;
   accent: string;
 }) {
+  // Anatomy (sweep 2026-11-11): vital values render in ink tabular
+  // figures — the per-vital `accent` colour prop is accepted for API
+  // compatibility but no longer colours the numeral (rainbow numerals
+  // were the old dialect).
   return (
     <div className="p-4 rounded-xl bg-card border border-border">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
         {icon}
       </div>
-      <div className={`text-2xl font-semibold font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+      <div className={`text-2xl font-bold tabular-nums ${value ? "text-foreground" : "text-muted-foreground"}`}>
         {value ?? "—"}
       </div>
       <div className="text-xs text-muted-foreground font-semibold mt-0.5">
@@ -325,8 +329,8 @@ function VitalsTile({ title, value, accent, caption }: {
 }) {
   return (
     <div className="p-4 rounded-xl border border-border bg-background">
-      <p className="font-semibold text-xs text-muted-foreground uppercase">{title}</p>
-      <p className={`text-3xl font-semibold font-mono mt-2 ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+      <p className="text-[13px] font-medium text-muted-foreground">{title}</p>
+      <p className={`text-3xl font-bold tabular-nums mt-2 ${value ? "text-foreground" : "text-muted-foreground"}`}>
         {value ?? "—"}
       </p>
       <p className="text-xs text-muted-foreground font-semibold mt-1">

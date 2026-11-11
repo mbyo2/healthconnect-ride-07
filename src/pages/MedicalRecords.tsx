@@ -347,7 +347,7 @@ export default function MedicalRecords() {
                       <div key={index} className="py-3 flex justify-between items-center">
                         <div>
                           <p className="font-semibold text-xs text-foreground">{metric.label}</p>
-                          <p className="text-xl font-semibold font-mono text-primary-500">{metric.value}</p>
+                          <p className="text-xl font-bold tabular-nums text-foreground">{metric.value}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">{metric.date}</p>
                         </div>
                         <div>

@@ -414,7 +414,7 @@ export const AppointmentsPage = () => {
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
             {isProvider && (
-              <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
+              <div className="text-[11px] tabular-nums text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
             )}
             {!isProvider && person?.specialty && (
               <div className="text-xs text-muted-foreground font-medium">{person.specialty}</div>
@@ -510,7 +510,7 @@ export const AppointmentsPage = () => {
                 : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
             </div>
             {isProvider && (
-              <div className="text-[11px] font-mono text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
+              <div className="text-[11px] tabular-nums text-muted-foreground mt-0.5">Ref {bookingRef(app)}</div>
             )}
             {!isProvider && person?.specialty && (
               <div className="text-xs text-muted-foreground font-medium mt-0.5">{person.specialty}</div>

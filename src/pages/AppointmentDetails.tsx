@@ -326,7 +326,7 @@ export const AppointmentDetails = () => {
                 <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
                   <div className="font-semibold text-muted-foreground uppercase">Time</div>
-                  <div className="font-mono font-semibold text-foreground">
+                  <div className="font-semibold tabular-nums text-foreground">
                     {String(appointment.time).slice(0, 5)}
                   </div>
                 </div>

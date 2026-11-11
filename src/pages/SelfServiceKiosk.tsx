@@ -719,7 +719,7 @@ export const SelfServiceKiosk: React.FC = () => {
             {billRef ? (
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500 text-center space-y-2">
                 <p className="text-[13px] font-medium text-muted-foreground">Bill Slip Ready</p>
-                <p className="text-lg font-bold font-mono text-foreground">{billRef}</p>
+                <p className="text-lg font-bold tabular-nums text-foreground">{billRef}</p>
                 <p className="text-2xl font-bold text-emerald-600">K{billAmount.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground dark:text-slate-300 font-medium">
                   Pay at the billing counter (cash / card / MoMo POS) or in the Doc' O Clock app using this reference.
@@ -761,7 +761,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
             <div>
               <span className="text-[13px] font-medium text-muted-foreground">Your Queue Token Number</span>
-              <div className="text-6xl font-bold font-mono text-primary-500 mt-2">
+              <div className="text-6xl font-bold tabular-nums text-foreground mt-2">
                 {generatedToken.number}
               </div>
               {generatedToken.alreadyCheckedIn && (

@@ -155,7 +155,7 @@ const BookingConfirmed = () => {
             ? "Your provider still needs to confirm this time."
             : "Your appointment has been scheduled successfully."}
         </p>
-        <p className="text-xs text-muted-foreground font-mono">Booking ref: {String(appointment.id).slice(0, 8)}</p>
+        <p className="text-xs text-muted-foreground tabular-nums">Booking ref: {String(appointment.id).slice(0, 8)}</p>
       </div>
 
       {/* Payment Status */}

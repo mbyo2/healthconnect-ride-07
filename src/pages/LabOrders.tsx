@@ -403,7 +403,7 @@ const LabOrders = () => {
                       <div>
                         <p className="text-sm font-semibold text-foreground">
                           {o.test_type}
-                          <span className="ml-2 font-mono text-xs text-slate-400">{o.test_number}</span>
+                          <span className="ml-2 tabular-nums text-xs text-slate-400">{o.test_number}</span>
                         </p>
                         <p className="text-xs text-slate-500">
                           {o.patient?.first_name} {o.patient?.last_name} · {o.lab?.name} ·
