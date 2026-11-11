@@ -41,7 +41,7 @@ export const RingGauge = ({
     >
       {(label || sublabel) && (
         <div className="mb-3 w-full text-left">
-          {label && <h3 className="font-display text-sm font-medium text-midnight">{label}</h3>}
+          {label && <h3 className="text-sm font-medium text-midnight">{label}</h3>}
           {sublabel && <p className="text-xs text-graphite-500">{sublabel}</p>}
         </div>
       )}
@@ -71,7 +71,7 @@ export const RingGauge = ({
         {(centerValue || centerLabel) && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             {centerValue && (
-              <p className="font-display text-2xl font-medium text-midnight leading-none">{centerValue}</p>
+              <p className="text-2xl font-medium text-midnight leading-none">{centerValue}</p>
             )}
             {centerLabel && <p className="text-xs text-graphite-500 mt-1">{centerLabel}</p>}
           </div>

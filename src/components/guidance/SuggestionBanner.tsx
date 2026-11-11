@@ -73,7 +73,7 @@ export const SuggestionBanner = ({
         )}
         
         <div className="flex-1 min-w-0">
-          <h3 className={`font-display font-medium text-sm ${style.title} mb-1`}>
+          <h3 className={`font-medium text-sm ${style.title} mb-1`}>
             {title}
           </h3>
           <p className="text-xs text-graphite-600 mb-3">

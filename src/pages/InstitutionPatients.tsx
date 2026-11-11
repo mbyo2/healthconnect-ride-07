@@ -100,7 +100,7 @@ const InstitutionPatients = () => {
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button"><Users className="h-5 w-5" /></div>
             <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight">Patients</h1>
+              <h1 className="text-2xl font-medium tracking-tight">Patients</h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">{patients.length} patient{patients.length !== 1 ? 's' : ''} · institutional scope</p>
             </div>
           </div>

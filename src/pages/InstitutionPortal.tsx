@@ -137,7 +137,7 @@ export const InstitutionPortal = () => {
               <Building2 className="h-8 w-8 text-primary-500" />
             </div>
           </div>
-          <h1 className="font-display text-3xl font-medium text-midnight">
+          <h1 className="text-3xl font-medium text-midnight">
             Healthcare Institution Portal
           </h1>
           <p className="text-base text-graphite-500 tracking-wide">

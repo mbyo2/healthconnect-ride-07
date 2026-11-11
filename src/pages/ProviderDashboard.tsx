@@ -816,7 +816,7 @@ export const ProviderDashboard = () => {
               <Stethoscope className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
                 {dashboardMeta.title}
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
@@ -844,22 +844,22 @@ export const ProviderDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Today's Consultations</div>
-            <div className="text-3xl font-display font-medium text-primary-500">{todayAppointments.length}</div>
+            <div className="text-3xl font-medium text-primary-500">{todayAppointments.length}</div>
             <div className="text-xs font-medium text-success-500">{completedToday.length} Done • {scheduledToday.length} Pending</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Weekly Patient Volume</div>
-            <div className="text-3xl font-display font-medium text-midnight">{weekStats?.total || 0}</div>
+            <div className="text-3xl font-medium text-midnight">{weekStats?.total || 0}</div>
             <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed this week</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Active Queue Status</div>
-            <div className="text-3xl font-display font-medium text-warning-500">{weekStats?.pending || 0}</div>
+            <div className="text-3xl font-medium text-warning-500">{weekStats?.pending || 0}</div>
             <div className="text-xs font-medium text-warning-500">Awaiting Triage</div>
           </div>
           <div className="vf-card space-y-3">
             <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-display font-medium text-success-500">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-3xl font-medium text-success-500">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-xs font-medium text-emerald-500">
               {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
                 ? "Collected this week"

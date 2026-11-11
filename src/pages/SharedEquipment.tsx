@@ -210,7 +210,7 @@ export default function SharedEquipment() {
       <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
         <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
           <div className="max-w-content mx-auto">
-            <h1 className="font-display text-2xl font-medium tracking-tight">Shared Equipment</h1>
+            <h1 className="text-2xl font-medium tracking-tight">Shared Equipment</h1>
             <p className="text-sm text-graphite-500 font-medium tracking-wide">
               Machines shared by verified institutions — request usage across facilities
             </p>

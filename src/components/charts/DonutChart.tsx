@@ -28,7 +28,7 @@ export const DonutChart = ({
   return (
     <div className="vf-card p-5">
       <div className="mb-4">
-        <h3 className="font-display text-sm font-medium text-midnight mb-1">{title}</h3>
+        <h3 className="text-sm font-medium text-midnight mb-1">{title}</h3>
         {subtitle && <p className="text-xs text-graphite-500">{subtitle}</p>}
       </div>
       <div className="relative">
@@ -65,7 +65,7 @@ export const DonutChart = ({
         </ResponsiveContainer>
         {centerLabel && centerValue && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <p className="text-2xl font-display font-medium text-midnight">{centerValue}</p>
+            <p className="text-2xl font-medium text-midnight">{centerValue}</p>
             <p className="text-xs text-graphite-500">{centerLabel}</p>
           </div>
         )}

@@ -63,7 +63,7 @@ const Wallet = () => {
                             <WalletIcon className="h-5 w-5" />
                         </div>
                         <div>
-                            <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+                            <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
                                 {isEarner ? "Earnings & Wallet" : "Healthcare Wallet"}
                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-white bg-success-500 dark:bg-emerald-600">
                                     <ShieldCheck className="h-3 w-3" /> {currency} · {getSymbol()} · Live FX

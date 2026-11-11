@@ -46,7 +46,7 @@ export const RecommendationCard = ({
         
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="font-display font-medium text-sm text-midnight">
+            <h3 className="font-medium text-sm text-midnight">
               {title}
             </h3>
             <div className="flex items-center gap-1.5 flex-shrink-0">

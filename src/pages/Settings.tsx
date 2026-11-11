@@ -349,7 +349,7 @@ const Settings = () => {
             <SettingsIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
               Settings
               <span className="w-2 h-2 rounded-full bg-success-500" />
             </h1>

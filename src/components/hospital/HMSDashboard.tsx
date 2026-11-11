@@ -138,7 +138,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
         {/* Bed Occupancy by Department */}
         <div className="vf-card p-5">
           <div className="mb-4">
-            <h3 className="font-display text-sm font-medium text-midnight">
+            <h3 className="text-sm font-medium text-midnight">
               Bed Occupancy by Department
             </h3>
             <p className="text-xs text-graphite-500 mt-1">Current status across all departments</p>
@@ -156,7 +156,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
         {/* Patient Distribution */}
         <div className="vf-card p-5">
           <div className="mb-4">
-            <h3 className="font-display text-sm font-medium text-midnight">
+            <h3 className="text-sm font-medium text-midnight">
               Patient Distribution
             </h3>
             <p className="text-xs text-graphite-500 mt-1">Current admissions by category</p>
@@ -173,7 +173,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
         {/* Weekly Admissions Trend */}
         <div className="vf-card p-5">
           <div className="mb-4">
-            <h3 className="font-display text-sm font-medium text-midnight flex items-center gap-2">
+            <h3 className="text-sm font-medium text-midnight flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary-500" />
               Weekly Admission Trends
             </h3>
@@ -192,7 +192,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
         {/* Revenue Breakdown */}
         <div className="vf-card p-5">
           <div className="mb-4">
-            <h3 className="font-display text-sm font-medium text-midnight">
+            <h3 className="text-sm font-medium text-midnight">
               Billing by Status
             </h3>
             <p className="text-xs text-graphite-500 mt-1">Invoiced amounts grouped by payment status</p>

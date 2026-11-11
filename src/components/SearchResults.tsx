@@ -83,7 +83,7 @@ export const SearchResults = () => {
       {/* Header with simple controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-midnight">
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-midnight">
             {providers.length > 0 
               ? `${totalCount} Healthcare Providers`
               : "No Providers Found"}

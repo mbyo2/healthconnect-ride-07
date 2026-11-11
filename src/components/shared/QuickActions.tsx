@@ -17,7 +17,7 @@ interface QuickActionsProps {
 export const QuickActions = ({ title = 'Quick Actions', actions }: QuickActionsProps) => {
   return (
     <div className="vf-card p-5">
-      <h3 className="font-display text-sm font-medium text-midnight mb-4">
+      <h3 className="text-sm font-medium text-midnight mb-4">
         {title}
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">

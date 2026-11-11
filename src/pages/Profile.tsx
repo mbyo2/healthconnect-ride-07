@@ -270,7 +270,7 @@ const Profile = () => {
             <div className="relative">
               <Avatar className="h-28 w-28 ring-4 ring-primary-500/20 shadow-card">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary-50 text-primary-500 text-2xl font-display font-medium">
+                <AvatarFallback className="bg-primary-50 text-primary-500 text-2xl font-medium">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -296,7 +296,7 @@ const Profile = () => {
 
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="font-display text-3xl font-medium text-midnight tracking-tight">
+                <h1 className="text-3xl font-medium text-midnight tracking-tight">
                   {[formData.firstName, formData.lastName].filter(Boolean).join(" ") || "Your Account"}
                 </h1>
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">

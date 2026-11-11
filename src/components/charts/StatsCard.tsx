@@ -28,7 +28,7 @@ export const StatsCard = ({
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
             {label}
           </p>
-          <p className="text-3xl font-display font-medium text-midnight mb-2">
+          <p className="text-3xl font-medium text-midnight mb-2">
             {value}
           </p>
           {change && (

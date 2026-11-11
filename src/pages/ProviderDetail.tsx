@@ -24,7 +24,7 @@ const Section = ({
   icon: Icon, title, children,
 }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
   <div className="p-5 rounded-2xl bg-card border border-border shadow-xs space-y-3">
-    <h3 className="font-display text-lg font-medium flex items-center gap-2 text-foreground">
+    <h3 className="text-lg font-medium flex items-center gap-2 text-foreground">
       <Icon className="h-4 w-4 text-primary-500" />
       {title}
     </h3>
@@ -279,7 +279,7 @@ export const ProviderDetail = () => {
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="font-display text-base font-medium tracking-tight truncate">{providerName}</h1>
+              <h1 className="text-base font-medium tracking-tight truncate">{providerName}</h1>
               <p className="text-xs text-primary-500 font-semibold truncate">{providerSpecialty}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -320,7 +320,7 @@ export const ProviderDetail = () => {
 
             <div className="flex-1 space-y-3 min-w-0">
               <div>
-                <h2 className="font-display text-3xl font-medium tracking-tight text-foreground">{providerName}</h2>
+                <h2 className="text-3xl font-medium tracking-tight text-foreground">{providerName}</h2>
                 <p className="text-sm text-primary-500 font-semibold mt-1">{providerSpecialty}</p>
                 <div className="mt-2">
                   <RatingDisplay rating={rating} reviewCount={reviewCount} size="md" />
@@ -513,7 +513,7 @@ export const ProviderDetail = () => {
 
               {/* Reviews */}
               <div className="p-5 rounded-2xl bg-card border border-border shadow-xs">
-                <h3 className="font-display text-lg font-medium text-foreground mb-3 flex items-center gap-2">
+                <h3 className="text-lg font-medium text-foreground mb-3 flex items-center gap-2">
                   <Star className="h-4 w-4 text-primary-500" /> Patient Reviews
                 </h3>
                 <ProviderReviews providerId={id} />

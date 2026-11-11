@@ -5,13 +5,13 @@ import React from "react";
  * (InstitutionDashboard + HospitalManagement).
  *
  * Token-styled: `doc-page-header` sticky bar, canvas surfaces, a
- * `font-display` title and a single 1600px content width so header, tabs
+ * clean sans title and a single 1600px content width so header, tabs
  * and page content line up across both shells. Everything shell-specific
  * (identity chip colour, badges, actions) is passed in as slots so each
  * shell keeps its existing elements and handlers.
  */
 export interface InstitutionPageHeaderProps {
-  /** Page title (usually the institution name). Rendered in font-display. */
+  /** Page title (usually the institution name). Rendered in the product sans. */
   title: React.ReactNode;
   /** Optional line under the title. */
   subtitle?: React.ReactNode;
@@ -25,7 +25,7 @@ export interface InstitutionPageHeaderProps {
   badges?: React.ReactNode;
   /** Action buttons rendered on the trailing side of the header. */
   actions?: React.ReactNode;
-  /** Title class overrides (defaults to the shared font-display ramp). */
+  /** Title class overrides (defaults to the shared ramp). */
   titleClassName?: string;
   /** Subtitle class overrides. */
   subtitleClassName?: string;
@@ -41,7 +41,7 @@ export const InstitutionPageHeader = ({
   iconStyle,
   badges,
   actions,
-  titleClassName = "font-display text-2xl font-medium tracking-tight text-midnight",
+  titleClassName = "text-2xl font-medium tracking-tight text-midnight",
   subtitleClassName = "text-sm text-muted-foreground font-medium tracking-wide",
   className = "py-4 shadow-2xs",
 }: InstitutionPageHeaderProps) => {

@@ -18,7 +18,7 @@ const Chat = () => {
               <MessageCircle className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight">Messages</h1>
+              <h1 className="text-2xl font-medium tracking-tight">Messages</h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 Secure chat with your providers — realtime and private
               </p>

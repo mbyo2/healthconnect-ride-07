@@ -26,7 +26,7 @@ export const NextStepsCard = ({
   return (
     <div className="vf-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display text-sm font-medium text-midnight">
+        <h3 className="text-sm font-medium text-midnight">
           {title}
         </h3>
         <span className="text-xs font-medium text-graphite-500">

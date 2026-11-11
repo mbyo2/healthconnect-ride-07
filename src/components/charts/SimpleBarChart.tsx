@@ -35,7 +35,7 @@ export const SimpleBarChart = ({
   return (
     <div className="vf-card p-5">
       <div className="mb-4">
-        <h3 className="font-display text-sm font-medium text-midnight mb-1">{title}</h3>
+        <h3 className="text-sm font-medium text-midnight mb-1">{title}</h3>
         {subtitle && <p className="text-xs text-graphite-500">{subtitle}</p>}
       </div>
       <ResponsiveContainer width="100%" height={height}>

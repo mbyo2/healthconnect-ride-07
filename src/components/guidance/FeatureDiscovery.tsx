@@ -68,7 +68,7 @@ export const FeatureDiscovery = ({
                 <span className="text-xs font-medium text-primary-600 uppercase tracking-wide">
                   New Feature
                 </span>
-                <h4 className="font-display font-medium text-sm text-midnight">
+                <h4 className="font-medium text-sm text-midnight">
                   {feature.title}
                 </h4>
               </div>

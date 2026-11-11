@@ -241,7 +241,7 @@ export const HospitalManagement = () => {
       <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
         <div className="max-w-md w-full vf-card text-center space-y-4">
           <Building2 className="h-12 w-12 mx-auto text-primary-500" />
-          <h2 className="font-display text-xl font-medium text-foreground">Setting Up Your Dashboard</h2>
+          <h2 className="text-xl font-medium text-foreground">Setting Up Your Dashboard</h2>
           <p className="text-sm text-muted-foreground">
             We couldn't load an institution workspace for this account. If you just
             registered a facility, refresh in a moment. If you're joining as staff,

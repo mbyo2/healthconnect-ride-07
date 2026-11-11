@@ -27,7 +27,7 @@ export default function HelpSupport() {
             <LifeBuoy className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-medium tracking-tight">Help & Support</h1>
+            <h1 className="text-2xl font-medium tracking-tight">Help & Support</h1>
             <p className="text-sm text-foreground font-medium tracking-wide">
               Search help articles or talk to our support team
             </p>

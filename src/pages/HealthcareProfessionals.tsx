@@ -184,7 +184,7 @@ const HealthcareProfessionals = () => {
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
         <div className="max-w-content mx-auto">
-          <h1 className="font-display text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-3">
             <User className="h-8 w-8 text-primary-500" />
             Healthcare Professionals
           </h1>

@@ -317,7 +317,7 @@ const VideoCall = () => {
         <div className="min-h-screen flex items-center justify-center p-6 bg-canvas">
           <div className="max-w-sm w-full vf-card text-center space-y-4">
             <VideoOff className="h-10 w-10 mx-auto text-error-500" />
-            <h1 className="font-display text-xl text-midnight">Cannot join this visit</h1>
+            <h1 className="text-xl text-midnight">Cannot join this visit</h1>
             <p className="text-sm text-graphite-500">{fatalError}</p>
             <div className="space-y-2">
               <Button onClick={() => window.location.reload()} className="w-full min-h-[44px]">

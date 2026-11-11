@@ -7,6 +7,11 @@ interface AppLogoProps {
   className?: string;
   onClick?: () => void;
   linkTo?: string;
+  /**
+   * Serif (Fraunces) wordmark — marketing/landing surfaces only. The
+   * product shell uses the default clean sans wordmark.
+   */
+  serifWordmark?: boolean;
 }
 
 export const AppLogo = ({
@@ -14,7 +19,8 @@ export const AppLogo = ({
   showText = true,
   className = "",
   onClick,
-  linkTo = "/"
+  linkTo = "/",
+  serifWordmark = false
 }: AppLogoProps) => {
   const sizeClasses = {
     sm: "w-8 h-8",
@@ -53,7 +59,8 @@ export const AppLogo = ({
       />
       {showText && (
         <span className={cn(
-          "font-display font-medium text-midnight whitespace-nowrap tracking-tight",
+          serifWordmark && "font-display",
+          "font-medium text-midnight whitespace-nowrap tracking-tight",
           textSizeClasses[size]
         )}>
           Doc&apos; O Clock

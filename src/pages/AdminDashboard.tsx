@@ -178,7 +178,7 @@ export const AdminDashboard = () => {
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2">
                 Executive Admin Dashboard
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
@@ -219,7 +219,7 @@ export const AdminDashboard = () => {
               <div className="space-y-5">
                 {/* Header */}
                 <div>
-                  <h2 className="font-display text-xl font-medium text-midnight mb-1">
+                  <h2 className="text-xl font-medium text-midnight mb-1">
                     Platform Overview
                   </h2>
                   <p className="text-sm text-graphite-500">
@@ -273,7 +273,7 @@ export const AdminDashboard = () => {
                   <div className="vf-card p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-display text-sm font-medium text-midnight">
+                        <h3 className="text-sm font-medium text-midnight">
                           User Growth Trends
                         </h3>
                         <p className="text-xs text-graphite-500 mt-1">
@@ -299,7 +299,7 @@ export const AdminDashboard = () => {
                   <div className="vf-card p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-display text-sm font-medium text-midnight">
+                        <h3 className="text-sm font-medium text-midnight">
                           Collected Revenue
                         </h3>
                         <p className="text-xs text-graphite-500 mt-1">
@@ -325,7 +325,7 @@ export const AdminDashboard = () => {
                   {/* User Distribution */}
                   <div className="vf-card p-5">
                     <div className="mb-4">
-                      <h3 className="font-display text-sm font-medium text-midnight">
+                      <h3 className="text-sm font-medium text-midnight">
                         User Type Distribution
                       </h3>
                       <p className="text-xs text-graphite-500 mt-1">
@@ -339,7 +339,7 @@ export const AdminDashboard = () => {
                   <div className="vf-card p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-display text-sm font-medium text-midnight">
+                        <h3 className="text-sm font-medium text-midnight">
                           Security Incidents
                         </h3>
                         <p className="text-xs text-graphite-500 mt-1">

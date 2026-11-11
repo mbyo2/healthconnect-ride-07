@@ -97,7 +97,7 @@ const SearchPage = () => {
                 <Stethoscope className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-medium tracking-tight">
+                <h1 className="text-2xl font-medium tracking-tight">
                   Find a Doctor
                 </h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">

@@ -655,7 +655,7 @@ export const Prescriptions = () => {
               <Pill className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2.5 text-midnight">
+              <h1 className="text-2xl font-medium tracking-tight flex items-center gap-2.5 text-midnight">
                 {isProvider ? "Prescription & Dispensing Board" : "My Medication Prescriptions"}
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
@@ -680,7 +680,7 @@ export const Prescriptions = () => {
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border rounded-card p-6">
                   <DialogHeader>
-                    <DialogTitle className="font-display text-xl font-medium text-midnight flex items-center gap-2">
+                    <DialogTitle className="text-xl font-medium text-midnight flex items-center gap-2">
                       <Pill className="h-6 w-6 text-primary-500" />
                       Write Multi-Medication E-Prescription
                     </DialogTitle>
