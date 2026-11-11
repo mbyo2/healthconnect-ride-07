@@ -497,8 +497,95 @@ export const InstitutionDashboard = () => {
     { label: "Revenue Collected (6mo)", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Payments ledger", color: "warning", icon: <TrendingUp className="h-5 w-5" /> },
   ];
 
+  // Mobile quick actions (PayPal app anatomy): the same actions the
+  // desktop header card carries as buttons, as pale-circle actions.
+  const mobileQuickActions = [
+    {
+      label: "Kiosk",
+      ariaLabel: "Open self-service kiosk (new tab)",
+      icon: <Ticket className="h-6 w-6" />,
+      onClick: () => window.open(`/kiosk?institution=${institution.id}`, "_blank", "noopener"),
+    },
+    {
+      label: "TV Screen",
+      ariaLabel: "Open public TV display (new tab)",
+      icon: <Tv className="h-6 w-6" />,
+      onClick: () => window.open(`/queue-display?institution=${institution.id}`, "_blank", "noopener"),
+    },
+    {
+      label: "Patients",
+      ariaLabel: "Open the Patient Hub tab",
+      icon: <UserRound className="h-6 w-6" />,
+      onClick: () => setActiveTab("patients"),
+    },
+    isAdmin
+      ? {
+          label: "Settings",
+          ariaLabel: "Open institution settings",
+          icon: <Settings className="h-6 w-6" />,
+          onClick: () => navigate("/institution/settings"),
+        }
+      : {
+          label: "Bookings",
+          ariaLabel: "Open institution appointments",
+          icon: <Calendar className="h-6 w-6" />,
+          onClick: () => navigate("/institution/appointments"),
+        },
+  ];
+
   return (
-    <div className="pb-16">
+    <div className="pb-40 min-[1025px]:pb-16">
+      {/* ─── Mobile head (PayPal APP anatomy, CEO screenshots 2026-11-11):
+          bold greeting-style header (institution name + one grey subline
+          — the badge pile-up stays on the desktop header card only),
+          ONE sky hero card for today, then pale-circle quick actions.
+          All three scroll away; only the tab bar sticks. md+ keeps the
+          InstitutionPageHeader card exactly as it was. ─── */}
+      <div className="md:hidden px-1 pb-5 space-y-5">
+        <div>
+          <h1 className="text-greeting text-foreground">{institution.name}</h1>
+          <p className="text-[13px] text-muted-foreground mt-1">
+            {format(new Date(), "EEEE, MMMM d")} · {institution.is_verified ? "Verified facility" : "Pending verification"} · {headerLabel} Dashboard
+          </p>
+        </div>
+
+        <section
+          aria-label="Today at your facility"
+          className="rounded-[24px] bg-[#60CDFF] dark:bg-card border border-[#60CDFF] dark:border-border p-5 text-slate-950 dark:text-foreground"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-[13px] font-medium text-slate-900/70 dark:text-muted-foreground">
+              Appointments today
+            </p>
+            <span className="h-9 w-9 rounded-full bg-white/30 dark:bg-muted flex items-center justify-center shrink-0" aria-hidden>
+              {cfg.icon}
+            </span>
+          </div>
+          <p className="text-heronum mt-2">{counts.todayAppointments}</p>
+          <p className="text-[13px] text-slate-900/70 dark:text-muted-foreground mt-1.5">
+            {counts.patients} patients · {counts.appointments} appointments · {institution.currency || "ZMW"} {(counts.revenue / 1000).toFixed(1)}k collected (6mo)
+          </p>
+        </section>
+
+        <div className="flex items-start justify-between px-1">
+          {mobileQuickActions.map((action) => (
+            <button
+              key={action.label}
+              onClick={action.onClick}
+              aria-label={action.ariaLabel}
+              className="flex flex-col items-center gap-1.5 w-16 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-full"
+            >
+              <span className="h-14 w-14 rounded-full bg-pill text-pill-foreground flex items-center justify-center">
+                {action.icon}
+              </span>
+              <span className="text-[12px] font-medium text-foreground text-center leading-tight">
+                {action.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Header + module tabs stick as ONE unit below the global header.
           They used to be two separate sticky bars at the same top offset
           (header card via .doc-page-header at z-40, tablist at z-20), so on
@@ -508,7 +595,7 @@ export const InstitutionDashboard = () => {
       <div className="sticky top-[4.5rem] z-40 bg-background">
       {/* Header */}
       <InstitutionPageHeader
-        className="py-5 shadow-sm [position:static]"
+        className="py-5 shadow-sm [position:static] max-md:hidden"
         icon={cfg.icon}
         iconClassName="shadow-button"
         iconStyle={{ background: cfg.color }}
@@ -603,7 +690,7 @@ export const InstitutionDashboard = () => {
                       { description: `Required module: ${rule?.requiredModules.join(" or ") || "—"}. Contact your administrator to enable it.` }
                     );
                   }}
-                  className="px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed"
+                  className="px-4 py-2.5 rounded-full text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors bg-muted/50 border border-border text-muted-foreground/50 cursor-not-allowed max-md:bg-transparent max-md:border-transparent"
                 >
                   <Lock className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -617,12 +704,12 @@ export const InstitutionDashboard = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 title={atypicalNote || undefined}
-                className={`px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors ${
+                className={`px-4 py-2.5 rounded-full text-xs font-medium flex items-center gap-2 whitespace-nowrap transition-colors ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-pill text-pill-foreground font-semibold md:bg-primary md:text-primary-foreground md:font-medium"
                     : isAtypical
-                      ? "bg-card border border-dashed border-border text-muted-foreground/60 hover:bg-muted hover:text-foreground hover:border-solid"
-                      : "bg-card border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-card border border-dashed border-border text-muted-foreground/60 hover:bg-muted hover:text-foreground hover:border-solid max-md:bg-transparent max-md:border-transparent"
+                      : "bg-card border border-border text-muted-foreground hover:bg-muted hover:text-foreground max-md:bg-transparent max-md:border-transparent"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -671,8 +758,30 @@ export const InstitutionDashboard = () => {
         {/* 1. Overview */}
         {activeTab === "overview" && (
           <div className="space-y-6">
-            {/* KPI Cards - Modern Design */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* KPI stats — mobile: ONE hairline list (PayPal app anatomy:
+                pale icon square, label + grey subline, bold value right),
+                not stacked cards. sm+ keeps the MetricCard grid. The list
+                mirrors the four cards' exact values. */}
+            <div className="sm:hidden rounded-2xl border border-border bg-card px-4 divide-y divide-border">
+              {[
+                { label: "Staff & Personnel", value: counts.personnel.toString(), sub: "Active members", icon: <Users className="h-5 w-5" /> },
+                { label: "Total Appointments", value: counts.appointments.toString(), sub: `${counts.todayAppointments} scheduled today`, icon: <Calendar className="h-5 w-5" /> },
+                { label: "Unique Patients", value: counts.patients.toString(), sub: "All time", icon: <UserRound className="h-5 w-5" /> },
+                { label: "Revenue Collected", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Last 6 months", icon: <TrendingUp className="h-5 w-5" /> },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center gap-3 py-3.5 min-h-16">
+                  <span className="h-10 w-10 rounded-xl bg-pill text-pill-foreground flex items-center justify-center shrink-0" aria-hidden>
+                    {row.icon}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{row.label}</p>
+                    <p className="text-[13px] text-muted-foreground">{row.sub}</p>
+                  </div>
+                  <span className="text-lg font-extrabold text-foreground">{row.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <MetricCard
                 title="Staff & Personnel"
                 value={counts.personnel.toString()}

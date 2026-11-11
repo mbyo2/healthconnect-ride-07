@@ -285,14 +285,21 @@ export default {
         'pill-nav': '0 8px 32px rgba(23, 23, 23, 0.08), 0 1px 0 rgba(255,255,255,0.8) inset',
       },
       fontFamily: {
-        // Fraunces ≈ Tiempos editorial serif; Figtree ≈ Selecta humanist sans
+        // Fraunces ≈ Tiempos editorial serif; Manrope = the app sans
+        // (bold geometric, PayPal-app character — CEO order 2026-11-11)
         serif: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
-        sans: ['Figtree', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
         display: ['Fraunces', 'Georgia', 'serif'],
       },
       fontSize: {
         'display': ['4rem', { lineHeight: '1', fontWeight: '300', letterSpacing: '-0.02em' }],
         'heading-lg': ['3.5rem', { lineHeight: '1.14', fontWeight: '300', letterSpacing: '-0.015em' }],
+        // PayPal-app type ramp for rebuilt product surfaces (2026-11-11):
+        // greeting = the bold "Adam H." header (28px/800), heronum = the
+        // hero card's headline number (40px/800). Fixed ramp — rebuilt
+        // surfaces use these, not ad-hoc sizes.
+        'greeting': ['1.75rem', { lineHeight: '1.15', fontWeight: '800', letterSpacing: '-0.02em' }],
+        'heronum': ['2.5rem', { lineHeight: '1', fontWeight: '800', letterSpacing: '-0.02em' }],
         '4xl': '2.25rem',
         '5xl': '3rem',
         '6xl': '3.75rem',

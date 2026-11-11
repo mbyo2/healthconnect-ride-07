@@ -407,20 +407,20 @@ export const PatientWorkflow = React.memo(() => {
   // MAIN HEALTH DASHBOARD (MATCHING THE ATTACHED SCREEN 2 REFERENCE)
   // ═══════════════════════════════════════════════════════════════════
   return (
-    <div className="space-y-6 sm:space-y-8 w-full pb-12">
+    <div className="space-y-6 sm:space-y-8 w-full pb-32 min-[1025px]:pb-12">
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
 
-      {/* ─── Greeting (PayPal anatomy, fidelity rebuild 2026-11-11):
-          bold black greeting, tight and left, date as the grey subline,
-          notifications as a plain pale circle — no header card, no
-          coloured band anywhere on this page. ─── */}
+      {/* ─── Greeting (PayPal APP anatomy, CEO screenshots 2026-11-11):
+          the bold "Adam H." header — greeting-ramp type (28px/800 on
+          mobile), date as the 13px grey subline, notifications as a
+          plain pale circle — no header card, no badge clutter. ─── */}
       <div className="flex items-start justify-between gap-4 px-1">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="text-greeting sm:text-3xl text-foreground">
             {greetingWord}{greetingName}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-[13px] text-muted-foreground mt-1">
             {format(new Date(), 'EEEE, MMMM d, yyyy')}
           </p>
         </div>
@@ -466,14 +466,17 @@ export const PatientWorkflow = React.memo(() => {
         </div>
       </div>
 
-      {/* ─── Summary modules (PayPal anatomy): Next appointment |
-          Wallet balance — two flat WHITE hairline cards side-by-side.
-          The navy band is retired; the appointment module keeps the
-          exact same data, states and tap behaviour. ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
+      {/* ─── Summary modules (PayPal APP anatomy): on mobile the WALLET
+          is the sky hero and leads (order-1); the Next appointment card
+          follows as a white hairline card with its pill action. At lg+
+          the desktop arrangement is unchanged: appointment left, wallet
+          right, both white modules. Same data, states and tap behaviour
+          everywhere. px-1 gives the rebuilt surface the 20px gutter
+          (16px layout column + 4px). ─── */}
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-5 lg:gap-6 items-start px-1 lg:px-0">
         <div
           onClick={() => upcomingError ? refetchUpcoming() : handleNavigation('/appointments', 'Appointments')}
-          className="group p-5 sm:p-6 rounded-2xl bg-card text-foreground border border-border flex flex-col justify-between gap-4 cursor-pointer h-full"
+          className="group order-2 lg:order-1 w-full p-5 sm:p-6 rounded-2xl bg-card text-foreground border border-border flex flex-col justify-between gap-4 cursor-pointer h-full"
         >
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -518,7 +521,9 @@ export const PatientWorkflow = React.memo(() => {
           </div>
         </div>
 
-        <WalletCard />
+        <div className="order-1 lg:order-2 w-full">
+          <WalletCard />
+        </div>
       </div>
 
       {/* ─── AI Symptom Triage — the page's primary action, now a white
@@ -600,7 +605,7 @@ export const PatientWorkflow = React.memo(() => {
                     : 'border-border hover:border-primary-500/40'
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
                   <spec.icon className="h-6 w-6 text-primary-500" aria-hidden />
                 </div>
                 <div>

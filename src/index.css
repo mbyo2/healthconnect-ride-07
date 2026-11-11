@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -350,17 +350,24 @@ main {
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Figtree', system-ui, -apple-system, sans-serif;
-    font-feature-settings: 'cv11', 'ss01';
+    /* App font (CEO order 2026-11-11, "even the font"): Manrope — a bold
+       geometric sans in the same character as PayPal's app type (very
+       heavy tight headings, clean body, confident numbers). One family
+       everywhere, like PayPal. Loaded via the Google Fonts @import at
+       the top of this file, the repo's existing font route. */
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Product UI is sans everywhere (Figtree via body). The editorial
+  /* Product UI is sans everywhere (Manrope via body). The editorial
      serif survives ONLY where a surface opts in with .font-display —
-     public/marketing pages — never as a global heading default. */
+     public/marketing pages — never as a global heading default.
+     Headings follow the PayPal ramp: 800 weight, tight -0.02em tracking
+     (explicit font classes on a heading still win over this base rule). */
   h1, h2, h3 {
-    letter-spacing: -0.01em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   .font-display {

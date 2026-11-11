@@ -93,28 +93,31 @@ export const WalletCard = () => {
     };
 
     return (
-        // PayPal anatomy (fidelity rebuild 2026-11-11): the wallet
-        // summary is a WHITE HAIRLINE module with blue pill actions —
-        // the solid blue band is retired.
-        <Card>
-            <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold flex items-center gap-2 text-muted-foreground uppercase tracking-widest">
+        // PayPal APP anatomy (CEO screenshots, 2026-11-11): on mobile the
+        // wallet IS the hero — one flat SKY card (#60CDFF, 24px radius,
+        // black text, black pill CTA) carrying the balance as the single
+        // headline number. In dark mode it becomes a dark hairline card.
+        // At lg+ the desktop arrangement is untouched: the white hairline
+        // module with blue pill actions from the fidelity rebuild.
+        <Card className="max-lg:rounded-[24px] max-lg:border-[#60CDFF] max-lg:bg-[#60CDFF] max-lg:text-slate-950 dark:max-lg:border-border dark:max-lg:bg-card dark:max-lg:text-card-foreground">
+            <CardHeader className="pb-2 max-lg:p-5 max-lg:pb-0">
+                <CardTitle className="text-xs font-bold flex items-center gap-2 text-muted-foreground uppercase tracking-widest max-lg:text-slate-900/70 dark:max-lg:text-muted-foreground">
                     <Wallet className="h-3.5 w-3.5" aria-hidden />
                     {isEarner ? "Earnings Balance" : "Wallet balance"}
                 </CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="max-lg:p-5 max-lg:pt-3">
                 <div className="flex flex-col gap-5">
                     <div>
-                        <div className="text-4xl font-bold tracking-tight text-foreground">
+                        <div className="text-heronum text-foreground max-lg:text-slate-950 dark:max-lg:text-foreground">
                             {isLoading ? (
                                 <Skeleton className="h-10 w-32 rounded-lg" />
                             ) : (
                                 formatPrice(balance ?? 0)
                             )}
                         </div>
-                        <p className="text-xs md:text-xs text-muted-foreground mt-1.5 font-medium flex items-center gap-1">
+                        <p className="text-[13px] text-muted-foreground mt-1.5 font-medium flex items-center gap-1 max-lg:text-slate-900/70 dark:max-lg:text-muted-foreground">
                             <ArrowUpRight className="h-3 w-3" />
                             {isEarner
                                 ? "Consultation earnings & payouts"
@@ -125,7 +128,7 @@ export const WalletCard = () => {
                     <div className="flex gap-3 mt-1">
                         <Button
                             size="sm"
-                            className="flex-1 font-bold h-11"
+                            className="flex-1 font-bold h-11 max-lg:bg-slate-950 max-lg:text-white max-lg:hover:bg-slate-900 dark:max-lg:bg-primary dark:max-lg:text-primary-foreground dark:max-lg:hover:bg-primary/90"
                             onClick={() => scrollToWalletSection('wallet-topup')}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
