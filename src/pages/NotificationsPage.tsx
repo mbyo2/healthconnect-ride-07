@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Bell, Check, CheckCheck, Trash2, Calendar, MessageSquare, AlertCircle, FileText, Pill, Users } from "lucide-react";
@@ -186,16 +187,27 @@ const NotificationsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+      <div className="pt-6">
+        <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">
-              Loading notification stream...
+            <div className="p-6 space-y-3" role="status" aria-label="Loading notifications">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full doc-shimmer shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 w-2/5 doc-shimmer rounded" />
+                    <div className="h-3 w-3/5 doc-shimmer rounded" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="p-12 text-center text-xs text-graphite-500 dark:text-slate-400">
-              <Bell className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-              <p className="font-bold">No notifications found.</p>
+            <div className="p-6">
+              <EmptyState
+                icon={Bell}
+                title="No notifications found"
+                description="You're all caught up. New notifications will appear here."
+              />
             </div>
           ) : (
             <div className="divide-y divide-canvas-silk">

@@ -380,10 +380,14 @@ const LabOrders = () => {
           </CardHeader>
           <CardContent>
             {ordersLoading ? (
-              <p className="text-xs text-slate-500">Loading orders…</p>
+              <div className="space-y-2.5 py-2" role="status" aria-label="Loading orders">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-10 w-full doc-shimmer rounded-lg" />
+                ))}
+              </div>
             ) : myOrders.length === 0 ? (
               <div className="py-6 text-center space-y-3">
-                <p className="text-xs text-slate-500">No lab orders yet.</p>
+                <p className="text-sm text-muted-foreground">No lab orders yet.</p>
                 <Button
                   onClick={() => document.getElementById("new-lab-order")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                   className="min-h-[44px]"

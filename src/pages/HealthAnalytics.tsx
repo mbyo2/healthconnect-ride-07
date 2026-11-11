@@ -223,8 +223,8 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Line type="monotone" dataKey="avg" stroke="#0073ea" strokeWidth={3} name="Average" />
-                          <Line type="monotone" dataKey="min" stroke="#00c875" strokeWidth={2} name="Min" />
+                          <Line type="monotone" dataKey="avg" stroke="#397dff" strokeWidth={3} name="Average" />
+                          <Line type="monotone" dataKey="min" stroke="#00a86b" strokeWidth={2} name="Min" />
                           <Line type="monotone" dataKey="max" stroke="#e2445c" strokeWidth={2} name="Max" />
                         </LineChart>
                       </ResponsiveContainer>
@@ -247,8 +247,8 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="steps" fill="#0073ea" name="Steps" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="calories" fill="#00c875" name="Calories" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="steps" fill="#397dff" name="Steps" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="calories" fill="#00a86b" name="Calories" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -270,7 +270,7 @@ const HealthAnalytics = () => {
                           <YAxis fontSize={11} />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="hours" fill="#a25ddc" name="Sleep hours" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="hours" fill="#94bfff" name="Sleep hours" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>

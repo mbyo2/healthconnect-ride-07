@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save, ShieldCheck, Building2, Activity, Globe, Stethoscope, CheckCircle2, Hourglass, Ban, Puzzle } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Building2, Activity, Globe, Stethoscope, CheckCircle2, Hourglass, Ban, Puzzle, AlertTriangle, Clock } from "lucide-react";
 import { InsuranceProvider } from "@/types/healthcare";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -603,13 +603,13 @@ const InstitutionSettings = () => {
                   Disable this to use the platform for internal HMS operations only.
                 </p>
                 {formData.payment_mode === 'own' && (
-                  <p className="text-xs text-amber-600 font-medium mt-2">
-                    ⚠️ Marketplace listing requires platform payment mode. Your request will need admin approval to switch.
+                  <p className="text-xs text-warning-700 dark:text-warning-300 font-medium mt-2 flex items-start gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-px" /> Marketplace listing requires platform payment mode. Your request will need admin approval to switch.
                   </p>
                 )}
                 {pendingListingRequest && (
-                  <p className="text-xs font-medium text-amber-600 mt-2">
-                    ⏳ Listing change requested{pendingListingRequest.created_at ? ` on ${new Date(pendingListingRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review
+                  <p className="text-xs font-medium text-warning-700 dark:text-warning-300 mt-2 flex items-start gap-1.5">
+                    <Clock className="h-3.5 w-3.5 shrink-0 mt-px" /> Listing change requested{pendingListingRequest.created_at ? ` on ${new Date(pendingListingRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review
                   </p>
                 )}
               </div>
@@ -659,8 +659,8 @@ const InstitutionSettings = () => {
                 stays in effect until the request is approved.
               </p>
               {pendingModeRequest ? (
-                <p className="text-xs font-medium text-amber-600 mt-3">
-                  ⏳ Switch to {pendingModeRequest.to_mode === 'platform' ? 'platform payments' : 'own-money (HMS only)'} mode
+                <p className="text-xs font-medium text-warning-700 dark:text-warning-300 mt-3 flex items-start gap-1.5">
+                  <Clock className="h-3.5 w-3.5 shrink-0 mt-px" /> Switch to {pendingModeRequest.to_mode === 'platform' ? 'platform payments' : 'own-money (HMS only)'} mode
                   requested{pendingModeRequest.created_at ? ` on ${new Date(pendingModeRequest.created_at).toLocaleDateString()}` : ''} — awaiting admin review.
                 </p>
               ) : (

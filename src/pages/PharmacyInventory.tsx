@@ -1,20 +1,18 @@
 import { MedicationInventory } from "@/components/pharmacy/MedicationInventory";
-import { Header } from "@/components/Header";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Package } from "lucide-react";
 
 const PharmacyInventoryPage = () => {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-20 pb-24 max-w-7xl">
+      <div>
+        <main>
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 bg-primary/10 rounded-xl">
-              <Package className="h-6 w-6 text-primary" />
+            <div className="h-10 w-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center shrink-0">
+              <Package className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Pharmacy & Medical Inventory</h1>
+              <h1 className="text-2xl font-semibold text-foreground">Pharmacy & medical inventory</h1>
               <p className="text-muted-foreground text-sm">
                 Add medications, manage stock levels, track batch numbers, and monitor expiration dates.
               </p>
