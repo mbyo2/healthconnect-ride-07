@@ -185,24 +185,26 @@ const ProviderCalendar = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-            <CalendarIcon className="h-8 w-8 text-primary" />
-            My Calendar
-          </h1>
-          <p className="text-muted-foreground">
-            Week of {format(currentWeekStart, 'MMM d, yyyy')}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <CalendarIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">My calendar</h1>
+            <p className="text-sm text-muted-foreground">
+              Week of {format(currentWeekStart, 'MMM d, yyyy')}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, -1))}
           >
-            Previous Week
+            Previous week
           </Button>
           <Button
             variant="outline"
@@ -211,7 +213,7 @@ const ProviderCalendar = () => {
             Today
           </Button>
           <Button onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}>
-            Next Week
+            Next week
           </Button>
         </div>
       </div>
@@ -221,12 +223,12 @@ const ProviderCalendar = () => {
         <DialogTrigger asChild>
           <Button>
             <Plus className="h-4 w-4 mr-2" />
-            Add Time Slot
+            Add time slot
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Time Slot</DialogTitle>
+            <DialogTitle>Add time slot</DialogTitle>
             <DialogDescription>Create a new available time slot for appointments</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
@@ -286,14 +288,14 @@ const ProviderCalendar = () => {
               <Button variant="outline" onClick={() => setShowAddSlotDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={addTimeSlot}>Add Slot</Button>
+              <Button onClick={addTimeSlot}>Add slot</Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Calendar Grid */}
-      <Card>
+      {/* Calendar Grid — desktop week view */}
+      <Card className="hidden lg:block">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <div className="min-w-[800px]">
@@ -324,8 +326,8 @@ const ProviderCalendar = () => {
                             ? appointment
                               ? 'bg-primary/10'
                               : slot.is_available
-                                ? 'bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/30'
-                                : 'bg-red-50 dark:bg-red-950/20'
+                                ? 'bg-success-500/10 hover:bg-success-500/15'
+                                : 'bg-error-500/10'
                             : 'hover:bg-muted/50'
                             }`}
                         >
@@ -370,6 +372,66 @@ const ProviderCalendar = () => {
         </CardContent>
       </Card>
 
+      {/* Mobile day list — stacked alternative to the 800px week grid */}
+      <div className="space-y-4 lg:hidden">
+        {weekDays.map((day) => {
+          const daySlots = timeSlots24h.slice(8, 20)
+            .map((time) => ({ time, slot: getSlotForDateTime(day, time) }))
+            .filter((entry) => entry.slot)
+            .map((entry) => ({ ...entry, appointment: entry.slot ? getAppointmentForSlot(entry.slot.id) : null }));
+          return (
+            <Card key={day.toISOString()}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">
+                  {format(day, 'EEEE')} <span className="text-muted-foreground font-normal">{format(day, 'MMM d')}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {daySlots.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No slots this day.</p>
+                ) : (
+                  daySlots.map(({ time, slot, appointment }) => (
+                    <div
+                      key={time}
+                      className={`flex items-center justify-between gap-2 rounded-lg border border-border p-2.5 ${
+                        appointment ? 'bg-primary/10' : slot!.is_available ? 'bg-success-500/10' : 'bg-error-500/10'
+                      }`}
+                    >
+                      <span className="text-sm font-medium tnum">{time}</span>
+                      {appointment ? (
+                        <Badge variant="default" className="text-xs">{appointment.patient_name}</Badge>
+                      ) : (
+                        <>
+                          <span className="text-xs text-muted-foreground">{slot!.is_available ? 'Available' : 'Blocked'}</span>
+                          <span className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="min-h-[44px] min-w-[44px] text-xs p-1"
+                              onClick={() => toggleSlotAvailability(slot!.id, slot!.is_available)}
+                            >
+                              {slot!.is_available ? 'Block' : 'Open'}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="min-h-[44px] min-w-[44px] p-1"
+                              onClick={() => deleteSlot(slot!.id)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
       {/* Legend */}
       <Card>
         <CardHeader>
@@ -377,15 +439,15 @@ const ProviderCalendar = () => {
         </CardHeader>
         <CardContent className="flex gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-50 dark:bg-green-950/20 border" />
+            <div className="w-4 h-4 rounded-sm bg-success-500/15 border border-border" />
             <span>Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-50 dark:bg-red-950/20 border" />
+            <div className="w-4 h-4 rounded-sm bg-error-500/15 border border-border" />
             <span>Blocked</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-primary/10 border" />
+            <div className="w-4 h-4 rounded-sm bg-primary/10 border border-border" />
             <span>Booked</span>
           </div>
         </CardContent>
