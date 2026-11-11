@@ -224,7 +224,7 @@ export default function TriageIntake() {
                 value={chiefComplaint}
                 onChange={(e) => setChiefComplaint(e.target.value)}
                 maxLength={500}
-                className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -235,7 +235,7 @@ export default function TriageIntake() {
                 placeholder="shortness of breath, sweating, mild nausea"
                 value={symptomsText}
                 onChange={(e) => setSymptomsText(e.target.value)}
-                className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -247,7 +247,7 @@ export default function TriageIntake() {
                   placeholder="e.g. 3 hours / 2 days"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
-                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -278,7 +278,7 @@ export default function TriageIntake() {
                 onChange={(e) => setExtraNotes(e.target.value)}
                 maxLength={2000}
                 rows={3}
-                className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -354,7 +354,7 @@ export default function TriageIntake() {
                 {result.providers.length === 0 && (
                   <button
                     onClick={() => navigate("/search")}
-                    className="w-full py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-primary-500 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                    className="w-full py-2.5 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-primary-500 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
                   >
                     Browse all doctors
                   </button>

@@ -773,7 +773,7 @@ export const Prescriptions = () => {
                           <div>
                             <label className="font-bold text-slate-700 dark:text-slate-300">Medication Name *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                               placeholder="e.g. Amoxicillin 500mg"
                               value={item.medication_name}
                               onChange={(e) => {
@@ -793,7 +793,7 @@ export const Prescriptions = () => {
                             <div>
                               <label className="font-bold text-slate-700 dark:text-slate-300">Dosage / Frequency *</label>
                               <input
-                                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                 placeholder="1 tablet 2x daily"
                                 value={item.dosage}
                                 onChange={(e) => handleUpdateMedication(item.id, "dosage", e.target.value)}
@@ -812,7 +812,7 @@ export const Prescriptions = () => {
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                   value={item.quantity}
                                   onChange={(e) => handleUpdateMedication(item.id, "quantity", parseInt(e.target.value) || 1)}
                                 />
@@ -822,7 +822,7 @@ export const Prescriptions = () => {
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                   value={item.duration_days}
                                   onChange={(e) => handleUpdateMedication(item.id, "duration_days", parseInt(e.target.value) || 1)}
                                 />
@@ -833,7 +833,7 @@ export const Prescriptions = () => {
                           <div>
                             <label className="font-bold text-slate-700 dark:text-slate-300">Instructions *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                               placeholder="e.g. Take with a glass of water after food"
                               value={item.instructions}
                               onChange={(e) => handleUpdateMedication(item.id, "instructions", e.target.value)}
@@ -951,7 +951,7 @@ export const Prescriptions = () => {
                       </div>
                       <textarea
                         rows={2}
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
                         placeholder="Additional notes, diagnosis or patient instructions..."
                         value={rxNotes}
                         onChange={(e) => setRxNotes(e.target.value)}
@@ -1126,7 +1126,7 @@ export const Prescriptions = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[950px]">
                   <thead>
-                    <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                    <tr className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-background">
                       <th className="py-2.5 px-4 w-[240px]">Medication Profile</th>
                       <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                       <th className="py-2.5 px-3 w-[180px]">Dosage &amp; Frequency</th>

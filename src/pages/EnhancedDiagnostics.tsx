@@ -191,7 +191,7 @@ export const EnhancedDiagnostics = () => {
       case "lab": return "bg-primary-500";
       case "radiology": return "bg-primary-500";
       case "both": return "bg-primary-500";
-      default: return "bg-graphite-500 dark:bg-slate-600";
+      default: return "bg-muted-foreground";
     }
   };
 
@@ -200,7 +200,7 @@ export const EnhancedDiagnostics = () => {
       case "stat": return "bg-error-500 text-white";
       case "urgent": return "bg-warning-500 text-white";
       case "routine": return "bg-primary-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -211,7 +211,7 @@ export const EnhancedDiagnostics = () => {
       case "approved": return "bg-success-500 text-white";
       case "pending": return "bg-warning-500 text-white";
       case "cancelled": return "bg-error-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -219,12 +219,12 @@ export const EnhancedDiagnostics = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced diagnostics.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access enhanced diagnostics.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -242,23 +242,23 @@ export const EnhancedDiagnostics = () => {
   const scheduledStaff = schedules.filter((s) => new Date(s.shift_date) >= new Date()).length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <FlaskConical className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Enhanced Diagnostics</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Lab & Radiology Order Management</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Lab & Radiology Order Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" /> New Order
                 </Button>
               </DialogTrigger>
@@ -268,7 +268,7 @@ export const EnhancedDiagnostics = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Patient</Label>
+                    <Label className="text-xs font-semibold">Patient</Label>
                     <Select
                       value={orderForm.patient_id}
                       onValueChange={(value) => setOrderForm({ ...orderForm, patient_id: value })}
@@ -282,7 +282,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Order Type</Label>
+                    <Label className="text-xs font-semibold">Order Type</Label>
                     <Select
                       value={orderForm.order_type}
                       onValueChange={(value) => setOrderForm({ ...orderForm, order_type: value })}
@@ -298,7 +298,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Priority</Label>
+                    <Label className="text-xs font-semibold">Priority</Label>
                     <Select
                       value={orderForm.priority}
                       onValueChange={(value) => setOrderForm({ ...orderForm, priority: value })}
@@ -314,7 +314,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Clinical Indication</Label>
+                    <Label className="text-xs font-semibold">Clinical Indication</Label>
                     <Textarea
                       value={orderForm.clinical_indication}
                       onChange={(e) => setOrderForm({ ...orderForm, clinical_indication: e.target.value })}
@@ -323,7 +323,7 @@ export const EnhancedDiagnostics = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Required By</Label>
+                    <Label className="text-xs font-semibold">Required By</Label>
                     <Input
                       type="date"
                       value={orderForm.required_by}
@@ -332,7 +332,7 @@ export const EnhancedDiagnostics = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Notes</Label>
+                    <Label className="text-xs font-semibold">Notes</Label>
                     <Textarea
                       value={orderForm.notes}
                       onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
@@ -340,7 +340,7 @@ export const EnhancedDiagnostics = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Order
                   </Button>
                 </div>
@@ -348,7 +348,7 @@ export const EnhancedDiagnostics = () => {
             </Dialog>
             <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="text-xs font-bold">
+                <Button variant="outline" className="text-xs font-semibold">
                   <Calendar className="h-4 w-4 mr-1" /> Schedule Staff
                 </Button>
               </DialogTrigger>
@@ -358,7 +358,7 @@ export const EnhancedDiagnostics = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Staff Member</Label>
+                    <Label className="text-xs font-semibold">Staff Member</Label>
                     <Select
                       value={scheduleForm.staff_id}
                       onValueChange={(value) => setScheduleForm({ ...scheduleForm, staff_id: value })}
@@ -372,7 +372,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Department</Label>
+                    <Label className="text-xs font-semibold">Department</Label>
                     <Select
                       value={scheduleForm.department_id}
                       onValueChange={(value) => setScheduleForm({ ...scheduleForm, department_id: value })}
@@ -388,7 +388,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Shift Date</Label>
+                    <Label className="text-xs font-semibold">Shift Date</Label>
                     <Input
                       type="date"
                       value={scheduleForm.shift_date}
@@ -398,7 +398,7 @@ export const EnhancedDiagnostics = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Start Time</Label>
+                      <Label className="text-xs font-semibold">Start Time</Label>
                       <Input
                         type="time"
                         value={scheduleForm.shift_start}
@@ -407,7 +407,7 @@ export const EnhancedDiagnostics = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">End Time</Label>
+                      <Label className="text-xs font-semibold">End Time</Label>
                       <Input
                         type="time"
                         value={scheduleForm.shift_end}
@@ -417,7 +417,7 @@ export const EnhancedDiagnostics = () => {
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Shift Type</Label>
+                    <Label className="text-xs font-semibold">Shift Type</Label>
                     <Select
                       value={scheduleForm.shift_type}
                       onValueChange={(value) => setScheduleForm({ ...scheduleForm, shift_type: value })}
@@ -435,7 +435,7 @@ export const EnhancedDiagnostics = () => {
                     </Select>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-bold">On Call</Label>
+                    <Label className="text-xs font-semibold">On Call</Label>
                     <input
                       type="checkbox"
                       checked={scheduleForm.is_on_call}
@@ -444,7 +444,7 @@ export const EnhancedDiagnostics = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Notes</Label>
+                    <Label className="text-xs font-semibold">Notes</Label>
                     <Textarea
                       value={scheduleForm.notes}
                       onChange={(e) => setScheduleForm({ ...scheduleForm, notes: e.target.value })}
@@ -452,7 +452,7 @@ export const EnhancedDiagnostics = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateSchedule} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateSchedule} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Schedule
                   </Button>
                 </div>
@@ -462,53 +462,53 @@ export const EnhancedDiagnostics = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Orders</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{pendingOrders}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{pendingOrders}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">In Progress</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{inProgressOrders}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently processing</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{inProgressOrders}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently processing</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Completed Today</span>
                 <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">{completedToday}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Results delivered</div>
+              <div className="text-2xl font-semibold font-mono text-success-500">{completedToday}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Results delivered</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Scheduled Staff</span>
                 <Users className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">{scheduledStaff}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Upcoming shifts</div>
+              <div className="text-2xl font-semibold font-mono text-warning-500">{scheduledStaff}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Upcoming shifts</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="orders" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FlaskConical className="h-4 w-4 mr-2" /> Diagnostic Orders
             </TabsTrigger>
@@ -561,28 +561,28 @@ export const EnhancedDiagnostics = () => {
               </div>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-border shadow-xs overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                <thead className="bg-canvas-mist dark:bg-slate-800">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Order #</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Patient</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Type</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Priority</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Tests</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Ordered</th>
-                    <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Order #</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Patient</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Type</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Priority</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Tests</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Ordered</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.map((order) => (
-                    <tr key={order.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                    <tr key={order.id} className="border-t border-border hover:bg-muted/50">
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">{order.order_number}</div>
+                        <div className="text-xs font-semibold">{order.order_number}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-xs font-bold">
+                        <div className="text-xs font-semibold">
                           {order.patient?.first_name} {order.patient?.last_name}
                         </div>
                       </td>
@@ -602,7 +602,7 @@ export const EnhancedDiagnostics = () => {
                           {order.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(order.ordered_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -624,14 +624,14 @@ export const EnhancedDiagnostics = () => {
 
           {/* Results Management Tab */}
           <TabsContent value="results" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary-500" /> Results Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                   Results management interface placeholder - Review and approve diagnostic results
                 </div>
               </CardContent>
@@ -661,7 +661,7 @@ export const EnhancedDiagnostics = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {schedules.map((schedule) => (
-                <Card key={schedule.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={schedule.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -672,7 +672,7 @@ export const EnhancedDiagnostics = () => {
                           <CardTitle className="text-sm font-semibold">
                             {schedule.staff?.first_name} {schedule.staff?.last_name}
                           </CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">{schedule.staff?.specialty}</div>
+                          <div className="text-xs text-muted-foreground">{schedule.staff?.specialty}</div>
                         </div>
                       </div>
                       {schedule.is_on_call && (
@@ -682,19 +682,19 @@ export const EnhancedDiagnostics = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Date</span>
-                      <span className="font-bold">{new Date(schedule.shift_date).toLocaleDateString()}</span>
+                      <span className="text-muted-foreground">Date</span>
+                      <span className="font-semibold">{new Date(schedule.shift_date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Shift</span>
-                      <span className="font-bold">{schedule.shift_start} - {schedule.shift_end}</span>
+                      <span className="text-muted-foreground">Shift</span>
+                      <span className="font-semibold">{schedule.shift_start} - {schedule.shift_end}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Type</span>
+                      <span className="text-muted-foreground">Type</span>
                       <Badge variant="outline" className="text-xs">{schedule.shift_type}</Badge>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {schedule.assigned_patients.length} patients assigned
                       </div>
                       <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
@@ -709,14 +709,14 @@ export const EnhancedDiagnostics = () => {
 
           {/* Telemedicine Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Video className="h-4 w-4 text-primary-500" /> Telemedicine-Diagnostic Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                   Telemedicine integration interface placeholder - Order diagnostics during video consultations
                 </div>
               </CardContent>

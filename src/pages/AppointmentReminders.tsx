@@ -113,11 +113,11 @@ const AppointmentRemindersPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      <div className="pb-16">
         {/* Sticky Monday Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-          <div className="max-w-[1500px] mx-auto flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -125,35 +125,35 @@ const AppointmentRemindersPage = () => {
                 Appointment Reminders & Calendar Sync
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Timed reminders follow the channels you enable below. Sync visits to iCal / Google Calendar.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        <div className="px-4 sm:px-6 pt-6 space-y-6">
           {/* Reminder Channel Preferences */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
               <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
-              {prefsLoading && <span className="text-xs font-medium text-graphite-400">Loading…</span>}
+              {prefsLoading && <span className="text-xs font-medium text-muted-foreground">Loading…</span>}
             </h2>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-primary-500">
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-semibold text-xs">Email Notifications</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
+                  <p className="text-xs text-muted-foreground">Sent to registered patient email address</p>
                 </div>
               </div>
               <Switch checked={emailReminders} onCheckedChange={setEmailReminders} aria-label="Email notifications" />
             </div>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-success-500">
                   <MessageSquare className="h-4 w-4" />
@@ -161,22 +161,22 @@ const AppointmentRemindersPage = () => {
                 <div>
                   <p className="font-semibold text-xs flex items-center gap-2">
                     SMS Text Reminders
-                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-xs font-bold">Coming soon</span>
+                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-xs font-semibold">Coming soon</span>
                   </p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
+                  <p className="text-xs text-muted-foreground">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
                 </div>
               </div>
               <Switch checked={smsReminders} disabled aria-label="SMS text reminders (coming soon — no live gateway yet)" />
             </div>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-primary-500">
                   <Smartphone className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-semibold text-xs">Push Notifications</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
+                  <p className="text-xs text-muted-foreground">Browser push & mobile app push alerts</p>
                 </div>
               </div>
               <Switch checked={pushReminders} onCheckedChange={setPushReminders} aria-label="Push notifications" />
@@ -192,15 +192,15 @@ const AppointmentRemindersPage = () => {
           </div>
 
           {/* Upcoming Visits & Calendar Sync */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <h2 className="font-semibold text-sm flex items-center gap-2 border-b border-border pb-3">
               <Calendar className="h-4 w-4 text-success-500" /> Upcoming Visits & iCal Export
             </h2>
 
             {upcomingLoading ? (
               <div className="space-y-3">
                 {[0, 1].map((i) => (
-                  <div key={i} className="h-20 rounded-xl bg-canvas dark:bg-slate-950 animate-pulse" />
+                  <div key={i} className="h-20 rounded-xl bg-background animate-pulse" />
                 ))}
               </div>
             ) : upcomingError ? (
@@ -214,13 +214,13 @@ const AppointmentRemindersPage = () => {
                 </Button>
               </div>
             ) : upcoming.length === 0 ? (
-              <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
+              <div className="text-center py-10 text-xs text-muted-foreground">
                 <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                <p className="font-bold">No upcoming appointments scheduled.</p>
+                <p className="font-semibold">No upcoming appointments scheduled.</p>
                 <Button
                   variant="link"
                   onClick={() => navigate("/search")}
-                  className="mt-3 px-3 py-2.5 min-h-[44px] text-xs font-bold text-primary-500"
+                  className="mt-3 px-3 py-2.5 min-h-[44px] text-xs font-semibold text-primary-500"
                 >
                   Book an appointment now
                 </Button>
@@ -230,15 +230,15 @@ const AppointmentRemindersPage = () => {
                 {upcoming.map((apt: any) => (
                   <div
                     key={apt.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-border bg-canvas gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-white dark:bg-slate-800 rounded-xl text-primary-500 border border-canvas-silk dark:border-slate-800">
+                      <div className="p-2.5 bg-white dark:bg-slate-800 rounded-xl text-primary-500 border border-border">
                         <Clock className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{apt.type || "Medical Consultation"}</p>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                        <p className="font-semibold text-xs text-foreground">{apt.type || "Medical Consultation"}</p>
+                        <p className="text-xs text-muted-foreground font-medium">
                           {new Date(apt.date).toLocaleDateString()} at {apt.time}
                         </p>
                       </div>

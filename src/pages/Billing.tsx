@@ -325,7 +325,7 @@ export const Billing = () => {
           invoices.map((invoice) => (
             <Card key={invoice.id}>
               <CardContent className="p-4">
-                <div className="flex justify-between items-start">
+                <div className="flex flex-wrap justify-between items-start gap-3">
                   <div>
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold">{invoice.invoice_number}</h3>
@@ -334,12 +334,12 @@ export const Billing = () => {
                     <p className="text-sm text-muted-foreground mt-1">
                       {invoice.patient_name} • {new Date(invoice.created_at).toLocaleDateString()}
                     </p>
-                    <p className="text-lg font-bold mt-2">{formatPrice(invoice.total_amount)}</p>
+                    <p className="text-lg font-semibold tnum mt-2">{formatPrice(invoice.total_amount)}</p>
                     {invoice.balance > 0 && (
                       <p className="text-sm text-muted-foreground">Balance: {formatPrice(invoice.balance)}</p>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="outline" size="sm" className="min-h-[44px]" onClick={() => setShowReceipt(invoice)}>
                       <Receipt className="h-4 w-4 mr-1" /> Receipt
                     </Button>
@@ -353,7 +353,7 @@ export const Billing = () => {
                             This facility handles its own payments — please pay them directly.
                           </p>
                         ) : (
-                          <Button size="sm" className="min-h-[44px] bg-blue-600 hover:bg-blue-700" onClick={() => handlePayOnline(invoice)}>
+                          <Button size="sm" className="min-h-[44px]" onClick={() => handlePayOnline(invoice)}>
                             <CheckCircle className="h-4 w-4 mr-1" /> Pay Online
                           </Button>
                         )}

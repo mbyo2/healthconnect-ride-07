@@ -542,7 +542,7 @@ export const PatientRegistration = () => {
               <Phone className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-semibold">Emergency Contact</h3>
             </div>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">In case of emergency, who should we contact?</p>
+            <p className="text-xs text-muted-foreground">In case of emergency, who should we contact?</p>
             <FormField
               control={emergencyContactForm.control}
               name="emergencyName"
@@ -614,7 +614,7 @@ export const PatientRegistration = () => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-xs font-bold">I have health insurance</FormLabel>
+                    <FormLabel className="text-xs font-semibold">I have health insurance</FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -682,7 +682,7 @@ export const PatientRegistration = () => {
               <Heart className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-semibold">Medical History</h3>
             </div>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">This information helps your healthcare provider give you better care.</p>
+            <p className="text-xs text-muted-foreground">This information helps your healthcare provider give you better care.</p>
 
             <FormField
               control={medicalHistoryForm.control}
@@ -693,7 +693,7 @@ export const PatientRegistration = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-xs font-bold">I have allergies</FormLabel>
+                    <FormLabel className="text-xs font-semibold">I have allergies</FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -721,7 +721,7 @@ export const PatientRegistration = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-xs font-bold">I have chronic conditions</FormLabel>
+                    <FormLabel className="text-xs font-semibold">I have chronic conditions</FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -749,7 +749,7 @@ export const PatientRegistration = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-xs font-bold">I have had surgeries</FormLabel>
+                    <FormLabel className="text-xs font-semibold">I have had surgeries</FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -844,7 +844,7 @@ export const PatientRegistration = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-xs font-bold">
+                    <FormLabel className="text-xs font-semibold">
                       I agree to the Terms of Service and Privacy Policy
                     </FormLabel>
                   </div>
@@ -861,7 +861,7 @@ export const PatientRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 font-sans">
       <Card className="w-full max-w-2xl shadow-md">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between mb-2">
@@ -873,7 +873,7 @@ export const PatientRegistration = () => {
             >
               <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back
             </Button>
-            <div className="text-xs font-bold text-graphite-500 dark:text-slate-400">
+            <div className="text-xs font-semibold text-muted-foreground">
               Step {currentStep} of {totalSteps}
             </div>
           </div>

@@ -95,7 +95,7 @@ export default function MedicalRecords() {
       case "Active":
         return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-primary-500 bg-primary-50 border border-primary-100">{status}</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-graphite-500 bg-graphite-50 border border-graphite-200">{status}</span>;
+        return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-muted-foreground bg-graphite-50 border border-graphite-200">{status}</span>;
     }
   };
 
@@ -111,13 +111,13 @@ export default function MedicalRecords() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 font-sans">
+      <div className="min-h-screen bg-background p-6 font-sans">
         <div className="max-w-content mx-auto space-y-4" role="status" aria-label="Loading your health records">
           <Skeleton className="h-10 w-64 rounded-xl" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 rounded-2xl border border-canvas-silk bg-white px-5 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
+            <div className="lg:col-span-2 rounded-2xl border border-border bg-white px-5 dark:border-slate-800 dark:bg-slate-900" aria-hidden>
               {[0, 1, 2, 3].map((i) => (
-                <SkeletonListRow key={i} className="border-b border-canvas-silk py-4 last:border-0 dark:border-slate-800" />
+                <SkeletonListRow key={i} className="border-b border-border py-4 last:border-0 dark:border-slate-800" />
               ))}
             </div>
             <SkeletonCard className="h-64">
@@ -137,10 +137,10 @@ export default function MedicalRecords() {
   if (loadError) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
-          <div className="max-w-md w-full rounded-2xl border border-destructive/30 bg-white dark:bg-slate-900 p-8 text-center space-y-3">
+        <div className="min-h-screen bg-background flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full rounded-2xl border border-destructive/30 bg-card p-8 text-center space-y-3">
             <p className="font-semibold text-sm">We couldn&apos;t load your health records</p>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Check your connection and try again.</p>
+            <p className="text-xs text-muted-foreground">Check your connection and try again.</p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold"
@@ -155,7 +155,7 @@ export default function MedicalRecords() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      <div className="min-h-screen bg-canvas text-foreground font-sans transition-colors pb-16">
         {/* Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
           <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -168,7 +168,7 @@ export default function MedicalRecords() {
                   My Health Records
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-sm text-graphite-500 font-medium tracking-wide">
+                <p className="text-sm text-muted-foreground font-medium tracking-wide">
                   Your visits, lab results, and prescriptions in one place
                 </p>
               </div>
@@ -204,9 +204,9 @@ export default function MedicalRecords() {
         </div>
 
         {/* Content Body */}
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        <div className="px-4 sm:px-6 pt-6 space-y-6">
           {/* AI Insights for Medical Records */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <AIInsightsWidget
               context="records"
               data={{
@@ -217,34 +217,34 @@ export default function MedicalRecords() {
           </div>
 
           {/* Comprehensive Medical Records Section */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <ComprehensiveMedicalRecords />
           </div>
 
           {/* Lab results + medication administration (live data) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
               <PatientLabResults />
             </div>
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
               <PatientMAR />
             </div>
           </div>
 
           {/* Mood screening history (PHQ-9) — standalone section */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
             <PatientPHQ9History />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Records */}
-            <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-              <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+            <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-primary-500" />
                   Recent Diagnostic & Consultation Records
                 </h2>
-                <span className="text-xs text-graphite-500 dark:text-slate-400 font-bold">{records.length} records</span>
+                <span className="text-xs text-muted-foreground font-semibold">{records.length} records</span>
               </div>
 
               <div className="space-y-2">
@@ -252,15 +252,15 @@ export default function MedicalRecords() {
                   records.map((record) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors"
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-canvas-silk dark:border-slate-800">
+                        <div className="p-2.5 bg-card rounded-lg border border-border">
                           {getTypeIcon(record.type)}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+                          <h3 className="font-semibold text-xs text-foreground">{record.title}</h3>
+                          <p className="text-xs text-muted-foreground font-medium mt-0.5">
                             {record.provider} • {new Date(record.date).toLocaleDateString()}
                           </p>
                         </div>
@@ -271,7 +271,7 @@ export default function MedicalRecords() {
                           onClick={() => downloadRecord(record)}
                           aria-label={`Download record: ${record.title}`}
                           title="Download record (JSON)"
-                          className="p-3 min-h-[44px] min-w-[44px] rounded-lg border border-graphite-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
+                          className="p-3 min-h-[44px] min-w-[44px] rounded-lg border border-border dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
                         >
                           <Download className="h-3.5 w-3.5" />
                         </button>
@@ -280,12 +280,12 @@ export default function MedicalRecords() {
                   ))
                 ) : (
                   <div className="text-center py-10 space-y-3">
-                    <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                    <p className="text-xs text-muted-foreground font-medium">
                       No medical records found yet. Records from your providers appear here automatically after each visit.
                     </p>
                     <button
                       onClick={() => navigate('/ai-diagnostics')}
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
                     >
                       Scan your first document
                     </button>
@@ -296,12 +296,12 @@ export default function MedicalRecords() {
 
             {/* Health Metrics & FHIR Export */}
             <div className="space-y-6">
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                 <FHIRExportPanel />
               </div>
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <PatientPortal />
                 </div>
               )}
@@ -321,19 +321,19 @@ export default function MedicalRecords() {
               )}
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <HealthHistoryTransfer patientId={user.id} />
                 </div>
               )}
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <FHIRImportPanel patientId={user.id} />
                 </div>
               )}
 
-              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-                <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+                <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
                   <h2 className="font-semibold text-sm flex items-center gap-2">
                     <Activity className="h-4 w-4 text-success-500" />
                     Vital Sign Metrics
@@ -343,11 +343,11 @@ export default function MedicalRecords() {
                 <div className="space-y-3">
                   {healthMetrics.length > 0 ? (
                     healthMetrics.map((metric, index) => (
-                      <div key={index} className="p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 flex justify-between items-center">
+                      <div key={index} className="p-3 rounded-xl border border-border bg-background flex justify-between items-center">
                         <div>
-                          <p className="font-bold text-xs text-slate-700 dark:text-slate-300">{metric.label}</p>
-                          <p className="text-xl font-bold font-mono text-primary-500">{metric.value}</p>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{metric.date}</p>
+                          <p className="font-semibold text-xs text-foreground">{metric.label}</p>
+                          <p className="text-xl font-semibold font-mono text-primary-500">{metric.value}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{metric.date}</p>
                         </div>
                         <div>
                           {getStatusPill(metric.status)}
@@ -356,12 +356,12 @@ export default function MedicalRecords() {
                     ))
                   ) : (
                     <div className="text-center py-6 space-y-3">
-                      <p className="text-xs text-graphite-500 dark:text-slate-400">
+                      <p className="text-xs text-muted-foreground">
                         No health metrics recorded yet.
                       </p>
                       <button
                         onClick={() => navigate('/iot-monitoring')}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
                       >
                         Record vitals
                       </button>
@@ -371,19 +371,19 @@ export default function MedicalRecords() {
               </div>
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <VitalsFlowsheet patientId={user.id} />
                 </div>
               )}
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <ProblemList patientId={user.id} canEdit={false} />
                 </div>
               )}
 
               {user?.id && (
-                <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
                   <ClinicalReminders patientId={user.id} />
                 </div>
               )}
@@ -391,25 +391,25 @@ export default function MedicalRecords() {
           </div>
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
             <h2 className="font-semibold text-sm mb-3">Quick EHR Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <button
                 onClick={() => navigate('/appointments')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
               >
                 <Calendar className="h-4 w-4 text-primary-500" />
                 <span>Schedule Checkup</span>
               </button>
               <button
                 onClick={() => toast.info("Records from your providers appear here automatically after each visit.")}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
                 <FileText className="h-4 w-4 text-purple-500" />
                 <span>Request Records</span>
               </button>
               <button
                 onClick={() => navigate('/health-dashboard')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-semibold"
               >
                 <Heart className="h-4 w-4 text-error-500" />
                 <span>Health Summary</span>

@@ -128,7 +128,7 @@ const Landing = () => {
                   <Link
                     key={chip.label}
                     to={`/triage?area=${chip.area}`}
-                    className="px-3.5 py-2 rounded-full border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-300 transition-all"
+                    className="px-3.5 py-2 rounded-full border border-border dark:border-slate-700 text-xs font-semibold hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-300 transition-all"
                   >
                     {chip.label}
                   </Link>

@@ -182,7 +182,7 @@ export const ProcedureManagement = () => {
       case "radiology": return "bg-warning-500";
       case "surgery": return "bg-error-500";
       case "therapy": return "bg-primary-500";
-      default: return "bg-graphite-500 dark:bg-slate-600";
+      default: return "bg-muted-foreground";
     }
   };
 
@@ -192,8 +192,8 @@ export const ProcedureManagement = () => {
       case "in_progress": return "bg-primary-500 text-white";
       case "scheduled": return "bg-warning-500 text-white";
       case "complications": return "bg-error-500 text-white";
-      case "cancelled": return "bg-graphite-500 dark:bg-slate-600 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      case "cancelled": return "bg-muted-foreground text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -212,23 +212,23 @@ export const ProcedureManagement = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Activity className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Procedure Management</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Clinical Procedures & Pricing Configuration</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Clinical Procedures & Pricing Configuration</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showProcedureDialog} onOpenChange={setShowProcedureDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" /> New Procedure
                 </Button>
               </DialogTrigger>
@@ -238,7 +238,7 @@ export const ProcedureManagement = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Procedure Code</Label>
+                    <Label className="text-xs font-semibold">Procedure Code</Label>
                     <Input
                       value={procedureForm.procedure_code}
                       onChange={(e) => setProcedureForm({ ...procedureForm, procedure_code: e.target.value })}
@@ -247,7 +247,7 @@ export const ProcedureManagement = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Procedure Name</Label>
+                    <Label className="text-xs font-semibold">Procedure Name</Label>
                     <Input
                       value={procedureForm.procedure_name}
                       onChange={(e) => setProcedureForm({ ...procedureForm, procedure_name: e.target.value })}
@@ -256,7 +256,7 @@ export const ProcedureManagement = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Category</Label>
+                    <Label className="text-xs font-semibold">Category</Label>
                     <Select
                       value={procedureForm.category}
                       onValueChange={(value) => setProcedureForm({ ...procedureForm, category: value })}
@@ -276,7 +276,7 @@ export const ProcedureManagement = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Base Price</Label>
+                      <Label className="text-xs font-semibold">Base Price</Label>
                       <Input
                         type="number"
                         value={procedureForm.base_price}
@@ -285,7 +285,7 @@ export const ProcedureManagement = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Duration (min)</Label>
+                      <Label className="text-xs font-semibold">Duration (min)</Label>
                       <Input
                         type="number"
                         value={procedureForm.duration_minutes}
@@ -295,7 +295,7 @@ export const ProcedureManagement = () => {
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Description</Label>
+                    <Label className="text-xs font-semibold">Description</Label>
                     <Textarea
                       value={procedureForm.description}
                       onChange={(e) => setProcedureForm({ ...procedureForm, description: e.target.value })}
@@ -305,21 +305,21 @@ export const ProcedureManagement = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Requires Prior Authorization</Label>
+                      <Label className="text-xs font-semibold">Requires Prior Authorization</Label>
                       <Switch
                         checked={procedureForm.requires_prior_authorization}
                         onCheckedChange={(checked) => setProcedureForm({ ...procedureForm, requires_prior_authorization: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Requires Preparation</Label>
+                      <Label className="text-xs font-semibold">Requires Preparation</Label>
                       <Switch
                         checked={procedureForm.requires_preparation}
                         onCheckedChange={(checked) => setProcedureForm({ ...procedureForm, requires_preparation: checked })}
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateProcedure} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateProcedure} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Procedure
                   </Button>
                 </div>
@@ -328,7 +328,7 @@ export const ProcedureManagement = () => {
             {institution && (
               <Dialog open={showPricingDialog} onOpenChange={setShowPricingDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="text-xs font-bold">
+                  <Button variant="outline" className="text-xs font-semibold">
                     <DollarSign className="h-4 w-4 mr-1" /> Set Pricing
                   </Button>
                 </DialogTrigger>
@@ -338,7 +338,7 @@ export const ProcedureManagement = () => {
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-xs font-bold">Procedure</Label>
+                      <Label className="text-xs font-semibold">Procedure</Label>
                       <Select
                         value={pricingForm.procedure_id}
                         onValueChange={(value) => setPricingForm({ ...pricingForm, procedure_id: value })}
@@ -357,7 +357,7 @@ export const ProcedureManagement = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold">Price</Label>
+                        <Label className="text-xs font-semibold">Price</Label>
                         <Input
                           type="number"
                           value={pricingForm.price}
@@ -366,7 +366,7 @@ export const ProcedureManagement = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Currency</Label>
+                        <Label className="text-xs font-semibold">Currency</Label>
                         <Select
                           value={pricingForm.currency}
                           onValueChange={(value) => setPricingForm({ ...pricingForm, currency: value })}
@@ -384,7 +384,7 @@ export const ProcedureManagement = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold">Effective From</Label>
+                        <Label className="text-xs font-semibold">Effective From</Label>
                         <Input
                           type="date"
                           value={pricingForm.effective_from}
@@ -393,7 +393,7 @@ export const ProcedureManagement = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold">Effective To (Optional)</Label>
+                        <Label className="text-xs font-semibold">Effective To (Optional)</Label>
                         <Input
                           type="date"
                           value={pricingForm.effective_to}
@@ -402,7 +402,7 @@ export const ProcedureManagement = () => {
                         />
                       </div>
                     </div>
-                    <Button onClick={handleSetPricing} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                    <Button onClick={handleSetPricing} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                       Set Pricing
                     </Button>
                   </div>
@@ -413,55 +413,55 @@ export const ProcedureManagement = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Total Procedures</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Total Procedures</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{totalProcedures}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">In catalog</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{totalProcedures}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">In catalog</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Pricing</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Pricing</span>
                 <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">{activePricing}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured prices</div>
+              <div className="text-2xl font-semibold font-mono text-success-500">{activePricing}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured prices</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Recent Executions</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Recent Executions</span>
                 <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{recentExecutions}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Past 7 days</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{recentExecutions}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Past 7 days</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Avg Price</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Price</span>
                 <TrendingUp className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">
+              <div className="text-2xl font-semibold font-mono text-warning-500">
                 {institution?.currency || "ZMW"} {avgProcedurePrice.toFixed(0)}
               </div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per procedure</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Per procedure</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="catalog" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="catalog" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Procedure Catalog
             </TabsTrigger>
@@ -501,12 +501,12 @@ export const ProcedureManagement = () => {
             </div>
 
             {procedures.length === 0 && (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-12 text-center space-y-3">
-                  <Activity className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                  <p className="text-sm font-bold">No procedures yet</p>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400">Add clinical procedures with pricing to make them bookable and billable.</p>
-                  <Button onClick={() => setShowProcedureDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-bold min-h-[44px]">
+                  <Activity className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No procedures yet</p>
+                  <p className="text-xs text-muted-foreground">Add clinical procedures with pricing to make them bookable and billable.</p>
+                  <Button onClick={() => setShowProcedureDialog(true)} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold min-h-[44px]">
                     <Plus className="h-4 w-4 mr-1" /> Add Procedure
                   </Button>
                 </CardContent>
@@ -514,7 +514,7 @@ export const ProcedureManagement = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {procedures.map((procedure) => (
-                <Card key={procedure.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={procedure.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -523,7 +523,7 @@ export const ProcedureManagement = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-semibold">{procedure.procedure_name}</CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">{procedure.procedure_code}</div>
+                          <div className="text-xs text-muted-foreground">{procedure.procedure_code}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -538,19 +538,19 @@ export const ProcedureManagement = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Category</span>
+                      <span className="text-muted-foreground">Category</span>
                       <Badge variant="outline" className="text-xs">{procedure.category}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Base Price</span>
-                      <span className="font-bold">K{procedure.base_price.toFixed(2)}</span>
+                      <span className="text-muted-foreground">Base Price</span>
+                      <span className="font-semibold">K{procedure.base_price.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Duration</span>
-                      <span className="font-bold">{procedure.duration_minutes || 0} min</span>
+                      <span className="text-muted-foreground">Duration</span>
+                      <span className="font-semibold">{procedure.duration_minutes || 0} min</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {procedure.description?.slice(0, 50)}...
                       </div>
                       <div className="flex items-center gap-1">
@@ -571,11 +571,11 @@ export const ProcedureManagement = () => {
           {/* Institution Pricing Tab */}
           <TabsContent value="pricing" className="space-y-4">
             {!institution ? (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Select an institution to manage pricing</p>
+                  <p className="text-xs text-muted-foreground mb-4">Select an institution to manage pricing</p>
                   <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
                     Go to Institution Portal
                   </Button>
@@ -601,32 +601,32 @@ export const ProcedureManagement = () => {
                   </Button>
                 </div>
 
-                <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+                <Card className="border-border shadow-xs overflow-hidden">
                   <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-                    <thead className="bg-canvas-mist dark:bg-slate-800">
+                    <thead className="bg-muted/50">
                       <tr>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Procedure</th>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Price</th>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Currency</th>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Effective From</th>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Status</th>
-                        <th className="text-left text-xs font-semibold px-4 py-3">Actions</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Procedure</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Price</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Currency</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Effective From</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Status</th>
+                        <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pricing.map((price) => (
-                        <tr key={price.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
+                        <tr key={price.id} className="border-t border-border hover:bg-muted/50">
                           <td className="px-4 py-3">
-                            <div className="text-xs font-bold">{price.procedure?.procedure_name}</div>
-                            <div className="text-xs text-graphite-500 dark:text-slate-400">{price.procedure?.procedure_code}</div>
+                            <div className="text-xs font-semibold">{price.procedure?.procedure_name}</div>
+                            <div className="text-xs text-muted-foreground">{price.procedure?.procedure_code}</div>
                           </td>
-                          <td className="px-4 py-3 text-xs font-bold">{price.price.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-sm text-right tnum font-medium">{price.price.toFixed(2)}</td>
                           <td className="px-4 py-3 text-xs">{price.currency}</td>
-                          <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
+                          <td className="px-4 py-3 text-xs text-muted-foreground">
                             {new Date(price.effective_from).toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
-                            <Badge className={price.is_active ? "bg-success-500 text-white text-xs" : "bg-graphite-500 dark:bg-slate-600 text-white text-xs"}>
+                            <Badge className={price.is_active ? "bg-success-500 text-white text-xs" : "bg-muted-foreground text-white text-xs"}>
                               {price.is_active ? "Active" : "Inactive"}
                             </Badge>
                           </td>
@@ -652,11 +652,11 @@ export const ProcedureManagement = () => {
           {/* Executions Tab */}
           <TabsContent value="executions" className="space-y-4">
             {!institution ? (
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardContent className="p-8 text-center">
                   <Building2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-semibold mb-2">Institution Required</h3>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Select an institution to view executions</p>
+                  <p className="text-xs text-muted-foreground mb-4">Select an institution to view executions</p>
                   <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
                     Go to Institution Portal
                   </Button>
@@ -685,17 +685,17 @@ export const ProcedureManagement = () => {
                 </div>
 
                 {executions.length === 0 && (
-                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                  <Card className="border-border shadow-xs">
                     <CardContent className="p-12 text-center space-y-3">
-                      <Calendar className="h-10 w-10 mx-auto text-graphite-500 dark:text-slate-400" />
-                      <p className="text-sm font-bold">No procedure executions yet</p>
-                      <p className="text-xs text-graphite-500 dark:text-slate-400">Performed procedures will be recorded here with outcomes and complications.</p>
+                      <Calendar className="h-10 w-10 mx-auto text-muted-foreground" />
+                      <p className="text-sm font-semibold">No procedure executions yet</p>
+                      <p className="text-xs text-muted-foreground">Performed procedures will be recorded here with outcomes and complications.</p>
                     </CardContent>
                   </Card>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {executions.map((execution) => (
-                    <Card key={execution.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                    <Card key={execution.id} className="border-border shadow-xs">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
@@ -704,7 +704,7 @@ export const ProcedureManagement = () => {
                             </div>
                             <div>
                               <CardTitle className="text-sm font-semibold">{execution.procedure?.procedure_name}</CardTitle>
-                              <div className="text-xs text-graphite-500 dark:text-slate-400">
+                              <div className="text-xs text-muted-foreground">
                                 {execution.patient?.first_name} {execution.patient?.last_name}
                               </div>
                             </div>
@@ -716,23 +716,23 @@ export const ProcedureManagement = () => {
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-graphite-500 dark:text-slate-400">Execution Date</span>
-                          <span className="font-bold">{new Date(execution.execution_date).toLocaleDateString()}</span>
+                          <span className="text-muted-foreground">Execution Date</span>
+                          <span className="font-semibold">{new Date(execution.execution_date).toLocaleDateString()}</span>
                         </div>
                         {execution.complications && (
                           <div className="flex items-center gap-2 text-xs">
                             <AlertTriangle className="h-3 w-3 text-error-500" />
-                            <span className="text-error-500 font-bold">Complications reported</span>
+                            <span className="text-error-500 font-semibold">Complications reported</span>
                           </div>
                         )}
                         {execution.follow_up_required && (
                           <div className="flex items-center gap-2 text-xs">
                             <Calendar className="h-3 w-3 text-warning-500" />
-                            <span className="text-warning-500 font-bold">Follow-up required</span>
+                            <span className="text-warning-500 font-semibold">Follow-up required</span>
                           </div>
                         )}
-                        <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
+                          <div className="text-xs text-muted-foreground">
                             {execution.staff_involved.length} staff involved
                           </div>
                           <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-0">
@@ -749,14 +749,14 @@ export const ProcedureManagement = () => {
 
           {/* Inventory Mapping Tab */}
           <TabsContent value="inventory" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Package className="h-4 w-4 text-primary-500" /> Procedure-Inventory Mapping
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                   Inventory mapping interface placeholder - Link procedures to inventory items
                 </div>
               </CardContent>

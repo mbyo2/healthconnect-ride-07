@@ -23,8 +23,8 @@ import { ProviderSlotsPreview } from "@/components/booking/ProviderSlotsPreview"
 const Section = ({
   icon: Icon, title, children,
 }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
-  <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
-    <h3 className="font-display text-lg font-medium flex items-center gap-2 text-midnight">
+  <div className="p-5 rounded-2xl bg-card border border-border shadow-xs space-y-3">
+    <h3 className="font-display text-lg font-medium flex items-center gap-2 text-foreground">
       <Icon className="h-4 w-4 text-primary-500" />
       {title}
     </h3>
@@ -34,7 +34,7 @@ const Section = ({
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex items-start gap-2 text-sm">
-    <span className="text-graphite-500 dark:text-slate-400 font-bold w-36 shrink-0">{label}</span>
+    <span className="text-muted-foreground font-semibold w-36 shrink-0">{label}</span>
     <span className="text-slate-800 dark:text-slate-200 font-medium">{value}</span>
   </div>
 );
@@ -138,11 +138,11 @@ export const ProviderDetail = () => {
     const isFetchError = !!error && (error as Error).message !== "Provider not found";
     return (
       <div className="min-h-screen bg-canvas p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-center space-y-3">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-card border border-border text-center space-y-3">
           <h2 className="text-lg font-semibold">
             {isFetchError ? "Couldn't load this profile" : "Provider Profile Not Found"}
           </h2>
-          <p className="text-sm text-graphite-500">
+          <p className="text-sm text-muted-foreground">
             {isFetchError
               ? "Check your connection and try again."
               : "This provider may have been removed or the link is incorrect."}
@@ -151,14 +151,14 @@ export const ProviderDetail = () => {
             {isFetchError && (
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white font-bold text-xs"
+                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white font-semibold text-xs"
               >
                 Try again
               </button>
             )}
             <button
               onClick={() => navigate("/search")}
-              className="px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-slate-700 font-bold text-xs"
+              className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-slate-700 font-semibold text-xs"
             >
               Browse Verified Doctors
             </button>
@@ -274,18 +274,18 @@ export const ProviderDetail = () => {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+      <div className="pb-16">
         {/* Sticky top bar */}
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
               <h1 className="font-display text-base font-medium tracking-tight truncate">{providerName}</h1>
-              <p className="text-xs text-primary-500 font-bold truncate">{providerSpecialty}</p>
+              <p className="text-xs text-primary-500 font-semibold truncate">{providerSpecialty}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsWaitlistOpen(true)}
-                className="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-xs font-medium text-graphite-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                className="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-medium text-graphite-600 hover:bg-muted"
               >
                 Join Waitlist
               </button>
@@ -302,7 +302,7 @@ export const ProviderDetail = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-5">
 
           {/* ── Hero ── */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col sm:flex-row gap-5">
+          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs flex flex-col sm:flex-row gap-5">
             {/* Avatar */}
             <div className="shrink-0">
               {provider.avatar_url ? (
@@ -312,7 +312,7 @@ export const ProviderDetail = () => {
                   className="w-28 h-28 rounded-2xl object-cover border-2 border-primary-500"
                 />
               ) : (
-                <div className="w-28 h-28 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center text-3xl font-bold border-2 border-primary-500">
+                <div className="w-28 h-28 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center text-3xl font-semibold border-2 border-primary-500">
                   {provider.first_name?.[0]}{provider.last_name?.[0]}
                 </div>
               )}
@@ -320,7 +320,7 @@ export const ProviderDetail = () => {
 
             <div className="flex-1 space-y-3 min-w-0">
               <div>
-                <h2 className="font-display text-3xl font-medium tracking-tight text-midnight">{providerName}</h2>
+                <h2 className="font-display text-3xl font-medium tracking-tight text-foreground">{providerName}</h2>
                 <p className="text-sm text-primary-500 font-semibold mt-1">{providerSpecialty}</p>
                 <div className="mt-2">
                   <RatingDisplay rating={rating} reviewCount={reviewCount} size="md" />
@@ -352,7 +352,7 @@ export const ProviderDetail = () => {
               </div>
 
               {/* Quick info row */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-graphite-500 dark:text-slate-400">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 {provider.primary_practice_location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5 shrink-0 text-primary-500" />
@@ -370,7 +370,7 @@ export const ProviderDetail = () => {
                     {feeLabel}
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-graphite-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1 text-muted-foreground">
                     {feeDisplay}
                   </span>
                 )}
@@ -383,7 +383,7 @@ export const ProviderDetail = () => {
               </div>
 
               {provider.bio && (
-                <p className="text-sm text-graphite-500 dark:text-slate-400 leading-relaxed line-clamp-3">{provider.bio}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{provider.bio}</p>
               )}
             </div>
           </div>
@@ -415,7 +415,7 @@ export const ProviderDetail = () => {
                   )}
                   {certs.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Board Certifications</p>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Board Certifications</p>
                       <div className="flex flex-wrap gap-1.5">
                         {certs.map(c => (
                           <Badge key={c} variant="outline" className="gap-1 text-xs">
@@ -427,7 +427,7 @@ export const ProviderDetail = () => {
                   )}
                   {subs.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Subspecialties</p>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Subspecialties</p>
                       <div className="flex flex-wrap gap-1.5">
                         {subs.map(s => (
                           <Badge key={s} variant="secondary" className="text-xs">
@@ -445,7 +445,7 @@ export const ProviderDetail = () => {
                 <Section icon={Building2} title="Practice Details">
                   {hospitals.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Affiliated Hospitals</p>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Affiliated Hospitals</p>
                       <ul className="space-y-1">
                         {hospitals.map(h => (
                           <li key={h} className="flex items-center gap-1.5 text-sm">
@@ -457,7 +457,7 @@ export const ProviderDetail = () => {
                   )}
                   {apptTypes.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Appointment Types</p>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Appointment Types</p>
                       <div className="flex flex-wrap gap-1.5">
                         {apptTypes.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
                       </div>
@@ -474,7 +474,7 @@ export const ProviderDetail = () => {
                     {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => {
                       const info = (schedule as Record<string, { available: boolean; hours: string[] }>)[day];
                       return (
-                        <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
+                        <div key={day} className="p-2 rounded-lg border border-border bg-canvas dark:bg-slate-800">
                           <p className="text-sm font-semibold capitalize text-graphite-700 dark:text-slate-200">{day}</p>
                           {info?.available ? (
                             <div className="space-y-0.5 mt-1">
@@ -486,7 +486,7 @@ export const ProviderDetail = () => {
                               )}
                             </div>
                           ) : (
-                            <p className="text-sm text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
+                            <p className="text-sm text-muted-foreground mt-1">Not available</p>
                           )}
                         </div>
                       );
@@ -500,10 +500,10 @@ export const ProviderDetail = () => {
                 <Section icon={Stethoscope} title="Services Offered">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {services.map((svc: any) => (
-                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-canvas-silk dark:border-slate-700 text-sm">
+                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-border text-sm">
                         <span className="font-medium">{svc.name}</span>
                         {svc.price && (
-                          <span className="font-bold text-primary-500">K{svc.price}</span>
+                          <span className="font-semibold text-primary-500">K{svc.price}</span>
                         )}
                       </div>
                     ))}
@@ -512,8 +512,8 @@ export const ProviderDetail = () => {
               )}
 
               {/* Reviews */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-                <h3 className="font-display text-lg font-medium text-midnight mb-3 flex items-center gap-2">
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-xs">
+                <h3 className="font-display text-lg font-medium text-foreground mb-3 flex items-center gap-2">
                   <Star className="h-4 w-4 text-primary-500" /> Patient Reviews
                 </h3>
                 <ProviderReviews providerId={id} />
@@ -525,10 +525,10 @@ export const ProviderDetail = () => {
               {/* Fees & Insurance */}
               {(feeDisplay || insurances.length > 0) && (
                 <Section icon={Wallet} title="Fees & Insurance">
-                  <InfoRow label="Consultation fee" value={feeLabel ? <span className="font-bold text-primary-500">{feeLabel}</span> : feeDisplay} />
+                  <InfoRow label="Consultation fee" value={feeLabel ? <span className="font-semibold text-primary-500">{feeLabel}</span> : feeDisplay} />
                   {insurances.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Accepted Insurance</p>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Accepted Insurance</p>
                       <div className="flex flex-wrap gap-1.5">
                         {insurances.map(ins => (
                           <Badge key={ins} variant="outline" className="text-xs gap-1">
@@ -553,13 +553,13 @@ export const ProviderDetail = () => {
                   </button>
                   <button
                     onClick={() => setIsWaitlistOpen(true)}
-                    className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-graphite-700 dark:text-slate-200 font-medium text-sm transition-all"
+                    className="w-full py-3 min-h-[44px] rounded-2xl border border-border hover:bg-muted text-graphite-700 dark:text-slate-200 font-medium text-sm transition-all"
                   >
                     Join Waitlist
                   </button>
                 </div>
               ) : (
-                <div className="p-3 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-canvas-mist dark:bg-slate-800/60">
+                <div className="p-3 rounded-2xl border border-border bg-muted/60">
                   <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium">
                     This professional works through a health facility — appointments are arranged via the institution, not direct booking.
                   </p>

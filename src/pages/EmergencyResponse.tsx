@@ -139,12 +139,12 @@ const EmergencyResponse = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Top Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
@@ -152,40 +152,40 @@ const EmergencyResponse = () => {
                 24/7 Emergency Dispatch & Triage Board
                 <span className="w-2 h-2 rounded-full bg-error-500" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Immediate medical dispatch, live GPS location sharing, and critical profile access
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500 flex items-center gap-1.5">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-success-500 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" /> 24/7 Response Active
             </span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="px-4 sm:px-6 pt-6 space-y-6">
         {/* Big SOS Action Panel */}
-        <div className="rounded-2xl border-2 border-error-500 bg-white dark:bg-slate-900 p-8 shadow-md text-center space-y-4">
+        <div className="rounded-2xl border-2 border-error-500 bg-card p-8 shadow-md text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-error-50 dark:bg-red-950/40 text-error-500 flex items-center justify-center mx-auto">
             <Phone className="w-8 h-8 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Need Immediate Emergency Assistance?</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-1">
+            <h2 className="text-2xl font-semibold text-foreground">Need Immediate Emergency Assistance?</h2>
+            <p className="text-xs text-muted-foreground font-medium mt-1">
               Click below to dispatch emergency response and share live GPS telemetry with medical teams.
             </p>
           </div>
           <button
             onClick={handleEmergencyCall}
-            className="px-10 py-4 rounded-xl bg-error-500 hover:bg-error-500 text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
+            className="px-10 py-4 rounded-xl bg-error-500 hover:bg-error-500 text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
           >
             <Phone className="w-6 h-6" />
             <span>CALL EMERGENCY SERVICES</span>
           </button>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Automatically transmits blood type, critical allergies, and GPS coordinates to hospital dispatch.
           </p>
         </div>
@@ -193,24 +193,24 @@ const EmergencyResponse = () => {
         {/* Contacts & Medical Info Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Emergency Contacts */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <User className="w-4 h-4 text-primary-500" />
                 Primary Emergency Contacts
               </h2>
-              <button onClick={() => navigate('/profile')} className="text-xs font-bold text-primary-500 hover:underline">
+              <button onClick={() => navigate('/profile')} className="text-xs font-semibold text-primary-500 hover:underline">
                 Manage Contacts
               </button>
             </div>
 
             <div className="space-y-3">
               {emergencyContacts.map((contact) => (
-                <div key={contact.id} className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
+                <div key={contact.id} className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-background">
                   <div>
-                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100">{contact.name}</h4>
-                    <p className="text-xs text-graphite-500 dark:text-slate-400">{contact.relationship || contact.relation}</p>
-                    <p className="text-xs font-mono font-bold text-primary-500 mt-0.5">{contact.phone}</p>
+                    <h4 className="font-semibold text-xs text-foreground">{contact.name}</h4>
+                    <p className="text-xs text-muted-foreground">{contact.relationship || contact.relation}</p>
+                    <p className="text-xs font-mono font-semibold text-primary-500 mt-0.5">{contact.phone}</p>
                   </div>
                   <button
                     onClick={() => callNumber(contact.phone)}
@@ -221,7 +221,7 @@ const EmergencyResponse = () => {
                 </div>
               ))}
               {emergencyContacts.length === 0 && (
-                <div className="text-center py-6 text-xs text-graphite-500 dark:text-slate-400">
+                <div className="text-center py-6 text-xs text-muted-foreground">
                   No emergency contacts configured yet.
                 </div>
               )}
@@ -229,13 +229,13 @@ const EmergencyResponse = () => {
           </div>
 
           {/* Critical Medical Info */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h2 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-error-500" />
                 Critical Telemetry & Medical Profile
               </h2>
-              <button onClick={() => navigate('/profile')} className="text-xs font-bold text-primary-500 hover:underline">
+              <button onClick={() => navigate('/profile')} className="text-xs font-semibold text-primary-500 hover:underline">
                 Update Info
               </button>
             </div>
@@ -243,33 +243,33 @@ const EmergencyResponse = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-error-50 dark:bg-red-950/40 border border-error-500/30">
-                  <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Blood Type</p>
-                  <p className="text-2xl font-bold font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Blood Type</p>
+                  <p className="text-2xl font-semibold font-mono text-error-500 mt-0.5">{medicalInfo.bloodType}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
-                  <p className="text-xs font-semibold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
-                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
+                <div className="p-3 rounded-xl bg-canvas border border-border">
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Known Allergies</p>
+                  <p className="text-xs font-semibold text-foreground mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
                 </div>
               </div>
 
               <div className="space-y-2 text-xs">
                 <div>
-                  <p className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Medical Conditions</p>
+                  <p className="font-semibold text-muted-foreground uppercase text-xs mb-1">Medical Conditions</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.conditions.map((condition, index) => (
-                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{condition}</span>
+                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-primary-500">{condition}</span>
                     ))}
-                    {medicalInfo.conditions.length === 0 && <span className="text-graphite-500 dark:text-slate-400">None listed</span>}
+                    {medicalInfo.conditions.length === 0 && <span className="text-muted-foreground">None listed</span>}
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-semibold text-graphite-500 dark:text-slate-400 uppercase text-xs mb-1">Current Medications</p>
+                  <p className="font-semibold text-muted-foreground uppercase text-xs mb-1">Current Medications</p>
                   <div className="flex flex-wrap gap-1.5">
                     {medicalInfo.medications.map((med, index) => (
-                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{med}</span>
+                      <span key={index} className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-primary-500">{med}</span>
                     ))}
-                    {medicalInfo.medications.length === 0 && <span className="text-graphite-500 dark:text-slate-400">None listed</span>}
+                    {medicalInfo.medications.length === 0 && <span className="text-muted-foreground">None listed</span>}
                   </div>
                 </div>
               </div>
@@ -278,8 +278,8 @@ const EmergencyResponse = () => {
         </div>
 
         {/* Nearby Hospitals Board */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary-500" />
               Nearest Trauma Centers & Hospitals
@@ -288,19 +288,19 @@ const EmergencyResponse = () => {
 
           <div className="space-y-3">
             {nearbyHospitals.map((h) => (
-              <div key={h.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3">
+              <div key={h.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-border bg-canvas gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{h.name}</h4>
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">24/7 Emergency</span>
+                    <h4 className="font-semibold text-sm text-foreground">{h.name}</h4>
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-error-500">24/7 Emergency</span>
                   </div>
-                  <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{h.address || "Lusaka Medical District"}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{h.address || "Lusaka Medical District"}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center justify-center gap-1">
+                  <button onClick={() => openDirections(h)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold flex items-center justify-center gap-1">
                     <Navigation className="w-3.5 h-3.5" /> Directions
                   </button>
-                  <button onClick={() => callNumber(h.phone)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-primary-500 text-white text-xs font-bold flex items-center justify-center gap-1">
+                  <button onClick={() => callNumber(h.phone)} className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-primary-500 text-white text-xs font-semibold flex items-center justify-center gap-1">
                     <Phone className="w-3.5 h-3.5" /> Call
                   </button>
                 </div>
@@ -317,7 +317,7 @@ const EmergencyResponse = () => {
             </div>
             <div>
               <h3 className="font-semibold text-sm text-primary-500">Live GPS Location Telemetry</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Broadcast precise GPS positioning to responding dispatchers and emergency contacts.</p>
+              <p className="text-xs text-muted-foreground font-medium">Broadcast precise GPS positioning to responding dispatchers and emergency contacts.</p>
             </div>
           </div>
           <button

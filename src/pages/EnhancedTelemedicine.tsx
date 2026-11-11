@@ -240,7 +240,7 @@ export const EnhancedTelemedicine = () => {
       case "active": return "bg-purple-500 text-white";
       case "pending": return "bg-warning-500 text-white";
       case "cancelled": return "bg-error-500 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -249,8 +249,8 @@ export const EnhancedTelemedicine = () => {
       case "urgent": return "bg-error-500 text-white";
       case "high": return "bg-warning-500 text-white";
       case "normal": return "bg-primary-500 text-white";
-      case "low": return "bg-graphite-500 dark:bg-slate-600 text-white";
-      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
+      case "low": return "bg-muted-foreground text-white";
+      default: return "bg-muted-foreground text-white";
     }
   };
 
@@ -258,12 +258,12 @@ export const EnhancedTelemedicine = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced telemedicine.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access enhanced telemedicine.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -281,23 +281,23 @@ export const EnhancedTelemedicine = () => {
   }).length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Video className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Enhanced Telemedicine</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Integrated Telemedicine & Workflow Management</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Integrated Telemedicine & Workflow Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" /> New Workflow
                 </Button>
               </DialogTrigger>
@@ -307,7 +307,7 @@ export const EnhancedTelemedicine = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Patient</Label>
+                    <Label className="text-xs font-semibold">Patient</Label>
                     <Select
                       value={workflowForm.patient_id}
                       onValueChange={(value) => setWorkflowForm({ ...workflowForm, patient_id: value })}
@@ -321,7 +321,7 @@ export const EnhancedTelemedicine = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Associated Appointment (Optional)</Label>
+                    <Label className="text-xs font-semibold">Associated Appointment (Optional)</Label>
                     <Select
                       value={workflowForm.appointment_id}
                       onValueChange={(value) => setWorkflowForm({ ...workflowForm, appointment_id: value })}
@@ -335,7 +335,7 @@ export const EnhancedTelemedicine = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Video Consultation (Optional)</Label>
+                    <Label className="text-xs font-semibold">Video Consultation (Optional)</Label>
                     <Select
                       value={workflowForm.video_consultation_id}
                       onValueChange={(value) => setWorkflowForm({ ...workflowForm, video_consultation_id: value })}
@@ -349,7 +349,7 @@ export const EnhancedTelemedicine = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Notes</Label>
+                    <Label className="text-xs font-semibold">Notes</Label>
                     <Textarea
                       value={workflowForm.notes}
                       onChange={(e) => setWorkflowForm({ ...workflowForm, notes: e.target.value })}
@@ -357,7 +357,7 @@ export const EnhancedTelemedicine = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateWorkflow} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateWorkflow} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Start Workflow
                   </Button>
                 </div>
@@ -367,53 +367,53 @@ export const EnhancedTelemedicine = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Workflows</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Workflows</span>
                 <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{activeWorkflows}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently running</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{activeWorkflows}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently running</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Tasks</span>
                 <CheckCircle className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-purple-500">{pendingTasks}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
+              <div className="text-2xl font-semibold font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Diagnostic Orders</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Diagnostic Orders</span>
                 <FileText className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">{pendingOrders}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Remote diagnostics</div>
+              <div className="text-2xl font-semibold font-mono text-warning-500">{pendingOrders}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Remote diagnostics</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Completed Today</span>
                 <TrendingUp className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">{completedToday}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Workflow sessions</div>
+              <div className="text-2xl font-semibold font-mono text-success-500">{completedToday}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Workflow sessions</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="workflows" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="workflows" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Active Workflows
             </TabsTrigger>
@@ -455,7 +455,7 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {workflows.map((workflow) => (
-                <Card key={workflow.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={workflow.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -466,7 +466,7 @@ export const EnhancedTelemedicine = () => {
                           <CardTitle className="text-sm font-semibold">
                             {workflow.patient?.first_name} {workflow.patient?.last_name}
                           </CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">
+                          <div className="text-xs text-muted-foreground">
                             Started: {new Date(workflow.started_at).toLocaleString()}
                           </div>
                         </div>
@@ -478,17 +478,17 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Current Stage</span>
-                      <span className="font-bold">{workflow.current_stage || "Not Started"}</span>
+                      <span className="text-muted-foreground">Current Stage</span>
+                      <span className="font-semibold">{workflow.current_stage || "Not Started"}</span>
                     </div>
                     {workflow.video_consultation_id && (
                       <div className="flex items-center gap-2 text-xs">
                         <Video className="h-3 w-3 text-primary-500" />
-                        <span className="text-graphite-500 dark:text-slate-400">Associated video consultation</span>
+                        <span className="text-muted-foreground">Associated video consultation</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {Object.keys(workflow.stage_data || {}).length} stages completed
                       </div>
                       <div className="flex items-center gap-1">
@@ -534,12 +534,12 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={task.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-semibold">{task.task_name}</CardTitle>
-                        <div className="text-xs text-graphite-500 dark:text-slate-400">{task.task_type}</div>
+                        <div className="text-xs text-muted-foreground">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
                         <Badge className={getPriorityColor(task.priority) + " text-xs"}>
@@ -553,8 +553,8 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Assigned To</span>
-                      <span className="font-bold">
+                      <span className="text-muted-foreground">Assigned To</span>
+                      <span className="font-semibold">
                         {task.assigned_to_profile
                           ? `${task.assigned_to_profile.first_name} ${task.assigned_to_profile.last_name}`
                           : "Unassigned"}
@@ -562,20 +562,20 @@ export const EnhancedTelemedicine = () => {
                     </div>
                     {task.due_date && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-graphite-500 dark:text-slate-400">Due Date</span>
-                        <span className={`font-bold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-error-500" : ""}`}>
+                        <span className="text-muted-foreground">Due Date</span>
+                        <span className={`font-semibold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-error-500" : ""}`}>
                           {new Date(task.due_date).toLocaleDateString()}
                         </span>
                       </div>
                     )}
                     {task.estimated_duration_minutes && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-graphite-500 dark:text-slate-400">Est. Duration</span>
-                        <span className="font-bold">{task.estimated_duration_minutes} min</span>
+                        <span className="text-muted-foreground">Est. Duration</span>
+                        <span className="font-semibold">{task.estimated_duration_minutes} min</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {task.dependencies.length} dependencies
                       </div>
                       <div className="flex items-center gap-1">
@@ -622,7 +622,7 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {orders.map((order) => (
-                <Card key={order.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={order.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -633,7 +633,7 @@ export const EnhancedTelemedicine = () => {
                           <CardTitle className="text-sm font-semibold">
                             {order.patient?.first_name} {order.patient?.last_name}
                           </CardTitle>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">{order.order_number}</div>
+                          <div className="text-xs text-muted-foreground">{order.order_number}</div>
                         </div>
                       </div>
                       <Badge className={getStatusColor(order.status) + " text-xs"}>
@@ -643,17 +643,17 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Order Type</span>
+                      <span className="text-muted-foreground">Order Type</span>
                       <Badge variant="outline" className="text-xs">{order.order_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Priority</span>
+                      <span className="text-muted-foreground">Priority</span>
                       <Badge className={getPriorityColor(order.priority) + " text-xs"}>
                         {order.priority}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground">
                         {order.requested_tests.length} tests requested
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -668,14 +668,14 @@ export const EnhancedTelemedicine = () => {
 
           {/* Device Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+            <Card className="border-border shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <MonitorSpeaker className="h-4 w-4 text-primary-500" /> IoT Device Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                   IoT device integration interface placeholder - Connect health monitoring devices for remote patient data
                 </div>
               </CardContent>

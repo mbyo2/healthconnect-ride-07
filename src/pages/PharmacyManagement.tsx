@@ -157,11 +157,11 @@ export const PharmacyManagement = () => {
 
   if (!pharmacy) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk text-center space-y-3">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-card border border-border text-center space-y-3">
           <Package className="h-12 w-12 mx-auto text-primary-500" />
           <h3 className="text-lg font-semibold">Pharmacy POS Board</h3>
-          <p className="text-xs text-graphite-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Link your pharmacy account to activate the Doc' O Clock inventory & POS system.
           </p>
         </div>
@@ -172,12 +172,12 @@ export const PharmacyManagement = () => {
   const categories = ["All", ...Array.from(new Set(inventory.map((i) => i.category || "General").filter(Boolean)))];
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Top Bar */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
               <ShoppingCart className="h-5 w-5" />
             </div>
             <div>
@@ -185,7 +185,7 @@ export const PharmacyManagement = () => {
                 {pharmacy.name} — Pharmacy Management & POS
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Inventory Tracking • Prescription Dispatches • Automated Sales Accounting
               </p>
             </div>
@@ -194,7 +194,7 @@ export const PharmacyManagement = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetchInventory()}
-              className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1"
+              className="px-3 py-1.5 rounded-md bg-muted hover:bg-primary-50 dark:hover:bg-slate-800 text-foreground font-semibold text-xs flex items-center gap-1"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               <span>Refresh Inventory</span>
@@ -204,37 +204,37 @@ export const PharmacyManagement = () => {
       </div>
 
       {/* Financial Banners */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Stock Retail Value</div>
-          <div className="text-2xl font-bold font-mono text-primary-500 mt-1">{formatPrice(totalRetailValue)}</div>
+      <div className="px-4 sm:px-6 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <div className="text-xs font-semibold text-muted-foreground uppercase">Stock Retail Value</div>
+          <div className="text-2xl font-semibold font-mono text-primary-500 mt-1">{formatPrice(totalRetailValue)}</div>
           <div className="text-xs text-slate-400 mt-0.5">{inventory.length} total items</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Today's Sales Revenue</div>
-          <div className="text-2xl font-bold font-mono text-success-500 mt-1">
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <div className="text-xs font-semibold text-muted-foreground uppercase">Today's Sales Revenue</div>
+          <div className="text-2xl font-semibold font-mono text-success-500 mt-1">
             {formatPrice(todaySales.reduce((s, i) => s + (Number(i.total_amount) || 0), 0))}
           </div>
-          <div className="text-xs text-emerald-500 font-bold mt-0.5">{todaySales.length} transactions</div>
+          <div className="text-xs text-emerald-500 font-semibold mt-0.5">{todaySales.length} transactions</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Low Stock Warnings</div>
-          <div className="text-2xl font-bold font-mono text-warning-500 mt-1">{lowStockItems.length}</div>
-          <div className="text-xs text-amber-500 font-bold mt-0.5">Reorder required</div>
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <div className="text-xs font-semibold text-muted-foreground uppercase">Low Stock Warnings</div>
+          <div className="text-2xl font-semibold font-mono text-warning-500 mt-1">{lowStockItems.length}</div>
+          <div className="text-xs text-amber-500 font-semibold mt-0.5">Reorder required</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
-          <div className="text-xs font-bold text-graphite-500 dark:text-slate-400 uppercase">Active Cart Items</div>
-          <div className="text-2xl font-bold font-mono text-purple-600 mt-1">{cart.length}</div>
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <div className="text-xs font-semibold text-muted-foreground uppercase">Active Cart Items</div>
+          <div className="text-2xl font-semibold font-mono text-purple-600 mt-1">{cart.length}</div>
           <div className="text-xs text-slate-400 mt-0.5">Subtotal: {formatPrice(cartSubtotal)}</div>
         </div>
       </div>
 
       {/* Main Board Tabs: POS vs Inventory Control */}
       <Tabs value={mainTab} onValueChange={setMainTab}>
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+        <div className="px-4 sm:px-6 pt-6">
           <TabsList className="w-full sm:w-auto">
             <TabsTrigger value="pos" className="flex-1 sm:flex-none">POS Board</TabsTrigger>
             <TabsTrigger value="inventory" className="flex-1 sm:flex-none">Inventory Control</TabsTrigger>
@@ -243,10 +243,10 @@ export const PharmacyManagement = () => {
 
         <TabsContent value="pos">
       {/* Main Board Content */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="px-4 sm:px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Inventory Product Grid */}
-        <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs p-4 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-canvas-silk dark:border-slate-800">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card shadow-xs p-4 space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-border">
             <h2 className="font-semibold text-base flex items-center gap-2">
               <Package className="h-5 w-5 text-primary-500" />
               Pharmacy Inventory Catalog
@@ -259,7 +259,7 @@ export const PharmacyManagement = () => {
                 placeholder="Search medication name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-9 pr-3 py-1.5 rounded-md border border-border dark:border-slate-700 dark:border-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -271,14 +271,14 @@ export const PharmacyManagement = () => {
                 <div
                   key={item.id}
                   onClick={() => item.quantity > 0 && addToCart(item)}
-                  className="p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors cursor-pointer flex justify-between items-center group"
+                  className="p-3.5 rounded-xl border border-border bg-background hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors cursor-pointer flex justify-between items-center group"
                 >
                   <div>
-                    <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">
+                    <div className="font-semibold text-sm text-foreground group-hover:text-primary-500 transition-colors">
                       {item.product_name}
                     </div>
-                    <div className="text-xs text-graphite-500 dark:text-slate-400">
-                      Code: {item.product_code || "—"} • Stock: <strong className="text-slate-900 dark:text-slate-100">{item.quantity}</strong>
+                    <div className="text-xs text-muted-foreground">
+                      Code: {item.product_code || "—"} • Stock: <strong className="text-foreground">{item.quantity}</strong>
                     </div>
                     <div className="font-mono font-semibold text-sm text-primary-500 mt-1">
                       {formatPrice(item.unit_price)}
@@ -298,15 +298,15 @@ export const PharmacyManagement = () => {
         </div>
 
         {/* Right: Cart & POS Checkout */}
-        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs flex flex-col justify-between space-y-4">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-canvas-silk dark:border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <h2 className="font-semibold text-base flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5 text-primary-500" />
                 Active Cart ({cart.length})
               </h2>
               {cart.length > 0 && (
-                <button onClick={() => setCart([])} className="text-xs font-bold text-error-500 hover:underline">
+                <button onClick={() => setCart([])} className="text-xs font-semibold text-error-500 hover:underline">
                   Clear
                 </button>
               )}
@@ -314,16 +314,16 @@ export const PharmacyManagement = () => {
 
             <div className="mt-3 space-y-2 max-h-[260px] overflow-y-auto pr-1">
               {cart.length === 0 ? (
-                <div className="py-12 text-center text-xs text-graphite-500 dark:text-slate-400">Cart is empty. Click inventory items to add.</div>
+                <div className="py-12 text-center text-xs text-muted-foreground">Cart is empty. Click inventory items to add.</div>
               ) : (
                 cart.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center p-2.5 rounded-lg border border-canvas-silk bg-canvas text-xs">
+                  <div key={item.id} className="flex justify-between items-center p-2.5 rounded-lg border border-border bg-canvas text-xs">
                     <div>
-                      <div className="font-bold text-slate-900 dark:text-slate-100">{item.product_name}</div>
-                      <div className="text-xs text-graphite-500 dark:text-slate-400">{formatPrice(item.unit_price)} × {item.cartQuantity}</div>
+                      <div className="font-semibold text-foreground">{item.product_name}</div>
+                      <div className="text-xs text-muted-foreground">{formatPrice(item.unit_price)} × {item.cartQuantity}</div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 font-bold">
+                    <div className="flex items-center gap-1.5 font-semibold">
                       <button onClick={() => removeFromCart(item.id)} className="text-error-500 p-1">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -335,23 +335,23 @@ export const PharmacyManagement = () => {
           </div>
 
           {/* Checkout Footer */}
-          <div className="pt-3 border-t border-canvas-silk space-y-3">
+          <div className="pt-3 border-t border-border space-y-3">
             <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
-              <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Tax (est., final per item at checkout)</span><span>{formatPrice(cartTax)}</span></div>
-              <div className="flex justify-between text-base font-semibold text-slate-900 dark:text-slate-100 pt-1 border-t">
+              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
+              <div className="flex justify-between text-muted-foreground"><span>Tax (est., final per item at checkout)</span><span>{formatPrice(cartTax)}</span></div>
+              <div className="flex justify-between text-base font-semibold text-foreground pt-1 border-t">
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
-              <p className="text-graphite-400 dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
+              <p className="text-muted-foreground dark:text-slate-500 pt-1">Preview from catalogue prices — final figures are confirmed by the server on the receipt.</p>
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="pm-prescription" className="text-xs font-bold">Prescription (optional)</Label>
+              <Label htmlFor="pm-prescription" className="text-xs font-semibold">Prescription (optional)</Label>
               <select
                 id="pm-prescription"
                 value={selectedPrescriptionId}
                 onChange={(e) => setSelectedPrescriptionId(e.target.value)}
-                className="w-full p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-900"
+                className="w-full p-2 rounded-md border border-border dark:border-slate-700 text-xs font-medium bg-card"
               >
                 <option value="">Walk-in sale — no prescription</option>
                 {(pendingPharmacyPrescriptions || []).map((rx: any) => (
@@ -361,7 +361,7 @@ export const PharmacyManagement = () => {
                 ))}
               </select>
               {selectedPrescriptionId && (
-                <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+                <p className="text-[11px] text-muted-foreground">
                   This payment is recorded against the prescription, so it cannot be charged for twice.
                 </p>
               )}
@@ -381,7 +381,7 @@ export const PharmacyManagement = () => {
         </TabsContent>
 
         <TabsContent value="inventory">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+          <div className="px-4 sm:px-6 pt-6">
             <InventoryControlTabs />
           </div>
         </TabsContent>

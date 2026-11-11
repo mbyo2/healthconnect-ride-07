@@ -171,14 +171,14 @@ const LabOrders = () => {
   // The canOrder check here is redundant and causes issues with role loading timing.
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 p-4 sm:p-6 font-sans">
+    <div className="font-sans">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
             <FlaskConical className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Order Lab Tests</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">Order Lab Tests</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">Place test orders for your patients at verified laboratories</p>
           </div>
         </div>
@@ -192,7 +192,7 @@ const LabOrders = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs font-bold uppercase">Patient *</Label>
+                <Label className="text-xs font-semibold uppercase">Patient *</Label>
                 <Input
                   placeholder="Search your patients…"
                   value={patientSearch}
@@ -213,7 +213,7 @@ const LabOrders = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-bold uppercase">Receiving laboratory *</Label>
+                <Label className="text-xs font-semibold uppercase">Receiving laboratory *</Label>
                 <Select value={labId} onValueChange={setLabId}>
                   <SelectTrigger className="mt-1 h-9 text-xs">
                     <SelectValue placeholder="Select lab / diagnostic centre" />
@@ -226,7 +226,7 @@ const LabOrders = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-bold uppercase">Test *</Label>
+                <Label className="text-xs font-semibold uppercase">Test *</Label>
                 <Select
                   value={testType}
                   onValueChange={(v) => {
@@ -248,7 +248,7 @@ const LabOrders = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-bold uppercase">Category</Label>
+                <Label className="text-xs font-semibold uppercase">Category</Label>
                 <Input
                   placeholder="e.g. Haematology"
                   value={testCategory}
@@ -257,7 +257,7 @@ const LabOrders = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-bold uppercase">Priority</Label>
+                <Label className="text-xs font-semibold uppercase">Priority</Label>
                 <Select value={priority} onValueChange={setPriority}>
                   <SelectTrigger className="mt-1 h-9 text-xs">
                     <SelectValue />
@@ -271,7 +271,7 @@ const LabOrders = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-bold uppercase">Sample type</Label>
+                <Label className="text-xs font-semibold uppercase">Sample type</Label>
                 <Input
                   placeholder="e.g. Venous blood (EDTA)"
                   value={sampleType}
@@ -281,7 +281,7 @@ const LabOrders = () => {
               </div>
             </div>
             <div>
-              <Label className="text-xs font-bold uppercase">Clinical notes</Label>
+              <Label className="text-xs font-semibold uppercase">Clinical notes</Label>
               <Textarea
                 placeholder="Indication, relevant history, instructions for the lab…"
                 value={notes}
@@ -401,7 +401,7 @@ const LabOrders = () => {
                   <div key={o.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        <p className="text-sm font-semibold text-foreground">
                           {o.test_type}
                           <span className="ml-2 font-mono text-xs text-slate-400">{o.test_number}</span>
                         </p>
@@ -443,7 +443,7 @@ const LabOrders = () => {
                     </div>
                     {o.result_summary && (
                       <p className="mt-2 text-xs bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
-                        <span className="font-bold">Result: </span>{o.result_summary}
+                        <span className="font-semibold">Result: </span>{o.result_summary}
                       </p>
                     )}
                   </div>

@@ -324,7 +324,7 @@ export const SelfServiceKiosk: React.FC = () => {
         {mode !== "menu" && terminalState === "ready" && (
           <button
             onClick={() => goMode("menu")}
-            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-graphite-300 dark:border-slate-700 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-xs hover:bg-canvas-mist dark:hover:bg-slate-800"
+            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-border dark:border-slate-700 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-xs hover:bg-canvas-mist dark:hover:bg-slate-800"
           >
             <Home className="h-4 w-4" /> Home Screen
           </button>
@@ -456,7 +456,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <label className="font-bold text-xs text-slate-700 dark:text-slate-300">Mobile Phone Number</label>
               <input
                 type="tel"
-                className="w-full mt-2 px-4 py-3 rounded-2xl border border-graphite-300 dark:border-slate-700 text-lg font-bold text-center tracking-widest focus:border-primary-500 focus:outline-none"
+                className="w-full mt-2 px-4 py-3 rounded-2xl border border-border dark:border-slate-700 text-lg font-bold text-center tracking-widest focus:border-primary-500 focus:outline-none"
                 placeholder="+260 97X XXX XXX"
                 value={phoneSearch}
                 onChange={(e) => {
@@ -510,7 +510,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   <button
                     key={m.patientId}
                     onClick={() => setSelectedMatch(m)}
-                    className="w-full py-3 rounded-2xl border border-graphite-300 dark:border-slate-700 font-bold text-sm hover:border-primary-500"
+                    className="w-full py-3 rounded-2xl border border-border dark:border-slate-700 font-bold text-sm hover:border-primary-500"
                   >
                     {m.name}
                   </button>
@@ -573,7 +573,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">First Name *</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700"
                   value={patientData.firstName}
                   onChange={(e) => setPatientData({ ...patientData, firstName: e.target.value })}
                 />
@@ -581,7 +581,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">Last Name</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700"
                   value={patientData.lastName}
                   onChange={(e) => setPatientData({ ...patientData, lastName: e.target.value })}
                 />
@@ -593,7 +593,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 <label className="font-bold">Mobile Phone *</label>
                 <input
                   type="tel"
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700"
                   placeholder="+260 97..."
                   value={patientData.phone}
                   onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
@@ -602,7 +602,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">Target Department</label>
                 <select
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                   value={patientData.department}
                   onChange={(e) => setPatientData({ ...patientData, department: e.target.value })}
                 >
@@ -618,7 +618,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <label className="font-bold">Chief Symptoms / Reason for Visit</label>
               <textarea
                 rows={2}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-border dark:border-slate-700"
                 placeholder="e.g. Fever, cough, shoulder pain, routine checkup..."
                 value={patientData.symptoms}
                 onChange={(e) => setPatientData({ ...patientData, symptoms: e.target.value })}
@@ -660,7 +660,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 step="0.01"
                 inputMode="decimal"
                 aria-label="Bill amount in Kwacha from your hospital invoice"
-                className="w-full px-4 py-3 rounded-2xl border border-graphite-300 dark:border-slate-700 text-2xl font-bold text-emerald-600 text-center focus:border-primary-500 focus:outline-none"
+                className="w-full px-4 py-3 rounded-2xl border border-border dark:border-slate-700 text-2xl font-bold text-emerald-600 text-center focus:border-primary-500 focus:outline-none"
                 placeholder="0.00"
                 value={billAmount || ''}
                 onChange={(e) => setBillAmount(Math.max(0, Number(e.target.value) || 0))}
@@ -708,7 +708,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 <label className="font-bold">Mobile Money Number</label>
                 <input
                   type="tel"
-                  className="w-full mt-1 px-4 py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 text-center font-bold"
+                  className="w-full mt-1 px-4 py-2.5 rounded-xl border border-border dark:border-slate-700 text-center font-bold"
                   placeholder="097X XXX XXX"
                   value={payPhone}
                   onChange={(e) => setPayPhone(e.target.value)}
@@ -733,7 +733,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   </button>
                   <button
                     onClick={() => { setBillRef(null); goMode("menu"); }}
-                    className="flex-1 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 font-bold text-xs"
+                    className="flex-1 py-2.5 rounded-2xl border border-border dark:border-slate-700 font-bold text-xs"
                   >
                     Done
                   </button>

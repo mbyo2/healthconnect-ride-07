@@ -376,7 +376,7 @@ const Settings = () => {
                 </div>
                 <button
                   onClick={handleTwoFactorToggle}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 text-xs font-semibold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
                 >
                   Manage · {twoFactor ? 'On' : 'Off'}
                 </button>
@@ -412,7 +412,7 @@ const Settings = () => {
               <button
                 onClick={handleExportRequest}
                 disabled={exporting}
-                className="w-full py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
+                className="w-full py-2.5 min-h-[44px] rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
               >
                 {exporting ? 'Submitting request…' : 'Request Export of All Personal Data'}
               </button>
@@ -501,7 +501,7 @@ const Settings = () => {
                   setLanguage(val);
                   showSuccess({ message: `Language updated` });
                 }}>
-                  <SelectTrigger id="settings-language" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-language" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {SUPPORTED_LANGUAGES.map((lang) => (
                       <SelectItem key={lang.code} value={lang.code}>{lang.nativeName}</SelectItem>
@@ -513,7 +513,7 @@ const Settings = () => {
               <div className="space-y-1.5">
                 <label htmlFor="settings-timezone" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
-                  <SelectTrigger id="settings-timezone" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-timezone" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="UTC">UTC</SelectItem>
                     <SelectItem value="CAT">Central Africa Time (CAT / Lusaka)</SelectItem>
@@ -526,7 +526,7 @@ const Settings = () => {
               <div className="space-y-1.5">
                 <label htmlFor="settings-date-format" className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                  <SelectTrigger id="settings-date-format" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-date-format" className="border-border dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
                     <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>

@@ -124,7 +124,7 @@ const NotificationsPage = () => {
       case "alert": return <AlertCircle className="h-5 w-5 text-error-500" />;
       case "reminder": return <Pill className="h-5 w-5 text-warning-500" />;
       case "connection": return <Users className="h-5 w-5 text-purple-500" />;
-      default: return <FileText className="h-5 w-5 text-graphite-500 dark:text-slate-400" />;
+      default: return <FileText className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -132,12 +132,12 @@ const NotificationsPage = () => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -146,7 +146,7 @@ const NotificationsPage = () => {
                 <span className="w-2 h-2 rounded-full bg-success-500" aria-hidden />
                 <span className="sr-only">Live notifications</span>
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}` : "All notifications read"}
               </p>
             </div>
@@ -167,7 +167,7 @@ const NotificationsPage = () => {
         </div>
 
         {/* View Tabs */}
-        <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-2">
           {[
             { id: "all", label: `All Notifications (${notifications.length})` },
             { id: "unread", label: `Unread (${unreadCount})` },
@@ -178,7 +178,7 @@ const NotificationsPage = () => {
               className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                 filter === tab.id
                   ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
               {tab.label}
@@ -214,27 +214,27 @@ const NotificationsPage = () => {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-canvas dark:bg-slate-950"}`}
+                  className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-background"}`}
                 >
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 shadow-2xs">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-border shadow-2xs">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+                          <h3 className="font-semibold text-xs text-foreground">
                             {notification.title}
                           </h3>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">
+                          <p className="text-xs text-muted-foreground mt-0.5 font-medium">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-1">
+                          <p className="text-xs text-muted-foreground font-semibold mt-1">
                             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                           </p>
                         </div>
                         {!notification.read && (
-                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">New</span>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-primary-500">New</span>
                         )}
                       </div>
 
@@ -243,7 +243,7 @@ const NotificationsPage = () => {
                     <button
                       onClick={() => markAsRead(notification.id)}
                       aria-label={`Mark as read: ${notification.title}`}
-                      className="px-3 py-1 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                      className="px-3 py-1 min-h-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold flex items-center gap-1 hover:bg-muted dark:hover:bg-slate-700"
                     >
                       <Check className="h-3.5 w-3.5 text-success-500" /> Mark Read
                     </button>
@@ -251,7 +251,7 @@ const NotificationsPage = () => {
                   <button
                     onClick={() => deleteNotification(notification.id)}
                     aria-label={`Delete notification: ${notification.title}`}
-                    className="px-3 py-1 min-h-[44px] rounded-md text-error-500 hover:bg-error-50 dark:hover:bg-rose-950/30 text-xs font-bold flex items-center gap-1"
+                    className="px-3 py-1 min-h-[44px] rounded-md text-error-500 hover:bg-error-50 dark:hover:bg-rose-950/30 text-xs font-semibold flex items-center gap-1"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Delete
                   </button>

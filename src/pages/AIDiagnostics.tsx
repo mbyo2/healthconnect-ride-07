@@ -26,12 +26,12 @@ const AIDiagnostics = () => {
         <meta name="description" content="Get AI-powered health analysis and medical insights from Doc' O Clock AI." />
       </Helmet>
 
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      <div className="pb-16">
         {/* Sticky Monday Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
                 <Brain className="h-5 w-5" />
               </div>
               <div>
@@ -39,21 +39,21 @@ const AIDiagnostics = () => {
                   Multimodal Medical AI Diagnostic Workspace
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                <p className="text-xs text-muted-foreground font-medium">
                   Evidence-based clinical decision support from Doc' O Clock AI, with preliminary scan-slice review
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-primary-500">
                 Clinical AI Engine Active
               </span>
             </div>
           </div>
 
           {/* Navigation Tabs — horizontally scrollable on small screens */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [-ms-overflow-style:none] [scrollbar-width:thin]" role="tablist" aria-label="AI diagnostics sections">
+          <div className="mt-4 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [-ms-overflow-style:none] [scrollbar-width:thin]" role="tablist" aria-label="AI diagnostics sections">
             {[
               { id: "chat", label: "AI Consultation", icon: <MessageSquare className="h-3.5 w-3.5" /> },
               { id: "documents", label: "Document OCR", icon: <FileText className="h-3.5 w-3.5" /> },
@@ -69,7 +69,7 @@ const AIDiagnostics = () => {
                 className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                    : "bg-card border border-border text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {tab.icon}
@@ -79,7 +79,7 @@ const AIDiagnostics = () => {
           </div>
         </div>
 
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        <div className="px-4 sm:px-6 pt-6 space-y-6">
           {/* Feature Quick-Access Bento Grid */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
@@ -99,44 +99,44 @@ const AIDiagnostics = () => {
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveTab(card.id); } }}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   activeTab === card.id
-                    ? "border-primary-500 bg-white dark:bg-slate-900 shadow-xs ring-2 ring-primary-500/20"
-                    : "border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-primary-500 dark:hover:bg-slate-800"
+                    ? "border-primary-500 bg-card shadow-xs ring-2 ring-primary-500/20"
+                    : "border-border bg-card hover:border-primary-500 dark:hover:bg-slate-800"
                 }`}
               >
                 <div style={{ color: card.color }} className="mb-2">{card.icon}</div>
-                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">{card.title}</p>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">{card.sub}</p>
+                <p className="font-semibold text-xs text-foreground">{card.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 font-medium">{card.sub}</p>
               </div>
             ))}
           </div>
 
           {/* Main Active Tab Body */}
           {activeTab === "chat" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
               <DocOClockAIChat onActionClick={handleActionClick} />
             </div>
           )}
 
           {activeTab === "documents" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
               <DocumentAnalysisUploader />
             </div>
           )}
 
           {activeTab === "imaging" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
               <Imaging3DUploader />
             </div>
           )}
 
           {activeTab === "symptoms" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <div className="border-b border-canvas-silk pb-3">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+              <div className="border-b border-border pb-3">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-warning-500" />
                   Guided Clinical Symptom Analysis
                 </h2>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+                <p className="text-xs text-muted-foreground font-medium mt-0.5">
                   Describe symptoms, duration, and severity to generate an evidence-based clinical differential.
                 </p>
               </div>
@@ -145,7 +145,7 @@ const AIDiagnostics = () => {
           )}
 
           {activeTab === "history" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
               <AIDiagnosisHistory />
             </div>
           )}
@@ -154,11 +154,11 @@ const AIDiagnostics = () => {
           <div className="rounded-2xl border border-warning-500/30 bg-canvas-bone p-4 flex items-start gap-3 text-xs">
             <AlertCircle className="h-5 w-5 text-warning-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
                 <TriangleAlert className="h-4 w-4 text-warning-500" aria-hidden /> Important safety note
               </p>
-              <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">
-                <strong className="text-slate-900 dark:text-slate-100">If this is an emergency, call 116 or 112 now.</strong>{" "}
+              <p className="text-muted-foreground mt-0.5 leading-relaxed font-medium">
+                <strong className="text-foreground">If this is an emergency, call 116 or 112 now.</strong>{" "}
                 This AI assistant gives information only — it is not a doctor and cannot diagnose you.
                 Always confirm important health decisions with a qualified clinician.
               </p>

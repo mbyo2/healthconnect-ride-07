@@ -51,19 +51,19 @@ const HealthAnalytics = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Top Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight">
                 Biometric Health Analytics
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Your recorded vitals and activity trends — shown only from data you have actually logged
               </p>
             </div>
@@ -73,7 +73,7 @@ const HealthAnalytics = () => {
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="px-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none"
+              className="px-3 py-2 rounded-md border border-border dark:border-slate-700 dark:border-slate-800 bg-card text-xs font-semibold focus:outline-none"
               aria-label="Time range"
             >
               <option value="7days">Last 7 Days</option>
@@ -94,31 +94,31 @@ const HealthAnalytics = () => {
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="px-4 sm:px-6 pt-6 space-y-6">
         {loading ? (
           /* Loading state: skeleton cards while vitals load — never flash placeholder numbers */
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Loading vitals">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+                <div key={i} className="p-4 rounded-xl bg-card border border-border shadow-xs">
                   <SkeletonLine className="h-3 w-24 mb-3" />
                   <Skeleton className="h-8 w-20 mb-2" />
                   <SkeletonLine className="h-3 w-28" />
                 </div>
               ))}
             </div>
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
               <Skeleton className="h-[380px] w-full rounded-xl" />
             </div>
           </>
         ) : !hasAnyData ? (
           /* Empty state: nothing recorded yet — one clear next action */
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-xs text-center max-w-xl mx-auto">
+          <div className="rounded-2xl border border-border bg-card p-10 shadow-xs text-center max-w-xl mx-auto">
             <div className="h-16 w-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center mx-auto mb-4">
               <HeartPulse className="h-8 w-8" />
             </div>
             <h2 className="text-lg font-semibold mb-2">No health data yet</h2>
-            <p className="text-sm text-graphite-500 dark:text-slate-400 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               Record your first vitals — blood pressure, heart rate, weight or oxygen saturation —
               and your trends will appear here. We only show measurements you have actually logged.
             </p>
@@ -132,7 +132,7 @@ const HealthAnalytics = () => {
         ) : (
           <>
             {/* AI Health Insights */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
               <AIInsightsWidget
                 context="health"
                 data={{
@@ -177,13 +177,13 @@ const HealthAnalytics = () => {
             </div>
 
             {/* Detailed Analytics Board */}
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-              <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
                   <LineChartIcon className="h-4 w-4 text-primary-500" />
                   Biometric Data Visualizations
                 </h2>
-                <div className="flex items-center gap-1 p-1 rounded-lg bg-canvas border border-canvas-silk dark:border-slate-800" role="tablist" aria-label="Biometric data views">
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-canvas border border-border" role="tablist" aria-label="Biometric data views">
                   {[
                     { id: "heart-rate", label: "Heart Rate" },
                     { id: "activity", label: "Activity" },
@@ -198,7 +198,7 @@ const HealthAnalytics = () => {
                       className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                         activeTab === tab.id
                           ? "bg-primary-500 text-white shadow-xs"
-                          : "text-graphite-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800"
+                          : "text-muted-foreground hover:bg-white dark:hover:bg-slate-800"
                       }`}
                     >
                       {tab.label}
@@ -213,7 +213,7 @@ const HealthAnalytics = () => {
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Heart Rate (bpm) — from your recorded vitals</h3>
+                      <h3 className="font-semibold text-xs text-muted-foreground uppercase">Heart Rate (bpm) — from your recorded vitals</h3>
                     </div>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -238,7 +238,7 @@ const HealthAnalytics = () => {
                   <ChartEmptyState message="No activity data in this period. Sync a device or log activity to see your trend." />
                 ) : (
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Daily Step Count & Active Caloric Burn</h3>
+                    <h3 className="font-semibold text-xs text-muted-foreground uppercase">Daily Step Count & Active Caloric Burn</h3>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={activityData}>
@@ -261,7 +261,7 @@ const HealthAnalytics = () => {
                   <ChartEmptyState message="No sleep logged in this period. Log your sleep hours to see your trend." />
                 ) : (
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Duration (recorded hours per night)</h3>
+                    <h3 className="font-semibold text-xs text-muted-foreground uppercase">Sleep Duration (recorded hours per night)</h3>
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={sleepData}>
@@ -302,15 +302,15 @@ function KpiCard({ label, icon, value, caption, accent }: {
   accent: string;
 }) {
   return (
-    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
+    <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase">{label}</span>
         {icon}
       </div>
-      <div className={`text-2xl font-bold font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+      <div className={`text-2xl font-semibold font-mono ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
         {value ?? "—"}
       </div>
-      <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
+      <div className="text-xs text-muted-foreground font-semibold mt-0.5">
         {value ? caption ?? "Recorded reading" : "No readings yet"}
       </div>
     </div>
@@ -324,12 +324,12 @@ function VitalsTile({ title, value, accent, caption }: {
   caption: string | null;
 }) {
   return (
-    <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
-      <p className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase">{title}</p>
-      <p className={`text-3xl font-bold font-mono mt-2 ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
+    <div className="p-4 rounded-xl border border-border bg-background">
+      <p className="font-semibold text-xs text-muted-foreground uppercase">{title}</p>
+      <p className={`text-3xl font-semibold font-mono mt-2 ${value ? accent : "text-slate-400 dark:text-slate-500"}`}>
         {value ?? "—"}
       </p>
-      <p className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-1">
+      <p className="text-xs text-muted-foreground font-semibold mt-1">
         {value ? caption ?? "Recorded reading" : "No readings yet"}
       </p>
     </div>
@@ -340,7 +340,7 @@ function ChartEmptyState({ message }: { message: string }) {
   return (
     <div className="h-[280px] flex flex-col items-center justify-center text-center gap-2">
       <Activity className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-      <p className="text-sm font-bold text-graphite-500 dark:text-slate-400 max-w-xs">{message}</p>
+      <p className="text-sm font-semibold text-muted-foreground max-w-xs">{message}</p>
     </div>
   );
 }

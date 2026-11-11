@@ -68,12 +68,12 @@ const Marketplace = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      <div className="pb-16">
         {/* Sticky Monday Top Header */}
         <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs">
                 <Pill className="h-5 w-5" />
               </div>
               <div>
@@ -81,7 +81,7 @@ const Marketplace = () => {
                   Pharmacy Marketplace & Prescription Fulfillment
                   <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                <p className="text-xs text-muted-foreground font-medium">
                   Direct procurement from licensed regional pharmacies, e-prescriptions, and courier dispatch
                 </p>
               </div>
@@ -99,7 +99,7 @@ const Marketplace = () => {
           </div>
 
           {/* Navigation Bar */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2" role="tablist" aria-label="Marketplace sections">
+          <div className="mt-4 flex items-center gap-2" role="tablist" aria-label="Marketplace sections">
             {[
               { id: "products", label: "Medication Catalog" },
               { id: "cart", label: `Cart Checkout (${cart?.items?.length ?? 0})` },
@@ -113,7 +113,7 @@ const Marketplace = () => {
                 className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                    : "bg-card border border-border text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {tab.label}
@@ -122,25 +122,25 @@ const Marketplace = () => {
           </div>
         </div>
 
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        <div className="px-4 sm:px-6 pt-6 space-y-6">
           {activeTab === "products" && (
             <div className="space-y-6">
               {/* Search and Filters */}
-              <div className="flex flex-col md:flex-row gap-3 p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+              <div className="flex flex-col md:flex-row gap-3 p-4 rounded-2xl border border-border bg-card shadow-xs">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-graphite-500 dark:text-slate-400 h-4 w-4" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <input
                     type="text"
                     placeholder="Search medication name, generic compound, or brand..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full pl-10 pr-3 py-2 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-foreground text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-2 border border-graphite-300 dark:border-slate-700 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                  className="px-4 py-2 border border-border dark:border-slate-700 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-foreground"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((category) => (
@@ -153,9 +153,9 @@ const Marketplace = () => {
 
               {/* Products Grid */}
               {productsError ? (
-                <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400" role="alert">
+                <div className="text-center py-12 text-xs text-muted-foreground" role="alert">
                   <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                  <p className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Couldn't load medications.</p>
+                  <p className="font-semibold text-sm text-foreground mb-1">Couldn't load medications.</p>
                   <p className="font-medium mb-4">Check your connection and try again — your cart is safe.</p>
                   <button
                     onClick={() => refetchProducts()}
@@ -180,9 +180,9 @@ const Marketplace = () => {
               )}
 
               {!productsError && filteredProducts?.length === 0 && !productsLoading && (
-                <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
+                <div className="text-center py-12 text-xs text-muted-foreground">
                   <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                  <p className="font-bold">No medications found matching your criteria.</p>
+                  <p className="font-semibold">No medications found matching your criteria.</p>
                   <p className="font-medium mt-1">Try a different search term or category.</p>
                 </div>
               )}
@@ -190,7 +190,7 @@ const Marketplace = () => {
           )}
 
           {activeTab === "cart" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
               <Cart
                 cart={cart}
                 onUpdateQuantity={updateCartQuantity}
@@ -202,7 +202,7 @@ const Marketplace = () => {
           )}
 
           {activeTab === "orders" && (
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
               <h2 className="font-semibold text-sm mb-4">Medication Fulfillment & Order History</h2>
               <div className="space-y-3" aria-label={ordersLoading ? "Loading orders" : "Order history"}>
                 {ordersLoading ? (
@@ -211,21 +211,21 @@ const Marketplace = () => {
                   ))
                 ) : (
                   orders?.map((order) => (
-                  <div key={order.id} className="border border-canvas-silk bg-canvas rounded-xl p-4 gap-3">
+                  <div key={order.id} className="border border-border bg-canvas rounded-xl p-4 gap-3">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
+                          <h3 className="font-semibold text-xs text-foreground">Order #{order.id.slice(0, 8)}</h3>
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white ${
                             order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
                           }`}>
                             {order.status.replace("_", " ")}
                           </span>
                         </div>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400 mt-1 font-medium">
+                        <p className="text-xs text-muted-foreground mt-1 font-medium">
                           Total: <strong>K{order.total_amount}</strong> • {new Date(order.created_at).toLocaleDateString()}
                         </p>
-                        <p className="text-xs text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
+                        <p className="text-xs text-muted-foreground">Delivery address: {order.delivery_address}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {order.status === "pending" && (
@@ -243,9 +243,9 @@ const Marketplace = () => {
                 )))}
 
                 {!ordersLoading && orders?.length === 0 && (
-                  <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
+                  <div className="text-center py-10 text-xs text-muted-foreground">
                     <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                    <p className="font-bold">No orders yet.</p>
+                    <p className="font-semibold">No orders yet.</p>
                     <p className="font-medium mt-1">
                       When you place an order, it will appear here so you can pay and track delivery.
                     </p>

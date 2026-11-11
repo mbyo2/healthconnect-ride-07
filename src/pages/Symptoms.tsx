@@ -106,12 +106,12 @@ const Symptoms = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Monday Top Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-xs shrink-0">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -119,7 +119,7 @@ const Symptoms = () => {
                 <span className="truncate">Check your symptoms</span>
                 <span className="w-2 h-2 rounded-full bg-success-500 shrink-0" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
+              <p className="text-xs text-muted-foreground font-medium truncate">
                 Log your symptoms to get AI-guided insights and share them with your clinician
               </p>
             </div>
@@ -128,7 +128,7 @@ const Symptoms = () => {
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <div className="px-4 sm:px-6 pt-6 space-y-6">
         {/* AI Assistant Callout Banner */}
         <div className="rounded-2xl border border-primary-500/30 bg-primary-50 dark:bg-blue-950/30 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ const Symptoms = () => {
               <h3 className="font-semibold text-sm text-primary-500 flex items-center gap-1.5">
                 Doc' O Clock Clinical AI Triage <Sparkles className="h-4 w-4" />
               </h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 Receive immediate differential diagnostic analysis, symptom clustering, and 24/7 specialist matching.
               </p>
             </div>
@@ -155,10 +155,10 @@ const Symptoms = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Category Symptom Selector */}
-          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <div className="border-b border-canvas-silk pb-3">
-              <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Select your symptoms</h2>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">Tap a symptom to add it to your list.</p>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+            <div className="border-b border-border pb-3">
+              <h2 className="font-semibold text-sm text-foreground">Select your symptoms</h2>
+              <p className="text-xs text-muted-foreground font-medium mt-0.5">Tap a symptom to add it to your list.</p>
             </div>
 
             <div className="space-y-4">
@@ -178,7 +178,7 @@ const Symptoms = () => {
               ) : (
                 symptomCategories.map((category) => (
                 <div key={category.title} className="space-y-2">
-                  <h4 className="font-semibold text-xs text-graphite-500 dark:text-slate-400 uppercase flex items-center gap-1.5">
+                  <h4 className="font-semibold text-xs text-muted-foreground uppercase flex items-center gap-1.5">
                     {getIconForCategory(category.title)}
                     {category.title}
                   </h4>
@@ -191,10 +191,10 @@ const Symptoms = () => {
                           onClick={() => toggleSymptom(symptom)}
                           aria-pressed={isSelected}
                           title={isSelected ? 'Remove symptom' : 'Add symptom'}
-                          className={`min-h-[44px] min-w-0 max-w-full break-words text-left px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                          className={`min-h-[44px] min-w-0 max-w-full break-words text-left px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                             isSelected
                               ? "bg-primary-500 text-white shadow-xs"
-                              : "bg-canvas dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-canvas-silk dark:border-slate-700 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                              : "bg-canvas dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-border hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-700"
                           }`}
                         >
                           {symptom} {isSelected ? "✓" : "+"}
@@ -210,14 +210,14 @@ const Symptoms = () => {
 
           {/* Details & Submission */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <div className="border-b border-canvas-silk dark:border-slate-800 pb-3">
-                <h2 className="font-semibold text-sm text-slate-900 dark:text-slate-100">Severity & details</h2>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+              <div className="border-b border-border pb-3">
+                <h2 className="font-semibold text-sm text-foreground">Severity & details</h2>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label htmlFor="symptom-severity" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Discomfort Severity (1 - 10)</label>
+                  <label htmlFor="symptom-severity" className="font-semibold text-muted-foreground uppercase">Discomfort Severity (1 - 10)</label>
                   <input
                     id="symptom-severity"
                     type="number"
@@ -228,19 +228,19 @@ const Symptoms = () => {
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
                     placeholder="Rate severity from 1 (mild) to 10 (severe)"
-                    className="w-full mt-1 p-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold placeholder:text-slate-400"
+                    className="w-full mt-1 p-2.5 min-h-[44px] rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold placeholder:text-slate-400"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="symptom-description" className="font-semibold text-graphite-500 dark:text-slate-400 uppercase">Describe your symptoms</label>
+                  <label htmlFor="symptom-description" className="font-semibold text-muted-foreground uppercase">Describe your symptoms</label>
                   <textarea
                     id="symptom-description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe onset, triggers, pain quality, and affected body regions..."
                     rows={4}
-                    className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-slate-400"
+                    className="w-full mt-1 p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-slate-400"
                   />
                 </div>
 
@@ -264,8 +264,8 @@ const Symptoms = () => {
             </div>
 
             {selectedSymptoms.length > 0 && (
-              <div className="rounded-2xl border border-primary-500/30 bg-white dark:bg-slate-900 p-4 shadow-xs space-y-2">
-                <p className="font-semibold text-xs text-slate-900 dark:text-slate-100">Your selected symptoms ({selectedSymptoms.length})</p>
+              <div className="rounded-2xl border border-primary-500/30 bg-card p-4 shadow-xs space-y-2">
+                <p className="font-semibold text-xs text-foreground">Your selected symptoms ({selectedSymptoms.length})</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedSymptoms.map((symptom) => (
                     <button
@@ -273,7 +273,7 @@ const Symptoms = () => {
                       onClick={() => toggleSymptom(symptom)}
                       title="Remove symptom"
                       aria-label={`Remove ${symptom}`}
-                      className="inline-flex items-center gap-1 min-h-[44px] px-4 py-2 rounded-full text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 transition-colors break-words min-w-0 max-w-full text-left"
+                      className="inline-flex items-center gap-1 min-h-[44px] px-4 py-2 rounded-full text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 transition-colors break-words min-w-0 max-w-full text-left"
                     >
                       {symptom} <span aria-hidden>×</span>
                     </button>

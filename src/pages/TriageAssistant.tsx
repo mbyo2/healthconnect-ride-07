@@ -133,7 +133,7 @@ function Chip({
       : "bg-error-50 dark:bg-red-950/30 border-error-200 dark:border-red-900 text-error-700 dark:text-red-300 hover:border-error-400"
     : selected
       ? "bg-primary-500 border-primary-500 text-white"
-      : "bg-white dark:bg-slate-800 border-graphite-300 dark:border-slate-700 text-graphite-700 dark:text-slate-200 hover:border-primary-400";
+      : "bg-white dark:bg-slate-800 border-border dark:border-slate-700 text-graphite-700 dark:text-slate-200 hover:border-primary-400";
   return (
     <button type="button" aria-pressed={selected} onClick={onClick} className={`${base} ${styles}`}>
       {children}
@@ -458,7 +458,7 @@ export default function TriageAssistant() {
                 placeholder="Describe how you feel in your own words — e.g. 'Sharp pain in my lower right belly since this morning'"
                 rows={3}
                 maxLength={500}
-                className="w-full mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full mt-1 p-3 rounded-xl border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -534,7 +534,7 @@ export default function TriageAssistant() {
               <button
                 type="button"
                 onClick={() => setStep("intro")}
-                className="px-4 py-3 rounded-xl border border-graphite-300 dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
+                className="px-4 py-3 rounded-xl border border-border dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
@@ -588,7 +588,7 @@ export default function TriageAssistant() {
               <button
                 type="button"
                 onClick={() => setStep("intake")}
-                className="px-4 py-3 rounded-xl border border-graphite-300 dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
+                className="px-4 py-3 rounded-xl border border-border dark:border-slate-700 font-semibold text-sm flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>

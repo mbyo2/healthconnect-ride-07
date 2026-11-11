@@ -187,7 +187,7 @@ export const PatientFlowManagement = () => {
       case "treatment": return "bg-error-500";
       case "billing": return "bg-indigo-500";
       case "discharge": return "bg-success-500";
-      default: return "bg-graphite-500 dark:bg-slate-600";
+      default: return "bg-muted-foreground";
     }
   };
 
@@ -207,12 +207,12 @@ export const PatientFlowManagement = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
             <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-semibold">Institution Required</h2>
-            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access patient flow management.</p>
+            <p className="text-xs text-muted-foreground">Please select an institution to access patient flow management.</p>
             <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
@@ -228,23 +228,23 @@ export const PatientFlowManagement = () => {
   const utilizationRate = totalCapacity > 0 ? (currentLoad / totalCapacity) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="pb-16">
       {/* Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <Users className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold truncate">Patient Flow Management</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Real-time Patient Journey & Capacity Optimization</p>
+              <p className="text-xs text-muted-foreground font-medium truncate">Real-time Patient Journey & Capacity Optimization</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showStageDialog} onOpenChange={setShowStageDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
+                <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" /> Add Stage
                 </Button>
               </DialogTrigger>
@@ -254,7 +254,7 @@ export const PatientFlowManagement = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Stage Name</Label>
+                    <Label className="text-xs font-semibold">Stage Name</Label>
                     <Input
                       value={stageForm.stage_name}
                       onChange={(e) => setStageForm({ ...stageForm, stage_name: e.target.value })}
@@ -263,7 +263,7 @@ export const PatientFlowManagement = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Stage Type</Label>
+                    <Label className="text-xs font-semibold">Stage Type</Label>
                     <Select
                       value={stageForm.stage_type}
                       onValueChange={(value) => setStageForm({ ...stageForm, stage_type: value })}
@@ -284,7 +284,7 @@ export const PatientFlowManagement = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-bold">Order</Label>
+                      <Label className="text-xs font-semibold">Order</Label>
                       <Input
                         type="number"
                         value={stageForm.stage_order}
@@ -293,7 +293,7 @@ export const PatientFlowManagement = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs font-bold">Duration (min)</Label>
+                      <Label className="text-xs font-semibold">Duration (min)</Label>
                       <Input
                         type="number"
                         value={stageForm.estimated_duration_minutes}
@@ -304,21 +304,21 @@ export const PatientFlowManagement = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Auto-Proceed</Label>
+                      <Label className="text-xs font-semibold">Auto-Proceed</Label>
                       <Switch
                         checked={stageForm.auto_proceed}
                         onCheckedChange={(checked) => setStageForm({ ...stageForm, auto_proceed: checked })}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold">Skip Allowed</Label>
+                      <Label className="text-xs font-semibold">Skip Allowed</Label>
                       <Switch
                         checked={stageForm.skip_allowed}
                         onCheckedChange={(checked) => setStageForm({ ...stageForm, skip_allowed: checked })}
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateStage} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleCreateStage} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Create Stage
                   </Button>
                 </div>
@@ -326,7 +326,7 @@ export const PatientFlowManagement = () => {
             </Dialog>
             <Dialog open={showCapacityDialog} onOpenChange={setShowCapacityDialog}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="text-xs font-bold">
+                <Button variant="outline" className="text-xs font-semibold">
                   <Settings className="h-4 w-4 mr-1" /> Capacity
                 </Button>
               </DialogTrigger>
@@ -336,7 +336,7 @@ export const PatientFlowManagement = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label className="text-xs font-bold">Department</Label>
+                    <Label className="text-xs font-semibold">Department</Label>
                     <Select
                       value={capacityForm.department_id}
                       onValueChange={(value) => setCapacityForm({ ...capacityForm, department_id: value })}
@@ -352,7 +352,7 @@ export const PatientFlowManagement = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Max Capacity</Label>
+                    <Label className="text-xs font-semibold">Max Capacity</Label>
                     <Input
                       type="number"
                       value={capacityForm.max_capacity}
@@ -361,7 +361,7 @@ export const PatientFlowManagement = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-bold">Overbooking Threshold</Label>
+                    <Label className="text-xs font-semibold">Overbooking Threshold</Label>
                     <Input
                       type="number"
                       value={capacityForm.overbooking_threshold}
@@ -370,13 +370,13 @@ export const PatientFlowManagement = () => {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-bold">Allow Overbooking</Label>
+                    <Label className="text-xs font-semibold">Allow Overbooking</Label>
                     <Switch
                       checked={capacityForm.overbooking_allowed}
                       onCheckedChange={(checked) => setCapacityForm({ ...capacityForm, overbooking_allowed: checked })}
                     />
                   </div>
-                  <Button onClick={handleUpdateCapacity} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
+                  <Button onClick={handleUpdateCapacity} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold">
                     Update Capacity
                   </Button>
                 </div>
@@ -386,53 +386,53 @@ export const PatientFlowManagement = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Active Patients</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Active Patients</span>
                 <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-primary-500">{activeFlows.length}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently in flow</div>
+              <div className="text-2xl font-semibold font-mono text-primary-500">{activeFlows.length}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Currently in flow</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Avg Wait Time</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Avg Wait Time</span>
                 <Clock className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-purple-500">{averageWaitTime.toFixed(0)}m</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per patient</div>
+              <div className="text-2xl font-semibold font-mono text-purple-500">{averageWaitTime.toFixed(0)}m</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Per patient</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Capacity Utilization</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Capacity Utilization</span>
                 <BarChart3 className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-success-500">{utilizationRate.toFixed(0)}%</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{currentLoad}/{totalCapacity} patients</div>
+              <div className="text-2xl font-semibold font-mono text-success-500">{utilizationRate.toFixed(0)}%</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">{currentLoad}/{totalCapacity} patients</div>
             </CardContent>
           </Card>
-          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+          <Card className="border-border shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-graphite-500 dark:text-slate-400 uppercase">Flow Stages</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Flow Stages</span>
                 <ArrowRight className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-bold font-mono text-warning-500">{stages.length}</div>
-              <div className="text-xs text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured stages</div>
+              <div className="text-2xl font-semibold font-mono text-warning-500">{stages.length}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-0.5">Configured stages</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsList className="bg-card border border-border p-1">
             <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Active Flows
             </TabsTrigger>
@@ -491,7 +491,7 @@ export const PatientFlowManagement = () => {
                 );
 
                 return (
-                  <Card key={flow.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                  <Card key={flow.id} className="border-border shadow-xs">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
@@ -502,7 +502,7 @@ export const PatientFlowManagement = () => {
                             <CardTitle className="text-sm font-semibold">
                               {flow.patient?.first_name} {flow.patient?.last_name}
                             </CardTitle>
-                            <div className="text-xs text-graphite-500 dark:text-slate-400">
+                            <div className="text-xs text-muted-foreground">
                               Started: {new Date(flow.started_at).toLocaleTimeString()}
                             </div>
                           </div>
@@ -514,14 +514,14 @@ export const PatientFlowManagement = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {flow.current_stage && (
-                        <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-3">
+                        <div className="rounded-xl bg-muted p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <div className={`h-6 w-6 rounded-lg ${getStageTypeColor(flow.current_stage.stage_type)} text-white flex items-center justify-center`}>
                               {getStageTypeIcon(flow.current_stage.stage_type)}
                             </div>
                             <div>
-                              <div className="text-xs font-bold">{flow.current_stage.stage_name}</div>
-                              <div className="text-xs text-graphite-500 dark:text-slate-400">
+                              <div className="text-xs font-semibold">{flow.current_stage.stage_name}</div>
+                              <div className="text-xs text-muted-foreground">
                                 {timeData.elapsedMinutes.toFixed(0)} / {flow.current_stage.estimated_duration_minutes || 0} min
                               </div>
                             </div>
@@ -530,10 +530,10 @@ export const PatientFlowManagement = () => {
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
                         <div className="text-xs">
-                          <span className="text-graphite-500 dark:text-slate-400">Total Wait: </span>
-                          <span className="font-bold">{flow.total_wait_time_minutes || 0}m</span>
+                          <span className="text-muted-foreground">Total Wait: </span>
+                          <span className="font-semibold">{flow.total_wait_time_minutes || 0}m</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -562,19 +562,19 @@ export const PatientFlowManagement = () => {
 
             <div className="space-y-2">
               {stages.map((stage, index) => (
-                <Card key={stage.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={stage.id} className="border-border shadow-xs">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="h-8 w-8 rounded-lg bg-canvas-mist dark:bg-slate-800 flex items-center justify-center font-bold text-sm">
+                        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center font-semibold text-sm">
                           {index + 1}
                         </div>
                         <div className={`h-8 w-8 rounded-lg ${getStageTypeColor(stage.stage_type)} text-white flex items-center justify-center`}>
                           {getStageTypeIcon(stage.stage_type)}
                         </div>
                         <div>
-                          <div className="text-sm font-bold">{stage.stage_name}</div>
-                          <div className="text-xs text-graphite-500 dark:text-slate-400">
+                          <div className="text-sm font-semibold">{stage.stage_name}</div>
+                          <div className="text-xs text-muted-foreground">
                             {stage.estimated_duration_minutes} min • {stage.stage_type}
                           </div>
                         </div>
@@ -601,7 +601,7 @@ export const PatientFlowManagement = () => {
           <TabsContent value="capacity" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {capacity.map((cap) => (
-                <Card key={cap.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
+                <Card key={cap.id} className="border-border shadow-xs">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-primary-500" />
@@ -610,18 +610,18 @@ export const PatientFlowManagement = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Current Load</span>
-                      <span className="font-bold">{cap.current_load} / {cap.max_capacity}</span>
+                      <span className="text-muted-foreground">Current Load</span>
+                      <span className="font-semibold">{cap.current_load} / {cap.max_capacity}</span>
                     </div>
                     <Progress value={(cap.current_load / cap.max_capacity) * 100} className="h-2" />
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Available</span>
-                      <span className="font-bold text-success-500">{cap.available_slots}</span>
+                      <span className="text-muted-foreground">Available</span>
+                      <span className="font-semibold text-success-500">{cap.available_slots}</span>
                     </div>
                     {cap.overbooking_allowed && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-graphite-500 dark:text-slate-400">Overbooking</span>
-                        <span className="font-bold text-warning-500">+{cap.overbooking_threshold}</span>
+                        <span className="text-muted-foreground">Overbooking</span>
+                        <span className="font-semibold text-warning-500">+{cap.overbooking_threshold}</span>
                       </div>
                     )}
                   </CardContent>
@@ -633,19 +633,19 @@ export const PatientFlowManagement = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary-500" /> Flow Analytics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
+                  <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs">
                     Flow analytics chart placeholder
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
+              <Card className="border-border shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-primary-500" /> Bottlenecks
@@ -654,16 +654,16 @@ export const PatientFlowManagement = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Triage Stage</span>
-                      <span className="font-bold text-error-500">12 min avg</span>
+                      <span className="text-muted-foreground">Triage Stage</span>
+                      <span className="font-semibold text-error-500">12 min avg</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Consultation</span>
-                      <span className="font-bold text-warning-500">8 min avg</span>
+                      <span className="text-muted-foreground">Consultation</span>
+                      <span className="font-semibold text-warning-500">8 min avg</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-graphite-500 dark:text-slate-400">Billing</span>
-                      <span className="font-bold text-success-500">5 min avg</span>
+                      <span className="text-muted-foreground">Billing</span>
+                      <span className="font-semibold text-success-500">5 min avg</span>
                     </div>
                   </div>
                 </CardContent>

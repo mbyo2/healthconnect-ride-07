@@ -197,11 +197,11 @@ export const AppointmentDetails = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-success-500">Completed</span>;
       case "cancelled":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-error-500">Cancelled</span>;
       default:
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Scheduled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-primary-400">Scheduled</span>;
     }
   };
 
@@ -211,13 +211,13 @@ export const AppointmentDetails = () => {
 
   if (!appointment) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk text-center space-y-3">
+      <div className="flex items-center justify-center p-6 min-h-[60vh]">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-card border border-border text-center space-y-3">
           <Calendar className="h-12 w-12 mx-auto text-primary-500" />
           <h3 className="text-lg font-semibold">Appointment Record Not Found</h3>
           <button
             onClick={() => navigate("/appointments")}
-            className="px-4 py-2 rounded-md bg-primary-500 text-white font-bold text-xs"
+            className="px-4 py-2 rounded-md bg-primary-500 text-white font-semibold text-xs"
           >
             Return to Appointments Board
           </button>
@@ -227,7 +227,7 @@ export const AppointmentDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="pb-16">
       {/* Sticky Header */}
       <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3">
@@ -235,13 +235,13 @@ export const AppointmentDetails = () => {
             <button
               onClick={() => navigate("/appointments")}
               aria-label="Back to appointments"
-              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-700 transition-colors shrink-0"
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-muted hover:bg-primary-50 dark:hover:bg-slate-700 transition-colors shrink-0"
             >
-              <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+              <ArrowLeft className="h-4 w-4 text-foreground" />
             </button>
             <div className="min-w-0">
               <h1 className="text-xl font-semibold tracking-tight truncate">Appointment Record #{appointment.id.slice(0, 8)}</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
+              <p className="text-xs text-muted-foreground font-medium truncate">
                 {appointment.patient
                   ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}`
                   : appointment.provider
@@ -256,7 +256,7 @@ export const AppointmentDetails = () => {
             {appointment.type === "video_consultation" && videoConsultation && appointment.status !== "cancelled" && (
               <button
                 onClick={() => navigate(`/video-consultations?join=${videoConsultation.id}`)}
-                className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-success-500 hover:bg-success-600 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-success-500 hover:bg-success-600 text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
               >
                 <Video className="h-3.5 w-3.5" />
                 Join Meeting
@@ -282,7 +282,7 @@ export const AppointmentDetails = () => {
                       toast.error("Failed to mark as completed");
                     }
                   }}
-                  className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-green-600 text-white font-semibold text-xs hover:bg-green-700 transition-colors flex items-center gap-1.5"
                 >
                   <CheckCircle className="h-3.5 w-3.5" />
                   Mark Complete
@@ -290,7 +290,7 @@ export const AppointmentDetails = () => {
                 )}
                 <button
                   onClick={() => setShowCancelDialog(true)}
-                  className="px-3.5 py-1.5 min-h-[44px] rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 min-h-[44px] rounded-md border border-error-500/40 text-error-500 font-semibold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
                 >
                   <X className="h-3.5 w-3.5" />
                   Cancel appointment
@@ -305,8 +305,8 @@ export const AppointmentDetails = () => {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Appointment Information Card */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-border pb-3">
               <Calendar className="h-5 w-5 text-primary-500" />
               Appointment Information
             </h2>
@@ -315,8 +315,8 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Calendar className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Date</div>
-                  <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+                  <div className="font-semibold text-muted-foreground uppercase">Date</div>
+                  <div className="font-semibold text-sm text-foreground">
                     {format(new Date(`${appointment.date}T00:00:00`), "EEEE, MMMM d, yyyy")}
                   </div>
                 </div>
@@ -325,8 +325,8 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Time</div>
-                  <div className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                  <div className="font-semibold text-muted-foreground uppercase">Time</div>
+                  <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                     {String(appointment.time).slice(0, 5)}
                   </div>
                 </div>
@@ -335,7 +335,7 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Video className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Consultation Type</div>
+                  <div className="font-semibold text-muted-foreground uppercase">Consultation Type</div>
                   <div className="font-semibold text-slate-800 dark:text-slate-200 capitalize">
                     {appointment.type === "video_consultation" ? "Video Consultation" : "In-Person Visit"}
                   </div>
@@ -346,7 +346,7 @@ export const AppointmentDetails = () => {
                 <div className="flex items-start gap-3">
                   <Wallet className="h-4 w-4 text-slate-400 mt-0.5" />
                   <div>
-                    <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Consultation Fee</div>
+                    <div className="font-semibold text-muted-foreground uppercase">Consultation Fee</div>
                     <div className="font-semibold text-slate-800 dark:text-slate-200">
                       K{appointment.consultation_fee}
                     </div>
@@ -358,7 +358,7 @@ export const AppointmentDetails = () => {
                 <div className="flex items-start gap-3">
                   <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                   <div>
-                    <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Duration</div>
+                    <div className="font-semibold text-muted-foreground uppercase">Duration</div>
                     <div className="font-semibold text-slate-800 dark:text-slate-200">
                       {appointment.duration} minutes
                     </div>
@@ -369,7 +369,7 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Location</div>
+                  <div className="font-semibold text-muted-foreground uppercase">Location</div>
                   <div className="font-semibold text-slate-800 dark:text-slate-200">
                     {appointment.type === "video_consultation"
                       ? "Video Consultation"
@@ -381,16 +381,16 @@ export const AppointmentDetails = () => {
           </div>
 
           {/* Participant Info */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+          <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+            <h2 className="font-semibold text-base flex items-center gap-2 border-b border-border pb-3">
               <User className="h-5 w-5 text-primary-500" />
               Participant Details
             </h2>
 
             <div className="space-y-3 text-xs">
               <div>
-                <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Full Name</div>
-                <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+                <div className="font-semibold text-muted-foreground uppercase">Full Name</div>
+                <div className="font-semibold text-sm text-foreground">
                   {appointment.patient
                     ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
                     : appointment.provider
@@ -401,8 +401,8 @@ export const AppointmentDetails = () => {
 
               {appointment.provider?.specialty && (
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Clinical Specialty</div>
-                  <div className="font-bold text-primary-500">{appointment.provider.specialty}</div>
+                  <div className="font-semibold text-muted-foreground uppercase">Clinical Specialty</div>
+                  <div className="font-semibold text-primary-500">{appointment.provider.specialty}</div>
                 </div>
               )}
             </div>
@@ -410,14 +410,14 @@ export const AppointmentDetails = () => {
         </div>
 
         {/* Clinical Notes Section */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
+        <div className="p-6 rounded-2xl bg-card border border-border shadow-xs space-y-3">
           <h2 className="font-semibold text-base flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-500" />
             Clinical Notes & Observations
           </h2>
           <textarea
             rows={4}
-            className="w-full p-3 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full p-3 rounded-xl border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Enter clinical observations, symptoms, or instructions..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -444,7 +444,7 @@ export const AppointmentDetails = () => {
           <DialogFooter>
             <button
               onClick={() => setShowCancelDialog(false)}
-              className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs"
+              className="px-4 py-2 rounded-md border border-border dark:border-slate-700 font-semibold text-xs"
             >
               Keep appointment
             </button>
