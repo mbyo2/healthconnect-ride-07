@@ -109,6 +109,13 @@ verify_jwt = true
 [functions.lenco-webhook]
 verify_jwt = false
 
+# Lenco webhook fan-out relay: Lenco calls it without a Supabase JWT;
+# it verifies nothing itself — it forwards the raw body to both apps'
+# webhooks (Doc'O Clock lenco-webhook + BMaGlass Pay momo-webhook),
+# which each verify the HMAC signature themselves.
+[functions.lenco-webhook-relay]
+verify_jwt = false
+
 [functions.lenco-widget-init]
 verify_jwt = true
 
