@@ -24,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
+import { useAuth } from "@/context/AuthContext";
 import { AgendaTimeline } from "@/components/provider/AgendaTimeline";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { DentistWorkflow } from "@/components/workflows/DentistWorkflow";
@@ -397,11 +398,16 @@ const MyPracticeEditor = () => {
 
 const PatientRecordPanel = ({ canEditProblems }: { canEditProblems: boolean }) => {
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
+  // LOAD GATING (defect fix, 2026-11-13 — graceful but ungated: the key
+  // carried no identity, so a pre-restore fetch ran under a stale key and
+  // the list could briefly show another session's patients after an
+  // account switch). Keyed on the provider id, enabled once auth resolves.
+  const { user } = useAuth();
 
   const { data: patients = [], isLoading } = useQuery({
-    queryKey: ["provider-record-patients"],
+    queryKey: ["provider-record-patients", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [] as { id: string; name: string }[];
       const { data } = await supabase
         .from("appointments")
@@ -492,6 +498,13 @@ export const ProviderDashboard = () => {
   const { formatPrice } = useCurrency();
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  // LOAD GATING (defect fix, 2026-11-13): the today/agenda/week-stats
+  // queries below were keyed without identity and fired before the
+  // session restored, briefly rendering zeroed stats on dashboard load
+  // and risking stale cross-user cache keys after an account switch
+  // (Appointments.tsx:85 pattern — identity in the key, enabled once
+  // auth has resolved).
+  const { user } = useAuth();
 
   // ── Approval gate: unverified providers see a pending screen, not the dashboard ──
   // (Security: prevents "under review" accounts from accessing clinical tools.)
@@ -692,9 +705,9 @@ export const ProviderDashboard = () => {
     hasRoutePermission(availableRoles, PROVIDER_MODULE_PATHS[m.module_key]);
 
   const { data: todayAppointments = [] } = useQuery({
-    queryKey: ["provider-today-appointments"],
+    queryKey: ["provider-today-appointments", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       const { data } = await supabase
         .from("appointments")
@@ -708,9 +721,9 @@ export const ProviderDashboard = () => {
 
   // Agenda timeline data for the navigable day (defaults to today).
   const { data: agendaAppointments = [], isLoading: agendaLoading } = useQuery({
-    queryKey: ["provider-agenda-appointments", format(agendaDate, "yyyy-MM-dd")],
+    queryKey: ["provider-agenda-appointments", user?.id, format(agendaDate, "yyyy-MM-dd")],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       const { data } = await supabase
         .from("appointments")
@@ -723,9 +736,9 @@ export const ProviderDashboard = () => {
   });
 
   const { data: weekStats } = useQuery({
-    queryKey: ["provider-week-stats"],
+    queryKey: ["provider-week-stats", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return { total: 0, completed: 0, pending: 0, revenue: 0 };
       const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
       const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");

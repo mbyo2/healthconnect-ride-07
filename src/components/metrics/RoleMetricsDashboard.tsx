@@ -291,9 +291,17 @@ export function PharmacyMetricsDashboard() {
     enabled: !!user?.id,
   });
 
+  // LOAD GATING (defect fix, 2026-11-13): this query was keyed on the
+  // user id but had no `enabled` gate and its fetcher did not guard on
+  // !user — before userInstitutions resolved it ran unfiltered and
+  // briefly showed the GLOBAL pending-prescription count, then refetched
+  // scoped. Enabled only once auth AND the institution list have
+  // resolved, so the unfiltered run never happens.
   const { data: pendingRx } = useQuery({
     queryKey: ["pharmacy-pending-rx", user?.id, userInstitutions],
+    enabled: !!user?.id && userInstitutions !== undefined,
     queryFn: async () => {
+      if (!user?.id) return 0;
       let query = supabase
         .from("pharmacy_prescriptions" as any)
         .select("id", { count: "exact", head: true })

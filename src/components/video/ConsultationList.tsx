@@ -10,6 +10,7 @@ import { VideoConsultationDetails, ConsultationListProps } from "@/types/video";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { useAuth } from "@/context/AuthContext";
 
 /** Joinable while the visit is bookable or live — the Daily room is minted on demand.
  *  DB CHECK on video_consultations.status allows only
@@ -20,6 +21,14 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  // LOAD GATING (defect fix, 2026-11-13 — ungated-query permanent-empty
+  // class, same as Appointments.tsx:85): keyed on the signed-in id and
+  // enabled only once auth has resolved; the fetcher returns an empty
+  // list when there is no user instead of throwing "Not authenticated"
+  // before the session restores (the shared retry policy only retries
+  // Network errors, so the throw parked this query in a permanent error
+  // state on first paint).
+  const { user } = useAuth();
 
   // Visit going live / cancelled elsewhere reflects here instantly.
   useEffect(() => {
@@ -37,10 +46,10 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   }, [queryClient]);
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['video-consultations'],
+    queryKey: ['video-consultations', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) return { consultations: [], userId: "" };
 
       // Both sides of the visit: patients see their doctors, providers see
       // their patient list (previously only the patient side was queried,

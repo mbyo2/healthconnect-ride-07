@@ -443,7 +443,10 @@ export const Auth = () => {
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-center p-4">
+      {/* R-3 (2026-11-13): the app-wide skip link targets #main-content,
+          which Auth never rendered, so activating it on /auth moved
+          nothing. The form column is the page's main content. */}
+      <main id="main-content" className="flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 py-8">
         <div className="text-center space-y-2">
           <Link to="/" className="mx-auto inline-flex flex-col items-center">
@@ -702,7 +705,7 @@ export const Auth = () => {
           <span>NHIMA accepted</span>
         </p>
       </div>
-      </div>
+      </main>
     </div>
     </>
   );

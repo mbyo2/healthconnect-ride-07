@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useAuth } from "@/context/AuthContext";
 
 interface Appointment {
   id: string;
@@ -28,12 +29,19 @@ interface Appointment {
 
 export const ScheduleManager = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  // LOAD GATING (defect fix, 2026-11-13 — ungated-query permanent-empty
+  // class, same as Appointments.tsx:85): tab-mounted and reachable via
+  // ?tab=schedule deep link, so a fresh load could fire this before the
+  // session restored and the "Not authenticated" throw parked the query
+  // permanently (retry policy only retries Network errors). Keyed on the
+  // provider id, enabled only once auth has resolved; the fetcher returns
+  // [] when there is no user instead of throwing.
+  const { user } = useAuth();
 
   const { data: appointments, isLoading } = useQuery({
-    queryKey: ['appointments', selectedDate],
+    queryKey: ['appointments', user?.id, selectedDate],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) return [] as Appointment[];
 
       const { data, error } = await supabase
         .from('appointments')
@@ -56,7 +64,7 @@ export const ScheduleManager = () => {
       if (error) throw error;
       return data as Appointment[];
     },
-    enabled: !!selectedDate,
+    enabled: !!selectedDate && !!user?.id,
   });
 
   const getStatusColor = (status: string) => {
