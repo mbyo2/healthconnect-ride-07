@@ -53,5 +53,7 @@ export interface ConnectionRequest {
   notes?: string;
 }
 
-// Connection status transitions implemented in src/utils/connection-workflows.ts
-// Use sendConnectionRequest(), approveConnection(), rejectConnection(), blockConnection(), and unblockConnection()
+// Connection status transitions live in src/hooks/useConnections.ts
+// (useConnections / updateConnectionMutation) against user_connections —
+// the old src/utils/connection-workflows.ts queried a `connections`
+// table that does not exist live and was deleted 2026-11-13.

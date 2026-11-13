@@ -51,7 +51,7 @@ const PaymentSuccess = () => {
             // Check if it was a wallet top-up and load receipt details
             const { data: paymentData } = await supabase
               .from('payments')
-              .select('metadata, amount, currency, payment_method, reference, transaction_id')
+              .select('metadata, amount, currency, payment_method, external_payment_id')
               .eq('id', paymentId)
               .single();
 
@@ -60,7 +60,7 @@ const PaymentSuccess = () => {
                 amount: (paymentData as any).amount ?? null,
                 currency: (paymentData as any).currency ?? 'ZMW',
                 payment_method: (paymentData as any).payment_method ?? null,
-                reference: (paymentData as any).reference ?? (paymentData as any).transaction_id ?? paymentId,
+                reference: (paymentData as any).external_payment_id ?? paymentId,
               });
             }
 
@@ -86,7 +86,7 @@ const PaymentSuccess = () => {
           // verifying the payment row; a cancel return lands here too.
           const { data: paymentRow } = await supabase
             .from('payments')
-            .select('status, amount, currency, payment_method, reference, transaction_id')
+            .select('status, amount, currency, payment_method, external_payment_id')
             .eq('id', paymentId)
             .maybeSingle();
           if (paymentRow?.status === 'completed') {
@@ -95,7 +95,7 @@ const PaymentSuccess = () => {
               amount: (paymentRow as any).amount ?? null,
               currency: (paymentRow as any).currency ?? 'ZMW',
               payment_method: (paymentRow as any).payment_method ?? null,
-              reference: (paymentRow as any).reference ?? (paymentRow as any).transaction_id ?? paymentId,
+              reference: (paymentRow as any).external_payment_id ?? paymentId,
             });
           } else {
             toast.info("Payment not confirmed yet — check your wallet for the updated balance.");

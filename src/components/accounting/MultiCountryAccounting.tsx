@@ -33,20 +33,29 @@ export type AccountType = "Asset" | "Liability" | "Equity" | "Revenue" | "Expens
 
 export interface AccountItem {
   id: string;
-  code: string;
-  name: string;
+  account_code: string;
+  account_name: string;
   account_type: AccountType;
+}
+
+export interface JournalLine {
+  account_id: string;
+  debit_amount: number;
+  credit_amount: number;
+  line_number: number;
 }
 
 export interface JournalEntryRow {
   id: string;
   entry_number: string;
   entry_date: string;
-  reference: string | null;
+  // Live journal_entries has reference_number + totals only; the debit/credit
+  // legs live in journal_entry_lines (verified live 2026-11-13).
+  reference_number: string | null;
   description: string;
-  debit_account: string;
-  credit_account: string;
-  amount: number;
+  total_debit: number;
+  total_credit: number;
+  lines: JournalLine[];
 }
 
 /**
@@ -110,15 +119,33 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     setLoadError(null);
     try {
       const [accRes, jRes, cfgRes] = await Promise.all([
-        supabase.from("chart_of_accounts").select("id, code, name, account_type").eq("institution_id", institutionId).order("code"),
-        supabase.from("journal_entries").select("id, entry_number, entry_date, reference, description, debit_account, credit_account, amount").eq("institution_id", institutionId).order("entry_date", { ascending: false }).order("created_at", { ascending: false }),
+        supabase.from("chart_of_accounts").select("id, account_code, account_name, account_type").eq("institution_id", institutionId).order("account_code"),
+        supabase.from("journal_entries").select("id, entry_number, entry_date, reference_number, description, total_debit, total_credit").eq("institution_id", institutionId).order("entry_date", { ascending: false }).order("created_at", { ascending: false }),
         supabase.from("country_statutory_configs").select("country_code, country_name, currency, vat_rate").eq("institution_id", institutionId).maybeSingle(),
       ]);
       if (accRes.error) throw accRes.error;
       if (jRes.error) throw jRes.error;
       if (cfgRes.error) throw cfgRes.error;
-      setAccounts((accRes.data ?? []) as AccountItem[]);
-      setJournals((jRes.data ?? []) as JournalEntryRow[]);
+      const accounts = (accRes.data ?? []) as AccountItem[];
+      const entries = (jRes.data ?? []) as JournalEntryRow[];
+      // Legs live in journal_entry_lines — fetch them for the listed entries
+      // and attach client-side (no nested embed; each select stays provable).
+      let linesByEntry = new Map<string, JournalLine[]>();
+      if (entries.length > 0) {
+        const { data: lines, error: linesError } = await supabase
+          .from("journal_entry_lines")
+          .select("journal_entry_id, account_id, debit_amount, credit_amount, line_number")
+          .in("journal_entry_id", entries.map((e) => e.id))
+          .order("line_number");
+        if (linesError) throw linesError;
+        for (const l of (lines ?? []) as Array<JournalLine & { journal_entry_id: string }>) {
+          const arr = linesByEntry.get(l.journal_entry_id) ?? [];
+          arr.push({ account_id: l.account_id, debit_amount: Number(l.debit_amount) || 0, credit_amount: Number(l.credit_amount) || 0, line_number: l.line_number });
+          linesByEntry.set(l.journal_entry_id, arr);
+        }
+      }
+      setAccounts(accounts);
+      setJournals(entries.map((e) => ({ ...e, total_debit: Number(e.total_debit) || 0, total_credit: Number(e.total_credit) || 0, lines: linesByEntry.get(e.id) ?? [] })));
       if (cfgRes.data) {
         setCountry({
           countryCode: cfgRes.data.country_code,
@@ -141,27 +168,28 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [institutionId]);
 
-  /** Real double-entry balances computed from posted journal entries. */
+  /** Real double-entry balances computed from posted journal entry lines. */
   const balances = useMemo(() => {
     const debits: Record<string, number> = {};
     const credits: Record<string, number> = {};
     for (const j of journals) {
-      const amt = Number(j.amount) || 0;
-      debits[j.debit_account] = (debits[j.debit_account] ?? 0) + amt;
-      credits[j.credit_account] = (credits[j.credit_account] ?? 0) + amt;
+      for (const l of j.lines) {
+        debits[l.account_id] = (debits[l.account_id] ?? 0) + (Number(l.debit_amount) || 0);
+        credits[l.account_id] = (credits[l.account_id] ?? 0) + (Number(l.credit_amount) || 0);
+      }
     }
-    const byCode: Record<string, number> = {};
+    const byAccountId: Record<string, number> = {};
     for (const a of accounts) {
-      const d = debits[a.code] ?? 0;
-      const c = credits[a.code] ?? 0;
-      byCode[a.code] = DEBIT_NORMAL.includes(a.account_type) ? d - c : c - d;
+      const d = debits[a.id] ?? 0;
+      const c = credits[a.id] ?? 0;
+      byAccountId[a.id] = DEBIT_NORMAL.includes(a.account_type) ? d - c : c - d;
     }
-    return byCode;
+    return byAccountId;
   }, [accounts, journals]);
 
   const totals = useMemo(() => {
     const sum = (t: AccountType) =>
-      accounts.filter((a) => a.account_type === t).reduce((s, a) => s + (balances[a.code] ?? 0), 0);
+      accounts.filter((a) => a.account_type === t).reduce((s, a) => s + (balances[a.id] ?? 0), 0);
     const revenue = sum("Revenue");
     const expenses = sum("Expense");
     const assets = sum("Asset");
@@ -174,6 +202,13 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
   const hasTransactions = journals.length > 0;
   const estimatedVat = (totals.revenue * country.vatRate) / 100;
 
+  // Resolve a journal leg's account id back to its code for display.
+  const accountCodeById = useMemo(() => new Map(accounts.map((a) => [a.id, a.account_code])), [accounts]);
+  const legCode = (j: JournalEntryRow, side: "debit" | "credit") => {
+    const line = j.lines.find((l) => (side === "debit" ? l.debit_amount > 0 : l.credit_amount > 0));
+    return line ? accountCodeById.get(line.account_id) ?? "—" : "—";
+  };
+
   const seedChart = async () => {
     if (!institutionId) return;
     setSeeding(true);
@@ -181,10 +216,9 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
       const template: CoaTemplate = getCoaTemplate(templateCode);
       const rows = template.accounts.map((a) => ({
         institution_id: institutionId,
-        code: a.code,
-        name: a.name,
+        account_code: a.code,
+        account_name: a.name,
         account_type: a.account_type,
-        balance: 0,
       }));
       const { error } = await supabase.from("chart_of_accounts").insert(rows);
       if (error) throw error;
@@ -206,10 +240,9 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     try {
       const { error } = await supabase.from("chart_of_accounts").insert({
         institution_id: institutionId,
-        code: newAccount.code.trim(),
-        name: newAccount.name.trim(),
+        account_code: newAccount.code.trim(),
+        account_name: newAccount.name.trim(),
         account_type: newAccount.type,
-        balance: 0,
       });
       if (error) throw error;
       toast.success("Account added with a zero opening balance.");
@@ -243,19 +276,25 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
     setPosting(true);
     try {
       // Double-entry is enforced by construction: one debit leg = one credit leg.
+      // Live journal_entries holds header + totals only (entry_type/status
+      // default to 'general'/'posted'); the legs go in journal_entry_lines.
       const entry_number = `JE-${newJournal.entry_date.replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-      const { error } = await supabase.from("journal_entries").insert({
+      const { data: entry, error } = await supabase.from("journal_entries").insert({
         institution_id: institutionId,
         entry_number,
         entry_date: newJournal.entry_date,
-        reference: newJournal.reference.trim() || null,
+        reference_number: newJournal.reference.trim() || null,
         description: newJournal.description.trim(),
-        debit_account: newJournal.debitAccount,
-        credit_account: newJournal.creditAccount,
-        amount,
-        posted_by: user.id,
-      });
+        total_debit: amount,
+        total_credit: amount,
+        created_by: user.id,
+      }).select("id").single();
       if (error) throw error;
+      const { error: linesError } = await supabase.from("journal_entry_lines").insert([
+        { journal_entry_id: entry.id, account_id: newJournal.debitAccount, debit_amount: amount, credit_amount: 0, line_number: 1 },
+        { journal_entry_id: entry.id, account_id: newJournal.creditAccount, debit_amount: 0, credit_amount: amount, line_number: 2 },
+      ]);
+      if (linesError) throw linesError;
       toast.success(`Journal entry ${entry_number} posted.`);
       setShowJournalModal(false);
       setNewJournal({
@@ -372,10 +411,10 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 exportToCSV(
                   `ChartOfAccounts_${country.countryCode}`,
                   accounts.map((a) => ({
-                    code: a.code,
-                    name: a.name,
+                    code: a.account_code,
+                    name: a.account_name,
                     type: a.account_type,
-                    balance: (balances[a.code] ?? 0).toFixed(2),
+                    balance: (balances[a.id] ?? 0).toFixed(2),
                   }))
                 )
               }
@@ -519,11 +558,11 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 <tbody className="divide-y divide-border">
                   {accounts.map((acc) => (
                     <tr key={acc.id} className="hover:bg-muted transition-colors">
-                      <td className="py-3 px-4 font-bold tabular-nums">{acc.code}</td>
-                      <td className="py-3 px-3 font-bold">{acc.name}</td>
+                      <td className="py-3 px-4 font-bold tabular-nums">{acc.account_code}</td>
+                      <td className="py-3 px-3 font-bold">{acc.account_name}</td>
                       <td className="py-3 px-3 text-muted-foreground text-xs">{acc.account_type}</td>
                       <td className="py-3 px-3 text-right font-bold text-primary-600 dark:text-primary-400 tabular-nums">
-                        {fmt(balances[acc.code] ?? 0)}
+                        {fmt(balances[acc.id] ?? 0)}
                       </td>
                     </tr>
                   ))}
@@ -562,11 +601,11 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                         <td className="py-3 px-3 text-xs whitespace-nowrap">{j.entry_date}</td>
                         <td className="py-3 px-3 text-xs">
                           <span className="font-bold">{j.description}</span>
-                          {j.reference && <span className="block text-graphite-400">Ref: {j.reference}</span>}
+                          {j.reference_number && <span className="block text-graphite-400">Ref: {j.reference_number}</span>}
                         </td>
-                        <td className="py-3 px-3 text-xs tabular-nums">{j.debit_account}</td>
-                        <td className="py-3 px-3 text-xs tabular-nums">{j.credit_account}</td>
-                        <td className="py-3 px-3 text-right font-bold tabular-nums">{fmt(Number(j.amount))}</td>
+                        <td className="py-3 px-3 text-xs tabular-nums">{legCode(j, "debit")}</td>
+                        <td className="py-3 px-3 text-xs tabular-nums">{legCode(j, "credit")}</td>
+                        <td className="py-3 px-3 text-right font-bold tabular-nums">{fmt(Number(j.total_debit))}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -636,7 +675,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 <select className={inputCls} value={newJournal.debitAccount} onChange={(e) => setNewJournal({ ...newJournal, debitAccount: e.target.value })}>
                   <option value="">Select…</option>
                   {accounts.map((a) => (
-                    <option key={a.id} value={a.code}>{a.code} — {a.name}</option>
+                    <option key={a.id} value={a.id}>{a.account_code} — {a.account_name}</option>
                   ))}
                 </select>
               </div>
@@ -645,7 +684,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 <select className={inputCls} value={newJournal.creditAccount} onChange={(e) => setNewJournal({ ...newJournal, creditAccount: e.target.value })}>
                   <option value="">Select…</option>
                   {accounts.map((a) => (
-                    <option key={a.id} value={a.code}>{a.code} — {a.name}</option>
+                    <option key={a.id} value={a.id}>{a.account_code} — {a.account_name}</option>
                   ))}
                 </select>
               </div>

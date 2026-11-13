@@ -24,7 +24,8 @@ interface InvoiceRow {
   invoice_number?: string | null;
   total_amount: number;
   balance: number;
-  payment_status?: string | null;
+  // Live column is `status` on billing_invoices (no payment_status).
+  status?: string | null;
   created_at?: string | null;
 }
 
@@ -78,7 +79,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           .eq("institution_id", institutionId),
         supabase
           .from("billing_invoices")
-          .select("id, invoice_number, total_amount, balance, payment_status, created_at")
+          .select("id, invoice_number, total_amount, balance, status, created_at")
           .eq("institution_id", institutionId)
           .order("created_at", { ascending: false })
           .limit(200),
@@ -90,7 +91,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           .limit(500),
         supabase
           .from("staff_schedules")
-          .select("user_id, shift_type, start_time, end_time")
+          .select("staff_id, shift_type, shift_start, shift_end")
           .eq("institution_id", institutionId)
           .limit(500),
       ]);
@@ -109,10 +110,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       }
       const shiftsByUser = new Map<string, string>();
       ((shiftsRes.data as any[]) || []).forEach((s: any) => {
-        if (s?.user_id && !shiftsByUser.has(s.user_id)) {
+        if (s?.staff_id && !shiftsByUser.has(s.staff_id)) {
           shiftsByUser.set(
-            s.user_id,
-            [s.shift_type, s.start_time && s.end_time ? `${s.start_time}–${s.end_time}` : null]
+            s.staff_id,
+            [s.shift_type, s.shift_start && s.shift_end ? `${s.shift_start}–${s.shift_end}` : null]
               .filter(Boolean)
               .join(" ") || "Scheduled"
           );
@@ -141,7 +142,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
         invoice_number: inv.invoice_number,
         total_amount: Number(inv.total_amount || 0),
         balance: Number(inv.balance ?? inv.total_amount ?? 0),
-        payment_status: inv.payment_status,
+        status: inv.status,
         created_at: inv.created_at,
       })));
       setAssets(((assetsRes.data as any[]) || []) as AssetRow[]);
@@ -405,7 +406,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                       <td className="py-3 px-4 font-semibold text-foreground tabular-nums">{inv.invoice_number || inv.id.slice(0, 8)}</td>
                       <td className="py-3 px-3 text-right font-bold tabular-nums">{formatPrice(inv.total_amount)}</td>
                       <td className="py-3 px-3 text-right tabular-nums">{formatPrice(inv.balance)}</td>
-                      <td className="py-3 px-3 capitalize">{inv.payment_status || "pending"}</td>
+                      <td className="py-3 px-3 capitalize">{inv.status || "pending"}</td>
                       <td className="py-3 px-3 text-slate-500">
                         {inv.created_at ? new Date(inv.created_at).toLocaleDateString() : "—"}
                       </td>
