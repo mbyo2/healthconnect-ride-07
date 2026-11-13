@@ -16,6 +16,7 @@ import { reloadOnceForChunkError } from '@/lib/chunkRecovery';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 import { PageTitleManager } from '@/components/PageTitleManager';
+import { RouteAnnouncer } from '@/components/RouteAnnouncer';
 import { ScrollToTop } from '@/components/ScrollToTop';
 
 // Bounded retry wrapper for lazy imports to handle stale chunk errors without hanging indefinitely.
@@ -446,6 +447,7 @@ const App: React.FC = () => {
             <Router>
               <div className="App">
                 <PageTitleManager />
+                <RouteAnnouncer />
                 <ScrollToTop />
                 <TwoFactorGate>
                   <AppContentWithPreload />

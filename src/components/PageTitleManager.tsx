@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const ROUTE_TITLES: Record<string, string> = {
+export const ROUTE_TITLES: Record<string, string> = {
   // NOTE: '/' and '/auth' are intentionally absent — their pages own their
   // titles via Helmet (see the guard below). Helmet is the single title
   // owner for every public page; this map only covers app routes that

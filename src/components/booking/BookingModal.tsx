@@ -11,6 +11,7 @@ import { format, addDays, startOfWeek, isSameDay, isAfter, isBefore, startOfDay 
 import { Provider } from "@/types/provider";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { useAuth } from "@/context/AuthContext";
+import { useAccessibility } from "@/context/AccessibilityContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -49,6 +50,7 @@ interface BookingModalProps {
 
 export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initialDate, initialTime, initialAppointmentType }: BookingModalProps) => {
   const { user } = useAuth();
+  const { screenReaderAnnounce } = useAccessibility();
   const { queueAction } = useOfflineSync();
   const navigate = useNavigate();
   const [step, setStep] = useState<'type' | 'datetime' | 'confirm'>('type');
@@ -328,6 +330,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
       }
 
       toast.success("Appointment booked successfully!");
+      screenReaderAnnounce("Appointment booked successfully. Your appointment is confirmed.", false);
       // Duolingo-style celebration: confetti + haptic on booking win
       const { celebrate } = await import("@/utils/celebration");
       celebrate({ intensity: "large" });

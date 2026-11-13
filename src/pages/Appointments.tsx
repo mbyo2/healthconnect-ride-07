@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { useAuth } from "@/context/AuthContext";
+import { useAccessibility } from "@/context/AccessibilityContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState } from "@/components/shared";
@@ -64,6 +65,7 @@ export const AppointmentsPage = () => {
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
   const { user } = useAuth();
+  const { screenReaderAnnounce } = useAccessibility();
   const { availableRoles, loading: rolesLoading } = useUserRoles();
 
   // Every clinical cadre sees the provider-side schedule.
@@ -185,8 +187,14 @@ export const AppointmentsPage = () => {
         throw new Error("Cancellation was blocked. Please try again or contact support.");
       }
     },
-    onSuccess: () => toast.success("Appointment cancelled"),
-    onError: (e: any) => toast.error(friendlyErrorMessage(e, "Could not cancel the appointment.")),
+    onSuccess: () => {
+      toast.success("Appointment cancelled");
+      screenReaderAnnounce("Appointment cancelled.", false);
+    },
+    onError: (e: any) => {
+      toast.error(friendlyErrorMessage(e, "Could not cancel the appointment."));
+      screenReaderAnnounce("Could not cancel the appointment. Please try again.", true);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["appointments"] }),
   });
 
