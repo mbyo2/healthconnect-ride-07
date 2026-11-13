@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAccessibility } from '@/context/AccessibilityContext';
@@ -86,14 +86,20 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     console.log('SearchContext not available in current component tree');
   }
 
-  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = SpeechRecognitionAPI ? new SpeechRecognitionAPI() : null;
-  
-  if (recognition) {
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-  }
+  // The SpeechRecognition instance is created ONCE and memoised
+  // (defect fix, 2026-11-13): it used to be constructed on EVERY render,
+  // so the attach effect below re-ran each render — handlers re-attached
+  // and the cleanup (which stops recognition) ran on every render.
+  const recognition = useMemo<SpeechRecognition | null>(() => {
+    const SpeechRecognitionAPI =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) return null;
+    const instance = new SpeechRecognitionAPI();
+    instance.continuous = true;
+    instance.interimResults = false;
+    instance.lang = 'en-US';
+    return instance;
+  }, []);
 
   // Define announceForScreenReader. The announcement always reaches
   // assistive technology via the aria-live region; it is SPOKEN aloud
@@ -188,11 +194,27 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     speakContent
   ]);
 
+  // Latest-callback / latest-state refs for the attach effect below.
+  // handleResult changes identity whenever its deps change (notably the
+  // SearchContext value object, which is rebuilt on every provider
+  // render), and isListening/isSpeaking flip on state transitions — none
+  // of that may re-attach the recognition handlers. The effect reads the
+  // current values through these refs instead, so it runs once per
+  // (memoised) recognition instance and cleans up only when that
+  // instance goes away.
+  const handleResultRef = useRef(handleResult);
+  handleResultRef.current = handleResult;
+  const isListeningRef = useRef(isListening);
+  isListeningRef.current = isListening;
+  const isSpeakingRef = useRef(isSpeaking);
+  isSpeakingRef.current = isSpeaking;
+
   useEffect(() => {
     if (!recognition) return;
 
-    recognition.onresult = handleResult;
-    
+    recognition.onresult = (event: SpeechRecognitionEvent) =>
+      handleResultRef.current(event);
+
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error', event.error);
       if (event.error === 'not-allowed') {
@@ -200,10 +222,10 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
         setIsListening(false);
       }
     };
-    
+
     recognition.onend = () => {
       // Only restart if we are supposed to be listening and not currently speaking
-      if (isListening && !isSpeaking) {
+      if (isListeningRef.current && !isSpeakingRef.current) {
         recognition.start();
       }
     };
@@ -212,11 +234,11 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       recognition.onresult = null;
       recognition.onend = null;
       recognition.onerror = null;
-      if (isListening) {
+      if (isListeningRef.current) {
         recognition.stop();
       }
     };
-  }, [recognition, handleResult, isListening, isSpeaking]);
+  }, [recognition]);
 
   return {
     isListening,

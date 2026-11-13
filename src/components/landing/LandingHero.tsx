@@ -44,11 +44,11 @@ export const LandingHero = () => {
 
         <form
           onSubmit={onSearch}
-          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
+          className="mx-auto mt-8 flex max-w-xl items-center gap-1.5 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
           style={{ animationDelay: "0.2s" }}
           role="search"
         >
-          <Search className="ml-3 h-4 w-4 shrink-0 text-graphite-400" aria-hidden />
+          <Search className="ml-2 h-4 w-4 shrink-0 text-graphite-400" aria-hidden />
           <label htmlFor="hero-search" className="sr-only">
             Search doctors, specialties, or pharmacies
           </label>
@@ -57,14 +57,24 @@ export const LandingHero = () => {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search doctors, specialties, or pharmacies"
+            placeholder="Search doctors, clinics"
             className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-midnight outline-none placeholder:text-graphite-400"
           />
           <button
             type="submit"
-            className="inline-flex shrink-0 items-center justify-center rounded-pill bg-gold px-5 py-3 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
+            className="inline-flex shrink-0 items-center justify-center rounded-pill bg-gold px-3 sm:px-5 py-3 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold-deep"
           >
-            Find a doctor
+            {/* R-2 (2026-11-13): at 360px the input was 140px wide next to
+                the full "Find a doctor" button, so the 42-char placeholder
+                clipped to "Search doctors, s…". Shorter placeholder plus a
+                compact "Search" label below sm gives the input room to show
+                the whole placeholder; the full label returns at sm+. The
+                placeholder is 24 chars on purpose: the 27-char version
+                still overflowed the 360px input by ~5px in a live
+                scrollWidth probe, so "specialties" lives in the Popular
+                chips and the sr-only label below instead. */}
+            <span className="sm:hidden">Search</span>
+            <span className="hidden sm:inline">Find a doctor</span>
           </button>
         </form>
 

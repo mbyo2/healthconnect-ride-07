@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { isPatientRecordAccessible } from "@/utils/patientRecordAccess";
 import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { useAuth } from "@/context/AuthContext";
 
 interface PatientRecord {
   id: string;
@@ -53,12 +54,21 @@ export const PatientRecords = () => {
   usePatientAccessLog(selectedPatientId, "medical_records");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  // LOAD GATING (defect fix, 2026-11-13 — ungated-query permanent-empty
+  // class): this query previously fired on mount with a key carrying no
+  // identity and a fetcher that THREW "Not authenticated" before the
+  // session restored. The shared retry policy only retries Network
+  // errors, so the throw parked the query in a permanent error state and
+  // the tab rendered empty until a full reload. Keyed on the provider id
+  // and enabled only once auth has resolved (Appointments.tsx:85 pattern);
+  // the fetcher returns [] when there is no user instead of throwing.
+  const { user } = useAuth();
 
   const { data: records, isLoading } = useQuery({
-    queryKey: ['medical_records'],
+    queryKey: ['medical_records', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) return [] as PatientRecord[];
 
       // NOTE: comprehensive_medical_records.patient_id FKs point at
       // auth.users, so the `profiles!..._fkey` join hint is invalid
@@ -147,10 +157,12 @@ export const PatientRecords = () => {
   });
 
   // Active break-glass grants held by this clinician (for the banner + revoke).
+  // Same gating as the records query above: identity in the key, enabled
+  // only once auth has resolved (fetcher already returned [] on !user).
   const { data: activeGrants = [] } = useQuery({
-    queryKey: ['break-glass-grants'],
+    queryKey: ['break-glass-grants', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       const { data, error } = await (supabase as any)
         .from('emergency_access_grants')

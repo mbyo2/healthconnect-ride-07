@@ -58,7 +58,12 @@ export class AppErrorBoundary extends React.Component<Props, State> {
               </Button>
             </div>
             
-            {this.state.error && (
+            {/* Raw error text never reaches the user in production:
+                the <details> block is dev-only. Production shows only
+                the crafted copy above ("Something went wrong…") — a raw
+                browser/system message in the UI violates the standing
+                error-presentation rule (CEO, 2026-10-22). */}
+            {import.meta.env.DEV && this.state.error && (
               <details className="mt-4 text-left">
                 <summary className="text-sm text-muted-foreground cursor-pointer">Error Details</summary>
                 <pre className="mt-2 text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto">

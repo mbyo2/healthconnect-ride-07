@@ -99,7 +99,10 @@ describe("classic shell: landing", () => {
   });
 
   it("hero search submit (Find a doctor) is gold, not vf-btn-primary blue", () => {
-    expect(landingHero).toContain("rounded-pill bg-gold px-5 py-3 text-sm font-semibold text-gold-ink");
+    // R-2 fix (2026-11-13): the submit compacts to px-4 + a short "Search"
+    // label below sm so the 360px input shows the whole placeholder; the
+    // gold pill, ink text and semibold weight are unchanged.
+    expect(landingHero).toContain("rounded-pill bg-gold px-3 sm:px-5 py-3 text-sm font-semibold text-gold-ink");
     expect(landingHero).not.toContain("vf-btn-primary");
   });
 
