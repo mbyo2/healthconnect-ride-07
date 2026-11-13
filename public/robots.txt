@@ -31,8 +31,6 @@ Disallow: /payment-cancelled
 # Internal / QA — never index
 Disallow: /testing
 Disallow: /documentation
-Disallow: /workos
-Disallow: /showcase
 Disallow: /queue-display
 Disallow: /kiosk
 

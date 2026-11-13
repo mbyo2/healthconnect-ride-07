@@ -233,11 +233,10 @@ describe("eradicated white-on-white shapes stay eradicated", () => {
   });
 
   it("fixed surfaces use translucent-white chips on coloured headers", () => {
-    const sidebar = readFileSync(
-      resolve(__dirname, "../components/workos/WorkOSSidebar.tsx"),
-      "utf8"
-    );
-    expect(sidebar).toContain("bg-white/25 text-white");
+    // PIN REMOVED 2026-11-13 (three factual fixes): the WorkOS sidebar was
+    // the example surface here; the /workos demo showcase (and its
+    // components/workos/ directory) was deleted, so the pin now covers
+    // the remaining coloured-header surface only.
     const offline = readFileSync(
       resolve(__dirname, "../components/OfflineAlert.tsx"),
       "utf8"

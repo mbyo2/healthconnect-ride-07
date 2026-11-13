@@ -156,7 +156,6 @@ const CostEstimatorPage = lazyWithRetry(() => import('@/pages/CostEstimatorPage'
 const WaitlistPage = lazyWithRetry(() => import('@/pages/WaitlistPage'));
 const AppointmentReminders = lazyWithRetry(() => import('@/pages/AppointmentReminders'));
 const AcceptInvitation = lazyWithRetry(() => import('@/pages/AcceptInvitation'));
-const BespokeWorkOSShowcase = lazyWithRetry(() => import('@/pages/BespokeWorkOSShowcase'));
 const PublicQueueDisplay = lazyWithRetry(() => import('@/pages/PublicQueueDisplay'));
 const SelfServiceKiosk = lazyWithRetry(() => import('@/pages/SelfServiceKiosk'));
 
@@ -229,9 +228,6 @@ const AppContent = () => {
             <Route path="/provider/:id" element={<ProviderDetail />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/pricing" element={<Pricing />} />
-            {/* Internal ops board — mock clinical data, never public. Super-admin only. */}
-            <Route path="/workos" element={<RouteGuard requireRoles={["super_admin"]}><BespokeWorkOSShowcase /></RouteGuard>} />
-            <Route path="/showcase" element={<RouteGuard requireRoles={["super_admin"]}><BespokeWorkOSShowcase /></RouteGuard>} />
             <Route path="/queue-display" element={<Suspense fallback={<LoadingScreen />}><PublicQueueDisplay /></Suspense>} />
             <Route path="/kiosk" element={<Suspense fallback={<LoadingScreen />}><SelfServiceKiosk /></Suspense>} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />

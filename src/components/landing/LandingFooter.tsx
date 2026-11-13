@@ -222,7 +222,7 @@ export const LandingFooter = () => {
         </div>
 
         <div className="pt-8 border-t border-canvas-silk flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-graphite-400 font-medium">
-          <p>© {new Date().getFullYear()} Doc&apos; O Clock Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Mabvuto Banda Science, Information Technical Consultancy. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-5">
             <span className="flex items-center gap-1.5 text-success-500 font-medium">
               <ShieldCheck className="h-4 w-4" />

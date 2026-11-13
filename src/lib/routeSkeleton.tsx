@@ -113,8 +113,6 @@ export const ROUTE_SKELETON_KINDS: Record<string, RouteSkeletonKind> = {
   "/provider/:id": "provider-profile",
   "/emergency": "kiosk",
   "/pricing": "article",
-  "/workos": "dashboard",
-  "/showcase": "dashboard",
   "/queue-display": "display",
   "/kiosk": "kiosk",
   "/booking-confirmed": "auth",

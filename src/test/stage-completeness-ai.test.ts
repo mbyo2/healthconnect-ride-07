@@ -86,13 +86,6 @@ describe('AI honesty + role gates', () => {
     expect(s).toContain('"rule-based-fallback"');
   });
 
-  it('WorkOS copilot calls the real assistant (no canned telemetry)', () => {
-    const s = read('src/components/workos/WorkOSAICopilotBar.tsx');
-    expect(s).toContain("functions.invoke('doc-chat'");
-    expect(s).not.toContain('AI Telemetry Execution Complete');
-    expect(s).not.toContain('Confidence 98.4%');
-  });
-
   it('AIDiagnostics makes no false model claims', () => {
     const s = read('src/pages/AIDiagnostics.tsx');
     expect(s).not.toContain('MedGemma 27B');
