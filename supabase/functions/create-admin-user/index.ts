@@ -26,17 +26,23 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // 2. Verify caller's identity and admin status
+    // 2. Verify caller's identity.
+    // NOTE (2026-11-13 sweep): auth.getClaims() does NOT exist on the
+    // deployed supabase-js@2.47.10 esm.sh build — live edge logs prove it
+    // ("TypeError: anonClient.auth.getClaims is not a function"), so
+    // every valid call 500'd here before reaching any check. Use the
+    // proven in-repo pattern instead: explicit-JWT getUser(), exactly as
+    // fhir-inbound / process-refund / doc-chat do (same F1 defect class).
     const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user: caller }, error: claimsError } = await anonClient.auth.getUser(token);
+    if (claimsError || !caller) {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const callerId = claimsData.claims.sub;
+    const callerId = caller.id;
 
     // 3. Check caller has admin/superadmin role via secure DB function
     const { data: isAdmin, error: roleError } = await anonClient.rpc('has_role', {
@@ -104,7 +110,10 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
-      return new Response(JSON.stringify({ error: createError.message }), {
+      // Sanitised (triage-assess pattern): the Auth Admin error text is
+      // logged server-side only; the client gets a generic message.
+      console.error('create-admin-user failed:', createError.message);
+      return new Response(JSON.stringify({ error: 'Could not create the admin account. Please try again.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
