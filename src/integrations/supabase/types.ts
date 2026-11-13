@@ -776,6 +776,45 @@ export type Database = {
         }
         Relationships: []
       }
+      app_owner_wallet_credits: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          description: string | null
+          external_ref: string
+          gateway: string
+          id: string
+          payer_id: string | null
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          external_ref: string
+          gateway: string
+          id?: string
+          payer_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          external_ref?: string
+          gateway?: string
+          id?: string
+          payer_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: []
+      }
       application_extended_data: {
         Row: {
           admin_notes: Json
@@ -26336,7 +26375,10 @@ export type Database = {
           amount: number
           created_at: string
           currency: string
+          decided_at: string | null
+          decided_by: string | null
           id: string
+          paid_at: string | null
           payout_details: Json
           payout_method: string
           provider_id: string
@@ -26348,7 +26390,10 @@ export type Database = {
           amount: number
           created_at?: string
           currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
+          paid_at?: string | null
           payout_details: Json
           payout_method: string
           provider_id: string
@@ -26360,7 +26405,10 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
+          paid_at?: string | null
           payout_details?: Json
           payout_method?: string
           provider_id?: string
@@ -27654,6 +27702,37 @@ export type Database = {
     }
     Functions: {
       accept_staff_invitation: { Args: { _token: string }; Returns: Json }
+      admin_delete_user_counts: {
+        Args: { p_detach?: Json; p_steps: Json; p_target: string }
+        Returns: {
+          action: string
+          row_count: number
+          table_name: string
+        }[]
+      }
+      admin_delete_user_discover: {
+        Args: never
+        Returns: {
+          column_name: string
+          delete_rule: string
+          is_nullable: boolean
+          ref_column: string
+          ref_schema: string
+          ref_table: string
+          table_name: string
+          table_schema: string
+        }[]
+      }
+      admin_delete_user_execute: {
+        Args: {
+          p_actor: string
+          p_detach: Json
+          p_steps: Json
+          p_target: string
+          p_target_email: string
+        }
+        Returns: Json
+      }
       admission_segment_nights_due: {
         Args: { p_segment_id: string }
         Returns: number
@@ -28247,6 +28326,10 @@ export type Database = {
         Args: { p_ids: string[]; p_term: string }
         Returns: undefined
       }
+      log_patient_record_access: {
+        Args: { p_context?: Json; p_patient_id: string; p_surface: string }
+        Returns: undefined
+      }
       lookup_user_id_by_email: { Args: { p_email: string }; Returns: string }
       map_staff_role_to_app_role: {
         Args: { _staff_role: string }
@@ -28357,6 +28440,15 @@ export type Database = {
         }
         Returns: string
       }
+      record_security_event: {
+        Args: {
+          p_email?: string
+          p_event_data?: Json
+          p_event_type: string
+          p_user_agent?: string
+        }
+        Returns: string
+      }
       redeem_promo_code: {
         Args: { p_code: string; p_context?: string }
         Returns: Json
@@ -28427,6 +28519,19 @@ export type Database = {
       set_provider_suspended: {
         Args: { p_reason?: string; p_suspended: boolean; p_user_id: string }
         Returns: undefined
+      }
+      settle_platform_revenue: {
+        Args: {
+          p_amount: number
+          p_currency?: string
+          p_description?: string
+          p_external_ref: string
+          p_gateway: string
+          p_payer_id: string
+          p_reference_id?: string
+          p_reference_type: string
+        }
+        Returns: Json
       }
       shares_institution_with_provider: {
         Args: { p_provider_id: string }
