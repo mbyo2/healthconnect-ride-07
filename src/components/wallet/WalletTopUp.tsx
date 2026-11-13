@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useAccessibility } from "@/context/AccessibilityContext";
 import { toast } from "sonner";
 import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
@@ -18,6 +19,7 @@ type PaymentMethod = 'paypal' | 'lenco' | 'card';
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
+    const { screenReaderAnnounce } = useAccessibility();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('lenco');
@@ -114,6 +116,7 @@ export const WalletTopUp = () => {
                         const r = await verifyPayment(response.reference);
                         if (r?.status === 'paid') {
                             toast.success("Payment successful — your wallet has been credited.");
+                            screenReaderAnnounce("Payment successful. Your wallet has been credited.", false);
                         } else {
                             toast.info("Payment received — confirming. Check your wallet in a moment.");
                         }
@@ -154,6 +157,7 @@ export const WalletTopUp = () => {
                     setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
                     if (res.status === 'paid') {
                         toast.success("Payment confirmed — your wallet has been credited.");
+                        screenReaderAnnounce("Payment confirmed. Your wallet has been credited.", false);
                         setLencoReference(null);
                     }
                 }
@@ -161,6 +165,7 @@ export const WalletTopUp = () => {
         } catch (error) {
             console.error('Top up error:', error);
             toast.error(friendlyErrorMessage(error, "Failed to initiate top up"));
+            screenReaderAnnounce("Top-up failed. We could not start your payment. Please try again.", true);
         } finally {
             setIsLoading(false);
         }
@@ -255,9 +260,11 @@ export const WalletTopUp = () => {
                                         if (!r) return;
                                         if (r.status === 'paid') {
                                             toast.success("Payment confirmed — your wallet has been credited.");
+                                            screenReaderAnnounce("Payment confirmed. Your wallet has been credited.", false);
                                             setLencoReference(null);
                                         } else if (r.status === 'failed' || r.status === 'cancelled') {
                                             toast.error("This payment did not complete. You can try again.");
+                                            screenReaderAnnounce("This payment did not complete. You can try again.", true);
                                             setLencoReference(null);
                                         } else {
                                             toast.info(r.message || "Still waiting — approve the prompt on your phone, then check again.");

@@ -25,12 +25,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SkeletonCard, SkeletonLine, SkeletonListRow } from "@/components/ui/skeleton-kit";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
+import { useAccessibility } from "@/context/AccessibilityContext";
+import { useAnnounceOnChange } from "@/hooks/use-announce-on-change";
 import PatientMAR from "@/components/patient/PatientMAR";
 import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
 import { EmptyState } from "@/components/shared/EmptyState";
 
 export default function MedicalRecords() {
   const { user } = useAuth();
+  const { screenReaderAnnounce } = useAccessibility();
   // Audit trail (2026-11-11): opening the record chart is a logged view.
   // This page renders the signed-in user's own chart, so the server RPC
   // records it as 'self_view'; the write is fire-and-forget.
@@ -40,6 +43,17 @@ export default function MedicalRecords() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
+
+  // Record opened: announce the loaded chart once the fetch settles
+  // (null while loading, so nothing fires on mount).
+  useAnnounceOnChange(
+    loading ? null : records.length,
+    (count) =>
+      count === 0
+        ? "Your health records loaded. No records yet."
+        : `Your health records loaded. ${count} record${count === 1 ? "" : "s"}.`,
+    false,
+  );
 
   const downloadRecord = (record: MedicalRecord) => {
     const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
@@ -71,6 +85,7 @@ export default function MedicalRecords() {
     link.click();
     URL.revokeObjectURL(url);
     toast.success("EHR data exported");
+    screenReaderAnnounce("Your health records have been exported.", false);
   };
 
   useEffect(() => {
@@ -85,6 +100,7 @@ export default function MedicalRecords() {
       } catch (error) {
         console.error("Error fetching medical records:", error);
         setLoadError(true);
+        screenReaderAnnounce("We could not load your health records. Please try again.", true);
       } finally {
         setLoading(false);
       }

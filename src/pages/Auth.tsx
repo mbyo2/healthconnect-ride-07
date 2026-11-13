@@ -17,6 +17,7 @@ import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { safeRedirectTarget } from "@/utils/pendingAction";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { useAccessibility } from "@/context/AccessibilityContext";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -223,6 +224,7 @@ export const Auth = () => {
   const [signupPath, setSignupPath] = useState<SignupPath>(pathParam || null);
   const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
+  const { screenReaderAnnounce } = useAccessibility();
   const [providerTypes, setProviderTypes] = useState<Array<{ value: string; label: string; requiresLicense?: boolean }>>([]);
   const [businessTypes, setBusinessTypes] = useState<Array<{ value: string; label: string }>>([]);
   const [specialties, setSpecialties] = useState<Array<{ value: string; label: string }>>([]);
@@ -293,8 +295,13 @@ export const Auth = () => {
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
-    if (error) showError(friendlyErrorMessage(error));
-    else navigate(redirectTo, { replace: true });
+    if (error) {
+      showError(friendlyErrorMessage(error));
+      screenReaderAnnounce(`Sign-in failed. ${friendlyErrorMessage(error)}`, true);
+    } else {
+      screenReaderAnnounce("Signed in successfully.", false);
+      navigate(redirectTo, { replace: true });
+    }
     setLocalLoading(false);
   };
 
@@ -317,8 +324,11 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(friendlyErrorMessage(error));
-    else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
+    if (error) {
+      showError(friendlyErrorMessage(error));
+      screenReaderAnnounce(`Account creation failed. ${friendlyErrorMessage(error)}`, true);
+    }
+    else { showSuccess("Account created! Check your email to verify."); screenReaderAnnounce("Account created. Check your email to verify.", false); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
@@ -329,6 +339,7 @@ export const Auth = () => {
     const chosenProfession = providerTypes.find((t) => t.value === data.providerType);
     if (chosenProfession?.requiresLicense && !data.licenseNumber?.trim()) {
       showError(`A licence / registration number is required for ${chosenProfession.label}.`);
+      screenReaderAnnounce(`A licence or registration number is required for ${chosenProfession.label}.`, true);
       setLocalLoading(false);
       return;
     }
@@ -348,8 +359,11 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(friendlyErrorMessage(error));
-    else { showSuccess("Account created! Your application is under review."); setActiveTab("signin"); }
+    if (error) {
+      showError(friendlyErrorMessage(error));
+      screenReaderAnnounce(`Account creation failed. ${friendlyErrorMessage(error)}`, true);
+    }
+    else { showSuccess("Account created! Your application is under review."); screenReaderAnnounce("Account created. Your application is under review.", false); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
@@ -381,8 +395,11 @@ export const Auth = () => {
         },
       },
     });
-    if (error) showError(friendlyErrorMessage(error));
-    else { showSuccess("Business registered! Account under review."); setActiveTab("signin"); }
+    if (error) {
+      showError(friendlyErrorMessage(error));
+      screenReaderAnnounce(`Registration failed. ${friendlyErrorMessage(error)}`, true);
+    }
+    else { showSuccess("Business registered! Account under review."); screenReaderAnnounce("Business registered. Your account is under review.", false); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 

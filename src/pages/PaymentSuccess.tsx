@@ -7,6 +7,8 @@ import { CheckCircle2, ArrowLeft, Wallet as WalletIcon, Receipt } from "lucide-r
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { useAccessibility } from "@/context/AccessibilityContext";
+import { useAnnounceOnChange } from "@/hooks/use-announce-on-change";
 
 interface PaymentDetails {
   amount: number | null;
@@ -26,6 +28,19 @@ const PaymentSuccess = () => {
   const status = searchParams.get('status');
   const token = searchParams.get('token'); // PayPal token
   const PayerID = searchParams.get('PayerID'); // PayPal payer ID
+
+  const { screenReaderAnnounce } = useAccessibility();
+  // Payment result is a state change: announce it once the verified
+  // payment details land (both the PayPal-capture and the direct-wallet
+  // paths set paymentDetails on success).
+  useAnnounceOnChange(
+    paymentDetails,
+    (details) =>
+      details.amount !== null
+        ? `Payment successful. ${details.currency ?? "ZMW"} ${details.amount} received.`
+        : "Payment successful.",
+    false,
+  );
 
   useEffect(() => {
     const handlePaymentCompletion = async () => {
@@ -111,6 +126,7 @@ const PaymentSuccess = () => {
       } catch (error) {
         console.error('Payment completion error:', error);
         toast.error(friendlyErrorMessage(error, "Failed to complete payment"));
+        screenReaderAnnounce("Payment failed. We could not complete your payment. Please try again.", true);
       } finally {
         setIsLoading(false);
       }
