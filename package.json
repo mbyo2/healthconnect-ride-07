@@ -92,7 +92,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^14.0.0",
     "vaul": "^0.9.3",
-    "zod": "^3.23.8"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -124,6 +124,7 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "@vitejs/plugin-react": "^6.0.0"
+    "@vitejs/plugin-react": "^6.0.0",
+    "postcss-selector-parser": "6.1.5"
   }
 }

@@ -52,11 +52,21 @@ serve(async (req) => {
     });
 
     if (error) {
+      // Sanitised (triage-assess pattern): the RPC/DB error text is logged
+      // server-side only. The client gets a generic message per outcome
+      // class — never the raw DB error.
       const msg = String(error.message || '');
+      console.error('process-refund RPC error:', msg);
       let status = 400;
-      if (msg.includes('Forbidden')) status = 403;
-      else if (msg.includes('Payment not found')) status = 404;
-      return new Response(JSON.stringify({ error: msg || 'Refund failed' }), {
+      let safe = 'Refund failed. Please try again.';
+      if (msg.includes('Forbidden')) {
+        status = 403;
+        safe = 'You do not have permission to process this refund.';
+      } else if (msg.includes('Payment not found')) {
+        status = 404;
+        safe = 'Payment not found.';
+      }
+      return new Response(JSON.stringify({ error: safe }), {
         status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

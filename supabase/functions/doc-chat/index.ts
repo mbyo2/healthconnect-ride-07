@@ -9,6 +9,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
 
+// User-facing AIError strings that are safe to return verbatim (static text
+// from _shared/ai.ts). Any other AIError message (e.g. provider/setup detail)
+// is replaced by a generic message in the catch block below.
+const SAFE_AI_MESSAGES = new Set([
+  'The assistant is temporarily unavailable.',
+  'The assistant is busy right now. Please try again in a moment.',
+  'The assistant could not produce an answer.',
+  'AI provider unreachable',
+  'AI request failed',
+]);
+
 // Input validation schema
 const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
@@ -659,8 +670,16 @@ serve(async (req: Request) => {
   } catch (error: any) {
     console.error('Error in Doc 0 Clock chat:', error);
     if (error?.name === 'AIError') {
+      // Sanitised (triage-assess pattern): only the allow-listed,
+      // user-facing AIError strings reach the client. Anything else —
+      // notably the "AI service not configured. Set OPENROUTER_API_KEY…"
+      // setup detail — is replaced by a generic message; the detail stays
+      // in the server log above.
+      const safeAIMessage = SAFE_AI_MESSAGES.has(error.message)
+        ? error.message
+        : 'The assistant is temporarily unavailable. Please try again.';
       return new Response(
-        JSON.stringify({ error: error.message }),
+        JSON.stringify({ error: safeAIMessage }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: error.status >= 400 && error.status < 600 ? error.status : 503 }
       );
     }

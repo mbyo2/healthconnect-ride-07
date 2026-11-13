@@ -223,14 +223,17 @@ Deno.serve(async (req) => {
       }).select('id').single();
       if (error) {
         // The live DB prescribing-safety gate (allergy/interaction triggers)
-        // refuses unsafe prescriptions at insert time. Surface that refusal
-        // as a clean 422 naming the conflict — never a silent drop or a 500.
+        // refuses unsafe prescriptions at insert time. The full DB error is
+        // kept ONLY in the server-side exchange log (fhir_exchanges row);
+        // the client gets a generic 422 naming the conflict — never the raw
+        // DB error text (triage-assess sanitisation pattern).
+        console.error('fhir-inbound prescription safety refusal:', error.message);
         await db.from('fhir_exchanges').update({
           status: 'rejected',
           error_message: `Prescription safety check failed: ${error.message}`,
           updated_at: new Date().toISOString(),
         }).eq('id', exchange?.id);
-        return bad(`Prescription safety check failed: ${error.message}`, 422);
+        return bad('A prescription in this bundle failed the safety check and was not imported.', 422);
       }
       results.push({ resourceType: 'MedicationRequest', action: 'imported', id: data.id });
     }
@@ -278,7 +281,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
+    // Sanitised (triage-assess pattern): detail goes to the server log only;
+    // the client gets a generic message — never raw exception text.
     console.error('fhir-inbound error:', e);
-    return bad(e instanceof Error ? e.message : 'Internal error', 500);
+    return bad('The import could not be completed. Please try again.', 500);
   }
 });
