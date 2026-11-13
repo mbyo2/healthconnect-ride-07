@@ -72,6 +72,17 @@ const INSURANCE_OPTIONS = [
 const MyPracticeEditor = () => {
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  // Identity proven at load time: the form only renders after the
+  // mount load found a session, so keep that user id. The old save
+  // handler re-derived identity from scratch with a bare
+  // getUser() at click time and threw "Not authenticated" whenever
+  // the session had lapsed since mount (token expired, refresh
+  // failed, storage read raced the client's session restore) —
+  // even though the form was on screen. A save that throws is a
+  // bug; the handler now uses the proven id, recovers the session
+  // if it somehow has none, and otherwise asks for a fresh sign-in
+  // instead of throwing. (2026-11-13 sweep residuals.)
+  const [userId, setUserId] = useState<string | null>(null);
   const [data, setData] = useState({
     medical_school: "",
     graduation_year: "",
@@ -94,6 +105,7 @@ const MyPracticeEditor = () => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setUserId(user.id);
       const { data: p } = await supabase
         .from("profiles")
         .select(
@@ -149,8 +161,18 @@ const MyPracticeEditor = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      // Identity first from the load-proven id; recover the session
+      // (getSession attempts a refresh) before ever giving up.
+      let id = userId;
+      if (!id) {
+        const { data: { session } } = await supabase.auth.getSession();
+        id = session?.user?.id ?? null;
+        if (id) setUserId(id);
+      }
+      if (!id) {
+        toast.error("Your session has expired. Please sign in again, then retry saving.");
+        return;
+      }
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -169,7 +191,7 @@ const MyPracticeEditor = () => {
           insurance_providers_accepted: data.insurance_providers_accepted,
           affiliated_hospitals: data.affiliated_hospitals,
         } as any)
-        .eq("id", user.id);
+        .eq("id", id);
       if (error) throw error;
       toast.success("Practice details saved");
     } catch (err: any) {

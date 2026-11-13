@@ -137,14 +137,20 @@ Deno.serve(async (req) => {
       }, { onConflict: 'user_id,role' });
 
       // Audit trail: who minted this privileged account (best-effort).
+      // NOTE (2026-11-13 residuals): audit_logs has CHECK vocabularies —
+      // category ∈ authentication|authorization|data_access|
+      // data_modification|system|security|payment and severity ∈
+      // info|warning|error|critical. The old 'admin'/'high' values
+      // violated both CHECKs, so the insert failed silently and the
+      // creation left no audit row. Admin creation is a security event.
       const { error: auditError } = await serviceClient.from('audit_logs').insert({
         user_id: callerId,
         action: 'admin_account_created',
-        category: 'admin',
+        category: 'security',
         outcome: 'success',
         resource: 'user',
         resource_id: newUser.user.id,
-        severity: 'high',
+        severity: 'critical',
         timestamp: new Date().toISOString(),
         details: { email, admin_level: targetLevel },
       });

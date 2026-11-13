@@ -88,11 +88,14 @@ describe("sweep fix 2 — ungated-query permanent-empty class (2026-11-13)", () 
     );
     expect(src).toContain('queryKey: ["provider-week-stats", user?.id]');
     expect(src.match(/enabled: !!user\?\.id/g)?.length).toBeGreaterThanOrEqual(4);
-    // The single remaining "Not authenticated" throw in this file is the
-    // MyPracticeEditor SAVE handler (a user action, caught and toasted
-    // via friendlyErrorMessage) — not a mount query. No query fetcher
-    // here throws it any more.
-    expect(src.match(/throw new Error\("Not authenticated"\)/g)?.length).toBe(1);
+    // 2026-11-13 residuals: the MyPracticeEditor SAVE handler no longer
+    // throws "Not authenticated" at all — it uses the load-proven user
+    // id, recovers the session via getSession() if it has none, and
+    // otherwise asks for a fresh sign-in. Zero occurrences remain.
+    expect(src).not.toContain('throw new Error("Not authenticated")');
+    expect(src).toContain("const [userId, setUserId] = useState<string | null>(null);");
+    expect(src).toContain("const { data: { session } } = await supabase.auth.getSession();");
+    expect(src).toContain("Your session has expired. Please sign in again, then retry saving.");
   });
 
   it("RoleMetricsDashboard: pending-prescriptions waits for auth AND the institution list, and guards on !user", () => {
@@ -256,5 +259,52 @@ describe("sweep fix 2 — voice commands instance is memoised (2026-11-13)", () 
     expect(src).toContain("handleResultRef.current = handleResult;");
     expect(src).toContain("}, [recognition]);");
     expect(src).not.toContain("}, [recognition, handleResult, isListening, isSpeaking]);");
+  });
+});
+
+describe("sweep residuals 2026-11-13 — audit_logs CHECK vocabulary (item 2)", () => {
+  it("create-admin-user audit insert uses the audit_logs CHECK vocabulary (category 'security', severity 'critical')", () => {
+    const src = readRoot("supabase/functions/create-admin-user/index.ts");
+    expect(src).toContain("category: 'security',");
+    expect(src).toContain("severity: 'critical',");
+    expect(src).not.toContain("category: 'admin',");
+    expect(src).not.toContain("severity: 'high',");
+  });
+
+  it("no edge function inserts audit_logs with a category outside the CHECK list", () => {
+    // audit_logs.category CHECK: authentication | authorization |
+    // data_access | data_modification | system | security | payment.
+    // 'notification' (send-email/send-push) silently failed the same
+    // way create-admin-user's 'admin' did — both are fixed to 'system'.
+    for (const rel of [
+      "supabase/functions/send-email/index.ts",
+      "supabase/functions/send-push/index.ts",
+    ]) {
+      const src = readRoot(rel);
+      expect(src).not.toContain("category: 'notification'");
+      expect(src).not.toContain('category: "notification"');
+    }
+    for (const rel of [
+      "supabase/functions/create-admin-user/index.ts",
+      "supabase/functions/fhir-inbound/index.ts",
+      "supabase/functions/send-email/index.ts",
+      "supabase/functions/send-push/index.ts",
+    ]) {
+      const src = readRoot(rel);
+      for (const m of src.matchAll(/\bcategory:\s*['"]([^'"]+)['"]/g)) {
+        expect([
+          "authentication",
+          "authorization",
+          "data_access",
+          "data_modification",
+          "system",
+          "security",
+          "payment",
+        ]).toContain(m[1]);
+      }
+      for (const m of src.matchAll(/\bseverity:\s*['"]([^'"]+)['"]/g)) {
+        expect(["info", "warning", "error", "critical"]).toContain(m[1]);
+      }
+    }
   });
 });

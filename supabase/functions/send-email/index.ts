@@ -200,7 +200,9 @@ serve(async (req) => {
           const { error: auditError } = await supabaseService.from('audit_logs').insert({
             user_id: user!.id,
             action: 'staff_email_sent',
-            category: 'notification',
+            // NOTE (2026-11-13 residuals): 'notification' is not in the
+            // audit_logs category CHECK — it silently failed; use 'system'.
+            category: 'system',
             outcome: 'success',
             resource: 'email',
             severity: 'info',

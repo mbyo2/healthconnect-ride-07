@@ -169,10 +169,12 @@ serve(async (req) => {
 
     // Audit log of the push send (columns must match the audit_logs schema:
     // action/category/outcome/resource/severity/timestamp are required).
+    // NOTE (2026-11-13 residuals): 'notification' is not in the
+    // audit_logs category CHECK — it silently failed; use 'system'.
     const { error: auditError } = await supabase.from("audit_logs").insert({
       user_id: user.id,
       action: "push_notification_sent",
-      category: "notification",
+      category: "system",
       outcome: "success",
       resource: "notification",
       severity: "info",
