@@ -1,3 +1,4 @@
+// @ts-nocheck Deno edge module; typechecked by Deno at deploy, imported by vitest.
 // Shared Lenco (api.lenco.co) v2 client for Edge Functions.
 //
 // Lenco API v2 — mobile money collections (Zambia: mtn | airtel | zamtel):

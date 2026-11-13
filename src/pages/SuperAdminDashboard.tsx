@@ -15,6 +15,7 @@ import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
 import { PaymentModeApprovals } from "@/components/admin/PaymentModeApprovals";
 import { MarketplaceListingApprovals } from "@/components/admin/MarketplaceListingApprovals";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 type AdminUser = {
