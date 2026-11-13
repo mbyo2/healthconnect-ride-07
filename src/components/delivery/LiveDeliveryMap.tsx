@@ -29,32 +29,6 @@ const courierIcon = new L.Icon({
   popupAnchor: [0, -18],
 });
 
-const pickupIcon = new L.Icon({
-  iconUrl:
-    "data:image/svg+xml;base64," +
-    btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#16a34a" width="28" height="28">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-    </svg>
-  `),
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -28],
-});
-
-const dropoffIcon = new L.Icon({
-  iconUrl:
-    "data:image/svg+xml;base64," +
-    btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#dc2626" width="28" height="28">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-    </svg>
-  `),
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -28],
-});
-
 function MapFollower({ position }: { position: [number, number] | null }) {
   const map = useMap();
   useEffect(() => {
@@ -72,8 +46,9 @@ interface LiveDeliveryMapProps {
  * Patient-facing LIVE delivery map.
  *
  * Shows the courier's real-time GPS position (refreshed every 10s via
- * Supabase realtime on courier_locations), plus pickup and dropoff pins
- * and the travelled path. This is the Yango-style live tracking view.
+ * Supabase realtime on courier_locations) and the travelled path. This is
+ * the Yango-style live tracking view. (Pickup/dropoff pins were removed
+ * 2026-11-13: delivery_tracking has no lat/lng columns live.)
  */
 export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapProps) {
   const [delivery, setDelivery] = useState<any>(null);
@@ -85,12 +60,27 @@ export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapPro
     const load = async () => {
       const { data } = await (supabase as any)
         .from("delivery_tracking")
-        .select(
-          "id, status, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, courier:couriers(id, full_name, current_lat, current_lng, vehicle_type)"
-        )
+        // Live columns only: delivery_tracking has no pickup/dropoff lat/lng
+        // (dropped 2026-11-13 — the pins had no live source, so the whole
+        // select 400'd). There is also no FK from delivery_tracking to
+        // couriers (PGRST200 on the old embedded-courier select), so
+        // the courier is fetched in a second query by user_id = driver_id.
+        .select("id, status, driver_id")
         .eq("id", deliveryId)
         .maybeSingle();
-      if (!cancelled && data) setDelivery(data);
+      if (cancelled) return;
+      if (data) {
+        let courier = null;
+        if (data.driver_id) {
+          const { data: c } = await (supabase as any)
+            .from("couriers")
+            .select("id, full_name, current_latitude, current_longitude, vehicle_type")
+            .eq("user_id", data.driver_id)
+            .maybeSingle();
+          courier = c ?? null;
+        }
+        if (!cancelled) setDelivery({ ...data, courier });
+      }
 
       const { data: locs } = await (supabase as any)
         .from("courier_locations")
@@ -117,7 +107,7 @@ export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapPro
           const { lat, lng } = payload.new;
           setTrail((t) => [...t.slice(-199), [lat, lng]]);
           setDelivery((d: any) =>
-            d ? { ...d, courier: { ...d.courier, current_lat: lat, current_lng: lng } } : d
+            d ? { ...d, courier: { ...d.courier, current_latitude: lat, current_longitude: lng } } : d
           );
         }
       )
@@ -146,18 +136,16 @@ export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapPro
   }, [deliveryId]);
 
   const courierPos: [number, number] | null =
-    delivery?.courier?.current_lat != null
-      ? [delivery.courier.current_lat, delivery.courier.current_lng]
+    delivery?.courier?.current_latitude != null
+      ? [delivery.courier.current_latitude, delivery.courier.current_longitude]
       : trail.length > 0
         ? trail[trail.length - 1]
         : null;
 
-  const pickup: [number, number] | null =
-    delivery?.pickup_lat != null ? [delivery.pickup_lat, delivery.pickup_lng] : null;
-  const dropoff: [number, number] | null =
-    delivery?.dropoff_lat != null ? [delivery.dropoff_lat, delivery.dropoff_lng] : null;
-
-  const center: [number, number] = courierPos ?? pickup ?? dropoff ?? [-15.3875, 28.3228]; // Lusaka fallback
+  // No pickup/dropoff pins: delivery_tracking carries no lat/lng columns
+  // live, so there is no honest coordinate source for either pin. The map
+  // centres on the courier (live GPS) or the last trail point instead.
+  const center: [number, number] = courierPos ?? [-15.3875, 28.3228]; // Lusaka fallback
 
   return (
     <div className="rounded-2xl overflow-hidden border border-border" style={{ height }}>
@@ -173,16 +161,6 @@ export function LiveDeliveryMap({ deliveryId, height = 280 }: LiveDeliveryMapPro
         />
         <MapFollower position={courierPos} />
         {trail.length > 1 && <Polyline positions={trail} color="#0066f5" weight={3} opacity={0.7} />}
-        {pickup && (
-          <Marker position={pickup} icon={pickupIcon}>
-            <Popup>Pickup — pharmacy</Popup>
-          </Marker>
-        )}
-        {dropoff && (
-          <Marker position={dropoff} icon={dropoffIcon}>
-            <Popup>Delivery address</Popup>
-          </Marker>
-        )}
         {courierPos && (
           <Marker position={courierPos} icon={courierIcon}>
             <Popup>

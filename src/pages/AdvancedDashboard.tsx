@@ -47,7 +47,7 @@ const AdvancedDashboard = () => {
                         id,
                         first_name,
                         last_name,
-                        specialization,
+                        specialty,
                         role
                     )
                 `)
@@ -200,7 +200,7 @@ const AdvancedDashboard = () => {
     const upcomingAppointments = appointments.map(apt => ({
         id: apt.id,
         doctor: apt.provider ? providerDisplayName({ first_name: apt.provider.first_name, last_name: apt.provider.last_name, role: (apt.provider as any)?.role }) : 'Unknown Provider',
-        specialty: apt.provider?.specialization || 'General',
+        specialty: apt.provider?.specialty || 'General',
         date: new Date(apt.appointment_date).toLocaleDateString(),
         time: apt.appointment_time || 'TBD',
         status: apt.status || 'pending'

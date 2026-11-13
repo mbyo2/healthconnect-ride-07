@@ -24,7 +24,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("delivery_tracking")
-        .select("id, status, pickup_time, delivery_time, tracking_notes, updated_at, courier_id")
+        .select("id, status, pickup_time, delivery_time, tracking_notes, updated_at, driver_id")
         .eq("order_id", orderId)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -80,7 +80,7 @@ export const PatientOrderTracking = ({ orderId }: { orderId: string }) => {
         </p>
       )}
       {/* Live courier map — Yango-style (CEO 2026-10-10) */}
-      {tracking?.id && tracking?.courier_id && tracking?.status !== "delivered" && (
+      {tracking?.id && tracking?.driver_id && tracking?.status !== "delivered" && (
         <div className="mt-3">
           <p className="text-xs font-bold mb-1.5 flex items-center gap-1">
             <Truck className="h-3.5 w-3.5" /> Live courier location
