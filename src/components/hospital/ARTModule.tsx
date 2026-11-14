@@ -75,7 +75,11 @@ export const ARTModule = ({ hospital: hospitalProp }: { hospital?: any }) => {
     try {
       const [{ data: procs }, { data: assigned }] = await Promise.all([
         (supabase.from("art_procedures" as any) as any).select("*").eq("cycle_id", cycle.id).order("procedure_date", { ascending: false }),
-        (supabase.from("art_cycle_staff" as any) as any).select("*, staff:staff_id(id)").eq("cycle_id", cycle.id),
+        // NOTE (gate 2026-11-14): art_cycle_staff.staff_id references
+        // auth.users, so staff:staff_id(id) 400s (PGRST200) and the staff
+        // list silently rendered empty. Only staff_id is rendered, so no
+        // embed is needed at all.
+        (supabase.from("art_cycle_staff" as any) as any).select("*").eq("cycle_id", cycle.id),
       ]);
       setProcedures(procs || []);
       setStaff(assigned || []);

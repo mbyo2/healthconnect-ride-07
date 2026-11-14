@@ -43,11 +43,29 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
   useEffect(() => {
     const fetchPersonnel = async () => {
       if (!hospital?.id) return;
-      const { data } = await supabase
+      // NOTE (gate 2026-11-14): institution_personnel.user_id references
+      // auth.users, not profiles, so profile:user_id(...) 400s (PGRST200)
+      // and the roster silently rendered empty. Fetch personnel then
+      // profiles separately and merge client-side (PersonnelManagement pattern).
+      const { data: rows, error } = await supabase
         .from('institution_personnel')
-        .select('*, profile:user_id(first_name, last_name)')
+        .select('*')
         .eq('institution_id', hospital.id);
-      setPersonnel((data as any[]) || []);
+      if (error) {
+        console.error('Failed to load personnel:', error);
+        setPersonnel([]);
+        return;
+      }
+      const ids = (rows || []).map((r: any) => r.user_id).filter(Boolean);
+      const { data: profs } = ids.length
+        ? await supabase.from('profiles').select('id, first_name, last_name').in('id', ids)
+        : { data: [] as any[] };
+      setPersonnel(
+        (rows || []).map((r: any) => ({
+          ...r,
+          profile: (profs || []).find((p: any) => p.id === r.user_id) || null,
+        }))
+      );
     };
     fetchPersonnel();
   }, [hospital?.id]);

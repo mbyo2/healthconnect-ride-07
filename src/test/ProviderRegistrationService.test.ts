@@ -116,7 +116,11 @@ describe('ProviderRegistrationService Property Tests', () => {
       ),
       { numRuns: 100 }
     );
-  });
+    // NOTE (gate 2026-11-14): this fast-check property (100 runs, expensive
+    // generators) took 5,206ms under full-suite CPU contention vs the 5,000ms
+    // default timeout and failed once as a timing flake; it passes 3/3 in
+    // isolation. Explicit timeout keeps the suite green under load.
+  }, 30000);
 
   /**
    * **Feature: provider-registration-fix, Property 3: Validation error specificity**

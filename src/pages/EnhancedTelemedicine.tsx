@@ -137,10 +137,7 @@ export const EnhancedTelemedicine = () => {
       const [workflowsRes, tasksRes, ordersRes] = await Promise.all([
         supabase
           .from("clinical_workflow_instances")
-          .select(`
-            *,
-            patient:profiles!patient_id(first_name, last_name)
-          `)
+          .select("*")
           .eq("institution_id", institution.id)
           .eq("status", "active")
           .order("started_at", { ascending: false })
@@ -156,19 +153,34 @@ export const EnhancedTelemedicine = () => {
           .limit(50),
         supabase
           .from("diagnostic_orders")
-          .select(`
-            *,
-            patient:profiles!patient_id(first_name, last_name)
-          `)
+          .select("*")
           .eq("institution_id", institution.id)
           .eq("status", "pending")
           .order("ordered_at", { ascending: false })
           .limit(50),
       ]);
 
-      if (workflowsRes.data) setWorkflows(workflowsRes.data as any);
+      // NOTE (gate 2026-11-14): clinical_workflow_instances.patient_id and
+      // diagnostic_orders.patient_id both reference auth.users, not
+      // profiles, so the patient:profiles!patient_id embeds 400s (PGRST200)
+      // and the telemedicine fetch failed. Patient names come from profiles
+      // in a second query and are merged client-side. (The clinical_tasks
+      // assigned_to embed above is valid: assigned_to -> profiles.)
+      const mergePatients = async (rows: any[]) => {
+        const ids = Array.from(new Set(rows.map((r) => r.patient_id).filter(Boolean)));
+        let profMap: Record<string, any> = {};
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", ids);
+          for (const p of (profs as any[]) || []) profMap[p.id] = p;
+        }
+        return rows.map((r) => ({ ...r, patient: profMap[r.patient_id] || null }));
+      };
+      if (workflowsRes.data) setWorkflows((await mergePatients(workflowsRes.data as any[])) as any);
       if (tasksRes.data) setTasks(tasksRes.data as any);
-      if (ordersRes.data) setOrders(ordersRes.data as any);
+      if (ordersRes.data) setOrders((await mergePatients(ordersRes.data as any[])) as any);
     } catch (error) {
       console.error("Error fetching telemedicine data:", error);
     } finally {

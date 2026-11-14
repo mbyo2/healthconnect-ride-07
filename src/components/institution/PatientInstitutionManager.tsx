@@ -26,21 +26,28 @@ export function PatientInstitutionManager({ institutionId }: { institutionId: st
   const { data: linkedPatients, isLoading } = useQuery({
     queryKey: ["institution-patients", institutionId],
     queryFn: async () => {
+      // NOTE (gate 2026-11-14): patient_institution_links.patient_id
+      // references auth.users, not profiles, so the profiles!… embed 400s
+      // (PGRST200) and the linked-patients list never loaded. Fetch the
+      // links, then profiles separately, and merge as `profiles` (the
+      // shape the render below reads).
       const { data, error } = await supabase
         .from("patient_institution_links")
-        .select(`
-          id,
-          patient_id,
-          status,
-          enrolled_at,
-          profiles!patient_institution_links_patient_id_fkey (
-            id, first_name, last_name, email, phone
-          )
-        `)
+        .select("id, patient_id, status, enrolled_at")
         .eq("institution_id", institutionId)
         .order("enrolled_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      const rows = (data as any[]) || [];
+      const ids = Array.from(new Set(rows.map((r) => r.patient_id).filter(Boolean)));
+      let profMap: Record<string, any> = {};
+      if (ids.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email, phone")
+          .in("id", ids);
+        for (const p of (profs as any[]) || []) profMap[p.id] = p;
+      }
+      return rows.map((r) => ({ ...r, profiles: profMap[r.patient_id] || null }));
     },
     enabled: !!institutionId,
   });

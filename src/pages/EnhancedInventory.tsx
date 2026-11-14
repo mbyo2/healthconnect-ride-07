@@ -52,7 +52,7 @@ interface PurchaseOrder {
   discount_amount: number;
   final_amount: number;
   supplier?: {
-    name: string;
+    supplier_name: string;
   };
 }
 
@@ -113,7 +113,7 @@ export const EnhancedInventory = () => {
           .from("purchase_orders")
           .select(`
             *,
-            supplier:suppliers(name)
+            supplier:procurement_suppliers(supplier_name)
           `)
           .eq("institution_id", institution.id)
           .order("order_date", { ascending: false })
@@ -489,7 +489,7 @@ export const EnhancedInventory = () => {
                       <td className="px-4 py-3">
                         <div className="text-xs font-semibold">{order.order_number}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs">{order.supplier?.name || "N/A"}</td>
+                      <td className="px-4 py-3 text-xs">{order.supplier?.supplier_name || "N/A"}</td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">
                         {new Date(order.order_date).toLocaleDateString()}
                       </td>

@@ -109,8 +109,7 @@ export const PatientFlowManagement = () => {
           .from("patient_flow_tracking")
           .select(`
             *,
-            patient:profiles!patient_id(first_name, last_name),
-            current_stage:patient_flow_stages(*)
+            current_stage:patient_flow_stages!patient_flow_tracking_current_stage_id_fkey(*)
           `)
           .eq("institution_id", institution.id)
           .eq("status", "active")
@@ -119,7 +118,27 @@ export const PatientFlowManagement = () => {
       ]);
 
       if (stagesRes.data) setStages(stagesRes.data as any);
-      if (flowsRes.data) setActiveFlows(flowsRes.data as any);
+      if (flowsRes.data) {
+        // NOTE (gate 2026-11-14): patient_flow_tracking.patient_id
+        // references auth.users, not profiles, so the patient:profiles!…
+        // embed 400s (PGRST200) and the whole flow query failed; and
+        // current_stage was ambiguous (current + previous stage FKs → 300).
+        // The stage embed now names its FK explicitly; patient names come
+        // from profiles in a second query and are merged client-side.
+        const flows = flowsRes.data as any[];
+        const patientIds = Array.from(new Set(flows.map((f) => f.patient_id).filter(Boolean)));
+        let patientMap: Record<string, { first_name?: string; last_name?: string }> = {};
+        if (patientIds.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", patientIds);
+          for (const p of (profs as any[]) || []) patientMap[p.id] = p;
+        }
+        setActiveFlows(
+          flows.map((f) => ({ ...f, patient: patientMap[f.patient_id] || null })) as any
+        );
+      }
       if (capacityRes.data) setCapacity(capacityRes.data);
     } catch (error) {
       console.error("Error fetching flow data:", error);

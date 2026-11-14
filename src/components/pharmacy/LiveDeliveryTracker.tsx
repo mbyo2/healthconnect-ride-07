@@ -54,15 +54,30 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
   const { data: delivery } = useQuery({
     queryKey: ["delivery", orderId],
     queryFn: async () => {
+      // NOTE (gate 2026-11-14): delivery_tracking.driver_id references
+      // auth.users, not couriers, so the courier:couriers!... embed 400s
+      // (PGRST200) and the tracker never loaded. Couriers link to the
+      // driver via couriers.user_id — fetch separately and attach.
       const { data, error } = await (supabase as any)
         .from("delivery_tracking")
-        .select("*, courier:couriers!delivery_tracking_driver_id_fkey(full_name, phone, vehicle_type)")
+        .select("*")
         .eq("order_id", orderId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return data;
+      let courier = null;
+      if (data.driver_id) {
+        const { data: cRow } = await (supabase as any)
+          .from("couriers")
+          .select("full_name, phone, vehicle_type")
+          .eq("user_id", data.driver_id)
+          .limit(1)
+          .maybeSingle();
+        courier = cRow || null;
+      }
+      return { ...data, courier };
     },
     refetchInterval: 15000, // poll every 15s
   });

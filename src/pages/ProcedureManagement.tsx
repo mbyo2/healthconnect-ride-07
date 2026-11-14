@@ -121,8 +121,7 @@ export const ProcedureManagement = () => {
               .from("procedure_executions")
               .select(`
                 *,
-                procedure:clinical_procedures(*),
-                patient:profiles!patient_id(first_name, last_name)
+                procedure:clinical_procedures(*)
               `)
               .eq("institution_id", institution.id)
               .order("execution_date", { ascending: false })
@@ -132,7 +131,25 @@ export const ProcedureManagement = () => {
 
       if (proceduresRes.data) setProcedures(proceduresRes.data as any);
       if (pricingRes.data) setPricing(pricingRes.data as any);
-      if (executionsRes.data) setExecutions(executionsRes.data as any);
+      if (executionsRes.data) {
+        // NOTE (gate 2026-11-14): procedure_executions.patient_id
+        // references auth.users, not profiles, so the
+        // patient:profiles!patient_id embed 400s (PGRST200) and the
+        // executions fetch failed. Patient names come from profiles in a
+        // second query and are merged client-side. (The procedure embed
+        // above is valid: procedure_id -> clinical_procedures.)
+        const rows = executionsRes.data as any[];
+        const ids = Array.from(new Set(rows.map((e) => e.patient_id).filter(Boolean)));
+        let profMap: Record<string, any> = {};
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", ids);
+          for (const p of (profs as any[]) || []) profMap[p.id] = p;
+        }
+        setExecutions(rows.map((e) => ({ ...e, patient: profMap[e.patient_id] || null })) as any);
+      }
     } catch (error) {
       console.error("Error fetching procedure data:", error);
     } finally {

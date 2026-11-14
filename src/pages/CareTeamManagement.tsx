@@ -124,7 +124,6 @@ export const CareTeamManagement = () => {
           .from("care_team_assignments")
           .select(`
             *,
-            patient:profiles!patient_id(first_name, last_name),
             staff:profiles!staff_id(first_name, last_name, specialty),
             role:care_team_roles(*)
           `)
@@ -143,7 +142,26 @@ export const CareTeamManagement = () => {
       ]);
 
       if (rolesRes.data) setRoles(rolesRes.data as any);
-      if (assignmentsRes.data) setAssignments(assignmentsRes.data as any);
+      if (assignmentsRes.data) {
+        // NOTE (gate 2026-11-14): care_team_assignments.patient_id
+        // references auth.users, not profiles, so the
+        // patient:profiles!patient_id embed 400s (PGRST200) and the whole
+        // care-team fetch failed. Patient names come from profiles in a
+        // second query and are merged client-side. (The staff and role
+        // embeds above are valid: staff_id -> profiles, role_id ->
+        // care_team_roles.)
+        const rows = assignmentsRes.data as any[];
+        const ids = Array.from(new Set(rows.map((a) => a.patient_id).filter(Boolean)));
+        let profMap: Record<string, any> = {};
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", ids);
+          for (const p of (profs as any[]) || []) profMap[p.id] = p;
+        }
+        setAssignments(rows.map((a) => ({ ...a, patient: profMap[a.patient_id] || null })) as any);
+      }
       if (tasksRes.data) setTasks(tasksRes.data as any);
     } catch (error) {
       console.error("Error fetching care team data:", error);

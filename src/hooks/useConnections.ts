@@ -18,24 +18,40 @@ export const useConnections = () => {
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
+      // NOTE (gate 2026-11-14): user_connections.patient_id and
+      // .provider_id both reference auth.users, not profiles, so the
+      // patient/provider profiles!… embeds 400d (PGRST200) and the
+      // connections list never loaded. Profiles are fetched separately
+      // and merged below as `patient` / `provider` (the shape the
+      // mapping code after this expects).
       const { data, error } = await supabase
         .from('user_connections')
-        .select(`
-          *,
-          patient:profiles!user_connections_patient_id_fkey(
-            id, first_name, last_name, avatar_url, email
-          ),
-          provider:profiles!user_connections_provider_id_fkey(
-            id, first_name, last_name, avatar_url, specialty, email
-          )
-        `)
+        .select('*')
         .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
+      const rows = (data || []) as any[];
+      const personIds = Array.from(new Set(
+        rows.flatMap((r) => [r.patient_id, r.provider_id]).filter(Boolean)
+      ));
+      let personMap: Record<string, any> = {};
+      if (personIds.length > 0) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url, specialty, email')
+          .in('id', personIds);
+        for (const p of (profs as any[]) || []) personMap[p.id] = p;
+      }
+      const merged = rows.map((r) => ({
+        ...r,
+        patient: personMap[r.patient_id] || null,
+        provider: personMap[r.provider_id] || null,
+      }));
+
       // Fix: Add explicit null checks and type guards
-      return (data || []).map(conn => {
+      return merged.map(conn => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         
@@ -84,20 +100,30 @@ export const useConnections = () => {
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
+      // NOTE (gate 2026-11-14): primary_provider_assignments.provider_id
+      // references auth.users, not profiles, so the provider profiles!…
+      // embed 400s (PGRST200). The provider profile is fetched separately
+      // and attached as `provider` (the shape the code below expects).
       const { data, error } = await supabase
         .from('primary_provider_assignments')
-        .select(`
-          *,
-          provider:profiles!primary_provider_assignments_provider_id_fkey(
-            id, first_name, last_name, avatar_url, specialty, email, role
-          )
-        `)
+        .select('*')
         .eq('patient_id', user.id)
         .maybeSingle();
 
       if (error) throw error;
 
       if (!data) return null;
+
+      if ((data as any).provider_id) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url, specialty, email, role')
+          .eq('id', (data as any).provider_id)
+          .maybeSingle();
+        (data as any).provider = prof || null;
+      } else {
+        (data as any).provider = null;
+      }
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       

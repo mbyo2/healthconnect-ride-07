@@ -113,7 +113,6 @@ export const EnhancedDiagnostics = () => {
           .from("diagnostic_orders")
           .select(`
             *,
-            patient:profiles!patient_id(first_name, last_name),
             ordering_provider:profiles!ordering_provider_id(first_name, last_name)
           `)
           .eq("institution_id", institution.id)
@@ -131,7 +130,25 @@ export const EnhancedDiagnostics = () => {
           .limit(50),
       ]);
 
-      if (ordersRes.data) setOrders(ordersRes.data as any);
+      if (ordersRes.data) {
+        // NOTE (gate 2026-11-14): diagnostic_orders.patient_id references
+        // auth.users, not profiles, so the patient:profiles!patient_id
+        // embed 400s (PGRST200) and the diagnostics fetch failed. Patient
+        // names come from profiles in a second query and are merged
+        // client-side. (The ordering_provider embed above is valid:
+        // ordering_provider_id -> profiles.)
+        const rows = ordersRes.data as any[];
+        const ids = Array.from(new Set(rows.map((o) => o.patient_id).filter(Boolean)));
+        let profMap: Record<string, any> = {};
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", ids);
+          for (const p of (profs as any[]) || []) profMap[p.id] = p;
+        }
+        setOrders(rows.map((o) => ({ ...o, patient: profMap[o.patient_id] || null })) as any);
+      }
       if (schedulesRes.data) setSchedules(schedulesRes.data as any);
     } catch (error) {
       console.error("Error fetching diagnostics data:", error);

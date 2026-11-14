@@ -81,8 +81,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           .from("radiology_requests")
           .select(`
             id, request_number, modality, body_part, status, report,
-            notes, request_date, image_url,
-            patient:profiles!radiology_requests_patient_id_fkey(first_name, last_name)
+            notes, request_date, image_url, patient_id
           `)
           .eq("hospital_id", institutionId)
           .order("request_date", { ascending: false })
@@ -90,6 +89,22 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       ]);
       if (testsRes.error) throw testsRes.error;
       if (radRes.error) throw radRes.error;
+      // NOTE (gate 2026-11-14): radiology_requests.patient_id references
+      // auth.users, not profiles, so the patient:profiles!… embed 400s
+      // (PGRST200) and the whole LIS/RIS fetch failed. Patient names come
+      // from profiles in a second query and are merged client-side. (The
+      // lab_tests embed above is valid: lab_tests.patient_id -> profiles.)
+      const radRowsBase = (radRes.data as any[]) || [];
+      const radIds = Array.from(new Set(radRowsBase.map((r) => r.patient_id).filter(Boolean)));
+      const radProfMap: Record<string, any> = {};
+      if (radIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name")
+          .in("id", radIds);
+        for (const p of (profs as any[]) || []) radProfMap[p.id] = p;
+      }
+      const radRows = radRowsBase.map((r) => ({ ...r, patient: radProfMap[r.patient_id] || null }));
 
       setSamples(
         ((testsRes.data as any[]) || []).map((t: any) => {
@@ -116,7 +131,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
         })
       );
 
-      const liveStudies = ((radRes.data as any[]) || []).map((r: any) => ({
+      const liveStudies = radRows.map((r: any) => ({
         id: r.id,
         accessionNumber: r.request_number || r.id.slice(0, 8),
         patientName: r.patient
