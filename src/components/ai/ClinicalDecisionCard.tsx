@@ -113,7 +113,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
 
       // External links
       if (action.route.startsWith('http')) {
-        window.open(action.route, '_blank');
+        window.open(action.route, '_blank', 'noopener,noreferrer');
         return;
       }
 

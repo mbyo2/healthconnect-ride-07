@@ -223,14 +223,20 @@ Deno.serve(async (req) => {
       }).select('id').single();
       if (error) {
         // The live DB prescribing-safety gate (allergy/interaction triggers)
-        // refuses unsafe prescriptions at insert time. The full DB error is
-        // kept ONLY in the server-side exchange log (fhir_exchanges row);
-        // the client gets a generic 422 naming the conflict — never the raw
-        // DB error text (triage-assess sanitisation pattern).
+        // refuses unsafe prescriptions at insert time. Only the trigger's
+        // own crafted refusal (a P0001 RAISE) is stored in the exchange
+        // log: fhir_exchanges rows are readable by the patient via RLS,
+        // so any other database error text is stored as a generic
+        // message only (live-proven 2026-11-15: a 22P02 date-parse error
+        // was readable by the patient). The full error stays in the
+        // server log; the client gets a generic 422 naming the conflict.
         console.error('fhir-inbound prescription safety refusal:', error.message);
+        const storedMessage = error.code === 'P0001'
+          ? `Prescription safety check failed: ${error.message}`
+          : 'Prescription safety check failed: the prescription could not be validated.';
         await db.from('fhir_exchanges').update({
           status: 'rejected',
-          error_message: `Prescription safety check failed: ${error.message}`,
+          error_message: storedMessage,
           updated_at: new Date().toISOString(),
         }).eq('id', exchange?.id);
         return bad('A prescription in this bundle failed the safety check and was not imported.', 422);

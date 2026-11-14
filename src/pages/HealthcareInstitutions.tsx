@@ -404,7 +404,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
             size="sm"
             variant="outline"
             className="h-9 px-3 rounded-xl border-border text-xs font-bold hover:bg-primary-50"
-            onClick={() => window.open(inst.website, '_blank')}
+            onClick={() => window.open(inst.website, '_blank', 'noopener,noreferrer')}
             title="Website"
           >
             <Globe className="h-3.5 w-3.5" />
