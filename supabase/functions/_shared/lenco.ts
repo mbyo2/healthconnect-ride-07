@@ -327,9 +327,18 @@ export async function verifyWebhookSignature(rawBody: string, signature: string 
       candidates.push(['SHA-512', enc.encode(secret)]);
       candidates.push(['SHA-256', enc.encode(secret)]);
     }
+    // WSC audit 2026-11-15 (Low): the comparison below used early-exit
+    // string equality on the HMAC (a timing side channel). Compare in
+    // constant time instead, like BMaGlass Pay's signatureMatches.
+    const constantTimeEqual = (a: string, b: string): boolean => {
+      if (a.length !== b.length) return false;
+      let diff = 0;
+      for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+      return diff === 0;
+    };
     for (const [algo, keyMaterial] of candidates) {
       const hex = await hmacHex(algo as 'SHA-256' | 'SHA-512', keyMaterial, rawBody);
-      if (clean.length === hex.length && clean === hex) return true;
+      if (constantTimeEqual(clean, hex)) return true;
     }
     return false;
   } catch {

@@ -312,3 +312,14 @@ describe('dompurify bump (deps M2)', () => {
     expect(s).not.toContain('IN_PLACE');
   });
 });
+
+// ── WSC money-paths audit 2026-11-15 (Low): webhook HMAC comparison ──
+
+describe('lenco webhook HMAC comparison is constant-time (WSC 2026-11-15)', () => {
+  it('verifyWebhookSignature never uses early-exit string equality on the HMAC', () => {
+    const s = read('supabase/functions/_shared/lenco.ts');
+    expect(s).toContain('constantTimeEqual');
+    expect(s).toContain('diff |= a.charCodeAt(i) ^ b.charCodeAt(i)');
+    expect(s).not.toContain('clean === hex');
+  });
+});
