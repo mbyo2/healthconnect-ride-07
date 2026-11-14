@@ -1,6 +1,8 @@
 /**
  * Three factual fixes (2026-11-13, CEO-approved):
- * 1. Landing footer names the PACRA-registered business, never "Ltd."
+ * 1. Landing footer copyright reads "Doc'O Clock", never "Ltd."
+ *    (CEO correction 2026-11-14: the 2026-11-13 change to the consultancy
+ *    name was wrong — the brand line is Doc'O Clock.)
  * 2. The /workos demo showcase (mock Zambian patient records) is gone.
  * 3. The landing "patients" count excludes demo signups.
  */
@@ -20,12 +22,14 @@ const walkSrc = (dir: string, out: string[] = []): string[] => {
 };
 
 describe('three factual fixes 2026-11-13', () => {
-  it('landing footer names the registered business, not a Ltd.', () => {
+  it('landing footer copyright reads Doc\'O Clock, not a Ltd. or the consultancy', () => {
     const s = read('src/components/landing/LandingFooter.tsx');
     expect(s).not.toContain('Ltd.');
-    expect(s).toContain('Mabvuto Banda Science, Information Technical Consultancy');
-    // The in-app footer never carried the wrong entity; it stays as-is.
+    expect(s).not.toContain('Mabvuto Banda Science, Information Technical Consultancy');
+    expect(s).toContain("Doc&apos; O Clock. All rights reserved.");
+    // The in-app footer already reads Doc'O Clock; it stays as-is.
     expect(read('src/components/Footer.tsx')).not.toContain('Ltd.');
+    expect(read('src/components/Footer.tsx')).toContain("Doc&apos; O Clock. All rights reserved.");
   });
 
   it('the /workos demo showcase is deleted: routes, page, components', () => {
