@@ -6,7 +6,12 @@ import type { CanonicalReading } from './types.js'
 const LOINC_MAP: Record<string, { data_type: string; unit?: string; critical?: [number, number] }> = {
   '8867-4': { data_type: 'heart_rate', unit: 'bpm', critical: [40, 130] },
   '59408-5': { data_type: 'spo2', unit: '%', critical: [90, 100] },
-  '8480-6': { data_type: 'systolic_bp', unit: 'mmHg', critical: [90, 180] },
+  // Critical bands are the device/clinical alert limits, NOT hypertensive-crisis
+  // levels: systolic >= 140 mmHg is ACC/AHA Stage 2 hypertension and the top of
+  // the reference range monitors themselves report (OBX-7, e.g. 90-140), so a
+  // systolic of 141-179 must already raise the critical alert — the old upper
+  // bound of 180 (crisis level) silently missed that whole range.
+  '8480-6': { data_type: 'systolic_bp', unit: 'mmHg', critical: [90, 140] },
   '8462-4': { data_type: 'diastolic_bp', unit: 'mmHg', critical: [50, 110] },
   '8310-5': { data_type: 'temperature', unit: 'degC', critical: [35, 39] },
   '9279-1': { data_type: 'respiratory_rate', unit: '/min', critical: [8, 30] },

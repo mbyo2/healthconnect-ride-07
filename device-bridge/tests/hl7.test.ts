@@ -40,6 +40,19 @@ describe('HL7 ORU parser', () => {
     const sbp = readings.find((r) => r.data_type === 'systolic_bp')!
     expect(sbp.is_critical).toBe(true)
   })
+
+  it('systolic boundary: 140 is not critical, 141 is', () => {
+    // ACC/AHA Stage 2 hypertension starts at 140; the alert band is [90, 140].
+    const oruWithSbp = (sbp: number) =>
+      [
+        'MSH|^~\\&|MONITOR|ICU1|DOC|OC|20260703120000||ORU^R01|MSG001|P|2.4',
+        'OBX|1|NM|8480-6^Systolic BP^LN||' + sbp + '|mmHg|90-140|H|||F',
+      ].join('\r')
+    const at140 = parseOru(oruWithSbp(140), 'dev-1').find((r) => r.data_type === 'systolic_bp')!
+    const at141 = parseOru(oruWithSbp(141), 'dev-1').find((r) => r.data_type === 'systolic_bp')!
+    expect(at140.is_critical).toBe(false)
+    expect(at141.is_critical).toBe(true)
+  })
 })
 
 describe('Dräger Medibus parser', () => {
@@ -48,5 +61,21 @@ describe('Dräger Medibus parser', () => {
     const frame = '\x012400' + '78' + '   72' + '50' + '   98' + '00\r'
     const readings = _parseMedibus(frame, 'dev-2')
     expect(readings.map((r) => r.data_type).sort()).toEqual(['heart_rate', 'spo2'])
+  })
+
+  it('extracts heart_rate + spo2 from a 6-char-value frame (old stride)', () => {
+    // Same frame with spec-style 6-char right-justified values — the
+    // width-detecting parser must keep handling these, not just 5-char ones.
+    const frame = '\x012400' + '78' + '    72' + '50' + '    98' + '00\r'
+    const readings = _parseMedibus(frame, 'dev-2')
+    expect(readings.map((r) => r.data_type).sort()).toEqual(['heart_rate', 'spo2'])
+    expect(readings.find((r) => r.data_type === 'spo2')!.data_value).toEqual({ value: 98 })
+  })
+
+  it('keeps the valid reading when another code has a blank value', () => {
+    const frame = '\x012400' + '78' + '   72' + '50' + '     ' + '00\r'
+    const readings = _parseMedibus(frame, 'dev-2')
+    expect(readings.map((r) => r.data_type)).toEqual(['heart_rate'])
+    expect(readings[0].data_value).toEqual({ value: 72 })
   })
 })
