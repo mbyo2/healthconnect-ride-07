@@ -4,6 +4,7 @@ const corsHeaders = {
 };
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { verifyAndSettleLenco, verifyWebhookSignature, settleTransferByReference } from '../_shared/lenco.ts';
+import { ipRateLimitResponse, clientIp } from '../_shared/rate-limit.ts';
 
 // Lenco webhook receiver.
 //
@@ -25,6 +26,15 @@ Deno.serve(async (req) => {
       status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+
+  // Workstream E (2026-11-15): per-IP flood guard, 60/min. Live-proven
+  // gap: invalid-signature deliveries were never throttled (10/10 in
+  // ~7s, 0x429), each costing an invocation + HMAC verify. Fail-open:
+  // a limiter outage must never drop real Lenco deliveries, so a
+  // limiter error lets the request through (see _shared/rate-limit.ts).
+  // Legitimate Lenco traffic is a handful of deliveries per minute.
+  const limited = await ipRateLimitResponse(`ip:${clientIp(req)}`, 'lenco-webhook', 60, corsHeaders);
+  if (limited) return limited;
 
   // Fail closed (P2-25): verifyWebhookSignature derives its candidate keys
   // from LENCO_WEBHOOK_SECRET and LENCO_SECRET_KEY (official spec: HMAC

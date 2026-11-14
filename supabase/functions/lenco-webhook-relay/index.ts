@@ -17,6 +17,8 @@
 // Configure this URL in the Lenco dashboard (API & Webhooks):
 //   https://tthzcijscedgxjfnfnky.supabase.co/functions/v1/lenco-webhook-relay
 
+import { ipRateLimitResponse, clientIp } from '../_shared/rate-limit.ts';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with, x-lenco-signature, x-webhook-signature, lenco-signature',
@@ -44,6 +46,15 @@ Deno.serve(async (req) => {
       status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+
+  // Workstream E (2026-11-15): per-IP flood guard, 60/min, BEFORE the
+  // fan-out. The relay verifies nothing and forwards to BOTH apps, so
+  // an unthrottled flood here doubles downstream load. Fail-open (see
+  // _shared/rate-limit.ts): a limiter outage must never drop real
+  // Lenco deliveries. Lenco retries on 429, so a genuine burst is
+  // delayed, never lost.
+  const limited = await ipRateLimitResponse(`ip:${clientIp(req)}`, 'lenco-webhook-relay', 60, corsHeaders);
+  if (limited) return limited;
 
   // Byte-identical raw body — never parse/re-serialize, or the downstream
   // HMAC checks (computed over the exact bytes Lenco sent) would fail.
