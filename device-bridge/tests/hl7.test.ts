@@ -53,6 +53,20 @@ describe('HL7 ORU parser', () => {
     expect(at140.is_critical).toBe(false)
     expect(at141.is_critical).toBe(true)
   })
+
+  it('diastolic boundary: 90 is not critical, 91 is', () => {
+    // ACC/AHA Stage 2 hypertension starts at 90; the alert band is [50, 90].
+    // (Strict check, same as systolic: the threshold value itself is safe.)
+    const oruWithDbp = (dbp: number) =>
+      [
+        'MSH|^~\\&|MONITOR|ICU1|DOC|OC|20260703120000||ORU^R01|MSG001|P|2.4',
+        'OBX|1|NM|8462-4^Diastolic BP^LN||' + dbp + '|mmHg|50-90|H|||F',
+      ].join('\r')
+    const at90 = parseOru(oruWithDbp(90), 'dev-1').find((r) => r.data_type === 'diastolic_bp')!
+    const at91 = parseOru(oruWithDbp(91), 'dev-1').find((r) => r.data_type === 'diastolic_bp')!
+    expect(at90.is_critical).toBe(false)
+    expect(at91.is_critical).toBe(true)
+  })
 })
 
 describe('Dräger Medibus parser', () => {

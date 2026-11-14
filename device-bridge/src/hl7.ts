@@ -10,9 +10,13 @@ const LOINC_MAP: Record<string, { data_type: string; unit?: string; critical?: [
   // levels: systolic >= 140 mmHg is ACC/AHA Stage 2 hypertension and the top of
   // the reference range monitors themselves report (OBX-7, e.g. 90-140), so a
   // systolic of 141-179 must already raise the critical alert — the old upper
-  // bound of 180 (crisis level) silently missed that whole range.
+  // bound of 180 (crisis level) silently missed that whole range. Same for
+  // diastolic: ACC/AHA Stage 2 starts at >= 90 mmHg, so a diastolic of 91+
+  // must already raise the critical alert — the old upper bound of 110
+  // silently missed 91-110. (Band is the safe range and the check is strict,
+  // so the threshold value itself is not critical: 140/90 safe, 141/91 alert.)
   '8480-6': { data_type: 'systolic_bp', unit: 'mmHg', critical: [90, 140] },
-  '8462-4': { data_type: 'diastolic_bp', unit: 'mmHg', critical: [50, 110] },
+  '8462-4': { data_type: 'diastolic_bp', unit: 'mmHg', critical: [50, 90] },
   '8310-5': { data_type: 'temperature', unit: 'degC', critical: [35, 39] },
   '9279-1': { data_type: 'respiratory_rate', unit: '/min', critical: [8, 30] },
   '19889-5': { data_type: 'etco2', unit: 'mmHg', critical: [30, 50] },
