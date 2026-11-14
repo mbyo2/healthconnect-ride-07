@@ -77,4 +77,29 @@ describe('three factual fixes 2026-11-13', () => {
     expect(s).toContain('me@me.com');
     expect(s).toContain('NOT IN');
   });
+
+  it('no user-visible surface names the consultancy (CEO order 2026-11-14)', () => {
+    // Brand surfaces carry Doc'O Clock only — never
+    // "Mabvuto Banda Science, Information Technical Consultancy".
+    // (This test file itself holds the string as an assertion literal;
+    // the check below reads only the rendered surfaces, not src.)
+    const banned = [
+      'Mabvuto Banda Science',
+      'Information Technical Consultancy',
+    ];
+    const llms = read('public/llms.txt');
+    for (const b of banned) expect(llms, 'public/llms.txt').not.toContain(b);
+    expect(llms).toContain('Operator: Doc\'O Clock');
+    for (const tpl of [
+      'change-email',
+      'confirm-signup',
+      'invite-user',
+      'magic-link',
+      'reset-password',
+    ]) {
+      const s = read(`supabase/email-templates/${tpl}.html`);
+      for (const b of banned) expect(s, `email template ${tpl}`).not.toContain(b);
+      expect(s).toContain('&copy; 2026 Doc\'O Clock');
+    }
+  });
 });

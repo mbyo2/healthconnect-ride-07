@@ -8,7 +8,7 @@
 - Canonical URL: https://doc0clock.online/
 - Language: English (en-ZM)
 - Service area: Zambia (Lusaka, Kitwe, Ndola, and nationwide via telehealth)
-- Operator: Mabvuto Banda Science, Information Technical Consultancy (Zambia)
+- Operator: Doc'O Clock
 
 ## For patients (book a doctor in Zambia)
 
