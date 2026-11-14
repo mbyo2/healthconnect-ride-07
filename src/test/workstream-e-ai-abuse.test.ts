@@ -61,14 +61,18 @@ describe("workstream E — triage-assess", () => {
 });
 
 describe("workstream E — webhook flood guards", () => {
-  it("lenco-webhook and lenco-webhook-relay enforce a per-IP limit", () => {
+  it("lenco-webhook and lenco-webhook-relay enforce a global per-function limit", () => {
     for (const f of [
       "supabase/functions/lenco-webhook/index.ts",
       "supabase/functions/lenco-webhook-relay/index.ts",
     ]) {
       const s = read(f);
       expect(s).toContain("ipRateLimitResponse");
-      expect(s).toContain("clientIp(req)");
+      // Unauthenticated ingress MUST use the literal 'global' key:
+      // x-forwarded-for[0] rotates at the Supabase edge (proven live),
+      // so a per-IP key gives every request a fresh bucket.
+      expect(s).toContain("ipRateLimitResponse('global'");
+      expect(s).not.toContain("clientIp(");
     }
   });
 

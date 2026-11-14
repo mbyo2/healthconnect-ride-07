@@ -17,7 +17,7 @@
 // Configure this URL in the Lenco dashboard (API & Webhooks):
 //   https://tthzcijscedgxjfnfnky.supabase.co/functions/v1/lenco-webhook-relay
 
-import { ipRateLimitResponse, clientIp } from '../_shared/rate-limit.ts';
+import { ipRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,13 +47,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Workstream E (2026-11-15): per-IP flood guard, 60/min, BEFORE the
-  // fan-out. The relay verifies nothing and forwards to BOTH apps, so
-  // an unthrottled flood here doubles downstream load. Fail-open (see
-  // _shared/rate-limit.ts): a limiter outage must never drop real
-  // Lenco deliveries. Lenco retries on 429, so a genuine burst is
-  // delayed, never lost.
-  const limited = await ipRateLimitResponse(`ip:${clientIp(req)}`, 'lenco-webhook-relay', 60, corsHeaders);
+  // Workstream E (2026-11-15, corrected same day): GLOBAL per-function
+  // bucket, 60/min, BEFORE the fan-out. Keying on the client IP was
+  // live-proven useless — x-forwarded-for[0] at the Supabase edge is a
+  // rotating Cloudflare IP, so every request got a fresh bucket and 70
+  // deliveries drew 0x429. Fail-open (see _shared/rate-limit.ts): a
+  // limiter outage must never drop real Lenco deliveries. Lenco retries
+  // on 429, so a genuine burst is delayed, never lost.
+  const limited = await ipRateLimitResponse('global', 'lenco-webhook-relay', 60, corsHeaders);
   if (limited) return limited;
 
   // Byte-identical raw body — never parse/re-serialize, or the downstream

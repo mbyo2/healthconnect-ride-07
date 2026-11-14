@@ -69,25 +69,22 @@ export async function aiRateLimitResponse(
 }
 
 /**
- * Client IP for unauthenticated ingress (workstream E, 2026-11-15).
- * Supabase sits behind a proxy, so the first x-forwarded-for entry is
- * the caller; x-real-ip is the fallback. "unknown" buckets callers
- * with no forwarding headers together — still bounded, never bypassed.
- */
-export function clientIp(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for") ?? "";
-  const first = forwarded.split(",")[0]?.trim();
-  if (first) return first;
-  return req.headers.get("x-real-ip")?.trim() || "unknown";
-}
-
-/**
- * Per-source-IP sliding-window limit for UNAUTHENTICATED functions
+ * Per-source sliding-window limit for UNAUTHENTICATED functions
  * (webhook ingress). Same fail-open contract as aiRateLimitResponse:
  * the limiter is flood protection, never an auth/settlement gate — a
  * limiter error lets the request through so real provider deliveries
  * are never dropped by a counter outage. Backed by
  * public.ip_rate_limit_hit (migration 20261115_workstream_e_ip_rate_limit).
+ *
+ * KEY RULE (workstream E, corrected 2026-11-15): unauthenticated
+ * ingress MUST pass the literal key 'global'. Keying on the client IP
+ * was tried first and live-proven useless: x-forwarded-for[0] at the
+ * Supabase edge is a rotating Cloudflare address (one flood produced
+ * ~20 distinct 104.29.x.x identifiers), so every request got a fresh
+ * bucket and 70 invalid deliveries drew 0x429. There is no stable
+ * per-client identifier at this edge, so the bucket is global per
+ * function — legitimate provider traffic is a handful/minute against
+ * a 60/min cap, and providers retry on 429.
  */
 export async function ipRateLimitResponse(
   sourceKey: string,
