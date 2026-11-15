@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
-import { z } from 'npm:zod@3.23.8'
+import { z } from 'npm:zod@4.6.7'
 
 const BRIDGE_SECRET = Deno.env.get('DEVICE_BRIDGE_SECRET') ?? ''
 
@@ -15,7 +15,7 @@ const ReadingSchema = z.object({
   device_id: z.string().uuid(),
   patient_id: z.string().uuid().optional().nullable(),
   data_type: z.string().min(1).max(64),
-  data_value: z.record(z.any()),
+  data_value: z.record(z.string(), z.any()),
   unit: z.string().max(32).optional().nullable(),
   is_critical: z.boolean().optional().default(false),
   recorded_at: z.string().datetime().optional(),
