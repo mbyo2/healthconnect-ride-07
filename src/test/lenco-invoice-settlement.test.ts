@@ -62,6 +62,18 @@ describe('Invoice settlement · the invoice actually closes', () => {
   it('reports a failed invoice booking as a failed settlement, never as success', () => {
     expect(src).toContain("reason: 'invoice_booking_failed'");
   });
+});
+
+describe('Invoice settlement · a stored settled flag never blocks a missing booking', () => {
+  const lenco = readSrc('supabase/functions/_shared/lenco.ts');
+
+  it('re-runs settlement when an invoice payment has no billing_payments row', () => {
+    expect(lenco).toContain("reference_type === 'invoice'");
+    expect(lenco).toContain("from('billing_payments')");
+    expect(lenco).toContain("eq('reference_number', lencoReference)");
+    expect(lenco).toContain('alreadySettled = false');
+  });
+});
 
   it('applies the booking on the settle-now path and on already-settled replays', () => {
     const hits = src.split('applyInvoicePayment(admin').length - 1;
