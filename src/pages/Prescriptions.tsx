@@ -131,7 +131,7 @@ export const Prescriptions = () => {
   ]);
 
   // Prescribers, dispensers and facility admins see the provider-side board.
-  // Only the five legal prescribing professions may WRITE prescriptions —
+  // Only the six legal prescribing professions may WRITE prescriptions —
   // nurses, allied health, lab and community cadres get the patient view.
   const isPrescriber = availableRoles.some((r) =>
     (PRESCRIBING_ROLES as readonly string[]).includes(r)

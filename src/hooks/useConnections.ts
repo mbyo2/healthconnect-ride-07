@@ -128,8 +128,11 @@ export const useConnections = () => {
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
       // Type guard for provider with comprehensive null check
-      if (data.provider && typeof data.provider === 'object' && data.provider !== null) {
-        const providerData = data.provider as any;
+      // (data is the generated row type; `provider` is attached above via
+      // the separate profiles fetch, so read it through the same cast.)
+      const attachedProvider = (data as any).provider;
+      if (attachedProvider && typeof attachedProvider === 'object' && attachedProvider !== null) {
+        const providerData = attachedProvider as any;
         if (providerData && typeof providerData === 'object' && providerData.id) {
           correctedProvider = {
             id: providerData.id,
