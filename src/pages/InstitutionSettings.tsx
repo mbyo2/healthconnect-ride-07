@@ -388,42 +388,6 @@ const InstitutionSettings = () => {
     }
   };
 
-  const handleModuleToggle = async (moduleKey: string, moduleName: string, currentlyLive: boolean) => {
-    if (!institution?.id) return;
-    try {
-      const { setInstitutionModuleEnabled, getEffectiveInstitutionModules } = await import("@/services/institutionModules");
-      const userId = (await supabase.auth.getUser()).data.user?.id;
-      if (!userId) throw new Error("Not authenticated");
-      
-      await setInstitutionModuleEnabled(
-        supabase as any,
-        institution.id,
-        moduleKey,
-        moduleName,
-        !currentlyLive,
-        userId,
-        `Toggled by institution admin via Settings`
-      );
-      
-      // Refresh the module list
-      const { modules } = await getEffectiveInstitutionModules(
-        supabase as any,
-        institution.id,
-        institution.type_code
-      );
-      setEffModules(modules);
-      
-      toast.success(currentlyLive ? `Module disabled` : `Module enabled`, {
-        description: moduleName,
-      });
-    } catch (error: any) {
-      console.error("Failed to toggle module:", error);
-      toast.error("Failed to update module", {
-        description: friendlyErrorMessage(error, "Please try again."),
-      });
-    }
-  };
-
   const handleSave = async (e: React.FormEvent) => {    e.preventDefault();
     if (!institution?.id) return;
     setSaving(true);
@@ -734,29 +698,13 @@ const InstitutionSettings = () => {
                       <p className="font-bold text-xs truncate">{m.module_name}</p>
                       <p className="text-xs text-muted-foreground">{sub}</p>
                     </div>
-                    {/* Institution admins can toggle modules for their own facility */}
-                    {m.effective !== "disabled" && (
-                      <button
-                        onClick={() => handleModuleToggle(m.module_key, m.module_name, m.effective === "live")}
-                        className={`shrink-0 px-2 py-1 rounded-lg text-xs font-bold transition-colors ${
-                          m.effective === "live"
-                            ? "bg-error-100 text-error-600 hover:bg-error-200"
-                            : "bg-success-100 text-success-600 hover:bg-success-200"
-                        }`}
-                        title={m.effective === "live" ? "Disable this module" : "Enable this module"}
-                      >
-                        {m.effective === "live" ? "Disable" : "Enable"}
-                      </button>
-                    )}
-                    {m.effective === "disabled" && (
-                      <button
-                        onClick={() => handleModuleToggle(m.module_key, m.module_name, false)}
-                        className="shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-success-100 text-success-600 hover:bg-success-200 transition-colors"
-                        title="Re-enable this module"
-                      >
-                        Enable
-                      </button>
-                    )}
+                    {/* No toggle here on purpose: module grants are platform-admin
+                        decisions (RLS on institution_module_entitlements allows
+                        only admin / super_admin writes, and add-on modules are
+                        priced). Institutions request a change from the platform
+                        team — see the note above. An Enable/Disable button here
+                        always failed with "Failed to update module" (live-proven
+                        2026-11-16, docswarm instadmin). */}
                   </div>
                   );
                 })}
