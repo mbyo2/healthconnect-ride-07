@@ -243,7 +243,23 @@ export async function verifyAndSettleLenco(
     ? { settled: false, reason: 'amount_mismatch', ...amountMismatch }
     : null;
   if (effectiveStatus === 'paid' && row) {
-    const alreadySettled = (row.metadata as any)?.settlement?.settled === true;
+    let alreadySettled = (row.metadata as any)?.settlement?.settled === true;
+    // A settlement recorded as settled before invoice booking existed
+    // (or interrupted before booking) must be retried: the money is in
+    // the wallets but the invoice is still open. Live-proven 2026-11-16:
+    // a K10 invoice stored { settled: true } while its billing_payments
+    // row never landed, and every later verify returned the stored
+    // settlement without ever re-running settlePayment. The booking is
+    // idempotent (keyed by gateway reference), so re-running is safe.
+    if (alreadySettled && (row as any).reference_type === 'invoice' && (row as any).reference_id) {
+      const { data: booked } = await admin
+        .from('billing_payments')
+        .select('id')
+        .eq('invoice_id', (row as any).reference_id)
+        .eq('reference_number', lencoReference)
+        .limit(1);
+      if (!booked || booked.length === 0) alreadySettled = false;
+    }
     if (!alreadySettled) {
       settlement = await settlePayment(admin as any, {
         gateway: 'lenco',

@@ -71,15 +71,27 @@ Deno.serve(async (req) => {
 
     const { status, payment, settlement } = await verifyAndSettleLenco(admin as any, reference);
 
+    // Never claim a credit that did not happen: when Lenco reports the
+    // collection as successful but settlement failed (e.g. the ledger
+    // booking errored), the money is received-but-unbooked, not credited.
+    // Live-proven 2026-11-16: an invoice payment returned 'paid' with
+    // settlement { settled: false, reason: 'payment_row_failed' } while
+    // this message told the user their wallet had been credited.
+    const settlementFailed = status === 'paid' && (settlement as any)?.settled === false;
+    const isInvoice = (payment as any)?.reference_type === 'invoice';
     return new Response(JSON.stringify({
       status, // paid | pending | failed | cancelled
       payment,
       settlement,
-      message: status === 'paid'
-        ? 'Payment confirmed. Your wallet has been credited.'
-        : status === 'pending'
-          ? 'Still waiting for approval on your phone. Approve the prompt, then check again.'
-          : 'This payment did not complete. No money was taken from your wallet record.',
+      message: settlementFailed
+        ? `We received your payment, but booking it failed. Your money is safe — please contact support and quote reference ${reference}.`
+        : status === 'paid'
+          ? isInvoice
+            ? 'Payment confirmed. The invoice has been marked paid.'
+            : 'Payment confirmed. Your wallet has been credited.'
+          : status === 'pending'
+            ? 'Still waiting for approval on your phone. Approve the prompt, then check again.'
+            : 'This payment did not complete. No money was taken from your wallet record.',
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e) {
     // L-1: never surface raw system error text to the client.
