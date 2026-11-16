@@ -305,9 +305,11 @@ export const AppointmentsPage = () => {
         throw new Error("That slot is already booked — please choose another time");
       }
 
+      // Mirror columns (see BookingModal): appointment_date/time must move
+      // with date/time or kiosk/review/hero readers never see the new slot.
       const { error } = await supabase
         .from("appointments")
-        .update({ date: newDate, time: newTime })
+        .update({ date: newDate, time: newTime, appointment_date: newDate, appointment_time: newTime })
         .eq("id", rescheduleTarget.id);
       if (error) throw error;
 

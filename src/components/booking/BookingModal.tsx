@@ -254,6 +254,15 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           : null,
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
+        // Mirror columns: several readers (kiosk has_appointment_today,
+        // review prompts, patient overview hero) query appointment_date /
+        // appointment_time, and the server triggers COALESCE them with
+        // date/time — but nothing ever wrote them, so app bookings left
+        // them NULL and those readers never saw the booking. Write both
+        // spellings at the source so the two column families stay in sync.
+        appointment_date: format(selectedDate, 'yyyy-MM-dd'),
+        appointment_time: selectedTime,
+        appointment_type: appointmentType === 'virtual' ? 'video_consultation' : 'in_person',
         type: appointmentType === 'virtual' ? 'video_consultation' : 'in_person',
         status: 'pending',
         notes: reason || null,
