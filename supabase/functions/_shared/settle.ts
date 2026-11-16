@@ -139,6 +139,77 @@ async function resolvePayee(
   return null;
 }
 
+/**
+ * Resolve the profile id the canonical `payments` row must carry as
+ * `provider_id`.
+ *
+ * BUG (live-proven 2026-11-16, docswarm billing): for institution payees
+ * (invoice, facility pharmacy sale) `payee.providerId` is null, so the old
+ * code stored the INSTITUTION id there — `payments.provider_id` FKs to
+ * `profiles(id)`, the insert failed with 23503, settlement returned
+ * `payment_row_failed`, and a collected Lenco payment was left in limbo:
+ * `lenco_payments` said 'paid', the user was told their wallet was
+ * credited, but no wallet was credited and the invoice stayed unpaid.
+ * The institution's admin is a real profile and the accountable human for
+ * the facility's money, so they are the representative payee here. The
+ * split itself keys off `p_institution_id`, not this id.
+ * Returns null when neither a provider nor an institution admin resolves —
+ * callers must fail closed, never insert a non-profile id.
+ */
+async function resolvePaymentsProviderId(
+  admin: Admin,
+  payee: Payee,
+): Promise<string | null> {
+  if (payee.providerId) return payee.providerId;
+  if (!payee.institutionId) return null;
+  const { data } = await admin
+    .from('healthcare_institutions')
+    .select('admin_id')
+    .eq('id', payee.institutionId)
+    .maybeSingle();
+  return (data as any)?.admin_id ?? null;
+}
+
+/**
+ * Book a settled gateway payment against its `billing_invoices` row.
+ * Idempotent: a `billing_payments` row keyed by the gateway reference is
+ * inserted only once per invoice. The existing trigger
+ * `trg_update_invoice_on_payment` then recomputes the invoice's
+ * paid_amount / balance / status from the sum of its payments — so
+ * replays, retries and the already-settled path can all call this safely.
+ */
+async function applyInvoicePayment(
+  admin: Admin,
+  args: {
+    institutionId: string;
+    invoiceId: string;
+    amount: number;
+    gateway: string;
+    externalRef: string;
+    payerId: string;
+  },
+): Promise<void> {
+  const { data: prior } = await admin
+    .from('billing_payments')
+    .select('id')
+    .eq('invoice_id', args.invoiceId)
+    .eq('reference_number', args.externalRef)
+    .limit(1);
+  if (prior && prior.length > 0) return;
+  const { error } = await admin.from('billing_payments').insert({
+    institution_id: args.institutionId,
+    invoice_id: args.invoiceId,
+    amount: args.amount,
+    payment_mode: args.gateway,
+    reference_number: args.externalRef,
+    received_by: args.payerId,
+    payment_date: new Date().toISOString(),
+  });
+  if (error) {
+    console.error('applyInvoicePayment: billing_payments insert failed', error);
+  }
+}
+
 export async function settlePayment(admin: Admin, input: SettleInput): Promise<SettleResult> {
   const {
     gateway,
@@ -165,6 +236,22 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
     .maybeSingle();
 
   if (existing?.status === 'completed') {
+    // Self-healing: a payment settled before the invoice-booking step
+    // existed (or interrupted between split and booking) still gets its
+    // invoice marked paid — applyInvoicePayment is idempotent.
+    if (type === 'invoice' && referenceId) {
+      const payeeForInvoice = await resolvePayee(admin, type, referenceId);
+      if (payeeForInvoice?.institutionId) {
+        await applyInvoicePayment(admin, {
+          institutionId: payeeForInvoice.institutionId,
+          invoiceId: referenceId,
+          amount,
+          gateway,
+          externalRef,
+          payerId,
+        });
+      }
+    }
     return { settled: true, already: true, paymentId: existing.id };
   }
 
@@ -268,14 +355,22 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
     return { settled: false, reason: 'payee_unresolved' };
   }
 
-  // The payments row is the anchor for splits and refunds.
+  // The payments row is the anchor for splits and refunds. Its
+  // provider_id must be a real profile (FK to profiles) — for institution
+  // payees that is the institution's admin, never the institution id.
+  const paymentsProviderId = await resolvePaymentsProviderId(admin, payee);
+  if (!paymentsProviderId) {
+    console.error('settlePayment: no profile resolves as payments provider', { referenceType, referenceId });
+    return { settled: false, reason: 'payee_admin_unresolved' };
+  }
+
   let paymentId = existing?.id as string | undefined;
   if (!paymentId) {
     const { data: created, error: insErr } = await admin
       .from('payments')
       .insert({
         patient_id: payerId,
-        provider_id: payee.providerId ?? payee.institutionId,
+        provider_id: paymentsProviderId,
         service_id: payee.serviceId ?? null,
         amount,
         currency,
@@ -300,6 +395,16 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
           .eq('external_payment_id', externalRef)
           .maybeSingle();
         if (raced) {
+          if (type === 'invoice' && referenceId && payee.institutionId) {
+            await applyInvoicePayment(admin, {
+              institutionId: payee.institutionId,
+              invoiceId: referenceId,
+              amount,
+              gateway,
+              externalRef,
+              payerId,
+            });
+          }
           return { settled: true, already: true, paymentId: raced.id };
         }
       }
@@ -317,7 +422,12 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
   const { data: split, error: splitErr } = await admin.rpc('process_payment_with_splits', {
     p_payment_id: paymentId,
     p_total_amount: amount,
-    p_provider_id: payee.providerId,
+    // Same resolved profile as the payments row: the split RPC inserts a
+    // 'health_personnel' payment_splits row with this id (recipient_id is
+    // NOT NULL), so a null provider id would fail the split for every
+    // institution payee. The amount routed to personnel is 0 when an
+    // institution is set, so this is bookkeeping only.
+    p_provider_id: paymentsProviderId,
     p_institution_id: payee.institutionId,
     p_payment_type: payee.paymentType,
   });
@@ -325,6 +435,19 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
   if (splitErr) {
     console.error('settlePayment split failed', splitErr);
     return { settled: false, paymentId, reason: 'split_failed' };
+  }
+
+  // Book the money against the invoice it was collected for, so the
+  // invoice actually closes instead of staying 'sent' with its balance.
+  if (type === 'invoice' && referenceId && payee.institutionId) {
+    await applyInvoicePayment(admin, {
+      institutionId: payee.institutionId,
+      invoiceId: referenceId,
+      amount,
+      gateway,
+      externalRef,
+      payerId,
+    });
   }
 
   return {
