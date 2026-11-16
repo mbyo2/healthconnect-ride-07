@@ -122,3 +122,51 @@ describe("kiosk server functions (migration)", () => {
     );
   });
 });
+
+describe("concurrency hardening (group 6, 2026-11-16)", () => {
+  const sql = readSrc("supabase/migrations/20261116_concurrent_kiosk_locks.sql");
+
+  it("kiosk_check_in serializes same-patient check-ins before the idempotency check", () => {
+    expect(sql).toContain("pg_advisory_xact_lock");
+    expect(sql).toContain("'kiosk-checkin:'");
+    // The lock must be taken before the already-checked-in SELECT reads.
+    const body = sql.slice(sql.indexOf("kiosk_check_in"));
+    expect(body.indexOf("pg_advisory_xact_lock")).toBeLessThan(
+      body.indexOf("Already in today's queue"),
+    );
+  });
+
+  it("token numbering serializes per institution per day (no COUNT(*)+1 race)", () => {
+    expect(sql).toContain("'queue-token:'");
+    expect(sql).toContain("generate_token_number");
+  });
+
+  it("the redefined check-in keeps its anon revoke / authenticated grant", () => {
+    expect(sql).toContain(
+      "REVOKE EXECUTE ON FUNCTION public.kiosk_check_in(uuid, uuid, text, text) FROM PUBLIC, anon",
+    );
+    expect(sql).toContain(
+      "GRANT EXECUTE ON FUNCTION public.kiosk_check_in(uuid, uuid, text, text) TO authenticated, service_role",
+    );
+  });
+});
+
+describe("shared-state screens subscribe live (group 6, 2026-11-16)", () => {
+  it("HospitalManagement refreshes the billing list on hospital_billing changes", () => {
+    const src = readSrc("src/pages/HospitalManagement.tsx");
+    expect(src).toContain("table: 'hospital_billing'");
+    expect(src).toContain("refetchInvoices()");
+  });
+
+  it("PatientLabResults refreshes on lab_results changes (verified results appear live)", () => {
+    const src = readSrc("src/components/patient/PatientLabResults.tsx");
+    expect(src).toContain("table: 'lab_results'");
+    expect(src).toContain("patient-lab-results-live");
+  });
+
+  it("LabManagement refreshes the request board on lab_tests changes", () => {
+    const src = readSrc("src/pages/LabManagement.tsx");
+    expect(src).toContain('table: "lab_tests"');
+    expect(src).toContain("lab-requests-live");
+  });
+});

@@ -206,6 +206,15 @@ export const HospitalManagement = () => {
         { event: '*', schema: 'public', table: 'hospital_departments', filter: `hospital_id=eq.${hospital.id}` },
         () => refetchDepts()
       )
+      // Concurrency (group 6, 2026-11-16): the consolidated bill lives in
+      // hospital_billing — without this, a charge appended from another
+      // terminal left this list stale until a manual refresh, while
+      // admissions/beds/departments already updated live.
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'hospital_billing', filter: `hospital_id=eq.${hospital.id}` },
+        () => refetchInvoices()
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
