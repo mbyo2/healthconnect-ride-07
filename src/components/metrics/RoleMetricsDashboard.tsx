@@ -193,14 +193,22 @@ export function PatientMetricsDashboard() {
   const { data: apptStats, isLoading: apptLoading } = useAppointmentStats(user?.id, "patient");
   const { data: balance } = useWalletBalance(user?.id);
 
+  // Doc swarm clinical 2026-11-16: count from comprehensive_prescriptions,
+  // the table every current prescription writer targets (doctor
+  // PrescriptionWriter, FHIR inbound, /prescriptions page). The previous
+  // query counted pharmacy_prescriptions — a legacy table only the
+  // FHIRImportPanel still writes — so a patient with live prescriptions
+  // saw "Active Prescriptions 0" (live-proven: 0 vs 3). Active =
+  // pending/filled/partially_filled (the status CHECK's live values).
   const { data: prescriptionCount } = useQuery({
-    queryKey: ["patient-prescription-count", user?.id],
+    queryKey: ["patient-comprehensive-prescription-count", user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
       const { count } = await supabase
-        .from("pharmacy_prescriptions" as any)
+        .from("comprehensive_prescriptions" as any)
         .select("id", { count: "exact", head: true })
-        .eq("patient_id", user.id);
+        .eq("patient_id", user.id)
+        .in("status", ["pending", "filled", "partially_filled"]);
       return count || 0;
     },
     enabled: !!user?.id,
@@ -241,7 +249,7 @@ export function PatientMetricsDashboard() {
           iconColor="text-purple-500"
         />
         <MetricsCard
-          label="Health Records"
+          label="Vital Sign Entries"
           value={vitalsCount || 0}
           icon={Heart}
           iconColor="text-rose-500"

@@ -1,0 +1,126 @@
+{
+ "results": [
+  {
+   "label": "patient /medical-records @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "patient /medical-records shows \"Full Blood Count\"",
+   "pass": false,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S | My Health Records |  | Your visits, lab results, and prescriptions in "
+  },
+  {
+   "label": "patient /medical-records shows \"13.2\"",
+   "pass": false,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S | My Health Records |  | Your visits, lab results, and prescriptions in "
+  },
+  {
+   "label": "patient /prescriptions @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "patient /prescriptions shows \"Amoxicillin\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S | My Medication Prescriptions |  | Track dosage instructions, active ref"
+  },
+  {
+   "label": "patient /prescriptions shows \"three times daily\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S | My Medication Prescriptions |  | Track dosage instructions, active ref"
+  },
+  {
+   "label": "patient /health-dashboard @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "patient /health-dashboard shows \"Blood pressure\"",
+   "pass": false,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S | Health dashboard |  | Monitor your health metrics and track your welln"
+  },
+  {
+   "label": "patient /medical-records dark mode body not white",
+   "pass": true,
+   "extra": "rgb(17, 15, 14)"
+  },
+  {
+   "label": "doctor /lab-orders @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "doctor /lab-orders shows \"Full Blood Count\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | 3 | K | Toggle theme | S | Order Lab Tests |  | Place test orders for your patients at verified"
+  },
+  {
+   "label": "doctor /imaging @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "doctor /imaging shows \"chest\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | 3 | K | Toggle theme | S | Imaging / Radiology |  | 4 pending · 0 completed |  | Refresh | New Order | "
+  },
+  {
+   "label": "doctor /art @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "doctor /art shows \"IVF\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | 3 | K | Toggle theme | S | Fertility (ART/IVF) |  | All cycles are confidential — restricted to"
+  },
+  {
+   "label": "pharm /drug-stock @390px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "pharm /drug-stock shows \"Amoxicillin\"",
+   "pass": false,
+   "extra": "Skip to content | Skip to main content | K | Toggle theme | S"
+  },
+  {
+   "label": "patient /medical-records @1280px no horizontal overflow",
+   "pass": true,
+   "extra": "overflow=0px"
+  },
+  {
+   "label": "patient /medical-records shows \"Full Blood Count\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | Doc' O Clock | Home | Find Care | My Appointments | Messages | More | K (ZMW) | Toggle theme | S | My"
+  },
+  {
+   "label": "patient /medical-records shows \"13.2\"",
+   "pass": true,
+   "extra": "Skip to content | Skip to main content | Doc' O Clock | Home | Find Care | My Appointments | Messages | More | K (ZMW) | Toggle theme | S | My"
+  }
+ ],
+ "consoleErrs": [
+  "console: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 403 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 403 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 404 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()",
+  "console: Failed to load resource: the server responded with a status of 503 ()"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "passes": [
+  "RPC setup batch qty 100 (JWT)",
+  "RPC dispense 5 allocated (JWT)",
+  "RPC over-dispense refused",
+  "UI-layer drug_stock_items insert (JWT)",
+  "UI-layer drug_stock_items readable (contains Amoxicillin)"
+ ],
+ "fails": [
+  "RPC dispense stock 100->95 exactly once",
+  "RPC movement quantity_after=95",
+  "stock unchanged after refused RPC (95)"
+ ],
+ "batch_id": "bae406f7-d4bb-4acf-b9d8-10013d1097c0",
+ "dsi_id": "b6f24ad7-6486-44a1-858b-b1440306e1c1"
+}

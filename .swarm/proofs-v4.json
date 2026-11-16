@@ -1,0 +1,99 @@
+{
+ "passes": [
+  "LAB order created by doctor (JWT)",
+  "LAB patient cannot read own lab_tests pre-verification (200 [])",
+  "LAB phantom test_name on lab_tests -> 400",
+  "LAB status 'resulted' rejected by CHECK",
+  "LAB sample collected by lab tech (JWT)",
+  "LAB result entered by lab tech (JWT)",
+  "LAB patient view hides value pre-verification (NULL)",
+  "LAB patient cannot read lab_results pre-verification (200 [])",
+  "LAB unauthorised verify refused (outsider pathologist)",
+  "LAB authorised verify by staff pathologist (JWT)",
+  "LAB patient view shows value post-verification (13.2)",
+  "LAB patient can read lab_results post-verification",
+  "LAB re-verification refused",
+  "IMG order created by doctor (JWT)",
+  "IMG draft result by radiologist (JWT)",
+  "IMG patient cannot see draft result (200 [])",
+  "IMG preliminary by radiologist (JWT)",
+  "IMG patient cannot see preliminary result (200 [])",
+  "IMG final by radiologist (JWT)",
+  "IMG patient sees final result with findings",
+  "IMG final report immutable (edit refused)",
+  "DISP batch created qty 100 (JWT)",
+  "DISP movement -5 accepted (JWT)",
+  "DISP quantity_after = 95 on movement row",
+  "DISP stock 100->95 exactly once (trigger only)",
+  "DISP second -5 -> 90 exactly once",
+  "DISP over-dispense refused (would go negative)",
+  "ART cycle created by doctor (JWT)",
+  "ART partner patient can read cycle",
+  "ART outsider cannot read cycle (200 [])",
+  "ART staff assigned (JWT)",
+  "ART assigned staff can read cycle",
+  "ART procedure recorded (JWT)",
+  "ART outsider cannot read procedures (200 [])",
+  "VITALS patient self-record diastolic 90 (JWT)",
+  "VITALS patient self-record diastolic 91 (JWT)",
+  "VITALS doctor reads patient vitals (care relationship)",
+  "VITALS other patient cannot read vitals (200 [])",
+  "RECS doctor creates record (JWT)",
+  "RECS patient reads own record",
+  "RECS other patient cannot read record (200 [])",
+  "RECS patient creates own self-reported record (JWT)",
+  "RECS other patient cannot update record",
+  "RX doctor creates prescription with instructions (JWT)",
+  "RX patient reads own prescription + instructions",
+  "RX phantom frequency column -> 400",
+  "RX pharmacist can view unassigned prescription",
+  "RX pharmacist fills (JWT)",
+  "FHIR exchanges readable by doctor (JWT)",
+  "FHIR exchanges anon refused (401)"
+ ],
+ "fails": [],
+ "results": {
+  "lab_test_id": "02eec703-254b-4d87-9992-f66861daba36",
+  "lab_result_id": "5903845c-fdd5-4915-af79-470e107f7024",
+  "unauth_verify": {
+   "code": 200,
+   "body": "[]"
+  },
+  "reverify": {
+   "code": 400,
+   "body": "{'code': 'P0001', 'details': None, 'hint': None, 'message': 'Lab test 02eec703-254b-4d87-9992-f66861daba36 is already verified; re-verification is not allowed'}"
+  },
+  "lab_result_mirror": {
+   "code": 200,
+   "rows": [
+    {
+     "id": "5903845c-fdd5-4915-af79-470e107f7024",
+     "verified_at": "2026-11-16T10:05:00+00:00"
+    }
+   ]
+  },
+  "imaging_order_id": "ee9698ba-880b-4204-a284-fed460d23d8a",
+  "imaging_result_id": "71627ea7-86a0-4836-83d6-adf2dca6183f",
+  "img_final_edit": {
+   "code": 403,
+   "body": "{'code': '42501', 'details': None, 'hint': None, 'message': 'Final imaging reports cannot be edited \u2014 file an addendum report instead.'}"
+  },
+  "batch_id": "f0ce3cd9-bfdd-4c8b-87cf-f5fe7ab81d88",
+  "overdispense": {
+   "code": 400,
+   "body": "{'code': '23514', 'details': 'Failing row contains (f0ce3cd9-bfdd-4c8b-87cf-f5fe7ab81d88, 7645c73d-7edd-4282-997c-3dd0e0450ea5, medication_inventory, 3470d253-9420-491a-baec-becd74e86b92, Amoxicillin 500mg, SWARM-CLINICAL-4-BATCH-001, null, null, null, 2027-11-16, 100, -110, 0.00, null, approved, nu"
+  },
+  "art_cycle_id": "d1d09812-7e7b-4ca8-91d2-d8c2cc59be35",
+  "vitals_ids": [
+   "d8e5dd10-592b-474d-b784-e6673081d558",
+   "a598149e-a67e-4389-aee6-9e901ba9224e"
+  ],
+  "record_id": "eee6aa51-ca5d-48e4-84e0-f67df869b2fe",
+  "record2_id": "dc7af361-0c33-4de4-8269-64c3cc980929",
+  "rx_id": "3a90e09e-0651-4a69-8b4b-974609cc1a55",
+  "rx_dispense": {
+   "code": 200,
+   "body": "[{'id': '3a90e09e-0651-4a69-8b4b-974609cc1a55', 'patient_id': '29f10ac4-2218-4e8a-a534-e756b2ba17e0', 'provider_id': '16ea4271-8e6e-41f3-aa08-96bcccb3b5f6', 'pharmacy_id': None, 'medication_name': 'Amoxicillin', 'generic_name': None, 'dosage': '500mg', 'strength': None, 'quantity': 30, 'refills_rema"
+  }
+ }
+}
