@@ -1,0 +1,1262 @@
+{
+ "phase2": {
+  "read_back_ok": 54,
+  "per_type": {
+   "central_hospital": {
+    "name": "Central Hospital",
+    "tier": "tertiary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "general_hospital": {
+    "name": "General Hospital",
+    "tier": "secondary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "radiology_centre": {
+    "name": "Radiology Centre",
+    "tier": "diagnostics",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "pathology_lab": {
+    "name": "Pathology Lab",
+    "tier": "diagnostics",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "diagnostic_laboratory": {
+    "name": "Diagnostic Laboratory",
+    "tier": "diagnostics",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "childrens_hospital": {
+    "name": "Children's Hospital",
+    "tier": "tertiary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "psychiatric_hospital": {
+    "name": "Psychiatric Hospital",
+    "tier": "tertiary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "specialized_hospital": {
+    "name": "Specialized Hospital",
+    "tier": "tertiary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "university_hospital": {
+    "name": "University Hospital",
+    "tier": "tertiary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "teaching_hospital": {
+    "name": "Teaching Hospital",
+    "tier": "tertiary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "community_pharmacy": {
+    "name": "Community Pharmacy",
+    "tier": "pharmacy",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 5,
+    "charter_live": 5
+   },
+   "health_screening_centre": {
+    "name": "Health Screening Centre",
+    "tier": "primary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "vaccination_centre": {
+    "name": "Vaccination Centre",
+    "tier": "primary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "fertility_clinic": {
+    "name": "Fertility Clinic",
+    "tier": "primary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "trauma_centre": {
+    "name": "Trauma Centre",
+    "tier": "secondary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "surgical_centre": {
+    "name": "Surgical Centre",
+    "tier": "secondary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "day_surgery_centre": {
+    "name": "Day Surgery Centre",
+    "tier": "secondary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "health_post": {
+    "name": "Health Post",
+    "tier": "community",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 6,
+    "charter_live": 6
+   },
+   "pharmacy": {
+    "name": "Pharmacy",
+    "tier": "pharmacy",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 5,
+    "charter_live": 5
+   },
+   "clinic": {
+    "name": "Clinic / Small Practice",
+    "tier": "primary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "rural_health_centre": {
+    "name": "Rural Health Centre",
+    "tier": "primary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "specialized_clinic": {
+    "name": "Specialized Clinic",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "urban_health_centre": {
+    "name": "Urban Health Centre",
+    "tier": "primary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "mini_hospital": {
+    "name": "Mini Hospital / Zonal Facility",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "hospital": {
+    "name": "Hospital",
+    "tier": "secondary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "district_hospital": {
+    "name": "District Hospital (First-Level)",
+    "tier": "secondary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "large_hospital": {
+    "name": "Large / Teaching Hospital",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "provincial_hospital": {
+    "name": "Provincial / General Hospital (Second-Level)",
+    "tier": "secondary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "laboratory": {
+    "name": "Laboratory",
+    "tier": "diagnostics",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "nursing_home": {
+    "name": "Nursing / Care Home",
+    "tier": "secondary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 27,
+    "charter_live": 18
+   },
+   "tertiary_hospital": {
+    "name": "Tertiary / Teaching Hospital (Third-Level)",
+    "tier": "tertiary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "diagnostic_center": {
+    "name": "Diagnostic / Imaging Center",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "maternity_hospital": {
+    "name": "Maternity Hospital",
+    "tier": "tertiary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "children_hospital": {
+    "name": "Children's Hospital",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "mental_hospital": {
+    "name": "Mental Health Hospital",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "cancer_hospital": {
+    "name": "Cancer / Oncology Hospital",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "cardiac_hospital": {
+    "name": "Cardiac / Heart Hospital",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "eye_hospital": {
+    "name": "Eye Hospital",
+    "tier": "tertiary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 31,
+    "charter_live": 21
+   },
+   "orthopaedic_hospital": {
+    "name": "Orthopaedic Hospital",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "dialysis_centre": {
+    "name": "Dialysis / Renal Centre",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "specialty_clinic": {
+    "name": "Specialty Clinic",
+    "tier": "primary",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "dental_clinic": {
+    "name": "Dental Clinic",
+    "tier": "primary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "eye_clinic": {
+    "name": "Eye Clinic",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "physiotherapy_centre": {
+    "name": "Physiotherapy & Rehab Centre",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "retail_pharmacy": {
+    "name": "Retail / Community Pharmacy",
+    "tier": "pharmacy",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 5,
+    "charter_live": 5
+   },
+   "hospital_pharmacy": {
+    "name": "Hospital Pharmacy Department",
+    "tier": "pharmacy",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 5,
+    "charter_live": 5
+   },
+   "wholesale_pharmacy": {
+    "name": "Wholesale Pharmacy / Distributor",
+    "tier": "pharmacy",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 5,
+    "charter_live": 5
+   },
+   "health_shop": {
+    "name": "Health Shop",
+    "tier": "primary",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 16,
+    "charter_live": 11
+   },
+   "imaging_centre": {
+    "name": "Imaging / Radiology Centre",
+    "tier": "diagnostics",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "diagnostic_centre": {
+    "name": "Diagnostic Centre (Lab + Imaging)",
+    "tier": "diagnostics",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "blood_bank": {
+    "name": "Blood Bank / Transfusion Service",
+    "tier": "diagnostics",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 8,
+    "charter_live": 8
+   },
+   "hospice": {
+    "name": "Hospice / Palliative Care",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "home_care": {
+    "name": "Home-Based Care Service",
+    "tier": "support",
+    "admin": "a",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   },
+   "rehabilitation_centre": {
+    "name": "Rehabilitation Centre",
+    "tier": "support",
+    "admin": "b",
+    "read_back": true,
+    "charter_keys": 4,
+    "charter_live": 4
+   }
+  },
+  "charter_by_tier": {
+   "community": 6,
+   "primary": 16,
+   "secondary": 27,
+   "tertiary": 31,
+   "diagnostics": 8,
+   "pharmacy": 5,
+   "support": 4
+  }
+ },
+ "f7": {
+  "community": {
+   "institution": "health_post",
+   "institution_id": "8bb22ee3-3224-4c91-b0ae-9eafc16ee34c",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "532ec27f-384a-4e35-a3dc-5e6ddb8991e1",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "2faf10e8-e502-4476-8851-19140a982208"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "ab0d5962-efb2-40dd-92eb-a41aa28af0ff",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "1502c72b-2acb-4fd4-ac78-d7777675a74e",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "1a28f16a-7da3-4984-8f1a-573fb365197e",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "fe980182-6de0-4fee-be60-d85352dcf089",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "91eb2b2c-662f-48a9-abec-4787a74d5081"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "1956c99e-781c-4aa0-8554-470707c90262",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "e59c5bc8-e956-4019-89b5-ec7630c93b65"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "702735cd-be91-451d-899e-de57cc16f83c"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "5b648c52-ac4f-4b7d-a4c4-6cf88d361596",
+     "pre_existing": true
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "3f6dd267-66ae-426c-905e-9ac0944f3c65"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "5a8a5e55-c92f-4fd4-abfe-70c5d29676f2",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "33debd9f-fb11-462a-8cfd-9f5071815a91",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "diagnostics": {
+   "institution": "radiology_centre",
+   "institution_id": "608fd49d-802c-40dd-87f9-1275a2a4cb41",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "7b7528a9-4944-4573-8c07-c371b59fba04",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "5e3ea60b-1c77-4671-9f10-f91b8c13d6f9"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "67fc57f3-bbc4-4568-a6e1-514a4a863fcf",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "fd123424-96d4-489e-8c30-b366d99eda02",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "fd4279c0-16ec-4e86-845c-3c607940b8c5",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "55fc204c-e7b4-45f5-b978-0261d55e6d14",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "0a70bd68-447d-48d7-b5ad-6c23148fab26"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "bed447ae-73b0-4635-a70e-f8deb65a51db",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "ce6aad0a-9260-4e0b-bef6-7003db77d036"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "251e99b4-c21f-44cd-bf8f-3e8ed0475e27"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "00a8781d-31e9-45aa-8e3d-60de943066c0",
+     "pre_existing": true
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "9174c571-81da-4e1b-b364-c0745abaadfa"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "082e9e3d-64af-4763-9c8f-ab1a36b4a13c",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "d2019018-9476-4faf-ac36-7738a292667c",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "pharmacy": {
+   "institution": "community_pharmacy",
+   "institution_id": "68d551bd-99a4-4511-aad7-2ef65202e38e",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "af0f044c-14ff-45d3-8c45-b4b9366d5465",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "16ed306a-cf8d-435d-890f-bd82110a9a2a"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "dc2b28fc-fe5b-43c7-8214-dc465df59007",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "d870392e-305a-4a06-9ebb-c969ea963fe5",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "c41b83b0-b838-4d69-9d2d-5308b50c2c5e",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "496e8ff8-b893-4e9e-8a8c-6a21a3e719ab",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "f1421a49-0ad8-4c41-ac9d-e91f8b6e38cf"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "9a764bd8-149e-497e-bffc-f7bf2ee3388b",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "fdbbd7eb-a069-4c71-b4a2-ef32566d6f35"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "2d02da35-0ee8-49f1-bad8-ab30460cde58"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "7e6499ac-4a69-4968-b169-c02c883f2b3b",
+     "pre_existing": true
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "0d000b97-c103-4f9a-a566-5dd26df59f57"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "d7b1289d-b1b6-4ef5-8d59-91194e6d9474",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "32da3252-d4f0-4b0d-ab9e-7bd24ddbafeb",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "primary": {
+   "institution": "health_screening_centre",
+   "institution_id": "a1484099-362c-4650-9d03-31f4eb8df107",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "63af338c-813e-4f94-87bc-e47485efc304",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "d6bdde0f-597c-43ee-b77e-45fd4a9a322f"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "5c2e03f2-20b7-4d90-94e1-6f7b52e8e3ce",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "dff3a676-2506-47a0-bbbb-14ed769735a4",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "12ee1fcc-a42a-407b-aed7-28845ed93840",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "f9a56139-1e5d-4212-beb9-674bb0b69c02",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "c55eae39-19eb-4d1a-8cec-c15932d9c85e"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "7158db9e-6d11-4db8-b406-7693f8c618f1",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "af8ac1c6-12d7-4698-96be-b79910784ff0"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "54615194-58e3-40be-b031-fc115e40db07"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "ca4bf7d4-bbb5-4d64-a108-2164a9964609"
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "a2efe1e9-e016-48f8-a83f-cf660b014af5"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "c8e9f6c0-c9eb-4410-b8f2-8196c96593b1",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "3982dcdb-fa91-48a6-ba3a-a6c3c3a962fc",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "secondary": {
+   "institution": "general_hospital",
+   "institution_id": "a1bb6d0c-db76-470b-b324-6e4586a6bdca",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "6bb4512c-571f-4e48-9f67-ef6a0f6da941",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "a9c20131-1db4-4c00-b116-dfa48cb98675"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "4cf80090-1c78-47a7-992c-d76d391ef0d6",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "ae025081-fc34-4ae7-b5ca-06eff735dbbc",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "b88d4ce2-cb0b-461d-a2d6-0b572a489b72",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "dc01f367-4e29-44c6-94a2-db06610e9e17",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "75d41bab-04a5-4b53-b0a4-37c521e3a7f2"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "04a8e201-ced0-438c-80c9-461fd7eaebd9",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "aa92091a-1e0e-407b-ad0e-7ba6b42ca2b0"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "a4283d77-10c1-4232-a795-f979254752ca"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "a18c5f6b-71b3-4623-8022-764c878624b2",
+     "pre_existing": true
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "98097a7a-96b6-461a-929b-b3a61b0f67f9"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "745f0ca9-bc89-4e40-a6e6-bbf60a6efdbe",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "00b16821-5b31-4fd6-b5c9-3ad9fdff70e0",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "support": {
+   "institution": "specialized_clinic",
+   "institution_id": "96b8d77e-da46-4546-bd1b-c4a2bb71caa9",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "6359b61e-7094-4781-8514-8bdc51af3b70",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "a1cc1ae4-b469-470e-97ae-a03ee49c1caa"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "d1c99773-8f26-4030-a8d3-6d7003a48a45",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "f98db0f1-d8c8-463c-95b4-969e67bf4669",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "f0923ab6-0aff-4607-94b5-a8fc8268d5fb",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "4488e3a1-f4ed-4e72-8671-53d6e41cc28d",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "2917345b-683f-4c1a-b899-3090037fd4ce"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "d5fd0a56-aa5d-45eb-b207-052d3d5bc343",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "7a080090-5b7d-4107-8e8c-a0acc03286b0"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "53e3b621-067d-401e-8a32-a3fd42d58882"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "c1636ce2-7302-4401-95cc-7f0729e9f449",
+     "pre_existing": true
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "de730f18-de6c-4366-b1a7-a9facf608e56"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "603b2962-d2bb-41a0-b465-20bd7d5a03bb",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "d6260b1a-72b5-4a61-9fc1-bbf6e69442bb",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  },
+  "tertiary": {
+   "institution": "central_hospital",
+   "institution_id": "ff77b535-afbc-448f-8d10-059bc9fcc6a9",
+   "tables": {
+    "medical_shifts": {
+     "insert": true,
+     "read_back": true,
+     "id": "f47699c0-125e-442c-82a8-db136b12131e",
+     "pre_existing": true
+    },
+    "asset_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "3d68f582-321b-43c3-baa4-ca1b00e7e939"
+    },
+    "attendance_records": {
+     "insert": true,
+     "read_back": true,
+     "id": "c5864446-9483-4315-9934-50842656fc7f",
+     "pre_existing": true
+    },
+    "bank_reconciliations": {
+     "insert": true,
+     "read_back": true,
+     "id": "545c96c0-c95f-42d8-9f10-823efbd54181",
+     "pre_existing": true
+    },
+    "biometric_devices": {
+     "insert": true,
+     "read_back": true,
+     "id": "028d2523-0cdf-43e3-8d35-514853626231",
+     "pre_existing": true
+    },
+    "employee_payroll": {
+     "insert": true,
+     "read_back": true,
+     "id": "917acf58-7de6-4fa9-a2db-0152ebcd5fcf",
+     "pre_existing": true
+    },
+    "general_ledger_entries": {
+     "insert": true,
+     "read_back": true,
+     "id": "8fb1f40f-1e8f-46dc-889c-6a9eefe35d62"
+    },
+    "paye_calculations": {
+     "insert": true,
+     "read_back": true,
+     "id": "d82b00df-49d5-4791-a09d-7487f3b5d5f5",
+     "pre_existing": true
+    },
+    "paye_tax_slabs": {
+     "insert": true,
+     "read_back": true,
+     "id": "f79b06b6-a4a8-4447-8de5-56a0e2211bab"
+    },
+    "pharmacy_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "82bbd710-c0c2-4950-af84-f40aa744144b"
+    },
+    "shift_assignments": {
+     "insert": true,
+     "read_back": true,
+     "id": "9498e7eb-0158-4302-ab8d-5dd1d755b790"
+    },
+    "smart_invoices": {
+     "insert": true,
+     "read_back": true,
+     "id": "66281781-a609-460a-8ae0-ffbb03ed0fbd"
+    },
+    "zambia_nhima_config": {
+     "insert": true,
+     "read_back": true,
+     "id": "a5e7e87a-348a-4dfd-af5d-dea8281df8f2",
+     "pre_existing": true
+    },
+    "comprehensive_prescriptions": {
+     "insert": true,
+     "read_back": true,
+     "id": "6adf52cb-3da1-4443-9ab9-80c182b10213",
+     "created_by": "verified-prescriber doctor"
+    }
+   }
+  }
+ },
+ "art": {
+  "create": {
+   "ok": true,
+   "id": "61da91c0-6ea4-421d-8ea6-f82da2fd1ab6"
+  },
+  "matrix_before_staff": {
+   "creator_admin_b": {
+    "http": 200,
+    "visible": true
+   },
+   "patient": {
+    "http": 200,
+    "visible": true
+   },
+   "other_admin_a": {
+    "http": 200,
+    "visible": false
+   },
+   "unassigned_staff": {
+    "http": 200,
+    "visible": false
+   }
+  },
+  "staff_assign_by_creator": {
+   "http": 201,
+   "ok": true
+  },
+  "matrix_after_staff": {
+   "assigned_staff_cycle": {
+    "http": 200,
+    "visible": true
+   }
+  },
+  "procedure_by_creator": {
+   "http": 201,
+   "ok": true
+  },
+  "procedure_visible_to_staff": {
+   "http": 200,
+   "visible": true
+  },
+  "staff_assign_by_other_admin": {
+   "http": 403,
+   "blocked": true
+  },
+  "cycle_id": "61da91c0-6ea4-421d-8ea6-f82da2fd1ab6"
+ },
+ "entitlements": {
+  "tertiary_charter": {
+   "live": 21,
+   "planned": 10
+  },
+  "instadmin_grant": {
+   "http": 403,
+   "blocked": true,
+   "detail": "{'code': '42501', 'details': None, 'hint': None, 'message': 'new row violates row-level security policy for table \"institution_module_entitlements\"'}"
+  },
+  "platform_grant": {
+   "http": 201,
+   "ok": true
+  },
+  "instadmin_reads_grant": {
+   "http": 200,
+   "visible": true
+  },
+  "platform_revoke": {
+   "http": 201,
+   "ok": true
+  },
+  "platform_delete_grant": {
+   "http": 204,
+   "ok": true
+  },
+  "platform_delete_revoke": {
+   "http": 204,
+   "ok": true
+  },
+  "entitlements_after_cleanup": {
+   "http": 200,
+   "rows": 0
+  }
+ },
+ "guards": {
+  "instadmin_payment_mode_own": {
+   "http": 403,
+   "ok": false,
+   "rows": 0,
+   "detail": "{'code': '42501', 'details': None, 'hint': None, 'message': 'payment_mode can only be changed by a platform admin after an approval decision (current: platform, requested: own)'}"
+  },
+  "instadmin_list_true": {
+   "http": 403,
+   "ok": false,
+   "rows": 0,
+   "detail": "{'code': '42501', 'details': None, 'hint': None, 'message': \"Only platform administrators can change an institution's verification, status or settlement details.\"}"
+  },
+  "instadmin_verify_self": {
+   "http": 403,
+   "ok": false,
+   "rows": 0,
+   "detail": "{'code': '42501', 'details': None, 'hint': None, 'message': \"Only platform administrators can change an institution's verification, status or settlement details.\"}"
+  },
+  "instadmin_bank_change": {
+   "http": 403,
+   "ok": false,
+   "rows": 0,
+   "detail": "{'code': '42501', 'details': None, 'hint': None, 'message': \"Only platform administrators can change an institution's verification, status or settlement details.\"}"
+  },
+  "instadmin_rename_ok": {
+   "http": 200,
+   "ok": true,
+   "rows": 1,
+   "detail": ""
+  },
+  "other_admin_rename": {
+   "http": 200,
+   "rows": 0,
+   "blocked": true
+  },
+  "instadmin_delete": {
+   "http": 204,
+   "blocked": true,
+   "note": "PostgREST 204 = 0 rows affected under RLS (only super_admin DELETE policy); central_hospital confirmed still present live afterwards"
+  },
+  "request_mode_switch": {
+   "http": 201,
+   "ok": true,
+   "id": "15d788f4-7f99-4946-911b-169c86972894"
+  },
+  "request_listing": {
+   "http": 201,
+   "ok": true,
+   "id": "80c0f202-aed4-4dea-b2ce-b18f1e00bcd6"
+  },
+  "platform_sets_own": {
+   "http": 200,
+   "ok": true
+  },
+  "platform_lists_own_mode": {
+   "http": 200,
+   "ok": true
+  },
+  "marketplace_hides_own_listed": {
+   "http": 200,
+   "hidden": true
+  },
+  "platform_reverts": {
+   "http": 200,
+   "ok": true
+  },
+  "platform_decision_row": {
+   "http": 201,
+   "ok": true
+  }
+ },
+ "staff": {
+  "staff_sees_f7_before": {
+   "http": 200,
+   "rows": 0
+  },
+  "add_personnel": {
+   "http": 201,
+   "ok": true
+  },
+  "add_staff_link": {
+   "http": 201,
+   "ok": true
+  },
+  "staff_sees_institution_after": {
+   "http": 200,
+   "visible": true
+  },
+  "staff_sees_f7_after": {
+   "http": 200,
+   "rows": 1
+  },
+  "staff_inserts_asset": {
+   "http": 201,
+   "ok": true
+  },
+  "other_admin_sees_f7": {
+   "http": 200,
+   "rows": 0
+  },
+  "other_admin_sees_institution": {
+   "http": 200,
+   "rows": 0
+  },
+  "remove_staff_link": {
+   "http": 204,
+   "ok": true
+  },
+  "remove_personnel": {
+   "http": 204,
+   "ok": true
+  },
+  "staff_sees_f7_after_removal": {
+   "http": 200,
+   "rows": 0
+  },
+  "admin_subscriptions": {
+   "http": 200,
+   "rows": 0
+  },
+  "plans_readable": {
+   "http": 200,
+   "rows": 6
+  }
+ },
+ "boundaries": {
+  "other_admin_sees_f7": {
+   "http": 200,
+   "rows": 0
+  },
+  "other_admin_sees_institution": {
+   "http": 200,
+   "rows": 0
+  }
+ },
+ "errors": []
+}

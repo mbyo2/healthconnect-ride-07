@@ -1,0 +1,74 @@
+{
+  "checks": {
+    "settings_390_light": {
+      "sw": 390,
+      "iw": 390,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Marketplace\n\nWhen enabled, patients searching for healthcare faciliti",
+      "modSection": true,
+      "toggleButtons": 0,
+      "toggleLabels": [],
+      "modulesUnavailable": false
+    },
+    "settings_390_dark": {
+      "sw": 390,
+      "iw": 390,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Marketplace\n\nWhen enabled, patients searching for healthcare faciliti",
+      "modSection": true,
+      "toggleButtons": 0,
+      "toggleLabels": []
+    },
+    "settings_1280": {
+      "sw": 1280,
+      "iw": 1280,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nDoc' O Clock\nDashboard\nAppointments\nPatients\nMessages\nMore\nK (ZMW)\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Mark",
+      "modSection": true,
+      "toggleButtons": 0,
+      "toggleLabels": []
+    },
+    "dashboard_390": {
+      "sw": 390,
+      "iw": 390,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nQA Swarm Home-Based Care Service [home_care]\n\nMonday, November 16 · Pending verification · Long-Term Care Dashboard\n\nAppointments today\n\n0\n\n0 patients · 0 appointments · ZMW 0.0k collected (6mo)\n\nKiosk\nTV Screen\nPatients\nSettings\nDashboard Overview\nPatient Hub (Central MRN)\nQueue & Calling Desk\nEmergency & Triage\nICU\nOperating Theatre\nAmbulance",
+      "hasQaInstitution": true,
+      "snippet": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nQA Swarm Home-Based Care Service [home_care]\n\nMonday, November 16 · Pending verification · Long-Term Care Dashboard\n\nAppointments today\n\n0\n\n0 patients · 0 appointments · ZMW 0.0k collected (6mo)\n\nKiosk\nTV Screen\nPatients\nSettings\nDashboard Overvi"
+    },
+    "settings_360": {
+      "sw": 360,
+      "iw": 360,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Marketplace\n\nWhen enabled, patients searching for healthcare faciliti"
+    },
+    "settings_414": {
+      "sw": 414,
+      "iw": 414,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Marketplace\n\nWhen enabled, patients searching for healthcare faciliti"
+    },
+    "settings_430": {
+      "sw": 430,
+      "iw": 430,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nK\nToggle theme\nS\nInstitution Settings\n\nOperational details, marketplace visibility, and billing preferences\n\nGeneral Information\nInstitution Name\nPhone\nEmail\nWebsite\nCity\nPreferred Currency\nZambian Kwacha (ZMW)\nZambian Kwacha (ZMW)\nUS Dollar (USD)\nAddress\nMarketplace Visibility\nList in Public Marketplace\n\nWhen enabled, patients searching for healthcare faciliti"
+    },
+    "admin_modules_tab": {
+      "clickedTab": "Modules",
+      "sw": 1280,
+      "iw": 1280,
+      "overflowX": false,
+      "bodyText": "Skip to content\nSkip to main content\nDoc' O Clock\nDashboard\nMessages\nMore\nK (ZMW)\nToggle theme\nS\nExecutive Admin Dashboard\n\nSystem-wide governance, security audit logs, platform revenue & accreditation controls\n\nActive System Governance\nOverview\nUsers\nRoles\nProviders\nInstitutions\nModules\nRevenue\nPayouts\nPayment Modes\nPromos\nSecurity\nAudit Logs\nPatient Access\nPlatform Overview\n\nReal-time metrics, t",
+      "hasModuleManager": true,
+      "snippet": "Skip to content\nSkip to main content\nDoc' O Clock\nDashboard\nMessages\nMore\nK (ZMW)\nToggle theme\nS\nExecutive Admin Dashboard\n\nSystem-wide governance, security audit logs, platform revenue & accreditation controls\n\nActive System Governance\nOverview\nUsers\nRoles\nProviders\nInstitutions\nModules\nRevenue\nPay"
+    }
+  },
+  "screenshots": [
+    "/home/hatch/workspace/docswarm-instadmin/qa/evidence/render/settings-390-light.png",
+    "/home/hatch/workspace/docswarm-instadmin/qa/evidence/render/settings-390-dark.png",
+    "/home/hatch/workspace/docswarm-instadmin/qa/evidence/render/settings-1280.png",
+    "/home/hatch/workspace/docswarm-instadmin/qa/evidence/render/dashboard-390.png",
+    "/home/hatch/workspace/docswarm-instadmin/qa/evidence/render/admin-modules-1280.png"
+  ]
+}
