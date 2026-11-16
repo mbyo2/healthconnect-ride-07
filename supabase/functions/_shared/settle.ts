@@ -171,12 +171,28 @@ async function resolvePaymentsProviderId(
 }
 
 /**
+ * Map a gateway name onto the billing_payments.payment_mode enum
+ * (cash | card | mobile_money | insurance | bank_transfer | cheque).
+ * Lenco/Broadpay collections ARE mobile money; PayPal settles as an
+ * electronic bank transfer. Passing the raw gateway string ('lenco')
+ * fails with 22P02 — live-proven 2026-11-16, which left a settled K10
+ * invoice unbooked after the split had already credited the wallets.
+ */
+function toBillingPaymentMode(gateway: string): string {
+  const g = (gateway || '').toLowerCase();
+  if (g === 'lenco' || g === 'broadpay' || g === 'mobile_money') return 'mobile_money';
+  return 'bank_transfer';
+}
+
+/**
  * Book a settled gateway payment against its `billing_invoices` row.
  * Idempotent: a `billing_payments` row keyed by the gateway reference is
  * inserted only once per invoice. The existing trigger
  * `trg_update_invoice_on_payment` then recomputes the invoice's
  * paid_amount / balance / status from the sum of its payments — so
  * replays, retries and the already-settled path can all call this safely.
+ * Returns false when the booking did not land (callers must report the
+ * settlement as failed, not claim the invoice is paid).
  */
 async function applyInvoicePayment(
   admin: Admin,
@@ -188,26 +204,28 @@ async function applyInvoicePayment(
     externalRef: string;
     payerId: string;
   },
-): Promise<void> {
+): Promise<boolean> {
   const { data: prior } = await admin
     .from('billing_payments')
     .select('id')
     .eq('invoice_id', args.invoiceId)
     .eq('reference_number', args.externalRef)
     .limit(1);
-  if (prior && prior.length > 0) return;
+  if (prior && prior.length > 0) return true;
   const { error } = await admin.from('billing_payments').insert({
     institution_id: args.institutionId,
     invoice_id: args.invoiceId,
     amount: args.amount,
-    payment_mode: args.gateway,
+    payment_mode: toBillingPaymentMode(args.gateway),
     reference_number: args.externalRef,
     received_by: args.payerId,
     payment_date: new Date().toISOString(),
   });
   if (error) {
     console.error('applyInvoicePayment: billing_payments insert failed', error);
+    return false;
   }
+  return true;
 }
 
 export async function settlePayment(admin: Admin, input: SettleInput): Promise<SettleResult> {
@@ -242,7 +260,7 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
     if (type === 'invoice' && referenceId) {
       const payeeForInvoice = await resolvePayee(admin, type, referenceId);
       if (payeeForInvoice?.institutionId) {
-        await applyInvoicePayment(admin, {
+        const booked = await applyInvoicePayment(admin, {
           institutionId: payeeForInvoice.institutionId,
           invoiceId: referenceId,
           amount,
@@ -250,6 +268,9 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
           externalRef,
           payerId,
         });
+        if (!booked) {
+          return { settled: false, paymentId: existing.id, reason: 'invoice_booking_failed' };
+        }
       }
     }
     return { settled: true, already: true, paymentId: existing.id };
@@ -396,7 +417,7 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
           .maybeSingle();
         if (raced) {
           if (type === 'invoice' && referenceId && payee.institutionId) {
-            await applyInvoicePayment(admin, {
+            const booked = await applyInvoicePayment(admin, {
               institutionId: payee.institutionId,
               invoiceId: referenceId,
               amount,
@@ -404,6 +425,9 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
               externalRef,
               payerId,
             });
+            if (!booked) {
+              return { settled: false, paymentId: raced.id, reason: 'invoice_booking_failed' };
+            }
           }
           return { settled: true, already: true, paymentId: raced.id };
         }
@@ -439,8 +463,11 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
 
   // Book the money against the invoice it was collected for, so the
   // invoice actually closes instead of staying 'sent' with its balance.
+  // A booking failure is reported as a failed settlement (never as a
+  // success): the wallets already hold the split, and the next verify
+  // retries the booking through the already-settled path.
   if (type === 'invoice' && referenceId && payee.institutionId) {
-    await applyInvoicePayment(admin, {
+    const booked = await applyInvoicePayment(admin, {
       institutionId: payee.institutionId,
       invoiceId: referenceId,
       amount,
@@ -448,6 +475,9 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
       externalRef,
       payerId,
     });
+    if (!booked) {
+      return { settled: false, paymentId, reason: 'invoice_booking_failed' };
+    }
   }
 
   return {

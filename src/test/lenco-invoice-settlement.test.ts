@@ -53,6 +53,16 @@ describe('Invoice settlement · the invoice actually closes', () => {
     expect(src).toContain("eq('reference_number', args.externalRef)");
   });
 
+  it('maps the gateway onto the billing_payments.payment_mode enum (raw gateway strings are invalid enum values)', () => {
+    expect(src).toContain('toBillingPaymentMode');
+    expect(src).toContain("return 'mobile_money'");
+    expect(src).not.toContain('payment_mode: args.gateway,');
+  });
+
+  it('reports a failed invoice booking as a failed settlement, never as success', () => {
+    expect(src).toContain("reason: 'invoice_booking_failed'");
+  });
+
   it('applies the booking on the settle-now path and on already-settled replays', () => {
     const hits = src.split('applyInvoicePayment(admin').length - 1;
     expect(hits).toBeGreaterThanOrEqual(3);
