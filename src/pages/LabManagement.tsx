@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -158,6 +158,25 @@ const LabManagement = () => {
       }
     },
   });
+
+  // Live (concurrency group 6, 2026-11-16): results entered or verified from
+  // another terminal must refresh this board without a reload — previously
+  // the queue only changed on manual refetch after a mutation.
+  useEffect(() => {
+    const channel = supabase
+      .channel("lab-requests-live")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "lab_tests" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: patients } = useQuery({
     queryKey: ["lab-patients", patientSearchTerm],

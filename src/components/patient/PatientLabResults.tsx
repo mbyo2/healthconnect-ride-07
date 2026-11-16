@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -81,6 +82,25 @@ export default function PatientLabResults() {
       return rows;
     },
   });
+
+  // Live (concurrency group 6, 2026-11-16): a pathologist verifying a result
+  // on another terminal mirrors verified_at onto the lab_results row; without
+  // this subscription the patient kept seeing "Pending verification" until a
+  // reload. RLS delivers only the patient's own verified rows.
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel('patient-lab-results-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lab_results', filter: `patient_id=eq.${user.id}` },
+        () => refetch()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, refetch]);
 
   return (
     <Card>
