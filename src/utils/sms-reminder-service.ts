@@ -18,6 +18,22 @@ export interface ReminderContext {
   [key: string]: string | undefined;
 }
 
+/**
+ * Lead times (hours before the appointment) a reminder is due, from the
+ * patient's notification preferences. Shared with the in-app reminder
+ * path (src/lib/appointmentReminders.ts) so the WhatsApp queue and the
+ * in-app notification always use the SAME scheduled times — one function,
+ * no drift. Default: 24h; a second lead time when the patient set one.
+ */
+export function resolveReminderLeadHours(prefs: {
+  appointment_reminder_hours?: number | null;
+  second_reminder_hours?: number | null;
+}): number[] {
+  const leadHours: number[] = [prefs?.appointment_reminder_hours ?? 24];
+  if (prefs?.second_reminder_hours) leadHours.push(prefs.second_reminder_hours);
+  return leadHours;
+}
+
 /** Render a template like "Hello {patient_name}..." with context values. */
 export function renderTemplate(template: string, ctx: ReminderContext): string {
   const map: Record<string, string> = {
@@ -134,8 +150,7 @@ export async function queueAppointmentReminders(args: {
     }),
   });
 
-  const leadHours: number[] = [p.appointment_reminder_hours ?? 24];
-  if (p.second_reminder_hours) leadHours.push(p.second_reminder_hours);
+  const leadHours: number[] = resolveReminderLeadHours(p);
 
   let queued = 0;
   const now = Date.now();

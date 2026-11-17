@@ -20,6 +20,10 @@ export const useNotifications = () => {
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
+        // Scheduled reminders (kind 'reminder') only surface at their due
+        // time: visible_at is in the future until then. Booking
+        // confirmations have visible_at <= now, so they show immediately.
+        .lte('visible_at', new Date().toISOString())
         .order('created_at', { ascending: false });
         
       if (error) throw error;
