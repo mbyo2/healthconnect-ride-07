@@ -16141,34 +16141,43 @@ export type Database = {
       }
       notifications: {
         Row: {
+          appointment_id: string | null
           created_at: string | null
           id: string
+          kind: string
           message: string
           read: boolean | null
           title: string
           type: string
           updated_at: string | null
           user_id: string
+          visible_at: string
         }
         Insert: {
+          appointment_id?: string | null
           created_at?: string | null
           id?: string
+          kind?: string
           message: string
           read?: boolean | null
           title: string
           type: string
           updated_at?: string | null
           user_id: string
+          visible_at?: string
         }
         Update: {
+          appointment_id?: string | null
           created_at?: string | null
           id?: string
+          kind?: string
           message?: string
           read?: boolean | null
           title?: string
           type?: string
           updated_at?: string | null
           user_id?: string
+          visible_at?: string
         }
         Relationships: [
           {
