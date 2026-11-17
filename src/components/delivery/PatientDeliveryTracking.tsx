@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, Truck, MapPin, Clock, Phone, CheckCircle, XCircle } from 'lucide-react';
+import { Package, Truck, MapPin, Clock, Phone, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
+import { createRealtimeChannel, removeRealtimeChannel } from '@/lib/realtimeChannel';
 
 interface DeliveryOrder {
   id: string;
@@ -19,6 +21,8 @@ interface DeliveryOrder {
   estimated_arrival?: string;
   created_at: string;
   couriers?: {
+    id?: string;
+    user_id?: string;
     full_name?: string;
     phone?: string;
     vehicle_type?: string;
@@ -46,9 +50,11 @@ export function PatientDeliveryTracking() {
     if (!user) return;
     fetchDeliveries();
 
-    // Real-time updates
-    const channel = supabase
-      .channel('patient-deliveries')
+    // Real-time updates — unique channel per mount (see
+    // src/lib/realtimeChannel.ts). delivery_orders joined the realtime
+    // publication in the 20261117 migration; before that this channel
+    // never delivered anything live.
+    const channel = createRealtimeChannel('patient-deliveries')
       .on(
         'postgres_changes',
         {
@@ -62,7 +68,7 @@ export function PatientDeliveryTracking() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      removeRealtimeChannel(channel);
     };
   }, [user]);
 
@@ -73,7 +79,7 @@ export function PatientDeliveryTracking() {
       .from('delivery_orders')
       .select(`
         *,
-        couriers (full_name, phone, vehicle_type)
+        couriers (id, user_id, full_name, phone, vehicle_type)
       `)
       .eq('patient_id', user.id)
       .order('created_at', { ascending: false })
@@ -153,26 +159,40 @@ export function PatientDeliveryTracking() {
 
               {/* Courier info */}
               {delivery.couriers && (
-                <div className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4" />
-                    <span className="text-sm font-medium">
+                <div className="flex items-center justify-between gap-2 p-2 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Truck className="h-4 w-4 shrink-0" />
+                    <span className="text-sm font-medium truncate">
                       {delivery.couriers.full_name || 'Courier'}
                     </span>
                     {delivery.couriers.vehicle_type && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground shrink-0">
                         • {delivery.couriers.vehicle_type}
                       </span>
                     )}
                   </div>
-                  {delivery.couriers.phone && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`tel:${delivery.couriers.phone}`}>
-                        <Phone className="h-3 w-3 mr-1" />
-                        Call
-                      </a>
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Message the assigned courier — same 1:1 thread the
+                        courier answers from their dashboard. The courier's
+                        auth user id comes from the couriers row
+                        (couriers.user_id); no id is ever invented. */}
+                    {delivery.couriers.user_id && (
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to={`/chat?receiver=${delivery.couriers.user_id}`}>
+                          <MessageSquare className="h-3 w-3 mr-1" />
+                          Message
+                        </Link>
+                      </Button>
+                    )}
+                    {delivery.couriers.phone && (
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={`tel:${delivery.couriers.phone}`}>
+                          <Phone className="h-3 w-3 mr-1" />
+                          Call
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )}
 

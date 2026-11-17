@@ -1,13 +1,16 @@
 // @ts-nocheck -- pre-existing loose Supabase typings; tracked for cleanup
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Truck, Package, CheckCircle, Clock, Navigation } from "lucide-react";
+import { Truck, Package, CheckCircle, Clock, Navigation, MessageSquare } from "lucide-react";
+import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
 
 // Doc'O Clock branded markers — no third-party branding on pins/popups
 const riderIcon = L.divIcon({
@@ -106,11 +109,13 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
     }
   }, [trail]);
 
-  // Realtime subscription for new location pings
+  // Realtime subscription for new location pings — unique channel per
+  // mount (see src/lib/realtimeChannel.ts). location_updates joined
+  // the realtime publication in the 20261117 migration; before that
+  // this channel never delivered anything live.
   useEffect(() => {
     if (!delivery?.id) return;
-    const channel = supabase
-      .channel(`delivery-${delivery.id}`)
+    const channel = createRealtimeChannel('delivery-location')
       .on(
         "postgres_changes",
         {
@@ -126,7 +131,7 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(channel);
+      removeRealtimeChannel(channel);
     };
   }, [delivery?.id]);
 
@@ -181,10 +186,21 @@ export const LiveDeliveryTracker = ({ orderId }: Props) => {
         </div>
 
         {delivery.courier && (
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
             <Badge variant="outline">
               Rider: {delivery.courier.full_name} · {delivery.courier.vehicle_type}
             </Badge>
+            {/* Message the rider — delivery_tracking.driver_id IS the
+                courier's auth user id (see the query above), so the
+                thread opens with the right receiver, no id invented. */}
+            {delivery.driver_id && (
+              <Button size="sm" variant="outline" asChild>
+                <Link to={`/chat?receiver=${delivery.driver_id}`}>
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Message rider
+                </Link>
+              </Button>
+            )}
           </div>
         )}
 

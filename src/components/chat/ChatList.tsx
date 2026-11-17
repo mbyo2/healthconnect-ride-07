@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { SkeletonListRow } from "@/components/ui/skeleton-kit";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
 
 interface ChatContact {
   id: string;
@@ -68,10 +69,13 @@ export const ChatList = () => {
       if (!user) return;
 
       // Only people this user actually has care relationships with:
-      // message counterparts + appointment counterparts. Never the
-      // whole user directory.
+      // message counterparts + appointment counterparts + delivery
+      // counterparts (the courier on my deliveries / the patient on my
+      // assigned deliveries). Never the whole user directory — a
+      // patient must never be able to enumerate or open threads with
+      // other patients.
       const counterpartIds = new Set<string>();
-        const [msgsRes, apptsAsPatient, apptsAsProvider] = await Promise.all([
+        const [msgsRes, apptsAsPatient, apptsAsProvider, myDeliveries, myCourierRows] = await Promise.all([
           supabase
             .from('messages')
             .select('sender_id, receiver_id')
@@ -87,6 +91,20 @@ export const ChatList = () => {
             .select('patient_id')
             .eq('provider_id', user.id)
             .limit(200),
+          // My deliveries as the patient — the courier on each one is a
+          // contact (courier rows readable via "Patients view assigned
+          // courier"; resolved to auth user ids below).
+          supabase
+            .from('delivery_orders')
+            .select('courier_id')
+            .eq('patient_id', user.id)
+            .limit(200),
+          // My courier record (empty unless this user is a courier).
+          supabase
+            .from('couriers')
+            .select('id')
+            .eq('user_id', user.id)
+            .limit(5),
         ]);
         (msgsRes.data || []).forEach((m: any) => {
           if (m.sender_id && m.sender_id !== user.id) counterpartIds.add(m.sender_id);
@@ -94,6 +112,26 @@ export const ChatList = () => {
         });
         (apptsAsPatient.data || []).forEach((a: any) => { if (a.provider_id) counterpartIds.add(a.provider_id); });
         (apptsAsProvider.data || []).forEach((a: any) => { if (a.patient_id) counterpartIds.add(a.patient_id); });
+
+        // Patient → courier user ids for my deliveries.
+        const myCourierIds = [...new Set((myDeliveries.data || []).map((d: any) => d.courier_id).filter(Boolean))];
+        if (myCourierIds.length > 0) {
+          const { data: courierRows } = await supabase
+            .from('couriers')
+            .select('user_id')
+            .in('id', myCourierIds);
+          (courierRows || []).forEach((c: any) => { if (c.user_id && c.user_id !== user.id) counterpartIds.add(c.user_id); });
+        }
+        // Courier → patient ids for my assigned deliveries.
+        const myCourierRowIds = (myCourierRows.data || []).map((c: any) => c.id).filter(Boolean);
+        if (myCourierRowIds.length > 0) {
+          const { data: assigned } = await supabase
+            .from('delivery_orders')
+            .select('patient_id')
+            .in('courier_id', myCourierRowIds)
+            .limit(200);
+          (assigned || []).forEach((d: any) => { if (d.patient_id && d.patient_id !== user.id) counterpartIds.add(d.patient_id); });
+        }
 
         if (counterpartIds.size === 0) {
           setContacts([]);
@@ -120,9 +158,10 @@ export const ChatList = () => {
       // Real-time: any new message refreshes the contact list. This both
       // bubbles active conversations and discovers brand-new counterparts
       // (no user-id race, no missed first messages). messages table is in the
-      // realtime publication (see 20260921 migration).
-      const channel = supabase
-        .channel('chat-list-realtime')
+      // realtime publication (see 20260921 migration). Unique channel per
+      // mount (see src/lib/realtimeChannel.ts) — the old fixed name
+      // 'chat-list-realtime' collided on fast unmount → remount.
+      const channel = createRealtimeChannel('chat-list-realtime')
         .on('postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'messages' },
           () => {
@@ -132,7 +171,7 @@ export const ChatList = () => {
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        removeRealtimeChannel(channel);
       };
     }, [loadContacts]);
 
@@ -178,21 +217,21 @@ export const ChatList = () => {
                 onClick={() => setSelectedContact(contact)}
                 className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors ${
                   selectedContact?.id === contact.id
-                    ? "bg-blue-50 border border-blue-200"
-                    : "hover:bg-gray-50 border border-transparent"
+                    ? "bg-primary/10 border border-primary/30"
+                    : "hover:bg-muted border border-transparent"
                 }`}
               >
                 <Avatar className="h-12 w-12 shrink-0">
                   <AvatarImage src={contact.avatar_url || ''} />
-                  <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                     {contact.first_name?.[0]}{contact.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-gray-900 truncate">
+                  <p className="font-semibold text-sm text-foreground truncate">
                     {providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
+                  <p className="text-xs text-muted-foreground capitalize truncate">
                     {(contact.role || 'member').replace('_', ' ')}
                   </p>
                 </div>
