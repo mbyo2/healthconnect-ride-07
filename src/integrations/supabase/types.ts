@@ -25777,6 +25777,71 @@ export type Database = {
           },
         ]
       }
+      voice_calls: {
+        Row: {
+          answered_at: string | null
+          callee_id: string
+          caller_id: string
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          answered_at?: string | null
+          callee_id: string
+          caller_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          answered_at?: string | null
+          callee_id?: string
+          caller_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_calls_callee_id_fkey"
+            columns: ["callee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_calls_callee_id_fkey"
+            columns: ["callee_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_calls_caller_id_fkey"
+            columns: ["caller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_calls_caller_id_fkey"
+            columns: ["caller_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visit_packages: {
         Row: {
           code: string
