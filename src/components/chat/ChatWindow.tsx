@@ -6,6 +6,8 @@ import { Message } from "@/types/communication";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
+import { appendIncomingMessage, isThreadMessage } from "@/lib/chatThread";
 
 interface ChatWindowProps {
   providerId: string;
@@ -17,7 +19,25 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let activeChannel: ReturnType<typeof supabase.channel> | null = null;
+    let activeChannel: ReturnType<typeof createRealtimeChannel> | null = null;
+
+    // Mark everything the other party sent us in this thread as read.
+    // Best-effort on purpose: a failed mark must never toast or block
+    // the chat (the bubbles simply keep a single check). Enabled by the
+    // "Receivers can mark messages read" UPDATE policy (20261117
+    // migration); a BEFORE UPDATE trigger keeps every other column
+    // immutable, so only the read flag can change.
+    const markThreadRead = (userId: string, otherId: string) => {
+      void supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('receiver_id', userId)
+        .eq('sender_id', otherId)
+        .eq('read', false)
+        .then(({ error }) => {
+          if (error) console.error('Error marking messages read:', error);
+        });
+    };
 
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -40,21 +60,25 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
       }
 
       setMessages(data || []);
+      markThreadRead(userId, providerId);
 
-      activeChannel = supabase
-        .channel(`messages-${providerId}`)
+      // Unique channel per mount (see src/lib/realtimeChannel.ts): the
+      // old fixed name `messages-${providerId}` collided on fast
+      // unmount → remount — realtime-js dedupes by topic and .on()
+      // throws on a joining/joined channel. The old and new channels
+      // may briefly both deliver the same row while the old one
+      // drains; appendIncomingMessage dedupes by id.
+      activeChannel = createRealtimeChannel('messages')
         .on('postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'messages' },
           (payload) => {
-            setMessages(prev => {
-              const incoming = payload.new as Message;
-              // Ignore messages from other conversations on the shared channel.
-              const mine = incoming.sender_id === userId && incoming.receiver_id === providerId;
-              const theirs = incoming.sender_id === providerId && incoming.receiver_id === userId;
-              if (!mine && !theirs) return prev;
-              if (prev.some(m => m.id === incoming.id)) return prev;
-              return [...prev, incoming];
-            });
+            const incoming = payload.new as Message;
+            setMessages(prev => appendIncomingMessage(prev, incoming, userId, providerId));
+            // A live incoming message from the other party is read the
+            // moment it lands in the open thread.
+            if (isThreadMessage(incoming, userId, providerId) && incoming.sender_id === providerId) {
+              markThreadRead(userId, providerId);
+            }
           }
         )
         .subscribe();
@@ -63,7 +87,7 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
     init();
 
     return () => {
-      if (activeChannel) supabase.removeChannel(activeChannel);
+      if (activeChannel) removeRealtimeChannel(activeChannel);
     };
   }, [providerId]);
 

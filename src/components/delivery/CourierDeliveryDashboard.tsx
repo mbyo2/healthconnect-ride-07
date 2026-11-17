@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, MapPin, Phone, Navigation, CheckCircle, Satellite, SatelliteDish } from 'lucide-react';
+import { Package, MapPin, Phone, Navigation, CheckCircle, Satellite, SatelliteDish, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { updateDeliveryStatus } from '@/services/deliveryService';
@@ -10,11 +11,13 @@ import { useCourierLocation } from '@/hooks/useCourierLocation';
 import { toast } from 'sonner';
 import { Skeleton } from "@/components/ui/skeleton";
 import { SkeletonBlock, SkeletonLine } from "@/components/ui/skeleton-kit";
+import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
 
 interface DeliveryOrder {
   id: string;
   order_type: string;
   status: string;
+  patient_id?: string;
   patient_address?: string;
   pickup_address?: string;
   patient_phone?: string;
@@ -29,6 +32,7 @@ interface DeliveryOrder {
 
 export function CourierDeliveryDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<DeliveryOrder[]>([]);
   const [courierId, setCourierId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,8 +58,12 @@ export function CourierDeliveryDashboard() {
     if (!user) return;
     fetchCourierAndDeliveries();
 
-    const channel = supabase
-      .channel('courier-deliveries')
+    // Unique channel per mount (see src/lib/realtimeChannel.ts) — the
+    // old fixed name 'courier-deliveries' collided on fast unmount →
+    // remount. delivery_orders joined the realtime publication in the
+    // 20261117 migration; before that this channel never delivered
+    // anything live.
+    const channel = createRealtimeChannel('courier-deliveries')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'delivery_orders' },
@@ -64,7 +72,7 @@ export function CourierDeliveryDashboard() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      removeRealtimeChannel(channel);
     };
   }, [user]);
 
@@ -292,7 +300,19 @@ export function CourierDeliveryDashboard() {
             )}
 
             {/* Action buttons based on status */}
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
+              {/* Reply in the same 1:1 thread the patient opened from
+                  their delivery tracking — /chat?receiver=<patient>. */}
+              {delivery.patient_id && (
+                <Button
+                  variant="outline"
+                  className="flex-1 min-h-[44px]"
+                  onClick={() => navigate(`/chat?receiver=${delivery.patient_id}`)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Message patient
+                </Button>
+              )}
               {delivery.status === 'assigned' && (
                 <Button
                   className="flex-1"

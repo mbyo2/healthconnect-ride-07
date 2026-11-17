@@ -38,9 +38,11 @@ import {
   ChevronRight,
   Plus,
   Info,
-  Wallet
+  Wallet,
+  MessageSquare
 } from "lucide-react";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
 
 // An appointment is a telemedicine visit only when the appointment itself
 // was booked as one (BookingModal writes 'video_consultation'; 'telemedicine'
@@ -155,10 +157,10 @@ export const AppointmentsPage = () => {
     }
   );
 
-  // Real-time subscription for appointment status updates
+  // Real-time subscription for appointment status updates — unique
+  // channel per mount (see src/lib/realtimeChannel.ts).
   useEffect(() => {
-    const channel = supabase
-      .channel("appointments-realtime")
+    const channel = createRealtimeChannel("appointments-realtime")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "appointments" },
@@ -169,7 +171,7 @@ export const AppointmentsPage = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      removeRealtimeChannel(channel);
     };
   }, [queryClient]);
 
@@ -468,6 +470,20 @@ export const AppointmentsPage = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mt-3">
+          {/* Message the other party — opens the same 1:1 thread in
+              /chat, preselected via ?receiver=. The appointment itself
+              is what authorises the contact (ChatList builds contacts
+              from appointments, and the profiles policy lets
+              appointment participants see each other). */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => navigate(`/chat?receiver=${isProvider ? app.patient_id : app.provider_id}`)}
+            className="min-h-[44px]"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            {isProvider ? "Message patient" : "Message provider"}
+          </Button>
           {isVideo && isToday(apptDate) && (
             <Button asChild size="sm" variant="success" className="min-h-[44px]">
             <Link to={`/video-call/${app.id}`}>Join</Link>

@@ -77,6 +77,7 @@ export const MessageInput = ({ onSendMessage, onUploadComplete, loading, draftKe
         placeholder="Type your message..."
         disabled={loading}
         maxLength={2000}
+        className="min-w-0"
         onSecurityViolation={handleSecurityViolation}
         enableXSSProtection={true}
         enableSQLProtection={true}
