@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Message } from "@/types/communication";
 import { MessageList } from "./MessageList";
@@ -8,6 +8,9 @@ import { MessageInput } from "./MessageInput";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 import { createRealtimeChannel, removeRealtimeChannel } from "@/lib/realtimeChannel";
 import { appendIncomingMessage, isThreadMessage } from "@/lib/chatThread";
+import { Button } from "@/components/ui/button";
+import { useVoiceCall } from "@/hooks/useVoiceCall";
+import { VoiceCallOverlay } from "@/components/calls/VoiceCallOverlay";
 
 interface ChatWindowProps {
   providerId: string;
@@ -17,6 +20,11 @@ interface ChatWindowProps {
 export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // In-app voice calls (group 2): free WebRTC audio over Supabase Realtime
+  // signalling. The overlay + hook own the call; this file only hosts the
+  // entry point so group 1's chat work is untouched.
+  const voiceCall = useVoiceCall({ peerId: providerId, peerName: providerName || "Chat" });
 
   useEffect(() => {
     let activeChannel: ReturnType<typeof createRealtimeChannel> | null = null;
@@ -156,7 +164,33 @@ export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
       <div className="p-4 border-b flex items-center gap-2 min-w-0">
         <MessageSquare className="h-5 w-5 flex-shrink-0" />
         <h2 className="font-semibold truncate">{providerName || 'Chat'}</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto shrink-0"
+          onClick={voiceCall.startCall}
+          disabled={voiceCall.phase !== "idle"}
+          aria-label="Start voice call"
+        >
+          <Phone className="h-4 w-4 sm:mr-1.5" />
+          <span className="hidden sm:inline">Voice call</span>
+        </Button>
       </div>
+
+      <VoiceCallOverlay
+        phase={voiceCall.phase}
+        peerName={providerName || "Chat"}
+        durationSeconds={voiceCall.durationSeconds}
+        muted={voiceCall.muted}
+        iceState={voiceCall.iceState}
+        error={voiceCall.error}
+        endReason={voiceCall.endReason}
+        remoteAudioRef={voiceCall.remoteAudioRef}
+        onAccept={voiceCall.acceptCall}
+        onDecline={voiceCall.declineCall}
+        onEnd={voiceCall.endCall}
+        onToggleMute={voiceCall.toggleMute}
+      />
 
       <MessageList messages={messages} providerId={providerId} />
 
