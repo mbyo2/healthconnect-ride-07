@@ -17,6 +17,9 @@ interface Notification {
   created_at: string;
   action_url?: string;
   metadata?: any;
+  appointment_id?: string | null;
+  kind?: "confirmation" | "reminder";
+  visible_at?: string;
 }
 
 const NotificationsPage = () => {
@@ -33,6 +36,8 @@ const NotificationsPage = () => {
         .from("notifications" as any)
         .select("*")
         .eq("user_id", user.id)
+        // Scheduled reminders only surface at their due time (visible_at).
+        .lte("visible_at", new Date().toISOString())
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -61,6 +66,14 @@ const NotificationsPage = () => {
         },
         (payload) => {
           const newNotification = payload.new as Notification;
+          // A reminder whose visible_at is still in the future is not due
+          // yet — the 30s poll / refetch surfaces it when the time comes.
+          if (
+            newNotification.visible_at &&
+            new Date(newNotification.visible_at).getTime() > Date.now()
+          ) {
+            return;
+          }
           setNotifications((prev) => [newNotification, ...prev]);
           toast.info(newNotification.title, {
             description: newNotification.message,

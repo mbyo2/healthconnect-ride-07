@@ -310,10 +310,22 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
           console.error('Reminder dispatch failed (non-fatal):', reminderErr);
         });
 
-        // Queue SMS/WhatsApp reminders (Zambia-critical channel). Also
-        // non-blocking — respects the patient's notification preferences
-        // and schedules at their chosen lead times.
+        // Queue SMS/WhatsApp reminders (Zambia-critical channel) + the
+        // in-app scheduled reminders (same times, NotificationCenter).
+        // Also non-blocking — respects the patient's notification
+        // preferences and schedules at their chosen lead times.
         (async () => {
+          // In-app reminders mirror the WhatsApp schedule (same lead
+          // times from the same preferences). Independent of phone: a
+          // patient with no phone still gets reminded in-app. The
+          // booking-time confirmation row + chat note are written by
+          // send-appointment-reminder (invoked above), not here.
+          try {
+            const { queueInAppAppointmentReminders } = await import('@/lib/appointmentReminders');
+            await queueInAppAppointmentReminders({ appointmentId: booked.id });
+          } catch (inAppErr) {
+            console.error('In-app reminder queue failed (non-fatal):', inAppErr);
+          }
           try {
             const { data: profile } = await supabase
               .from('profiles')

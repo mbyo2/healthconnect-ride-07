@@ -37,7 +37,7 @@ export const NotificationBell = ({ className }: { className?: string }) => {
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-[min(20rem,calc(100vw-2rem))]">
                 <DropdownMenuLabel className="flex items-center justify-between">
                     <span>Notifications</span>
                     {unreadCount > 0 && (
