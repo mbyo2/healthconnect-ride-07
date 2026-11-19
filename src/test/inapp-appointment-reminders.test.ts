@@ -61,17 +61,30 @@ describe("getInAppReminderTimes", () => {
 
 describe("buildReminderNotificationRows", () => {
   it("builds one deduped row per slot with the real appointment facts", () => {
+    const appointmentDate = new Date("2026-11-20T10:30:00.000Z");
     const rows = buildReminderNotificationRows({
       patientId: "11111111-1111-1111-1111-111111111111",
       appointmentId: "22222222-2222-2222-2222-222222222222",
       patientName: "Remmy Banda",
       providerName: "Dr. Jane Banda",
       facilityName: "Lusaka General Hospital",
-      appointmentDate: new Date("2026-11-20T10:30:00.000Z"),
+      appointmentDate,
       slots: [
         { leadHours: 24, when: new Date("2026-11-19T10:30:00.000Z") },
         { leadHours: 2, when: new Date("2026-11-20T08:30:00.000Z") },
       ],
+    });
+    // The builder renders the appointment instant in the runtime's local
+    // zone — in production the patient's browser, where the naive booked
+    // wall time (date + time columns) round-trips exactly. Derive the
+    // expected labels from the fixture instant the same way the builder
+    // formats them, so this test is zone-robust: hard-coding the UTC
+    // wall time ("10:30" / "20/11/2026") failed under TZ=Africa/Lusaka,
+    // where the same instant correctly renders as 12:30 local.
+    const expectedDate = appointmentDate.toLocaleDateString("en-GB");
+    const expectedTime = appointmentDate.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
     expect(rows).toHaveLength(2);
     for (const row of rows) {
@@ -82,8 +95,8 @@ describe("buildReminderNotificationRows", () => {
       expect(row.read).toBe(false);
       expect(row.message).toContain("Dr. Jane Banda");
       expect(row.message).toContain("Lusaka General Hospital");
-      expect(row.message).toContain("20/11/2026");
-      expect(row.message).toContain("10:30");
+      expect(row.message).toContain(expectedDate);
+      expect(row.message).toContain(expectedTime);
     }
     // Dedupe key (appointment_id, kind, visible_at) is unique per row.
     const keys = rows.map((r) => `${r.appointment_id}|${r.kind}|${r.visible_at}`);
