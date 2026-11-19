@@ -11,6 +11,7 @@ import { useAccessibility } from "@/context/AccessibilityContext";
 import { toast } from "sonner";
 import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
+import { FxRateUnavailableError } from "@/services/exchangeRates";
 import { useLencoPayment, LENCO_OPERATORS, type LencoOperator } from "@/hooks/useLencoPayment";
 import { useLencoWidget, generateWidgetReference } from "@/hooks/useLencoWidget";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
@@ -27,7 +28,7 @@ export const WalletTopUp = () => {
     const [lencoOperator, setLencoOperator] = useState<LencoOperator>('mtn');
     const [lencoReference, setLencoReference] = useState<string | null>(null);
     const [lencoMessage, setLencoMessage] = useState<string>('');
-    const { currency, getSymbol, toZmw, formatPrice } = useCurrency();
+    const { currency, getSymbol, toZmwForCharge, formatPrice } = useCurrency();
     const { createCollection, verifyPayment, verifying } = useLencoPayment();
     const { openWidget, loading: widgetLoading } = useLencoWidget();
 
@@ -47,7 +48,9 @@ export const WalletTopUp = () => {
         try {
             if (paymentMethod === 'paypal') {
                 // Same ZMW-canonical rule as before: convert display amount first.
-                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                // Charge-path conversion: fail-closed on fresh live server
+                // rates (throws FxRateUnavailableError → handled in catch).
+                const zmwAmount = Math.round(toZmwForCharge(numAmount, currency) * 100) / 100;
                 if (!(zmwAmount >= 1)) {
                     toast.error("Top-up must be at least K1.00");
                     setIsLoading(false);
@@ -75,7 +78,8 @@ export const WalletTopUp = () => {
                 }
             } else if (paymentMethod === 'card') {
                 // Lenco hosted widget — PCI-safe, card details never touch our code.
-                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                // Charge-path conversion: fail-closed (see PayPal branch).
+                const zmwAmount = Math.round(toZmwForCharge(numAmount, currency) * 100) / 100;
                 if (!(zmwAmount >= 1)) {
                     toast.error("Top-up must be at least K1.00");
                     setIsLoading(false);
@@ -131,7 +135,8 @@ export const WalletTopUp = () => {
                 return;
             } else if (paymentMethod === 'lenco') {
                 // Lenco mobile-money collection: same ZMW-canonical rule.
-                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                // Charge-path conversion: fail-closed (see PayPal branch).
+                const zmwAmount = Math.round(toZmwForCharge(numAmount, currency) * 100) / 100;
                 if (!(zmwAmount >= 1)) {
                     toast.error("Top-up must be at least K1.00");
                     setIsLoading(false);
@@ -164,8 +169,17 @@ export const WalletTopUp = () => {
             }
         } catch (error) {
             console.error('Top up error:', error);
-            toast.error(friendlyErrorMessage(error, "Failed to initiate top up"));
-            screenReaderAnnounce("Top-up failed. We could not start your payment. Please try again.", true);
+            if (error instanceof FxRateUnavailableError) {
+                // Plain-language by design: the message says what happened
+                // and what to do next. No payment rail was touched. Routed
+                // through friendlyErrorMessage like every display error —
+                // the crafted FX copy passes through unchanged.
+                toast.error(friendlyErrorMessage(error, "Live exchange rates are unavailable right now, so this payment cannot be priced safely. Please try again in a moment."));
+                screenReaderAnnounce("Top-up stopped. Live exchange rates are unavailable, so the payment could not be priced safely. Please try again in a moment.", true);
+            } else {
+                toast.error(friendlyErrorMessage(error, "Failed to initiate top up"));
+                screenReaderAnnounce("Top-up failed. We could not start your payment. Please try again.", true);
+            }
         } finally {
             setIsLoading(false);
         }

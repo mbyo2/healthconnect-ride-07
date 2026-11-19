@@ -4,6 +4,8 @@ import {
   BASE_CURRENCY,
   fromZmw,
   toZmw as toZmwRaw,
+  toZmwForCharge as toZmwForChargeRaw,
+  fromZmwForCharge,
   roundForCurrency,
   refreshRates,
   ratesAreLive,
@@ -88,15 +90,27 @@ export const useCurrency = () => {
   /**
    * Convert a canonical ZMW amount to a chargeable figure in the given
    * currency (for payment rails). Always pair amount+currency together.
+   * CHARGE path: fail-closed — throws FxRateUnavailableError when no
+   * fresh live server rate is available, so a rail is never priced off
+   * fallback/display rates.
    */
   const convertForCharge = useCallback((amountZmw: number, code?: string) => {
     const curr = (code || currency).toUpperCase();
-    return { amount: roundForCurrency(fromZmw(Number(amountZmw) || 0, curr), curr), currency: curr };
+    return { amount: roundForCurrency(fromZmwForCharge(Number(amountZmw) || 0, curr), curr), currency: curr };
   }, [currency]);
 
-  /** Convert a foreign-currency input back to canonical ZMW. */
+  /** Convert a foreign-currency input back to canonical ZMW (display path). */
   const toZmw = useCallback((amount: number, fromCode?: string) => {
     return toZmwRaw(Number(amount) || 0, fromCode || currency);
+  }, [currency]);
+
+  /**
+   * Convert a foreign-currency input back to canonical ZMW for a CHARGE
+   * (payment rail). Fail-closed like convertForCharge: throws
+   * FxRateUnavailableError when no fresh live server rate is available.
+   */
+  const toZmwForCharge = useCallback((amount: number, fromCode?: string) => {
+    return toZmwForChargeRaw(Number(amount) || 0, fromCode || currency);
   }, [currency]);
 
   return {
@@ -111,6 +125,7 @@ export const useCurrency = () => {
     getSymbol,
     convertForCharge,
     toZmw,
+    toZmwForCharge,
     loading,
     ratesLive,
     ratesUpdatedAt: ratesAt,

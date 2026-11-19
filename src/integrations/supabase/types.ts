@@ -7878,6 +7878,39 @@ export type Database = {
           },
         ]
       }
+      exchange_rates: {
+        Row: {
+          created_at: string
+          from_currency: string
+          id: string
+          rate: number
+          source: string
+          to_currency: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          created_at?: string
+          from_currency: string
+          id?: string
+          rate: number
+          source: string
+          to_currency: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          created_at?: string
+          from_currency?: string
+          id?: string
+          rate?: number
+          source?: string
+          to_currency?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
       expense_categories: {
         Row: {
           category_code: string

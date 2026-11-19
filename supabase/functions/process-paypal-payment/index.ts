@@ -192,6 +192,44 @@ serve(async (req: Request) => {
       );
     }
 
+    // Gateway conversion rate comes from the server-side exchange_rates
+    // table (refreshed every 10 minutes by the fetch-exchange-rates edge
+    // function) — never a static constant or a client-supplied figure.
+    // PayPal does not support ZMW, so ZMW amounts convert to USD for the
+    // gateway only; the canonical amount stays in ZMW in our ledger. If
+    // no valid rate row exists we refuse BEFORE creating any record:
+    // charging at a guessed rate would misprice the payment.
+    const isZMW = (currency || '').toUpperCase() === 'ZMW';
+    const paypalCurrency = isZMW ? 'USD' : (currency || 'ZMW');
+    let fxRateZmwToUsd: number | null = null;
+    let fxRateSource: string | null = null;
+    if (isZMW) {
+      const nowIso = new Date().toISOString();
+      const { data: fxRow, error: fxError } = await supabaseClient
+        .from('exchange_rates')
+        .select('rate, source')
+        .eq('from_currency', 'ZMW')
+        .eq('to_currency', 'USD')
+        .lte('valid_from', nowIso)
+        .gte('valid_until', nowIso)
+        .order('valid_from', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (fxError || !fxRow || !(Number(fxRow.rate) > 0)) {
+        console.error('No valid server FX rate for ZMW->USD; refusing PayPal payment.', fxError);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Payment provider unavailable',
+            message: 'Live exchange rates are unavailable right now. Please try again in a moment.'
+          }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      fxRateZmwToUsd = Number(fxRow.rate);
+      fxRateSource = String((fxRow as { source?: unknown }).source || 'exchange_rates');
+    }
+
     // Create payment record in our database.
     // NOTE: payments.service_id is a UUID in our schema, but wallet top-ups send serviceId like "wallet_topup".
     // We store non-UUID service identifiers in metadata and set service_id to null.
@@ -238,15 +276,10 @@ serve(async (req: Request) => {
 
       const tokenData: PayPalAccessTokenResponse = await tokenResponse.json();
 
-      // Create PayPal order
-      // PayPal does not support ZMW, so convert to USD for the gateway only.
-      // The canonical amount stays in ZMW in our ledger; conversion details are
-      // stored in metadata for finance reconciliation.
-      // TODO: replace the static fallback rate with a live FX lookup when available.
-      const isZMW = (currency || '').toUpperCase() === 'ZMW';
-      const paypalCurrency = isZMW ? 'USD' : (currency || 'ZMW');
-      const ZMW_TO_USD_FALLBACK = 0.037;
-      const paypalValue = isZMW ? Math.max(1, Math.round(amount * ZMW_TO_USD_FALLBACK * 100) / 100) : amount;
+      // Create PayPal order. The ZMW -> USD gateway conversion uses the
+      // server-side rate resolved above (fxRateZmwToUsd); conversion
+      // details are stored in metadata for finance reconciliation.
+      const paypalValue = isZMW ? Math.max(1, Math.round(amount * (fxRateZmwToUsd as number) * 100) / 100) : amount;
 
       const orderPayload = {
         intent: 'CAPTURE',
@@ -307,8 +340,9 @@ serve(async (req: Request) => {
               ? {
                   gateway_currency: paypalCurrency,
                   gateway_amount: paypalValue,
-                  fx_rate_zmw_to_usd: ZMW_TO_USD_FALLBACK,
-                  fx_note: 'Static fallback rate — reconcile against bank rate',
+                  fx_rate_zmw_to_usd: fxRateZmwToUsd,
+                  fx_source: fxRateSource,
+                  fx_note: 'Server-side live rate from exchange_rates',
                 }
               : {}),
           }

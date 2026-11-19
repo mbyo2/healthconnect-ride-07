@@ -82,6 +82,11 @@ verify_jwt = false
 [functions.doc-chat]
 verify_jwt = true
 
+# FX refresh: invoked by pg_cron via pg_net with the service-role key
+# as bearer; the function additionally verifies the bearer itself.
+[functions.fetch-exchange-rates]
+verify_jwt = true
+
 [functions.fhir-api]
 verify_jwt = true
 

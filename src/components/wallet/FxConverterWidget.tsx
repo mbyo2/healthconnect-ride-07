@@ -33,7 +33,11 @@ function timeAgo(ts: number): string {
 /**
  * Live FX panel: real-time foreign → ZMW rates plus a "what you'll
  * receive" converter. Settlement is always ZMW; this shows the math
- * before money moves. Rates: open.er-api.com (free, no key).
+ * before money moves. Rates are server-side reference data from
+ * public.exchange_rates (refreshed every 10 minutes by the
+ * fetch-exchange-rates edge function) via the exchangeRates service.
+ * This widget is display-only; charge paths use the fail-closed
+ * converters, never the figures shown here.
  */
 export function FxConverterWidget() {
   const [tick, setTick] = useState(0);
