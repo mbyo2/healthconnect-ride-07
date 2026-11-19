@@ -210,7 +210,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
 
       {activeTab === "orders" && (
         <div className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {["all", ...ORDER_STATUSES].map((s) => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 className={`px-3 py-1 rounded-full text-xs font-bold ${statusFilter === s ? "bg-primary-500 text-white" : "bg-muted text-muted-foreground"}`}>

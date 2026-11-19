@@ -81,13 +81,13 @@ export const PublicQueueDisplay: React.FC = () => {
   return (
     <div className="min-h-screen bg-canvas text-foreground font-sans p-6 sm:p-10 flex flex-col justify-between select-none">
       {/* Top TV Header */}
-      <div className="flex items-center justify-between border-b border-border pb-6">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-2xl">
+      <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="h-14 w-14 shrink-0 rounded-2xl bg-primary-500 flex items-center justify-center font-bold text-2xl">
             <Building2 className="h-8 w-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3 sm:text-3xl">
               DOC' O CLOCK HEALTHCARE NETWORK
               <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
             </h1>
@@ -97,8 +97,8 @@ export const PublicQueueDisplay: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-right">
-          <div className="text-3xl font-bold tabular-nums tracking-wider">
+        <div className="text-left sm:text-right">
+          <div className="text-2xl font-bold tabular-nums tracking-wider sm:text-3xl">
             {currentTime}
           </div>
           <div className="text-xs font-semibold text-muted-foreground mt-0.5">

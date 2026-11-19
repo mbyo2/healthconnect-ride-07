@@ -65,7 +65,7 @@ export function DayStripPicker({
   }, [days]);
 
   return (
-    <div>
+    <div className="min-w-0">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-bold text-foreground" aria-live="polite">
           {format(days[0], "MMMM yyyy")}

@@ -14,7 +14,12 @@ const TabsList = React.forwardRef<
     className={cn(
       // PayPal anatomy (rollout 2026-11-11): segmented pale-pill track —
       // full-pill container on the pale pill surface, no shadow.
-      "inline-flex h-11 items-center justify-center gap-1 rounded-full bg-pill p-1 text-pill-foreground",
+      // Responsive (2026-11-19): the pill track must never exceed its
+      // container — on phones a many-tab list is wider than the screen,
+      // and without a cap + scroll the trailing tabs were clipped by the
+      // app shell and unreachable. Cap at container width and let the
+      // track scroll horizontally (scrollbar hidden, pill look kept).
+      "inline-flex h-11 max-w-full items-center justify-start gap-1 overflow-x-auto rounded-full bg-pill p-1 text-pill-foreground scrollbar-hide",
       className
     )}
     {...props}

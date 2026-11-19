@@ -531,7 +531,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen, initial
         </div>
 
         {/* Mobile day strip (phones): large swipeable day cells */}
-        <div className="sm:hidden">
+        <div className="min-w-0 sm:hidden">
           <DayStripPicker
             selectedDate={selectedDate}
             onSelect={setSelectedDate}

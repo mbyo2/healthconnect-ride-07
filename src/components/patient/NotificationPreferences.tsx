@@ -149,7 +149,7 @@ export default function NotificationPreferences() {
             field="appointment_reminders"
           />
           {form.appointment_reminders && (
-            <div className="flex items-center gap-3 py-2 pl-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 py-2 pl-1">
               <label className="text-xs text-muted-foreground">Remind me</label>
               <Input
                 type="number"

@@ -255,9 +255,9 @@ const MapPage = () => {
         )}
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-2 gap-4">
           {/* Provider List */}
-          <div className="order-2 lg:order-1">
+          <div className="order-2 lg:order-1 min-w-0">
             <MobileOptimizedCard
               title="Healthcare Providers"
               description={`${filteredProviders.length} providers found`}
@@ -271,7 +271,7 @@ const MapPage = () => {
           </div>
 
           {/* Map */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2 min-w-0">
             <MobileOptimizedCard
               title="Map View"
               className="h-[400px] sm:h-[500px] lg:h-[600px]"
