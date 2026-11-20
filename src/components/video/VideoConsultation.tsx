@@ -45,6 +45,42 @@ export const VideoConsultation = () => {
     }
   }, [isTV, activeConsultation]);
 
+  // The room is private: the function creates/reuses it AND mints a
+  // meeting token for THIS participant. Both are needed on every
+  // join — entering on meeting_url alone is refused by Daily.
+  const invokeRoom = useCallback((consultation: VideoConsultationDetails) =>
+    supabase.functions.invoke('create-daily-room', {
+      body: {
+        consultation_id: consultation.id,
+        optimize_for_network: connectionQuality === "poor",
+        tv_mode: isTV,
+        enable_recording: true // Server honours this for the provider only
+      }
+    }).then(({ data, error }) => {
+      if (error) throw error;
+      if (!data?.url || !data?.token) {
+        throw new Error("The video room could not be set up.");
+      }
+      return data;
+    }), [connectionQuality, isTV]);
+
+  // Join latency (Zoom-parity pass): warm the room + token up ahead of
+  // the click — the list fires this for consultations inside their
+  // window and on Join intent (pointer down), so the actual click is
+  // usually instant. One in-flight promise per consultation; a failed
+  // prefetch is dropped so the click path invokes fresh (once, with
+  // the manual-retry error UI — never a retry loop).
+  const prefetchRef = useRef(new Map<string, Promise<any>>());
+  const prefetchJoin = useCallback((consultation: VideoConsultationDetails) => {
+    if (!isOnline) return;
+    if (prefetchRef.current.has(consultation.id)) return;
+    const p = invokeRoom(consultation);
+    p.catch(() => {
+      prefetchRef.current.delete(consultation.id);
+    });
+    prefetchRef.current.set(consultation.id, p);
+  }, [invokeRoom, isOnline]);
+
   const handleJoinMeeting = useCallback(async (consultation: VideoConsultationDetails) => {
     // Check for network status before joining
     if (!isOnline) {
@@ -64,25 +100,21 @@ export const VideoConsultation = () => {
     const loadingToast = toast.loading("Setting up your video room...");
 
     try {
-      // The room is private: the function creates/reuses it AND mints a
-      // meeting token for THIS participant. Both are needed on every
-      // join — entering on meeting_url alone is refused by Daily.
-      const { data, error } = await supabase.functions.invoke('create-daily-room', {
-        body: {
-          consultation_id: consultation.id,
-          optimize_for_network: connectionQuality === "poor",
-          tv_mode: isTV,
-          enable_recording: true // Server honours this for the provider only
+      let data: any = null;
+      const cached = prefetchRef.current.get(consultation.id);
+      if (cached) {
+        try {
+          data = await cached;
+        } catch {
+          data = null; // prefetch failed — fall through to a fresh invoke
         }
-      });
+      }
+      if (!data) {
+        data = await invokeRoom(consultation);
+      }
 
       toast.dismiss(loadingToast);
       setIsLoading(false);
-
-      if (error) throw error;
-      if (!data?.url || !data?.token) {
-        throw new Error("The video room could not be set up.");
-      }
 
       setMeetingToken(data.token as string);
       setActiveConsultation({
@@ -99,7 +131,7 @@ export const VideoConsultation = () => {
         message: "We couldn't set up the video room just now. Your visit is still booked — please try again.",
       });
     }
-  }, [isOnline, connectionQuality, isTV, handleError]);
+  }, [isOnline, connectionQuality, invokeRoom, handleError]);
 
   const handleLeaveCall = useCallback(() => {
     setActiveConsultation(null);
@@ -204,6 +236,16 @@ export const VideoConsultation = () => {
   );
 
   const isProvider = !!user && !!activeConsultation && activeConsultation.provider_id === user.id;
+
+  // Plain display name of the other party (no title prefix — Doc'O
+  // Clock covers 27 provider professions). Used by the waiting state
+  // and the visit info panel.
+  const peerName = (() => {
+    if (!activeConsultation) return undefined;
+    const other: any = isProvider ? (activeConsultation as any).patient : activeConsultation.provider;
+    const n = `${other?.first_name ?? ''} ${other?.last_name ?? ''}`.trim();
+    return n || undefined;
+  })();
 
   return (
     <div className={cn(
@@ -320,10 +362,11 @@ export const VideoConsultation = () => {
           onLeave={handleLeaveCall}
           consultationId={activeConsultation.id}
           isProvider={isProvider}
+          peerName={peerName}
           onEndMeeting={handleEndMeeting}
         />
       ) : !isLoading && (
-        <ConsultationList onJoinMeeting={handleJoinMeeting} />
+        <ConsultationList onJoinMeeting={handleJoinMeeting} onPrefetch={prefetchJoin} />
       )}
     </div>
   );

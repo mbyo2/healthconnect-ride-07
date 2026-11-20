@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Video, Phone } from "lucide-react";
+import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Sparkles, Tv, Video, Phone } from "lucide-react";
+import { QualityMode } from "@/lib/videoQuality";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +17,15 @@ interface VideoControlsProps {
   isScreenSharing: boolean;
   isRecording?: boolean;
   isAudioOnly?: boolean;
-  currentQuality?: "high" | "medium" | "low";
+  isBlurred?: boolean;
+  currentQuality?: QualityMode;
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
   onToggleRecording?: () => void;
   onToggleAudioOnly?: () => void;
-  onQualityChange?: (quality: "high" | "medium" | "low") => void;
+  onToggleBlur?: () => void;
+  onQualityChange?: (quality: QualityMode) => void;
 }
 
 export const VideoControls = ({
@@ -31,12 +34,14 @@ export const VideoControls = ({
   isScreenSharing,
   isRecording = false,
   isAudioOnly = false,
-  currentQuality = "high",
+  isBlurred = false,
+  currentQuality = "auto",
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
   onToggleRecording,
   onToggleAudioOnly,
+  onToggleBlur,
   onQualityChange,
 }: VideoControlsProps) => {
   const isTV = useIsTVDevice();
@@ -136,11 +141,27 @@ export const VideoControls = ({
         </Button>
       )}
 
+      {onToggleBlur && (
+        <Button
+          variant={isBlurred ? "default" : "secondary"}
+          size={isTV ? "lg" : isMobile ? "default" : "icon"}
+          onClick={onToggleBlur}
+          title={isBlurred ? "Turn background blur off" : "Blur my background"}
+          aria-label={isBlurred ? "Turn background blur off" : "Blur my background"}
+          aria-pressed={isBlurred}
+          className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
+          data-dpad-focusable={isTV ? "true" : undefined}
+        >
+          <Sparkles className={isTV ? "h-6 w-6 mr-2" : "h-5 w-5"} />
+          {(isTV || isMobile) && (isBlurred ? "Blur Off" : "Blur")}
+        </Button>
+      )}
+
       {onQualityChange && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size={isTV ? "lg" : isMobile ? "default" : "icon"}
               title="Video quality settings"
               className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
@@ -151,21 +172,28 @@ export const VideoControls = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className={`${isTV ? "p-2 min-w-52 text-lg" : ""} ${isMobile ? "min-w-48" : ""} z-50 bg-popover border shadow-md`}>
-            <DropdownMenuItem 
+            <DropdownMenuItem
+              onClick={() => onQualityChange("auto")}
+              className={`${currentQuality === "auto" ? "bg-accent" : ""} ${isTV ? "p-4 text-lg" : ""} ${isMobile ? "p-3 text-base" : ""}`}
+              data-dpad-focusable={isTV ? "true" : undefined}
+            >
+              Auto (Recommended) — follows your connection
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={() => onQualityChange("high")}
               className={`${currentQuality === "high" ? "bg-accent" : ""} ${isTV ? "p-4 text-lg" : ""} ${isMobile ? "p-3 text-base" : ""}`}
               data-dpad-focusable={isTV ? "true" : undefined}
             >
               High Quality (Best)
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onQualityChange("medium")}
               className={`${currentQuality === "medium" ? "bg-accent" : ""} ${isTV ? "p-4 text-lg" : ""} ${isMobile ? "p-3 text-base" : ""}`}
               data-dpad-focusable={isTV ? "true" : undefined}
             >
               Medium Quality (Balanced)
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onQualityChange("low")}
               className={`${currentQuality === "low" ? "bg-accent" : ""} ${isTV ? "p-4 text-lg" : ""} ${isMobile ? "p-3 text-base" : ""}`}
               data-dpad-focusable={isTV ? "true" : undefined}

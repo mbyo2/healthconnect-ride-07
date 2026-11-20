@@ -17,7 +17,7 @@ import { useAuth } from "@/context/AuthContext";
  *  ('scheduled','active','completed','cancelled'). */
 const JOINABLE_STATUSES = ["scheduled", "active"];
 
-export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
+export const ConsultationList = ({ onJoinMeeting, onPrefetch }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -114,6 +114,26 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const consultations = data?.consultations || [];
   const userId = data?.userId;
 
+  // Join latency (Zoom-parity pass): as soon as the list is on screen,
+  // warm up the Daily room + token for any visit whose window is open
+  // (from 10 minutes before start until the scheduled end) so pressing
+  // Join enters almost instantly. Room creation is idempotent — the
+  // room name is derived from the consultation id — so this never
+  // creates stray rooms.
+  useEffect(() => {
+    if (!onPrefetch || !consultations.length) return;
+    const now = Date.now();
+    for (const c of consultations as any[]) {
+      if (!JOINABLE_STATUSES.includes(c.status)) continue;
+      const start = new Date(c.scheduled_start).getTime();
+      const end = new Date(c.scheduled_end).getTime();
+      if (now >= start - 10 * 60 * 1000 && now <= end) {
+        onPrefetch(c as VideoConsultationDetails);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, onPrefetch]);
+
   return (
     <div className="grid gap-4">
 
@@ -154,11 +174,17 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
                 <p className={`text-sm capitalize ${isMobile ? 'mt-1' : 'mt-1'}`}>
                   Status: <span className={`font-medium ${consultation.status === 'in-progress' || consultation.status === 'active' ? 'text-green-600 dark:text-green-400' : ''}`}>{String(consultation.status || '').replace(/-/g, ' ')}</span>
                 </p>
+                {consultation.status === 'active' && (
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                    Visit in progress — join to enter the room
+                  </p>
+                )}
               </div>
 
               {canJoin && (
                 <Button
                   onClick={() => onJoinMeeting && onJoinMeeting(consultation as VideoConsultationDetails)}
+                  onPointerDown={() => onPrefetch && onPrefetch(consultation as VideoConsultationDetails)}
                   className={`gap-2 ${isMobile ? 'w-full mt-2' : ''}`}
                   size={isMobile ? "lg" : "default"}
                 >

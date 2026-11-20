@@ -55,7 +55,10 @@ describe("create-daily-room — join path", () => {
 
   it("mints a per-participant meeting token on every join and returns it", () => {
     expect(createRoomFn).toContain("api.daily.co/v1/meeting-tokens");
-    expect(createRoomFn).toContain("token: tokenData.token");
+    // v4 mints inside a helper (returns tokenData.token) and returns
+    // the minted value as `token` in the response payload.
+    expect(createRoomFn).toContain("return tokenData.token as string");
+    expect(createRoomFn).toContain("token: meetingToken");
   });
 
   it("refuses to open a visit that has already ended", () => {

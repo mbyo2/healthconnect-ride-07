@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { VideoRoom } from '@/components/video/VideoRoom';
 import { PreVisitChecklist } from '@/components/video/PreVisitChecklist';
@@ -211,6 +211,27 @@ const VideoCall = () => {
     };
   }, [user, roomId, searchParams]);
 
+  // Join latency (Zoom-parity pass): while the pre-visit checklist is
+  // on screen, pre-mint the room + token in the background. Room
+  // creation is idempotent (deterministic name from the consultation
+  // id), so a prefetch never creates stray rooms. A failed prefetch is
+  // forgotten — startCall then invokes fresh, once.
+  const roomPromiseRef = useRef<Promise<any> | null>(null);
+  useEffect(() => {
+    if (!consultationId) return;
+    if (roomPromiseRef.current) return;
+    const p = supabase.functions
+      .invoke('create-daily-room', { body: { consultation_id: consultationId } })
+      .then(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      });
+    p.catch(() => {
+      if (roomPromiseRef.current === p) roomPromiseRef.current = null;
+    });
+    roomPromiseRef.current = p;
+  }, [consultationId]);
+
   // Step 2 — mint the Daily room and join, after the pre-visit checklist.
   const startCall = useCallback(async () => {
     if (!consultation || !consultationId || meetingUrl || startingCall) return;
@@ -223,12 +244,24 @@ const VideoCall = () => {
       // is refused by Daily. The function also flips the visit
       // scheduled → active server-side (clients have no UPDATE policy
       // on video_consultations, so the old client-side status update
-      // here silently changed nothing).
+      // here silently changed nothing). If the prefetch already
+      // resolved, this is instant.
       toast.loading('Setting up your secure video room…');
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
-        body: { consultation_id: consultationId },
-      });
-      if (fnError) throw fnError;
+      let fnData: any = null;
+      if (roomPromiseRef.current) {
+        try {
+          fnData = await roomPromiseRef.current;
+        } catch {
+          fnData = null; // prefetch failed — fall through to a fresh invoke
+        }
+      }
+      if (!fnData) {
+        const { data, error: fnError } = await supabase.functions.invoke('create-daily-room', {
+          body: { consultation_id: consultationId },
+        });
+        if (fnError) throw fnError;
+        fnData = data;
+      }
       const url = (fnData as any)?.url;
       const token = (fnData as any)?.token;
       if (!url || !token) throw new Error('Video service did not return a room URL.');
@@ -388,6 +421,7 @@ const VideoCall = () => {
           consultationId={consultationId || undefined}
           isProvider={isConsultationProvider}
           onEndMeeting={handleEndMeeting}
+          peerName={isConsultationProvider ? undefined : providerName}
         />
       )}
     </ProtectedRoute>

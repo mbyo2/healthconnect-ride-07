@@ -40,6 +40,30 @@ function json(body: unknown, status: number) {
 // recreated, a fresh token is minted on every join, and room creation
 // degrades in steps (full → no recording → minimal) so no optional
 // feature can ever block the visit itself again.
+//
+// Zoom-parity pass (2026-11-20, later the same day): the room now also
+// carries Daily's quality + Prebuilt feature properties. EVERY property
+// below was probed against the live Daily API on this domain before it
+// shipped (one property per room, then the full set together, read back
+// from Daily's own room config — all accepted, HTTP 200):
+//   geo "af-south-1"        — pin the call servers to Cape Town, the
+//                             Daily region closest to Zambia, instead of
+//                             wherever the first joiner happens to be.
+//   enable_adaptive_simulcast / enable_multiparty_adaptive_simulcast
+//                           — quality follows the network in both
+//                             directions instead of freezing/dropping.
+//   enable_hand_raising, enable_emoji_reactions, enable_people_ui,
+//   enable_pip_ui, enable_noise_cancellation_ui (in-call noise
+//   cancellation toggle), enable_video_processing_ui (background
+//   blur / virtual background), enable_cpu_warning_notifications.
+// In-call chat intentionally does NOT use Daily's Prebuilt chat
+// (enable_chat stays false): chat lives in the app shell, carried over
+// Daily app-messages, so it gets an unread badge and never covers the
+// video on phones. Knocking is deliberately NOT enabled: Daily's
+// knock-to-join only gates TOKENLESS guests, and every participant here
+// joins with a minted token — the waiting room is implemented in the
+// client with Supabase presence instead (patient waits until the
+// provider is actually present).
 // ---------------------------------------------------------------------------
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -114,6 +138,15 @@ serve(async (req) => {
 
     const roomName = `consultation-${consultation_id}`;
 
+    // The caller's display name rides on the meeting token so every
+    // participant sees real names in the call. Fetched in parallel with
+    // the room lookup — neither waits on the other (join latency).
+    const profilePromise = supabaseClient
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("id", user.id)
+      .maybeSingle();
+
     // Reuse the room if it already exists at Daily (second participant,
     // rejoin after a drop, provider joining after the patient opened it).
     let room: { name: string; url: string } | null = null;
@@ -134,17 +167,49 @@ serve(async (req) => {
       const buildRoomBody = (withRecording: boolean) => {
         const properties: Record<string, unknown> = {
           exp,
+          // Quality + smoothness (probe-verified, see header).
+          geo: "af-south-1",
+          enable_adaptive_simulcast: true,
+          enable_multiparty_adaptive_simulcast: true,
+          max_participants: 4,
+          // Zoom-like in-call features, rendered by Daily Prebuilt.
           enable_screenshare: true,
-          enable_chat: true,
           enable_prejoin_ui: true,
+          enable_network_ui: true,
+          enable_people_ui: true,
+          enable_pip_ui: true,
+          enable_emoji_reactions: true,
+          enable_hand_raising: true,
+          enable_noise_cancellation_ui: true,
+          enable_video_processing_ui: true,
+          enable_cpu_warning_notifications: true,
+          // Chat lives in the app shell (Daily app-messages), not in
+          // Prebuilt — see header.
+          enable_chat: false,
           start_video_off: false,
           start_audio_off: false,
           eject_at_room_exp: true,
-          enable_network_ui: true,
+          lang: "en",
         };
-        if (optimize_for_network) {
-          properties.max_participants = 4;
+        if (withRecording) {
+          properties.enable_recording = "cloud";
         }
+        return { name: roomName, privacy: "private", properties };
+      };
+      // One step down: the long-standing core set, in case a newer
+      // feature property is ever refused on this domain.
+      const buildCoreRoomBody = (withRecording: boolean) => {
+        const properties: Record<string, unknown> = {
+          exp,
+          enable_screenshare: true,
+          enable_chat: false,
+          enable_prejoin_ui: true,
+          enable_network_ui: true,
+          start_video_off: false,
+          start_audio_off: false,
+          eject_at_room_exp: true,
+          max_participants: 4,
+        };
         if (withRecording) {
           properties.enable_recording = "cloud";
         }
@@ -156,17 +221,18 @@ serve(async (req) => {
         properties: {
           exp,
           enable_screenshare: true,
-          enable_chat: true,
+          enable_chat: false,
           enable_prejoin_ui: true,
           eject_at_room_exp: true,
         },
       });
 
       // Degrade in steps so no optional feature can block the visit:
-      // full set → without recording → minimal set.
+      // full set → without recording → core set → minimal set.
       const attempts: { body: unknown; recording: boolean }[] = [
         { body: buildRoomBody(wantRecording), recording: wantRecording },
         ...(wantRecording ? [{ body: buildRoomBody(false), recording: false }] : []),
+        { body: buildCoreRoomBody(false), recording: false },
         { body: buildMinimalRoomBody(), recording: false },
       ];
       let created = false;
@@ -213,41 +279,60 @@ serve(async (req) => {
     if (consultation.status === "scheduled") {
       patch.status = "active";
     }
-    const { error: updateError } = await supabaseClient
-      .from("video_consultations")
-      .update(patch)
-      .eq("id", consultation_id);
 
-    if (updateError) {
-      console.error("Failed to update consultation:", updateError);
-      return json({ error: "We couldn't set up the video room. Please try again in a moment." }, 500);
-    }
+    const { data: profile } = await profilePromise;
+    const displayName =
+      [profile?.first_name, profile?.last_name]
+        .filter((part) => typeof part === "string" && part.trim().length > 0)
+        .join(" ")
+        .trim() || undefined;
 
     // A meeting token is REQUIRED to enter a private room, and it is
     // per-participant — mint a fresh one for this caller on every join.
-    const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
-      method: "POST",
-      headers: dailyHeaders,
-      body: JSON.stringify({
-        properties: {
-          room_name: room.name,
-          user_id: user.id,
-          is_owner: isProvider,
-          exp: Math.floor(Date.now() / 1000) + 86400,
-        },
-      }),
-    });
+    // The mint and the consultation write are independent: run them
+    // together so a join costs one round trip, not two.
+    const mintToken = async () => {
+      const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
+        method: "POST",
+        headers: dailyHeaders,
+        body: JSON.stringify({
+          properties: {
+            room_name: room.name,
+            user_id: user.id,
+            ...(displayName ? { user_name: displayName } : {}),
+            is_owner: isProvider,
+            exp: Math.floor(Date.now() / 1000) + 86400,
+          },
+        }),
+      });
+      if (!tokenResponse.ok) {
+        console.error("Daily meeting-token error:", await tokenResponse.text());
+        return null;
+      }
+      const tokenData = await tokenResponse.json();
+      return tokenData.token as string;
+    };
 
-    if (!tokenResponse.ok) {
-      console.error("Daily meeting-token error:", await tokenResponse.text());
+    const [meetingToken, updateResult] = await Promise.all([
+      mintToken(),
+      supabaseClient
+        .from("video_consultations")
+        .update(patch)
+        .eq("id", consultation_id),
+    ]);
+
+    if (updateResult.error) {
+      console.error("Failed to update consultation:", updateResult.error);
       return json({ error: "We couldn't set up the video room. Please try again in a moment." }, 500);
     }
-    const tokenData = await tokenResponse.json();
+    if (!meetingToken) {
+      return json({ error: "We couldn't set up the video room. Please try again in a moment." }, 500);
+    }
 
     return json(
       {
         url: room.url,
-        token: tokenData.token,
+        token: meetingToken,
         recording_enabled: recordingEnabled,
         status: consultation.status === "scheduled" ? "active" : consultation.status,
       },

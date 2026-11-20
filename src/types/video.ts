@@ -10,6 +10,9 @@ export interface VideoRoomProps {
   consultationId?: string;
   /** True when the local user is the consultation's provider (host). */
   isProvider?: boolean;
+  /** Display name of the other participant — used by the waiting
+   *  state ("Waiting for … to start the visit") and the info panel. */
+  peerName?: string;
   /** Provider-only: end the meeting for everyone (server-side). */
   onEndMeeting?: () => Promise<void> | void;
   /** Fired when the meeting was ended by the other side (realtime). */
@@ -42,4 +45,7 @@ export interface ConsultationListProps {
   loading?: boolean;
   onSelectConsultation?: (consultation: VideoConsultationDetails) => void;
   onJoinMeeting?: (consultation: VideoConsultationDetails) => void;
+  /** Warm up the Daily room + token ahead of the click (join latency):
+   *  fired for consultations inside their window and on Join intent. */
+  onPrefetch?: (consultation: VideoConsultationDetails) => void;
 }
