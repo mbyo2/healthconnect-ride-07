@@ -1,14 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import DailyIframe from '@daily-co/daily-js';
 import { VideoControls } from "./VideoControls";
 import { VideoRoomProps } from "@/types/video";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, Clock, Users, Link2, PhoneOff } from "lucide-react";
 import { toast } from "sonner";
+import { formatCallDuration } from "@/lib/voiceCallState";
 
-export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", meetingToken, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", meetingToken, onLeave, consultationId, isProvider = false, onEndMeeting }: VideoRoomProps) {
   const [callFrame, setCallFrame] = useState<any>(null);
   const [participants, setParticipants] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState(false);
@@ -21,6 +22,11 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   const [isAudioOnly, setIsAudioOnly] = useState(false);
   const [joinAttempt, setJoinAttempt] = useState(0);
   const [startAudioOnly, setStartAudioOnly] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [showParticipants, setShowParticipants] = useState(false);
+  const [endArmed, setEndArmed] = useState(false);
+  const [isEnding, setIsEnding] = useState(false);
+  const joinedAtRef = useRef<number | null>(null);
   
   // Use roomId if passed, otherwise use roomUrl
   const actualRoomUrl = roomId || roomUrl;
@@ -30,6 +36,9 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   
   const handleJoinedMeeting = useCallback(() => {
     setHasJoined(true);
+    if (joinedAtRef.current === null) {
+      joinedAtRef.current = Date.now();
+    }
     toast.success("You've joined your visit");
     // If the user chose "audio-only instead" from the error screen, apply it now.
     if (startAudioOnly) {
@@ -46,9 +55,11 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
   }, [startAudioOnly, callFrame]);
   
   const handleError = useCallback((e: any) => {
+    // Never surface Daily's raw error text to patients (standing
+    // error-presentation rule) — plain language in the app's own UI.
     console.error("Daily.co error:", e);
-    setError(`Error: ${e.errorMsg || "Unknown error"}`);
-    toast.error(`Video call error: ${e.errorMsg || "Unknown error"}`);
+    setError("The video call hit a problem.");
+    toast.error("The video call hit a problem. You can try rejoining.");
   }, []);
   
   const handleParticipantsChange = useCallback((e: any) => {
@@ -82,13 +93,16 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
         // Pass meeting token for private rooms (required by Daily.co)
         ...(meetingToken ? { token: meetingToken } : {}),
         iframeStyle: {
-          position: 'fixed',
-          top: isMobile ? '60px' : '0',
+          // Bounded to the video container — the old style was a
+          // position:fixed full-viewport iframe (zIndex 20) that painted
+          // OVER the app's own control bar, leaving our Leave/End and
+          // call controls unreachable underneath it.
+          position: 'absolute',
+          top: '0',
           left: '0',
           width: '100%',
-          height: isMobile ? 'calc(100% - 140px)' : '100%',
-          border: 'none',
-          zIndex: '20' // Using string to match DailyFactoryOptions type
+          height: '100%',
+          border: 'none'
         }
       };
       
@@ -101,6 +115,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
         daily.on("joined-meeting", handleJoinedMeeting);
         daily.on("error", handleError);
         daily.on("participant-joined", handleParticipantsChange);
+        daily.on("participant-updated", handleParticipantsChange);
         daily.on("participant-left", handleParticipantsChange);
         daily.on("network-quality-change", handleNetworkQualityChange);
         daily.on("network-connection", handleNetworkConnection);
@@ -254,8 +269,104 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
     }
   };
 
+  // Call-duration timer, ticking from the moment we actually joined.
+  useEffect(() => {
+    if (!hasJoined) return;
+    const t = setInterval(() => {
+      if (joinedAtRef.current !== null) {
+        setElapsedSeconds((Date.now() - joinedAtRef.current) / 1000);
+      }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [hasJoined]);
+
+  const handleCopyJoinLink = useCallback(async () => {
+    if (!consultationId) return;
+    const link = `${window.location.origin}/video-consultations?join=${consultationId}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Join link copied — share it with the other participant.");
+    } catch {
+      toast.error("Could not copy the link. Please copy it from the address bar instead.");
+    }
+  }, [consultationId]);
+
+  // End-for-everyone is destructive, so it arms on first click and
+  // only fires on the confirming second click.
+  const handleEndMeetingClick = useCallback(async () => {
+    if (!onEndMeeting) return;
+    if (!endArmed) {
+      setEndArmed(true);
+      setTimeout(() => setEndArmed(false), 4000);
+      return;
+    }
+    setIsEnding(true);
+    try {
+      await onEndMeeting();
+    } finally {
+      setIsEnding(false);
+      setEndArmed(false);
+    }
+  }, [onEndMeeting, endArmed]);
+
   return (
-    <div className="relative h-full w-full">
+    <div className="relative flex h-full w-full flex-col">
+      {hasJoined && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground">
+            <Clock className="h-4 w-4" />
+            {formatCallDuration(elapsedSeconds)}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-[36px]"
+            onClick={() => setShowParticipants((v) => !v)}
+            aria-expanded={showParticipants}
+          >
+            <Users className="mr-1.5 h-4 w-4" />
+            {participants.length} in call
+          </Button>
+          {consultationId && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="min-h-[36px]"
+              onClick={handleCopyJoinLink}
+            >
+              <Link2 className="mr-1.5 h-4 w-4" />
+              Copy join link
+            </Button>
+          )}
+          {isRecording && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-600">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+              Recording
+            </span>
+          )}
+        </div>
+      )}
+
+      {hasJoined && showParticipants && (
+        <div className="mb-3 rounded-xl border border-border bg-card p-3">
+          <p className="mb-2 text-sm font-medium text-foreground">Participants</p>
+          <ul className="space-y-1.5">
+            {participants.map((p: any) => (
+              <li key={p.session_id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  {(p.user_name || "G").slice(0, 1).toUpperCase()}
+                </span>
+                <span className="text-foreground">{p.user_name || "Guest"}</span>
+                {p.local && <span className="text-xs">(You)</span>}
+                {p.owner && <span className="text-xs">· Host</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {error && (
         <div className="mb-4 rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
@@ -284,7 +395,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
         </div>
       )}
       
-      <div id="video-container" className="relative h-full min-h-[60vh] w-full bg-black/5 rounded-lg overflow-hidden">
+      <div id="video-container" className="relative h-[58vh] min-h-[360px] w-full shrink-0 overflow-hidden rounded-lg bg-black/5 md:h-[64vh]">
         {(!callFrame || !hasJoined || reconnecting) && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 z-10">
             <div className="text-center p-4 bg-background/80 backdrop-blur-sm rounded-lg shadow-lg">
@@ -299,8 +410,8 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
         )}
       </div>
       
-      <div className={`${isMobile ? 'mt-4' : 'absolute bottom-4 left-0 right-0'}`}>
-        <VideoControls 
+      <div className="mt-4">
+        <VideoControls
           isMuted={isMuted}
           isVideoOff={isVideoOff}
           isScreenSharing={isScreenSharing}
@@ -314,10 +425,10 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
           onToggleAudioOnly={handleToggleAudioOnly}
           onQualityChange={handleQualityChange}
         />
-        
-        <div className="flex justify-center mt-4">
-          <Button 
-            variant="destructive" 
+
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Button
+            variant="outline"
             onClick={handleLeaveMeeting}
             size={isMobile ? "lg" : "default"}
             className={isTV ? "px-6 py-4 text-lg" : ""}
@@ -326,7 +437,25 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
             <ArrowLeft className="mr-2 h-4 w-4" />
             Leave Visit
           </Button>
+          {isProvider && onEndMeeting && (
+            <Button
+              variant="destructive"
+              onClick={handleEndMeetingClick}
+              disabled={isEnding}
+              size={isMobile ? "lg" : "default"}
+              className={isTV ? "px-6 py-4 text-lg" : ""}
+              data-dpad-focusable={isTV ? "true" : undefined}
+            >
+              <PhoneOff className="mr-2 h-4 w-4" />
+              {isEnding ? "Ending…" : endArmed ? "Click again to end for everyone" : "End Meeting"}
+            </Button>
+          )}
         </div>
+        {isProvider && onEndMeeting && (
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Ending the meeting closes the visit for everyone and marks the consultation completed.
+          </p>
+        )}
       </div>
     </div>
   );

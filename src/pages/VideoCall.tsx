@@ -32,8 +32,10 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  *     tracked, billed and reviewable like any other visit; the link can be
  *     shared to invite the other party.
  *
- * On leave, providers close the visit (→ completed); patients simply leave
- * so they can rejoin while the visit is still live.
+ * Leaving only removes the local participant — the visit stays live
+ * and either side can rejoin. The provider additionally gets "End
+ * Meeting", which closes the visit for everyone server-side
+ * (end-video-consultation: status → completed + Daily room deleted).
  */
 const VideoCall = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -215,30 +217,24 @@ const VideoCall = () => {
     setStartingCall(true);
     setFatalError(null);
     try {
-      if (!consultation.meeting_url) {
-        toast.loading('Setting up your secure video room…');
-        const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
-          body: { consultation_id: consultationId },
-        });
-        if (fnError) throw fnError;
-        const url = (fnData as any)?.url;
-        const token = (fnData as any)?.token;
-        if (!url) throw new Error('Video service did not return a room URL.');
-        toast.dismiss();
-        setMeetingUrl(url);
-        if (token) setMeetingToken(token);
-      } else {
-        setMeetingUrl(consultation.meeting_url);
-      }
-
-      // Mark the visit live (idempotent). DB CHECK allows
-      // ('scheduled','active','completed','cancelled') — never 'in_progress'.
-      if (consultation.status === 'scheduled') {
-        await supabase
-          .from('video_consultations')
-          .update({ status: 'active' })
-          .eq('id', consultationId);
-      }
+      // Always go through the function — even when the room already
+      // exists. The room is private, so every participant needs a
+      // meeting token minted for them; entering on meeting_url alone
+      // is refused by Daily. The function also flips the visit
+      // scheduled → active server-side (clients have no UPDATE policy
+      // on video_consultations, so the old client-side status update
+      // here silently changed nothing).
+      toast.loading('Setting up your secure video room…');
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
+        body: { consultation_id: consultationId },
+      });
+      if (fnError) throw fnError;
+      const url = (fnData as any)?.url;
+      const token = (fnData as any)?.token;
+      if (!url || !token) throw new Error('Video service did not return a room URL.');
+      toast.dismiss();
+      setMeetingUrl(url);
+      setMeetingToken(token);
 
       setPreCheckDone(true);
       logAnalyticsEvent('video_call_opened', {
@@ -257,35 +253,79 @@ const VideoCall = () => {
     }
   }, [consultation, consultationId, meetingUrl, startingCall, user]);
 
-  const handleLeave = useCallback(async () => {
-    logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
-    // Only consultable clinicians close the visit on leave; patients can
-    // rejoin while live, and non-consultable staff never own a visit.
-    // Authority is user_roles (via UserRolesContext) — profiles.role is a
-    // display artefact that defaults to 'patient' and must never decide
-    // who owns a visit (P2-8); it is kept only as an OR fallback.
+  // Am I the consultation's provider (host)? Decided from the
+  // consultation row itself — the same test the server uses.
+  const isConsultationProvider = !!user && !!consultation && consultation.provider_id === user.id;
+
+  const navigateAfterCall = useCallback(() => {
+    // Patients land on the post-visit summary; providers go to the list.
+    // Role authority is user_roles (via UserRolesContext) — profiles.role
+    // is a display artefact that defaults to 'patient' and must never
+    // decide who owns a visit (P2-8); it is kept only as an OR fallback.
     const role = (profile?.role || '').toLowerCase();
-    const isProvider =
+    const isProviderRole =
       availableRoles.some((r) => (CONSULTABLE_PROVIDER_ROLES as string[]).includes(r)) ||
       (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role);
-    try {
-      if (consultationId && isProvider) {
-        await supabase
-          .from('video_consultations')
-          .update({ status: 'completed' })
-          .eq('id', consultationId)
-          .eq('status', 'active');
-      }
-    } catch (err) {
-      console.error('Failed to close consultation:', err);
-    }
-    // Patients land on the post-visit summary; providers go to the list.
-    if (consultationId && !isProvider) {
+    if (consultationId && !isProviderRole) {
       navigate(`/visit-summary/${consultationId}`, { replace: true });
     } else {
       navigate('/video-consultations', { replace: true });
     }
   }, [consultationId, profile, navigate, availableRoles]);
+
+  // Plain leave: only I exit — the visit stays live for the other side
+  // and I can rejoin. (This used to try to complete the visit from the
+  // client for providers, but clients have no UPDATE policy on
+  // video_consultations, so that write never landed. Ending for
+  // everyone is the separate server-side action below.)
+  const handleLeave = useCallback(async () => {
+    logAnalyticsEvent('video_call_left', { consultation_id: consultationId });
+    navigateAfterCall();
+  }, [consultationId, navigateAfterCall]);
+
+  // End the meeting for everyone (provider/host only; server enforces).
+  const handleEndMeeting = useCallback(async () => {
+    if (!consultationId) return;
+    const { error } = await supabase.functions.invoke('end-video-consultation', {
+      body: { consultation_id: consultationId },
+    });
+    if (error) {
+      toast.error('We couldn\'t end the meeting. Please try again in a moment.');
+      return;
+    }
+    logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
+    toast.success('Meeting ended for everyone.');
+    navigateAfterCall();
+  }, [consultationId, navigateAfterCall]);
+
+  // If the provider ends the meeting while I'm in it, leave the room
+  // and land on the same post-call screen with a clear message.
+  useEffect(() => {
+    if (!consultationId || !preCheckDone) return;
+    const channel = supabase
+      .channel(`video-call-${consultationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'video_consultations',
+          filter: `id=eq.${consultationId}`,
+        },
+        (payload) => {
+          const next = payload.new as { status?: string; ended_by?: string | null };
+          if (next.ended_by && user && next.ended_by === user.id) return; // I ended it myself
+          if (next.status === 'completed' || next.status === 'cancelled') {
+            toast.info('The meeting has ended.');
+            navigateAfterCall();
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [consultationId, preCheckDone, navigateAfterCall]);
 
   // Derived display values for the pre-visit screen.
 
@@ -340,7 +380,15 @@ const VideoCall = () => {
       ) : startingCall || !meetingUrl ? (
         <LoadingScreen message="Joining your visit…" />
       ) : (
-        <VideoRoom roomUrl={meetingUrl} userName={userName} meetingToken={meetingToken || undefined} onLeave={handleLeave} />
+        <VideoRoom
+          roomUrl={meetingUrl}
+          userName={userName}
+          meetingToken={meetingToken || undefined}
+          onLeave={handleLeave}
+          consultationId={consultationId || undefined}
+          isProvider={isConsultationProvider}
+          onEndMeeting={handleEndMeeting}
+        />
       )}
     </ProtectedRoute>
   );

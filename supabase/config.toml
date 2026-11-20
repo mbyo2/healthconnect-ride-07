@@ -67,6 +67,9 @@ verify_jwt = true
 [functions.create-daily-room]
 verify_jwt = true
 
+[functions.end-video-consultation]
+verify_jwt = true
+
 # CSP violation report collector (P3-22 follow-up): browsers deliver
 # CSP reports unauthenticated by design; the function stores them in
 # public.csp_reports via the service role and caps body size in-code.

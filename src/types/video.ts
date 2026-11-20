@@ -6,6 +6,14 @@ export interface VideoRoomProps {
   videoQuality?: 'low' | 'medium' | 'high';
   meetingToken?: string;  // Daily.co meeting token for private rooms
   onLeave?: () => void;
+  /** Consultation this room belongs to — enables the join-link copy. */
+  consultationId?: string;
+  /** True when the local user is the consultation's provider (host). */
+  isProvider?: boolean;
+  /** Provider-only: end the meeting for everyone (server-side). */
+  onEndMeeting?: () => Promise<void> | void;
+  /** Fired when the meeting was ended by the other side (realtime). */
+  meetingEnded?: boolean;
 }
 
 export interface VideoConsultationDetails {
@@ -25,6 +33,8 @@ export interface VideoConsultationDetails {
   notes?: string;
   created_at: string;
   duration?: number;
+  ended_at?: string | null;
+  ended_by?: string | null;
 }
 
 export interface ConsultationListProps {
