@@ -173,6 +173,26 @@ describe("Join smoothness — prefetch on both entry points", () => {
   it("checklist page pre-mints while the patient prepares", () => {
     expect(videoCallPage).toContain("roomPromiseRef");
   });
+
+  it("keeps EVERY hook above ConsultationList's early returns (React #310)", () => {
+    // Regression pin for the live breakage of 2026-11-20: the prefetch
+    // useEffect initially sat below `if (isLoading) return …`, so the
+    // hook count changed when data arrived and React threw error #310
+    // — the whole /video-consultations route fell behind the error
+    // boundary for every signed-in user. The last hook in the file
+    // must precede the first early return.
+    const firstEarlyReturn = listUi.indexOf("if (isLoading) {");
+    expect(firstEarlyReturn).toBeGreaterThan(-1);
+    const lastHook = Math.max(
+      listUi.lastIndexOf("useEffect("),
+      listUi.lastIndexOf("useQuery("),
+      listUi.lastIndexOf("useState("),
+      listUi.lastIndexOf("useRef("),
+      listUi.lastIndexOf("useMemo("),
+      listUi.lastIndexOf("useCallback(")
+    );
+    expect(lastHook).toBeLessThan(firstEarlyReturn);
+  });
 });
 
 describe("videoQuality helpers — unit behaviour", () => {

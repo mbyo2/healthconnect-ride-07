@@ -81,6 +81,32 @@ export const ConsultationList = ({ onJoinMeeting, onPrefetch }: ConsultationList
     }
   });
 
+  // Join latency (Zoom-parity pass): as soon as the list data is in,
+  // warm up the Daily room + token for any visit whose window is open
+  // (from 10 minutes before start until the scheduled end) so pressing
+  // Join enters almost instantly. Room creation is idempotent — the
+  // room name is derived from the consultation id — so this never
+  // creates stray rooms.
+  // HOOKS RULE: this effect must stay ABOVE the isLoading/isError
+  // early returns below — a hook below a conditional return changes
+  // the hook count between renders and React throws error #310,
+  // blanking the whole route behind the error boundary (proven live
+  // 2026-11-20; pinned in the zoom-quality test file).
+  useEffect(() => {
+    if (!onPrefetch) return;
+    const list = (data?.consultations as any[]) || [];
+    if (!list.length) return;
+    const now = Date.now();
+    for (const c of list) {
+      if (!JOINABLE_STATUSES.includes(c.status)) continue;
+      const start = new Date(c.scheduled_start).getTime();
+      const end = new Date(c.scheduled_end).getTime();
+      if (now >= start - 10 * 60 * 1000 && now <= end) {
+        onPrefetch(c as VideoConsultationDetails);
+      }
+    }
+  }, [data, onPrefetch]);
+
   if (isLoading) {
     return (
       <div className="grid gap-4">
@@ -113,26 +139,6 @@ export const ConsultationList = ({ onJoinMeeting, onPrefetch }: ConsultationList
 
   const consultations = data?.consultations || [];
   const userId = data?.userId;
-
-  // Join latency (Zoom-parity pass): as soon as the list is on screen,
-  // warm up the Daily room + token for any visit whose window is open
-  // (from 10 minutes before start until the scheduled end) so pressing
-  // Join enters almost instantly. Room creation is idempotent — the
-  // room name is derived from the consultation id — so this never
-  // creates stray rooms.
-  useEffect(() => {
-    if (!onPrefetch || !consultations.length) return;
-    const now = Date.now();
-    for (const c of consultations as any[]) {
-      if (!JOINABLE_STATUSES.includes(c.status)) continue;
-      const start = new Date(c.scheduled_start).getTime();
-      const end = new Date(c.scheduled_end).getTime();
-      if (now >= start - 10 * 60 * 1000 && now <= end) {
-        onPrefetch(c as VideoConsultationDetails);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, onPrefetch]);
 
   return (
     <div className="grid gap-4">
