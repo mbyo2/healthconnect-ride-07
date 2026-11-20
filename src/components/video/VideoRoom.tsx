@@ -942,7 +942,12 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", me
         <div className="flex flex-col gap-3 lg:flex-row">
           <div id="video-container" className="relative h-[58vh] min-h-[360px] w-full min-w-0 flex-1 overflow-hidden rounded-lg bg-black/5 md:h-[64vh]">
             {(!callFrame || !hasJoined || reconnecting) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10 z-10">
+              // pointer-events-none is LOAD-BEARING: this status pill
+              // sits over the Daily iframe, and Daily's pre-join lobby
+              // has its own Join button that must stay clickable. A
+              // plain overlay here swallows every click and strands
+              // users in the lobby (proven live 2026-11-20).
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/10 z-10">
                 <div className="text-center p-4 bg-background/80 backdrop-blur-sm rounded-lg shadow-lg">
                   <div className="animate-bounce mb-4">
                     <div className="w-4 h-4 bg-primary mx-auto rounded-full"></div>

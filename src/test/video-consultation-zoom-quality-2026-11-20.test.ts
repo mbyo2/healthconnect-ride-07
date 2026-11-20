@@ -148,6 +148,13 @@ describe("VideoRoom — quality + smoothness wiring", () => {
     expect(roomUi).toContain('accent: "#003087"');
     expect(roomUi).toContain('accent: "#FFC439"');
   });
+
+  it("keeps the joining-status overlay click-through (lobby Join must work)", () => {
+    // Proven live 2026-11-20: without pointer-events-none the
+    // "Joining your visit…" overlay covers the Daily iframe and
+    // swallows clicks, stranding users in the pre-join lobby.
+    expect(roomUi).toContain("pointer-events-none absolute inset-0");
+  });
 });
 
 describe("VideoControls — quality picker", () => {
