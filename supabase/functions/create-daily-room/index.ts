@@ -27,17 +27,19 @@ function json(body: unknown, status: number) {
 //
 // History (root cause of the 2026-11-20 "Join never works" outage): the
 // recording branch used to add `recording_consent`, `recording_resolution`
-// and `recording_available_notification` to the room properties. None of
+// and `recording_available_notification` to the room properties, and the
+// TV branch added `enable_d_pad_navigation` and `ui_config`. NONE of
 // those are Daily room properties — Daily rejects the whole create call
-// with 400 "invalid property name 'recording_consent'". The web client
-// always asks for recording and the provider's request is honoured, so the
-// provider (the person starting the visit) could never create the room.
-// The client also discarded the returned token and entered the private
-// room URL tokenless, which Daily refuses. Both are fixed here + client:
-// valid properties only, an existing room is reused instead of recreated,
-// a fresh token is minted on every join, and a recording-related Daily
-// rejection falls back to a room without recording so a visit can never
-// be blocked by the recording add-on again.
+// with 400 "invalid property name '<name>'" (each name verified against
+// the live Daily API). The web client always asks for recording and the
+// provider's request is honoured, so the provider (the person starting
+// the visit) could never create the room; a TV client could never create
+// one either. The client also discarded the returned token and entered
+// the private room URL tokenless, which Daily refuses. All fixed here +
+// client: valid properties only, an existing room is reused instead of
+// recreated, a fresh token is minted on every join, and room creation
+// degrades in steps (full → no recording → minimal) so no optional
+// feature can ever block the visit itself again.
 // ---------------------------------------------------------------------------
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -124,10 +126,14 @@ serve(async (req) => {
       recordingEnabled = consultation.recording_enabled === true;
     } else {
       // Create the room. ONLY properties Daily actually defines may be
-      // sent — an unknown property name fails the entire call.
+      // sent — an unknown property name fails the entire call (the TV
+      // branch's d-pad/theming properties were removed for exactly this
+      // reason; tv_mode is still recorded on the consultation for the
+      // client's own TV UI, it just cannot alter the Daily room).
+      const exp = Math.floor(Date.now() / 1000) + 86400;
       const buildRoomBody = (withRecording: boolean) => {
         const properties: Record<string, unknown> = {
-          exp: Math.floor(Date.now() / 1000) + 86400,
+          exp,
           enable_screenshare: true,
           enable_chat: true,
           enable_prejoin_ui: true,
@@ -139,48 +145,47 @@ serve(async (req) => {
         if (optimize_for_network) {
           properties.max_participants = 4;
         }
-        if (tv_mode) {
-          properties.enable_d_pad_navigation = true;
-          properties.ui_config = {
-            theme: {
-              colors: {
-                accent: "#2563EB",
-                accentText: "#FFFFFF",
-                background: "#111827",
-                backgroundAccent: "#1F2937",
-                baseText: "#FFFFFF",
-              },
-              scale: 1.5,
-            },
-          };
-        }
         if (withRecording) {
           properties.enable_recording = "cloud";
         }
         return { name: roomName, privacy: "private", properties };
       };
-
-      let createRes = await fetch("https://api.daily.co/v1/rooms", {
-        method: "POST",
-        headers: dailyHeaders,
-        body: JSON.stringify(buildRoomBody(wantRecording)),
+      const buildMinimalRoomBody = () => ({
+        name: roomName,
+        privacy: "private",
+        properties: {
+          exp,
+          enable_screenshare: true,
+          enable_chat: true,
+          enable_prejoin_ui: true,
+          eject_at_room_exp: true,
+        },
       });
-      recordingEnabled = wantRecording;
 
-      if (!createRes.ok && wantRecording) {
-        // Recording must never block the visit itself: log Daily's
-        // reason and retry once without the recording property.
-        console.error("Daily room create (with recording) failed:", await createRes.text());
-        recordingEnabled = false;
-        createRes = await fetch("https://api.daily.co/v1/rooms", {
+      // Degrade in steps so no optional feature can block the visit:
+      // full set → without recording → minimal set.
+      const attempts: { body: unknown; recording: boolean }[] = [
+        { body: buildRoomBody(wantRecording), recording: wantRecording },
+        ...(wantRecording ? [{ body: buildRoomBody(false), recording: false }] : []),
+        { body: buildMinimalRoomBody(), recording: false },
+      ];
+      let created = false;
+      for (const attempt of attempts) {
+        const res = await fetch("https://api.daily.co/v1/rooms", {
           method: "POST",
           headers: dailyHeaders,
-          body: JSON.stringify(buildRoomBody(false)),
+          body: JSON.stringify(attempt.body),
         });
+        if (res.ok) {
+          room = await res.json();
+          recordingEnabled = attempt.recording;
+          created = true;
+          break;
+        }
+        console.error("Daily room create attempt failed:", await res.text());
       }
 
-      if (!createRes.ok) {
-        console.error("Daily API error:", await createRes.text());
+      if (!created) {
         // Lost a create race with the other participant — reuse theirs.
         const raceRes = await fetch(`https://api.daily.co/v1/rooms/${roomName}`, {
           headers: dailyHeaders,
@@ -190,8 +195,6 @@ serve(async (req) => {
         } else {
           return json({ error: "We couldn't set up the video room. Please try again in a moment." }, 500);
         }
-      } else {
-        room = await createRes.json();
       }
     }
 

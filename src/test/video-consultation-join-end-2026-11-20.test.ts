@@ -23,8 +23,17 @@ describe("create-daily-room — join path", () => {
   it("never sends Daily properties that do not exist (the outage)", () => {
     // The function's history comment names the properties for the
     // record; what must never come back is SENDING them — as object
-    // keys or property assignments in the room payload.
-    for (const prop of ["recording_consent", "recording_resolution", "recording_available_notification"]) {
+    // keys or property assignments in the room payload. Every name
+    // here was verified invalid against the live Daily API (400
+    // "invalid property name '<name>'"): the first three broke the
+    // provider join, the last two broke TV-client joins.
+    for (const prop of [
+      "recording_consent",
+      "recording_resolution",
+      "recording_available_notification",
+      "enable_d_pad_navigation",
+      "ui_config",
+    ]) {
       expect(createRoomFn).not.toContain(`${prop}:`);
       expect(createRoomFn).not.toContain(`.${prop} =`);
       expect(createRoomFn).not.toContain(`"${prop}"`);
@@ -35,8 +44,9 @@ describe("create-daily-room — join path", () => {
     expect(createRoomFn).toContain('enable_recording = "cloud"');
   });
 
-  it("falls back to a room without recording if Daily rejects it", () => {
+  it("degrades room creation in steps so no optional feature can block a visit", () => {
     expect(createRoomFn).toContain("buildRoomBody(false)");
+    expect(createRoomFn).toContain("buildMinimalRoomBody()");
   });
 
   it("reuses an existing room instead of recreating it", () => {
