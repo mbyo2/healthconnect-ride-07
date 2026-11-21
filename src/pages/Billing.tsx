@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Receipt, CheckCircle, Clock, AlertCircle, Download, Loader2 } from "lucide-react";
+import { Plus, Receipt, CheckCircle, Clock, AlertCircle, Download, Loader2, Undo2, Landmark } from "lucide-react";
+import { QrCode } from "@/components/QrCode";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +31,7 @@ import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface Invoice {
   id: string;
+  institution_id: string;
   invoice_number: string;
   patient_id: string;
   patient_name: string;
@@ -44,11 +46,25 @@ interface Invoice {
   due_date: string;
   notes: string;
   created_at: string;
+  // ZRA Smart Invoice fiscal state (written only by the zra-declare
+  // worker from ZRA's actual response — never by the client).
+  zra_declaration_status?: string;
+  zra_sdc_id?: string | null;
+  zra_rcpt_no?: string | null;
+  zra_qr_code_url?: string | null;
+  zra_declared_at?: string | null;
+  zra_credit_note_rcpt_no?: string | null;
+  zra_credit_note_at?: string | null;
 }
 
 export const Billing = () => {
   const { user } = useAuth();
   const { institutionId, institution } = useInstitutionContext();
+  // ZRA Smart Invoice is Zambia-only (CEO rule, 2026-11-21): no ZRA
+  // status or fiscal block is ever shown for other countries. The
+  // server enforces the same rule — declarations cannot exist for a
+  // non-Zambian institution — this keeps the UI layer consistent.
+  const isZambia = (institution as any)?.country_code === "ZM";
   const { formatPrice } = useCurrency();
   const { createCollection, verifyPayment, verifying } = useLencoPayment();
   const [lencoPayInvoice, setLencoPayInvoice] = useState<Invoice | null>(null);
@@ -62,6 +78,9 @@ export const Billing = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [showReceipt, setShowReceipt] = useState<Invoice | null>(null);
   const [markPaidInvoice, setMarkPaidInvoice] = useState<Invoice | null>(null);
+  const [refundTarget, setRefundTarget] = useState<Invoice | null>(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [refunding, setRefunding] = useState(false);
 
   // Form state — P1-26: invoice lines are priced services chosen from
   // the institution's service_pricing list, never free-typed prices.
@@ -233,6 +252,33 @@ export const Billing = () => {
     }
   };
 
+  // Refund a paid invoice. The RPC flips the status; if the sale was
+  // declared to ZRA, the database queues a credit-note declaration
+  // automatically — no client path can skip it.
+  const handleRefund = async () => {
+    if (!refundTarget) return;
+    setRefunding(true);
+    try {
+      const { error } = await (supabase as any).rpc("refund_billing_invoice", {
+        p_invoice_id: refundTarget.id,
+        p_reason: refundReason.trim() || null,
+      });
+      if (error) throw error;
+      toast.success(
+        refundTarget.zra_declaration_status === "declared"
+          ? "Invoice refunded. A ZRA credit note has been queued for declaration."
+          : "Invoice refunded.",
+      );
+      setRefundTarget(null);
+      setRefundReason("");
+      fetchInvoices();
+    } catch (err: any) {
+      toast.error(friendlyErrorMessage(err, "Failed to refund this invoice."));
+    } finally {
+      setRefunding(false);
+    }
+  };
+
   const handleDownloadReceipt = async (invoice: Invoice) => {
     try {
       await downloadReceiptPdf({
@@ -244,7 +290,7 @@ export const Billing = () => {
         issuerPhone: institution?.phone,
         customerName: invoice.patient_name,
         items: invoice.items.map((item: any) => ({
-          description: item.description,
+          description: item.description || item.item_name,
           quantity: item.quantity,
           unitPrice: item.unit_price,
           total: item.quantity * item.unit_price,
@@ -253,6 +299,17 @@ export const Billing = () => {
         tax: invoice.tax,
         amountPaid: invoice.paid_amount,
         currency: "ZMW",
+        // The Smart Invoice block prints ONLY when ZRA has declared
+        // this invoice — the numbers come from ZRA's own response.
+        fiscal: isZambia && invoice.zra_declaration_status === "declared" && invoice.zra_rcpt_no
+          ? {
+              sdcId: invoice.zra_sdc_id || "",
+              receiptNo: invoice.zra_rcpt_no,
+              declaredAt: invoice.zra_declared_at || invoice.created_at,
+              qrUrl: invoice.zra_qr_code_url || "",
+              creditNoteNo: invoice.zra_credit_note_rcpt_no || null,
+            }
+          : null,
       });
       toast.success("Receipt downloaded");
     } catch (err) {
@@ -338,6 +395,26 @@ export const Billing = () => {
                     {invoice.balance > 0 && (
                       <p className="text-sm text-muted-foreground">Balance: {formatPrice(invoice.balance)}</p>
                     )}
+                    {isZambia && invoice.zra_declaration_status === "declared" && (
+                      <p className="inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+                        <Landmark className="h-3 w-3" /> ZRA declared{invoice.zra_rcpt_no ? ` · Receipt ${invoice.zra_rcpt_no}` : ""}
+                      </p>
+                    )}
+                    {isZambia && invoice.zra_declaration_status === "awaiting" && (
+                      <p className="inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                        <Clock className="h-3 w-3" /> Awaiting ZRA declaration
+                      </p>
+                    )}
+                    {isZambia && invoice.zra_declaration_status === "failed" && (
+                      <p className="inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200">
+                        <AlertCircle className="h-3 w-3" /> ZRA declaration pending — retrying automatically
+                      </p>
+                    )}
+                    {isZambia && invoice.zra_credit_note_rcpt_no && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ZRA credit note: {invoice.zra_credit_note_rcpt_no}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="outline" size="sm" className="min-h-[44px]" onClick={() => setShowReceipt(invoice)}>
@@ -361,6 +438,11 @@ export const Billing = () => {
                           <CheckCircle className="h-4 w-4 mr-1" /> Mark Paid
                         </Button>
                       </>
+                    )}
+                    {(invoice.status === "paid" || invoice.status === "partial") && (
+                      <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => { setRefundReason(""); setRefundTarget(invoice); }}>
+                        <Undo2 className="h-4 w-4 mr-1" /> Refund
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -532,6 +614,43 @@ export const Billing = () => {
                   <div className="flex justify-between font-medium"><span>Balance Due:</span><span className={`tabular-nums ${showReceipt.balance > 0 ? "text-red-600" : "text-green-600"}`}>{formatPrice(showReceipt.balance)}</span></div>
                 </div>
 
+                {/* ZRA Smart Invoice block — fiscal details appear ONLY
+                    once ZRA has declared this invoice; before that the
+                    receipt honestly shows the declaration is pending. */}
+                {isZambia && showReceipt.zra_declaration_status === "declared" && showReceipt.zra_rcpt_no && (
+                  <div className="border-2 border-primary-600 rounded-lg p-4" data-testid="zra-fiscal-block">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1 text-sm">
+                        <p className="font-bold flex items-center gap-2">
+                          <Landmark className="h-4 w-4" /> ZRA Smart Invoice
+                        </p>
+                        <p>SDC ID: <span className="font-semibold">{showReceipt.zra_sdc_id}</span></p>
+                        <p>Fiscal receipt no: <span className="font-semibold">{showReceipt.zra_rcpt_no}</span></p>
+                        {showReceipt.zra_declared_at && (
+                          <p>Declared: <span className="font-semibold">{new Date(showReceipt.zra_declared_at).toLocaleString()}</span></p>
+                        )}
+                        {showReceipt.zra_credit_note_rcpt_no && (
+                          <p>Credit note (ZRA): <span className="font-semibold">{showReceipt.zra_credit_note_rcpt_no}</span></p>
+                        )}
+                        <p className="text-xs text-muted-foreground">Verify this receipt with ZRA using the QR code.</p>
+                      </div>
+                      {showReceipt.zra_qr_code_url && (
+                        <QrCode value={showReceipt.zra_qr_code_url} size={104} className="shrink-0" />
+                      )}
+                    </div>
+                  </div>
+                )}
+                {isZambia && showReceipt.zra_declaration_status === "awaiting" && (
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded text-sm">
+                    Awaiting ZRA declaration — the fiscal receipt details will appear here once ZRA confirms this invoice.
+                  </div>
+                )}
+                {isZambia && showReceipt.zra_declaration_status === "failed" && (
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded text-sm">
+                    The ZRA declaration for this invoice is being retried automatically. The fiscal receipt details will appear here once ZRA confirms it.
+                  </div>
+                )}
+
                 {showReceipt.notes && (
                   <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded text-sm text-muted-foreground italic">
                     {showReceipt.notes}
@@ -579,6 +698,45 @@ export const Billing = () => {
               }}
             >
               Yes, mark paid
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Refund — sets the invoice refunded via RPC; a declared sale
+          automatically queues its ZRA credit-note declaration. */}
+      <Dialog open={!!refundTarget} onOpenChange={(o) => { if (!o) setRefundTarget(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Refund this invoice?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Invoice <span className="font-bold text-foreground">{refundTarget?.invoice_number}</span> for{" "}
+              <span className="font-bold text-foreground">{refundTarget ? formatPrice(refundTarget.paid_amount || refundTarget.total_amount) : ""}</span>{" "}
+              will be marked refunded. Only continue if the money has actually been returned to the payer.
+            </p>
+            {isZambia && refundTarget?.zra_declaration_status === "declared" && (
+              <p className="text-sm text-muted-foreground">
+                This sale was declared to ZRA, so a credit note will be declared to ZRA automatically as well.
+              </p>
+            )}
+            <div>
+              <Label>Reason (optional)</Label>
+              <Input
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="e.g. Duplicate payment"
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" className="min-h-[44px]" onClick={() => setRefundTarget(null)}>
+              Cancel
+            </Button>
+            <Button className="min-h-[44px]" disabled={refunding} onClick={handleRefund}>
+              {refunding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Yes, refund
             </Button>
           </DialogFooter>
         </DialogContent>

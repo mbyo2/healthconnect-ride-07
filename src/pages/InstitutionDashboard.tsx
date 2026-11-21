@@ -831,7 +831,12 @@ export const InstitutionDashboard = () => {
             <div className="rounded-lg border border-border bg-card p-4">
               <p className="text-xs font-medium text-muted-foreground mb-3">{cfg.label} quick access</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                {cfg.quickLinks.map((action) => (
+                {cfg.quickLinks
+                  // ZRA Smart Invoice is Zambia-only (CEO rule,
+                  // 2026-11-21): the entry point is entirely absent
+                  // for institutions in other countries.
+                  .filter((action) => action.path !== "/zra-smart-invoice" || (institution as any)?.country_code === "ZM")
+                  .map((action) => (
                   <button
                     key={action.label}
                     onClick={() => navigate(action.path)}

@@ -11,6 +11,19 @@
  */
 
 import { jsPDF } from "jspdf";
+import { qrMatrix } from "@/lib/qrCode";
+
+/** ZRA Smart Invoice fiscal block data. Present ONLY when ZRA has
+ *  actually declared the invoice — never rendered from unconfirmed
+ *  data. */
+export interface ReceiptFiscalData {
+  sdcId: string;
+  receiptNo: string;
+  declaredAt: Date | string;
+  /** Verification URL encoded into the QR code. */
+  qrUrl: string;
+  creditNoteNo?: string | null;
+}
 
 export interface ReceiptLineItem {
   description: string;
@@ -46,6 +59,8 @@ export interface ReceiptData {
   notes?: string;
   /** Served by (staff name) */
   servedBy?: string;
+  /** ZRA Smart Invoice block — only when the invoice was declared. */
+  fiscal?: ReceiptFiscalData | null;
 }
 
 const BRAND_BLUE: [number, number, number] = [0, 115, 234]; // #0073ea
@@ -279,6 +294,50 @@ export function generateReceiptPdf(data: ReceiptData): jsPDF {
     const noteLines = doc.splitTextToSize(`Notes: ${data.notes}`, contentW);
     doc.text(noteLines, margin, y);
     y += noteLines.length * 4 + 4;
+  }
+
+  // ---- ZRA Smart Invoice block (only when ZRA declared the invoice) ----
+  if (data.fiscal) {
+    const blockH = 38;
+    if (y + blockH > doc.internal.pageSize.getHeight() - 26) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.setDrawColor(...BRAND_BLUE);
+    doc.setLineWidth(0.4);
+    doc.rect(margin, y, contentW, blockH);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...DARK);
+    doc.text("ZRA SMART INVOICE", margin + 3, y + 6);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.text(`SDC ID: ${data.fiscal.sdcId}`, margin + 3, y + 12);
+    doc.text(`Fiscal receipt no: ${data.fiscal.receiptNo}`, margin + 3, y + 17);
+    doc.text(`Declared: ${fmtDate(data.fiscal.declaredAt)}`, margin + 3, y + 22);
+    if (data.fiscal.creditNoteNo) {
+      doc.text(`Credit note (ZRA): ${data.fiscal.creditNoteNo}`, margin + 3, y + 27);
+    }
+    doc.text("Verify this receipt with ZRA using the QR code.", margin + 3, y + 33);
+    // QR of the verification URL, drawn module by module.
+    try {
+      const matrix = qrMatrix(data.fiscal.qrUrl);
+      const qrSize = 30;
+      const cell = qrSize / matrix.length;
+      const qx = pageW - margin - qrSize - 3;
+      const qy = y + 4;
+      doc.setFillColor(15, 23, 42);
+      for (let r = 0; r < matrix.length; r++) {
+        for (let c = 0; c < matrix.length; c++) {
+          if (matrix[r][c]) doc.rect(qx + c * cell, qy + r * cell, cell, cell, "F");
+        }
+      }
+    } catch {
+      // If the URL cannot be encoded, the printed numbers above still
+      // identify the fiscal receipt; never fail the whole receipt.
+    }
+    y += blockH + 4;
   }
 
   // ---- Footer ----

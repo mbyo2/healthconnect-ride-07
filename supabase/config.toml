@@ -219,3 +219,18 @@ verify_jwt = true
 # self-verifies (GET handshake token + POST HMAC, fail-closed — P2-24).
 [functions.whatsapp-webhook]
 verify_jwt = false
+
+# ZRA Smart Invoice connection management (2026-11-21): authenticated
+# institution admins only; the function verifies the caller in-code
+# (auth.getUser + is_zra_institution_admin) before touching the
+# institution's ZRA device identity.
+[functions.zra-connection]
+verify_jwt = true
+
+# ZRA Smart Invoice declaration worker (2026-11-21): called by the
+# pg_cron sweep (x-zra-internal-secret, fail-closed when unset) and by
+# institution admins retrying their own declarations (verified in-code
+# via auth.getUser + is_zra_institution_admin). No gateway JWT because
+# the cron caller has no user JWT.
+[functions.zra-declare]
+verify_jwt = false
