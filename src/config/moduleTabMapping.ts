@@ -10,7 +10,10 @@
  * A tab is visible when it is essential OR when ANY of its required modules
  * is effective-live for the institution (see institutionModules service).
  *
- * NOT YET WIRED INTO THE DASHBOARD — awaiting CEO sign-off on this table.
+ * WIRED INTO THE DASHBOARD (verified 2026-11-23): InstitutionDashboard
+ * consumes this mapping via useModuleAccess (getTabRule / isTabAccessible);
+ * tabs whose required modules are not effective-live render locked and
+ * redirect to overview when opened.
  */
 
 import type { EffectiveModule } from "@/services/institutionModules";
@@ -213,7 +216,7 @@ export const TAB_MODULE_MAP: TabModuleRule[] = [
   },
 ];
 
-/** All 15 dashboard tab keys in display order. */
+/** All 21 dashboard tab keys in display order. */
 export const ALL_TABS: InstitutionTabKey[] = TAB_MODULE_MAP.map((r) => r.tab);
 
 /** Tabs that are always visible regardless of entitlements. */
