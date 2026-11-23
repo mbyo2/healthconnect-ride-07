@@ -161,7 +161,9 @@ async function importObservation(obs: any, patientId: string) {
   // This is simplified; real implementation would map LOINC codes
   const { error } = await supabase.from("vital_signs").insert({
     user_id: patientId,
-    created_at: obs.effectiveDateTime,
+    // vital_signs has no created_at column (live schema) — the observation
+    // time belongs in recorded_at; selecting/inserting created_at 400s.
+    recorded_at: obs.effectiveDateTime,
     metadata: {
       fhir_id: obs.id,
       imported: true,
@@ -174,8 +176,12 @@ async function importObservation(obs: any, patientId: string) {
 async function importMedication(med: any, patientId: string) {
   const { error } = await supabase.from("pharmacy_prescriptions").insert({
     patient_id: patientId,
-    medication_name: med.medicationCodeableConcept?.text,
-    dosage: med.dosageInstruction?.[0]?.text,
+    // pharmacy_prescriptions has no medication_name/dosage columns (live
+    // schema) — medicines live in the medications jsonb array.
+    medications: [{
+      name: med.medicationCodeableConcept?.text,
+      dosage: med.dosageInstruction?.[0]?.text,
+    }],
     status: med.status === "completed" ? "dispensed" : "pending",
     created_at: med.authoredOn,
   } as any);
@@ -186,10 +192,14 @@ async function importDiagnosticReport(report: any, patientId: string) {
   const { error } = await supabase.from("lab_tests").insert({
     patient_id: patientId,
     test_type: report.code?.text,
-    test_name: report.code?.text,
+    // lab_tests has no test_name/result_value columns (live schema) — the
+    // test name is test_type and the outcome lives in result/results_date.
+    test_number: `FHIR-${report.id || Date.now()}`,
     status: report.status === "final" ? "completed" : "pending",
-    result_value: report.conclusion,
-    created_at: report.effectiveDateTime,
+    result: report.conclusion,
+    results_date: report.effectiveDateTime,
+    order_source: "external_referral",
+    external_referrer_name: "FHIR import",
   } as any);
   if (error) throw error;
 }
@@ -197,11 +207,12 @@ async function importDiagnosticReport(report: any, patientId: string) {
 async function importAllergy(allergy: any, patientId: string) {
   const { error } = await supabase.from("patient_allergies").insert({
     patient_id: patientId,
-    allergen: allergy.code?.text,
-    allergy_name: allergy.code?.text,
+    // patient_allergies has no allergen/allergy_name/status columns (live
+    // schema) — the name is allergen_name and active state is is_active.
+    allergen_name: allergy.code?.text,
     reaction: allergy.reaction?.[0]?.manifestation?.[0]?.text,
-    status: "active",
-    created_at: allergy.recordedDate,
+    is_active: true,
+    reported_at: allergy.recordedDate,
   } as any);
   if (error) throw error;
 }
@@ -210,9 +221,12 @@ async function importImmunization(imm: any, patientId: string) {
   const { error } = await supabase.from("immunizations").insert({
     patient_id: patientId,
     vaccine_name: imm.vaccineCode?.text,
-    vaccine_code: imm.vaccineCode?.coding?.[0]?.code,
-    administered_at: imm.occurrenceDateTime,
-    lot_number: imm.lotNumber,
+    // immunizations has no vaccine_code/administered_at/lot_number columns
+    // (live schema) — the date is administered_date, the lot is batch_number,
+    // and the vaccine code rides in notes-free form via vaccine_name only.
+    administered_date: imm.occurrenceDateTime,
+    scheduled_date: imm.occurrenceDateTime,
+    batch_number: imm.lotNumber,
   } as any);
   if (error) throw error;
 }

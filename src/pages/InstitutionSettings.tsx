@@ -612,7 +612,7 @@ const InstitutionSettings = () => {
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {formData.payment_mode === 'platform'
-                    ? "Patients pay via wallet/Lenco. We collect, take the platform fee, and pay out to you. Required for marketplace listings."
+                    ? "Patients pay via wallet or Mobile Money. We collect, take the platform fee, and pay out to you. Required for marketplace listings."
                     : "Your institution collects payments directly. Doc'O Clock only provides the HMS software — we don't touch your money."}
                 </p>
               </div>
