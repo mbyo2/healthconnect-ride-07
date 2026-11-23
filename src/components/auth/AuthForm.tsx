@@ -98,8 +98,8 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (password.length < 10) {
+      toast.error('Password must be at least 10 characters');
       return;
     }
 

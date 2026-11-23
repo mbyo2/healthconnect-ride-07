@@ -82,7 +82,7 @@ const MAPPINGS: Array<{ pattern: RegExp; message: string }> = [
   },
   {
     pattern: /password.*(at least|weak|short|strength)|weak_password/i,
-    message: "Please choose a stronger password — at least 6 characters.",
+    message: "Please choose a stronger password — at least 10 characters.",
   },
   {
     pattern: /invalid email|email address.*invalid|validate email/i,

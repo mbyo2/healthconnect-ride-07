@@ -29,8 +29,8 @@ const patientSchema = z.object({
   lastName: z.string().min(2, "Required"),
   email: z.string().email("Valid email required"),
   phone: z.string().optional(),
-  password: z.string().min(6, "Min 6 characters"),
-  confirmPassword: z.string().min(6),
+  password: z.string().min(10, "Password must be at least 10 characters"),
+  confirmPassword: z.string().min(10),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
@@ -46,8 +46,8 @@ const providerSchema = z.object({
   // generic health-personnel cadre register without one).
   licenseNumber: z.string().optional(),
   yearsExperience: z.string().optional(),
-  password: z.string().min(6, "Min 6 characters"),
-  confirmPassword: z.string().min(6),
+  password: z.string().min(10, "Password must be at least 10 characters"),
+  confirmPassword: z.string().min(10),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
@@ -61,8 +61,8 @@ const businessSchema = z.object({
   city: z.string().min(2, "City required"),
   country: z.string().min(2, "Country required"),
   licenseNumber: z.string().optional(),
-  password: z.string().min(6, "Min 6 characters"),
-  confirmPassword: z.string().min(6),
+  password: z.string().min(10, "Password must be at least 10 characters"),
+  confirmPassword: z.string().min(10),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 

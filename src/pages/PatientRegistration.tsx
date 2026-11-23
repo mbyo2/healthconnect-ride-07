@@ -65,8 +65,8 @@ const medicalHistorySchema = z.object({
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Confirm password must be at least 8 characters"),
+  password: z.string().min(10, "Password must be at least 10 characters"),
+  confirmPassword: z.string().min(10, "Confirm password must be at least 10 characters"),
   termsAccepted: z.boolean().refine((val) => val === true, "You must accept the terms"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",

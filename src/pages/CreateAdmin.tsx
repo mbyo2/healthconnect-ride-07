@@ -46,8 +46,8 @@ const CreateAdmin: React.FC = () => {
       toast.error('All fields are required');
       return;
     }
-    if (form.password.length < 8) {
-      toast.error('Password must be at least 8 characters');
+    if (form.password.length < 10) {
+      toast.error('Password must be at least 10 characters');
       return;
     }
 

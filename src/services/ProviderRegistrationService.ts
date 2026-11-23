@@ -71,8 +71,8 @@ export class ProviderRegistrationService {
     if (!data.skipCredentials) {
       if (!data.password) {
         errors.password = "Password is required";
-      } else if (data.password.length < 6) {
-        errors.password = "Password must be at least 6 characters long";
+      } else if (data.password.length < 10) {
+        errors.password = "Password must be at least 10 characters long";
       }
 
       // Confirm password validation
