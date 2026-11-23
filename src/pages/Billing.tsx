@@ -146,7 +146,9 @@ export const Billing = () => {
         p_patient_id: patientId,
         p_patient_name: selectedPatient?.name || "Unknown",
         p_lines: buildInvoiceLinesPayload(items),
-        p_tax: tax,
+        // Tax is derived server-side per line (resolve_item_tax_rate);
+        // the client never sends a tax figure.
+        p_tax: 0,
         p_discount: discount,
         p_due_date: dueDate || null,
         p_notes: notes || null,

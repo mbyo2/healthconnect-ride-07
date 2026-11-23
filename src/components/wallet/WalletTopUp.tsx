@@ -223,8 +223,8 @@ export const WalletTopUp = () => {
                                 Secure card checkout
                             </p>
                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                A secure Lenco checkout will open where you can pay with your card or mobile money.
-                                Your card details are handled entirely by Lenco — we never see or store them.
+                                A secure checkout will open where you can pay with your card or mobile money.
+                                Your card details are handled entirely by our payment partner — we never see or store them.
                             </p>
                         </div>
                     )}

@@ -66,7 +66,7 @@ export function useLencoPayment() {
         },
       });
       if (error) {
-        let details = error?.message || "Lenco mobile money unavailable";
+        let details = error?.message || "Mobile money unavailable";
         try {
           const body = await (error.context as Response)?.json?.();
           if (body?.message || body?.error) details = body.message ? `${body.error} (${body.message})` : body.error;

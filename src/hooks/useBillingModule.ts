@@ -106,7 +106,8 @@ export function useBillingModule() {
         p_patient_id: data.patient_id || null,
         p_patient_name: data.patient_name,
         p_lines: data.lines,
-        p_tax: data.tax || 0,
+        // Tax is derived server-side per line; never sent from the client.
+        p_tax: 0,
         p_discount: data.discount || 0,
         p_due_date: data.due_date || null,
         p_notes: data.notes || null,
