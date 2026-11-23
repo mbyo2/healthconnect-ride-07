@@ -37,7 +37,7 @@ Disallow: /kiosk
 # Crawl hints
 Crawl-delay: 0
 
-Sitemap: https://doc0clock.online/sitemap.xml
+Sitemap: https://www.doc0clock.online/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
@@ -65,4 +65,16 @@ User-agent: cohere-ai
 Allow: /
 
 User-agent: Meta-WebIndexer
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
 Allow: /

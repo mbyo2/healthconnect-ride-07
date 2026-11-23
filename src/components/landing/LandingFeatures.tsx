@@ -206,7 +206,7 @@ export const Features = () => {
       tab: "Doctor Consultations",
       icon: Stethoscope,
       title: "Book verified doctors & specialists",
-      desc: "Browse verified practitioners across 20+ specialties. See each doctor's fees and available times, then choose a slot.",
+      desc: "Browse practitioners across 27 provider professions. See each doctor's fees and available times, then choose a slot.",
       metrics: ["Verified Doctors", "Fees shown upfront", "Provider confirms your time"],
       badge: "Booking",
       preview: (

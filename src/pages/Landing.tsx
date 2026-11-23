@@ -9,11 +9,11 @@ import { CareExperience, HowItWorks, Features, ForProviders, PlatformScale } fro
 import { Testimonials } from "@/components/landing/LandingTestimonials";
 import { BrowseSpecialties, CTASection, LandingFooter } from "@/components/landing/LandingFooter";
 
-const SITE_URL = "https://doc0clock.online";
+const SITE_URL = "https://www.doc0clock.online";
 const SITE_NAME = "Doc' O Clock";
 const DEFAULT_TITLE = "Doc' O Clock — Book Doctors & Video Consultations in Zambia";
 const DEFAULT_DESCRIPTION =
-  "Connect with verified doctors across Zambia. Book appointments, attend video consultations, receive digital prescriptions, and order medications for delivery. Healthcare that works for everyone.";
+  "Book doctors and video consultations in Zambia with Doc' O Clock — telehealth for patients, and hospital management software with ZRA Smart Invoice compliance for clinics and hospitals.";
 
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);

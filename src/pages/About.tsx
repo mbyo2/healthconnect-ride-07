@@ -46,6 +46,27 @@ const About = () => (
         ))}
       </section>
 
+      <section className="mt-16" aria-labelledby="doc-facts">
+        <h2 id="doc-facts" className="mb-5 text-2xl font-bold">Facts about Doc&apos; O Clock</h2>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          {[
+            { term: "Product", text: "Doc' O Clock — telehealth and hospital management software (Teledoctor + HMS)." },
+            { term: "Market", text: "Zambia. Patients book in-person care nationwide and video consultations from anywhere with an internet connection." },
+            { term: "Founder", text: "Founded and led by Mabvuto Banda, Founder and CEO." },
+            { term: "For patients", text: "Book doctors and other healthcare providers, attend video consultations, and receive digital prescriptions." },
+            { term: "Providers", text: "Healthcare professionals across 27 professions, including doctors, specialists, nurses, midwives, dentists and pharmacists." },
+            { term: "For institutions", text: "Clinics and hospitals manage appointments, patient records, billing, dispensary, laboratory and ward workflows, with ZRA Smart Invoice fiscal compliance built in for Zambian institutions." },
+            { term: "Patient pricing", text: "Patients pay the consultation price set by their chosen provider — each provider sets their own price, shown before booking." },
+            { term: "Institution pricing", text: "Healthcare institutions pay a flat subscription for the hospital management platform." },
+          ].map((fact) => (
+            <div key={fact.term} className="rounded-2xl border border-border/50 bg-card p-5">
+              <dt className="mb-1 text-sm font-semibold uppercase tracking-wide text-primary">{fact.term}</dt>
+              <dd className="text-sm leading-relaxed text-muted-foreground">{fact.text}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <section className="mt-16 rounded-2xl border border-primary/15 bg-primary/5 p-8 sm:p-10">
         <div className="flex gap-4">
           <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-primary" />
