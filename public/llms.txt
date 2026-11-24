@@ -9,6 +9,7 @@
 - Market: Zambia (in-person care nationwide; video consultations anywhere with an internet connection)
 - Category: Telehealth and hospital management software (Teledoctor + HMS)
 - Founder & CEO: Mabvuto Banda
+- Operator: Doc'O Clock
 
 ## What it does
 
