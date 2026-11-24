@@ -4,13 +4,14 @@
 import React, { useState } from "react";
 import {
   Crown, Building2, Users, CreditCard, Globe, ShieldAlert,
-  Search, Loader2, Ban, CheckCircle, LayoutDashboard,
+  Search, Loader2, Ban, CheckCircle, LayoutDashboard, HandCoins,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, subDays } from "date-fns";
 import { SuperAdminMetricsDashboard } from "@/components/metrics/RoleMetricsDashboard";
+import { InstitutionCommercialTermsAdmin } from "@/components/admin/InstitutionCommercialTermsAdmin";
 import { ChartCard, TrendAreaChart } from "@/components/metrics/MetricsCharts";
 import { useCurrency } from "@/hooks/use-currency";
 import { getEffectiveSubscriptionStatus } from "@/services/subscriptionStatus";
@@ -21,6 +22,7 @@ const TABS = [
   { id: "institutions", label: "Institutions", icon: Building2 },
   { id: "users", label: "Users", icon: Users },
   { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
+  { id: "commercial-terms", label: "Commercial Terms", icon: HandCoins },
   { id: "countries", label: "Countries", icon: Globe },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
 ] as const;
@@ -79,6 +81,7 @@ export const SuperAdminWorkflow = () => {
       {activeTab === "institutions" && <InstitutionsTab />}
       {activeTab === "users" && <UsersTab />}
       {activeTab === "subscriptions" && <SubscriptionsTab formatPrice={formatPrice} />}
+      {activeTab === "commercial-terms" && <InstitutionCommercialTermsAdmin />}
       {activeTab === "countries" && <CountriesTab />}
       {activeTab === "audit" && <AuditTab />}
     </div>
