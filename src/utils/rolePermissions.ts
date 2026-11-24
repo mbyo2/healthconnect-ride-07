@@ -85,6 +85,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/ipd-wards',           // inpatient ward & bed management
     '/theatre',             // operating theatre schedule & OT booking
     '/drug-stock',         // institutional drug inventory
+    '/hospital-inventory', // general hospital stock (sibling route)
     '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
@@ -109,6 +110,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/hospital-inventory', // general hospital stock
     '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // specialists can prescribe
@@ -172,6 +174,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-management',
     '/pharmacy-verify',      // barcode medication verification
     '/drug-stock',          // institutional drug inventory
+    '/hospital-inventory', // general hospital stock (sibling route)
     '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
     '/wallet',
@@ -270,6 +273,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/institution/appointments',
     '/institution/settings',
     '/drug-stock',          // institutional drug inventory
+    '/hospital-inventory', // general hospital stock (sibling route)
     '/institution/devices',
     '/email-campaigns',     // patient email campaigns
     '/camps',               // health camp management
@@ -441,6 +445,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/medical-records',
     '/hospital-management',
     '/drug-stock',            // institutional drug inventory
+    '/hospital-inventory', // general hospital stock (sibling route)
     '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',
     '/medications',
@@ -565,6 +570,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/hospital-inventory', // general hospital stock
     '/opd',                 // outpatient queue, triage & check-in
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // licensed to prescribe

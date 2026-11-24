@@ -14,6 +14,7 @@ import { SkeletonInstitutionDashboard } from "@/components/ui/skeleton-kit";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { InstitutionPageHeader } from "@/components/institution/InstitutionPageHeader";
+import { InstitutionSwitcher } from "@/components/institution/InstitutionSwitcher";
 import { archetypePalette } from "@/components/institution/archetypePalette";
 import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
@@ -239,7 +240,7 @@ function monthTrend(series: number[]): { value: number; isPositive: boolean } | 
 export const InstitutionDashboard = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { institution, loading: instLoading, isAdmin } = useInstitutionContext();
+  const { institution, loading: instLoading, isAdmin, affiliations, switchInstitution } = useInstitutionContext();
   const [counts, setCounts] = useState({ personnel: 0, appointments: 0, patients: 0, todayAppointments: 0, revenue: 0 });
   const [activities, setActivities] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -548,6 +549,20 @@ export const InstitutionDashboard = () => {
           <p className="text-[13px] text-muted-foreground mt-1">
             {format(new Date(), "EEEE, MMMM d")} · {institution.is_verified ? "Verified facility" : "Pending verification"} · {headerLabel} Dashboard
           </p>
+          {/* Labelled workspace switcher on the mobile dashboard too —
+              the global bar's switcher is icon-only at this width, so
+              this is the discoverable one. Self-hides for
+              single-institution users. */}
+          {affiliations.length >= 2 && (
+            <div className="mt-3">
+              <InstitutionSwitcher
+                affiliations={affiliations}
+                activeId={institution.id}
+                onSwitch={switchInstitution}
+                tone="light"
+              />
+            </div>
+          )}
         </div>
 
         <section
@@ -620,6 +635,16 @@ export const InstitutionDashboard = () => {
         }
         actions={
           <>
+            {/* Workspace switcher — self-hides for single-institution
+                users; without it here (and in DesktopNav) a user with
+                two affiliations had no reachable way to switch the
+                dashboard's institution (proven 2026-11-24). */}
+            <InstitutionSwitcher
+              affiliations={affiliations}
+              activeId={institution.id}
+              onSwitch={switchInstitution}
+              tone="light"
+            />
             <Button variant="outline" size="sm"
               onClick={() => window.open(`/kiosk?institution=${institution.id}`, "_blank", "noopener")}
               className="gap-1.5"

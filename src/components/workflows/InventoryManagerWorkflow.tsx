@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertTriangle, TrendingDown, Plus, Loader2, Search, ArrowDownUp, History } from 'lucide-react';
 import { useHospitalInventory, type HospitalInventoryItem, type HospitalMovementType } from '@/hooks/useHospitalInventory';
-import { HOSPITAL_MOVEMENT_LABELS, type HospitalInventoryMovement } from '@/services/hospitalStockService';
+import { HOSPITAL_MOVEMENT_LABELS, movementLocationLabel, type HospitalInventoryMovement } from '@/services/hospitalStockService';
 import { BarcodeScanner } from '@/components/shared/BarcodeScanner';
 
 type MovementAction = 'received' | 'issued' | 'transferred' | 'adjusted' | 'written_off';
@@ -130,7 +130,13 @@ export const InventoryManagerWorkflow = () => {
               {new Date(m.created_at).toLocaleString()}
               {m.reason ? ` • ${m.reason}` : ''}
               {m.reference ? ` • Ref ${m.reference}` : ''}
-              {m.to_department_id ? ` • To ${departmentNameById.get(m.to_department_id) || 'department'}` : ''}
+              {(() => {
+                // Direction comes from the movement type (see
+                // movementLocationLabel): an issue reads "From X",
+                // never "To X".
+                const loc = movementLocationLabel(m, (id) => (id ? departmentNameById.get(id) ?? null : null));
+                return loc ? ` • ${loc}` : '';
+              })()}
             </p>
           </div>
           <div className="text-right shrink-0">

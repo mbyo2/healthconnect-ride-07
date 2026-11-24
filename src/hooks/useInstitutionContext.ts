@@ -73,7 +73,44 @@ const overrideKey = (userId: string) => `dococlock.active_institution.${userId}`
  *  other live instance (portal header, tab panels, etc.) re-resolves too.
  *  Without this, each useInstitutionContext() keeps independent state and a
  *  switch in the header never reaches the tab components. */
-const INSTITUTION_SWITCH_EVENT = 'dococlock:institution-switched';
+export const INSTITUTION_SWITCH_EVENT = 'dococlock:institution-switched';
+
+/**
+ * Pure active-workspace resolution, shared by useInstitutionContext and
+ * useInstitutionAffiliation so EVERY consumer agrees on which institution
+ * is "current":
+ *  1. the persisted per-user override, when it still names an affiliation;
+ *  2. otherwise the newest owned institution (first 'admin' affiliation —
+ *     callers pass affiliations newest-owned-first);
+ *  3. otherwise the first staff affiliation.
+ * A stored override that no longer matches any affiliation is reported as
+ * stale so the caller can drop it instead of pinning the user to a
+ * workspace that no longer exists.
+ */
+export function resolveActiveInstitutionId(
+  affils: Pick<InstitutionAffiliation, 'id' | 'affiliation'>[],
+  overrideId: string | null,
+): { activeId: string | null; overrideStale: boolean } {
+  if (overrideId) {
+    if (affils.some((a) => a.id === overrideId)) {
+      return { activeId: overrideId, overrideStale: false };
+    }
+    return {
+      activeId:
+        affils.find((a) => a.affiliation === 'admin')?.id ??
+        affils.find((a) => a.affiliation === 'staff')?.id ??
+        null,
+      overrideStale: true,
+    };
+  }
+  return {
+    activeId:
+      affils.find((a) => a.affiliation === 'admin')?.id ??
+      affils.find((a) => a.affiliation === 'staff')?.id ??
+      null,
+    overrideStale: false,
+  };
+}
 
 /** Persisted "active institution" override, so staff with several affiliations
  *  (e.g. their own auto-provisioned pharmacy AND an employer's pharmacy they
@@ -126,24 +163,15 @@ export function useInstitutionContext() {
       fallback: InstitutionData | null,
       fallbackIsAdmin: boolean,
     ) => {
-      let activeId: string | null = null;
-      if (user) {
-        const stored = getActiveInstitutionOverride(user.id);
-        if (stored && affils.some((a) => a.id === stored)) {
-          activeId = stored;
-        } else if (stored) {
-          // Stale override (institution deleted or membership revoked) —
-          // drop it so we don't get stuck on a workspace that no longer exists.
-          clearActiveInstitutionOverride(user.id);
-        }
-      }
-      if (!activeId) {
-        // Default: newest owned institution, else first staff affiliation —
-        // preserves the historical single-workspace behaviour.
-        activeId =
-          affils.find((a) => a.affiliation === 'admin')?.id ??
-          affils.find((a) => a.affiliation === 'staff')?.id ??
-          null;
+      // Shared resolution (see resolveActiveInstitutionId): persisted
+      // override first, else newest owned, else first staff affiliation —
+      // the historical single-workspace default.
+      const stored = user ? getActiveInstitutionOverride(user.id) : null;
+      const { activeId, overrideStale } = resolveActiveInstitutionId(affils, stored);
+      if (user && overrideStale) {
+        // Stale override (institution deleted or membership revoked) —
+        // drop it so we don't get stuck on a workspace that no longer exists.
+        clearActiveInstitutionOverride(user.id);
       }
       const activeAffil = affils.find((a) => a.id === activeId) ?? null;
       const activeInst = (activeId && byId.get(activeId)) || fallback;

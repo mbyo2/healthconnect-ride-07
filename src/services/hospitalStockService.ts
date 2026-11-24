@@ -68,6 +68,45 @@ export const HOSPITAL_MOVEMENT_LABELS: Record<string, string> = {
   written_off: "Written off",
 };
 
+/**
+ * Direction wording for a movement-history row.
+ *
+ * Ledger semantics (apply_hospital_stock_movement): from_department_id is
+ * always the department the stock sat in; to_department_id is the transfer
+ * destination for transfers and simply mirrors from_department_id for
+ * every other type. So the direction word must come from the movement
+ * TYPE, never from which column happens to be populated:
+ *  - received            → stock arrived INTO the department: "To X"
+ *  - transferred         → "From X → To Y"
+ *  - issued / adjusted / expired / damaged / written_off
+ *                        → stock left (or was corrected at) the
+ *                          department: "From X"
+ * (The history UI previously printed "To X" for every row with a
+ * to_department_id — i.e. all of them — so an issue out of Main Store
+ * read "Issued • To Main Store".)
+ */
+export function movementLocationLabel(
+  movement: Pick<HospitalInventoryMovement, "movement_type" | "from_department_id" | "to_department_id">,
+  departmentName: (id: string | null) => string | null,
+): string | null {
+  const fromName = departmentName(movement.from_department_id);
+  const toName = departmentName(movement.to_department_id);
+  switch (movement.movement_type) {
+    case "transferred": {
+      if (fromName && toName && movement.from_department_id !== movement.to_department_id) {
+        return `From ${fromName} → To ${toName}`;
+      }
+      if (toName) return `To ${toName}`;
+      if (fromName) return `From ${fromName}`;
+      return null;
+    }
+    case "received":
+      return toName ? `To ${toName}` : fromName ? `To ${fromName}` : null;
+    default:
+      return fromName ? `From ${fromName}` : toName ? `From ${toName}` : null;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Movements                                                           */
 /* ------------------------------------------------------------------ */

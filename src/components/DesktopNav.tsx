@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
@@ -397,6 +398,12 @@ export function DesktopNav() {
 
           <CurrencyToggle />
           <ThemeToggle className="bg-white/10 text-white border-white/25 hover:bg-white/20" />
+          {/* Workspace switcher — renders only for users with 2+
+              affiliations. This is its ONLY desktop mount: the mobile
+              Header (which also carries it) returns null on desktop, so
+              without this, desktop users with two institutions had no
+              way to switch workspace at all (proven 2026-11-24). */}
+          {isAuthenticated && <InstitutionSwitcher />}
           {isAuthenticated && <NotificationBell className="text-white hover:bg-white/10 hover:text-white" />}
 
           {isAuthenticated && user ? (
