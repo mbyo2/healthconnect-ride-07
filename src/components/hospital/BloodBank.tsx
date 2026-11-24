@@ -8,6 +8,7 @@ import { usePatientNames } from "@/hooks/usePatientNames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -36,7 +37,6 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const [donorForm, setDonorForm] = useState({ full_name: "", blood_type: "O+", phone: "", email: "", date_of_birth: "", gender: "", address: "", notes: "" });
   const [donationForm, setDonationForm] = useState({ donor_id: "", blood_type: "O+", component_type: "whole_blood", units_collected: 1, expiry_date: "", screening_status: "pending", screening_notes: "" });
   const [compatForm, setCompatForm] = useState({ request_id: "", donor_blood_type: "O+", recipient_blood_type: "O+", test_type: "crossmatch", result: "pending", notes: "" });
-  const [patients, setPatients] = useState<any[]>([]);
 
   const { data: inventory, loading, error, refresh } = useHospitalModule<any>("blood_bank_inventory", "hospital_id", hospital?.id, { orderBy: "blood_type", ascending: true });
   const { data: requests, loading: reqLoading, refresh: refreshRequests } = useHospitalModule<any>("blood_bank_requests", "hospital_id", hospital?.id, { orderBy: "request_date", ascending: false });
@@ -46,19 +46,10 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const { data: auditLog, loading: auditLoading, refresh: refreshAudit } = useHospitalModule<any>("blood_bank_audit", "hospital_id", hospital?.id, { orderBy: "issued_at", ascending: false });
   const { nameFor } = usePatientNames(requests.map((r) => r.patient_id));
 
-  // Load patient list for the request form - only patients with transfusion requests
-  React.useEffect(() => {
-    (async () => {
-      try {
-        const { data: requests } = await supabase.from("blood_bank_requests" as any).select("patient_id").limit(200);
-        const patientIds = [...new Set((requests || []).map((r: any) => r.patient_id).filter(Boolean))];
-        if (patientIds.length === 0) { setPatients([]); return; }
-        const { data } = await supabase.from("profiles").select("id, first_name, last_name").in("id", patientIds);
-        setPatients(data || []);
-      } catch { /* non-fatal */ }
-    })();
-  }, []);
-
+  // The request form's patient comes from the hospital roster picker
+  // (HospitalPatientSelect below) — the previous loader only offered
+  // patients who already had a blood-bank request, so the first-ever
+  // request could never be created.
   const byType = BLOOD_TYPES.map((type) => {
     const rows = inventory.filter((i) => i.blood_type === type);
     const unitsFor = (comp: string) => rows.filter((r) => (r.component_type || "").toLowerCase() === comp).reduce((s, r) => s + (r.units_available || 0), 0);
@@ -513,13 +504,12 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         <DialogContent className="sm:max-w-[380px] bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">New Blood Transfusion Request</DialogTitle></DialogHeader>
           <form onSubmit={handleNewRequest} className="space-y-3 py-2 text-xs">
-            <div>
-              <label className="font-semibold text-muted-foreground uppercase">Patient *</label>
-              <select required className="w-full mt-1 p-2 rounded-md border border-border font-bold" value={reqForm.patient_id} onChange={(e) => setReqForm({ ...reqForm, patient_id: e.target.value })}>
-                <option value="">— Select patient —</option>
-                {patients.map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}
-              </select>
-            </div>
+            <HospitalPatientSelect
+              institutionId={hospital.id}
+              value={reqForm.patient_id}
+              onChange={(id) => setReqForm({ ...reqForm, patient_id: id })}
+              label="Patient *"
+            />
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="font-semibold text-muted-foreground uppercase">Blood Type</label>

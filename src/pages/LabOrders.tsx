@@ -21,6 +21,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 
 /**
  * Clinician lab ordering. The six ordering roles (doctor, specialist,
@@ -39,7 +40,6 @@ const LabOrders = () => {
     [availableRoles]
   );
 
-  const [patientSearch, setPatientSearch] = useState("");
   const [patientId, setPatientId] = useState("");
   const [labId, setLabId] = useState("");
   const [showOrderSets, setShowOrderSets] = useState(false);
@@ -50,28 +50,10 @@ const LabOrders = () => {
   const [sampleType, setSampleType] = useState("");
   const [notes, setNotes] = useState("");
 
-  // Patients the clinician has an appointment relationship with.
-  const { data: patients = [] } = useQuery({
-    queryKey: ["lab-order-patients", user?.id],
-    enabled: !!user?.id && canOrder,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("appointments")
-        .select("patient_id, patient:profiles!appointments_patient_id_fkey(id, first_name, last_name)")
-        .eq("provider_id", user!.id);
-      if (error) throw error;
-      const seen = new Map<string, any>();
-      for (const row of data || []) {
-        const p = (row as any).patient;
-        if (p && !seen.has(p.id)) seen.set(p.id, p);
-      }
-      return [...seen.values()].filter((p) =>
-        !patientSearch ||
-        `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearch.toLowerCase())
-      );
-    },
-  });
-
+  // The patient is picked from the RECEIVING lab's roster (search +
+  // create-on-missing via HospitalPatientSelect below). The previous
+  // source — only patients with a prior appointment with this clinician —
+  // dead-ended every new patient.
   // Verified laboratories / diagnostic centres that can receive orders.
   const { data: labs = [] } = useQuery({
     queryKey: ["lab-order-facilities"],
@@ -191,30 +173,16 @@ const LabOrders = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs font-semibold uppercase">Patient *</Label>
-                <Input
-                  placeholder="Search your patients…"
-                  value={patientSearch}
-                  onChange={(e) => setPatientSearch(e.target.value)}
-                  className="mt-1 h-9 text-xs"
-                />
-                <Select value={patientId} onValueChange={setPatientId}>
-                  <SelectTrigger className="mt-2 h-9 text-xs">
-                    <SelectValue placeholder="Select patient" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {patients.map((p: any) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.first_name} {p.last_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <HospitalPatientSelect
+                institutionId={labId || null}
+                value={patientId}
+                onChange={setPatientId}
+                label="Patient *"
+                emptyHint="Select the receiving laboratory first — then you can search its patient roster here, or create a new patient without leaving this page."
+              />
               <div>
                 <Label className="text-xs font-semibold uppercase">Receiving laboratory *</Label>
-                <Select value={labId} onValueChange={setLabId}>
+                <Select value={labId} onValueChange={(v) => { setLabId(v); setPatientId(""); }}>
                   <SelectTrigger className="mt-1 h-9 text-xs">
                     <SelectValue placeholder="Select lab / diagnostic centre" />
                   </SelectTrigger>

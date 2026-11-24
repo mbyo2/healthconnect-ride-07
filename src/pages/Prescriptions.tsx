@@ -12,6 +12,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { PHARMACY_SIDE_ROLES, PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { PatientQuickCreateDialog } from "@/components/hospital/PatientQuickCreateDialog";
+import { UserPlus } from "lucide-react";
 import { usePatientAccessLog } from "@/hooks/usePatientAccessLog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -98,6 +100,7 @@ export const Prescriptions = () => {
   }, [affiliations, institutionId]);
 
   const [selectedPatient, setSelectedPatient] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [showCreatePatient, setShowCreatePatient] = useState(false);
   const [rxNotes, setRxNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [interactionAlerts, setInteractionAlerts] = useState<string[]>([]);
@@ -430,6 +433,7 @@ export const Prescriptions = () => {
         provider_id: user.id,
         patient_id: selectedPatient.id,
         pharmacy_id: institutionId || null,
+        institution_id: institutionId || null,
         prescription_number: rxNumber,
         medication_name: item.medication_name.trim(),
         dosage: item.dosage.trim(),
@@ -745,6 +749,30 @@ export const Prescriptions = () => {
                         <div className="mt-2">
                           <AllergyAlertSystem patientId={selectedPatient.id} compact />
                         </div>
+                      )}
+                      {/* Create-on-missing: search_patients_for_provider only
+                          finds existing relationships — a brand-new patient
+                          is created inline here and auto-selected. */}
+                      {institutionId && !selectedPatient && (
+                        <button
+                          type="button"
+                          onClick={() => setShowCreatePatient(true)}
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:underline"
+                        >
+                          <UserPlus className="h-3.5 w-3.5" /> New patient? Create them without leaving this page
+                        </button>
+                      )}
+                      {institutionId && (
+                        <PatientQuickCreateDialog
+                          institutionId={institutionId}
+                          open={showCreatePatient}
+                          onOpenChange={setShowCreatePatient}
+                          initialName={searchPatient}
+                          onCreated={(p) => {
+                            setSelectedPatient({ id: p.id, name: p.name, email: p.email || "" });
+                            setSearchPatient(p.name);
+                          }}
+                        />
                       )}
                     </div>
 

@@ -41,7 +41,7 @@ export function useMedicalRecords(userId: string | undefined) {
                     .eq('patient_id', userId)
                     .eq('status', 'final')
                     .order('created_at', { ascending: false }),
-                (supabase.from('lab_results' as any) as any)
+                (supabase.from('lab_results_patient_view' as any) as any)
                     .select('id, test_name, result_value, unit, reference_range, test_date, created_at')
                     .eq('patient_id', userId)
                     .order('test_date', { ascending: false })

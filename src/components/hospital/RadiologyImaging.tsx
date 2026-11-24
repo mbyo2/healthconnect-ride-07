@@ -8,6 +8,7 @@ import { usePatientNames } from "@/hooks/usePatientNames";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 
 const getStatusPill = (status: string) => {
   switch (status) {
@@ -23,7 +24,7 @@ const getStatusPill = (status: string) => {
 export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({ patient_name: "", exam_type: "X-Ray", exam_name: "", body_part: "", priority: "routine", notes: "" });
+  const [form, setForm] = useState({ patient_id: "", exam_type: "X-Ray", exam_name: "", body_part: "", priority: "routine", notes: "" });
 
   const { data: orders, loading, error, refresh } = useHospitalModule<any>("radiology_requests", "hospital_id", hospital?.id, { orderBy: "request_date", ascending: false });
   const { nameFor } = usePatientNames(orders.map((o) => o.patient_id));
@@ -40,11 +41,18 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
   const handleNewOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.exam_type) return;
+    if (!form.patient_id) { toast.error("Please select a patient first — search the facility roster or create the patient inline."); return; }
     setIsSubmitting(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("You need to be signed in to create an imaging order."); return; }
       const reqNum = `RAD-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
       const { error: err } = await (supabase.from("radiology_requests" as any) as any).insert({
-        hospital_id: hospital.id, request_number: reqNum, exam_type: form.exam_type,
+        hospital_id: hospital.id, request_number: reqNum,
+        // patient_id and requested_by are NOT NULL live — omitting them
+        // failed every order; patient_name is not a column on this table.
+        patient_id: form.patient_id, requested_by: user.id,
+        exam_type: form.exam_type,
         exam_name: form.exam_name || form.exam_type, body_part: form.body_part,
         priority: form.priority, notes: form.notes, status: "requested",
         request_date: new Date().toISOString().split("T")[0],
@@ -52,7 +60,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Imaging order ${reqNum} created`);
       setShowNewOrder(false);
-      setForm({ patient_name: "", exam_type: "X-Ray", exam_name: "", body_part: "", priority: "routine", notes: "" });
+      setForm({ patient_id: "", exam_type: "X-Ray", exam_name: "", body_part: "", priority: "routine", notes: "" });
       refresh();
     } catch (e: any) {
       toast.error(friendlyErrorMessage(e, "Failed to create imaging order"));
@@ -192,6 +200,12 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
         <DialogContent className="sm:max-w-[425px] bg-card border border-border">
           <DialogHeader><DialogTitle className="font-semibold text-base">New Radiology Imaging Order</DialogTitle></DialogHeader>
           <form onSubmit={handleNewOrder} className="space-y-3 py-2 text-xs">
+            <HospitalPatientSelect
+              institutionId={hospital?.id}
+              value={form.patient_id}
+              onChange={(id) => setForm({ ...form, patient_id: id })}
+              label="Patient"
+            />
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="font-semibold text-muted-foreground uppercase">Modality *</label>

@@ -24,6 +24,8 @@ import { dispatchNotification } from "@/hooks/useNotifications";
 import { queueLabResultAlert } from "@/utils/sms-reminder-service";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
+import type { InstitutionPatient } from "@/lib/patients";
 
 const LabManagement = () => {
   const { user } = useAuth();
@@ -58,7 +60,7 @@ const LabManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState("");
-  const [patientSearchTerm, setPatientSearchTerm] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
   const [selectedTestType, setSelectedTestType] = useState("");
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"requests" | "results" | "catalog">("requests");
@@ -178,34 +180,23 @@ const LabManagement = () => {
     };
   }, [queryClient]);
 
-  const { data: patients } = useQuery({
-    queryKey: ["lab-patients", patientSearchTerm],
+  // The lab/facility this user belongs to — the roster the New Request
+  // picker searches (search_institution_patients + create-on-missing).
+  // Replaces the hand-rolled profiles ilike search, which bypassed roster
+  // scoping and dead-ended brand-new walk-in patients.
+  const { data: labInstitutionId = null } = useQuery({
+    queryKey: ["lab-own-institution", user?.id, contextInstitutionId],
+    enabled: !!user,
     queryFn: async () => {
-      // Search patients by name/email when a search term is provided.
-      // Without a term, show patients with existing lab orders (privacy:
-      // prevents lab staff from enumerating all patients).
-      if (patientSearchTerm && patientSearchTerm.length >= 2) {
-        const term = `%${patientSearchTerm}%`;
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name, email")
-          .or(`first_name.ilike.${term},last_name.ilike.${term},email.ilike.${term}`)
-          .limit(20);
-        return data || [];
-      }
-      // Only fetch patients who have lab orders (not all patients)
-      // This prevents patient enumeration by lab staff
-      const { data: labOrders } = await supabase
-        .from("lab_tests")
-        .select("patient_id")
-        .limit(200);
-      const patientIds = [...new Set((labOrders || []).map((o: any) => o.patient_id).filter(Boolean))];
-      if (patientIds.length === 0) return [];
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, email")
-        .in("id", patientIds);
-      return data || [];
+      if (contextInstitutionId) return contextInstitutionId;
+      const { data: staffRow } = await supabase
+        .from("institution_staff")
+        .select("institution_id")
+        .eq("provider_id", user!.id)
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+      return staffRow?.institution_id ?? null;
     },
   });
 
@@ -480,7 +471,7 @@ const LabManagement = () => {
       toast.success("Lab request created successfully");
       setShowNewRequestDialog(false);
       setSelectedPatientId("");
-      setPatientSearchTerm("");
+      setSelectedPatient(null);
       setSelectedTestType("");
       setSelectedVerification(null);
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
@@ -574,33 +565,15 @@ const LabManagement = () => {
                   <DialogTitle className="font-semibold text-base">Create New Lab Request</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground">Patient</label>
-                    <Input
-                      placeholder="Search patient name..."
-                      value={patientSearchTerm}
-                      onChange={(e) => setPatientSearchTerm(e.target.value)}
-                      className="mt-1"
-                    />
-                    {patientSearchTerm && !selectedPatientId && (
-                      <div className="max-h-32 overflow-y-auto border border-border rounded-md bg-card mt-1">
-                        {patients
-                          ?.filter((p) => `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase()))
-                          .map((p) => (
-                            <div
-                              key={p.id}
-                              className="p-2 text-sm font-medium hover:bg-muted cursor-pointer"
-                              onClick={() => {
-                                setSelectedPatientId(p.id);
-                                setPatientSearchTerm(`${p.first_name} ${p.last_name}`);
-                              }}
-                            >
-                              {p.first_name} {p.last_name}
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                  </div>
+                  <InstitutionPatientPicker
+                    institutionId={labInstitutionId}
+                    value={selectedPatient}
+                    onChange={(p) => {
+                      setSelectedPatient(p);
+                      setSelectedPatientId(p?.id ?? "");
+                    }}
+                    label="Patient"
+                  />
 
                   <div>
                     <label className="text-xs font-medium text-muted-foreground">Test Type</label>

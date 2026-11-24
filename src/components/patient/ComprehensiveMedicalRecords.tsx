@@ -174,7 +174,7 @@ export const ComprehensiveMedicalRecords = () => {
               .order('created_at', { ascending: false })
           : Promise.resolve({ data: [], error: null }),
         includeLabs
-          ? (supabase.from('lab_results' as any) as any)
+          ? (supabase.from('lab_results_patient_view' as any) as any)
               .select('id, test_name, result_value, unit, reference_range, test_date, created_at')
               .eq('patient_id', user?.id)
               .order('test_date', { ascending: false })

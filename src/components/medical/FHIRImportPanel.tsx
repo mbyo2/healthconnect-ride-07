@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Upload, FileJson, CheckCircle2, AlertCircle } from "lucide-react";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 
 /**
  * FHIR Import: Receive and import a transferred health history bundle
@@ -13,6 +14,22 @@ import { friendlyErrorMessage } from "@/utils/friendly-error";
  */
 export function FHIRImportPanel({ patientId }: { patientId: string }) {
   const { user } = useAuth();
+  const { institutionId } = useInstitutionContext();
+
+  // lab_tests.lab_id is NOT NULL: the receiving facility is the active
+  // institution when there is one, otherwise the first facility whose
+  // roster this patient is on. Without either, a DiagnosticReport cannot
+  // be filed and is reported as failed (plain language) instead of
+  // silently writing a row the database will reject.
+  const resolveLabId = async (): Promise<string | null> => {
+    if (institutionId) return institutionId;
+    const { data } = await (supabase.from("institution_patients" as any) as any)
+      .select("institution_id")
+      .eq("patient_id", patientId)
+      .limit(1)
+      .maybeSingle();
+    return (data as any)?.institution_id ?? null;
+  };
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{
     success: number;
@@ -49,12 +66,12 @@ export function FHIRImportPanel({ patientId }: { patientId: string }) {
               results.details.push(`✓ Observation: ${resource.code?.text || resource.id}`);
               break;
             case "MedicationRequest":
-              await importMedication(resource, patientId);
+              await importMedication(resource, patientId, user?.id);
               results.success++;
               results.details.push(`✓ Medication: ${resource.medicationCodeableConcept?.text || resource.id}`);
               break;
             case "DiagnosticReport":
-              await importDiagnosticReport(resource, patientId);
+              await importDiagnosticReport(resource, patientId, await resolveLabId());
               results.success++;
               results.details.push(`✓ Lab Report: ${resource.code?.text || resource.id}`);
               break;
@@ -173,31 +190,46 @@ async function importObservation(obs: any, patientId: string) {
   if (error) throw error;
 }
 
-async function importMedication(med: any, patientId: string) {
+async function importMedication(med: any, patientId: string, doctorId?: string) {
+  if (!doctorId) throw new Error("You need to be signed in to import medication history.");
   const { error } = await supabase.from("pharmacy_prescriptions").insert({
     patient_id: patientId,
-    // pharmacy_prescriptions has no medication_name/dosage columns (live
-    // schema) — medicines live in the medications jsonb array.
+    // Live NOT NULLs: doctor_id, prescription_number, valid_until and the
+    // medications jsonb (there are no medication_name/dosage columns).
+    doctor_id: doctorId,
+    prescription_number: `FHIR-${med.id || Date.now()}`,
+    valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     medications: [{
       name: med.medicationCodeableConcept?.text,
       dosage: med.dosageInstruction?.[0]?.text,
     }],
-    status: med.status === "completed" ? "dispensed" : "pending",
+    // Live status CHECK: pending/filled/partially_filled/cancelled/expired
+    // ("dispensed" is not an allowed value).
+    status: med.status === "completed" ? "filled" : "pending",
     created_at: med.authoredOn,
   } as any);
   if (error) throw error;
 }
 
-async function importDiagnosticReport(report: any, patientId: string) {
+async function importDiagnosticReport(report: any, patientId: string, labId: string | null) {
+  if (!labId) {
+    throw new Error("No facility is linked to this patient yet, so the lab report could not be filed. Open the patient from a facility workspace and try again.");
+  }
   const { error } = await supabase.from("lab_tests").insert({
     patient_id: patientId,
-    test_type: report.code?.text,
-    // lab_tests has no test_name/result_value columns (live schema) — the
-    // test name is test_type and the outcome lives in result/results_date.
+    // Live NOT NULLs: lab_id, test_number, test_type (there are no
+    // test_name/result_value columns — the outcome lives in
+    // result/result_summary + results_date). The attribution CHECK
+    // requires ordered_by to stay null for external_referral rows and
+    // external_referrer_name to be set.
+    lab_id: labId,
+    institution_id: labId,
+    test_type: report.code?.text || "Imported lab report",
     test_number: `FHIR-${report.id || Date.now()}`,
     status: report.status === "final" ? "completed" : "pending",
-    result: report.conclusion,
-    results_date: report.effectiveDateTime,
+    result: report.conclusion || null,
+    result_summary: report.conclusion || null,
+    results_date: report.effectiveDateTime || null,
     order_source: "external_referral",
     external_referrer_name: "FHIR import",
   } as any);

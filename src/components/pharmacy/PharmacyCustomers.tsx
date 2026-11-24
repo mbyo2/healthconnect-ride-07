@@ -14,6 +14,7 @@ import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
 import { toast } from 'sonner';
 import { Plus, Search, User, Phone, Mail } from 'lucide-react';
+import { findOrCreatePatient, splitPatientName } from '@/lib/patients';
 
 export const PharmacyCustomers = () => {
   const { user } = useAuth();
@@ -38,8 +39,23 @@ export const PharmacyCustomers = () => {
 
   const addCustomer = useMutation({
     mutationFn: async () => {
+      // Link the customer to the unified patient record by phone
+      // (find_or_create_patient dedupes on phone first and creates a
+      // walk-in patient when the number is new). Without a phone there is
+      // nothing safe to match on, so the row is saved unlinked.
+      let patientId: string | null = null;
+      if (pharmacyId && form.phone?.trim()) {
+        try {
+          const { firstName, lastName } = splitPatientName(form.name);
+          patientId = (await findOrCreatePatient(pharmacyId, {
+            firstName, lastName,
+            phone: form.phone.trim(),
+            email: form.email?.trim() || null,
+          }, 'walk_in')).patientId;
+        } catch { /* saved unlinked rather than blocking the add */ }
+      }
       const { error } = await (supabase as any).from('pharmacy_customers').insert({
-        pharmacy_id: pharmacyId, ...form,
+        pharmacy_id: pharmacyId, ...form, patient_id: patientId,
       });
       if (error) throw error;
     },

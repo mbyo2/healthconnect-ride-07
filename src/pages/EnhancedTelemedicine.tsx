@@ -19,6 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
+import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface ClinicalWorkflowInstance {
   id: string;
@@ -190,11 +193,19 @@ export const EnhancedTelemedicine = () => {
 
   const handleCreateWorkflow = async () => {
     if (!institution) return;
+    if (!workflowForm.patient_id) {
+      toast.error("Please select a patient first — search the facility roster or create the patient inline.");
+      return;
+    }
 
     try {
-      const { error } = await supabase.from("clinical_workflow_instances").insert({
+      const { error } = await (supabase.from("clinical_workflow_instances") as any).insert({
         institution_id: institution.id,
-        ...workflowForm,
+        patient_id: workflowForm.patient_id,
+        // Optional links are uuid columns — empty strings fail the insert.
+        appointment_id: workflowForm.appointment_id || null,
+        video_consultation_id: workflowForm.video_consultation_id || null,
+        notes: workflowForm.notes || null,
         started_by: (await supabase.auth.getUser()).data.user?.id,
         current_stage: "initial_assessment",
         status: "active",
@@ -230,18 +241,32 @@ export const EnhancedTelemedicine = () => {
     if (!institution) return;
 
     try {
-      const { error } = await supabase.from("diagnostic_orders").insert({
+      if (!orderForm.patient_id) {
+        toast.error("Please select a patient first — search the facility roster or create the patient inline.");
+        return;
+      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("You need to be signed in to create an order."); return; }
+      const { error } = await (supabase.from("diagnostic_orders") as any).insert({
         institution_id: institution.id,
         order_number: `DX-${Date.now()}`,
-        ordering_provider_id: (await supabase.auth.getUser()).data.user?.id,
-        ...orderForm,
+        ordering_provider_id: user.id,
+        patient_id: orderForm.patient_id,
+        order_type: orderForm.order_type,
+        priority: orderForm.priority,
+        clinical_indication: orderForm.clinical_indication || null,
+        requested_tests: orderForm.requested_tests,
+        // required_by is a timestamp column — empty string fails; use null.
+        required_by: orderForm.required_by || null,
+        notes: orderForm.notes || null,
       });
-
       if (error) throw error;
+      toast.success("Diagnostic order created");
       setShowOrderDialog(false);
       fetchTelemedicineData();
     } catch (error) {
       console.error("Error creating order:", error);
+      toast.error(friendlyErrorMessage(error, "We couldn't create that order. Please check the details and try again."));
     }
   };
 
@@ -318,20 +343,12 @@ export const EnhancedTelemedicine = () => {
                   <DialogTitle className="text-lg font-semibold">Start Telemedicine Workflow</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                  <div>
-                    <Label className="text-xs font-semibold">Patient</Label>
-                    <Select
-                      value={workflowForm.patient_id}
-                      onValueChange={(value) => setWorkflowForm({ ...workflowForm, patient_id: value })}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select patient" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="placeholder" disabled>No patients available yet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <HospitalPatientSelect
+                    institutionId={institution.id}
+                    value={workflowForm.patient_id}
+                    onChange={(id) => setWorkflowForm({ ...workflowForm, patient_id: id })}
+                    label="Patient"
+                  />
                   <div>
                     <Label className="text-xs font-semibold">Associated Appointment (Optional)</Label>
                     <Select

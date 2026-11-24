@@ -17,6 +17,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
+import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface DiagnosticOrder {
   id: string;
@@ -159,20 +162,34 @@ export const EnhancedDiagnostics = () => {
 
   const handleCreateOrder = async () => {
     if (!institution) return;
-
+    if (!orderForm.patient_id) {
+      toast.error("Please select a patient first — search the facility roster or create the patient inline.");
+      return;
+    }
     try {
-      const { error } = await supabase.from("diagnostic_orders").insert({
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("You need to be signed in to create an order."); return; }
+      const { error } = await (supabase.from("diagnostic_orders") as any).insert({
         institution_id: institution.id,
         order_number: `DX-${Date.now()}`,
-        ordering_provider_id: (await supabase.auth.getUser()).data.user?.id,
-        ...orderForm,
+        ordering_provider_id: user.id,
+        patient_id: orderForm.patient_id,
+        order_type: orderForm.order_type,
+        priority: orderForm.priority,
+        clinical_indication: orderForm.clinical_indication || null,
+        requested_tests: orderForm.requested_tests,
+        // required_by is a timestamp column — an empty string fails the
+        // insert, so an unset date is sent as null.
+        required_by: orderForm.required_by || null,
+        notes: orderForm.notes || null,
       });
-
       if (error) throw error;
+      toast.success("Diagnostic order created");
       setShowOrderDialog(false);
       fetchDiagnosticsData();
     } catch (error) {
       console.error("Error creating order:", error);
+      toast.error(friendlyErrorMessage(error, "We couldn't create that order. Please check the details and try again."));
     }
   };
 
@@ -284,20 +301,12 @@ export const EnhancedDiagnostics = () => {
                   <DialogTitle className="text-lg font-semibold">Create Diagnostic Order</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                  <div>
-                    <Label className="text-xs font-semibold">Patient</Label>
-                    <Select
-                      value={orderForm.patient_id}
-                      onValueChange={(value) => setOrderForm({ ...orderForm, patient_id: value })}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select patient" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="placeholder" disabled>No patients available yet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <HospitalPatientSelect
+                    institutionId={institution.id}
+                    value={orderForm.patient_id}
+                    onChange={(id) => setOrderForm({ ...orderForm, patient_id: id })}
+                    label="Patient"
+                  />
                   <div>
                     <Label className="text-xs font-semibold">Order Type</Label>
                     <Select

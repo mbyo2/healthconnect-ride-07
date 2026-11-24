@@ -16,6 +16,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { resolveInventoryItem, precheckDispenseLines, dispenseFEFO } from "./pharmacyStockService";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { PatientQuickCreateDialog } from "@/components/hospital/PatientQuickCreateDialog";
+import { UserPlus } from "lucide-react";
 
 interface Prescription {
   id: string;
@@ -53,6 +55,7 @@ export function PrescriptionFulfillment() {
   // Multi-medication prescribing state
   const [showNewRxDialog, setShowNewRxDialog] = useState(false);
   const [patientSearch, setPatientSearch] = useState("");
+  const [showCreatePatient, setShowCreatePatient] = useState(false);
   const [patientList, setPatientList] = useState<any[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [rxNotes, setRxNotes] = useState("");
@@ -239,6 +242,7 @@ export function PrescriptionFulfillment() {
         provider_id: user.id,
         patient_id: selectedPatient.id,
         pharmacy_id: institutionId || null,
+        institution_id: institutionId || null,
         prescription_number: rxNo,
         medication_name: m.medication_name.trim(),
         dosage: m.dosage.trim(),
@@ -539,6 +543,31 @@ export function PrescriptionFulfillment() {
                       </button>
                     ))}
                   </div>
+                )}
+                {/* Create-on-missing: the provider search only finds
+                    existing relationships — create a walk-in patient
+                    inline and auto-select them. */}
+                {institutionId && !selectedPatient && (
+                  <button
+                    type="button"
+                    onClick={() => setShowCreatePatient(true)}
+                    className="mt-2 inline-flex items-center gap-1.5 font-semibold text-primary-500 hover:underline"
+                  >
+                    <UserPlus className="h-3.5 w-3.5" /> New patient? Create them without leaving this page
+                  </button>
+                )}
+                {institutionId && (
+                  <PatientQuickCreateDialog
+                    institutionId={institutionId}
+                    open={showCreatePatient}
+                    onOpenChange={setShowCreatePatient}
+                    initialName={patientSearch}
+                    onCreated={(p) => {
+                      setSelectedPatient({ id: p.id, first_name: p.firstName, last_name: p.lastName, email: p.email });
+                      setPatientSearch(p.name);
+                      setPatientList([]);
+                    }}
+                  />
                 )}
                 {selectedPatient && (
                   <div className="mt-2 p-2.5 rounded-xl bg-primary-500/10 border border-primary-500/30 flex items-center justify-between">

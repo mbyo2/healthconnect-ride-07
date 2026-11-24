@@ -14,6 +14,7 @@ import {
   Smartphone, Shield, Printer, X, Package
 } from "lucide-react";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { findOrCreatePatient, splitPatientName } from "@/lib/patients";
 
 interface CartItem {
   medication_inventory_id: string | null;
@@ -151,7 +152,18 @@ export const PharmacyPOS = () => {
       if (error) throw error;
       const sale = (data as any)?.sale;
       const soldItems = ((data as any)?.items || []) as CartItem[];
-      if (customerPhone) await (supabase as any).from("pharmacy_customers").upsert({ pharmacy_id: pharmacyId, name: customerName || "Walk-in", phone: customerPhone, total_purchases: Number(sale?.total_amount || 0), visit_count: 1, last_visit_at: new Date().toISOString() }, { onConflict: "pharmacy_id,phone", ignoreDuplicates: false }).select();
+      if (customerPhone) {
+        // Link the POS customer to the unified patient record: resolve by
+        // phone through find_or_create_patient (creates a walk-in patient
+        // when the phone is new). Best-effort — a resolution failure must
+        // never fail a completed sale; the customer row is still saved.
+        let patientId: string | null = null;
+        try {
+          const { firstName, lastName } = splitPatientName(customerName || "Walk-in Customer");
+          patientId = (await findOrCreatePatient(pharmacyId, { firstName, lastName, phone: customerPhone }, "walk_in")).patientId;
+        } catch { /* customer saved unlinked rather than losing the sale */ }
+        await (supabase as any).from("pharmacy_customers").upsert({ pharmacy_id: pharmacyId, patient_id: patientId, name: customerName || "Walk-in", phone: customerPhone, total_purchases: Number(sale?.total_amount || 0), visit_count: 1, last_visit_at: new Date().toISOString() }, { onConflict: "pharmacy_id,phone", ignoreDuplicates: false }).select();
+      }
       return { ...sale, items: soldItems };
     },
     onSuccess: (data) => {
