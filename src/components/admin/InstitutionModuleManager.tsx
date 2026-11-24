@@ -174,7 +174,7 @@ export const InstitutionModuleManager = () => {
           className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border text-sm font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
         />
         {institutions.length > 0 && !selectedId && (
-          <div className="absolute z-20 mt-1 w-full rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+          <div className="absolute z-20 mt-1 max-h-72 w-full overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
             {institutions.map((i) => (
               <button
                 key={i.id}

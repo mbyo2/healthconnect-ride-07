@@ -246,7 +246,7 @@ export const RoleManagement: React.FC = () => {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
-              <SelectContent className="max-h-80">
+              <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
                 <SelectItem value="all">All Roles</SelectItem>
                 {availableRoles.map(role => (
                   <SelectItem key={role} value={role}>
@@ -293,7 +293,7 @@ export const RoleManagement: React.FC = () => {
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Assign role" />
                     </SelectTrigger>
-                <SelectContent className="max-h-80">
+                <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
                   {assignableRoles
                     .filter(role => !userData.roles.includes(role))
                     .map(role => (

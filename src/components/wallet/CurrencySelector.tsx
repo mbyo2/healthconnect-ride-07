@@ -16,7 +16,7 @@ export const CurrencySelector = () => {
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select currency" />
         </SelectTrigger>
-        <SelectContent className="max-h-60">
+        <SelectContent className="max-h-[min(15rem,var(--radix-select-content-available-height))]">
           {SUPPORTED_CURRENCIES.map((c) => (
             <SelectItem key={c.code} value={c.code}>
               {c.symbol} {c.code}

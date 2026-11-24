@@ -470,7 +470,7 @@ export const HealthcareInstitutionForm = () => {
             <SelectTrigger className={errors.type ? "border-destructive" : ""}>
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
-            <SelectContent className="max-h-80">
+            <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
               {(['care', 'pharmacy', 'diagnostic', 'support'] as const).map((kind) => {
                 const group = typeOptions.filter((t) => t.kind === kind);
                 if (group.length === 0) return null;

@@ -117,7 +117,7 @@ export const InstitutionPatientPicker = ({
           disabled={!institutionId}
         />
         {openList && institutionId && (
-          <div className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-md border bg-popover shadow-md">
+          <div className="absolute z-50 mt-1 max-h-[min(18rem,60dvh)] w-full overflow-auto rounded-md border bg-popover shadow-md">
             {loading ? (
               <div className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" /> Searching…
