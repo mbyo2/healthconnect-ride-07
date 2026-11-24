@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
@@ -50,12 +50,14 @@ import {
   receiveBatch,
   type BatchFilters,
   type ExpiryBand,
+  type InventoryItemOption,
   type InventoryTable,
   type MedicineBatch,
   type QaStatus,
   type ReceiveBatchInput,
 } from "./pharmacyStockService";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { CreateStockItemDialog } from "./CreateStockItemDialog";
 
 /* ------------------------------------------------------------------ */
 /* Badge helpers                                                       */
@@ -135,6 +137,8 @@ interface ReceiveBatchDialogProps {
   institutionId: string;
   pharmacyInventoryId: string | undefined;
   onReceived: () => void;
+  /** Item to auto-select once options load (e.g. just created inline). */
+  preselectedItemId?: string | null;
 }
 
 function ReceiveBatchDialog({
@@ -143,8 +147,12 @@ function ReceiveBatchDialog({
   institutionId,
   pharmacyInventoryId,
   onReceived,
+  preselectedItemId,
 }: ReceiveBatchDialogProps) {
+  const queryClient = useQueryClient();
   const [selectedItemId, setSelectedItemId] = useState("");
+  const [createItemOpen, setCreateItemOpen] = useState(false);
+  const [pendingCreatedId, setPendingCreatedId] = useState<string | null>(null);
   const [batchNumber, setBatchNumber] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [manufactureDate, setManufactureDate] = useState("");
@@ -160,6 +168,22 @@ function ReceiveBatchDialog({
   });
 
   const selectedOption = itemOptions.find((o) => o.id === selectedItemId);
+
+  // Auto-select an item that was just created inline (or handed in via
+  // preselectedItemId) as soon as the refreshed options include it. The
+  // batch fields the user already typed are deliberately left untouched.
+  useEffect(() => {
+    const wanted = pendingCreatedId ?? preselectedItemId;
+    if (wanted && itemOptions.some((o) => o.id === wanted)) {
+      setSelectedItemId(wanted);
+      setPendingCreatedId(null);
+    }
+  }, [itemOptions, pendingCreatedId, preselectedItemId]);
+
+  function handleItemCreated(item: InventoryItemOption) {
+    setPendingCreatedId(item.id);
+    queryClient.invalidateQueries({ queryKey: ["inventory-item-options"] });
+  }
 
   const mutation = useMutation({
     mutationFn: (input: ReceiveBatchInput) => receiveBatch(institutionId, input),
@@ -258,6 +282,21 @@ function ReceiveBatchDialog({
                 ))}
               </SelectContent>
             </Select>
+            {!itemsLoading && itemOptions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No items in the catalogue yet. Add the item first, then receive
+                its batch — what you've typed below stays as it is.
+              </p>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              className="justify-start"
+              onClick={() => setCreateItemOpen(true)}
+            >
+              <PackagePlus className="mr-2 h-4 w-4" />
+              Create new item
+            </Button>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="receive-batch-number">Batch number *</Label>
@@ -345,6 +384,12 @@ function ReceiveBatchDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+      <CreateStockItemDialog
+        open={createItemOpen}
+        onOpenChange={setCreateItemOpen}
+        institutionId={institutionId}
+        onCreated={handleItemCreated}
+      />
     </Dialog>
   );
 }
@@ -519,6 +564,8 @@ export function BatchInventory() {
   const [expiryBand, setExpiryBand] = useState<ExpiryBand>("all");
   const [source, setSource] = useState<InventoryTable | "all">("all");
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [addItemOpen, setAddItemOpen] = useState(false);
+  const [preselectItemId, setPreselectItemId] = useState<string | null>(null);
   const [selectedBatch, setSelectedBatch] = useState<MedicineBatch | null>(null);
 
   const filters: BatchFilters = useMemo(
@@ -574,10 +621,16 @@ export function BatchInventory() {
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
         <CardTitle>Batch inventory</CardTitle>
-        <Button onClick={() => setReceiveOpen(true)}>
-          <PackagePlus className="mr-2 h-4 w-4" />
-          Receive batch
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setAddItemOpen(true)}>
+            <PackagePlus className="mr-2 h-4 w-4" />
+            Add item
+          </Button>
+          <Button onClick={() => setReceiveOpen(true)}>
+            <PackagePlus className="mr-2 h-4 w-4" />
+            Receive batch
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -706,10 +759,24 @@ export function BatchInventory() {
 
       <ReceiveBatchDialog
         open={receiveOpen}
-        onOpenChange={setReceiveOpen}
+        onOpenChange={(next) => {
+          setReceiveOpen(next);
+          if (!next) setPreselectItemId(null);
+        }}
         institutionId={institutionId}
         pharmacyInventoryId={institution?.id}
         onReceived={handleReceived}
+        preselectedItemId={preselectItemId}
+      />
+      <CreateStockItemDialog
+        open={addItemOpen}
+        onOpenChange={setAddItemOpen}
+        institutionId={institutionId}
+        onCreated={(item) => {
+          // Flow straight into receiving the new item's first batch.
+          setPreselectItemId(item.id);
+          setReceiveOpen(true);
+        }}
       />
       <BatchDetailsSheet batch={selectedBatch} onClose={() => setSelectedBatch(null)} />
     </Card>

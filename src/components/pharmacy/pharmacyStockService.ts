@@ -838,3 +838,104 @@ export async function listInventoryItemOptions(
   }
   return options;
 }
+
+/* ------------------------------------------------------------------ */
+/* Item creation (create-on-missing, CEO rule 2026-10-29)              */
+/*                                                                     */
+/* The batch/stock-control surface historically offered ONLY           */
+/* "Receive batch" against pre-existing catalogue rows, so a           */
+/* dispensary with an empty catalogue hit a dead end. These two        */
+/* creators let staff add the item itself, inline, then carry on.      */
+/* ------------------------------------------------------------------ */
+
+export interface CreatePharmacyItemInput {
+  product_name: string;
+  /** Must equal the live pharmacy_inventory.category CHECK values. */
+  category: string;
+  unit_price: number;
+  cost_price?: number;
+  manufacturer?: string;
+  reorder_level?: number;
+  description?: string;
+}
+
+export interface CreateMedicationItemInput {
+  medication_name: string;
+  generic_name?: string;
+  /** Strength, e.g. "500mg". medication_inventory.dosage is NOT NULL. */
+  dosage: string;
+  /** Live medication_type enum value. */
+  medication_type: string;
+  manufacturer?: string;
+  unit_price?: number;
+  minimum_stock_level?: number;
+  /** medication_inventory.expiry_date is NOT NULL (legacy item-level
+   *  field): the expiry of the first stock the item was created with. */
+  expiry_date: string;
+}
+
+/**
+ * Create a dispensary stock item in pharmacy_inventory.
+ * Mirrors the proven MedicineQuickCreateDialog write pattern: the id is
+ * generated client-side and there is NO .select() read-back — the
+ * pharmacy_inventory SELECT policy only covers institutions the caller
+ * admin-owns, so a staff member's insert would succeed but its
+ * RETURNING would be refused.
+ */
+export async function createPharmacyInventoryItem(
+  institutionId: string,
+  input: CreatePharmacyItemInput
+): Promise<InventoryItemOption> {
+  const id = crypto.randomUUID();
+  const name = input.product_name.trim();
+  const { error } = await (supabase.from("pharmacy_inventory" as any) as any).insert({
+    id,
+    pharmacy_id: institutionId,
+    product_name: name,
+    product_code:
+      (name.toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32) || "MED") +
+      "-" +
+      Math.random().toString(36).slice(2, 7).toUpperCase(),
+    category: input.category,
+    quantity: 0,
+    unit_price: input.unit_price,
+    cost_price: input.cost_price ?? 0,
+    manufacturer: input.manufacturer?.trim() || null,
+    reorder_level: input.reorder_level ?? 10,
+    description: input.description?.trim() || null,
+  });
+  throwIf(error, "Failed to add item");
+  return { id, name, table: "pharmacy_inventory", quantity: 0, unitPrice: input.unit_price };
+}
+
+/** Create an item in the institution medication catalogue. */
+export async function createMedicationInventoryItem(
+  institutionId: string,
+  input: CreateMedicationItemInput
+): Promise<InventoryItemOption> {
+  const name = input.medication_name.trim();
+  const { data, error } = await (supabase.from("medication_inventory" as any) as any)
+    .insert({
+      institution_id: institutionId,
+      medication_name: name,
+      generic_name: input.generic_name?.trim() || null,
+      dosage: input.dosage.trim(),
+      medication_type: input.medication_type,
+      manufacturer: input.manufacturer?.trim() || null,
+      expiry_date: input.expiry_date,
+      quantity_available: 0,
+      minimum_stock_level: input.minimum_stock_level ?? 10,
+      unit_price: input.unit_price ?? null,
+    })
+    .select("id")
+    .single();
+  throwIf(error, "Failed to add item");
+  const row = data as unknown as { id: string };
+  return {
+    id: row.id,
+    name,
+    table: "medication_inventory",
+    quantity: 0,
+    unitPrice: input.unit_price ?? null,
+  };
+}
