@@ -93,28 +93,6 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [facilities, setFacilities] = useState<any[]>([]);
-  const [patientSearch, setPatientSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [selectedPatientName, setSelectedPatientName] = useState("");
-  // Fallback patient search via relationship-gated RPC (for providers
-  // without facility-registered patients, e.g. standalone /referrals page)
-  const searchPatients = async (query: string) => {
-    setPatientSearch(query);
-    if (query.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
-    setSearching(true);
-    try {
-      const { data } = await supabase.rpc("search_patients_for_provider", { p_search: query.trim() });
-      setSearchResults(data || []);
-    } catch (e) {
-      console.error("Patient search failed:", e);
-    } finally {
-      setSearching(false);
-    }
-  };
 
   const [form, setForm] = useState({
     patient_id: '',
@@ -261,14 +239,10 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   };
 
   const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => {
-    // Patient name lookup: master-profile map → search results →
-    // selected name → plain fallback (never a raw UUID).
+    // Patient name lookup: master-profile map → plain fallback
+    // (never a raw UUID).
     const nameFor = (patientId: string) => {
       if (patientNames[patientId]) return patientNames[patientId];
-      const p = searchResults.find((x: any) => x.id === patientId);
-      if (p) return `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || "Patient";
-      // For the just-created referral, use the name captured at selection time
-      if (form.patient_id === patientId && selectedPatientName) return selectedPatientName;
       return "Patient";
     };
     return (
@@ -336,41 +310,18 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Create Referral</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <HospitalPatientSelect
-              institutionId={hospital?.id}
-              value={form.patient_id}
-              onChange={(id) => setForm({ ...form, patient_id: id })}
-              createSource="referral"
-            />
-            {!hospital?.id && (
-              <div className="space-y-1.5">
-                <Label>Search your patients</Label>
-                <Input
-                  value={patientSearch}
-                  onChange={(e) => searchPatients(e.target.value)}
-                  placeholder="Type patient name..."
-                />
-                {searching && <p className="text-xs text-muted-foreground">Searching...</p>}
-                {searchResults.length > 0 && (
-                  <div className="rounded-lg border max-h-40 overflow-y-auto">
-                    {searchResults.map((p: any) => (
-                      <button
-                        key={p.id}
-                        onClick={() => {
-                          const name = `${p.first_name || ""} ${p.last_name || ""}`.trim();
-                          setForm({ ...form, patient_id: p.id });
-                          setSearchResults([]);
-                          setPatientSearch(name);
-                          setSelectedPatientName(name);
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-muted/60 text-sm"
-                      >
-                        {p.first_name} {p.last_name}
-                        {form.patient_id === p.id && <span className="ml-2 text-primary-500">✓</span>}
-                      </button>
-                    ))}
-                  </div>
-                )}
+            {hospital?.id ? (
+              <HospitalPatientSelect
+                institutionId={hospital?.id}
+                value={form.patient_id}
+                onChange={(id) => setForm({ ...form, patient_id: id })}
+                createSource="referral"
+              />
+            ) : (
+              <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3">
+                <p className="text-sm text-muted-foreground">
+                  Select a facility first — referrals are made from a facility so the patient can be found on its roster (or created there) and the receiving facility knows who sent it.
+                </p>
               </div>
             )}
             <div className="space-y-1.5">

@@ -107,6 +107,13 @@ export const NurseWorkflow = () => {
     setCriticalWarnings([]);
     const payload = {
       user_id: vitalsPatientId,
+      // Institution stamp (PW-16): vital_signs carries a real
+      // institution_id column (FK to healthcare_institutions, per the
+      // generated types) — staff-recorded vitals must carry it so
+      // institution-scoped views can find them. metadata.institution_id
+      // mirrors it because the offline-sync whitelist passes metadata
+      // through even where column lists are trimmed.
+      institution_id: institutionId || null,
       blood_pressure_systolic: numOrNull(vitals.sys),
       blood_pressure_diastolic: numOrNull(vitals.dia),
       heart_rate: numOrNull(vitals.hr),
@@ -116,7 +123,7 @@ export const NurseWorkflow = () => {
       blood_glucose: numOrNull(vitals.glucose),
       weight: numOrNull(vitals.weight),
       recorded_at: new Date().toISOString(),
-      metadata: { recorded_by: user.id, notes: vitalsNotes || null },
+      metadata: { recorded_by: user.id, notes: vitalsNotes || null, institution_id: institutionId || null },
     };
     const hasAny = [payload.blood_pressure_systolic, payload.blood_pressure_diastolic,
       payload.heart_rate, payload.temperature, payload.oxygen_saturation,

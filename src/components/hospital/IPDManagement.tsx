@@ -15,11 +15,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { DischargeChecklist } from './DischargeChecklist';
 import { DepartmentSelect } from './DepartmentSelect';
+import { HospitalPatientSelect } from './HospitalPatientSelect';
 import { ensureBillingDraft } from '@/services/dischargeWorkflow';
 
 interface IPDProps {
   hospital: any;
-  patients: any[];
   departments: any[];
   beds: any[];
   admissions: any[];
@@ -27,7 +27,7 @@ interface IPDProps {
   onRefresh: () => void;
 }
 
-export const IPDManagement = ({ hospital, patients, departments, beds, admissions, discharged = [], onRefresh }: IPDProps) => {
+export const IPDManagement = ({ hospital, departments, beds, admissions, discharged = [], onRefresh }: IPDProps) => {
   const [showAdmitDialog, setShowAdmitDialog] = useState(false);
   const [showDischargeDialog, setShowDischargeDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
@@ -293,20 +293,13 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
             <DialogDescription>Admit a patient to the hospital</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Patient *</Label>
-              <Select value={admitForm.patientId} onValueChange={v => setAdmitForm(p => ({ ...p, patientId: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select registered patient" /></SelectTrigger>
-                <SelectContent>
-                  {patients.map((patient: any) => (
-                    <SelectItem key={patient.id} value={patient.id}>
-                      {[patient.first_name, patient.last_name].filter(Boolean).join(' ') || patient.phone || patient.id}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {patients.length === 0 && <p className="text-xs text-muted-foreground">No patient profiles are available to admit.</p>}
-            </div>
+            <HospitalPatientSelect
+              institutionId={hospital?.id}
+              value={admitForm.patientId}
+              onChange={v => setAdmitForm(p => ({ ...p, patientId: v }))}
+              label="Patient *"
+              createSource="admission"
+            />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Admission Type *</Label>

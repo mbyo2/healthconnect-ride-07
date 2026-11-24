@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AdmitPatientDialog } from './AdmitPatientDialog';
 import { friendlyErrorMessage } from '@/utils/friendly-error';
+import { findOrCreatePatient, splitPatientName } from '@/lib/patients';
 
 const triageColors: Record<string, { bg: string; label: string }> = {
   critical: { bg: 'bg-red-500', label: 'Immediate' },
@@ -75,8 +76,8 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
   };
 
   const registerCase = async () => {
-    if (!form.patientName.trim() || !form.complaint.trim()) {
-      toast.error('Patient name and chief complaint are required');
+    if (!form.complaint.trim()) {
+      toast.error('Chief complaint is required — describe why the patient came in. The patient name can be left blank if they cannot give it.');
       return;
     }
     if (!hospital?.id) {
@@ -85,24 +86,35 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
     }
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
       const vitals: Record<string, string> = {};
       if (form.bp) vitals.bp = form.bp;
       if (form.pulse) vitals.pulse = form.pulse;
       if (form.spo2) vitals.spo2 = form.spo2;
       if (form.temp) vitals.temp = form.temp;
-      // Link a registered record when the phone matches a patient profile.
-      let patientId: string | null = null;
-      if (form.phone.trim()) {
-        const { data: match } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('role', 'patient')
-          .eq('phone', form.phone.trim())
-          .maybeSingle();
-        patientId = (match as any)?.id || null;
-      }
       const caseNumber = `A&E-${Date.now().toString(36).toUpperCase()}`;
+      // Patient Unity: every A&E case attaches to the master patient
+      // record. A named walk-in is resolved/created through
+      // find_or_create_patient (dedupe by phone, shadow-create when new).
+      // An unidentified patient (e.g. unconscious) still gets a shadow
+      // record — named "Unidentified" plus this case number so separate
+      // unidentified arrivals never merge into one record — which staff
+      // can claim/merge once the patient is identified.
+      const unidentified = !form.patientName.trim();
+      const identity = unidentified
+        ? { firstName: 'Unidentified', lastName: `Patient ${caseNumber}` }
+        : splitPatientName(form.patientName);
+      let patientId: string;
+      try {
+        const resolved = await findOrCreatePatient(
+          hospital.id,
+          { ...identity, phone: form.phone.trim() || null },
+          'triage',
+        );
+        patientId = resolved.patientId;
+      } catch (resolveError) {
+        toast.error(friendlyErrorMessage(resolveError, 'We could not link this case to a patient record, so it was not registered. Please try again.'));
+        return;
+      }
       const { error: err } = await (supabase.from('emergency_cases' as any) as any).insert({
         hospital_id: hospital.id,
         case_number: caseNumber,
@@ -113,10 +125,10 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
         arrival_time: new Date().toISOString(),
         status: 'waiting',
         vitals,
-        notes: JSON.stringify({ walk_in_name: form.patientName.trim(), phone: form.phone.trim() || undefined }),
+        notes: JSON.stringify({ phone: form.phone.trim() || undefined, unidentified: unidentified || undefined }),
       });
       if (err) throw err;
-      toast.success(`A&E case ${caseNumber} registered${patientId ? ' (linked to patient record)' : ''}`);
+      toast.success(`A&E case ${caseNumber} registered${unidentified ? ' (unidentified patient — record created to identify later)' : ' (linked to patient record)'}`);
       setShowNewCase(false);
       setForm({ patientName: '', phone: '', triage: 'urgent', complaint: '', arrivalMode: 'walk-in', bp: '', pulse: '', spo2: '', temp: '' });
       refresh();
@@ -255,8 +267,8 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Patient Name *</Label>
-                <Input value={form.patientName} onChange={e => setForm({ ...form, patientName: e.target.value })} placeholder="Full name" />
+                <Label>Patient Name</Label>
+                <Input value={form.patientName} onChange={e => setForm({ ...form, patientName: e.target.value })} placeholder="Full name — leave blank if unidentified" />
               </div>
               <div className="space-y-2">
                 <Label>Phone (links record)</Label>

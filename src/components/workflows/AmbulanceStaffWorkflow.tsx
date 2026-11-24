@@ -14,7 +14,9 @@ import { useAmbulancePositionPublisher, useLatestAmbulancePositions, positionAge
 import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMap';
 import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
-import type { InstitutionPatient } from '@/lib/patients';
+import { findOrCreatePatient, splitPatientName, type InstitutionPatient } from '@/lib/patients';
+import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const MOVING_STATUSES = ['en_route', 'on_scene', 'transporting'];
 
@@ -47,6 +49,59 @@ export const AmbulanceStaffWorkflow = () => {
   // clears the link so an id never rides under a wrong name.
   const { institutionId } = useInstitutionAffiliation();
   const [pickedPatient, setPickedPatient] = useState<InstitutionPatient | null>(null);
+  const [dispatching, setDispatching] = useState(false);
+  // Explicit-confirm fallback: only set after the dispatcher has been
+  // told the trip will be unlinked (and unbillable) and chosen to go
+  // ahead anyway — e.g. a caller who is not the patient.
+  const [confirmUnlinked, setConfirmUnlinked] = useState(false);
+
+  const doDispatch = async (patientId: string | null) => {
+    setDispatching(true);
+    try {
+      await createDispatch({ ...form, patient_id: patientId } as any);
+      setPickedPatient(null);
+      setConfirmUnlinked(false);
+      setShowAdd(false);
+    } finally {
+      setDispatching(false);
+    }
+  };
+
+  const handleDispatch = async () => {
+    if (pickedPatient) {
+      await doDispatch(pickedPatient.id);
+      return;
+    }
+    // Resolve-first: a typed patient name is matched/created on the
+    // master record before dispatch so the trip stays billable and on
+    // the patient's record.
+    if (form.patient_name.trim() && institutionId && !confirmUnlinked) {
+      setDispatching(true);
+      try {
+        const { firstName, lastName } = splitPatientName(form.patient_name);
+        const resolved = await findOrCreatePatient(
+          institutionId,
+          { firstName, lastName, phone: form.contact_phone.trim() || null },
+          'triage',
+        );
+        await doDispatch(resolved.patientId);
+        return;
+      } catch (e: any) {
+        toast.error(friendlyErrorMessage(e, 'We could not link this dispatch to a patient record. You can try again, or confirm an unlinked dispatch below.'));
+        setConfirmUnlinked(true);
+        return;
+      } finally {
+        setDispatching(false);
+      }
+    }
+    // No name typed, no facility context, or resolution failed: the
+    // dispatcher must explicitly confirm an unlinked dispatch.
+    if (!confirmUnlinked) {
+      setConfirmUnlinked(true);
+      return;
+    }
+    await doDispatch(null);
+  };
 
   const statusFlow: Record<string, string> = {
     dispatched: 'en_route', en_route: 'on_scene', on_scene: 'transporting', transporting: 'delivered', delivered: 'completed',
@@ -63,7 +118,7 @@ export const AmbulanceStaffWorkflow = () => {
           <h1 className="text-2xl font-bold text-foreground">Ambulance & Transport</h1>
           <p className="text-muted-foreground">Emergency dispatch, GPS tracking & patient transport</p>
         </div>
-        <Dialog open={showAdd} onOpenChange={setShowAdd}>
+        <Dialog open={showAdd} onOpenChange={(v) => { setShowAdd(v); if (!v) setConfirmUnlinked(false); }}>
           <DialogTrigger asChild><Button className="gap-1 bg-destructive hover:bg-destructive/90"><Plus className="h-4 w-4" /> New Dispatch</Button></DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Emergency Dispatch</DialogTitle></DialogHeader>
@@ -81,7 +136,7 @@ export const AmbulanceStaffWorkflow = () => {
                     />
                 </div>
               )}
-              <div className="space-y-1"><Label>Patient / Caller</Label><Input value={form.patient_name} onChange={e => { setPickedPatient(null); setForm({...form, patient_name: e.target.value}); }} /></div>
+              <div className="space-y-1"><Label>Patient / Caller</Label><Input value={form.patient_name} onChange={e => { setPickedPatient(null); setConfirmUnlinked(false); setForm({...form, patient_name: e.target.value}); }} /></div>
               <div className="space-y-1"><Label>Pickup Location</Label><Input value={form.pickup_location} onChange={e => setForm({...form, pickup_location: e.target.value})} placeholder="Address or landmark" /></div>
               <div className="space-y-1"><Label>Destination</Label><Input value={form.destination} onChange={e => setForm({...form, destination: e.target.value})} /></div>
               <div className="grid grid-cols-2 gap-2">
@@ -100,7 +155,17 @@ export const AmbulanceStaffWorkflow = () => {
               </div>
               <div className="space-y-1"><Label>Contact Phone</Label><Input type="tel" value={form.contact_phone} onChange={e => setForm({...form, contact_phone: e.target.value})} /></div>
               <div className="space-y-1"><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={2} /></div>
-              <Button className="w-full bg-destructive hover:bg-destructive/90" onClick={async () => { await createDispatch({ ...form, patient_id: pickedPatient?.id ?? null } as any); setPickedPatient(null); setShowAdd(false); }}>Dispatch Now</Button>
+              {confirmUnlinked && !pickedPatient && (
+                <div className="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950/30" role="alert">
+                  <p className="text-sm font-medium text-amber-900 dark:text-amber-200">This trip will not be linked to a patient record</p>
+                  <p className="text-xs text-amber-800 dark:text-amber-300">
+                    An unlinked trip cannot be billed to the patient and will not appear on their record. Use this only when the caller is not the patient or the patient cannot be identified yet — the button below will dispatch without a link.
+                  </p>
+                </div>
+              )}
+              <Button className="w-full bg-destructive hover:bg-destructive/90" disabled={dispatching} onClick={handleDispatch}>
+                {dispatching ? 'Dispatching…' : confirmUnlinked && !pickedPatient ? 'Dispatch Without a Patient Link' : 'Dispatch Now'}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

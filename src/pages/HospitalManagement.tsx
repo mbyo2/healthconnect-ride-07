@@ -24,7 +24,6 @@ import { EMRCaseSheets } from "@/components/hospital/EMRCaseSheets";
 import { HospitalPharmacy } from "@/components/hospital/HospitalPharmacy";
 import { HospitalLab } from "@/components/hospital/HospitalLab";
 import { RadiologyImaging } from "@/components/hospital/RadiologyImaging";
-import { InventoryPurchase } from "@/components/hospital/InventoryPurchase";
 import { DischargeSummary } from "@/components/hospital/DischargeSummary";
 import { InsuranceTPA } from "@/components/hospital/InsuranceTPA";
 import { DayCareManagement } from "@/components/hospital/DayCareManagement";
@@ -38,7 +37,6 @@ import { CampManagement } from "@/components/hospital/CampManagement";
 import { IndentManagement } from "@/components/hospital/IndentManagement";
 import { ARTModule } from "@/components/hospital/ARTModule";
 import { EmailCampaigns } from "@/components/hospital/EmailCampaigns";
-import { CSSDManagement } from "@/components/hospital/CSSDManagement";
 import { DietManagement } from "@/components/hospital/DietManagement";
 import { InfectionManagement } from "@/components/clinical/InfectionManagement";
 import { NotificationCenter } from "@/components/hospital/NotificationCenter";
@@ -145,21 +143,6 @@ export const HospitalManagement = () => {
         .order("discharge_date", { ascending: false })
         .limit(200);
       return (data as any[]) || [];
-    },
-    enabled: !!hospital,
-  });
-
-  const { data: patients = [] } = useQuery({
-    queryKey: ["hospital-patient-directory", hospital?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, phone, date_of_birth")
-        .eq("role", "patient")
-        .order("last_name")
-        .limit(200);
-      if (error) throw error;
-      return data || [];
     },
     enabled: !!hospital,
   });
@@ -352,7 +335,7 @@ export const HospitalManagement = () => {
             <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
             <TabsContent value="emr">{mod("emr", <EMRCaseSheets hospital={hospital} departments={departments} />)}</TabsContent>
             <TabsContent value="opd">{mod("opd", <OPDManagement hospital={hospital} departments={departments} />)}</TabsContent>
-            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} discharged={dischargedAdmissions} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} departments={departments} beds={beds} admissions={admissions} discharged={dischargedAdmissions} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="emergency">{mod("emergency", <EmergencyTriage hospital={hospital} />)}</TabsContent>
             <TabsContent value="ot">{mod("ot", <OTManagement hospital={hospital} />)}</TabsContent>
             <TabsContent value="icu">{mod("icu", <ICU hospital={hospital} />)}</TabsContent>

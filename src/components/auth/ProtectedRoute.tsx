@@ -6,25 +6,18 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requireAdmin?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading, profile } = useAuth();
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!isLoading) {
-      if (!isAuthenticated) {
-        setIsAuthorized(false);
-      } else if (requireAdmin && profile?.role !== 'admin') {
-        setIsAuthorized(false);
-      } else {
-        setIsAuthorized(true);
-      }
+      setIsAuthorized(isAuthenticated);
     }
-  }, [isAuthenticated, isLoading, profile, requireAdmin]);
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return <LoadingScreen />;

@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
-import type { InstitutionPatient } from '@/lib/patients';
+import { findOrCreatePatient, splitPatientName, type InstitutionPatient } from '@/lib/patients';
 import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 interface OTProps {
@@ -104,11 +104,30 @@ export const OTManagement = ({ hospital }: OTProps) => {
 
     setSaving(true);
     try {
+      // Patient selection is mandatory: a picked patient wins; a typed
+      // name is resolved/created through find_or_create_patient so the
+      // surgery (and its billing) always carries the master patient id.
+      // If resolution fails we stop — never book an unlinked surgery.
+      let patientId = pickedPatient?.id ?? null;
+      if (!patientId) {
+        try {
+          const { firstName, lastName } = splitPatientName(form.patientName);
+          const resolved = await findOrCreatePatient(
+            hospital.id,
+            { firstName, lastName },
+            'registration',
+          );
+          patientId = resolved.patientId;
+        } catch (resolveError) {
+          toast.error(friendlyErrorMessage(resolveError, 'We could not link this surgery to a patient record, so it was not scheduled. Please try again.'));
+          return;
+        }
+      }
       const { data: userData } = await supabase.auth.getUser();
       const { error } = await (supabase.from('ot_surgeries' as any) as any).insert({
         institution_id: hospital.id,
         patient_name: form.patientName,
-        patient_id: pickedPatient?.id ?? null,
+        patient_id: patientId,
         procedure_name: form.surgeryType,
         surgeon_name: form.surgeon || 'TBD',
         ot_room: form.otRoom,
@@ -188,7 +207,15 @@ export const OTManagement = ({ hospital }: OTProps) => {
       }
 
       setShowAnaesthesia(false);
-      toast.success('Anaesthesia record saved');
+      if (selected.patient_id) {
+        toast.success('Anaesthesia record saved');
+      } else {
+        // Legacy unlinked surgery: the details are kept on the surgery
+        // itself, but no standalone anaesthesia record can be filed
+        // until the surgery is linked to a patient — say so, never
+        // skip silently.
+        toast.warning('Anaesthesia details saved on the surgery, but no anaesthesia record was filed because this surgery is not linked to a patient record yet.');
+      }
       refresh();
     } catch (e: any) {
       toast.error(friendlyErrorMessage(e, 'Failed to save anaesthesia record'));
@@ -345,7 +372,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             {hospital?.id && (
               <div className="space-y-2">
-                <Label>Link to patient record (so the surgery can be billed)</Label>
+                <Label>Patient * (search the roster, create if new, or type the name below — we will link the record on save)</Label>
                 <InstitutionPatientPicker
                   institutionId={hospital.id}
                   value={pickedPatient}

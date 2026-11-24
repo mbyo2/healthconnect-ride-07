@@ -21,6 +21,8 @@ import {
   type InstitutionPatient,
 } from '@/lib/patients';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { friendlyErrorMessage } from '@/utils/friendly-error';
 
 const TRIAGE_CONFIG = {
   critical: { label: 'Critical', color: 'bg-red-600 text-white', border: 'border-l-red-600', description: 'Immediate life-threatening' },
@@ -66,12 +68,19 @@ export const TriageStaffWorkflow = () => {
 
   const handleSubmit = async () => {
     if (!form.patient_name.trim() || !form.chief_complaint.trim()) return;
+    if (!institutionId) {
+      toast.error('You need to be linked to a facility before recording a triage assessment, so the assessment can be attached to the patient record there.');
+      return;
+    }
     setCreating(true);
     // Patient Unity W2: assessments attach to the master patient. Picked
     // patient wins; a typed name is resolved through find_or_create_patient
-    // (dedupe or shadow-create) so triage stops writing unlinked records.
+    // (dedupe or shadow-create). Stop-on-failure (mirrors
+    // CentralizedQueueDesk): if resolution fails we abort with a
+    // plain-language error rather than submit a name-only assessment
+    // that no patient record will ever see.
     let patientId = selectedPatient?.id ?? null;
-    if (!patientId && institutionId) {
+    if (!patientId) {
       try {
         const { firstName, lastName } = splitPatientName(form.patient_name);
         const resolved = await findOrCreatePatient(
@@ -80,8 +89,10 @@ export const TriageStaffWorkflow = () => {
           'triage',
         );
         patientId = resolved.patientId;
-      } catch {
-        patientId = null;
+      } catch (e: any) {
+        toast.error(friendlyErrorMessage(e, 'We could not link this assessment to a patient record, so it was not saved. Please try again.'));
+        setCreating(false);
+        return;
       }
     }
     // Data-layer token link (Patient Unity W3): this workflow has no
@@ -173,7 +184,7 @@ export const TriageStaffWorkflow = () => {
               <DialogTitle>Triage Assessment Form</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {institutionId && (
+              {institutionId ? (
                 <InstitutionPatientPicker
                   institutionId={institutionId}
                   value={selectedPatient}
@@ -181,6 +192,10 @@ export const TriageStaffWorkflow = () => {
                   label="Patient (search the roster, or create)"
                   createSource="triage"
                 />
+              ) : (
+                <p className="rounded-lg border border-dashed border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                  You are not linked to a facility, so this assessment cannot be attached to a patient record. Ask an administrator to add you to a facility's staff first.
+                </p>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -292,7 +307,7 @@ export const TriageStaffWorkflow = () => {
                 <Input value={form.disposition} onChange={e => updateForm('disposition', e.target.value)} placeholder="e.g., Route to ER Bay 3, OPD Dr. Smith" />
               </div>
 
-              <Button onClick={handleSubmit} disabled={creating || !form.patient_name.trim() || !form.chief_complaint.trim()} className="w-full min-h-[44px]">
+              <Button onClick={handleSubmit} disabled={creating || !institutionId || !form.patient_name.trim() || !form.chief_complaint.trim()} className="w-full min-h-[44px]">
                 {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Stethoscope className="h-4 w-4 mr-2" />}
                 Submit Triage Assessment
               </Button>

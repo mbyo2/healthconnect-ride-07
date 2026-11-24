@@ -18,6 +18,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
+import { toast } from "sonner";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 interface CareTeamRole {
   id: string;
@@ -83,6 +86,7 @@ export const CareTeamManagement = () => {
   const { institution } = useInstitutionContext();
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<CareTeamRole[]>([]);
+  const [staffMembers, setStaffMembers] = useState<{ id: string; name: string }[]>([]);
   const [assignments, setAssignments] = useState<CareTeamAssignment[]>([]);
   const [tasks, setTasks] = useState<ClinicalTask[]>([]);
   const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
@@ -142,6 +146,34 @@ export const CareTeamManagement = () => {
       ]);
 
       if (rolesRes.data) setRoles(rolesRes.data as any);
+      // Staff picker: the institution's active staff roster, resolved to
+      // profile names (institution_staff.provider_id -> profiles.id).
+      try {
+        const { data: staffRows } = await supabase
+          .from("institution_staff")
+          .select("provider_id")
+          .eq("institution_id", institution.id)
+          .eq("is_active", true);
+        const staffIds = Array.from(
+          new Set(((staffRows as any[]) || []).map((s) => s.provider_id).filter(Boolean))
+        );
+        if (staffIds.length > 0) {
+          const { data: staffProfiles } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name")
+            .in("id", staffIds);
+          setStaffMembers(
+            ((staffProfiles as any[]) || []).map((p) => ({
+              id: p.id,
+              name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || "Staff member",
+            }))
+          );
+        } else {
+          setStaffMembers([]);
+        }
+      } catch {
+        setStaffMembers([]);
+      }
       if (assignmentsRes.data) {
         // NOTE (gate 2026-11-14): care_team_assignments.patient_id
         // references auth.users, not profiles, so the
@@ -172,19 +204,31 @@ export const CareTeamManagement = () => {
 
   const handleCreateAssignment = async () => {
     if (!institution) return;
+    if (!assignmentForm.patient_id) {
+      toast.error("Select a patient first — search the roster or create the patient from the picker.");
+      return;
+    }
+    if (!assignmentForm.staff_id) {
+      toast.error("Select a staff member to assign to this patient's care team.");
+      return;
+    }
 
     try {
       const { error } = await supabase.from("care_team_assignments").insert({
         institution_id: institution.id,
         ...assignmentForm,
+        role_id: assignmentForm.role_id || null,
+        expires_at: assignmentForm.expires_at || null,
         assigned_by: (await supabase.auth.getUser()).data.user?.id,
       });
 
       if (error) throw error;
+      toast.success("Care team assignment created");
       setShowAssignmentDialog(false);
       fetchCareTeamData();
     } catch (error) {
       console.error("Error creating assignment:", error);
+      toast.error(friendlyErrorMessage(error, "Could not create the care team assignment. Please try again."));
     }
   };
 
@@ -301,20 +345,13 @@ export const CareTeamManagement = () => {
                   <DialogTitle className="text-lg font-semibold">Assign Care Team Member</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                  <div>
-                    <Label className="text-xs font-semibold">Patient</Label>
-                    <Select
-                      value={assignmentForm.patient_id}
-                      onValueChange={(value) => setAssignmentForm({ ...assignmentForm, patient_id: value })}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select patient" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="placeholder" disabled>No patients available yet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <HospitalPatientSelect
+                    institutionId={institution.id}
+                    value={assignmentForm.patient_id}
+                    onChange={(id) => setAssignmentForm({ ...assignmentForm, patient_id: id })}
+                    label="Patient"
+                    createSource="registration"
+                  />
                   <div>
                     <Label className="text-xs font-semibold">Staff Member</Label>
                     <Select
@@ -325,7 +362,13 @@ export const CareTeamManagement = () => {
                         <SelectValue placeholder="Select staff" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder" disabled>No staff available yet</SelectItem>
+                        {staffMembers.length === 0 ? (
+                          <SelectItem value="placeholder" disabled>No staff on this facility's roster yet</SelectItem>
+                        ) : (
+                          staffMembers.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

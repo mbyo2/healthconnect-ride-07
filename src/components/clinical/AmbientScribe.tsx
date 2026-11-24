@@ -11,6 +11,9 @@ import { Mic, Square, FileText, Check, X, Loader2, AlertTriangle } from "lucide-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import type { InstitutionPatient } from "@/lib/patients";
 
 interface SoapDraft {
   subjective: string;
@@ -31,6 +34,45 @@ const SpeechRecognition =
 
 export default function AmbientScribe() {
   const { consultationId } = useParams<{ consultationId?: string }>();
+  const { institutionId: affiliationInstitutionId } = useInstitutionAffiliation();
+  // Patient linkage (PW-13): approved notes must land on a patient's
+  // record. The patient is resolved from the linked consultation when
+  // there is one; otherwise the clinician picks/creates the patient in
+  // the consent step below.
+  const [consultationPatientId, setConsultationPatientId] = useState<string | null>(null);
+  const [consultationInstitutionId, setConsultationInstitutionId] = useState<string | null>(null);
+  const [pickedPatient, setPickedPatient] = useState<InstitutionPatient | null>(null);
+  const patientId = pickedPatient?.id ?? consultationPatientId;
+  const pickerInstitutionId = consultationInstitutionId ?? affiliationInstitutionId ?? null;
+
+  useEffect(() => {
+    if (!consultationId) return;
+    let cancelled = false;
+    (async () => {
+      // The consultation id may reference a video consultation or an
+      // appointment — try both, in that order.
+      const { data: video } = await (supabase.from("video_consultations" as any) as any)
+        .select("patient_id, institution_id")
+        .eq("id", consultationId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (video?.patient_id) {
+        setConsultationPatientId(video.patient_id);
+        setConsultationInstitutionId(video.institution_id ?? null);
+        return;
+      }
+      const { data: appt } = await (supabase.from("appointments" as any) as any)
+        .select("patient_id, institution_id")
+        .eq("id", consultationId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (appt?.patient_id) {
+        setConsultationPatientId(appt.patient_id);
+        setConsultationInstitutionId(appt.institution_id ?? null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [consultationId]);
   const [phase, setPhase] = useState<Phase>("consent");
   const [consented, setConsented] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -147,10 +189,15 @@ export default function AmbientScribe() {
     if (!editedDraft) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast.error("You must be signed in"); return; }
+    if (!patientId) {
+      toast.error("These notes are not linked to a patient yet. Go back to the first step and select the patient — notes without a patient cannot be saved to a clinical record.");
+      return;
+    }
     setSaving(true);
     try {
       const { error } = await supabase.from("scribe_sessions").insert({
         consultation_id: consultationId || null,
+        patient_id: patientId,
         provider_id: user.id,
         transcript_text: finalRef.current.trim(),
         generated_notes: editedDraft,
@@ -222,6 +269,23 @@ export default function AmbientScribe() {
                 The patient has consented to audio transcription of this consultation
               </Label>
             </div>
+            {consultationPatientId && !pickedPatient ? (
+              <p className="text-[13px] text-muted-foreground">
+                These notes will be saved to the patient linked to this consultation.
+              </p>
+            ) : pickerInstitutionId ? (
+              <InstitutionPatientPicker
+                institutionId={pickerInstitutionId}
+                value={pickedPatient}
+                onChange={setPickedPatient}
+                label="Patient for these notes"
+                createSource="registration"
+              />
+            ) : (
+              <p className="text-[13px] text-muted-foreground">
+                Open the scribe from a consultation, or from a facility where you are on staff, so the notes can be saved to the right patient's record.
+              </p>
+            )}
             {!SpeechRecognition && (
               <p className="text-[13px] text-muted-foreground">
                 Live transcription needs Chrome or Edge. In other browsers you can paste a transcript instead.
