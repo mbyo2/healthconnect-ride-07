@@ -10,6 +10,7 @@ import {
   Download, RefreshCw, Search, Hash, Network, Server, Eye,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { loadInstitutionFinance } from "@/lib/institutionFinance";
 import { toast } from "sonner";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 
@@ -63,7 +64,13 @@ function FacilityOverview({ institutionId }: { institutionId: string }) {
         if (cancelled) return;
         const bedRows = (beds.data as any[]) || [];
         const invRows = (inv.data as any[]) || [];
-        setFacility((fac as any).data || null);
+        // LP-1 (2026-11-24): license_number moved to healthcare_institution_finance.
+        const facRow = (fac as any).data || null;
+        if (facRow) {
+          const fin = await loadInstitutionFinance(facRow.id).catch(() => null);
+          if (!cancelled && fin) Object.assign(facRow, fin);
+        }
+        setFacility(facRow);
         setStats({
           beds: bedRows.length,
           occupied: bedRows.filter((b) => b.status === "occupied").length,

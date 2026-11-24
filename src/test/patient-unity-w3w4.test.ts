@@ -68,9 +68,13 @@ describe("W3 · one roster picker everywhere", () => {
     expect(src).not.toContain("fetchPatients");
   });
 
-  it("Billing staff auto-fill resolves patients from the roster first", () => {
+  it("Billing staff pick the patient from the roster picker and bill the master id", () => {
     const src = readSrc("src/components/workflows/BillingStaffWorkflow.tsx");
-    expect(src).toContain("searchInstitutionPatients");
+    // PW-10 (2026-11-24 swarm): the picker (which wraps searchInstitutionPatients)
+    // replaced the free-text name + discarded-id auto-fill; the invoice is
+    // created against the picked master patient_id.
+    expect(src).toContain("InstitutionPatientPicker");
+    expect(src).toContain("patient_id: selectedPatient.id");
   });
 
   it("Triage attaches the patient's active queue token (data-layer link)", () => {

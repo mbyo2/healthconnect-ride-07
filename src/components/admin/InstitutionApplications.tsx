@@ -12,6 +12,7 @@ import {
   Building2, Globe, Activity, ShieldCheck,
 } from "lucide-react";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { loadInstitutionFinanceMap } from "@/lib/institutionFinance";
 
 interface InstitutionApplication {
   id: string;
@@ -126,10 +127,20 @@ export const InstitutionApplications = () => {
       // Surface profile-fetch errors instead of silently rendering blank applicants
       if (profilesError) throw profilesError;
 
+      // LP-1 (2026-11-24): settlement fields (incl. license_number) now live in
+      // healthcare_institution_finance — merge them back for this admin view.
+      const financeByInstitution = await loadInstitutionFinanceMap(
+        ((institutions || []) as any[]).map((i: any) => i.id),
+      ).catch(() => new Map());
+      const institutionsWithFinance = ((institutions || []) as any[]).map((i: any) => ({
+        ...i,
+        ...(financeByInstitution.get(i.id) || {}),
+      }));
+
       const merged = (data as any[] || []).map(a => ({
         ...a,
         applicant: (profiles || []).find((p: any) => p.id === a.applicant_id) || null,
-        institution: (institutions || []).find((i: any) => i.admin_id === a.applicant_id) || null,
+        institution: institutionsWithFinance.find((i: any) => i.admin_id === a.applicant_id) || null,
       }));
       setApps(merged as InstitutionApplication[]);
     } catch (e: any) {
