@@ -44,7 +44,7 @@ import { SuggestionBanner } from "@/components/guidance";
 import { PediatricCenter } from "@/components/specialized/PediatricCenter";
 import { PhysiotherapyCenter } from "@/components/specialized/PhysiotherapyCenter";
 import { DispensaryOperations } from "@/components/specialized/DispensaryOperations";
-import { ERPPharmacyInventory } from "@/components/erp/ERPPharmacyInventory";
+import { InventoryManagerWorkflow } from "@/components/workflows/InventoryManagerWorkflow";
 import { ERPAdministration } from "@/components/erp/ERPAdministration";
 import { FHIRInteroperabilityHub } from "@/components/interoperability/FHIRInteroperabilityHub";
 import { CentralizedQueueDesk } from "@/components/scheduling/CentralizedQueueDesk";
@@ -277,6 +277,7 @@ export const InstitutionDashboard = () => {
     laboratory: "/lab-management",
     pharmacy: "/pharmacy-portal",
     pharmacy_inventory: "/pharmacy-inventory",
+    erp_inventory: "/hospital-inventory",
     billing: "/hospital-management?tab=billing",
     hr_staff: "/institution/personnel",
     staff_management: "/institution/personnel",
@@ -1030,8 +1031,21 @@ export const InstitutionDashboard = () => {
         {/* 7. Care Management (OPD/IPD) */}
         {activeTab === "care" && <CareManagementSuite institutionId={institution.id} />}
 
-        {/* 8. ERP Stock & Buying */}
-        {activeTab === "erp_stock" && <ERPPharmacyInventory institutionId={institution.id} />}
+        {/* 8. ERP Stock & Buying — hospital stock (hospital_inventory +
+            movement ledger), NOT medication_inventory: the ERP tab used
+            to render ERPPharmacyInventory's medication view, so hospital
+            stock was invisible even when the tab was unlocked. The full
+            page (with the CSSD tab) is /hospital-inventory. */}
+        {activeTab === "erp_stock" && (
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" onClick={() => navigate("/hospital-inventory")}>
+                Open full Hospital Inventory page
+              </Button>
+            </div>
+            <InventoryManagerWorkflow />
+          </div>
+        )}
 
         {/* 9. ERP Admin & Finance */}
         {activeTab === "erp_admin" && <ERPAdministration institutionId={institution.id} />}

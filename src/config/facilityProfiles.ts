@@ -787,11 +787,21 @@ const HMS_MODULE_LABELS: Record<HmsModule, string> = {
   campaigns: 'Email Campaigns',
 };
 
+/** Archetypes whose DB tier charters (secondary / tertiary) carry the
+ *  erp_inventory module as 'live' — full hospitals running a central
+ *  store. Mirrors facility_module_charter, where erp_inventory is live
+ *  for the primary/secondary/tertiary hospital tiers. */
+const ERP_INVENTORY_ARCHETYPES: FacilityArchetype[] = [
+  'general_hospital',
+  'specialty_hospital',
+  'trauma_centre',
+];
+
 export function archetypeToCharter(
   type: string | null | undefined
 ): ArchetypeCharterModule[] {
   const profile = getFacilityProfile(type);
-  return (Object.keys(profile.modules) as HmsModule[]).map((key, idx) => {
+  const charter = (Object.keys(profile.modules) as HmsModule[]).map((key, idx) => {
     const relevance = profile.modules[key];
     return {
       module_key: key,
@@ -805,4 +815,20 @@ export function archetypeToCharter(
       relevance,
     };
   });
+  // erp_inventory is a DB-charter key, not an HMS module key, so it is
+  // appended explicitly for the hospital archetypes whose secondary /
+  // tertiary charters carry it live. Without this the archetype path
+  // (the primary resolution path in institutionModules) could never
+  // surface it and the ERP Stock tab stayed locked for everyone.
+  if (ERP_INVENTORY_ARCHETYPES.includes(profile.archetype)) {
+    charter.push({
+      module_key: 'erp_inventory',
+      module_name: 'ERP Stock & Procurement',
+      description: 'Hospital-wide stock: receive, issue, transfer, adjust and write off, by department',
+      status: 'live',
+      display_order: charter.length,
+      relevance: 'core',
+    });
+  }
+  return charter;
 }

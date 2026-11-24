@@ -145,7 +145,7 @@ export const TAB_MODULE_MAP: TabModuleRule[] = [
     requiredModules: ["erp_inventory"],
     essential: false,
     notes:
-      "Dedicated erp_inventory charter module (added 2026-10-10).",
+      "Dedicated erp_inventory charter module (added 2026-10-10). The tab renders hospital stock (hospital_inventory + its movement ledger, via InventoryManagerWorkflow) — the full page is /hospital-inventory. Medication stock stays on the dispensary tab / Drug Stock page.",
   },
   {
     tab: "erp_admin",
