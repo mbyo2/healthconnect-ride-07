@@ -787,14 +787,25 @@ const HMS_MODULE_LABELS: Record<HmsModule, string> = {
   campaigns: 'Email Campaigns',
 };
 
-/** Archetypes whose DB tier charters (secondary / tertiary) carry the
- *  erp_inventory module as 'live' — full hospitals running a central
- *  store. Mirrors facility_module_charter, where erp_inventory is live
- *  for the primary/secondary/tertiary hospital tiers. */
+/** Archetypes whose charters carry the erp_inventory module as 'live'.
+ *  CEO scope (2026-11-24): inventory is for EVERY institution type that
+ *  holds stock — hospitals, clinics and all other types — not hospitals
+ *  alone. Every archetype below holds general stock (consumables, medical
+ *  supplies, equipment, general supplies); pharmacies additionally keep
+ *  their dedicated medicine/batch inventory. Mirrors
+ *  facility_module_charter, where erp_inventory is live for the primary,
+ *  secondary and tertiary tiers alike. */
 const ERP_INVENTORY_ARCHETYPES: FacilityArchetype[] = [
   'general_hospital',
   'specialty_hospital',
   'trauma_centre',
+  'clinic',
+  'dental_clinic',
+  'dialysis_centre',
+  'long_term_care',
+  'diagnostics',
+  'solo_practice',
+  'pharmacy',
 ];
 
 export function archetypeToCharter(
@@ -816,15 +827,15 @@ export function archetypeToCharter(
     };
   });
   // erp_inventory is a DB-charter key, not an HMS module key, so it is
-  // appended explicitly for the hospital archetypes whose secondary /
-  // tertiary charters carry it live. Without this the archetype path
+  // appended explicitly for every stock-holding archetype (all of them —
+  // CEO scope 2026-11-24). Without this the archetype path
   // (the primary resolution path in institutionModules) could never
   // surface it and the ERP Stock tab stayed locked for everyone.
   if (ERP_INVENTORY_ARCHETYPES.includes(profile.archetype)) {
     charter.push({
       module_key: 'erp_inventory',
       module_name: 'ERP Stock & Procurement',
-      description: 'Hospital-wide stock: receive, issue, transfer, adjust and write off, by department',
+      description: 'Institution-wide stock: receive, issue, transfer, adjust and write off, by department',
       status: 'live',
       display_order: charter.length,
       relevance: 'core',
