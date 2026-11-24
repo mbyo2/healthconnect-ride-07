@@ -93,6 +93,30 @@ export const Billing = () => {
   const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
   const patientId = selectedPatient?.id ?? "";
   const [items, setItems] = useState<InvoiceServiceLine[]>([emptyServiceLine()]);
+  // PW-15b: the patient's insurance on file (list_patient_insurance) is
+  // selectable here and its provider is sent to create_manual_invoice —
+  // no more hard-coded null.
+  const [patientPolicies, setPatientPolicies] = useState<any[]>([]);
+  const [selectedPolicyId, setSelectedPolicyId] = useState<string>("");
+
+  useEffect(() => {
+    setPatientPolicies([]);
+    setSelectedPolicyId("");
+    if (!patientId || !institutionId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any).rpc("list_patient_insurance", {
+        p_hospital_id: institutionId,
+        p_patient_id: patientId,
+      });
+      if (cancelled) return;
+      const list = (data as any[]) || [];
+      setPatientPolicies(list);
+      const def = list.find((pol: any) => pol.active_today && pol.accepted_by_hospital);
+      setSelectedPolicyId(def?.id || "");
+    })();
+    return () => { cancelled = true; };
+  }, [patientId, institutionId]);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [dueDate, setDueDate] = useState("");
@@ -152,7 +176,8 @@ export const Billing = () => {
         p_discount: discount,
         p_due_date: dueDate || null,
         p_notes: notes || null,
-        p_insurance_provider: null,
+        p_insurance_provider:
+          patientPolicies.find((pol: any) => pol.id === selectedPolicyId)?.provider_name ?? null,
       });
 
       if (error) throw error;
@@ -334,6 +359,8 @@ export const Billing = () => {
 
   const resetForm = () => {
     setSelectedPatient(null);
+    setPatientPolicies([]);
+    setSelectedPolicyId("");
     setItems([emptyServiceLine()]);
     setTax(0);
     setDiscount(0);
@@ -480,6 +507,28 @@ export const Billing = () => {
               onChange={setSelectedPatient}
               label="Patient"
             />
+
+            {patientId && (
+              <div>
+                <Label>Insurance</Label>
+                {patientPolicies.length > 0 ? (
+                  <Select value={selectedPolicyId || "none"} onValueChange={(v) => setSelectedPolicyId(v === "none" ? "" : v)}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Patient pays in full" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No insurance — patient pays in full</SelectItem>
+                      {patientPolicies.map((pol: any) => (
+                        <SelectItem key={pol.id} value={pol.id} disabled={!pol.active_today || !pol.accepted_by_hospital}>
+                          {pol.provider_name} · Policy {pol.policy_number}
+                          {!pol.active_today ? " (not active today)" : !pol.accepted_by_hospital ? " (not billed by this facility)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="mt-1 text-xs text-muted-foreground">No insurance on file — the patient pays in full.</p>
+                )}
+              </div>
+            )}
 
             <div>
               <Label>Services (priced from the price list)</Label>

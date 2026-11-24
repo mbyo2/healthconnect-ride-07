@@ -48,7 +48,10 @@ const EmergencyResponse = () => {
       // must be reachable whether or not it markets itself publicly.
       const { data, error } = await supabase
         .from("healthcare_institutions")
-        .select("*")
+        // Anon-safe public column list only — never select * here: the
+        // bank/tax/license/admin_id columns are not readable by anon and
+        // requesting one fails the whole directory query.
+        .select("id, name, address, phone")
         .eq("type", "hospital")
         .eq("is_verified", true)
         .limit(3);

@@ -21,6 +21,7 @@ import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { upsertInstitutionFinance } from "@/lib/institutionFinance";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -271,7 +272,6 @@ export const HealthcareInstitutionFormEnhanced = () => {
         admin_id: user.id,
         name: formData.name,
         type: formData.type as any,
-        license_number: formData.license_number,
         address: formData.address,
         city: formData.city,
         state: formData.state,
@@ -290,12 +290,10 @@ export const HealthcareInstitutionFormEnhanced = () => {
         accreditation_body: formData.accreditation_body || null,
         accreditation_number: formData.accreditation_number || null,
         accreditation_expiry_date: formData.accreditation_expiry_date || null,
-        tax_id: formData.tax_id || null,
-        business_registration_number: formData.business_registration_number || null,
-        bank_name: formData.bank_name || null,
-        bank_account_number: formData.bank_account_number || null,
-        bank_account_name: formData.bank_account_name || null,
-        swift_code: formData.swift_code || null,
+        // LP-1: tax_id, business_registration_number, bank_* and swift_code
+        // are NOT columns of the base payload any more — they are upserted
+        // into healthcare_institution_finance below (license_number moves
+        // there too).
         services_offered: formData.services_offered,
         equipment_available: formData.equipment_available,
         languages_spoken: formData.languages_spoken,
@@ -311,6 +309,19 @@ export const HealthcareInstitutionFormEnhanced = () => {
         .single();
 
       if (institutionError) throw institutionError;
+
+      // LP-1: settlement/compliance fields go to the finance table.
+      if (institutionData) {
+        await upsertInstitutionFinance(institutionData.id, {
+          license_number: formData.license_number || null,
+          tax_id: formData.tax_id || null,
+          business_registration_number: formData.business_registration_number || null,
+          bank_name: formData.bank_name || null,
+          bank_account_number: formData.bank_account_number || null,
+          bank_account_name: formData.bank_account_name || null,
+          swift_code: formData.swift_code || null,
+        });
+      }
 
       // Provision the HMS workspace immediately (departments per facility
       // type) so the dashboard, queues and beds work from day one — for

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, DollarSign, CheckCircle, Loader2, Receipt, AlertCircle } from "lucide-react";
+import { Plus, DollarSign, CheckCircle, Loader2, Receipt, AlertCircle, ShieldPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
@@ -19,6 +19,9 @@ import { PricedServiceQuickCreateDialog, PRICED_SERVICE_CATEGORIES } from "@/com
 import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
 import type { InstitutionPatient } from "@/lib/patients";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 /**
  * A human label for the price-list service a charge needs, derived from
@@ -89,6 +92,67 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   const [isLoadingCharges, setIsLoadingCharges] = useState(false);
   const [policies, setPolicies] = useState<PatientPolicy[]>([]);
   const [selectedPolicyId, setSelectedPolicyId] = useState<string>("");
+  // PW-15a: create-on-missing for patient coverage — a biller facing a
+  // walk-in with a physical insurance card records it right here instead
+  // of dead-ending on "patient pays in full".
+  const [showAddInsurance, setShowAddInsurance] = useState(false);
+  const [savingInsurance, setSavingInsurance] = useState(false);
+  const [insuranceForm, setInsuranceForm] = useState({
+    provider_name: "",
+    policy_number: "",
+    group_number: "",
+    coverage_start_date: new Date().toISOString().split("T")[0],
+    coverage_end_date: "",
+  });
+
+  const refreshPolicies = async (patientId: string, preferPolicyNumber?: string) => {
+    const { data } = await (supabase as any).rpc("list_patient_insurance", {
+      p_hospital_id: hospital.id,
+      p_patient_id: patientId,
+    });
+    const list = ((data || []) as PatientPolicy[]);
+    setPolicies(list);
+    const preferred = preferPolicyNumber
+      ? list.find((pol) => pol.policy_number === preferPolicyNumber)
+      : undefined;
+    const chosen = preferred || list.find((pol) => pol.active_today && pol.accepted_by_hospital);
+    setSelectedPolicyId(chosen?.id || "");
+    return list;
+  };
+
+  const handleAddInsurance = async () => {
+    if (!selectedPatientId) return;
+    if (!insuranceForm.provider_name.trim() || !insuranceForm.policy_number.trim()) {
+      toast.error("Enter the insurer name and the policy number from the patient's card.");
+      return;
+    }
+    setSavingInsurance(true);
+    try {
+      const { error } = await supabase.from("insurance_information").insert({
+        patient_id: selectedPatientId,
+        provider_name: insuranceForm.provider_name.trim(),
+        policy_number: insuranceForm.policy_number.trim(),
+        group_number: insuranceForm.group_number.trim() || null,
+        coverage_start_date: insuranceForm.coverage_start_date || new Date().toISOString().split("T")[0],
+        coverage_end_date: insuranceForm.coverage_end_date || null,
+      } as any);
+      if (error) throw error;
+      toast.success("Insurance added for this patient");
+      setShowAddInsurance(false);
+      setInsuranceForm({
+        provider_name: "",
+        policy_number: "",
+        group_number: "",
+        coverage_start_date: new Date().toISOString().split("T")[0],
+        coverage_end_date: "",
+      });
+      await refreshPolicies(selectedPatientId, insuranceForm.policy_number.trim());
+    } catch (err: any) {
+      toast.error(friendlyErrorMessage(err, "Could not save the insurance details. Please try again."));
+    } finally {
+      setSavingInsurance(false);
+    }
+  };
 
   // E-14: charges are discovered from the encounter and matched to the
   // hospital's service_pricing catalogue. Prices shown here are a
@@ -725,7 +789,12 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="mt-1 text-xs text-muted-foreground">No insurance on file — the patient pays in full.</p>
+                  <div className="mt-1 space-y-2">
+                    <p className="text-xs text-muted-foreground">No insurance on file — the patient pays in full.</p>
+                    <Button type="button" size="sm" variant="outline" className="text-xs" onClick={() => setShowAddInsurance(true)}>
+                      <ShieldPlus className="h-3.5 w-3.5 mr-1.5" /> Add insurance for this patient
+                    </Button>
+                  </div>
                 )}
                 {selectedPolicyId && (
                   <p className="mt-1.5 text-xs text-muted-foreground">
@@ -794,7 +863,54 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             if (selectedPatientId) void handlePatientSelect(selectedPatientId);
           }}
         />
+
       )}
+
+      {/* PW-15a: add-insurance dialog — writes insurance_information for
+          the picked patient, then refreshes via list_patient_insurance. */}
+      <Dialog open={showAddInsurance} onOpenChange={setShowAddInsurance}>
+        <DialogContent className="sm:max-w-[440px]">
+          <DialogHeader>
+            <DialogTitle>Add insurance for this patient</DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Copy the details from the patient's insurance card. The new policy is selected for this bill straight away.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Insurance provider *</Label>
+              <Input value={insuranceForm.provider_name} onChange={(e) => setInsuranceForm({ ...insuranceForm, provider_name: e.target.value })} placeholder="e.g. NHIMA, Madison, Hollard" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Policy / member number *</Label>
+                <Input value={insuranceForm.policy_number} onChange={(e) => setInsuranceForm({ ...insuranceForm, policy_number: e.target.value })} placeholder="Policy number" />
+              </div>
+              <div>
+                <Label>Group number</Label>
+                <Input value={insuranceForm.group_number} onChange={(e) => setInsuranceForm({ ...insuranceForm, group_number: e.target.value })} placeholder="If any" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Coverage starts</Label>
+                <Input type="date" value={insuranceForm.coverage_start_date} onChange={(e) => setInsuranceForm({ ...insuranceForm, coverage_start_date: e.target.value })} />
+              </div>
+              <div>
+                <Label>Coverage ends</Label>
+                <Input type="date" value={insuranceForm.coverage_end_date} onChange={(e) => setInsuranceForm({ ...insuranceForm, coverage_end_date: e.target.value })} />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setShowAddInsurance(false)}>Cancel</Button>
+            <Button type="button" onClick={handleAddInsurance} disabled={savingInsurance}>
+              {savingInsurance ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
+              Save insurance
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

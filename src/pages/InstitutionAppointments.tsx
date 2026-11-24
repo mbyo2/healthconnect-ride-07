@@ -5,7 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Loader2, Clock } from "lucide-react";
+import { Calendar, Loader2, Clock, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
+import type { InstitutionPatient } from "@/lib/patients";
+import { friendlyErrorMessage } from "@/utils/friendly-error";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { NoShowManager, MarkNoShowButton } from "@/components/appointments/NoShowWorkflow";
@@ -15,6 +23,90 @@ const InstitutionAppointments = () => {
     const { institution, institutionId, loading: instLoading } = useInstitutionContext();
     const [loading, setLoading] = useState(true);
     const [appointments, setAppointments] = useState<any[]>([]);
+
+    // PW-20: staff booking for walk-ins — pick (or create) the patient via
+    // the roster picker, choose one of the institution's providers, and
+    // insert the appointment with the master patient_id, provider and
+    // institution set, mirroring the self-booking payload shape.
+    const [showBook, setShowBook] = useState(false);
+    const [bookingPatient, setBookingPatient] = useState<InstitutionPatient | null>(null);
+    const [providers, setProviders] = useState<Array<{ id: string; name: string; role: string }>>([]);
+    const [bookingForm, setBookingForm] = useState({
+        provider_id: "",
+        date: new Date().toISOString().split("T")[0],
+        time: "09:00",
+        type: "in_person",
+        notes: "",
+    });
+    const [booking, setBooking] = useState(false);
+
+    useEffect(() => {
+        if (!institutionId) return;
+        (async () => {
+            const { data } = await (supabase.from("institution_staff" as any) as any)
+                .select("provider_id, role, profiles!institution_staff_provider_id_fkey(first_name, last_name)")
+                .eq("institution_id", institutionId)
+                .eq("is_active", true)
+                .order("role");
+            const list = ((data as any[]) || [])
+                .map((r: any) => ({
+                    id: r.provider_id,
+                    name: [r.profiles?.first_name, r.profiles?.last_name].filter(Boolean).join(" ") || r.role,
+                    role: r.role,
+                }))
+                .filter((r: any) => r.id);
+            setProviders(list);
+        })();
+    }, [institutionId]);
+
+    const handleStaffBook = async () => {
+        if (!bookingPatient) {
+            toast.error("Select a patient first — pick them from the list, or create their record right here.");
+            return;
+        }
+        if (!bookingForm.provider_id) {
+            toast.error("Choose the provider for this appointment.");
+            return;
+        }
+        if (!bookingForm.date || !bookingForm.time) {
+            toast.error("Pick a date and time for the appointment.");
+            return;
+        }
+        setBooking(true);
+        try {
+            const payload = {
+                patient_id: bookingPatient.id,
+                provider_id: bookingForm.provider_id,
+                institution_id: institutionId,
+                date: bookingForm.date,
+                time: bookingForm.time,
+                appointment_date: bookingForm.date,
+                appointment_time: bookingForm.time,
+                appointment_type: bookingForm.type,
+                type: bookingForm.type,
+                status: "pending",
+                notes: bookingForm.notes || null,
+                duration: 30,
+            };
+            const { error } = await (supabase.from("appointments") as any).insert(payload);
+            if (error) throw error;
+            toast.success(`Appointment booked for ${bookingPatient.name}`);
+            setShowBook(false);
+            setBookingPatient(null);
+            setBookingForm({
+                provider_id: "",
+                date: new Date().toISOString().split("T")[0],
+                time: "09:00",
+                type: "in_person",
+                notes: "",
+            });
+            fetchAppointments();
+        } catch (err: any) {
+            toast.error(friendlyErrorMessage(err, "Could not book the appointment. Please try again."));
+        } finally {
+            setBooking(false);
+        }
+    };
 
     useEffect(() => {
         fetchAppointments();
@@ -98,6 +190,11 @@ const InstitutionAppointments = () => {
                 <h1 className="text-2xl font-medium tracking-tight">Appointments</h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">{appointments.length} appointment{appointments.length !== 1 ? 's' : ''} · institutional scope</p>
               </div>
+              <div className="ml-auto">
+                <Button onClick={() => setShowBook(true)}>
+                  <Plus className="h-4 w-4 mr-1.5" /> Book for patient
+                </Button>
+              </div>
             </div>
           </div>
           <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
@@ -162,6 +259,69 @@ const InstitutionAppointments = () => {
                     )}
               </div>
             </div>
+
+            {/* PW-20: staff walk-in booking dialog */}
+            <Dialog open={showBook} onOpenChange={setShowBook}>
+              <DialogContent className="sm:max-w-[480px]">
+                <DialogHeader>
+                  <DialogTitle>Book an appointment for a patient</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <InstitutionPatientPicker
+                    institutionId={institutionId}
+                    value={bookingPatient}
+                    onChange={setBookingPatient}
+                    label="Patient *"
+                    createSource="booking"
+                  />
+                  <div>
+                    <Label>Provider *</Label>
+                    <Select value={bookingForm.provider_id} onValueChange={(v) => setBookingForm({ ...bookingForm, provider_id: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Choose a provider" /></SelectTrigger>
+                      <SelectContent>
+                        {providers.map((prov) => (
+                          <SelectItem key={prov.id} value={prov.id}>{prov.name} · {prov.role}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {providers.length === 0 && (
+                      <p className="mt-1 text-xs text-muted-foreground">No active staff found for this institution yet — add the provider to the staff roster first.</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>Date *</Label>
+                      <Input type="date" value={bookingForm.date} onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })} />
+                    </div>
+                    <div>
+                      <Label>Time *</Label>
+                      <Input type="time" value={bookingForm.time} onChange={(e) => setBookingForm({ ...bookingForm, time: e.target.value })} />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Visit type</Label>
+                    <Select value={bookingForm.type} onValueChange={(v) => setBookingForm({ ...bookingForm, type: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="in_person">In person</SelectItem>
+                        <SelectItem value="video_consultation">Video consultation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Reason / notes</Label>
+                    <Input value={bookingForm.notes} onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })} placeholder="Optional" />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowBook(false)}>Cancel</Button>
+                  <Button onClick={handleStaffBook} disabled={booking || !bookingPatient || !bookingForm.provider_id}>
+                    {booking ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
+                    Book appointment
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         </div>
     </div>
     );

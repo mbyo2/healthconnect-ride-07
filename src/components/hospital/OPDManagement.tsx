@@ -21,6 +21,7 @@ import {
 import { StaffSelect } from './StaffSelect';
 import { DepartmentSelect } from './DepartmentSelect';
 import { friendlyErrorMessage } from '@/utils/friendly-error';
+import { usePatientNames } from '@/hooks/usePatientNames';
 
 interface OPDProps {
   hospital: any;
@@ -117,6 +118,13 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
     hospital?.id,
     { orderBy: 'check_in_time', ascending: true }
   );
+
+  // PW-25: render the live profile name via patient_id; the
+  // queue_tokens.patient_name snapshot is only a fallback for tokens
+  // that carry no patient_id.
+  const { names: patientNames } = usePatientNames(opdQueue.map((t) => t.patient_id));
+  const displayName = (t: QueueToken) =>
+    (t.patient_id && patientNames[t.patient_id]) || t.patient_name || 'Unknown patient';
 
   const todayQueue = useMemo(() => {
     const today = new Date().toDateString();
@@ -215,7 +223,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
 
   const filteredQueue = todayQueue.filter(p => {
     const matchesSearch =
-      p.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      displayName(p).toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.token_number?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -336,7 +344,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                         <Badge variant="outline" className="font-mono text-sm">{patient.token_number}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium">{patient.patient_name}</div>
+                        <div className="font-medium">{displayName(patient)}</div>
                         {doctor && <div className="text-xs text-muted-foreground">Dr. {doctor}</div>}
                       </TableCell>
                       <TableCell className="text-sm">{patient.department}</TableCell>
@@ -393,7 +401,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
         open={showAdmitDialog}
         onOpenChange={setShowAdmitDialog}
         defaultPatientId={admitToken?.patient_id}
-        defaultPatientName={admitToken ? `${admitToken.patient_name} · ${admitToken.department}` : undefined}
+        defaultPatientName={admitToken ? `${displayName(admitToken)} · ${admitToken.department}` : undefined}
         defaultDiagnosis={admitToken ? `Referred from OPD token ${admitToken.token_number}` : undefined}
         defaultAdmissionType="scheduled"
         sourceLabel={admitToken?.token_number}

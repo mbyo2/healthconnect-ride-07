@@ -19,6 +19,8 @@ import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { friendlyErrorMessage } from '@/utils/friendly-error';
+import { InstitutionPatientPicker } from '@/components/hospital/InstitutionPatientPicker';
+import type { InstitutionPatient } from '@/lib/patients';
 
 interface InsuranceClaim {
   id: string;
@@ -76,6 +78,11 @@ export const InsuranceClaimWorkflow: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creating, setCreating] = useState(false);
+  // PW-11: claims must carry the master patient_id — the patient is picked
+  // (or created) via the roster picker, never typed as free text.
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
+  const [openBills, setOpenBills] = useState<Array<{ id: string; invoice_number: string; balance: number; total_amount: number }>>([]);
+  const [linkedInvoiceId, setLinkedInvoiceId] = useState<string>('');
   const [claimForm, setClaimForm] = useState({
     patient_name: '',
     insurance_provider: '',
@@ -112,6 +119,25 @@ export const InsuranceClaimWorkflow: React.FC = () => {
     fetchClaims();
   }, [fetchClaims]);
 
+  useEffect(() => {
+    setLinkedInvoiceId('');
+    setOpenBills([]);
+    if (!selectedPatient || !institutionId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('billing_invoices')
+        .select('id, invoice_number, balance, total_amount, status')
+        .eq('institution_id', institutionId)
+        .eq('patient_id', selectedPatient.id)
+        .not('status', 'in', '("paid","cancelled","refunded")')
+        .order('created_at', { ascending: false })
+        .limit(25);
+      if (!cancelled) setOpenBills((data as any[]) || []);
+    })();
+    return () => { cancelled = true; };
+  }, [selectedPatient, institutionId]);
+
   const generateClaimNumber = () => {
     const prefix = 'CLM';
     const date = format(new Date(), 'yyyyMMdd');
@@ -121,6 +147,10 @@ export const InsuranceClaimWorkflow: React.FC = () => {
 
   const handleCreateClaim = async () => {
     if (!institutionId || !user) return;
+    if (!selectedPatient) {
+      toast.error('Select a patient first — pick them from the list, or create their record right here.');
+      return;
+    }
 
     setCreating(true);
     try {
@@ -132,7 +162,9 @@ export const InsuranceClaimWorkflow: React.FC = () => {
         .from('insurance_claims')
         .insert({
           institution_id: institutionId,
-          patient_name: claimForm.patient_name,
+          patient_id: selectedPatient.id,
+          invoice_id: linkedInvoiceId || null,
+          patient_name: selectedPatient.name,
           insurance_provider: claimForm.insurance_provider,
           policy_number: claimForm.policy_number,
           claim_number: claimNumber,
@@ -150,6 +182,8 @@ export const InsuranceClaimWorkflow: React.FC = () => {
 
       toast.success(`Claim ${claimNumber} created`);
       setShowCreateDialog(false);
+      setSelectedPatient(null);
+      setLinkedInvoiceId('');
       fetchClaims();
       setClaimForm({
         patient_name: '',
@@ -234,14 +268,31 @@ export const InsuranceClaimWorkflow: React.FC = () => {
               <DialogTitle>Create Insurance Claim</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 max-h-[60vh] overflow-auto pr-2">
-              <div>
-                <Label>Patient Name</Label>
-                <Input
-                  value={claimForm.patient_name}
-                  onChange={e => setClaimForm({ ...claimForm, patient_name: e.target.value })}
-                  placeholder="Full name"
-                />
-              </div>
+              <InstitutionPatientPicker
+                institutionId={institutionId}
+                value={selectedPatient}
+                onChange={setSelectedPatient}
+                label="Patient *"
+              />
+              {selectedPatient && openBills.length > 0 && (
+                <div>
+                  <Label>Link to an open bill (optional)</Label>
+                  <Select
+                    value={linkedInvoiceId || 'none'}
+                    onValueChange={v => setLinkedInvoiceId(v === 'none' ? '' : v)}
+                  >
+                    <SelectTrigger><SelectValue placeholder="No linked bill" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No linked bill</SelectItem>
+                      {openBills.map(b => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.invoice_number} — balance K{Number(b.balance ?? b.total_amount ?? 0).toLocaleString()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Insurance Provider</Label>
@@ -326,7 +377,7 @@ export const InsuranceClaimWorkflow: React.FC = () => {
               </div>
               <Button
                 onClick={handleCreateClaim}
-                disabled={creating || !claimForm.patient_name || !claimForm.insurance_provider || claimForm.claimed_amount <= 0}
+                disabled={creating || !selectedPatient || !claimForm.insurance_provider || claimForm.claimed_amount <= 0}
                 className="w-full"
               >
                 {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}

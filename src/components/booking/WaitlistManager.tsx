@@ -5,17 +5,22 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { usePatientNames } from '@/hooks/usePatientNames';
 
 interface WaitlistEntry {
   id: string;
   patient_id: string;
   provider_id: string;
-  preferred_times: string[];
+  // Live columns are preferred_time_start / preferred_time_end (there is
+  // no plural times column) plus the preferred date range.
+  preferred_time_start: string | null;
+  preferred_time_end: string | null;
+  preferred_date_start: string | null;
+  preferred_date_end: string | null;
   urgency: string;
   status: string;
   notes: string | null;
   created_at: string;
-  patient?: { first_name: string; last_name: string; email: string };
 }
 
 export const WaitlistManager = () => {
@@ -35,6 +40,10 @@ export const WaitlistManager = () => {
     },
     enabled: !!user,
   });
+
+  // PW-26: batch-resolve patient names from profiles (like WaitlistPage)
+  // — the waitlist rows themselves carry no embedded patient object.
+  const { nameFor } = usePatientNames(waitlistEntries.map((e) => e.patient_id));
 
   const urgencyColor = (urgency: string) => {
     switch (urgency) {
@@ -69,7 +78,7 @@ export const WaitlistManager = () => {
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">
-                      {entry.patient?.first_name} {entry.patient?.last_name}
+                      {nameFor(entry.patient_id)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -85,7 +94,11 @@ export const WaitlistManager = () => {
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {entry.preferred_times?.join(', ') || 'Any time'}
+                    {entry.preferred_time_start || entry.preferred_time_end
+                      ? `${entry.preferred_time_start || 'Any'} – ${entry.preferred_time_end || 'Any'}`
+                      : 'Any time'}
+                    {(entry.preferred_date_start || entry.preferred_date_end) &&
+                      ` · ${entry.preferred_date_start || 'any'} → ${entry.preferred_date_end || 'any'}`}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />

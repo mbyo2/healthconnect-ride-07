@@ -19,7 +19,8 @@ import { useCurrency } from "@/hooks/use-currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { ServiceLineEditor, useInstitutionServices } from "@/components/billing/InvoiceServiceLines";
-import { searchInstitutionPatients } from "@/lib/patients";
+import type { InstitutionPatient } from "@/lib/patients";
+import { InstitutionPatientPicker } from "@/components/hospital/InstitutionPatientPicker";
 import { useInstitutionTeam } from "@/hooks/useInstitutionTeam";
 import {
   type InvoiceServiceLine,
@@ -57,6 +58,8 @@ export const BillingStaffWorkflow = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<BillingInvoice | null>(null);
   const [creating, setCreating] = useState(false);
 
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
+
   const [invoiceForm, setInvoiceForm] = useState({
     patient_name: "",
     items: [emptyServiceLine()] as InvoiceServiceLine[],
@@ -69,24 +72,13 @@ export const BillingStaffWorkflow = () => {
 
   const [loadingCharges, setLoadingCharges] = useState(false);
 
-  const autoFillPatientSystemCharges = async (patientName: string) => {
-    if (!patientName.trim()) return;
+  const autoFillPatientSystemCharges = async (patientId: string) => {
+    if (!patientId) return;
     setLoadingCharges(true);
     try {
-      // Patient Unity W3: resolve the patient from the institution roster
-      // first (one list everywhere); the relationship-gated provider
-      // search remains the fallback for non-institution contexts.
-      let patientId: string | null = null;
-      if (institutionId) {
-        const rosterMatches = await searchInstitutionPatients(institutionId, patientName.trim()).catch(() => []);
-        if (rosterMatches.length > 0) patientId = rosterMatches[0].id;
-      }
-      if (!patientId) {
-        const { data: profiles } = await supabase
-          .rpc("search_patients_for_provider", { p_search: patientName.trim() });
-        if (profiles && profiles.length > 0) patientId = profiles[0].id;
-      }
-
+      // PW-10: the patient comes from InstitutionPatientPicker, so the
+      // master patient_id is already known — charges are fetched for that
+      // exact record and the same id is passed to invoice creation.
       if (patientId) {
         const [apptsRes, labsRes, rxsRes, insRes] = await Promise.all([
           supabase.from("appointments").select("id, type, date").eq("patient_id", patientId).eq("status", "completed"),
@@ -215,14 +207,19 @@ export const BillingStaffWorkflow = () => {
   const totalAmount = subtotal + invoiceForm.tax - invoiceForm.discount;
 
   const handleCreateInvoice = async () => {
-    if (!invoiceForm.patient_name.trim() || invoiceForm.items.length === 0) return;
+    if (!selectedPatient) {
+      toast.error("Select a patient first — pick them from the list, or create their record right here.");
+      return;
+    }
+    if (invoiceForm.items.length === 0) return;
     if (invoiceForm.items.some((i) => !i.service_pricing_id)) {
       toast.error("Every line needs a priced service — pick one from the price list, or create it right in the line");
       return;
     }
     setCreating(true);
     const result = await createInvoice({
-      patient_name: invoiceForm.patient_name,
+      patient_id: selectedPatient.id,
+      patient_name: selectedPatient.name,
       lines: buildInvoiceLinesPayload(invoiceForm.items),
       tax: invoiceForm.tax,
       discount: invoiceForm.discount,
@@ -231,6 +228,7 @@ export const BillingStaffWorkflow = () => {
       insurance_provider: invoiceForm.insurance_provider || undefined,
     });
     if (result) {
+      setSelectedPatient(null);
       setInvoiceForm({
         patient_name: "",
         items: [emptyServiceLine()],
@@ -352,26 +350,23 @@ export const BillingStaffWorkflow = () => {
             <div className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-semibold text-muted-foreground uppercase">Patient Name *</label>
-                    {invoiceForm.patient_name.trim().length >= 2 && (
-                      <button
-                        type="button"
-                        onClick={() => autoFillPatientSystemCharges(invoiceForm.patient_name)}
-                        disabled={loadingCharges}
-                        className="text-xs font-bold text-primary-500 hover:underline flex items-center"
-                      >
-                        {loadingCharges ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-                        Auto-fill charges
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    value={invoiceForm.patient_name}
-                    onChange={(e) => setInvoiceForm((prev) => ({ ...prev, patient_name: e.target.value }))}
-                    placeholder="Enter or search patient name..."
-                    className="w-full p-2 rounded-md border border-border font-bold"
+                  <InstitutionPatientPicker
+                    institutionId={institutionId}
+                    value={selectedPatient}
+                    onChange={setSelectedPatient}
+                    label="Patient *"
                   />
+                  {selectedPatient && (
+                    <button
+                      type="button"
+                      onClick={() => autoFillPatientSystemCharges(selectedPatient.id)}
+                      disabled={loadingCharges}
+                      className="mt-1 text-xs font-bold text-primary-500 hover:underline flex items-center"
+                    >
+                      {loadingCharges ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                      Auto-fill charges
+                    </button>
+                  )}
                 </div>
                 <div>
                   <label className="font-semibold text-muted-foreground uppercase">Insurance Provider</label>
@@ -438,7 +433,7 @@ export const BillingStaffWorkflow = () => {
 
               <button
                 onClick={handleCreateInvoice}
-                disabled={creating || !invoiceForm.patient_name.trim()}
+                disabled={creating || !selectedPatient}
                 className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-xs"
               >
                 {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Official Invoice"}

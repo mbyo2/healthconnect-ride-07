@@ -17,6 +17,8 @@ import { EntitySelect, type EntityOption } from '@/components/ui/EntitySelect';
 import { InsurerQuickCreateDialog } from './InsurerQuickCreateDialog';
 import { useInstitutionTeam } from '@/hooks/useInstitutionTeam';
 import { friendlyErrorMessage } from '@/utils/friendly-error';
+import { InstitutionPatientPicker } from './InstitutionPatientPicker';
+import type { InstitutionPatient } from '@/lib/patients';
 
 export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const { user } = useAuth();
@@ -44,6 +46,10 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const [unpaidInvoices, setUnpaidInvoices] = useState<any[]>([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
   const [linkedInvoiceId, setLinkedInvoiceId] = useState<string | null>(null);
+  // PW-11: manual claims pick the patient from the roster picker so the
+  // claim always stores the master patient_id.
+  const [selectedPatient, setSelectedPatient] = useState<InstitutionPatient | null>(null);
+  const [patientOpenBills, setPatientOpenBills] = useState<any[]>([]);
   const [linkedPatientId, setLinkedPatientId] = useState<string | null>(null);
   // Adjudication (approve/pay with insurer's settled amount)
   const [adjudicating, setAdjudicating] = useState<any>(null);
@@ -110,10 +116,41 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
     }
   };
 
+  const handlePatientPick = async (patient: InstitutionPatient | null) => {
+    setSelectedPatient(patient);
+    setPatientOpenBills([]);
+    if (!patient) {
+      setLinkedPatientId(null);
+      setClaimForm((f) => ({ ...f, patient_name: '' }));
+      return;
+    }
+    setLinkedPatientId(patient.id);
+    setClaimForm((f) => ({ ...f, patient_name: patient.name }));
+    try {
+      const { data } = await (supabase.from('hospital_billing' as any) as any)
+        .select('id, invoice_number, total_amount, balance, payment_status')
+        .eq('hospital_id', hospital.id)
+        .eq('patient_id', patient.id)
+        .neq('payment_status', 'paid')
+        .order('created_at', { ascending: false })
+        .limit(25);
+      setPatientOpenBills(data || []);
+    } catch {
+      setPatientOpenBills([]);
+    }
+  };
+
   const raiseFromInvoice = (inv: any) => {
     const adm = Array.isArray(inv.admission) ? inv.admission[0] : inv.admission;
     setLinkedInvoiceId(inv.id);
     setLinkedPatientId(inv.patient_id || null);
+    setSelectedPatient(inv.patient_id ? ({
+      id: inv.patient_id,
+      firstName: inv.patient?.first_name || '',
+      lastName: inv.patient?.last_name || '',
+      name: [inv.patient?.first_name, inv.patient?.last_name].filter(Boolean).join(' '),
+      email: null, phone: null, dateOfBirth: null, onRoster: true, source: null,
+    } as InstitutionPatient) : null);
     setClaimForm({
       patient_name: [inv.patient?.first_name, inv.patient?.last_name].filter(Boolean).join(' ') || '',
       insurance_provider: '',
@@ -156,6 +193,10 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
 
   const handleNewClaim = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!linkedPatientId) {
+      toast.error('Select a patient first — pick them from the list, or create their record right here.');
+      return;
+    }
     if (!claimForm.patient_name || !claimForm.insurance_provider || !claimForm.claim_amount) {
       toast.error('Please fill required fields');
       return;
@@ -185,6 +226,8 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
       setShowNewClaim(false);
       setLinkedInvoiceId(null);
       setLinkedPatientId(null);
+      setSelectedPatient(null);
+      setPatientOpenBills([]);
       setClaimForm({ patient_name: '', insurance_provider: '', policy_number: '', claim_amount: '', pre_auth_number: '', diagnosis: '', admission_date: '', discharge_date: '' });
       refresh();
     } catch (e: any) {
@@ -420,15 +463,36 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
               <button
                 type="button"
                 className="font-bold text-muted-foreground hover:text-foreground"
-                onClick={() => { setLinkedInvoiceId(null); setLinkedPatientId(null); }}
+                onClick={() => { setLinkedInvoiceId(null); }}
               >
                 Unlink
               </button>
             </div>
           )}
           <form onSubmit={handleNewClaim} className="space-y-3 py-2">
+            <InstitutionPatientPicker
+              institutionId={hospital?.id}
+              value={selectedPatient}
+              onChange={handlePatientPick}
+              label="Patient *"
+            />
+            {selectedPatient && !linkedInvoiceId && patientOpenBills.length > 0 && (
+              <div>
+                <Label>Link to an open bill (optional)</Label>
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value=""
+                  onChange={(e) => { if (e.target.value) { const inv = patientOpenBills.find((b: any) => b.id === e.target.value); if (inv) raiseFromInvoice(inv); } }}
+                >
+                  <option value="">No linked bill</option>
+                  {patientOpenBills.map((b: any) => (
+                    <option key={b.id} value={b.id}>{b.invoice_number} — balance K{Number(b.balance ?? b.total_amount ?? 0).toLocaleString()}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
-              <div><Label>Patient Name *</Label><Input value={claimForm.patient_name} onChange={e => setClaimForm({...claimForm, patient_name: e.target.value})} placeholder="Full name" required /></div>
+              <div><Label>Patient Name</Label><Input value={claimForm.patient_name} readOnly placeholder="Picked patient" /></div>
               <div>
                 <EntitySelect
                   entityName="insurer"

@@ -18,6 +18,7 @@ import { ReportCenter } from "@/components/reports/ReportCenter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { usePatientNames } from "@/hooks/usePatientNames";
 
 const CLAIM_STATUS_COLOR: Record<string, string> = {
   submitted: "bg-warning-500",
@@ -55,11 +56,17 @@ export const FinanceManagerWorkflow = () => {
     },
   });
 
+  // PW-29: invoices select patient_id — resolve and render the patient
+  // name (batch profiles lookup) instead of showing invoice numbers only.
+  const { nameFor } = usePatientNames(invoices.map((i: any) => i.patient_id));
+
   const filteredInvoices = invoices.filter((inv: any) => {
     const matchesStatus = invoiceFilter === "all" || inv.payment_status === invoiceFilter;
     const q = invoiceSearch.toLowerCase();
     const matchesSearch =
-      !q || inv.invoice_number?.toLowerCase().includes(q);
+      !q ||
+      inv.invoice_number?.toLowerCase().includes(q) ||
+      nameFor(inv.patient_id).toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
 
@@ -193,7 +200,7 @@ export const FinanceManagerWorkflow = () => {
                 type="search"
                 value={invoiceSearch}
                 onChange={(e) => setInvoiceSearch(e.target.value)}
-                placeholder="Search invoice #…"
+                placeholder="Search invoice # or patient…"
                 className="pl-8 h-8 text-xs w-44"
               />
             </div>
@@ -217,6 +224,7 @@ export const FinanceManagerWorkflow = () => {
                     <thead>
                       <tr className="border-b border-border text-xs text-muted-foreground">
                         <th className="text-left px-4 py-2.5 font-medium">Invoice #</th>
+                        <th className="text-left px-4 py-2.5 font-medium">Patient</th>
                         <th className="text-right px-4 py-2.5 font-medium">Total</th>
                         <th className="text-right px-4 py-2.5 font-medium">Paid</th>
                         <th className="text-right px-4 py-2.5 font-medium">Balance</th>
@@ -228,6 +236,7 @@ export const FinanceManagerWorkflow = () => {
                       {filteredInvoices.map((inv: any) => (
                         <tr key={inv.id} className="hover:bg-muted/40 cursor-pointer" onClick={() => setSelectedInvoice(inv)}>
                           <td className="px-4 py-2.5 font-medium text-xs">{inv.invoice_number}</td>
+                          <td className="px-4 py-2.5 text-xs">{inv.patient_id ? nameFor(inv.patient_id) : "—"}</td>
                           <td className="px-4 py-2.5 text-right text-xs">{formatPrice(inv.total_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-right text-xs text-success-600 dark:text-success-400">{formatPrice(inv.paid_amount || 0)}</td>
                           <td className="px-4 py-2.5 text-right text-xs text-destructive">{formatPrice(inv.balance || 0)}</td>
@@ -398,6 +407,10 @@ export const FinanceManagerWorkflow = () => {
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Patient</span>
+                <span className="font-medium">{selectedInvoice.patient_id ? nameFor(selectedInvoice.patient_id) : "—"}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Amount</span>
                 <span className="font-medium">{formatPrice(selectedInvoice.total_amount || 0)}</span>

@@ -19,6 +19,7 @@ import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/f
 import { provisionInstitutionWorkspace } from "@/services/institutionProvisioning";
 import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
+import { splitInstitutionFinance, upsertInstitutionFinance } from "@/lib/institutionFinance";
 
 // Draft key — a half-filled institution application survives reloads and
 // the login redirect, so nobody retypes 40 fields after signing in.
@@ -263,9 +264,13 @@ export const HealthcareInstitutionForm = () => {
         return;
       }
 
-      // 1. Create the institution record (unverified)
+      // 1. Create the institution record (unverified).
+      // LP-1: bank/tax/registration/license fields no longer live on
+      // healthcare_institutions — they are split out and upserted into
+      // healthcare_institution_finance once the institution exists.
+      const { base: baseFields, finance: financeFields } = splitInstitutionFinance({ ...formData });
       const institution = {
-        ...formData,
+        ...baseFields,
         type: formData.type as any,
         type_code: formData.type, // Preserve exact type for dashboard routing
         admin_id: user.id,
@@ -281,6 +286,11 @@ export const HealthcareInstitutionForm = () => {
         .single();
 
       if (institutionError) throw institutionError;
+
+      // LP-1: settlement/compliance fields go to the finance table.
+      if (institutionData) {
+        await upsertInstitutionFinance((institutionData as any).id, financeFields);
+      }
 
       // Add the creator as institution admin in personnel table
       // (required for queue tokens, staff checks, and other institution-scoped features)

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { loadInstitutionFinanceMap } from '@/lib/institutionFinance';
 
 export interface InstitutionData {
   id: string;
@@ -19,6 +20,9 @@ export interface InstitutionData {
   website?: string;
   is_verified: boolean;
   admin_id: string;
+  // LP-1: license_number, tax_id, business_registration_number, bank_* and
+  // swift_code are loaded from healthcare_institution_finance and merged
+  // onto this object — the base table's copies are always NULL now.
   license_number?: string;
   operating_hours?: any;
   accepted_insurance_providers?: string[];
@@ -165,6 +169,20 @@ export function useInstitutionContext() {
     [user],
   );
 
+  /** LP-1: merge each institution's finance-table fields onto its base row. */
+  const attachFinance = useCallback(async (byId: Map<string, InstitutionData>) => {
+    try {
+      const financeMap = await loadInstitutionFinanceMap(Array.from(byId.keys()));
+      for (const [id, fin] of financeMap) {
+        const inst = byId.get(id);
+        if (inst) byId.set(id, { ...inst, ...fin });
+      }
+    } catch {
+      // Finance rows are admin-scoped; a staff-only session may not read
+      // them — the base institution context must still load.
+    }
+  }, []);
+
   const fetchInstitution = useCallback(async () => {
     if (!user) {
       setInstitution(null);
@@ -255,6 +273,7 @@ export function useInstitutionContext() {
       }
 
       if (affils.length > 0) {
+        await attachFinance(byId);
         applyActive(affils, byId, null, false);
         return;
       }
@@ -270,7 +289,9 @@ export function useInstitutionContext() {
           .maybeSingle();
 
         if (emailInst) {
-          const inst = emailInst as InstitutionData;
+          const emailMap = new Map<string, InstitutionData>([[(emailInst as InstitutionData).id, emailInst as InstitutionData]]);
+          await attachFinance(emailMap);
+          const inst = emailMap.get((emailInst as InstitutionData).id) as InstitutionData;
           applyActive(
             [{ id: inst.id, name: inst.name, type: inst.type, affiliation: 'admin' }],
             new Map([[inst.id, inst]]),
@@ -400,7 +421,9 @@ export function useInstitutionContext() {
           .maybeSingle();
 
         if (lateInst) {
-          const inst = lateInst as InstitutionData;
+          const lateMap = new Map<string, InstitutionData>([[(lateInst as InstitutionData).id, lateInst as InstitutionData]]);
+          await attachFinance(lateMap);
+          const inst = lateMap.get((lateInst as InstitutionData).id) as InstitutionData;
           applyActive(
             [{ id: inst.id, name: inst.name, type: inst.type, affiliation: 'admin' }],
             new Map([[inst.id, inst]]),
@@ -448,6 +471,9 @@ export function useInstitutionContext() {
         }
 
         if (provisioned) {
+          const provMap = new Map<string, InstitutionData>([[provisioned.id, provisioned]]);
+          await attachFinance(provMap);
+          provisioned = provMap.get(provisioned.id) as InstitutionData;
           await supabase.from('institution_staff').insert({
             institution_id: provisioned.id,
             provider_id: user.id,
