@@ -12,11 +12,11 @@ import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSele
 
 const getStatusPill = (status: string) => {
   switch (status) {
-    case "reported": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Reported ✓</span>;
-    case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">In Progress</span>;
-    case "report_pending": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Report Pending</span>;
-    case "scheduled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Scheduled</span>;
-    case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
+    case "reported": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Reported ✓</span>;
+    case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">In Progress</span>;
+    case "report_pending": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-700">Report Pending</span>;
+    case "scheduled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-600">Scheduled</span>;
+    case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
     default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-muted-foreground">Requested</span>;
   }
 };
@@ -167,7 +167,7 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
                   </td>
                   <td className="py-3 px-3">
                     {o.priority && o.priority !== "routine" ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">{o.priority.toUpperCase()}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">{o.priority.toUpperCase()}</span>
                     ) : (
                       <span className="text-muted-foreground">Routine</span>
                     )}
@@ -176,13 +176,13 @@ export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
                   <td className="py-3 px-3 text-center">
                     <div className="flex gap-1 justify-center">
                       {["requested", "scheduled"].includes(o.status) && (
-                        <button onClick={() => setStatus(o, "in_progress")} className="px-2 py-1 rounded text-xs font-bold bg-warning-500 text-white">Start Scan</button>
+                        <button onClick={() => setStatus(o, "in_progress")} className="px-2 py-1 rounded text-xs font-bold bg-warning-700 text-white">Start Scan</button>
                       )}
                       {o.status === "in_progress" && (
-                        <button onClick={() => setStatus(o, "report_pending")} className="px-2 py-1 rounded text-xs font-bold bg-purple-500 text-white">Finish Scan</button>
+                        <button onClick={() => setStatus(o, "report_pending")} className="px-2 py-1 rounded text-xs font-bold bg-purple-700 text-white">Finish Scan</button>
                       )}
                       {o.status === "report_pending" && (
-                        <button onClick={() => setStatus(o, "reported")} className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white flex items-center gap-0.5">
+                        <button onClick={() => setStatus(o, "reported")} className="px-2 py-1 rounded text-xs font-bold bg-success-700 text-white flex items-center gap-0.5">
                           <FileText className="h-3 w-3" /> Sign Report
                         </button>
                       )}

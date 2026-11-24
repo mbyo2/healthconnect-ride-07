@@ -140,9 +140,9 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
                 <td className="py-3 px-3 font-semibold text-primary-500">{p.diet_type || "Regular"}</td>
                 <td className="py-3 px-3 text-center">
                   {!p.end_date || p.end_date >= today ? (
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active Plan</span>
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Active Plan</span>
                   ) : (
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-400">Completed</span>
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-600">Completed</span>
                   )}
                 </td>
                 <td className="py-3 px-3 font-mono">

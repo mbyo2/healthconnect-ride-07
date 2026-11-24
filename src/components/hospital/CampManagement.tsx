@@ -22,10 +22,10 @@ const CAMP_TYPES = [
 const campTypeLabel = (t: string) => CAMP_TYPES.find((c) => c.key === t)?.label || t;
 
 const getStatusPill = (status: string) => {
-  if (status === "active") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Active</span>;
-  if (status === "completed") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Completed</span>;
-  if (status === "cancelled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Planned</span>;
+  if (status === "active") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Active</span>;
+  if (status === "completed") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-600">Completed</span>;
+  if (status === "cancelled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Planned</span>;
 };
 
 const fmtDate = (d: string | null) => {
@@ -291,7 +291,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                   </div>
                   <div className="flex gap-2 flex-wrap pt-1">
                     {c.status === "planned" && (
-                      <button onClick={() => updateCampStatus(c, "active")} className="px-3 py-1.5 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-bold">Start camp</button>
+                      <button onClick={() => updateCampStatus(c, "active")} className="px-3 py-1.5 min-h-[44px] rounded-md bg-success-700 text-white text-xs font-bold">Start camp</button>
                     )}
                     {c.status === "active" && (
                       <>
@@ -344,7 +344,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                       <td className="py-3 px-3 text-muted-foreground">{campById(r.camp_id)?.name || "—"}</td>
                       <td className="py-3 px-3 text-center">
                         {r.referral_needed
-                          ? <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Referred</span>
+                          ? <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Referred</span>
                           : <span className="text-muted-foreground">—</span>}
                       </td>
                       <td className="py-3 px-3 text-center">
@@ -354,9 +354,9 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                       </td>
                       <td className="py-3 px-3 text-center">
                         <div className="flex gap-1 justify-center flex-wrap">
-                          <button onClick={() => openScreening(r)} className="px-2.5 py-1.5 min-h-[44px] rounded text-xs font-bold bg-primary-400 text-white">Screening</button>
+                          <button onClick={() => openScreening(r)} className="px-2.5 py-1.5 min-h-[44px] rounded text-xs font-bold bg-primary-600 text-white">Screening</button>
                           {!r.synced_to_ehr && (
-                            <button onClick={() => handleSyncEHR(r)} disabled={isSubmitting} className="px-2.5 py-1.5 min-h-[44px] rounded text-xs font-bold bg-success-500 text-white disabled:opacity-50">Sync to EHR</button>
+                            <button onClick={() => handleSyncEHR(r)} disabled={isSubmitting} className="px-2.5 py-1.5 min-h-[44px] rounded text-xs font-bold bg-success-700 text-white disabled:opacity-50">Sync to EHR</button>
                           )}
                         </div>
                       </td>
@@ -383,7 +383,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
                     {r.referral_needed && r.referred_to ? ` • Referred to ${r.referred_to}` : ""}
                   </p>
                 </div>
-                <button onClick={() => markFollowupDone(r)} className="px-3.5 py-2 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-bold">Mark done</button>
+                <button onClick={() => markFollowupDone(r)} className="px-3.5 py-2 min-h-[44px] rounded-md bg-success-700 text-white text-xs font-bold">Mark done</button>
               </div>
             ))}
           </div>
@@ -585,7 +585,7 @@ export const CampManagement = ({ hospital: hospitalProp }: { hospital?: any }) =
           </p>
           <DialogFooter>
             <button onClick={() => setCancelTarget(null)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep camp</button>
-            <button onClick={() => updateCampStatus(cancelTarget, "cancelled")} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
+            <button onClick={() => updateCampStatus(cancelTarget, "cancelled")} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-700 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

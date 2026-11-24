@@ -518,7 +518,7 @@ const Profile = () => {
                       onClick={() => toggleArr("subspecialties", sub)}
                       className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.subspecialties.includes(sub)
-                          ? "bg-purple-500 text-white border-purple-500"
+                          ? "bg-purple-700 text-white border-purple-500"
                           : "bg-card border-border text-muted-foreground hover:border-purple-500 hover:text-purple-500"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
@@ -665,7 +665,7 @@ const Profile = () => {
                         onClick={() => toggleArr("insurance_providers_accepted", ins)}
                         className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                           provData.insurance_providers_accepted.includes(ins)
-                            ? "bg-success-500 text-white border-success-500"
+                            ? "bg-success-700 text-white border-success-500"
                             : "bg-card border-border text-muted-foreground hover:border-success-500 hover:text-success-500"
                         } disabled:opacity-60 disabled:cursor-not-allowed`}
                       >
@@ -690,7 +690,7 @@ const Profile = () => {
                       onClick={() => toggleArr("languages_spoken", lang)}
                       className={`px-3 py-1 min-h-[44px] rounded-full text-xs font-bold border transition-all ${
                         provData.languages_spoken.includes(lang)
-                          ? "bg-warning-500 text-white border-warning-500"
+                          ? "bg-warning-700 text-white border-warning-500"
                           : "bg-card border-border text-muted-foreground hover:border-warning-500 hover:text-warning-500"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >

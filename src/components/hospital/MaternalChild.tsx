@@ -197,7 +197,7 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === t.key ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t.icon}{t.label}
-              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold bg-error-500 text-white">{t.badge}</span> : null}
+              {t.badge ? <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold bg-error-700 text-white">{t.badge}</span> : null}
             </button>
           ))}
         </div>
@@ -305,13 +305,13 @@ export const MaternalChild = ({ hospital }: { hospital: any }) => {
                     <button
                       onClick={() => markAdministered(i)}
                       disabled={markingId === i.id}
-                      className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-md bg-success-500 text-white text-xs font-medium hover:bg-success-600 disabled:opacity-50"
+                      className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-md bg-success-700 text-white text-xs font-medium hover:bg-success-700 disabled:opacity-50"
                     >
                       {markingId === i.id ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
                       Mark Given
                     </button>
                   ) : (
-                    <span className="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Administered</span>
+                    <span className="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Administered</span>
                   )}
                 </div>
               ))}

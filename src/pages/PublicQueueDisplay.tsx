@@ -89,7 +89,7 @@ export const PublicQueueDisplay: React.FC = () => {
           <div className="min-w-0">
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3 sm:text-3xl">
               DOC' O CLOCK HEALTHCARE NETWORK
-              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-3 h-3 rounded-full bg-emerald-700 animate-pulse" />
             </h1>
             <p className="text-sm font-medium text-muted-foreground">
               {institutionId ? "Department Queue Display" : "Department Queue Display — not connected"}

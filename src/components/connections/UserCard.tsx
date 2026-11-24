@@ -63,8 +63,8 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
   const getRolePill = (role: string) => {
     if (isClinicianRole(role)) return "bg-primary-500 text-white";
     switch (role) {
-      case "patient": return "bg-success-500 text-white";
-      default: return "bg-purple-500 text-white";
+      case "patient": return "bg-success-700 text-white";
+      default: return "bg-purple-700 text-white";
     }
   };
 

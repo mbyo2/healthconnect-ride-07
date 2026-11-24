@@ -14,11 +14,11 @@ const MOVEMENT_TYPES = ["received", "issued", "adjusted", "expired", "damaged"] 
 const getStockPill = (quantity: number, reorderLevel: number, expiryDate: string | null) => {
   const now = new Date();
   const expiry = expiryDate ? new Date(expiryDate) : null;
-  if (expiry && expiry < now) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Expired</span>;
-  if (quantity <= 0) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Out of Stock</span>;
-  if (expiry && expiry.getTime() - now.getTime() < 90 * 24 * 3600 * 1000) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Expiring Soon</span>;
-  if (quantity <= reorderLevel) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Low Stock</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Adequate</span>;
+  if (expiry && expiry < now) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Expired</span>;
+  if (quantity <= 0) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Out of Stock</span>;
+  if (expiry && expiry.getTime() - now.getTime() < 90 * 24 * 3600 * 1000) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Expiring Soon</span>;
+  if (quantity <= reorderLevel) return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Low Stock</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Adequate</span>;
 };
 
 const getMovementPill = (type: string) => {
@@ -29,7 +29,7 @@ const getMovementPill = (type: string) => {
     expired: "bg-error-500",
     damaged: "bg-error-500",
   };
-  return <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${colors[type] || "bg-graphite-400"}`}>{type}</span>;
+  return <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${colors[type] || "bg-graphite-600"}`}>{type}</span>;
 };
 
 export const DrugStock = ({ hospital }: { hospital: any }) => {

@@ -33,12 +33,12 @@ import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; pillColor: string }> = {
   draft: { label: "Draft", pillColor: "bg-muted-foreground text-white" },
-  sent: { label: "Sent", pillColor: "bg-primary-400 text-white" },
-  paid: { label: "Paid", pillColor: "bg-success-500 text-white" },
-  partial: { label: "Partial", pillColor: "bg-warning-500 text-white" },
-  overdue: { label: "Overdue", pillColor: "bg-error-500 text-white" },
+  sent: { label: "Sent", pillColor: "bg-primary-600 text-white" },
+  paid: { label: "Paid", pillColor: "bg-success-700 text-white" },
+  partial: { label: "Partial", pillColor: "bg-warning-700 text-white" },
+  overdue: { label: "Overdue", pillColor: "bg-error-700 text-white" },
   cancelled: { label: "Cancelled", pillColor: "bg-muted-foreground text-white" },
-  refunded: { label: "Refunded", pillColor: "bg-purple-500 text-white" },
+  refunded: { label: "Refunded", pillColor: "bg-purple-700 text-white" },
 };
 
 export const BillingStaffWorkflow = () => {
@@ -483,7 +483,7 @@ export const BillingStaffWorkflow = () => {
             <button
               onClick={handleRecordPayment}
               disabled={creating || paymentForm.amount <= 0}
-              className="w-full py-2.5 rounded-xl bg-success-500 text-white font-semibold text-xs"
+              className="w-full py-2.5 rounded-xl bg-success-700 text-white font-semibold text-xs"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Record & Post Payment"}
             </button>

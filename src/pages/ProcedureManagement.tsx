@@ -205,10 +205,10 @@ export const ProcedureManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-success-500 text-white";
+      case "completed": return "bg-success-700 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "scheduled": return "bg-warning-500 text-white";
-      case "complications": return "bg-error-500 text-white";
+      case "scheduled": return "bg-warning-700 text-white";
+      case "complications": return "bg-error-700 text-white";
       case "cancelled": return "bg-muted-foreground text-white";
       default: return "bg-muted-foreground text-white";
     }
@@ -545,10 +545,10 @@ export const ProcedureManagement = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         {procedure.requires_prior_authorization && (
-                          <Badge className="bg-warning-500 text-white text-xs">Auth Required</Badge>
+                          <Badge className="bg-warning-700 text-white text-xs">Auth Required</Badge>
                         )}
                         {procedure.requires_preparation && (
-                          <Badge className="bg-warning-500 text-white text-xs">Prep Required</Badge>
+                          <Badge className="bg-warning-700 text-white text-xs">Prep Required</Badge>
                         )}
                       </div>
                     </div>
@@ -643,7 +643,7 @@ export const ProcedureManagement = () => {
                             {new Date(price.effective_from).toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
-                            <Badge className={price.is_active ? "bg-success-500 text-white text-xs" : "bg-muted-foreground text-white text-xs"}>
+                            <Badge className={price.is_active ? "bg-success-700 text-white text-xs" : "bg-muted-foreground text-white text-xs"}>
                               {price.is_active ? "Active" : "Inactive"}
                             </Badge>
                           </td>

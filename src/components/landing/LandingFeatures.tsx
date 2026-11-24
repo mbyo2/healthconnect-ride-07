@@ -433,7 +433,7 @@ export const ForProviders = () => {
                 <Activity className="h-5 w-5 text-primary-500" />
                 <h3 className="font-display text-xl text-midnight">Practitioner Overview</h3>
               </div>
-              <span className="px-3 py-1 rounded-pill text-xs font-medium text-white bg-success-500">Preview</span>
+              <span className="px-3 py-1 rounded-pill text-xs font-medium text-white bg-success-700">Preview</span>
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[

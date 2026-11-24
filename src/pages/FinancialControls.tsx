@@ -190,9 +190,9 @@ export const FinancialControls = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": return "bg-success-500 text-white";
-      case "rejected": return "bg-error-500 text-white";
-      case "flagged": return "bg-warning-500 text-white";
+      case "approved": return "bg-success-700 text-white";
+      case "rejected": return "bg-error-700 text-white";
+      case "flagged": return "bg-warning-700 text-white";
       default: return "bg-primary-500 text-white";
     }
   };
@@ -520,7 +520,7 @@ export const FinancialControls = () => {
                           {log.status}
                         </Badge>
                         {log.flagged_for_review && (
-                          <Badge className="bg-warning-500 text-white text-xs ml-1">Flagged</Badge>
+                          <Badge className="bg-warning-700 text-white text-xs ml-1">Flagged</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">
@@ -607,7 +607,7 @@ export const FinancialControls = () => {
                           {new Date(discrepancy.created_at).toLocaleString()}
                         </div>
                       </div>
-                      <Badge className="bg-error-500 text-white text-xs">
+                      <Badge className="bg-error-700 text-white text-xs">
                         {discrepancy.difference_percentage.toFixed(1)}% Diff
                       </Badge>
                     </div>
@@ -637,7 +637,7 @@ export const FinancialControls = () => {
                       <Button
                         size="sm"
                         onClick={() => handleResolveDiscrepancy(discrepancy.id)}
-                        className="text-xs bg-success-500 hover:bg-success-600 text-white min-h-[44px]"
+                        className="text-xs bg-success-700 hover:bg-success-700 text-white min-h-[44px]"
                       >
                         Resolve
                       </Button>

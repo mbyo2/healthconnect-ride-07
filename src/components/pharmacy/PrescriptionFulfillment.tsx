@@ -474,13 +474,13 @@ export function PrescriptionFulfillment() {
   const getStatusPill = (st: string) => {
     switch (st) {
       case "filled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Filled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Filled</span>;
       case "cancelled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
       case "partially_filled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Partially Filled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-700">Partially Filled</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending Rx</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Pending Rx</span>;
     }
   };
 

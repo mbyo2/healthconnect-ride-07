@@ -17,20 +17,20 @@ const getStatusPill = (status: string, order?: any) => {
   // A completed result with no verifier is NOT a released report — it is
   // sitting in the pathologist queue. Label it honestly.
   if ((status === "completed" || status === "report_ready") && order && !order.verified_by) {
-    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Awaiting Verification</span>;
+    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Awaiting Verification</span>;
   }
   switch (status) {
     case "completed":
     case "report_ready":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Report Ready</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Report Ready</span>;
     case "processing":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Processing</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Processing</span>;
     case "sample_collected":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Sample Collected</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-600">Sample Collected</span>;
     case "cancelled":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
     default:
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Pending Collection</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-700">Pending Collection</span>;
   }
 };
 
@@ -328,7 +328,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                   <td className="py-3 px-3 text-slate-500">{order.sample_type || "—"}</td>
                   <td className="py-3 px-3">
                     {order.priority && order.priority !== "routine" ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">{order.priority.toUpperCase()}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">{order.priority.toUpperCase()}</span>
                     ) : (
                       <span className="text-muted-foreground">Routine</span>
                     )}
@@ -339,7 +339,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["pending", "ordered"].includes(order.status) && (
                         <button
                           onClick={() => advance(order, "sample_collected")}
-                          className="px-2 py-1 rounded text-xs font-bold bg-primary-400 text-white"
+                          className="px-2 py-1 rounded text-xs font-bold bg-primary-600 text-white"
                         >
                           Collect
                         </button>
@@ -347,7 +347,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {order.status === "sample_collected" && (
                         <button
                           onClick={() => advance(order, "processing")}
-                          className="px-2 py-1 rounded text-xs font-bold bg-warning-500 text-white"
+                          className="px-2 py-1 rounded text-xs font-bold bg-warning-700 text-white"
                         >
                           Process
                         </button>
@@ -363,7 +363,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["completed", "report_ready"].includes(order.status) && (
                         <button
                           onClick={() => window.print()}
-                          className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white flex items-center gap-0.5"
+                          className="px-2 py-1 rounded text-xs font-bold bg-success-700 text-white flex items-center gap-0.5"
                         >
                           <Printer className="h-3 w-3" /> Print
                         </button>
@@ -499,7 +499,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
             <button
               onClick={submitResult}
               disabled={!resultInput.trim() || isSubmitting}
-              className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold"
+              className="px-4 py-1.5 rounded-md bg-success-700 text-white text-xs font-bold"
             >
               {isSubmitting ? "Submitting..." : "Submit for Verification"}
             </button>

@@ -423,7 +423,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   <Label className="font-bold text-sm">Visual Analog Scale (VAS): {painScore} / 10</Label>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
-                      painScore <= 3 ? "bg-emerald-500" : painScore <= 6 ? "bg-amber-500" : "bg-rose-500"
+                      painScore <= 3 ? "bg-emerald-700" : painScore <= 6 ? "bg-amber-700" : "bg-rose-500"
                     }`}
                   >
                     {painScore <= 3 ? "Mild" : painScore <= 6 ? "Moderate" : "Severe"}

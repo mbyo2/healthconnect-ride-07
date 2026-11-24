@@ -14,9 +14,9 @@ type Tab = "rotations" | "research" | "discussions";
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const rotStatusPill = (s: string) => {
-  if (s === "active") return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Active</span>;
+  if (s === "active") return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Active</span>;
   if (s === "completed") return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">Completed</span>;
-  return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-graphite-400">Cancelled</span>;
+  return <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-graphite-600">Cancelled</span>;
 };
 
 const studyStatusPill = (s: string) => {
@@ -28,7 +28,7 @@ const studyStatusPill = (s: string) => {
     published: "bg-purple-500",
   };
   const label = s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return <span className={`px-2 py-0.5 rounded-full text-xs font-bold text-white ${map[s] || "bg-graphite-400"}`}>{label}</span>;
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-bold text-white ${map[s] || "bg-graphite-600"}`}>{label}</span>;
 };
 
 const studyTypeLabel = (t: string) =>

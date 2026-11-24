@@ -231,8 +231,8 @@ export const EnhancedDiagnostics = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "stat": return "bg-error-500 text-white";
-      case "urgent": return "bg-warning-500 text-white";
+      case "stat": return "bg-error-700 text-white";
+      case "urgent": return "bg-warning-700 text-white";
       case "routine": return "bg-primary-500 text-white";
       default: return "bg-muted-foreground text-white";
     }
@@ -240,11 +240,11 @@ export const EnhancedDiagnostics = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-success-500 text-white";
+      case "completed": return "bg-success-700 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "approved": return "bg-success-500 text-white";
-      case "pending": return "bg-warning-500 text-white";
-      case "cancelled": return "bg-error-500 text-white";
+      case "approved": return "bg-success-700 text-white";
+      case "pending": return "bg-warning-700 text-white";
+      case "cancelled": return "bg-error-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -702,7 +702,7 @@ export const EnhancedDiagnostics = () => {
                         </div>
                       </div>
                       {schedule.is_on_call && (
-                        <Badge className="bg-warning-500 text-white text-xs">On Call</Badge>
+                        <Badge className="bg-warning-700 text-white text-xs">On Call</Badge>
                       )}
                     </div>
                   </CardHeader>

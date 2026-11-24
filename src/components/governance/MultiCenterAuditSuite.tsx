@@ -35,11 +35,11 @@ interface TeamMember {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  push_notification_sent: "text-indigo-400",
-  staff_email_sent: "text-blue-400",
-  payment_received: "text-emerald-400",
-  refund_issued: "text-orange-400",
-  search: "text-slate-400",
+  push_notification_sent: "text-indigo-700 dark:text-indigo-400",
+  staff_email_sent: "text-blue-700 dark:text-blue-400",
+  payment_received: "text-emerald-700 dark:text-emerald-400",
+  refund_issued: "text-orange-700 dark:text-orange-400",
+  search: "text-muted-foreground",
 };
 
 // ─── Facility Overview (live aggregates) ─────────────────────────────────────
@@ -92,32 +92,32 @@ function FacilityOverview({ institutionId }: { institutionId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-slate-800/60 rounded-xl border border-slate-700/50 p-4 flex flex-wrap items-center gap-3">
-        <div className="p-2 rounded-lg bg-indigo-500/15"><Building2 className="h-5 w-5 text-indigo-300" /></div>
+      <div className="bg-muted rounded-xl border border-border p-4 flex flex-wrap items-center gap-3">
+        <div className="p-2 rounded-lg bg-indigo-500/15"><Building2 className="h-5 w-5 text-indigo-700 dark:text-indigo-300" /></div>
         <div className="min-w-0">
-          <p className="font-semibold text-white text-sm">{loading ? "Loading facility…" : facility?.name || "Facility"}</p>
-          <p className="text-xs text-slate-400">
+          <p className="font-semibold text-foreground text-sm">{loading ? "Loading facility…" : facility?.name || "Facility"}</p>
+          <p className="text-xs text-muted-foreground">
             {[facility?.type, facility?.city, facility?.state].filter(Boolean).join(" · ") || "—"}
             {facility?.license_number ? ` · Lic. ${facility.license_number}` : ""}
           </p>
         </div>
         <div className="ml-auto flex gap-2">
-          {facility?.is_verified ? <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs">Verified</Badge> : null}
-          {facility?.status ? <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">{facility.status}</Badge> : null}
+          {facility?.is_verified ? <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 text-xs">Verified</Badge> : null}
+          {facility?.status ? <Badge className="bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 text-xs">{facility.status}</Badge> : null}
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Bed Occupancy", value: loading ? "…" : `${occupancy}%`, sub: `${stats.occupied}/${stats.beds} beds`, icon: BedDouble, color: "text-blue-400" },
-          { label: "Active Admissions", value: loading ? "…" : String(stats.admitted), sub: "currently admitted", icon: Activity, color: "text-emerald-400" },
-          { label: "Revenue (MTD)", value: loading ? "…" : `K${stats.revenueMTD.toLocaleString()}`, sub: `K${stats.outstanding.toLocaleString()} outstanding`, icon: DollarSign, color: "text-amber-400" },
-          { label: "Registered Staff", value: loading ? "…" : String(stats.staff), sub: "personnel on record", icon: Users, color: "text-indigo-400" },
+          { label: "Bed Occupancy", value: loading ? "…" : `${occupancy}%`, sub: `${stats.occupied}/${stats.beds} beds`, icon: BedDouble, color: "text-blue-700 dark:text-blue-400" },
+          { label: "Active Admissions", value: loading ? "…" : String(stats.admitted), sub: "currently admitted", icon: Activity, color: "text-emerald-700 dark:text-emerald-400" },
+          { label: "Revenue (MTD)", value: loading ? "…" : `K${stats.revenueMTD.toLocaleString()}`, sub: `K${stats.outstanding.toLocaleString()} outstanding`, icon: DollarSign, color: "text-amber-700 dark:text-amber-400" },
+          { label: "Registered Staff", value: loading ? "…" : String(stats.staff), sub: "personnel on record", icon: Users, color: "text-indigo-700 dark:text-indigo-400" },
         ].map((m) => (
-          <div key={m.label} className="bg-slate-700/30 rounded-xl p-4 border border-slate-600/30">
+          <div key={m.label} className="bg-muted rounded-xl p-4 border border-border">
             <m.icon className={`h-5 w-5 ${m.color} mb-2`} />
             <p className={`text-xl font-bold ${m.color}`}>{m.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{m.label} · {m.sub}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{m.label} · {m.sub}</p>
           </div>
         ))}
       </div>
@@ -190,21 +190,21 @@ function FacilityAuditTrail() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between bg-slate-800/80 rounded-xl border border-slate-700/50 p-4">
+      <div className="flex items-center justify-between bg-muted rounded-xl border border-border p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-slate-700/50 rounded-lg"><Hash className="h-5 w-5 text-blue-400" /></div>
+          <div className="p-2 bg-card rounded-lg"><Hash className="h-5 w-5 text-blue-700 dark:text-blue-400" /></div>
           <div>
-            <p className="font-semibold text-white text-sm">Facility Audit Trail</p>
-            <p className="text-xs text-slate-400">
+            <p className="font-semibold text-foreground text-sm">Facility Audit Trail</p>
+            <p className="text-xs text-muted-foreground">
               {loading ? "Loading…" : `${filtered.length} events · system-recorded, newest first`}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={fetchEvents} disabled={loading} className="border-slate-600 text-slate-300 hover:bg-slate-700 h-8 text-xs gap-1">
+          <Button size="sm" variant="outline" onClick={fetchEvents} disabled={loading} className="border-border text-foreground hover:bg-muted h-8 text-xs gap-1">
             <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
-          <Button size="sm" variant="outline" onClick={handleExport} disabled={!filtered.length} className="border-slate-600 text-slate-300 hover:bg-slate-700 h-8 text-xs gap-1">
+          <Button size="sm" variant="outline" onClick={handleExport} disabled={!filtered.length} className="border-border text-foreground hover:bg-muted h-8 text-xs gap-1">
             <Download className="h-3 w-3" /> Export CSV
           </Button>
         </div>
@@ -212,20 +212,20 @@ function FacilityAuditTrail() {
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Events Shown", value: String(filtered.length), color: "text-blue-400" },
-          { label: "Unique Actors", value: String(new Set(filtered.map((e) => e.user_id)).size), color: "text-indigo-400" },
-          { label: "Categories", value: String(new Set(filtered.map((e) => e.category || "—")).size), color: "text-emerald-400" },
+          { label: "Events Shown", value: String(filtered.length), color: "text-blue-700 dark:text-blue-400" },
+          { label: "Unique Actors", value: String(new Set(filtered.map((e) => e.user_id)).size), color: "text-indigo-700 dark:text-indigo-400" },
+          { label: "Categories", value: String(new Set(filtered.map((e) => e.category || "—")).size), color: "text-emerald-700 dark:text-emerald-400" },
         ].map((s) => (
-          <div key={s.label} className="bg-slate-700/20 rounded-lg p-3 border border-slate-600/20 text-center">
+          <div key={s.label} className="bg-muted rounded-lg p-3 border border-border text-center">
             <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400">{s.label}</p>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by actor, action, or resource…" className="pl-9 bg-slate-700/50 border-slate-600 text-white" />
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by actor, action, or resource…" className="pl-9 bg-background border-input text-foreground" />
       </div>
 
       {loading ? (
@@ -233,7 +233,7 @@ function FacilityAuditTrail() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-10 text-xs text-muted-foreground">
           <Eye className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          <p className="font-semibold text-slate-300">No audit events recorded yet.</p>
+          <p className="font-semibold text-foreground">No audit events recorded yet.</p>
           <p className="mt-1">Staff notifications, emails and system actions will appear here as they happen.</p>
         </div>
       ) : (
@@ -244,14 +244,14 @@ function FacilityAuditTrail() {
               <div
                 key={entry.id}
                 onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                className="rounded-lg border border-slate-600/30 bg-slate-700/10 hover:border-slate-500/40 p-3 cursor-pointer transition-all"
+                className="rounded-lg border border-border bg-muted/50 hover:border-foreground/25 p-3 cursor-pointer transition-all"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-1.5 h-8 rounded-full bg-primary-500 shrink-0" />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-xs font-semibold font-mono ${ACTION_COLORS[entry.action] || "text-slate-300"}`}>
+                        <span className={`text-xs font-semibold font-mono ${ACTION_COLORS[entry.action] || "text-foreground"}`}>
                           {entry.action.replace(/_/g, " ")}
                         </span>
                         {entry.outcome ? <span className="text-xs text-muted-foreground">· {entry.outcome}</span> : null}
@@ -263,7 +263,7 @@ function FacilityAuditTrail() {
                   <p className="text-xs text-muted-foreground shrink-0">{entry.created_at ? new Date(entry.created_at).toLocaleString() : "—"}</p>
                 </div>
                 {isExpanded && (
-                  <pre className="mt-3 pt-3 border-t border-slate-700/40 text-xs text-slate-300 font-mono whitespace-pre-wrap break-all" onClick={(e) => e.stopPropagation()}>
+                  <pre className="mt-3 pt-3 border-t border-border text-xs text-foreground font-mono whitespace-pre-wrap break-all" onClick={(e) => e.stopPropagation()}>
                     {JSON.stringify(entry.details || {}, null, 2)}
                   </pre>
                 )}
@@ -321,13 +321,13 @@ function FacilityTeam({ institutionId }: { institutionId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-slate-800/60 rounded-xl border border-slate-700/50 p-4 flex items-center gap-3">
-        <Users className="h-5 w-5 text-indigo-300" />
+      <div className="bg-muted rounded-xl border border-border p-4 flex items-center gap-3">
+        <Users className="h-5 w-5 text-indigo-700 dark:text-indigo-300" />
         <div>
-          <p className="font-semibold text-white text-sm">{loading ? "Loading team…" : `${members.length} active team members`}</p>
-          <p className="text-xs text-slate-400">Live personnel roster for this facility, grouped by assigned role.</p>
+          <p className="font-semibold text-foreground text-sm">{loading ? "Loading team…" : `${members.length} active team members`}</p>
+          <p className="text-xs text-muted-foreground">Live personnel roster for this facility, grouped by assigned role.</p>
         </div>
-        <ShieldCheck className="ml-auto h-5 w-5 text-emerald-400" />
+        <ShieldCheck className="ml-auto h-5 w-5 text-emerald-700 dark:text-emerald-400" />
       </div>
       {loading ? (
         <p className="text-xs text-muted-foreground text-center py-8">Loading roster…</p>
@@ -336,12 +336,12 @@ function FacilityTeam({ institutionId }: { institutionId: string }) {
       ) : (
         <div className="space-y-3">
           {Object.entries(byRole).sort((a, b) => b[1] - a[1]).map(([role, count]) => (
-            <div key={role} className="bg-slate-700/20 rounded-lg p-3 border border-slate-600/20">
+            <div key={role} className="bg-muted rounded-lg p-3 border border-border">
               <div className="flex justify-between mb-1.5">
-                <span className="text-sm text-slate-300 capitalize">{role.replace(/_/g, " ")}</span>
-                <span className="text-sm font-semibold text-slate-200">{count}</span>
+                <span className="text-sm text-foreground capitalize">{role.replace(/_/g, " ")}</span>
+                <span className="text-sm font-semibold text-foreground">{count}</span>
               </div>
-              <div className="h-1.5 rounded bg-slate-700 overflow-hidden">
+              <div className="h-1.5 rounded bg-foreground/15 overflow-hidden">
                 <div className="h-full bg-indigo-500" style={{ width: `${Math.round((count / members.length) * 100)}%` }} />
               </div>
             </div>
@@ -356,9 +356,9 @@ function FacilityTeam({ institutionId }: { institutionId: string }) {
 export default function MultiCenterAuditSuite({ institutionId }: { institutionId?: string }) {
   if (!institutionId) {
     return (
-      <Card className="bg-slate-900 border-slate-700/50">
-        <CardHeader><CardTitle className="text-white text-sm">Facility Governance</CardTitle></CardHeader>
-        <CardContent><p className="text-xs text-slate-400">No facility selected. Open this tab from a facility dashboard.</p></CardContent>
+      <Card>
+        <CardHeader><CardTitle className="text-sm">Facility Governance</CardTitle></CardHeader>
+        <CardContent><p className="text-xs text-muted-foreground">No facility selected. Open this tab from a facility dashboard.</p></CardContent>
       </Card>
     );
   }
@@ -370,23 +370,23 @@ export default function MultiCenterAuditSuite({ institutionId }: { institutionId
           <Network className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white">Facility Governance & Audit</h2>
-          <p className="text-slate-400 text-sm">Live facility metrics, system-recorded audit trail, and team roster</p>
+          <h2 className="text-xl font-bold text-foreground">Facility Governance & Audit</h2>
+          <p className="text-muted-foreground text-sm">Live facility metrics, system-recorded audit trail, and team roster</p>
         </div>
         <div className="ml-auto hidden sm:block">
-          <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30"><Server className="h-3 w-3 mr-1" />Live Data</Badge>
+          <Badge className="bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30"><Server className="h-3 w-3 mr-1" />Live Data</Badge>
         </div>
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-1">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 rounded-lg text-xs">
+        <TabsList className="bg-muted border border-border rounded-xl p-1">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-muted-foreground rounded-lg text-xs">
             <Building2 className="h-3 w-3 mr-1" /> Facility Overview
           </TabsTrigger>
-          <TabsTrigger value="audit" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 rounded-lg text-xs">
+          <TabsTrigger value="audit" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-muted-foreground rounded-lg text-xs">
             <Hash className="h-3 w-3 mr-1" /> Audit Trail
           </TabsTrigger>
-          <TabsTrigger value="team" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 rounded-lg text-xs">
+          <TabsTrigger value="team" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-muted-foreground rounded-lg text-xs">
             <Users className="h-3 w-3 mr-1" /> Team & Roles
           </TabsTrigger>
         </TabsList>

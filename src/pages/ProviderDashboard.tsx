@@ -387,13 +387,13 @@ const MyPracticeEditor = () => {
       {/* Insurance providers — shown only when accepts_insurance is on */}
       {data.accepts_insurance && (
         <Section icon={Shield} title="Accepted Insurance Providers">
-          <PillSelector options={INSURANCE_OPTIONS} field="insurance_providers_accepted" activeColor="bg-success-500" />
+          <PillSelector options={INSURANCE_OPTIONS} field="insurance_providers_accepted" activeColor="bg-success-700" />
         </Section>
       )}
 
       {/* Languages */}
       <Section icon={Languages} title="Languages Spoken">
-        <PillSelector options={LANGUAGE_OPTIONS} field="languages_spoken" activeColor="bg-warning-500" />
+        <PillSelector options={LANGUAGE_OPTIONS} field="languages_spoken" activeColor="bg-warning-700" />
       </Section>
 
       {/* Save */}

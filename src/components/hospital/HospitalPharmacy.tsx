@@ -290,7 +290,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           <button className="px-3 py-1.5 rounded-md bg-primary-500 text-white font-semibold text-xs flex items-center gap-1" onClick={() => setShowAddRx(true)}>
             <Plus className="h-3.5 w-3.5" /> New Prescription
           </button>
-          <button className="px-3 py-1.5 rounded-md bg-error-500 text-white font-semibold text-xs flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+          <button className="px-3 py-1.5 rounded-md bg-error-700 text-white font-semibold text-xs flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
             <ShieldAlert className="h-3.5 w-3.5" /> Write-Off
           </button>
         </div>
@@ -354,9 +354,9 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       <td className="py-3 px-3 font-bold text-foreground">{rx.medication_name}</td>
                       <td className="py-3 px-3 text-muted-foreground">{rx.strength || rx.dosage || '—'}</td>
                       <td className="py-3 px-3 font-semibold">{rx.quantity ?? '1'}</td>
-                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500 capitalize">{rx.status}</span></td>
+                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700 capitalize">{rx.status}</span></td>
                       <td className="py-3 px-3 text-center">
-                        <button onClick={() => dispense(rx, 'completed')} className="px-3 py-1 rounded-md bg-success-500 text-white text-xs font-semibold flex items-center gap-1 mx-auto">
+                        <button onClick={() => dispense(rx, 'completed')} className="px-3 py-1 rounded-md bg-success-700 text-white text-xs font-semibold flex items-center gap-1 mx-auto">
                           <CheckCircle2 className="h-3 w-3" /> Dispense
                         </button>
                       </td>
@@ -535,16 +535,16 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                         <td className="py-3 px-3 text-muted-foreground text-right">K{cost.toFixed(2)}</td>
                         <td className="py-3 px-3 font-bold text-right">K{price.toFixed(2)}</td>
                         <td className="py-3 px-3 text-center">
-                          <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">+{marginPct}%</span>
+                          <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">+{marginPct}%</span>
                         </td>
                         <td className="py-3 px-3 text-muted-foreground">{i.expiry_date || '—'}</td>
                         <td className="py-3 px-3 text-center">
                           {isExpired ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Expired</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Expired</span>
                           ) : (i.quantity ?? 0) <= (i.reorder_level ?? 20) ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Low</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Low</span>
                           ) : (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">OK</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">OK</span>
                           )}
                         </td>
                       </tr>
@@ -560,7 +560,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         <TabsContent value="alerts" className="space-y-3 pt-3">
           <div className="flex justify-between items-center">
             <h4 className="text-sm font-semibold text-foreground flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-warning-500" />Stock Alerts & Damage Audit</h4>
-            <button className="px-3 py-1.5 rounded-md bg-error-500 text-white text-xs font-semibold flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+            <button className="px-3 py-1.5 rounded-md bg-error-700 text-white text-xs font-semibold flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
               <ShieldAlert className="h-3.5 w-3.5" /> Log Write-Off
             </button>
           </div>
@@ -576,7 +576,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <p className="text-sm font-semibold text-foreground">{i.product_name} — EXPIRED</p>
                 <p className="text-xs text-muted-foreground">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Action Needed</span>
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Action Needed</span>
             </div>
           ))}
 
@@ -587,7 +587,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <p className="text-sm font-semibold text-foreground">{i.product_name} — Expiring Soon</p>
                 <p className="text-xs text-muted-foreground">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Near Expiry</span>
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Near Expiry</span>
             </div>
           ))}
 

@@ -263,9 +263,9 @@ export const CareTeamManagement = () => {
   const getRoleTypeColor = (type: string) => {
     switch (type) {
       case "clinical": return "bg-primary-500";
-      case "nursing": return "bg-success-500";
-      case "technical": return "bg-purple-500";
-      case "administrative": return "bg-warning-500";
+      case "nursing": return "bg-success-700";
+      case "technical": return "bg-purple-700";
+      case "administrative": return "bg-warning-700";
       case "support": return "bg-indigo-500";
       default: return "bg-muted-foreground";
     }
@@ -273,8 +273,8 @@ export const CareTeamManagement = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-error-500 text-white";
-      case "high": return "bg-warning-500 text-white";
+      case "urgent": return "bg-error-700 text-white";
+      case "high": return "bg-warning-700 text-white";
       case "normal": return "bg-primary-500 text-white";
       case "low": return "bg-muted-foreground text-white";
       default: return "bg-muted-foreground text-white";
@@ -283,11 +283,11 @@ export const CareTeamManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-success-500 text-white";
+      case "completed": return "bg-success-700 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "pending": return "bg-purple-500 text-white";
-      case "cancelled": return "bg-error-500 text-white";
-      case "deferred": return "bg-warning-500 text-white";
+      case "pending": return "bg-purple-700 text-white";
+      case "cancelled": return "bg-error-700 text-white";
+      case "deferred": return "bg-warning-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -665,7 +665,7 @@ export const CareTeamManagement = () => {
                       </td>
                       <td className="px-4 py-3">
                         {assignment.is_active ? (
-                          <Badge className="bg-success-500 text-white text-xs">Active</Badge>
+                          <Badge className="bg-success-700 text-white text-xs">Active</Badge>
                         ) : (
                           <Badge className="bg-muted-foreground text-white text-xs">Inactive</Badge>
                         )}
@@ -709,10 +709,10 @@ export const CareTeamManagement = () => {
                         <Badge className="bg-primary-500 text-white text-xs">Can Prescribe</Badge>
                       )}
                       {role.can_order_tests && (
-                        <Badge className="bg-purple-500 text-white text-xs">Can Order Tests</Badge>
+                        <Badge className="bg-purple-700 text-white text-xs">Can Order Tests</Badge>
                       )}
                       {role.can_perform_procedures && (
-                        <Badge className="bg-success-500 text-white text-xs">Can Perform Procedures</Badge>
+                        <Badge className="bg-success-700 text-white text-xs">Can Perform Procedures</Badge>
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground">

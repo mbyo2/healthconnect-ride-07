@@ -197,11 +197,11 @@ export const AppointmentDetails = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-success-500">Completed</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-success-700">Completed</span>;
       case "cancelled":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-error-500">Cancelled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-error-700">Cancelled</span>;
       default:
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-primary-400">Scheduled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold text-white bg-primary-600">Scheduled</span>;
     }
   };
 
@@ -256,7 +256,7 @@ export const AppointmentDetails = () => {
             {appointment.type === "video_consultation" && videoConsultation && appointment.status !== "cancelled" && (
               <button
                 onClick={() => navigate(`/video-consultations?join=${videoConsultation.id}`)}
-                className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-success-500 hover:bg-success-600 text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-1.5 min-h-[44px] rounded-md bg-success-700 hover:bg-success-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
               >
                 <Video className="h-3.5 w-3.5" />
                 Join Meeting
@@ -451,7 +451,7 @@ export const AppointmentDetails = () => {
             <button
               onClick={cancelAppointment}
               disabled={cancelling}
-              className="px-4 py-2 rounded-md bg-error-500 hover:bg-error-600 text-white font-semibold text-xs disabled:opacity-50"
+              className="px-4 py-2 rounded-md bg-error-700 hover:bg-error-600 text-white font-semibold text-xs disabled:opacity-50"
             >
               {cancelling ? "Cancelling…" : "Yes, cancel"}
             </button>

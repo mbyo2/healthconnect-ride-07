@@ -65,9 +65,9 @@ interface BillingProps {
 
 const getPaymentPill = (status: string) => {
   switch (status) {
-    case "paid": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Paid</span>;
-    case "overdue": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Overdue</span>;
-    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
+    case "paid": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Paid</span>;
+    case "overdue": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Overdue</span>;
+    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Pending</span>;
   }
 };
 

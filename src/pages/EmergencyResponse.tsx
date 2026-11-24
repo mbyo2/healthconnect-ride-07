@@ -147,7 +147,7 @@ const EmergencyResponse = () => {
       <div className="doc-page-header px-4 sm:px-6 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-error-500 text-white flex items-center justify-center font-semibold text-sm">
+            <div className="h-10 w-10 rounded-xl bg-error-700 text-white flex items-center justify-center font-semibold text-sm">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
@@ -162,7 +162,7 @@ const EmergencyResponse = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-success-500 flex items-center gap-1.5">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-success-700 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" /> 24/7 Response Active
             </span>
           </div>
@@ -183,7 +183,7 @@ const EmergencyResponse = () => {
           </div>
           <button
             onClick={handleEmergencyCall}
-            className="px-10 py-4 rounded-xl bg-error-500 hover:bg-error-500 text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
+            className="px-10 py-4 rounded-xl bg-error-700 hover:bg-error-700 text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
           >
             <Phone className="w-6 h-6" />
             <span>CALL EMERGENCY SERVICES</span>
@@ -217,7 +217,7 @@ const EmergencyResponse = () => {
                   </div>
                   <button
                     onClick={() => callNumber(contact.phone)}
-                    className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-success-500 text-white text-xs font-semibold flex items-center justify-center gap-1"
+                    className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-md bg-success-700 text-white text-xs font-semibold flex items-center justify-center gap-1"
                   >
                     <Phone className="w-3.5 h-3.5" /> Call
                   </button>
@@ -295,7 +295,7 @@ const EmergencyResponse = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <h4 className="font-semibold text-sm text-foreground">{h.name}</h4>
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-error-500">24/7 Emergency</span>
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-error-700">24/7 Emergency</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">{h.address || "Lusaka Medical District"}</p>
                 </div>
@@ -325,7 +325,7 @@ const EmergencyResponse = () => {
           </div>
           <button
             onClick={handleShareLocation}
-            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs text-white transition-all ${locationSharing ? "bg-error-500" : "bg-primary-500"}`}
+            className={`px-5 py-2.5 min-h-[44px] rounded-xl font-semibold text-xs text-white transition-all ${locationSharing ? "bg-error-700" : "bg-primary-500"}`}
           >
             {locationSharing ? "Stop Location Telemetry" : "Activate GPS Telemetry Broadcast"}
           </button>

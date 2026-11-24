@@ -387,7 +387,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                     </div>
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-bold text-white ${
-                        s.is_active ? "bg-success-500" : "bg-graphite-400"
+                        s.is_active ? "bg-success-700" : "bg-graphite-600"
                       }`}
                     >
                       {s.is_active ? "Active" : "Inactive"}

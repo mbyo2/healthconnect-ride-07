@@ -530,7 +530,7 @@ export const MultiCountryAccounting = ({ institutionId }: { institutionId: strin
                 ))}
               </select>
             </div>
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white bg-success-500">
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white bg-success-700">
               Active {country.countryCode} Rules
             </span>
           </div>

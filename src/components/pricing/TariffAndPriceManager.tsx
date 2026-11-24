@@ -633,9 +633,9 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                   <td className="py-3 px-3 text-center">
                     <button onClick={() => toggleAvailability(t.id, !t.isAvailable)}>
                       {t.isAvailable ? (
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active</span>
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Active</span>
                       ) : (
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Disabled</span>
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Disabled</span>
                       )}
                     </button>
                   </td>
@@ -643,7 +643,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                     {isEditing ? (
                       <button
                         onClick={() => handleSaveInlineEdit(t.id)}
-                        className="px-2.5 py-1 rounded-md bg-success-500 text-white text-xs font-bold"
+                        className="px-2.5 py-1 rounded-md bg-success-700 text-white text-xs font-bold"
                       >
                         Save
                       </button>

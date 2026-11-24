@@ -28,7 +28,7 @@ const TRIAGE_CONFIG = {
   critical: { label: 'Critical', color: 'bg-red-600 text-white', border: 'border-l-red-600', description: 'Immediate life-threatening' },
   urgent: { label: 'Urgent', color: 'bg-orange-500 text-white', border: 'border-l-orange-500', description: 'High priority, <30 min' },
   standard: { label: 'Standard', color: 'bg-yellow-500 text-white', border: 'border-l-yellow-500', description: 'Normal queue' },
-  non_urgent: { label: 'Non-Urgent', color: 'bg-green-500 text-white', border: 'border-l-green-500', description: 'Can wait safely' },
+  non_urgent: { label: 'Non-Urgent', color: 'bg-green-700 text-white', border: 'border-l-green-500', description: 'Can wait safely' },
 };
 
 const CONSCIOUSNESS_LEVELS = ['Alert', 'Verbal response', 'Pain response', 'Unresponsive'];

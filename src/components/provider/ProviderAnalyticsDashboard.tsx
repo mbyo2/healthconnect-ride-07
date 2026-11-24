@@ -128,7 +128,7 @@ export const ProviderAnalyticsDashboard = () => {
                     <p className="text-xs text-muted-foreground font-medium">{apt.date} at {apt.time}</p>
                   </div>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${
-                    apt.status === "completed" ? "bg-success-500" : apt.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
+                    apt.status === "completed" ? "bg-success-700" : apt.status === "cancelled" ? "bg-error-700" : "bg-primary-500"
                   }`}>
                     {apt.status}
                   </span>

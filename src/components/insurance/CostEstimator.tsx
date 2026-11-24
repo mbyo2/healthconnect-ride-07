@@ -182,11 +182,11 @@ export const CostEstimator = () => {
             </div>
           </div>
           {verification && (verification.verification_status === 'verified' || verification.status === 'verified') ? (
-            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">
+            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">
               Verified Coverage
             </span>
           ) : (
-            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">
+            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">
               Unverified — estimates use plan defaults
             </span>
           )}

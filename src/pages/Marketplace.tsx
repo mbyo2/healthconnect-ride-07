@@ -217,7 +217,7 @@ const Marketplace = () => {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-xs text-foreground">Order #{order.id.slice(0, 8)}</h3>
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white ${
-                            order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
+                            order.status === "delivered" ? "bg-success-700" : order.status === "cancelled" ? "bg-error-700" : "bg-primary-500"
                           }`}>
                             {order.status.replace("_", " ")}
                           </span>

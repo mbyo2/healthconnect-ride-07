@@ -313,7 +313,7 @@ export const SelfServiceKiosk: React.FC = () => {
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
               Doc' O Clock Patient Self-Service Kiosk
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-700 animate-pulse" />
             </h1>
             <p className="text-xs text-muted-foreground dark:text-slate-300 font-medium">
               {institutionName ? `${institutionName} • ` : ""}Touchscreen Check-In, Walk-in Triage &amp; Mobile Money Billing

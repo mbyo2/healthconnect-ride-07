@@ -129,7 +129,7 @@ function Chip({
     "px-3 py-2 rounded-full border text-xs font-semibold transition-all active:scale-95 text-left";
   const styles = danger
     ? selected
-      ? "bg-error-500 border-error-500 text-white"
+      ? "bg-error-700 border-error-500 text-white"
       : "bg-error-50 dark:bg-red-950/30 border-error-200 dark:border-red-900 text-error-700 dark:text-red-300 hover:border-error-400"
     : selected
       ? "bg-primary-500 border-primary-500 text-white"
@@ -633,7 +633,7 @@ export default function TriageAssistant() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <a
                 href="tel:116"
-                className="py-3.5 rounded-xl bg-error-500 hover:bg-error-600 text-white font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                className="py-3.5 rounded-xl bg-error-700 hover:bg-error-600 text-white font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
               >
                 <Phone className="h-5 w-5" /> Call 116 — Ambulance
               </a>
@@ -668,7 +668,7 @@ export default function TriageAssistant() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white ${
-                    assessment.urgency === "urgent" ? "bg-warning-500" : "bg-primary-500"
+                    assessment.urgency === "urgent" ? "bg-warning-700" : "bg-primary-500"
                   }`}
                 >
                   {assessment.urgency === "urgent" ? (

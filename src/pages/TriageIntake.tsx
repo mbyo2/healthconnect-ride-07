@@ -32,12 +32,12 @@ type TriageResponse = {
 const URGENCY_META: Record<TriageResponse["urgency"], { label: string; pillColor: string; icon: React.ReactNode }> = {
   emergency: {
     label: "Emergency — call now",
-    pillColor: "bg-error-500 text-white",
+    pillColor: "bg-error-700 text-white",
     icon: <Ambulance className="h-4 w-4" />,
   },
   urgent: {
     label: "See a doctor soon",
-    pillColor: "bg-warning-500 text-white",
+    pillColor: "bg-warning-700 text-white",
     icon: <AlertTriangle className="h-4 w-4" />,
   },
   routine: {
@@ -47,7 +47,7 @@ const URGENCY_META: Record<TriageResponse["urgency"], { label: string; pillColor
   },
   self_care: {
     label: "Care at home",
-    pillColor: "bg-success-500 text-white",
+    pillColor: "bg-success-700 text-white",
     icon: <ShieldCheck className="h-4 w-4" />,
   },
 };

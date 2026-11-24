@@ -300,8 +300,8 @@ export const InstitutionApplications = () => {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold capitalize transition-all ${
                 filter === f
-                  ? f === "approved" ? "bg-success-500 text-white"
-                    : f === "rejected" ? "bg-error-500 text-white"
+                  ? f === "approved" ? "bg-success-700 text-white"
+                    : f === "rejected" ? "bg-error-700 text-white"
                     : "bg-primary-500 text-white"
                   : "text-muted-foreground hover:bg-muted"
               }`}
@@ -549,14 +549,14 @@ export const InstitutionApplications = () => {
             <button
               onClick={() => decide("rejected")}
               disabled={processing || !notes.trim()}
-              className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40"
+              className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40"
             >
               <X className="h-3.5 w-3.5" /> Reject
             </button>
             <button
               onClick={() => decide("approved")}
               disabled={processing || docUrls.length === 0}
-              className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40"
+              className="px-4 py-1.5 rounded-md bg-success-700 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40"
             >
               {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               Approve Institution

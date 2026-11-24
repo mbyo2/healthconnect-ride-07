@@ -22,7 +22,7 @@ const buttonVariants = cva(
         secondary: "bg-pill text-pill-foreground hover:bg-pill/80",
         ghost: "text-foreground hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline decoration-2",
-        success: "bg-success-600 text-white hover:bg-success-700",
+        success: "bg-success-700 text-white hover:bg-success-700",
       },
       size: {
         default: "h-10 px-6 py-2",

@@ -73,9 +73,9 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
 
   const getStatusPill = (qty: number, reorder: number) => {
     if (qty <= reorder) {
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Reorder Required</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Reorder Required</span>;
     }
-    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">In Stock</span>;
+    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">In Stock</span>;
   };
 
   return (

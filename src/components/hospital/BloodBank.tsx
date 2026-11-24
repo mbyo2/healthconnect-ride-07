@@ -13,15 +13,15 @@ import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSele
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const getStockPill = (status: string) => {
-  if (status === "adequate") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Adequate</span>;
-  if (status === "low") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Low Stock</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Critical</span>;
+  if (status === "adequate") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Adequate</span>;
+  if (status === "low") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Low Stock</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Critical</span>;
 };
 
 const getRequestPill = (urgency: string) => {
-  if (urgency === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Emergency</span>;
-  if (urgency === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Urgent</span>;
-  return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Routine</span>;
+  if (urgency === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Emergency</span>;
+  if (urgency === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Urgent</span>;
+  return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-600">Routine</span>;
 };
 
 export const BloodBank = ({ hospital }: { hospital: any }) => {
@@ -209,7 +209,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <button onClick={() => setShowAddStock(true)} className="px-3 py-1.5 rounded-md border border-border font-bold text-xs flex items-center gap-1">
             <Plus className="h-3.5 w-3.5" /> Add Stock
           </button>
-          <button onClick={() => setShowNewRequest(true)} className="px-3.5 py-1.5 rounded-md bg-error-500 hover:bg-error-500 text-white font-semibold text-xs flex items-center gap-1">
+          <button onClick={() => setShowNewRequest(true)} className="px-3.5 py-1.5 rounded-md bg-error-700 hover:bg-error-700 text-white font-semibold text-xs flex items-center gap-1">
             <Plus className="h-4 w-4" /> New Request
           </button>
         </div>
@@ -303,17 +303,17 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 text-right font-mono font-bold">{r.units_required}</td>
                     <td className="py-3 px-3 text-center">{getRequestPill(r.urgency)}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${r.status === "issued" ? "bg-success-500" : r.status === "crossmatch_done" ? "bg-primary-400" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${r.status === "issued" ? "bg-success-700" : r.status === "crossmatch_done" ? "bg-primary-600" : "bg-warning-700"}`}>
                         {(r.status || "pending").replace("_", " ")}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
                       <div className="flex gap-1 justify-center">
                         {r.status === "pending" && (
-                          <button onClick={() => setShowCompatTest(true)} className="px-2 py-1 rounded text-xs font-bold bg-primary-400 text-white">Crossmatch</button>
+                          <button onClick={() => setShowCompatTest(true)} className="px-2 py-1 rounded text-xs font-bold bg-primary-600 text-white">Crossmatch</button>
                         )}
                         {r.status !== "issued" && (
-                          <button onClick={() => updateRequest(r, "issued")} className="px-2 py-1 rounded text-xs font-bold bg-success-500 text-white">Issue</button>
+                          <button onClick={() => updateRequest(r, "issued")} className="px-2 py-1 rounded text-xs font-bold bg-success-700 text-white">Issue</button>
                         )}
                       </div>
                     </td>
@@ -347,7 +347,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3">{d.phone || "—"}</td>
                     <td className="py-3 px-3">{d.last_donation_date ? new Date(d.last_donation_date).toLocaleDateString() : "Never"}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.is_active ? "bg-success-500" : "bg-graphite-400"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.is_active ? "bg-success-700" : "bg-graphite-600"}`}>
                         {d.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
@@ -381,7 +381,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 capitalize">{(d.component_type || "").replace(/_/g, " ")}</td>
                     <td className="py-3 px-3 text-right font-mono font-bold">{d.units_collected}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.screening_status === "passed" ? "bg-success-500" : d.screening_status === "failed" ? "bg-error-500" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${d.screening_status === "passed" ? "bg-success-700" : d.screening_status === "failed" ? "bg-error-700" : "bg-warning-700"}`}>
                         {d.screening_status}
                       </span>
                     </td>
@@ -415,7 +415,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 font-mono font-bold">{t.recipient_blood_type}</td>
                     <td className="py-3 px-3 capitalize">{t.test_type}</td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${t.result === "compatible" ? "bg-success-500" : t.result === "incompatible" ? "bg-error-500" : "bg-warning-500"}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${t.result === "compatible" ? "bg-success-700" : t.result === "incompatible" ? "bg-error-700" : "bg-warning-700"}`}>
                         {t.result}
                       </span>
                     </td>
@@ -450,7 +450,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 font-mono font-bold">{a.blood_type}</td>
                     <td className="py-3 px-3 capitalize">{(a.component_type || "").replace("_", " ")}</td>
                     <td className="py-3 px-3 text-center font-bold">{a.units_issued}</td>
-                    <td className="py-3 px-3"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">{a.action}</span></td>
+                    <td className="py-3 px-3"><span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">{a.action}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -543,7 +543,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowNewRequest(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold">{isSubmitting ? "Submitting..." : "Submit Request"}</button>
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold">{isSubmitting ? "Submitting..." : "Submit Request"}</button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -589,7 +589,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowAddDonor(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Register Donor"}</button>
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Register Donor"}</button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -646,7 +646,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowAddDonation(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Record Donation"}</button>
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Record Donation"}</button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -700,7 +700,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
             </div>
             <DialogFooter>
               <button type="button" onClick={() => setShowCompatTest(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Record Test"}</button>
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold">{isSubmitting ? "Saving..." : "Record Test"}</button>
             </DialogFooter>
           </form>
         </DialogContent>

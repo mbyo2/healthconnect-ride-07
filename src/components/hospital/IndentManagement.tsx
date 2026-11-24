@@ -11,18 +11,18 @@ import { toast } from "sonner";
 import { friendlyErrorMessage } from "@/utils/friendly-error";
 
 const getStatusPill = (status: string) => {
-  if (status === "approved") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Approved</span>;
-  if (status === "fulfilled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Fulfilled</span>;
-  if (status === "partially_fulfilled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Partially fulfilled</span>;
-  if (status === "rejected") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
-  if (status === "cancelled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
+  if (status === "approved") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-600">Approved</span>;
+  if (status === "fulfilled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Fulfilled</span>;
+  if (status === "partially_fulfilled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Partially fulfilled</span>;
+  if (status === "rejected") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Rejected</span>;
+  if (status === "cancelled") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Pending</span>;
 };
 
 const getPriorityPill = (priority: string) => {
-  if (priority === "emergency") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Emergency</span>;
-  if (priority === "urgent") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Urgent</span>;
-  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-400">Routine</span>;
+  if (priority === "emergency") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Emergency</span>;
+  if (priority === "urgent") return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Urgent</span>;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-600">Routine</span>;
 };
 
 const fmtDate = (d: string | null) => {
@@ -250,7 +250,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <div className="flex gap-2 flex-wrap pt-1">
             {indent.status === "pending" && (
               <>
-                <button onClick={() => openApprove(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-bold">Approve</button>
+                <button onClick={() => openApprove(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md bg-success-700 text-white text-xs font-bold">Approve</button>
                 <button onClick={() => openReject(indent)} className="px-3.5 py-2 min-h-[44px] rounded-md border border-border text-xs font-bold text-error-500">Reject</button>
                 <button onClick={() => { setSelected(indent); setShowCancelConfirm(true); }} className="px-3 py-2 min-h-[44px] rounded-md text-xs font-bold text-muted-foreground">Cancel</button>
               </>
@@ -392,7 +392,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <DialogFooter>
             <button onClick={() => setShowApprove(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Cancel</button>
-            <button onClick={handleApprove} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-success-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
+            <button onClick={handleApprove} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-success-700 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Approve indent
             </button>
           </DialogFooter>
@@ -409,7 +409,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           </div>
           <DialogFooter>
             <button onClick={() => setShowReject(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep</button>
-            <button onClick={handleReject} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
+            <button onClick={handleReject} disabled={isSubmitting} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-700 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} <XCircle className="h-3.5 w-3.5" /> Reject indent
             </button>
           </DialogFooter>
@@ -451,7 +451,7 @@ export const IndentManagement = ({ hospital: hospitalProp, departments }: { hosp
           <p className="text-sm text-muted-foreground"><strong className="text-foreground">{selected?.indent_number}</strong> will be withdrawn. This cannot be undone.</p>
           <DialogFooter>
             <button onClick={() => setShowCancelConfirm(false)} className="px-4 py-2.5 min-h-[44px] rounded-md border border-border text-xs font-bold">Keep</button>
-            <button onClick={handleCancel} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-500 text-white text-xs font-semibold">Yes, cancel</button>
+            <button onClick={handleCancel} className="px-4 py-2.5 min-h-[44px] rounded-md bg-error-700 text-white text-xs font-semibold">Yes, cancel</button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

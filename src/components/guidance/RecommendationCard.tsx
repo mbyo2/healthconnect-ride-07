@@ -30,9 +30,9 @@ export const RecommendationCard = ({
   };
 
   const priorityBadges = {
-    high: 'bg-error-500 text-white',
+    high: 'bg-error-700 text-white',
     medium: 'bg-primary-500 text-white',
-    low: 'bg-graphite-400 text-white',
+    low: 'bg-graphite-600 text-white',
   };
 
   return (

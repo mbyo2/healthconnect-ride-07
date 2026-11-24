@@ -116,13 +116,13 @@ async function callZraFunction(name: string, body: Record<string, unknown>) {
 
 function humanStatus(status: string, nextRetryAt?: string | null): { label: string; cls: string } {
   switch (status) {
-    case "sent": return { label: "Declared", cls: "bg-success-500 text-white" };
-    case "queued": return { label: "Awaiting declaration", cls: "bg-warning-500 text-white" };
+    case "sent": return { label: "Declared", cls: "bg-success-700 text-white" };
+    case "queued": return { label: "Awaiting declaration", cls: "bg-warning-700 text-white" };
     case "sending": return { label: "Declaring…", cls: "bg-primary-500 text-white" };
     case "failed":
       return nextRetryAt
-        ? { label: "Failed — will retry automatically", cls: "bg-error-500 text-white" }
-        : { label: "Failed — needs attention", cls: "bg-error-500 text-white" };
+        ? { label: "Failed — will retry automatically", cls: "bg-error-700 text-white" }
+        : { label: "Failed — needs attention", cls: "bg-error-700 text-white" };
     default: return { label: status, cls: "bg-muted-foreground text-white" };
   }
 }
@@ -412,9 +412,9 @@ export const ZraSmartInvoiceIntegration = () => {
     .sort((a, b) => b - a);
 
   const connectionBadge = conn?.connected
-    ? { label: conn.environment === "production" ? "Connected — Production" : "Connected — Test", cls: "bg-success-500 text-white" }
+    ? { label: conn.environment === "production" ? "Connected — Production" : "Connected — Test", cls: "bg-success-700 text-white" }
     : conn?.status === "pending_setup"
-      ? { label: "Details saved — device not initialised", cls: "bg-warning-500 text-white" }
+      ? { label: "Details saved — device not initialised", cls: "bg-warning-700 text-white" }
       : { label: "Not connected", cls: "bg-muted-foreground text-white" };
 
   return (
@@ -882,9 +882,9 @@ export const ZraSmartInvoiceIntegration = () => {
                           <div className="text-xs text-muted-foreground">ZRA item code: {mapping.zra_item_code}</div>
                         </div>
                         {mapping.synced_at ? (
-                          <Badge className="bg-success-500 text-white text-xs">Registered with ZRA</Badge>
+                          <Badge className="bg-success-700 text-white text-xs">Registered with ZRA</Badge>
                         ) : (
-                          <Badge className="bg-warning-500 text-white text-xs">Registers at first declaration</Badge>
+                          <Badge className="bg-warning-700 text-white text-xs">Registers at first declaration</Badge>
                         )}
                       </div>
                     </CardHeader>
@@ -927,7 +927,7 @@ export const ZraSmartInvoiceIntegration = () => {
                     <tr key={log.id} className="border-t border-border hover:bg-canvas-bone">
                       <td className="px-4 py-3"><div className="text-xs font-semibold">{log.operation_type}</div></td>
                       <td className="px-4 py-3">
-                        <Badge className={(log.operation_status === "success" ? "bg-success-500" : "bg-error-500") + " text-white text-xs"}>
+                        <Badge className={(log.operation_status === "success" ? "bg-success-700" : "bg-error-700") + " text-white text-xs"}>
                           {log.operation_status}
                         </Badge>
                       </td>

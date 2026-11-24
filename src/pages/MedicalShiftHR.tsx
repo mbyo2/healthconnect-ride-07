@@ -231,10 +231,10 @@ export const MedicalShiftHR = () => {
 
   const getAttendanceStatusColor = (status: string) => {
     switch (status) {
-      case "present": return "bg-success-500 text-white";
-      case "absent": return "bg-error-500 text-white";
-      case "late": return "bg-warning-500 text-white";
-      case "early_departure": return "bg-purple-500 text-white";
+      case "present": return "bg-success-700 text-white";
+      case "absent": return "bg-error-700 text-white";
+      case "late": return "bg-warning-700 text-white";
+      case "early_departure": return "bg-purple-700 text-white";
       case "on_leave": return "bg-muted-foreground text-white";
       default: return "bg-muted-foreground text-white";
     }
@@ -242,9 +242,9 @@ export const MedicalShiftHR = () => {
 
   const getDeviceStatusColor = (status: string) => {
     switch (status) {
-      case "online": return "bg-success-500 text-white";
-      case "offline": return "bg-error-500 text-white";
-      case "syncing": return "bg-warning-500 text-white";
+      case "online": return "bg-success-700 text-white";
+      case "offline": return "bg-error-700 text-white";
+      case "syncing": return "bg-warning-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -491,7 +491,7 @@ export const MedicalShiftHR = () => {
                         </div>
                       </div>
                       {shift.is_active ? (
-                        <Badge className="bg-success-500 text-white text-xs">Active</Badge>
+                        <Badge className="bg-success-700 text-white text-xs">Active</Badge>
                       ) : (
                         <Badge className="bg-muted-foreground text-white text-xs">Inactive</Badge>
                       )}
@@ -508,13 +508,13 @@ export const MedicalShiftHR = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       {shift.is_overnight && (
-                        <Badge className="bg-indigo-500 text-white text-xs">Overnight</Badge>
+                        <Badge className="bg-indigo-600 text-white text-xs">Overnight</Badge>
                       )}
                       {shift.requires_on_call && (
-                        <Badge className="bg-error-500 text-white text-xs">On Call</Badge>
+                        <Badge className="bg-error-700 text-white text-xs">On Call</Badge>
                       )}
                       {shift.auto_assign_rotation && (
-                        <Badge className="bg-purple-500 text-white text-xs">Auto Rotation</Badge>
+                        <Badge className="bg-purple-700 text-white text-xs">Auto Rotation</Badge>
                       )}
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-border">

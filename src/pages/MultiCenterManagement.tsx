@@ -299,13 +299,13 @@ export const MultiCenterManagement = () => {
                     </div>
                     <div className="flex items-center gap-2 text-xs">
                       {network.centralized_pricing && (
-                        <Badge className="bg-success-500 text-white">Central Pricing</Badge>
+                        <Badge className="bg-success-700 text-white">Central Pricing</Badge>
                       )}
                       {network.centralized_inventory && (
-                        <Badge className="bg-purple-500 text-white">Central Inventory</Badge>
+                        <Badge className="bg-purple-700 text-white">Central Inventory</Badge>
                       )}
                       {network.cross_billing_enabled && (
-                        <Badge className="bg-warning-500 text-white">Cross-Billing</Badge>
+                        <Badge className="bg-warning-700 text-white">Cross-Billing</Badge>
                       )}
                     </div>
                     <div className="pt-2 border-t border-border">
@@ -367,9 +367,9 @@ export const MultiCenterManagement = () => {
                       <td className="px-4 py-3 text-sm text-right tnum font-medium">{member.commission_rate}%</td>
                       <td className="px-4 py-3">
                         {member.is_active ? (
-                          <Badge className="bg-success-500 text-white text-xs">Active</Badge>
+                          <Badge className="bg-success-700 text-white text-xs">Active</Badge>
                         ) : (
-                          <Badge className="bg-error-500 text-white text-xs">Inactive</Badge>
+                          <Badge className="bg-error-700 text-white text-xs">Inactive</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">

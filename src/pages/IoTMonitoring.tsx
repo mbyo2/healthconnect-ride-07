@@ -155,7 +155,7 @@ const IoTMonitoring = () => {
                       </div>
                     </div>
                     {device.is_active ? (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Connected</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-700">Connected</span>
                     ) : (
                       <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-muted-foreground">Offline</span>
                     )}
@@ -204,7 +204,7 @@ const IoTMonitoring = () => {
             <div className="p-4 rounded-xl border border-border bg-background">
               <div className="flex items-center justify-between mb-2">
                 <Heart className="w-5 h-5 text-error-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-700">Normal</span>
               </div>
               <p className="text-[13px] font-medium text-muted-foreground">Heart Rate</p>
               <p className="text-3xl font-semibold text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
@@ -214,7 +214,7 @@ const IoTMonitoring = () => {
             <div className="p-4 rounded-xl border border-border bg-background">
               <div className="flex items-center justify-between mb-2">
                 <Activity className="w-5 h-5 text-primary-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-700">Normal</span>
               </div>
               <p className="text-[13px] font-medium text-muted-foreground">Blood Pressure</p>
               <p className="text-3xl font-semibold text-primary-500 mt-1">
@@ -228,7 +228,7 @@ const IoTMonitoring = () => {
             <div className="p-4 rounded-xl border border-border bg-background">
               <div className="flex items-center justify-between mb-2">
                 <Thermometer className="w-5 h-5 text-warning-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-700">Normal</span>
               </div>
               <p className="text-[13px] font-medium text-muted-foreground">Body Temperature</p>
               <p className="text-3xl font-semibold text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
@@ -238,7 +238,7 @@ const IoTMonitoring = () => {
             <div className="p-4 rounded-xl border border-border bg-background">
               <div className="flex items-center justify-between mb-2">
                 <Droplet className="w-5 h-5 text-primary-500" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-500">Normal</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold text-white bg-success-700">Normal</span>
               </div>
               <p className="text-[13px] font-medium text-muted-foreground">Oxygen Saturation</p>
               <p className="text-3xl font-semibold text-primary-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
@@ -283,7 +283,7 @@ const IoTMonitoring = () => {
             <div className="space-y-3">
               {alerts.map((alert) => (
                 <div key={alert.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-canvas text-xs">
-                  <div className={`p-1.5 rounded-full text-white ${alert.severity === "high" ? "bg-error-500" : alert.severity === "medium" ? "bg-warning-500" : "bg-primary-500"}`}>
+                  <div className={`p-1.5 rounded-full text-white ${alert.severity === "high" ? "bg-error-700" : alert.severity === "medium" ? "bg-warning-700" : "bg-primary-500"}`}>
                     {alert.severity === "low" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1">

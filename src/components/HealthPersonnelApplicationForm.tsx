@@ -247,7 +247,7 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 2: Professional */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-border pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white text-xs font-bold">2</span>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-700 text-white text-xs font-bold">2</span>
           <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Professional Information</h3>
         </div>
 
@@ -335,7 +335,7 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 3: Documents */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-border pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-success-500 text-white text-xs font-bold">3</span>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-success-700 text-white text-xs font-bold">3</span>
           <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Regulatory Documents</h3>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -400,7 +400,7 @@ export const HealthPersonnelApplicationForm = () => {
       {/* Section 4: Practice Details (optional but recommended) */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b border-border pb-2">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-500 text-white text-xs font-bold">4</span>
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-warning-700 text-white text-xs font-bold">4</span>
           <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Practice Details <span className="text-xs normal-case font-medium">(optional — can be completed after approval)</span></h3>
         </div>
 

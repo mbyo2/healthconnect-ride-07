@@ -202,22 +202,22 @@ export const HRManagerWorkflow = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "approved":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Approved</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Approved</span>;
       case "rejected":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Rejected</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending Review</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Pending Review</span>;
     }
   };
 
   const getEmployeeStatusPill = (status: string) => {
     switch (status) {
       case "active":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Active</span>;
       case "inactive":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-400">Inactive</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-600">Inactive</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Pending</span>;
     }
   };
 
@@ -230,7 +230,7 @@ export const HRManagerWorkflow = () => {
       on_leave: "bg-slate-400",
     };
     return (
-      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${styles[status] || "bg-slate-400"}`}>
+      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold text-white ${styles[status] || "bg-slate-600"}`}>
         {status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
       </span>
     );
@@ -435,7 +435,7 @@ export const HRManagerWorkflow = () => {
                             </button>
                             <button
                               onClick={() => setEmployeeStatus(e.id, e.status === "active" ? "inactive" : "active")}
-                              className={`px-2.5 py-1.5 rounded-md text-xs font-bold text-white min-h-[44px] ${e.status === "active" ? "bg-error-500" : "bg-success-500"}`}
+                              className={`px-2.5 py-1.5 rounded-md text-xs font-bold text-white min-h-[44px] ${e.status === "active" ? "bg-error-700" : "bg-success-700"}`}
                             >
                               {e.status === "active" ? "Deactivate" : "Reactivate"}
                             </button>
@@ -480,13 +480,13 @@ export const HRManagerWorkflow = () => {
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => approveLeave(l.id, true)}
-                            className="px-2.5 py-1 rounded-md bg-success-500 text-white text-xs font-bold"
+                            className="px-2.5 py-1 rounded-md bg-success-700 text-white text-xs font-bold"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => setRejectTarget(l)}
-                            className="px-2.5 py-1 rounded-md bg-error-500 text-white text-xs font-bold"
+                            className="px-2.5 py-1 rounded-md bg-error-700 text-white text-xs font-bold"
                           >
                             Reject
                           </button>
@@ -649,7 +649,7 @@ export const HRManagerWorkflow = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-error-500 text-white hover:bg-error-600"
+              className="bg-error-700 text-white hover:bg-error-600"
               onClick={() => {
                 if (rejectTarget) approveLeave(rejectTarget.id, false);
                 setRejectTarget(null);
@@ -857,7 +857,7 @@ export const HRManagerWorkflow = () => {
                 <button
                   onClick={handleConfirmPayroll}
                   disabled={payrollProcessing}
-                  className="w-full py-2.5 rounded-md bg-success-500 hover:bg-success-600 text-white font-semibold text-xs min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 rounded-md bg-success-700 hover:bg-success-700 text-white font-semibold text-xs min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-1.5"
                 >
                   {payrollProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                   Confirm & Process Payroll — K{payrollPreview.totalNet.toLocaleString()} net

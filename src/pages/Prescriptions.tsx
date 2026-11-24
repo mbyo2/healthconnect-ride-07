@@ -1253,7 +1253,7 @@ export const Prescriptions = () => {
                                     toast.error(friendlyErrorMessage(e, "Failed to claim prescription."));
                                   }
                                 }}
-                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1"
+                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-700 hover:bg-success-700 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1"
                                 title="Claim this prescription for your pharmacy"
                               >
                                 <CheckCircle className="h-3.5 w-3.5" />

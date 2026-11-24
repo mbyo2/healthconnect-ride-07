@@ -237,9 +237,9 @@ export const EnterpriseAccounting = () => {
 
   const getReconciliationStatusColor = (status: string) => {
     switch (status) {
-      case "reconciled": return "bg-success-500 text-white";
-      case "pending": return "bg-warning-500 text-white";
-      case "variance": return "bg-error-500 text-white";
+      case "reconciled": return "bg-success-700 text-white";
+      case "pending": return "bg-warning-700 text-white";
+      case "variance": return "bg-error-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -543,9 +543,9 @@ export const EnterpriseAccounting = () => {
                       <td className="px-4 py-3 text-xs">{entry.currency}</td>
                       <td className="px-4 py-3">
                         {entry.is_posted ? (
-                          <Badge className="bg-success-500 text-white text-xs">Posted</Badge>
+                          <Badge className="bg-success-700 text-white text-xs">Posted</Badge>
                         ) : (
-                          <Badge className="bg-warning-500 text-white text-xs">Draft</Badge>
+                          <Badge className="bg-warning-700 text-white text-xs">Draft</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3">

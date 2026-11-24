@@ -229,7 +229,7 @@ export const PharmacyPOS = () => {
               className="w-full pl-8 pr-3 py-2 rounded-md border border-border text-xs font-medium"
             />
           </div>
-          <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-500 text-white text-xs font-semibold">
+          <button onClick={() => setShowCloseDialog(true)} className="px-3 py-2 rounded-md bg-error-700 text-white text-xs font-semibold">
             Close Register
           </button>
         </div>
@@ -258,7 +258,7 @@ export const PharmacyPOS = () => {
                 <p className="text-xs text-muted-foreground font-medium">{item.dosage} · {item.medication_type}</p>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-bold text-primary-500">{formatPrice(item.unit_price || 0)}</span>
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${item.quantity_available <= 5 ? "bg-error-500" : "bg-success-500"}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white ${item.quantity_available <= 5 ? "bg-error-700" : "bg-success-700"}`}>
                     {item.quantity_available}
                   </span>
                 </div>
@@ -412,7 +412,7 @@ export const PharmacyPOS = () => {
           </div>
           <DialogFooter>
             <button onClick={() => setShowCloseDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-            <button onClick={() => { closeRegister.mutate(parseFloat(closingBalanceInput) || 0); setShowCloseDialog(false); }} className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold">Close Register</button>
+            <button onClick={() => { closeRegister.mutate(parseFloat(closingBalanceInput) || 0); setShowCloseDialog(false); }} className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold">Close Register</button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

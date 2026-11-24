@@ -228,9 +228,9 @@ export const PayeTaxCalculations = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "processed": return "bg-success-500 text-white";
-      case "pending": return "bg-warning-500 text-white";
-      case "failed": return "bg-error-500 text-white";
+      case "processed": return "bg-success-700 text-white";
+      case "pending": return "bg-warning-700 text-white";
+      case "failed": return "bg-error-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -522,7 +522,7 @@ export const PayeTaxCalculations = () => {
                         </div>
                       </div>
                       {slab.is_active ? (
-                        <Badge className="bg-success-500 text-white text-xs">Active</Badge>
+                        <Badge className="bg-success-700 text-white text-xs">Active</Badge>
                       ) : (
                         <Badge className="bg-muted-foreground text-white text-xs">Inactive</Badge>
                       )}

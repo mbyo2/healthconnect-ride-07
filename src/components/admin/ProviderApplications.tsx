@@ -231,9 +231,9 @@ export const ProviderApplications = () => {
   };
 
   const statusPill = (st: string) => {
-    if (st === "approved") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Approved</span>;
-    if (st === "rejected") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
-    return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
+    if (st === "approved") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-700">Approved</span>;
+    if (st === "rejected") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-700">Rejected</span>;
+    return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-700">Pending</span>;
   };
 
   const p = selected?.profile;
@@ -300,7 +300,7 @@ export const ProviderApplications = () => {
                     <div className="flex flex-col items-center gap-1">
                       {statusPill(app.status)}
                       {app.profile?.is_suspended && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-amber-600" title={app.profile.suspension_reason || "Suspended"}>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white bg-amber-700" title={app.profile.suspension_reason || "Suspended"}>
                           Suspended
                         </span>
                       )}
@@ -527,7 +527,7 @@ export const ProviderApplications = () => {
                 <button
                   onClick={() => toggleSuspension(false)}
                   disabled={processing}
-                  className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-md bg-success-700 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
                 >
                   {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                   Lift Suspension
@@ -537,7 +537,7 @@ export const ProviderApplications = () => {
                   onClick={() => toggleSuspension(true)}
                   disabled={processing || !notes.trim()}
                   title="Suspend for Terms & Conditions violation (reason required)"
-                  className="px-4 py-1.5 rounded-md bg-amber-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-md bg-amber-700 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
                 >
                   {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
                   Suspend (T&C Violation)
@@ -547,14 +547,14 @@ export const ProviderApplications = () => {
             <button
               onClick={() => decide("rejected")}
               disabled={processing || !notes.trim()}
-              className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+              className="px-4 py-1.5 rounded-md bg-error-700 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
             >
               <X className="h-3.5 w-3.5" /> Reject
             </button>
             <button
               onClick={() => decide("approved")}
               disabled={processing}
-              className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+              className="px-4 py-1.5 rounded-md bg-success-700 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
             >
               {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               Approve & Verify

@@ -526,7 +526,7 @@ export const PatientFlowManagement = () => {
                             </div>
                           </div>
                         </div>
-                        <Badge className={timeData.isOverdue ? "bg-error-500 text-white text-xs" : "bg-success-500 text-white text-xs"}>
+                        <Badge className={timeData.isOverdue ? "bg-error-700 text-white text-xs" : "bg-success-700 text-white text-xs"}>
                           {timeData.isOverdue ? "Overdue" : "On Track"}
                         </Badge>
                       </div>
@@ -600,10 +600,10 @@ export const PatientFlowManagement = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {stage.auto_proceed && (
-                          <Badge className="bg-success-500 text-white text-xs">Auto</Badge>
+                          <Badge className="bg-success-700 text-white text-xs">Auto</Badge>
                         )}
                         {stage.skip_allowed && (
-                          <Badge className="bg-purple-500 text-white text-xs">Skip</Badge>
+                          <Badge className="bg-purple-700 text-white text-xs">Skip</Badge>
                         )}
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                           <Edit className="h-3 w-3" />

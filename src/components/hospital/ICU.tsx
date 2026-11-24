@@ -24,7 +24,7 @@ const STATUS_BG: Record<string, string> = {
 };
 
 const getStatusPill = (status: string) => (
-  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${STATUS_COLORS[status] || "bg-slate-400"} capitalize`}>
+  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold text-white ${STATUS_COLORS[status] || "bg-slate-600"} capitalize`}>
     {status}
   </span>
 );
@@ -263,7 +263,7 @@ export const ICU = ({ hospital }: { hospital: any }) => {
                         <button
                           onClick={() => handleDischarge(bed)}
                           disabled={isSubmitting}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-success-500 text-white text-xs font-bold hover:bg-success-600 disabled:opacity-50"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-success-700 text-white text-xs font-bold hover:bg-success-700 disabled:opacity-50"
                         >
                           <LogOut className="h-3 w-3" /> Discharge
                         </button>

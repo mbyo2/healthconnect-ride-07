@@ -272,19 +272,19 @@ export const EnhancedTelemedicine = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-success-500 text-white";
+      case "completed": return "bg-success-700 text-white";
       case "in_progress": return "bg-primary-500 text-white";
-      case "active": return "bg-purple-500 text-white";
-      case "pending": return "bg-warning-500 text-white";
-      case "cancelled": return "bg-error-500 text-white";
+      case "active": return "bg-purple-700 text-white";
+      case "pending": return "bg-warning-700 text-white";
+      case "cancelled": return "bg-error-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-error-500 text-white";
-      case "high": return "bg-warning-500 text-white";
+      case "urgent": return "bg-error-700 text-white";
+      case "high": return "bg-warning-700 text-white";
       case "normal": return "bg-primary-500 text-white";
       case "low": return "bg-muted-foreground text-white";
       default: return "bg-muted-foreground text-white";
@@ -655,7 +655,7 @@ export const EnhancedTelemedicine = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-purple-500 text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-purple-700 text-white flex items-center justify-center">
                           <FileText className="h-5 w-5" />
                         </div>
                         <div>

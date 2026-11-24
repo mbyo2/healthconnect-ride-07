@@ -25,24 +25,24 @@ const ORDER_STATUSES = ["ordered", "in_progress", "completed", "cancelled"] as c
 
 const getStatusPill = (status: string) => {
   switch (status) {
-    case "completed": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
-    case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">In Progress</span>;
-    case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
-    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Ordered</span>;
+    case "completed": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Completed</span>;
+    case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">In Progress</span>;
+    case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Cancelled</span>;
+    default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-600">Ordered</span>;
   }
 };
 
 const getResultStatusPill = (status?: string | null) => {
   switch (status) {
-    case "final": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Final report</span>;
-    case "preliminary": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Preliminary</span>;
+    case "final": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-700">Final report</span>;
+    case "preliminary": return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Preliminary</span>;
     default: return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-muted-foreground">Draft</span>;
   }
 };
 
 const getPriorityPill = (priority: string) => {
-  if (priority === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Emergency</span>;
-  if (priority === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Urgent</span>;
+  if (priority === "emergency") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-700">Emergency</span>;
+  if (priority === "urgent") return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-700">Urgent</span>;
   return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-muted-foreground">Routine</span>;
 };
 

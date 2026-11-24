@@ -180,10 +180,10 @@ export const EnhancedInventory = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": case "received": return "bg-success-500 text-white";
+      case "approved": case "received": return "bg-success-700 text-white";
       case "pending": case "in_progress": return "bg-primary-500 text-white";
-      case "flagged": case "partial_received": return "bg-warning-500 text-white";
-      case "cancelled": return "bg-error-500 text-white";
+      case "flagged": case "partial_received": return "bg-warning-700 text-white";
+      case "cancelled": return "bg-error-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };

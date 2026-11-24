@@ -205,9 +205,9 @@ export const ZambiaCompliance = () => {
 
   const getComplianceStatusColor = (status: string) => {
     switch (status) {
-      case "compliant": case "active": return "bg-success-500 text-white";
-      case "non_compliant": case "suspended": return "bg-error-500 text-white";
-      case "pending": case "pending_review": return "bg-warning-500 text-white";
+      case "compliant": case "active": return "bg-success-700 text-white";
+      case "non_compliant": case "suspended": return "bg-error-700 text-white";
+      case "pending": case "pending_review": return "bg-warning-700 text-white";
       default: return "bg-muted-foreground text-white";
     }
   };
@@ -280,7 +280,7 @@ export const ZambiaCompliance = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
-                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
+                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-success-700" : "bg-error-700"} text-white flex items-center justify-center`}>
                   {nhimaConfig?.is_nhima_accredited ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
@@ -291,7 +291,7 @@ export const ZambiaCompliance = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
-                <div className={`h-10 w-10 rounded-lg ${medicalCouncilConfig?.compliance_status === "compliant" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
+                <div className={`h-10 w-10 rounded-lg ${medicalCouncilConfig?.compliance_status === "compliant" ? "bg-success-700" : "bg-error-700"} text-white flex items-center justify-center`}>
                   {medicalCouncilConfig?.compliance_status === "compliant" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
@@ -302,7 +302,7 @@ export const ZambiaCompliance = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted">
-                <div className={`h-10 w-10 rounded-lg ${taxConfig?.tax_compliance_status === "active" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
+                <div className={`h-10 w-10 rounded-lg ${taxConfig?.tax_compliance_status === "active" ? "bg-success-700" : "bg-error-700"} text-white flex items-center justify-center`}>
                   {taxConfig?.tax_compliance_status === "active" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
@@ -460,7 +460,7 @@ export const ZambiaCompliance = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 pt-2 border-t border-border">
-                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-500 text-white text-xs" : "bg-error-500 text-white text-xs"}>
+                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-700 text-white text-xs" : "bg-error-700 text-white text-xs"}>
                       {nhimaConfig.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                     </Badge>
                   </div>
@@ -703,7 +703,7 @@ export const ZambiaCompliance = () => {
                       {taxConfig.tax_compliance_status || "Not Configured"}
                     </Badge>
                     {taxConfig.requires_ecfd_system && (
-                      <Badge className="bg-purple-500 text-white text-xs">ECFD Required</Badge>
+                      <Badge className="bg-purple-700 text-white text-xs">ECFD Required</Badge>
                     )}
                   </div>
                 </CardContent>

@@ -34,13 +34,13 @@ interface ClaimRow {
 }
 
 const STATUS_COLORS: Record<ClaimStatus, string> = {
-  Draft: "bg-gray-500/20 text-gray-400 border-gray-500/30",
-  Scrubbed: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  Submitted: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  Adjudicated: "bg-green-500/20 text-green-300 border-green-500/30",
-  Remitted: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  Denied: "bg-red-500/20 text-red-300 border-red-500/30",
-  Appealed: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  Draft: "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30",
+  Scrubbed: "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30",
+  Submitted: "bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/30",
+  Adjudicated: "bg-green-500/20 text-green-700 dark:text-green-700 dark:text-green-300 border-green-500/30",
+  Remitted: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+  Denied: "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30",
+  Appealed: "bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30",
 };
 
 function ClaimStatusBadge({ status }: { status: ClaimStatus }) {
@@ -165,15 +165,15 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Total Billed", value: `ZMW ${(totalBilled / 1000).toFixed(1)}K`, icon: DollarSign, color: "text-blue-400" },
-          { label: "Remitted", value: `ZMW ${(totalRemitted / 1000).toFixed(1)}K`, icon: CheckCircle2, color: "text-emerald-400" },
-          { label: "Denied Claims", value: String(deniedClaims), icon: XCircle, color: "text-red-400" },
-          { label: "Collection Rate", value: `${totalBilled > 0 ? ((totalRemitted / totalBilled) * 100).toFixed(1) : 0}%`, icon: TrendingUp, color: "text-amber-400" },
+          { label: "Total Billed", value: `ZMW ${(totalBilled / 1000).toFixed(1)}K`, icon: DollarSign, color: "text-blue-700 dark:text-blue-400" },
+          { label: "Remitted", value: `ZMW ${(totalRemitted / 1000).toFixed(1)}K`, icon: CheckCircle2, color: "text-emerald-700 dark:text-emerald-400" },
+          { label: "Denied Claims", value: String(deniedClaims), icon: XCircle, color: "text-red-700 dark:text-red-400" },
+          { label: "Collection Rate", value: `${totalBilled > 0 ? ((totalRemitted / totalBilled) * 100).toFixed(1) : 0}%`, icon: TrendingUp, color: "text-amber-700 dark:text-amber-400" },
         ].map((m) => (
-          <div key={m.label} className="bg-slate-700/30 rounded-xl p-4 border border-slate-600/30">
+          <div key={m.label} className="bg-muted rounded-xl p-4 border border-border">
             <m.icon className={`h-5 w-5 ${m.color} mb-2`} />
             <p className={`text-xl font-bold ${m.color}`}>{m.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{m.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{m.label}</p>
           </div>
         ))}
       </div>
@@ -183,9 +183,9 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
         {pipelineStages.map((stage) => {
           const count = claims.filter((c) => c.status === stage).length;
           return (
-            <div key={stage} className="bg-slate-700/20 rounded-lg p-2 border border-slate-600/20">
-              <div className={`text-xs font-semibold mb-1 ${count > 0 ? "text-blue-300" : "text-muted-foreground"}`}>{stage}</div>
-              <div className={`text-2xl font-bold ${count > 0 ? "text-white" : "text-slate-600"}`}>{count}</div>
+            <div key={stage} className="bg-muted rounded-lg p-2 border border-border">
+              <div className={`text-xs font-semibold mb-1 ${count > 0 ? "text-blue-700 dark:text-blue-300" : "text-muted-foreground"}`}>{stage}</div>
+              <div className={`text-2xl font-bold ${count > 0 ? "text-foreground" : "text-muted-foreground"}`}>{count}</div>
             </div>
           );
         })}
@@ -193,32 +193,32 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search claims by patient, claim #, or payer..."
-          className="pl-9 bg-slate-700/50 border-slate-600 text-white"
+          className="pl-9 bg-background border-input text-foreground"
         />
       </div>
 
       {/* Claims List */}
       {loading ? (
-        <div className="bg-slate-700/20 rounded-xl border border-slate-600/30 p-8 text-center">
-          <p className="text-sm text-slate-400">Loading claims…</p>
+        <div className="bg-muted rounded-xl border border-border p-8 text-center">
+          <p className="text-sm text-muted-foreground">Loading claims…</p>
         </div>
       ) : loadError ? (
         <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
-          <AlertTriangle className="h-6 w-6 text-red-400 mx-auto mb-2" />
-          <p className="text-sm text-red-200">{loadError}</p>
+          <AlertTriangle className="h-6 w-6 text-red-700 dark:text-red-400 mx-auto mb-2" />
+          <p className="text-sm text-red-700 dark:text-red-200">{loadError}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-slate-700/20 rounded-xl border border-slate-600/30 p-8 text-center">
-          <FileText className="h-6 w-6 text-slate-500 mx-auto mb-2" />
-          <p className="text-sm text-slate-300 font-medium">
+        <div className="bg-muted rounded-xl border border-border p-8 text-center">
+          <FileText className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-foreground font-medium">
             {claims.length === 0 ? "No insurance claims yet" : "No claims match your search"}
           </p>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {claims.length === 0
               ? "Claims created from patient billing will appear here."
               : "Try a different patient name, claim number, or payer."}
@@ -230,19 +230,19 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
             <div
               key={claim.id}
               onClick={() => setSelectedClaim(selectedClaim?.id === claim.id ? null : claim)}
-              className="bg-slate-700/20 rounded-xl border border-slate-600/30 p-4 cursor-pointer hover:border-blue-500/40 transition-all"
+              className="bg-muted rounded-xl border border-border p-4 cursor-pointer hover:border-blue-500/40 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="font-semibold text-white text-sm">{claim.patientName}</p>
-                    <p className="text-xs text-slate-400">{claim.claimNumber} · {claim.payerName}</p>
+                    <p className="font-semibold text-foreground text-sm">{claim.patientName}</p>
+                    <p className="text-xs text-muted-foreground">{claim.claimNumber} · {claim.payerName}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="text-sm font-bold text-white">ZMW {claim.totalBilled.toLocaleString()}</p>
-                    <p className="text-xs text-slate-400">{claim.dateOfService}</p>
+                    <p className="text-sm font-bold text-foreground">ZMW {claim.totalBilled.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{claim.dateOfService}</p>
                   </div>
                   <ClaimStatusBadge status={claim.status} />
                   <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${selectedClaim?.id === claim.id ? "rotate-90" : ""}`} />
@@ -251,18 +251,18 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
 
               {/* Expanded Detail */}
               {selectedClaim?.id === claim.id && (
-                <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-3 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-4 pt-4 border-t border-border space-y-3 animate-fade-in" onClick={(e) => e.stopPropagation()}>
                   {claim.status === "Denied" && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-                      <p className="text-red-300 font-semibold text-sm">Claim denied</p>
-                      <p className="text-red-200/70 text-xs mt-1">
+                      <p className="text-red-700 dark:text-red-300 font-semibold text-sm">Claim denied</p>
+                      <p className="text-red-800 dark:text-red-200/70 text-xs mt-1">
                         {claim.denialReason || "No reason was recorded for this denial."}
                       </p>
                     </div>
                   )}
                   {claim.adjudicatedAmount != null && (
                     <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
-                      <p className="text-emerald-300 text-sm font-medium">
+                      <p className="text-emerald-700 dark:text-emerald-300 text-sm font-medium">
                         Approved amount: ZMW {claim.adjudicatedAmount.toLocaleString()}
                       </p>
                     </div>
@@ -274,7 +274,7 @@ function ClaimsPipeline({ institutionId }: { institutionId?: string }) {
                       </Button>
                     )}
                     {claim.status === "Scrubbed" && (
-                      <Button size="sm" onClick={() => handleAction(claim, "submit")} className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs">
+                      <Button size="sm" onClick={() => handleAction(claim, "submit")} className="bg-emerald-700 hover:bg-emerald-800 text-white h-7 text-xs">
                         <Send className="h-3 w-3 mr-1" /> Mark Submitted
                       </Button>
                     )}
@@ -304,8 +304,8 @@ export default function AdvancedRevenueCycle({ institutionId }: { institutionId?
           <CreditCard className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white">Revenue Cycle — Insurance Claims</h2>
-          <p className="text-slate-400 text-sm">Live claims pipeline from patient billing: submission tracking, approvals, and denial management</p>
+          <h2 className="text-xl font-bold text-foreground">Revenue Cycle — Insurance Claims</h2>
+          <p className="text-muted-foreground text-sm">Live claims pipeline from patient billing: submission tracking, approvals, and denial management</p>
         </div>
       </div>
 

@@ -129,7 +129,7 @@ export function CheckmarkAnimation({
   return (
     <div className={cn(
       'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50',
-      'bg-green-500 rounded-full flex items-center justify-center text-white shadow-2xl',
+      'bg-green-700 rounded-full flex items-center justify-center text-white shadow-2xl',
       sizeClasses[size],
       'animate-in zoom-in-0 duration-500 ease-out'
     )}>
