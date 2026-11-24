@@ -260,14 +260,16 @@ serve(async (req: Request) => {
     if (paymentError) throw paymentError;
 
     try {
-      // Get PayPal access token
+      // Get PayPal access token (hard timeout: a stalled PayPal call must
+      // fail fast with a plain error, never spin until the worker is killed)
       const tokenResponse = await fetch(`${paypalBaseUrl}/v1/oauth2/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': `Basic ${btoa(`${paypalClientId}:${paypalClientSecret}`)}`
         },
-        body: 'grant_type=client_credentials'
+        body: 'grant_type=client_credentials',
+        signal: AbortSignal.timeout(20000)
       });
 
       if (!tokenResponse.ok) {
@@ -306,7 +308,8 @@ serve(async (req: Request) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${tokenData.access_token}`
         },
-        body: JSON.stringify(orderPayload)
+        body: JSON.stringify(orderPayload),
+        signal: AbortSignal.timeout(20000)
       });
 
       if (!orderResponse.ok) {
