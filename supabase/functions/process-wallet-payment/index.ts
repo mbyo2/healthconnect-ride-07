@@ -160,7 +160,26 @@ serve(async (req) => {
     }
     // Order references travel in metadata — service_id must stay NULL for
     // orders (it references healthcare_services).
-    const serviceIdForDb = orderId ? null : serviceId;
+    //
+    // Payments-audit fix (2026-11-24): payments.service_id is a UUID FK to
+    // healthcare_services, but callers also pass service CODES (e.g.
+    // 'video_consultation_general' from service_pricing). Inserting a code
+    // string into the UUID column failed the whole wallet payment — every
+    // wallet-paid video consultation errored out. Only a real
+    // healthcare_services UUID may land in service_id; anything else is
+    // preserved in metadata as service_code instead.
+    let serviceIdForDb: string | null = null;
+    if (!orderId && serviceId) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceId);
+      if (isUuid) {
+        const { data: svc } = await supabaseClient
+          .from('healthcare_services')
+          .select('id')
+          .eq('id', serviceId)
+          .maybeSingle();
+        if (svc) serviceIdForDb = serviceId;
+      }
+    }
     console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId: serviceIdForDb, orderId });
 
 
@@ -219,7 +238,9 @@ serve(async (req) => {
         currency: (currency || 'ZMW').toUpperCase(),
         status: 'completed',
         payment_method: 'wallet',
-        metadata: orderId ? { reference_type: 'order', reference_id: orderId, description } : { description },
+        metadata: orderId
+          ? { reference_type: 'order', reference_id: orderId, description }
+          : { description, ...(serviceId && serviceId !== serviceIdForDb ? { service_code: serviceId } : {}) },
         created_at: new Date().toISOString(),
       })
       .select()
@@ -266,15 +287,18 @@ serve(async (req) => {
             .maybeSingle();
           if (pharmInst) {
             splitInstitutionId = (pharmInst as any).id;
-            splitProviderId = null;
+            // Payments-audit fix (2026-11-24): do NOT null the provider id
+            // here. process_payment_with_splits always writes a
+            // health_personnel split row whose recipient_id is NOT NULL —
+            // a null provider id made the split fail, and the old code
+            // swallowed that error: the patient was debited, the order was
+            // confirmed, and NOBODY was credited. providerId already holds
+            // the institution admin's profile for orders (resolved above),
+            // the same representative-payee pattern settle.ts uses; the
+            // personnel amount for a pharmacy split is 0.
           }
           paymentType = 'pharmacy';
         }
-        // Mark the order as paid
-        await supabaseClient
-          .from('orders')
-          .update({ status: 'confirmed', updated_at: new Date().toISOString() })
-          .eq('id', orderId);
       }
 
       const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
@@ -286,9 +310,35 @@ serve(async (req) => {
       });
 
       if (splitError) {
-        console.error('Wallet payment split failed:', splitError);
-        // Don't fail the whole payment — the debit succeeded.
-        // Log for admin reconciliation.
+        // Money safety: a failed split must never leave a debit with no
+        // credit. Roll the debit back, void the payment record, and tell
+        // the patient plainly that nothing was charged.
+        console.error('Wallet payment split failed — rolling back debit:', splitError);
+        await supabaseClient.rpc('process_wallet_transaction', {
+          p_user_id: patientId,
+          p_transaction_type: 'credit',
+          p_amount: amount,
+          p_description: `Rollback for failed wallet payment of ${amount} (split failed)`,
+          p_payment_id: null,
+          p_gateway_ref: null
+        });
+        await supabaseClient
+          .from('payments')
+          .update({ status: 'failed', updated_at: new Date().toISOString() })
+          .eq('id', payment.id);
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment could not be completed. Your wallet has not been charged.' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      // Mark the order as paid only after the money actually distributed.
+      if (orderId) {
+        await supabaseClient
+          .from('orders')
+          .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+          .eq('id', orderId)
+          .eq('status', 'pending');
       }
 
     console.log('Wallet payment processed successfully:', payment);

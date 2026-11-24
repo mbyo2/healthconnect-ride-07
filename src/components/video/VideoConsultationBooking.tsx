@@ -266,9 +266,17 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
         setLencoReference(res.reference);
         setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
         if (res.status === 'paid') {
-          toast.success('Consultation booked and paid.');
-          setLencoReference(null);
-          resetForm();
+          // Instant gateway success still needs server-side settlement —
+          // without verify, the provider is never credited even though
+          // the patient was charged (payments audit 2026-11-24).
+          const v = await verifyPayment(res.reference);
+          if (v?.status === 'paid') {
+            toast.success('Consultation booked and paid.');
+            setLencoReference(null);
+            resetForm();
+          } else {
+            toast.info('Payment received — tap "I\'ve approved" below to finish confirming.');
+          }
         }
       }
     } catch (error) {

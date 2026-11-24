@@ -161,9 +161,16 @@ export const WalletTopUp = () => {
                     setLencoReference(res.reference);
                     setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
                     if (res.status === 'paid') {
-                        toast.success("Payment confirmed — your wallet has been credited.");
-                        screenReaderAnnounce("Payment confirmed. Your wallet has been credited.", false);
-                        setLencoReference(null);
+                        // Never claim a credit that has not settled: verify
+                        // server-side first (the credit happens there).
+                        const v = await verifyPayment(res.reference);
+                        if (v?.status === 'paid') {
+                            toast.success("Payment confirmed — your wallet has been credited.");
+                            screenReaderAnnounce("Payment confirmed. Your wallet has been credited.", false);
+                            setLencoReference(null);
+                        } else {
+                            toast.info("Payment received — tap \"I've approved\" below to finish confirming.");
+                        }
                     }
                 }
             }

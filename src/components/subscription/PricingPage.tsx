@@ -47,24 +47,23 @@ function LencoSubscribeDialog({ open, onClose, planName, amountZmw, referenceId,
   const finishPaid = async () => {
     if (referenceId) {
       try {
+        // Activation is applied server-side when the payment settles
+        // (settle.ts) — the browser only re-reads the outcome. Forcing
+        // the status from here is neither needed nor permitted any more
+        // (payments audit 2026-11-24: users must not self-activate).
         const { data: sub } = await supabase
           .from('user_subscriptions')
           .select('id, status')
           .eq('id', referenceId)
           .maybeSingle() as any;
-        if (sub && sub.status !== 'active') {
-          const { error } = await (supabase as any)
-            .from('user_subscriptions')
-            .update({ status: 'active' })
-            .eq('id', referenceId)
-            .eq('status', 'pending');
-          if (error) {
-            toast.error('Payment received — account activation is pending. Contact support if it takes longer than a few minutes.');
-          }
+        if (sub?.status === 'active') {
+          toast.success('Subscription activated — welcome aboard!');
+        } else {
+          toast.success('Payment received — your subscription is being activated.');
         }
-        toast.success('Subscription activated — welcome aboard!');
       } catch (e) {
-        console.error('Subscription activation failed (non-fatal):', e);
+        console.error('Subscription status check failed (non-fatal):', e);
+        toast.success('Payment received — your subscription is being activated.');
       }
     }
     setReference(null);
@@ -91,9 +90,17 @@ function LencoSubscribeDialog({ open, onClose, planName, amountZmw, referenceId,
         country: 'zm',
       });
       if (res?.reference) {
+        if (res.status === 'paid') {
+          // Instant gateway success still needs server-side settlement
+          // (platform revenue + activation) before we call it done.
+          const v = await verifyPayment(res.reference);
+          if (v?.status === 'paid') {
+            await finishPaid();
+            return;
+          }
+        }
         setReference(res.reference);
         setMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
-        if (res.status === 'paid') await finishPaid();
       }
     } finally {
       setSending(false);

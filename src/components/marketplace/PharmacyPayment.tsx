@@ -128,9 +128,16 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         setLencoReference(res.reference);
         setLencoMessage(res.message || 'Approve the payment on your phone, then tap "I\'ve approved".');
         if (res.status === 'paid') {
-          toast.success("Payment confirmed — your order is being processed.");
-          setLencoReference(null);
-          onPaymentSuccess();
+          // Instant gateway success still needs server-side settlement
+          // (pharmacy split + order confirmation) before we call it paid.
+          const v = await verifyPayment(res.reference);
+          if (v?.status === 'paid') {
+            toast.success("Payment confirmed — your order is being processed.");
+            setLencoReference(null);
+            onPaymentSuccess();
+          } else {
+            toast.info("Payment received — tap \"I've approved\" below to finish confirming.");
+          }
         }
       }
     } catch (error) {

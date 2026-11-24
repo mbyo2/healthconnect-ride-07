@@ -225,9 +225,19 @@ export const Billing = () => {
         setLencoReference(res.reference);
         setLencoMessage(res.message || "Approve the payment on your phone, then tap \"I've approved\".");
         if (res.status === "paid") {
-          await handleMarkPaid(lencoPayInvoice);
-          setLencoPayInvoice(null);
-          setLencoReference(null);
+          // Instant success at the gateway still needs server-side
+          // settlement: lenco-verify-payment books the billing_payments
+          // row and credits the wallets. NEVER record the payment here —
+          // a client-side billing_payments insert double-books the
+          // invoice (payments audit 2026-11-24: paid_amount hit 200 on a
+          // K100 invoice, balance −100).
+          const v = await verifyPayment(res.reference);
+          if (v?.status === "paid") {
+            toast.success("Invoice payment confirmed");
+            fetchInvoices();
+            setLencoPayInvoice(null);
+            setLencoReference(null);
+          }
         }
       }
     } catch (err: any) {
@@ -242,8 +252,11 @@ export const Billing = () => {
     const r = await verifyPayment(lencoReference);
     if (!r) return;
     if (r.status === "paid") {
-      await handleMarkPaid(lencoPayInvoice);
+      // Settlement already booked this payment server-side (exactly one
+      // billing_payments row, keyed by the gateway reference). Recording
+      // it again here double-books the invoice — just refresh.
       toast.success("Invoice payment confirmed");
+      fetchInvoices();
       setLencoPayInvoice(null);
       setLencoReference(null);
     } else if (r.status === "failed" || r.status === "cancelled") {

@@ -47,6 +47,42 @@ interface Payee {
 
 const WALLET_TOPUP_TYPES = new Set(['wallet_topup', 'topup']);
 const PLATFORM_ONLY_TYPES = new Set(['subscription', 'plan', 'listing_fee', 'hms_fee']);
+const ORDER_TYPES = new Set(['order', 'pharmacy_sale']);
+
+/**
+ * A paid pharmacy order must leave 'pending': the pharmacy only prepares
+ * confirmed orders, and a still-pending order stays payable — the patient
+ * could be charged twice for the same order (payments audit 2026-11-24:
+ * the wallet path confirmed the order in-function, the gateway settle path
+ * never did). Guarded on status='pending' so it is idempotent and never
+ * overrides a later fulfilment state.
+ */
+async function markOrderConfirmed(admin: Admin, referenceId: string | null | undefined): Promise<void> {
+  if (!referenceId) return;
+  const { error } = await admin
+    .from('orders')
+    .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+    .eq('id', referenceId)
+    .eq('status', 'pending');
+  if (error) console.error('settlePayment: order confirm failed', error);
+}
+
+/**
+ * Activate a subscription whose payment just settled, server-side. The
+ * pricing page used to flip the row active from the browser after payment;
+ * if the user closed the tab first, they had paid for a plan that never
+ * activated (payments audit 2026-11-24). Idempotent: only pending/trialing
+ * rows transition.
+ */
+async function activateSubscription(admin: Admin, referenceId: string | null | undefined): Promise<void> {
+  if (!referenceId) return;
+  const { error } = await admin
+    .from('user_subscriptions')
+    .update({ status: 'active', updated_at: new Date().toISOString() })
+    .eq('id', referenceId)
+    .in('status', ['pending', 'trialing']);
+  if (error) console.error('settlePayment: subscription activation failed', error);
+}
 
 async function resolvePayee(
   admin: Admin,
@@ -254,6 +290,14 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
     .maybeSingle();
 
   if (existing?.status === 'completed') {
+    // Self-healing for side effects added after some payments settled:
+    // pharmacy orders confirm and subscriptions activate on re-verify too.
+    if (ORDER_TYPES.has(type)) {
+      await markOrderConfirmed(admin, referenceId);
+    }
+    if (type === 'subscription') {
+      await activateSubscription(admin, referenceId);
+    }
     // Self-healing: a payment settled before the invoice-booking step
     // existed (or interrupted between split and booking) still gets its
     // invoice marked paid — applyInvoicePayment is idempotent.
@@ -363,6 +407,11 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
       if (!credit?.settled) {
         console.error('settlePayment platform credit refused', credit);
         return { settled: false, reason: (credit?.reason as string) || 'platform_credit_failed' };
+      }
+      // The money is in — activate the subscription server-side so the
+      // plan is live even if the payer never returns to the pricing page.
+      if (type === 'subscription') {
+        await activateSubscription(admin, referenceId);
       }
       return {
         settled: true,
@@ -480,12 +529,25 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
     }
   }
 
+  // A paid pharmacy order leaves 'pending' (fulfilment + double-pay guard).
+  if (ORDER_TYPES.has(type)) {
+    await markOrderConfirmed(admin, referenceId);
+  }
+
+  // The split RPC returns app_amount / institution_amount /
+  // personnel_amount / pharmacy_amount — map those real fields (the old
+  // platform_fee / payee_amount keys never existed, so verify responses
+  // always carried nulls).
+  const payeeAmount =
+    Number(split?.institution_amount ?? 0) +
+    Number(split?.personnel_amount ?? 0) +
+    Number(split?.pharmacy_amount ?? 0);
   return {
     settled: true,
     paymentId,
-    payeeType: split?.payee_type ?? null,
-    payeeId: split?.payee_id ?? null,
-    platformFee: split?.platform_fee ?? null,
-    payeeAmount: split?.payee_amount ?? null,
+    payeeType: payee.institutionId ? 'institution' : 'provider',
+    payeeId: payee.institutionId ?? payee.providerId ?? null,
+    platformFee: split?.app_amount ?? null,
+    payeeAmount: split ? payeeAmount : null,
   };
 }
