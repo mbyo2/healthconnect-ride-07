@@ -61,7 +61,10 @@ describe('Completeness · ambulance trips gain a patient link', () => {
   it('the dispatch form links the trip to the roster patient and passes the id through', () => {
     const form = readSrc('src/components/workflows/AmbulanceStaffWorkflow.tsx');
     expect(form).toContain('InstitutionPatientPicker');
-    expect(form).toContain('patient_id: pickedPatient?.id ?? null');
+    // PW-21 (2026-11-24 swarm): dispatch is resolve-first — a typed name is
+    // find-or-created before dispatch, replacing the old `?? null` pass-through.
+    expect(form).toContain('findOrCreatePatient');
+    expect(form).toContain('patient_id: patientId');
     const hook = readSrc('src/hooks/useAmbulanceDispatch.ts');
     expect(hook).toContain('patient_id: string | null;');
   });
@@ -140,6 +143,9 @@ describe('Completeness · theatre bookings carry the patient master id', () => {
   it('the OT schedule form picks from the roster and stores patient_id', () => {
     const ot = readSrc('src/components/hospital/OTManagement.tsx');
     expect(ot).toContain('InstitutionPatientPicker');
-    expect(ot).toContain('patient_id: pickedPatient?.id ?? null');
+    // PW-3 (2026-11-24 swarm): a typed name is find-or-created and the resolved
+    // id stored — never the old `pickedPatient?.id ?? null`.
+    expect(ot).toContain('findOrCreatePatient');
+    expect(ot).toContain('patient_id: patientId');
   });
 });
