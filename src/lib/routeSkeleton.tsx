@@ -167,6 +167,7 @@ export const ROUTE_SKELETON_KINDS: Record<string, RouteSkeletonKind> = {
   "/emergency-response": "dashboard",
   "/pharmacy-management": "institution-dashboard",
   "/hospital-management": "institution-dashboard",
+  "/hospital-inventory": "table",
   "/lab-management": "institution-dashboard",
   "/lab-orders": "table",
   "/referrals": "table",
